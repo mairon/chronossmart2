@@ -1,0 +1,104 @@
+<div class="panel">
+	<div class="panel-body">
+		<div class="row">
+			<div class="col-md-10">
+				<h3>Datos FOPAG</h3>
+        <label>Depart.</label>    
+        <b><%= @persona.departamento %></b>
+        <label><%= t('DATE') %> Ingresso</label>
+        <b><%= @persona.data_entrada.strftime("%d/%m/%y") unless @persona.data_entrada.blank? %></b>    
+
+
+        <div class="row">
+          <div class="col-md-4">
+            <%= link_to 'Historial de RRHH', print_funcionario_persona_path(@persona), target: '_blank', class: 'btn' %>            
+          </div>
+          <div class="col-md-4">
+            <label></label>    
+          </div>
+        </div>				
+			</div>
+			<div class="col-md-2">
+  			<a class="modalButton-frma panel-icon-right" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-fopag">
+  				<%= image_tag("icon-edit.png", width: '13') %>
+  			</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modal-fopag" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel">Datos FOPAG</h4>
+      </div>
+      <div class="modal-body">
+				<%= form_for(@persona) do |ffg| %>
+					<div class="row panel-modal-body">
+            <div class="col-md-12">
+              <label>Departamiento</label>
+              <%= ffg.text_field :departamento, class: 'panel-field' %>
+            </div>
+
+            <div class="col-md-12">
+              <label><%= t('DATE') %> Ingresso</label>
+              <%= ffg.date_select :data_entrada, :start_year => 1950, class: 'panel-field' %>
+            </div>
+
+            <div class="col-md-12">
+              <label>Sueldo</label>
+              <%= ffg.telephone_field :salario, class: 'panel-field' %>
+            </div>
+
+            <% if @persona.tipo_vendedor == 1 %>
+              <div class="col-md-12">
+                <label>Comissión</label>
+                <%= ffg.telephone_field :comissao, class: 'panel-field' %>
+              </div>
+            <% end %>
+
+	          <div class="col-md-12">
+	         		<br>
+	            <%= ffg.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+	          </div>
+
+					</div>
+
+      	<% end %>
+      </div>      
+    </div>
+  </div>
+</div>
+
+<script>
+( function($) {
+  
+function iframeModalOpen(){
+
+    $('.acao').on('click', function(e) {
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+      
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+      
+      // stampiamo i nostri dati nell'iframe
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#myiframe').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+    });
+  }
+  
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+  
+  } ) ( jQuery );
+
+</script>

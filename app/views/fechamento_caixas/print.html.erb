@@ -1,0 +1,56 @@
+<div class="tab_container" style="margin-top:40px">
+	<table>
+	<% @fechamento_caixa_dts.each do |fc| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td width="60"><%= fc.id %></td>
+        <td width="200">
+          <%= fc.forma_pago.nome %>
+        	<% if fc.cred_deb.to_i == 1 %>
+        		<font color="green">SOBRANTE +</font>
+        	<% elsif fc.cred_deb.to_i == 2 %>
+        		<font color="red">FALTANTE - </font>
+        	<% end %>
+        </td>
+        <td width="200">
+        <% if fc.forma_pago_id == 4 or fc.forma_pago_id == 3 %>
+        <% unless fc.cartao_bandeira.nil? %>
+          <%= fc.cartao_bandeira.nome  %>
+        <% else %>
+            <font color="red">BANDEIRA NO INFORMADA </font>
+          <% end %>
+        <% end %>
+        </td>
+        <% if fc.moeda.to_i == 0 %>
+          <td width="20">U$</td>
+          <td width="70" align="right"><%= format_decimal(fc.valor) %></td>
+          <td width="70" align="right"><%= format_decimal(fc.valor_sis) %></td>
+          <td width="70" align="right"><%= format_decimal(fc.valor.to_f - fc.valor_sis.to_f) %></td>
+        <% elsif fc.moeda.to_i == 1 %>
+          <td width="20">G$</td>
+          <td width="70" align="right"><%= format_int(fc.valor) %></td>
+          <td width="70" align="right"><%= format_int(fc.valor_sis) %></td>
+          <td width="70" align="right"><%= format_int(fc.valor.to_f - fc.valor_sis.to_f) %></td>
+        <% elsif fc.moeda.to_i == 2 %>
+          <td width="20">R$</td>
+          <td width="70" align="right"><%= format_decimal(fc.valor) %></td>
+          <td width="70" align="right"><%= format_decimal(fc.valor_sis) %></td>
+          <td width="70" align="right"><%= format_decimal(fc.valor.to_f - fc.valor_sis.to_f) %></td>
+        <% elsif fc.moeda.to_i == 3 %>
+          <td width="20">P$</td>
+          <td width="70" align="right"><%= format_int(fc.valor) %></td>
+          <td width="70" align  ="right"><%= format_int(fc.valor_sis) %></td>
+          <td width="70" align="right"><%= format_int(fc.valor.to_f - fc.valor_sis.to_f) %></td>
+        <% end %>
+        <% if fc.valor.to_f !=  fc.valor_sis.to_f %>
+          <td><font color="red"><span class="delete"></span></font></td>
+        <% else %>
+          <td><font color="green"><span class="save"></span></font></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </table>
+</div>
+ 
+
+
+

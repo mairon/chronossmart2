@@ -1,0 +1,83 @@
+<style type="text/css">
+  td{
+    font-size: 10px;
+  }
+  .clickable-row{
+    cursor: pointer;
+  }
+</style>
+  <ul class="tabs">
+    <li><a href="#tab1">Lista de Carga - <%= @lista_carga.id.to_s.rjust(6,'0') %></a></li>
+  </ul>
+  <div class="tab_container">
+    <div id="tab1" class="tab_content">
+      <div class="group">
+        <h2 style="padding: 10px">
+          Rodado: <%= @lista_carga.rodado.placa %> | 
+          Capacidad: <%= @lista_carga.rodado.capacidade %> | 
+          Peso Itens: <%= tot_itens = @lista_carga.lista_carga_produtos.joins(:produto).sum("lista_carga_produtos.quantidade * produtos.peso").to_f %> |
+          Capacidad Disponible:
+          <% if @lista_carga.rodado.capacidade.to_f >=  tot_itens.to_f %>
+            <span class="btn-success" ><%= (@lista_carga.rodado.capacidade.to_f - tot_itens.to_f) %></span>
+          <% else %>
+            <span class="btn-danger"><%= (@lista_carga.rodado.capacidade.to_f - tot_itens.to_f) %></span>
+          <% end %>
+          <div style="float:right; margin-top: -8px">
+            <%= link_to 'Adicionar Cobranças', '', class: 'button' %>
+          </div>
+        </h2>
+      </div>
+      <br>
+      <div>
+        <table>
+          <tr>
+           	<td valign="top"><%= render 'pedidos' %></td>
+            <td valign="top"><%= render 'pedido_produtos' %></td>
+         	</tr>
+          <tr>
+            <td colspan="4">
+              <div class="group">
+                <%= render "pedidos_adicionados" %>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div> 	
+  </div> 	
+  <div class="buttons">
+    <%= link_to 'Editar', edit_lista_carga_path(@lista_carga), :class => "button back" %>
+    <%= link_to 'Rota', '#', :class => "button print", onclick: "ComprovanteRota()" %>
+		<%= link_to 'Finalizar', lista_cargas_path, :class => "button next" %>
+  </div>
+</div>
+
+<script>
+
+function DetalhePedido(pedido){
+    window.open('/lista_cargas/detalhe_pedido?pedido='+ pedido, 'Produtos Adicionados', ' SCROLLBARS=YES, TOP=50, LEFT=50, WIDTH=950, HEIGHT=600');
+  }
+
+
+  function ProdutosAdicionados(pedido){
+    window.open('/lista_cargas/' + <%= @lista_carga.id %> + '/produtos_adicionados?pedido=' + pedido, 'Produtos Adicionados', ' SCROLLBARS=YES, TOP=50, LEFT=50, WIDTH=950, HEIGHT=540');
+  }
+
+  
+  function ComprovanteSeparacao(pedido){
+    window.open('/lista_cargas/' + <%= @lista_carga.id %> + '/separacao?pedido=' + pedido, 'Separación', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=650, HEIGHT=400');
+  }
+
+  function ComprovanteRota(){
+    window.open('/lista_cargas/' + <%= @lista_carga.id %> + '/rota', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=650, HEIGHT=400');
+  }
+
+  function Faturar(pedido,vendedor,persona_nome,persona_id,tabela_preco_id,lista_carga_id){
+    window.open('/vendas/new?tipo_venda=1&pedido_id='+ pedido + '&vendedor_id=' + vendedor + '&persona_nome=' + persona_nome + '&persona_id=' + persona_id + '&tabela_preco_id=' + tabela_preco_id  + '&lista_carga_id=' + lista_carga_id, 'Pagina', ' SCROLLBARS=YES, TOP=0, LEFT=0, WIDTH=1250, HEIGHT=800');
+  }
+
+
+  function VisualizarFatura(venda){
+    window.open('/vendas/' + venda, 'Pagina', ' SCROLLBARS=YES, TOP=0, LEFT=0, WIDTH=1250, HEIGHT=800');
+  }
+</script>

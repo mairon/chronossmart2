@@ -1,0 +1,86 @@
+<% #VERIFICA SE  TEM CLASE E IMPRIME
+        #VERIFICA SE  TEM SUB_GRUPO E IMPRIME
+        if params[:busca]["sub_grupo"].blank?
+            sgrupo = 'Todos..'
+        else
+            sgrupo = params[:busca]["sub_grupo"]
+            sgp_c  = SubGrupo.find_by_id(params[:busca]["sub_grupo"])
+            sgp_desc = ' - ' << sgp_c.descricao
+        end
+
+        #VERIFICA SE  TEM SUB_GRUPO E IMPRIME
+        if params[:busca]["colecao"].blank?
+            cole = 'Todos..'
+        else
+            cole = params[:busca]["colecao"]
+            c_c  = Colecao.find_by_id(params[:busca]["colecao"])
+            c_desc = ' - ' << c_c.nome
+        end
+
+
+        #VERIFICA SE  TEM PRODUTO E IMPRIME
+        if params[:busca]["produto"].blank?
+            produto = 'Todos..'
+        else
+            produto = params[:busca]["produto"]
+            pd_c    = Produto.find_by_id(params[:busca]["produto"])
+            pd_desc = ' - ' << pd_c.nome
+
+        end
+
+        #VERIFICA SE  TEM DEPOSITO E IMPRIME
+        if params[:busca]["deposito"].blank?
+            deposito = 'Todos..'
+        else
+            deposito = params[:busca]["deposito"]
+            d_c    = Deposito.find_by_id(params[:busca]["deposito"])
+            d_desc = ' - ' << d_c.nome
+        end
+        %>
+
+<table width="755">
+	<tr>
+		<td align="center"><%= $empresa_nome %></td>
+	</tr>
+	<tr>
+		<td align="center">DISPONIBILIDAD DEL STOCK</td>
+	</tr>
+
+	<tr>
+		<td align="left">Fecha....: <%= params[:inicio] %> hasta <%=params[:final] %></td>
+	</tr>
+
+	<tr>
+		<td align="left">Marca....: <%= sgrupo.to_s.rjust(6,'0') %> <%= sgp_desc %></td>
+	</tr>
+	<tr>
+		<td align="left">Colección: <%= cole.to_s.rjust(6,'0') %> <%= c_desc %></td>
+	</tr>
+
+	<tr>
+		<td align="left">Produto..: <%= produto.to_s.rjust(6,'0') %><%= pd_desc %></td>
+	</tr>
+	<tr>
+		<td align="left">Deposito.: <%= deposito.to_s.rjust(6,'0') %> <%= d_desc %></td>
+	</tr>
+	<tr>
+		<td>
+			<hr>
+			<table>
+				<tr>
+					<td width="80" >Ref.</td>
+				    <td width="300">Producto</td>
+				    <td width="180">Color</td>
+				    <td width="35">TM</td>
+				    <td width="30" align="right">Stock</td>
+				    <td width="30" align="right">P.C.</td>
+				    <td width="30" align="right">P.V.</td>
+				    <td width="55" align="right">A comprar</td>
+				    <td width="45" align="right">A Vender</td>
+				    <td width="52" align="right">Status</td>
+				</tr>	
+			</table>
+			<hr>
+		</td>
+	</tr>
+</table>

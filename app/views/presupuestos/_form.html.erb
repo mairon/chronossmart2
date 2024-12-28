@@ -1,0 +1,146 @@
+<h1 id="header">Pedido Venta - [<%= t('EDITION') %>]</h1>
+<div class="group">
+
+<%= form_for(@presupuesto) do |f| %>
+	 <% if @presupuesto.errors.any? %>
+		<div id="error_explanation">
+			<h2><%= pluralize(@presupuesto.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+			<ul>
+				<% @presupuesto.errors.full_messages.each do |msg| %>
+				<li>
+					<%= msg %>
+				</li>
+				<% end %>
+			</ul>
+		</div>
+	<% end %>
+		<%= f.hidden_field :tipo_maiorista, :value => '0' %>
+	<table>
+		<tr>
+			<td>
+				<label><%= t('DATE') %></label>
+				<%= f.date_select :data,{},{:onblur => "DataCotacao('presupuesto_data_3i','presupuesto_data_2i','presupuesto_data_1i')"}  %>
+			</td>
+			<td> 
+				<label>Cotiz G$xU$</label>
+				<%= text_field  :presupuesto, :cotacao, size: 10, value: @presupuesto.cotacao.to_i %>
+			</td>
+
+			<td> 
+				<label>G$XR$</label>
+					<%= text_field :presupuesto,:cotacao_real, size: 10, value: @presupuesto.cotacao_real.to_i %>
+				</td>
+			</tr>
+			
+			<tr>
+				<td colspan="4">
+				 <fieldset>
+						<legend><%= t('COIN') %></legend>
+						<%= f.radio_button :moeda, 0 %> U$
+						<%= f.radio_button :moeda, 1, :Checked => "True"  %> Gs
+						<%= f.radio_button :moeda, 2 %> R$
+				 </fieldset>					
+				</td>
+			</tr>
+			
+			<tr>
+				<td colspan="4">
+					<label>Vendedor</label>
+					<%= f.collection_select :vendedor_id, Persona.all( :select     => ' id,nome,tipo_vendedor', :conditions => ["tipo_vendedor = 1"], :order      => '2'),:id,:nome, { :prompt => 'Seleccione Vendedor'}, {required: true} %>
+				</td>
+			</tr>
+
+			<tr>
+				<td colspan="4">
+					<label>Plan</label>
+					<%= f.collection_select :plano_id, Plano.all( :select     => ' id,condicao', :order      => '2'),:id,:condicao, { :prompt => 'Seleccione'}, {required: true} %>
+				</td>
+			</tr>
+
+      <tr>
+        <td colspan="4">
+          <label>Cliente <a href="#" target="popup" style="font-size: 12px;" onclick="window.open('/personas/new?layout=resumido','popup','width=600,height=600'); return false;"> Add
+        </a></label>
+          <%= f.text_field :persona_nome, required: true, class: 'autocomplete panel-field' %>
+           <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+          <%= f.hidden_field :persona_id %>
+        </td>
+      <tr>
+			
+      <tr>
+        <td colspan="4">
+          <label>Ctd Dependentes</label>
+          <%= f.text_field :qtd_dependentes, required: true, class: 'panel-field' %>          
+        </td>
+      <tr>
+
+			<tr>
+				<td colspan="4">
+					<label>Obs.</label>
+					<%= f.text_area :obs, rows: 3, cols: 55 %>
+				</td>
+			</tr>
+			
+		 </table>
+    <div class="footer-buttons">
+      <%= f.submit "Seguir", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), presupuestos_path, :class => "btn btn-back" %>
+    </div>
+  <% end %>
+</div>
+
+ <script>
+	$(function() {
+		$( "#presupuesto_persona_nome" ).autocomplete({
+				source: function( request, response ) {
+				$.ajax({
+					url: "/personas/busca",
+					dataType: "json",
+					data: {
+						tipo: 'DESCRIPCION',
+						busca: request.term
+					},
+					success: function( data ) {
+						response( data );
+					},
+				});
+			},
+			minLength: 2,
+			change: function( event, ui ) {
+				$("#presupuesto_persona_id").val("");
+				$('#presupuesto_persona_id').val(ui.item.id);
+				return false;
+			}
+		});
+	});
+		
+  $('#presupuesto_vendedor_id, #presupuesto_tabela_preco_id, #presupuesto_prazo_id, #presupuesto_indicador_id, #presupuesto_plano_id').selectize();
+ </script>
+
+<% if params[:action] == 'new' %>
+<script>
+$(document).ready(function() {
+  $.ajax({url: '/buscas/cotz_us_compra', 
+  	type: 'POST',
+		data: 'data=' + $('#presupuesto_data_3i').val()+'/'+
+			$('#presupuesto_data_2i').val()+'/'+
+			$('#presupuesto_data_1i').val(),
+		success: function(data){
+			$('#presupuesto_cotacao').val(number_format( data,0, ',', '.'));
+		} 
+	})
+
+	$.ajax({url: '/buscas/cotz_rs_compra',
+		type: 'POST',
+		data: 'data=' + $('#presupuesto_data_3i').val()+'/'+
+			$('#presupuesto_data_2i').val()+'/'+
+			$('#presupuesto_data_1i').val(),
+		success: function(data){
+		 $('#presupuesto_cotacao_real').val(number_format( data,0, ',', '.'));
+		} 
+	})
+
+});
+</script>
+<% end %>

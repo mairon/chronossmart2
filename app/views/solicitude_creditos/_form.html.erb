@@ -1,0 +1,363 @@
+<%= form_for( @solicitude_credito ) do |f| %>
+  <div class="box-panel" style="display: table; margin: 0 auto;">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Solicitud de Credito
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-6">
+                <label>Plan de Venta</label>
+                <%= f.text_field :plano_venda_id, value: params[:plano_venda_id],  class: "panel-field", autofocus: true, required: true %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Garante 01
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+
+              <div class="col-md-6">
+                <label>Nombre y Apellido</label>
+                <%= f.text_field :garantia_01_nome,  class: "panel-field" %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Profesión</label>
+                <%= f.text_field :garantia_01_proficao,  class: "panel-field" %>
+              </div>
+
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label>Nº de Cedula</label>
+                <%= f.text_field :garantia_01_documento,  class: "panel-field" %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Cargo</label>
+                <%= f.text_field :garantia_01_cargo,  class: "panel-field" %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label>Domicilio</label>
+                <%= f.text_field :garantia_01_domicio,  class: "panel-field" %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Empresa</label>
+                <%= f.text_field :garantia_01_empresa,  class: "panel-field" %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label>Teléfono</label>
+                <%= f.text_field :garantia_01_telefone,  class: "panel-field" %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Dirección de Trabajo</label>
+                <%= f.text_field :garantia_01_endereco_trabalho,  class: "panel-field" %>
+              </div>
+            </div>    
+                    
+            <div class="row">
+              <div class="col-md-6">
+                <label>Fecha Nacimiento</label>
+                <%= f.text_field :garantia_01_data_nascimento,  class: "panel-field date" %>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Garante 02
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+
+              <div class="col-md-6">
+                <label>Nombre y Apellido</label>
+                <%= f.text_field :garantia_02_nome,  class: "panel-field" %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Profesión</label>
+                <%= f.text_field :garantia_02_proficao,  class: "panel-field" %>
+              </div>
+
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label>Nº de Cedula</label>
+                <%= f.text_field :garantia_02_documento,  class: "panel-field" %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Cargo</label>
+                <%= f.text_field :garantia_02_cargo,  class: "panel-field" %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label>Domicilio</label>
+                <%= f.text_field :garantia_02_domicio,  class: "panel-field" %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Empresa</label>
+                <%= f.text_field :garantia_02_empresa,  class: "panel-field" %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label>Teléfono</label>
+                <%= f.text_field :garantia_02_telefone,  class: "panel-field" %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Dirección de Trabajo</label>
+                <%= f.text_field :garantia_02_endereco_trabalho,  class: "panel-field" %>
+              </div>
+            </div>    
+                    
+            <div class="row">
+              <div class="col-md-6">
+                <label>Fecha Nacimiento</label>
+                <%= f.text_field :garantia_02_data_nascimento,  class: "panel-field date" %>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Vehículo en Entregado
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-6">
+                <label>Marca</label>
+                <%= f.text_field :usado_marca,  class: "panel-field" %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Modelo</label>
+                <%= f.text_field :usado_modelo,  class: "panel-field" %>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <label>Tipo</label>
+                <%= f.text_field :usado_tipo,  class: "panel-field" %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Motor N•</label>
+                <%= f.text_field :usado_motor,  class: "panel-field" %>
+              </div>              
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <label>Chassi N•</label>
+                <%= f.text_field :usado_chassi,  class: "panel-field" %>
+              </div>              
+
+              <div class="col-md-6">
+                <label>Año</label>
+                <%= f.text_field :usado_ano,  class: "panel-field" %>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <label>Color</label>
+                <%= f.text_field :usado_cor,  class: "panel-field" %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Chapa</label>
+                <%= f.text_field :usado_chapa,  class: "panel-field" %>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <label>Ex</label>
+                <%= f.text_field :usado_ex,  class: "panel-field" %>
+              </div>              
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Referencias Comerciales
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-12">
+                <label>Nombre y Apellido 01</label>
+                <%= f.text_field :referencia_comercial_01,  class: "panel-field" %>
+              </div>
+
+              <div class="col-md-12">
+                <label>Nombre y Apellido 02</label>
+                <%= f.text_field :referencia_comercial_02,  class: "panel-field" %>
+              </div>              
+
+              <div class="col-md-12">
+                <label>Nombre y Apellido 03</label>
+                <%= f.text_field :referencia_comercial_03,  class: "panel-field" %>
+              </div>              
+
+              <div class="col-md-12">
+                <label>Nombre y Apellido 04</label>
+                <%= f.text_field :referencia_comercial_04,  class: "panel-field" %>
+              </div>              
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Referencias Personales
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-9">
+                <label>Nombre y Apellido 01</label>
+                <%= f.text_field :referencia_pessoal_01,  class: "panel-field" %>
+
+              </div>
+
+              <div class="col-md-3">
+                <label>Contacto</label>
+                <%= f.text_field :referencia_pessoal_contato_01,  class: "panel-field" %>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-9">
+                <label>Nombre y Apellido 02</label>
+                <%= f.text_field :referencia_pessoal_02,  class: "panel-field" %>
+              </div>
+
+              <div class="col-md-3">
+                <label>Contacto</label>
+                <%= f.text_field :referencia_pessoal_contato_02,  class: "panel-field" %>
+              </div>
+
+            </div>
+
+            <div class="row">
+              <div class="col-md-9">
+                <label>Nombre y Apellido 03</label>
+                <%= f.text_field :referencia_pessoal_03,  class: "panel-field" %>
+              </div>
+
+              <div class="col-md-3">
+                <label>Contacto</label>
+                <%= f.text_field :referencia_pessoal_contato_03,  class: "panel-field" %>
+              </div>
+
+            </div>
+
+            <div class="row">
+              <div class="col-md-9">
+                <label>Nombre y Apellido 04</label>
+                <%= f.text_field :referencia_pessoal_04,  class: "panel-field" %>
+              </div>
+
+              <div class="col-md-3">
+                <label>Contacto</label>
+                <%= f.text_field :referencia_pessoal_contato_04,  class: "panel-field" %>
+              </div>
+            </div>            
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-12">
+                <label>Obs</label>
+                <%= f.text_area :obs,  class: "panel-field", rows: 2 %>
+              </div> 
+            </div>
+            <div class="footer-buttons">
+              <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+            </div>    
+          </div>
+        </div>
+      </div>
+    </div>    
+  </div>
+<% end %>
+
+  <style>
+    div#contents{
+      background: none !important;
+    }
+  </style>

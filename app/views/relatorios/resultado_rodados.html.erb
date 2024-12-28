@@ -1,0 +1,5 @@
+<% if params[:tp] == "0" %>   
+  <%= render :partial => 'relatorios/forms/rodados/rodado_analitico' %>
+<% elsif params[:tp] == "1" %>
+  <%= render :partial => 'relatorios/forms/rodados/rodado_sintetico' %>
+<% end %>

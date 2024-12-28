@@ -1,0 +1,51 @@
+<h1 id="header">Saldo Inicial <%= t('PROVIDER') %></h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_proveedore_path, :class => 'button add' %>  
+</div>
+
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="45" align="center">Registro</td>
+      <td width="50" align="center"><%= t('DATE') %></td>
+      <td width="50" align="center">Venc.</td>
+      <td width="300"><%= t('PROVIDER') %></td>
+      <td width="120"><%= t('DOC') %></td>
+      <td width="40"><%= t('QUOTA') %></td>
+      <td width="80" align="right">Divida U$.</td>
+      <td width="80" align="right">Divida Gs.</td>
+      <td width="80" align="right">Divida R$.</td>
+      <td width="80" align="right">Pago U$.</td>
+      <td width="80" align="right">Pago Gs.</td>
+      <td width="80" align="right">Pago R$.</td>
+    </tr>
+  </table>
+  <div class="rolagem" id="div">
+      <table>
+      <% @clientes.each do |p| %>
+        <tr class = "<%= cycle("cor1", "cor2")%>" >
+          <td width="45" align="center" ><%= p.id.to_s.rjust(6,'0') %></td>
+          <td width="50" align="center"><%= p.data.strftime("%d/%m/%y") %></td>
+          <td width="50" align="center"><%= p.vencimento.strftime("%d/%m/%y") %></td>
+          <td width="300" align="left"><%= truncate( p.persona_nome, :leght => 200) %></td>
+          <td width="120"><%= p.documento_numero_01 %>-<%= p.documento_numero_02 %>-<%= p.documento_numero %></td>
+          <td width="40"><%= p.cota %></td>
+          <td width="80" align="right"><%= format_decimal( p.divida_dolar) %></td>
+          <td width="80" align="right"><%= format_int( p.divida_guarani) %></td>
+          <td width="80" align="right"><%= format_decimal( p.divida_real) %></td>
+          <td width="80" align="right"><%= format_decimal( p.pago_dolar) %></td>
+          <td width="80" align="right"><%= format_int( p.pago_guarani) %></td>
+          <td width="80" align="right"><%= format_decimal( p.pago_real) %></td>
+          <% if p.liquidacao == 1 %>
+            <td colspan="2" style="color:red">Doc. Aplicado</td>
+          <% else %>
+            <td><%= link_to '', edit_proveedore_path(p), class: 'icon-pencil'  %></td>
+            <td><%= link_to '', p, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>                      
+          <% end %>
+        </tr>
+      <% end %>
+
+      </table>      
+  </div>
+</div>
+

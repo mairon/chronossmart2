@@ -1,0 +1,47 @@
+<%= form_for(@banco) do |f| %>
+  <% if @banco.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@banco.errors.count, "error") %> prohibited this banco from being saved:</h2>
+
+      <ul>
+      <% @banco.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> bancos - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">nome :</td>                    
+                      <td><%= f.text_field :nome %></td>
+                                      
+                      <td align="right">status :</td>                    
+                      <td><%= f.number_field :status %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), bancos_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

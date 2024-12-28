@@ -1,0 +1,71 @@
+	
+	<table>
+    <thead class="report-header">
+      <tr>
+        <td colspan="10" class="title" align="center">
+          <%= current_unidade.nome_sys %> <br>
+          Vendas por Productos
+        </td>
+      </tr>
+      <tr>
+        <td colspan="10">Fecha: <%= params[:inicio] %> hasta <%= params[:final] %></td>
+      </tr>
+
+      <%        
+          if params[:moeda].to_s == '0'
+            moeda = 'Dolar'
+          elsif params[:moeda].to_s == '1'
+            moeda = 'Guaranies'
+          else
+            moeda = 'Reales'
+          end
+      %>
+
+      <tr>
+        <td colspan="10">Moneda: <%= moeda %></td>
+      </tr>
+
+      <tr class="td-header">
+        <td align="center" width="40">Cod.</td>
+        <td align="center" width="40">Origen</td>
+        <td align="center" width="40">Fecha</td>
+        <td width="300">Cliente</td>
+        <td width="300">Producto</td>
+        <td width="40" align="right">Qtd.</td>
+        <td width="70" align="right">Valor</td>
+      </tr>
+    </thead>
+
+
+	<% tot_qtd = 0 %>
+	<% tot_val = 0 %>
+	<% quebra = '' %>
+	<% @vendas.each do |v| %>
+		<tr class="<%= cycle("cor1", "cor2")%>">
+			<td width="40" align="center"><%= v.produto_id.to_s.rjust(6,'0') %></td>
+			<td width="40"align="center"><%= v.origem %></td>
+			<td width="40"align="center"><%= v.data.strftime("%d/%m/%y") %></td>
+			<td width="300"><%= v.persona_nome %></td>
+			<td width="300"><%= v.produto_nome %></td>
+			<td width="40" align="right"><%= format_int( v.qtd.to_f ) %></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><%= format_decimal(v.tot_us.to_f) %></td>
+				<% tot_val += v.tot_us.to_f %>
+			<% else %>
+				<td width="70" align="right"><%= format_int(v.tot_gs.to_f) %></td>
+				<% tot_val += v.tot_gs.to_f %>
+			<% end %>
+
+		</tr>
+		<% tot_qtd += v.qtd.to_f %>
+	<% end %>
+		<tr class="head">
+			<td colspan="5"  height="25" align="right">Total ==> </td>
+			<td align="right"><%= format_int(tot_qtd.to_f) %></td>
+			<% if params[:moeda] == '0' %>
+				<td align="right"><%= format_decimal(tot_val.to_f) %></td>
+			<% else %>
+				<td align="right"><%= format_int(tot_val.to_f) %></td>
+			<% end %>
+		</tr>
+	</table>

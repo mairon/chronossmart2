@@ -1,0 +1,325 @@
+<h1 id="header">Contrato - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+<%= form_for(@contrato) do |f| %>
+  <% if @contrato.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@contrato.errors.count, "error") %> prohibited this contrato from being saved:</h2>
+
+      <ul>
+      <% @contrato.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+        <table>
+          <tr>
+            <td>
+                <table>
+                  <tr>
+                    <td colspan="4">
+                    <label><%= t('DATE') %></label>
+                      <%= f.date_select :data %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="4">
+                    <label><%= t('DATE') %> Entrega/Final</label>
+                      <%= f.date_select :data_final %>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td colspan="4">
+                    <label>Cliente</label>
+                    <%= text_field_tag :persona_nome, "#{@contrato.persona.nome unless @contrato.persona_id.nil?}", size: 81, required: true, class: 'autocomplete', autofocus: true, placeholder: 'Digite o nome do Cliente', readonly: true %>
+                      <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+                    <%= f.hidden_field :persona_id %></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label><%= t('DOC') %></label>
+                      <%= f.text_field :documento_numero, required: true %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="4">
+                    	<fieldset readonly="readonly"> 
+                    		<legend><%= t('COIN') %></legend>
+	                      <%= f.radio_button  :moeda, 1, Checked: "True", onfocus: "MoedaCompra('1')", disabled: true %> Gs.
+	                      <%= f.radio_button :moeda, 0, onfocus: "MoedaCompra('0')", disabled: true %> Dolar
+	                      <%= f.radio_button :moeda, 2, onfocus: "MoedaCompra('2')", disabled: true %> Real
+                    	</fieldset>
+                    </td>                    
+                  </tr>
+                  <tr>
+                    <td colspan="4" style="padding-right: 10px">
+                    <label>Conta p/ Recebimento</label>
+                    <%= f.collection_select :conta_id, 
+                               Conta.all( :select => 'id,nome',
+                                          :order  => '2' ),:id,
+                                          :nome,{:prompt => 'Selecione la Cuenta'}, {required: true, readonly: true} %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="4">
+                    <label><%= t('CENTER_OF_COSTOS') %></label>
+                    <%= f.collection_select :centro_custo_id,
+                               CentroCusto.all( :select => 'id,nome',
+                                          :order  => '2' ),:id,
+                                          :nome,{:prompt => 'Selecione Centro de Costo'}, {required: true} %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="4" style="padding-right: 10px">
+                    <label>Vendedor</label>
+                    <%= f.collection_select :vendedor_id, 
+                               Persona.where(tipo_vendedor: 1).select('id,nome').order('2'),:id,
+                                          :nome,{:prompt => 'Selecione lo Vendedor'} %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="4">
+                    <label>Terminal</label>
+                    <%= f.collection_select :terminal_id,
+                               Terminal.all( :select => 'id,nome', :order  => '2' ),:id, :nome,{:prompt => 'Selecione Terminal'}, {required: true} %>
+                    </td>
+
+                  </tr>
+                  <tr>
+                    <td>
+                    <label>Depositos</label>
+                    <%= f.collection_select :deposito_id,
+                               Deposito.all(:select => 'id,nome'),:id,
+                                          :nome,{:prompt => 'Selecione el Deposito'}, {required: false} %>
+                    </td>
+
+                  </tr>
+                  <tr>
+                    <td colspan="6">
+                    	<fieldset> 
+                    		<legend>Tipo</legend>
+		                    <%= f.radio_button  :tipo, 0, Checked: "True" %> Mensual
+		                    <%= f.radio_button  :tipo, 1 %> Cota Fija
+	                    </fieldset>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+	                    <label><%= t('DATE') %> <%= t('EXPIRATION') %></label>
+	                    <%= f.number_field :dia_venc, required: true, readonly: true %> 
+                    </td>
+                    <td style="padding-left: 50px">
+                      <label>Mês Inicio</label>
+                      <%= f.number_field :mes_inicio, required: true, readonly: true %> 
+                    </td>
+                    
+                    <td style="padding-left: 83px">
+                      <label>Competencia</label>
+                      <%= f.number_field :competencia, required: true, readonly: true %> 
+                    </td>
+                  </tr>
+
+                </table>
+            </td>
+          </tr>
+        	<tr> 
+	        	<td style="padding: 5px;">
+	        	 <div class="group">	
+		        	 	<table>
+		        				<tr class="head_grid">
+		        					<td width="290"><%= t('PRODUCT') %></td>
+		        					<td width="60" align="right">Qtd</td>
+		        					<td width="100" align="right">Unitário</td>
+		        					<td width="100" align="right">Total</td>
+		        					<td width="30"></td>
+		        				</tr>
+						        <%= f.fields_for :contrato_servicos do |builder| %>
+						          <%= render "contrato_servico_fields", f: builder %>
+						        <% end %>						        
+		        		</table>
+		        		<p>
+		        			<%= link_to_add_fields "Add Producto/Servi.", f, :contrato_servicos %> 
+		        			<h1 align="right" class="total">
+										Valor total 
+										<span class="resultado">
+										<% if @contrato.moeda.to_i == 0 %>
+											<%= format_decimal(@contrato.valor_us) %>
+										<% elsif @contrato.moeda.to_i == 1 %>
+											<%= format_int(@contrato.valor_gs) %>
+										<% else %>
+											<%= format_decimal(@contrato.valor_rs) %>
+										<% end %>
+										</span>
+									</h1>
+		        		</p>
+
+
+	        		</div>
+	        	</td>
+        	</tr>
+	      <tr>
+	        <td colspan="4"><%= f.text_area :obs, rows: 3, cols: 93, placeholder: 'Concepto' %></td>
+	      </tr>                                      
+			</table>
+   <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), contratos_path, :class => "btn btn-back" %>
+   </div>
+<% end %>
+</div>
+<% if params[:action] == 'new' %>
+  <%= hidden_field_tag :moeda, '1' %>
+<% else %>
+  <%= hidden_field_tag :moeda, @contrato.moeda %>
+<% end %>
+
+<script>
+    $(document).ready(function() {
+      d = $('#moeda').val();
+      if (d == '1') {
+        $(".valores-gs").show();
+        $(".valores-rs").hide();
+        $(".valores-us").hide();
+
+      } else if (d == '0') {
+
+        $(".valores-us").show();
+        $(".valores-rs").hide();
+        $(".valores-gs").hide();
+      } else if (d == '2') {
+        $(".valores-rs").show();
+        $(".valores-us").hide();
+        $(".valores-gs").hide();
+      }           
+    });
+  </script>
+
+
+<script type="text/javascript">
+  //moeda
+  function MoedaCompra(d){
+    moeda = $('#moeda').val(d);
+    if (d == '1') {
+      $(".valores-gs").show();
+      $(".valores-rs").hide();
+      $(".valores-us").hide();
+
+    } else if (d == '0') {
+
+      $(".valores-us").show();
+      $(".valores-rs").hide();
+      $(".valores-gs").hide();
+    } else if (d == '2') {
+      $(".valores-rs").show();
+      $(".valores-us").hide();
+      $(".valores-gs").hide();
+    }
+  }
+
+
+  $(function() {
+    $( "#persona_nome" ).autocomplete({
+        source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+        $.ajax({
+          url: "/personas/busca?per=CLIENTE",
+          dataType: "json",
+
+          data: {
+            tipo: 'DESCRIPCION',
+            busca: request.term
+          },
+          beforeSend: function(){
+          $("#spinner").addClass("sppiner_show");
+          },
+
+          success: function( data ) {
+            $("#sppiner").removeClass("sppiner_show");
+            response( data );
+          },
+        });
+      },
+      minLength: 2,
+      change: function( event, ui ) {
+        $('#contrato_persona_id').val(ui.item.id);
+        return false;
+      }
+    });
+    $( "#persona_nome" ).change(function(){
+      if ($( "#contrato_persona_id" ).val() == ''){
+        alert('Cliente nao Cadastrado!')
+      }
+    });
+  });
+
+  $('#contrato_conta_id').selectize();
+  $('#contrato_vendedor_id').selectize();
+  $('#contrato_centro_custo_id').selectize();
+  $('#contrato_terminal_id').selectize();
+</script>
+
+<script type="text/javascript">
+  
+  function add_fields(link, association, content) {
+
+    var new_id = new Date().getTime();
+    var regexp = new RegExp("new_" + association, "g")
+    $(link).up().insert({    	
+	    before: content.replace(regexp, new_id)
+    });    
+  }
+
+  $('form').on('click', '.remove_field', function(event) {
+    $(this).prev('input[type=hidden]').val('1');
+    $(this).closest('tr').hide();    
+    return event.preventDefault();
+  });
+
+
+  $('form').on('click', '.add_fields', function(event) {
+    time = new Date().getTime();
+    regexp = new RegExp($(this).data('id'),'g')
+
+    $(this).before($(this).data('fields').replace(regexp, time))
+    moeda = $('#moeda').val();
+    if (moeda == '1') {
+      $(".valores-gs").show();
+      $(".valores-rs").hide();
+      $(".valores-us").hide();
+
+    } else if (moeda == '0') {
+
+      $(".valores-us").show();
+      $(".valores-rs").hide();
+      $(".valores-gs").hide();
+    } else if (moeda == '2') {
+      $(".valores-rs").show();
+      $(".valores-us").hide();
+      $(".valores-gs").hide();
+    }
+
+    return event.preventDefault();
+
+  });
+
+</script>
+<style>
+  .add_fields{
+    margin: 10px 10px 10px 5px;
+  }
+
+  .total{
+    margin:  -42px 37px 5px 0px;
+    padding: 10px;
+    font-size: 25px;
+    color:  #444;
+  }
+  .tots-prod{
+    margin-top: 10px;
+  }
+</style>
+
+
+

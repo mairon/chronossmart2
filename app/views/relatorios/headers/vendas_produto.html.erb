@@ -1,0 +1,43 @@
+<% #VERIFICA SE  TEM CLASE E IMPRIME
+        #VERIFICA SE  TEM SUB_GRUPO E IMPRIME
+        if params[:busca]["sub_grupo"].blank?
+            sgrupo = 'Todos..'
+        else
+            sgrupo = params[:busca]["sub_grupo"]
+            sgp_c  = SubGrupo.find_by_id(params[:busca]["sub_grupo"])
+            sgp_desc = ' - ' << sgp_c.descricao
+        end
+%>
+<table width="755">
+	<tr>
+		<td align="center"><%= $empresa_nome %></td>
+	</tr>
+	<tr>
+		<td align="center">VENDAS POR PRODUCTOS</td>
+	</tr>
+
+	<tr>
+		<td align="left">De....: <%= params[:inicio] %> hasta <%=params[:final] %></td>
+	</tr>
+
+	<tr>
+		<td>
+			<hr>
+			<table>
+				<tr>
+					<td width="80" >Ref.</td>
+				    <td width="300">Producto</td>
+				    <td width="180">Color</td>
+				    <td width="35">TM</td>
+				    <td width="30" align="right">Stock</td>
+				    <td width="30" align="right">P.C.</td>
+				    <td width="30" align="right">P.V.</td>
+				    <td width="55" align="right">A comprar</td>
+				    <td width="45" align="right">A Vender</td>
+				    <td width="52" align="right">Status</td>
+				</tr>	
+			</table>
+			<hr>
+		</td>
+	</tr>
+</table>

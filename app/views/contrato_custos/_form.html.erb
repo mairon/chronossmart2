@@ -1,0 +1,62 @@
+  <%= form_for(@contrato_custo) do |f| %>
+  <% if @contrato_custo.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@contrato_custo.errors.count, "error") %> prohibited this contrato_custo from being saved:</h2>
+
+      <ul>
+      <% @contrato_custo.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> contrato_custos - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">persona_id :</td>                    
+                      <td><%= f.number_field :persona_id %></td>
+                                      
+                      <td align="right">tipo :</td>                    
+                      <td><%= f.number_field :tipo %></td>
+                                      
+                      <td align="right">moeda :</td>                    
+                      <td><%= f.number_field :moeda %></td>
+                                      
+                      <td align="right">valor_gs :</td>                    
+                      <td><%= f.text_field :valor_gs %></td>
+                                      
+                      <td align="right">valor_us :</td>                    
+                      <td><%= f.text_field :valor_us %></td>
+                                      
+                      <td align="right">valor_rs :</td>                    
+                      <td><%= f.text_field :valor_rs %></td>
+                                      
+                      <td align="right">contrato_id :</td>                    
+                      <td><%= f.number_field :contrato_id %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), contrato_custos_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

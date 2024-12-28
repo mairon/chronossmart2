@@ -1,0 +1,164 @@
+<div class="group sub-total" >
+	<table>
+		<tr>
+			<% if @venda.moeda.to_i == 0 %>
+
+				<td align="right">
+				<table>
+					<tr>
+						<td align="right"><font class="style3" color="green">Sub Total:</font></td>
+						<td align="right" width="320">
+							<font class="style3" color="green" style="padding-right: 15px">
+								<span id="sub_total_dolar"><%= format_decimal(@total_dolar) %></span>
+							</font>											
+						</td>
+					</tr>
+					<tr>
+						<td align="right"><font class="style3" color="green"><%= t('DISCOUNT') %>:</font></td>
+						<td align="right">
+							<a id="opener" class="button" style="padding-top: 15px" >
+								<font class="style3" color="green">
+									<%= format_decimal(@venda.desconto_us) %>
+								</font>
+							</a>
+						</td>
+					</tr>
+					<tr>
+						<td align="right"><font class="style3" color="green">Total:</font></td>
+						<td align="right">
+							<font class="style3" color="green" style="padding-right: 15px">
+								<span id="total_dolar">
+									<%= format_decimal(@total_dolar.to_f - @venda.desconto_us.to_f) %>
+								</span>
+							</font>
+						</td>
+					</tr>
+				</table>									
+				</td>
+
+			<% elsif @venda.moeda == 1 %>
+				<td align="right">
+				<table>
+					<tr>
+						<td><font class="style3 gs" style="font-family: 'prox-bold';">Sub Total</font></td>
+						<td align="right" width="320">
+							<font class="style3 gs" style="font-family: 'prox-bold';" style="padding-right: 15px">
+								<span id="sub_total_guarani"><%= format_int(@total_guarani) %></span>
+							</font>											
+						</td>
+					</tr>
+					<tr>
+						<td><font class="style3 gs" style="font-family: 'prox-bold';"><%= t('DISCOUNT') %></font></td>
+						<td align="right">
+							<a id="opener" class="button"  >
+								<font class="style3 gs" style="font-family: 'prox-bold';">
+									<%= format_int(@venda.desconto_gs) %>
+								</font>
+							</a>
+						</td>
+					</tr>
+					<tr>
+						<td><font class="style3 gs" style="font-family: 'prox-bold';">Total</font></td>
+						<td align="right">
+							<font class="style3 gs" style="font-family: 'prox-bold';" >
+								<span id="total_guarani">
+									<%= format_int(@total_guarani.to_f - @venda.desconto_gs.to_f) %>
+								</span>
+							</font>
+						</td>
+					</tr>
+					<tr>
+						<div class="row" style="padding: 10px 8px">
+							<div class="col-md-12"><span class="us"style="font-family: 'prox-bold'; font-size: 14px;">U$ <%= format_decimal(@total_dolar)%></span></div>
+							<div class="col-md-12"><span class="rs"style="font-family: 'prox-bold'; font-size: 14px;">R$ <%= format_decimal(@total_real)%></span></div>
+						</div>
+					</tr>		
+				</table>
+				</td>
+			<% else %>
+
+				<td align="right">
+				<table>
+					<tr>
+						<td align="right"><font class="style3" color="blue">Sub Total:</font></td>
+						<td align="right" width="320">
+							<font class="style3" color="blue" style="padding-right: 15px">
+								<span id="sub_total_dolar"><%= format_decimal(@total_real) %></span>
+							</font>											
+						</td>
+					</tr>
+					<tr>
+						<td align="right"><font class="style3" color="blue"><%= t('DISCOUNT') %>:</font></td>
+						<td align="right">
+							<a id="opener" class="button" style="padding-top: 15px" >
+								<font class="style3" color="blue">
+									<%= format_decimal(@venda.desconto_rs) %>
+								</font>
+							</a>
+						</td>
+					</tr>
+					<tr>
+						<td align="right"><font class="style3" color="blue">Total:</font></td>
+						<td align="right">
+							<font class="style3" color="blue" style="padding-right: 15px">
+								<span id="total_dolar">
+									<%= format_decimal(@total_real.to_f - @venda.desconto_rs.to_f) %>
+								</span>
+							</font>
+						</td>
+					</tr>
+				</table>									
+				</td>			
+			<% end %>
+		</tr>
+	</table>
+</div>
+
+
+
+<div class="slidingDiv" style='display:none' id="dialog" title="Descuento" >
+	<%= form_for(@venda) do |vdc| %>
+		<%= hidden_field_tag :calc_desc, 'true' %>
+		<% if @venda.moeda.to_i == 0 %>
+			<%= field_us_label 'Descuento:',vdc, :desconto_us  %>
+		<% else %>
+			<%= field_gs_label 'Descuento:',vdc, :desconto_gs  %>
+		<% end %>
+	  <%= vdc.submit t('SAVE'), disable_with: "Aguarde..." , class: "button" , class: "btn btn-default", "data-plus-as-tab" => "false" %>
+	<% end %>
+</div>
+
+
+<script type="text/javascript">
+  $(function() {
+  	//abre tela de desconto
+    $( "#dialog" ).dialog({
+      autoOpen: false,
+      height: 200,
+      width: 300,
+      modal: true,
+      show: {
+        effect: "fade",
+        duration: 400
+      },
+      hide: {
+        effect: "fade",
+        duration: 400
+      }
+    });
+
+    $( "#opener" ).click(function() {
+      $( "#dialog" ).dialog( "open" );
+    });
+  });
+
+  $('.lista-produtos').scrollTop($('.lista-produtos')[0].scrollHeight);
+</script>
+
+<% if params[:calc_desc] == 'true' %>
+	<% @venda.vendas_produtos.each do |vp| %>
+		<% porcentagem  = ( ( (vp.unitario_guarani.to_f * vp.quantidade ) * 100 ) / @total_guarani.to_f ) %>
+		<% desc = ( ( ( @venda.desconto_gs.to_f * porcentagem ) / 100 ) ) %>
+		<% vp.update_attribute :desconto_guarani, desc.to_f %>
+	<% end %>
+<% end %>

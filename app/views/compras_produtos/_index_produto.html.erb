@@ -1,0 +1,128 @@
+<table class="head_grid">
+	 <tr>
+		<td width="30" >DP</td>
+		<td width="120" >Referencia</td>
+		<td width="380" >Producto</td>
+		<td width="50" align="right">Cant.</td>
+		<td width="50" align="right">%</td>
+		<td width="80" align="right">Unit</td>
+		<td width="80" align="right">Desc.</td>
+		<td width="80" align="right">Frete</td>
+		<td width="80" align="right">Outros</td>
+		<td width="80" align="right">Unit Rat.</td>
+		<td width="80" align="right">Total</td>
+		<td width="80" align="right">Precio <%= t('SALE') %></td>
+		<td width="140"></td>
+	 </tr>
+</table>
+<div class="rolagem" dir="div" style="height: 200px">
+	<table>
+		<% indice = 1 %>
+		<% qtd    = 0 %>
+		<% cust   = 0 %>
+		<% unit   = 0 %>
+		<% desc   = 0 %>
+		<% tot    = 0 %>
+		<% fret   = 0 %>
+		<% @compras_produto.each do |cp| %>
+
+						<% if params[:rateio] == 'true' %>
+							<% porcentagem    = ( ( (cp.custo_guarani * cp.quantidade ) * 100 ) / (@compra.total_guarani.to_f - @compra.desconto_guarani.to_f).to_f ) %>
+
+              <% porcentagem    = ( ( (cp.custo_guarani * cp.quantidade ) * 100 ) / (@compra.total_guarani.to_f - @compra.desconto_guarani.to_f).to_f ) %>
+
+              <!-- Frete !-->
+              <% frete_guarani       = ( ( ( @compra.frete_guarani.to_f * porcentagem ) / 100 ) / cp.quantidade.to_f ) %>
+              <% cp.update_attribute :frete_guarani, frete_guarani.to_f %>
+
+              <!-- Outros !-->
+              <% outros_guarani       = ( ( ( @compra.outros_guarani.to_f * porcentagem ) / 100 )  / cp.quantidade.to_f) %>
+              <% cp.update_attribute :outros_guarani, outros_guarani.to_f %>
+
+							<!-- Desc. !-->
+              <% desconto_guarani       = ( ( ( @compra.desconto_guarani.to_f * porcentagem ) / 100 )  / cp.quantidade.to_f) %>
+              <% cp.update_attribute :desconto_guarani, desconto_guarani.to_f %>
+
+              <% cp.update_attribute :unitario_guarani, ((cp.custo_guarani.to_f + frete_guarani.to_f + outros_guarani.to_f ) - desconto_guarani.to_f) %>
+
+              <% cp.update_attribute :total_guarani, (((cp.custo_guarani.to_f + frete_guarani.to_f + outros_guarani.to_f ) - desconto_guarani.to_f) * cp.quantidade.to_f) %>
+
+              <% cp.update_attribute :porcen, porcentagem.to_f %>
+
+
+            <% end %>
+
+			  <tr class = "<%= cycle("cor1", "cor2") %>">
+					<td width="30" align="left" title="<%= cp.deposito_nome %>"><%= cp.deposito_id %></td>
+					<td width="120" align="left"><%= cp.produto.fabricante_cod %></td>
+					<td width="380" align="left"><small><%= cp.produto_nome %></small></td>
+					<td width="50"  align="right"><b><%= cp.quantidade.to_i %></b></td>
+					<td width="50"  align="right"><b><%= format_decimal(cp.porcen) %></b></td>
+					<% if @compra.moeda == 0 %>
+						<td width="80" align="right"><%= format_decimal(cp.unitario_dolar) %></td>
+						<td width="80" align="right"><%= format_decimal(cp.desconto_dolar) %></td>
+						<td width="80" align="right"><%= format_decimal(cp.frete_dolar) %></td>
+						<td width="80" align="right"><%= format_decimal(cp.outros_dolar) %></td>
+
+						<td width="80" align="right"><%= format_decimal(cp.total_dolar) %></td>
+						<td width="80" align="right"><%= format_decimal(cp.preco_venda_us) %></td>
+						<% tot    += cp.total_dolar.to_f %>
+						<% desc   += cp.desconto_dolar.to_f %>
+					<% elsif @compra.moeda == 1 %>
+						<td width="80" align="right"><%= format_int(cp.custo_guarani) %></td>
+						<td width="80" align="right"><%= format_int(cp.desconto_guarani) %></td>
+						<td width="80" align="right"><%= format_int(cp.frete_guarani) %></td>
+						<td width="80" align="right"><%= format_decimal(cp.outros_guarani) %></td>
+						<td width="80" align="right"><%= format_int(cp.unitario_guarani) %></td>
+						<td width="80" align="right"><%= format_int(cp.total_guarani) %></td>
+						<td width="80" align="right"><%= format_int(cp.preco_venda_gs) %></td>
+
+						<% tot    += cp.total_guarani.to_f %>
+						<% desc   += cp.desconto_guarani.to_f %>
+						<% fret += (cp.frete_guarani.to_f * cp.quantidade.to_f) %>
+					<% else %>
+						<td width="80" align="right"><%= format_decimal(cp.unitario_real) %></td>
+						<td width="80" align="right"><%= format_decimal(cp.desconto_real) %></td>
+						<td width="80" align="right"><%= format_decimal(cp.total_real) %></td>
+						<td width="80" align="right"><%= format_decimal(cp.preco_venda_rs) %></td>
+						<% tot    += cp.total_real.to_f %>
+						<% desc   += cp.desconto_real.to_f %>
+					<% end %>
+					<td><a href="#" onclick="AtulizadaPreco(<%= cp.produto_id %>, <%= cp.unitario_guarani.to_i %>)" >Actulizar Precio</a> </td>
+          <td><%= link_to '', edit_compras_produto_path(cp), class: 'icon-pencil' %></td>
+          <td><%= link_to '', cp, :confirm => 'Estas Seguro?', :method => :delete , class: 'icon-trash'%></td>
+					<% indice += 1 %>
+					<% qtd += cp.quantidade.to_f %>
+			 </tr>
+		<% end %>
+	</table>
+</div>
+<!-- RESULTDOS!-->
+<table  class="head_grid">
+	 <tr>
+		<td width="530"></td>
+		<td width="50" align="right"><%= qtd.to_i %></td>
+		<td width="50"></td>
+		<td width="80"></td>
+		<% if @compra.moeda == 1  %>
+			<td width="82" align="right"><%=format_int(desc)%></td>
+			<td width="82" align="right"><%=format_int(fret)%></td>
+			<td width="80"></td>
+			<td width="80"></td>
+			<td width="80" align="right"><%=format_int(tot)%></td>
+		<% else %>
+			<td width="110" align="right"><%=format_decimal(desc)%></td>
+			<td width="80" align="right"><%=format_decimal(tot)%></td>
+		<% end %>
+			<td width="220"></td>
+	 </tr>
+</table>
+
+<%= link_to 'Proratear', compra_path(@compra, rateio: 'true' ), class: 'btn btn-blue' %>
+
+<script>
+	function AtulizadaPreco(id,custo_gs){
+		window.open('/produtos/'+id+'/atualizar_precos?custo_gs='+ custo_gs, 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=10, WIDTH=800, HEIGHT=550');
+	}
+</script>
+

@@ -1,0 +1,95 @@
+<%= form_for(@retencao_doc) do |f| %>
+  <% if @retencao_doc.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@retencao_doc.errors.count, "error") %> prohibited this retencao_doc from being saved:</h2>
+
+      <ul>
+      <% @retencao_doc.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> retencao_docs - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right"><%= t('DATE') %> :</td>                    
+                      <td><%= f.date_select :data %></td>
+                                      
+                      <td align="right">persona_id :</td>                    
+                      <td><%= f.number_field :persona_id %></td>
+                                      
+                      <td align="right">persona_nome :</td>                    
+                      <td><%= f.text_field :persona_nome %></td>
+                                      
+                      <td align="right">moeda :</td>                    
+                      <td><%= f.number_field :moeda %></td>
+                                      
+                      <td align="right">documento_numero_01 :</td>                    
+                      <td><%= f.text_field :documento_numero_01 %></td>
+                                      
+                      <td align="right">documento_numero_02 :</td>                    
+                      <td><%= f.text_field :documento_numero_02 %></td>
+                                      
+                      <td align="right">documento_numero :</td>                    
+                      <td><%= f.text_field :documento_numero %></td>
+                                      
+                      <td align="right">cota :</td>                    
+                      <td><%= f.number_field :cota %></td>
+                                      
+                      <td align="right">retencao_01 :</td>                    
+                      <td><%= f.text_field :retencao_01 %></td>
+                                      
+                      <td align="right">retencao_02 :</td>                    
+                      <td><%= f.text_field :retencao_02 %></td>
+                                      
+                      <td align="right">retencao :</td>                    
+                      <td><%= f.text_field :retencao %></td>
+                                      
+                      <td align="right">valor_us :</td>                    
+                      <td><%= f.text_field :valor_us %></td>
+                                      
+                      <td align="right">valor_gs :</td>                    
+                      <td><%= f.text_field :valor_gs %></td>
+                                      
+                      <td align="right">cotacao :</td>                    
+                      <td><%= f.text_field :cotacao %></td>
+                                      
+                      <td align="right">iva_us :</td>                    
+                      <td><%= f.text_field :iva_us %></td>
+                                      
+                      <td align="right">iva_gs :</td>                    
+                      <td><%= f.text_field :iva_gs %></td>
+                                      
+                      <td align="right">retencao_us :</td>                    
+                      <td><%= f.text_field :retencao_us %></td>
+                                      
+                      <td align="right">retencao_gs :</td>                    
+                      <td><%= f.text_field :retencao_gs %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), retencao_docs_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

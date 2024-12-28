@@ -1,0 +1,56 @@
+<style type="text/css">
+  td{
+    padding: 5px;
+  }
+  input[type="text"]{
+    height: 12px;
+    width: 12px;
+    text-align:center;
+    background:none;
+    border:none;
+    outline:none;
+    margin:0;
+    padding:0;
+  }
+
+  input[type="text"]:focus{
+    background-image: url("/assets/ui-icons_222222_256x240.png");
+    background-position: -32px -3px;
+    background-repeat: no-repeat;
+    border:none;
+    outline:none; 
+  }
+</style>
+<table class="head_grid">
+  <tr>
+    <td width="12"></td>
+    <td width="200">Chapa</td>
+    <td width="400">Resposable</td>
+  </tr>
+</table>
+
+<div class="rolagem" id="div">
+  <table>
+    <% count = 0 %>
+    <% @placas.each do |c| %>
+      <tr class = "<%= cycle("cor2", "cor1")%>"  onMouseOver="javascript:this.style.backgroundColor='#949494'" onMouseOut="javascript:this.style.backgroundColor=''"onclick="Fecha('<%= c.id %>',
+                                               '<%= c.chapa %>')">
+        <td><input type="text" id="<%= count %>" value="" size="1"
+                  onkeypress="Fecha('<%= c.id %>','<%= c.chapa %>')"  data-plus-as-tab="false" ></td>      
+        <td class="<%= count %>" width="200"align="left"><%= c.chapa %></td>
+        <td class="<%= count %>" width="400"align="center"><%= c.responsavel %></td>
+      </tr>
+      <% count += 1 %>
+    <% end %>
+    <input type="hidden" id="foco" value="-1">
+  </table>
+</div>
+
+<script type="text/javascript">
+  function Fecha(id,chapa){
+        window.opener.document.getElementById('venda_persona_rodado_id').value  = id;
+        window.opener.document.getElementById('venda_chapa').value              = chapa;
+        window.opener.document.getElementById('venda_chapa').focus();
+        self.close();
+  }
+</script>

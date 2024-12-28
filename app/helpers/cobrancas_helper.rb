@@ -1,0 +1,2 @@
+module CobrancasHelper
+end

@@ -1,0 +1,36 @@
+<div class="group">
+	<fieldset>
+		<legend>Routes</legend>
+	  get '<%= params[:arq]%>' <br/>
+	  get 'resultado_<%= params[:arq]%>'
+	</fieldset>
+</div>
+
+<div class="group">
+	<fieldset>
+		<legend>Controller</legend>
+		<%= ''%>
+			def resultado_<%= params[:arq]%>
+			    @var = Relatorios.<%= params[:arq]%>(params)
+			      
+			    respond_to do |format|
+			      format.html do
+			        render  :pdf                    => "resultado_controle_func",                
+			                :layout                 => "layer_relatorios",
+			                :margin => {:top        => '1.20in',
+			                            :bottom     => '0.25in',
+			                            :left       => '0.10in',
+			                            :right      => '0.10in'},        
+			                :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
+			                            :font_size  => 7,
+			                            :spacing    => 25},
+			                :footer => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
+			                            :font_size  => 7,
+			                            :right      => "Pagina [page] de [toPage]",
+			                            :left       => "MercoSys Zetta - Fecha de la imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
+			      end
+			    end
+			    end
+	</fieldset>
+
+</div>		

@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+	xmlns:o="urn:schemas-microsoft-com:office:office"
+	xmlns:x="urn:schemas-microsoft-com:office:excel"
+	xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+	xmlns:html="http://www.w3.org/TR/REC-html40">
+	<ss:Styles>
+		<ss:Style ss:ID="1">
+			<ss:Font ss:Bold="1"/>
+			<ss:Alignment ss:Horizontal="Center"/>
+			<ss:Interior ss:Pattern="Gray25"/>
+		</ss:Style>
+		<ss:Style ss:ID="2">
+			<ss:Alignment ss:Horizontal="Center"/>
+		</ss:Style>
+	</ss:Styles>
+	<Worksheet ss:Name="Sheet1">
+		<Table>
+			<Row ss:StyleID="1">
+				<Cell><Data ss:Type="String"><B>Ref.</B></Data></Cell>
+				<Cell><Data ss:Type="String"><B>Producto</B></Data></Cell>
+				<Cell><Data ss:Type="String"><B>Saldo</B></Data></Cell>
+				<Cell><Data ss:Type="String"><B>Custo</B></Data></Cell>
+				<Cell><Data ss:Type="String"><B>Total</B></Data></Cell>
+			</Row>
+
+			<% tot_saldo  = 0 %>
+			<% tot_us     = 0 %>
+			<% sub_tot_saldo  = 0 %>
+			<% sub_tot        = 0 %>
+
+			<% quebra     = '' %>
+
+				<% @stocks.each do |p| %>
+					<Row>
+						<Cell><Data ss:Type="String"><%= p.marca %></Data></Cell>
+						<Cell><Data ss:Type="String"><%= p.cole %></Data></Cell>
+						<Cell><Data ss:Type="String"><%= p.fabricante_cod %></Data></Cell>
+						<Cell><Data ss:Type="String"><%= p.nome %></Data></Cell>
+						<Cell><Data ss:Type="Number"><%= p.saldo.to_f %></Data></Cell>
+						<Cell><Data ss:Type="Number"><%= p.custo_us.to_f %></Data></Cell>
+						<Cell><Data ss:Type="Number"><%= p.saldo.to_f * p.custo_us.to_f %></Data></Cell>
+					</Row>
+					<% tot_saldo += p.saldo.to_f %>
+					<% tot_us    += p.saldo.to_f * p.custo_us.to_f %>
+				<% end %>
+
+				<Row ss:StyleID="1">
+					<Cell><Data ss:Type="String"></Data></Cell>
+					<Cell><Data ss:Type="String"></Data></Cell>
+					<Cell><Data ss:Type="String"><B></B></Data></Cell>
+					<Cell><Data ss:Type="String"><B></B></Data></Cell>
+					<Cell><Data ss:Type="Number"><B><%= tot_saldo.to_f %></B></Data></Cell>
+					<Cell><Data ss:Type="String"><B></B></Data></Cell>
+					<Cell><Data ss:Type="Number"><B><%= tot_us.to_f %></B></Data></Cell>
+				</Row>
+
+		</Table>
+	</Worksheet>
+</Workbook>

@@ -1,0 +1,107 @@
+
+  <!-- A button for taking snaps -->
+
+
+  <% if params[:un] == '1' %>
+    <% token = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZF9jbGllbnRlIjoxMDYsImlkX2NsaWVudGVfdGFnZWQiOjE1NSwiZW1haWwiOiJtYWlyb25icmFzaWw5OUBnbWFpbC5jb20iLCJ0YWdzIjpbIkNlbnRyYWwgLSB1bmlkYWRlX2lkID0gMSJdfQ._GQ43uia-kFBHLX0haBy0kcxCngoctuukqTSZSPJelY" %>
+  <% else %>
+    <% token = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZF9jbGllbnRlIjoxMDYsImlkX2NsaWVudGVfdGFnZWQiOjE1NiwiZW1haWwiOiJtYWlyb25icmFzaWw5OUBnbWFpbC5jb20iLCJ0YWdzIjpbIlRhdmFweSAtIHVuaWRhZGVfaWQgPSA4Il19.lSyKZqE5FuVc3AqBTkMgwU6e2ismbSjxlTFrEkJYRXk" %>
+
+  <% end %>
+
+
+  <div class="add_point">
+    <h3>Registrar Nuevo Usuario</h3>
+  <div id="my_camera"></div>
+
+    <!-- Configure a few settings and attach camera -->
+    <script language="JavaScript">
+      Webcam.set({
+        width: 400,
+        height: 240,
+        image_format: 'base64',
+        jpeg_quality: 90
+      });
+      Webcam.attach( '#my_camera' );
+    </script>
+
+    <form >
+      <br>
+      <label>Codigo</label><br>
+      <%= password_field_tag :cod, nil, :class => 'text', autofocus: true, placeholder: 'Digite su Código', required: 'required' %>
+      <br>
+      <br>
+      <input type="hidden" value="" id="type_point_input">
+      <input type="hidden" value="<%= params[:token_un] %>" id="token_un">
+      <a href="#" onClick="take_snapshot()" class="submit">REGISTRAR</a>
+      <br>
+      <br>
+    </form>
+    <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinner", :width => 41,:height => 41, :style =>"display: none;" ) %>
+    <h3 id="results"></h3>
+    <h3 id="results-insert"></h3>
+
+  </div>
+  <!-- Code to handle taking the snapshot and displaying it locally 891798 -->
+  <script language="JavaScript">
+
+
+       $('#cod').blur(function(){
+              if(!$(this).val()){
+                  $(this).addClass("error");
+                  $('.submit').attr("disabled", true)
+              } else{
+                  $(this).removeClass("error");
+                  $('.submit').attr("disabled", false)
+              }
+          });
+
+    function take_snapshot() {
+      $('#spinner').show();
+      idp = ($("#token_un").val() + $("#cod").val())
+      alert(idp)
+      // take snapshot and get image data
+      Webcam.snap( function(data_uri) {
+
+
+        $.ajax
+        ({
+          type: "POST",
+          url: "https://apifacialid.com.br/wsfacecid/register",
+          contentType: "application/json",
+          dataType: "json",
+
+          headers: {
+            "Authorization": "<%= token %>"
+          },
+          data: JSON.stringify({ idPessoa: idp, fotob64: data_uri.replace("data:image/png;base64,", "")}),
+
+          success: function(response) {
+              console.log(response);
+
+              document.getElementById('results-insert').innerHTML = '<h3>'+ response.code + '-'+ response.msg  +'</h3>';
+
+              window.setTimeout(function(){location.reload()},3000)
+
+          },
+          error: function(response) {
+              console.log(response);
+          }
+
+        });
+
+
+      } );
+    }
+  </script>
+
+  <style>
+    .text{
+      height: 30px;
+    }
+
+.error{
+        outline: 1px solid red !important;
+    }
+
+  </style>

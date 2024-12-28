@@ -1,0 +1,24 @@
+<table>
+  <tr>
+      <td>
+        <div>
+          <table>
+            <tr>
+              <td>
+                <div class="group">
+                  <%= render :partial=>"/persona_produtos/index", :locals=>{:persona_produtos => @persona.persona_produtos} %>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="group">
+                <%= render :partial=>"/persona_produtos/new_produto", :locals=>{:persona_produto=>PersonaProduto.new(:persona_id=>@persona.id)} %>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+</table>

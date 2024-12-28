@@ -1,0 +1,204 @@
+<h1 id="header">Pedido de Compras</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_pedido_compra_path, :class => 'button add' %>    
+</div>
+   <div class="group">
+      <h2>
+         <%= form_tag busca_pedido_compra_pedido_compras_path, :method => "get" do%>
+            <table>
+                <tr>
+                  <!--FILTRO_DATA!-->
+                  <td><input   id         = "filtro"
+                               name       = "filtro"
+                               type       = "radio"
+                               value      = "0"
+                               checked
+                               onfocus="SetaFiltro('0')"/>
+
+                  </td>
+
+                  <td align="right"> De:</td>
+                  <td><input name       = "inicio"
+                             id         = "inicio"
+                             type       = "text"
+                             size       = "10"
+                             onkeyup    = "Formatadata(this,event),EnterTab(event,'final')" autofocus />
+                     Hasta
+
+                     <input name       = "final"
+                            id         = "final"
+                            type       = "text"
+                            size       = "10"
+                            onkeyup    = "Formatadata(this,event)"/></td>
+                </tr>
+               <!--FILTRO_CLIENTE!-->
+               <tr>
+                  <td><input   id         = "filtro"
+                               name       = "filtro"
+                               type       = "radio"
+                               value      = "1"
+                               onfocus     = "SetaFiltro('1')" />
+
+                  </td>
+
+                  <td>
+                     <select name="tipo" id="tipo">
+                       <option>CODIGO</option>
+                       <option>PROVEEDOR</option>
+                    </select>
+                  </td>
+
+                  <td>
+                     <input id="busca" name="busca" type="text" onkeyup = "f(this)"onkeydown = "f(this)" onkeypress ="return bloqEnter(event)" size="31"  />
+                  </td>
+                  <td>
+
+                     <input type="button" class="button" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar"/>
+                     <%= image_tag("load.gif",
+                                   :align => "absmiddle",
+                                   :border => 0,
+                                   :id => "spinner",
+                                   :width => 21,
+                                   :height => 21,
+                                   :style =>"display: none;" ) %>
+                  </td>
+               </tr>
+            </table>
+            <input type="hidden" id="seta" value="0"/>
+         <% end %>
+      </h2>
+   </div>
+
+   <div id="pagina"></div>
+<script language="javascript">
+   function VendaCampoFiltro()              //
+   {
+      document.getElementById("filtro").focus();
+   }
+
+   function SetaFiltro(d)                 //
+   {
+      document.getElementById('seta').value = d
+      if(document.getElementById('seta').value == '0')
+      {
+         document.getElementById('busca').value = ''
+      }
+      else
+      {
+         document.getElementById('inicio').value = ''
+         document.getElementById('final').value = ''
+      }
+
+   }
+
+   function pesquisa(valor)
+
+   {
+      inicio = document.getElementById('inicio').value
+      finala = document.getElementById('final').value
+      tipo   = document.getElementById('tipo').value
+      busca  = document.getElementById('busca').value
+      seta   = document.getElementById('seta').value
+      //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+      url="/pedido_compras/busca_pedido_compra?seta="+seta+"&inicio="+inicio+"&final="+finala+"&tipo="+tipo+"&busca="+valor+"&commit=buscar";
+      ajax(url);
+
+   }
+
+
+   function ajax(url)
+
+   {
+
+          $('#spinner').show();
+
+      //alert(nick);
+
+      //alert(dest);
+
+      //alert(msg);
+
+
+
+      req = null;
+
+      // Procura por um objeto nativo (Mozilla/Safari)
+
+      if (window.XMLHttpRequest) {
+
+         req = new XMLHttpRequest();
+
+         req.onreadystatechange = processReqChange;
+
+         req.open("GET",url,true);
+
+         req.send(null);
+
+         // Procura por uma versão ActiveX (IE)
+
+      } else if (window.ActiveXObject) {
+
+         req = new ActiveXObject("Microsoft.XMLHTTP");
+
+         if (req) {
+
+
+
+            req.onreadystatechange = processReqChange;
+
+            req.open("GET",url,true);
+
+
+
+            req.send();
+
+         }
+
+      }
+
+   }
+
+
+
+   function processReqChange()
+
+   {
+
+
+
+      // apenas quando o estado for "completado"
+
+      if (req.readyState == 4) {
+
+
+
+         // apenas se o servidor retornar "OK"
+
+
+
+         if (req.status ==200) {
+
+
+
+            // procura pela div id="pagina" e insere o conteudo
+
+            // retornado nela, como texto HTML
+
+
+            onSuccess:$('#spinner').hide();
+            document.getElementById('pagina').innerHTML = req.responseText;
+
+
+
+         } else {
+
+            alert("Houve um problema ao obter os dados:n" + req.statusText);
+
+         }
+
+      }
+
+   }
+</script>
+

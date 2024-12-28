@@ -1,0 +1,20 @@
+<h1 align="right" id="header">Transferencia Deposito Producto</h1>
+ <div class="group">
+	<%= form_for(@transferencia_deposito_detalhe) do |f| %>
+	<% if @transferencia_deposito_detalhe.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@transferencia_deposito_detalhe.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @transferencia_deposito_detalhe.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= link_to t('BACK'), "transferencia_depositos/#{@transferencia_deposito_detalhe.transferencia_deposito.id}" %>
+  <% end %>
+</div>

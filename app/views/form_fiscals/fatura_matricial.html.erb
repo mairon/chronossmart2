@@ -1,0 +1,29 @@
+<% tip = Venda.find_by_id(@ft.cod_proc)%>
+<% if tip.tipo == 1
+    	tipo_venda_cred = "TIPO VENTA: CREDITO"
+	  else
+	    tipo_venda_cont = "TIPO VENTA: CONTADO"
+	  end
+%>
+
+
+<% if @venda.moeda == 0
+	 	d = "DOLAR"
+	 else
+	 	d = "GUARANIES"
+	 end
+ %>
+<% per = Persona.find_by_id(@ft.persona_id)%>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<table>
+	<tr>
+		<td><%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc %>/<%= @ft.cod_proc %></td>
+	</tr>
+</table>

@@ -1,0 +1,46 @@
+<%= form_for(nota_credito_proveedor_aplic) do |f| %>
+  <%= f.hidden_field :nota_credito_proveedor_id %>
+  <%= f.hidden_field :data, :value => @nota_credito_proveedor.data %>
+  <%= f.hidden_field :persona_id, :value => @nota_credito_proveedor.persona_id %>
+  <%= f.hidden_field :persona_nome, :value => @nota_credito_proveedor.persona_nome %>
+  <%= f.hidden_field :moeda, :value => @nota_credito_proveedor.moeda %>
+  <%= f.hidden_field :clase_produto, :value => @nota_credito_proveedor.clase_produto %>
+  <%= f.hidden_field :tipo, :value => @nota_credito_proveedor.tipo %>
+  <%= f.hidden_field :vencimento %>
+  <%= hidden_field_tag :cotacao, nil, :value => @nota_credito_proveedor.cotacao.to_i %>
+  <%= hidden_field_tag :cotacao_real, nil, :value => @nota_credito_proveedor.cotacao_real.to_i %>
+
+  <table>
+    <tr>
+        <td align="right">Documento :</td>
+        <td><%= f.text_field :documento_numero_01, :size => 5, :value => '000' %>-<%= f.text_field :documento_numero_02, :value => '000', :size => 5 %>-<%= f.text_field :documento_numero, :size => 15, :value => "NC000#{@nota_credito_proveedor.id}"  %></td>
+        <td align="right">Cuota :</td>
+        <td><%= f.text_field :cota, :size => 5,:value=> 0, :readonly => "readonly" %></td>
+
+	       <%= field_gs 'Valor Gs.:',f,:valor_guarani, :value => format_int(@valor_total_gs.to_f - (NotaCreditoProveedorAplic.where(nota_credito_proveedor_id: @nota_credito_proveedor.id).sum(:valor_guarani)).to_f),
+	       :onchange   => "GsToUsRs('cotacao','cotacao_real','nota_credito_proveedor_aplic_valor_guarani','nota_credito_proveedor_aplic_valor_dolar','nota_credito_proveedor_aplic_valor_real')" %>
+
+	       <%= field_us 'Valor U$:',f,:valor_dolar, :value => format_decimal(@valor_total_us.to_f - (NotaCreditoProveedorAplic.where(nota_credito_proveedor_id: @nota_credito_proveedor.id).sum(:valor_dolar)).to_f),
+	             :onchange   => "UsToGsRs('cotacao','cotacao_real','nota_credito_proveedor_aplic_valor_dolar','nota_credito_proveedor_aplic_valor_guarani','nota_credito_proveedor_aplic_valor_real')" %>
+
+	       <%= field_us 'Valor R$:',f,:valor_real, :value => format_decimal(@valor_total_rs.to_f - (NotaCreditoProveedorAplic.where(nota_credito_proveedor_id: @nota_credito_proveedor.id).sum(:valor_real)).to_f),
+	       :onchange   => "RsToUsGs('cotacao','cotacao_real','nota_credito_proveedor_aplic_valor_guarani','nota_credito_proveedor_aplic_valor_dolar','nota_credito_proveedor_aplic_valor_real')" %>
+      </td>
+    </tr>
+    <tr>
+
+      <td></td>
+      <td>
+        <fieldset>
+          <%= f.radio_button :liquidacao, 0, :checked => 'checked' %>Parte
+          <%= f.radio_button :liquidacao, 1 %>Cancelacion
+        </fieldset>
+        </td>
+        <td colspan="2" align="right">
+          <%= f.submit t('SAVE'), :class => 'btn btn-info' %>
+        </td>
+
+    </tr>       
+  </table>
+
+<% end %>

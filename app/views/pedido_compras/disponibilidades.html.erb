@@ -1,0 +1,69 @@
+
+<ul class="tabs">
+   <li><a href="#tab1">Productos A Comprar - [<%= t('EDITION') %>]</a></li>
+</ul>
+<div class="tab_container">
+	<%= form_tag "/pedido_compras/#{@pedido_compra.id}/gerar_disponibilidades" do %>
+	 	<%= submit_tag "Agregar ao Pedido ",:disable_with => "Aguarde...", :class => "button", data: { confirm: "Esta Seguro que desea Agregar todos estos productos al pedido?" }  %>
+	PEDIDOS DE VENTAS HASTA : <%= @pedido_compra.pedido_venda_ate %>
+	<% end %>
+
+		<div class="group">
+
+		  <table>
+		    <tr>
+		      <td width="80" align="center">Ref.</td>
+		      <td width="80" align="center">Grade</td>
+		      <td width="400" >Producto</td>
+		      <td width="200" align="center">Color</td>
+		      <td width="60" align="center">Tamanho</td>
+		      <td width="70" align="right">Stock</td>
+		      <td width="70" align="right">P. <%= t('PURCHASE') %></td>
+		      <td width="70" align="right">P. <%= t('SALE') %></td>
+		      <td width="70" align="right">A Comprar.</td>
+		    </tr>
+		  </table>
+		<div class="rolagem">
+			<table>
+				<% stock   = 0 %>
+				<% p_comp  = 0 %>
+				<% p_vend  = 0 %>
+				<% a_cp = 0 %>
+				<% @stocks.each do |s| %>
+				<tr class = "<%= cycle("cor1", "cor2") %>">
+					<td width="80"><%= s.fabricante_cod %></td>
+					<td width="80"><%= s.produtos_grade_id %></td>
+					<td width="400"><%= s.produto_nome %></td>
+					<td width="200"><%= s.cor_nome %></td>
+					<td width="60"><%= s.tamanho_nome %></td>
+					<td width="70" align="right"><%= s.stock.to_i %></td>
+					<td width="70" align="right"><%= s.p_compra.to_i %></td>
+					<td width="70" align="right"><%= s.p_venda.to_i %></td>
+					<td width="70" align="right"><%= (s.stock.to_i + s.p_compra.to_i) - s.p_venda.to_i %></td>
+
+					<% stock   += s.stock.to_i %>
+					<% p_comp  += s.p_compra.to_i %>
+					<% p_vend  += s.p_venda.to_i %>
+					<% a_cp += (s.stock.to_i + s.p_compra.to_i) - s.p_venda.to_i %>
+				</tr>
+				<% end %>
+			</table>
+		</div>
+		<table>
+			<tr class="head">
+				<td width="830"></td>
+				<td width="70" align="right"><%= stock.to_i %></td>
+				<td width="70" align="right"><%= p_comp.to_i %></td>
+				<td width="70" align="right"><%= p_vend.to_i %></td>
+				<td width="70" align="right"><%= a_cp %></td>
+			</tr>
+
+		</table>
+	</div>
+
+  <div class="buttons">
+  		<%= link_to t('BACK'), edit_pedido_compra_path(@pedido_compra), :class => "button back" %>
+  		<%= link_to 'Seguir', pedido_compra_path(@pedido_compra), :class => "button next" %>
+  </div>
+
+</div>

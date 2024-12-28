@@ -1,0 +1,168 @@
+<div class="modal fade" id="modal-efetivar-pg" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary">
+        <h1 style="font-size: 16px; font-weight: bold; padding: 0px !important; color: #fff">Pagar Titulo #<span id="data-id"></span> -
+          <span id="data_doc_01"></span>-<span id="data_doc_02"></span>-<span id="data_doc"></span>
+        </h1>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 5px 20px 20px 20px">
+        <%= form_for(Proveedore.new) do |fr| %>
+        <%= hidden_field_tag :proc, 'painel' %>
+        <%= fr.hidden_field :liquidacao, value: 0 %>
+        <%= fr.hidden_field :finan, value: true %>
+        <%= fr.hidden_field :sigla_proc, value: 'PGR' %>
+        <%= fr.hidden_field :cota, class: 'pg_cota' %>
+        <%= fr.hidden_field :documento_numero, class: 'pg_doc' %>
+        <%= fr.hidden_field :documento_numero_01, class: 'pg_doc_01' %>
+        <%= fr.hidden_field :documento_numero_02, class: 'pg_doc_02' %>
+        <%= fr.hidden_field :descricao, class: 'pg_descricao' %>
+        <%= fr.hidden_field :rubro_id, class: 'pg_rubro_id' %>
+        <%= fr.hidden_field :tot_cotas, class: 'pg_tot_cotas' %>
+        <%= fr.hidden_field :persona_id, class: 'pg_persona_id' %>
+        <%= fr.hidden_field :titulo, class: 'pg_titulo' %>
+        <%= fr.hidden_field :usuario_created, value: current_user.id %>
+        <%= fr.hidden_field :total_divida_real, class: 'pg_saldo_real' %>
+        <%= fr.hidden_field :banco_nome, class: 'pg_banco_nome' %>
+        <%= fr.hidden_field :bc_agencia, class: 'pg_bc_agencia' %>
+        <%= fr.hidden_field :bc_conta, class: 'pg_bc_conta' %>
+        <%= fr.hidden_field :tipo_conta, class: 'pg_tipo_conta' %>
+        <%= fr.hidden_field :favorecido, class: 'pg_favorecido' %>
+
+
+        <div class="row">
+          <div class="col-md-12">
+            <br>
+            <span id="data-descricao"></span>
+            <hr>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <label>Conta</label>
+            <%= fr.collection_select :conta_id,
+                   Conta.select('id,nome').order(2), :id, :nome, {:prompt => 'Selecione'}, {required: true, class: 'panel-field'} %>
+          </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-7">
+              <label>Data</label>
+                <%= fr.text_field :data, value: Time.now.strftime("%d/%m/%Y"), size: 12, class: "input-addon date", onkeyup: "Formatadata(this,event)", autocomplete: 'off', required: true %>
+                <div class="input-group-addon-f">
+                  <span class="icon-calendar"></span>
+                </div>
+            </div>
+            <div class="col-md-5">
+              <label>Moeda</label>
+              <%= fr.select :moeda, options_for_select([['Dolar', 0], ['Guarani', 1], ['Reais', 2]]), {}, {class: 'panel-field pg-moeda'} %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-5">
+            </div>
+            <div class="col-md-7" align="right">
+              <div class="pg-divida-us">
+                <%= field_us_label 'Valor U$', fr, :divida_dolar, class: 'pg_divida_dolar money_us' %>
+                <%= field_us_label 'Taxa', fr, :taxa_us %>
+              </div>
+              <div class="pg-divida-gs" hidden>
+                <%= field_gs_label 'Valor Gs.', fr, :divida_guarani, class: 'pg_divida_guarani money_gs' %>
+                <%= field_gs_label 'Taxa', fr, :taxa_gs %>
+              </div>
+              <div class="pg-divida-rs" hidden>
+                <%= field_us_label 'Valor R$', fr, :divida_real, class: 'pg_divida_real money_us' %>
+                <%= field_us_label 'Taxa', fr, :taxa_rs %>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12 footer-buttons" >
+              <%= fr.submit "Grabar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+$('.pg-moeda').change(function(){
+
+  if ($('.pg-moeda').val() == '0') {
+    $(".pg-divida-us").show();
+    $(".pg-divida-gs").hide();
+    $(".pg-divida-rs").hide();
+  } else if ($('.pg-moeda').val() == '1') {
+    $(".pg-divida-us").hide();
+    $(".pg-divida-gs").show();
+    $(".pg-divida-rs").hide();
+  } else if ($('.pg-moeda').val() == '2') {
+    $(".pg-divida-us").hide();
+    $(".pg-divida-gs").hide();
+    $(".pg-divida-rs").show();
+  };
+})
+
+</script>
+
+<script type="text/javascript">
+
+  $('#modal-efetivar-pg').on('shown.bs.modal', function(event) {
+    $('#proveedore_conta_id').selectize();
+    $('#proveedore_conta_id')[0].selectize.focus();
+    $("#data-id").text($(event.relatedTarget).data('id'));
+    $("#data-descricao").text($(event.relatedTarget).data('descricao'));
+    $("#data_doc").text($(event.relatedTarget).data('documento-numero'));
+    $("#data_doc_01").text($(event.relatedTarget).data('documento-numero-01'));
+    $("#data_doc_02").text($(event.relatedTarget).data('documento-numero-02'));
+
+    $(".pg-moeda").val($(event.relatedTarget).data('moeda'));
+    $(".pg_divida_dolar").val($(event.relatedTarget).data('saldo-us'));
+    $(".pg_divida_guarani").val($(event.relatedTarget).data('saldo-gs'));
+    $(".pg_divida_real").val($(event.relatedTarget).data('saldo-rs'));
+    $(".pg_saldo_real").val($(event.relatedTarget).data('saldo-rs'));
+    $(".pg_cota").val($(event.relatedTarget).data('cota'));
+
+    $(".pg_doc").val($(event.relatedTarget).data('documento-numero'));
+    $(".pg_doc_01").val($(event.relatedTarget).data('documento-numero-01'));
+    $(".pg_doc_02").val($(event.relatedTarget).data('documento-numero-02'));
+
+    $(".pg_rubro_id").val($(event.relatedTarget).data('rubro-id'));
+    $(".pg_tot_cotas").val($(event.relatedTarget).data('tot-cotas'));
+    $(".pg_descricao").val($(event.relatedTarget).data('descricao'));
+    $(".pg_persona_id").val($(event.relatedTarget).data('persona-id'));
+    $(".pg_titulo").val($(event.relatedTarget).data('titulo'));
+    $(".pg_banco_nome").val($(event.relatedTarget).data('banco-nome'));
+    $(".pg_bc_agencia").val($(event.relatedTarget).data('bc-agencia'));
+    $(".pg_bc_conta").val($(event.relatedTarget).data('bc-conta'));
+    $(".pg_tipo_conta").val($(event.relatedTarget).data('tipo-conta'));
+    $(".pg_favorecido").val($(event.relatedTarget).data('favorecido'));
+
+
+      if ($(event.relatedTarget).data('moeda') == '0') {
+        $(".pg-divida-us").show();
+        $(".pg-divida-gs").hide();
+        $(".pg-divida-rs").hide();
+      } else if ($(event.relatedTarget).data('moeda') == '1') {
+        $(".pg-divida-us").hide();
+        $(".pg-divida-gs").show();
+        $(".pg-divida-rs").hide();
+      } else if ($(event.relatedTarget).data('moeda') == '2') {
+        $(".pg-divida-us").hide();
+        $(".pg-divida-gs").hide();
+        $(".pg-divida-rs").show();
+      };
+
+  })
+
+
+</script>

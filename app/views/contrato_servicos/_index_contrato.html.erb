@@ -1,0 +1,37 @@
+
+<table class="head_grid">
+	<tr>
+		 <td width="150">Produto</td>
+		 <td width="75">Quantidade</td>
+		 <% if @contrato.moeda == 1 %>
+			 <td width="100">Unitario G$</td>
+			 <td width="100">Total G$</td>
+		 <% else %>
+			 <td width="100">Unitario US$</td>
+			 <td width="100">Total US$</td>
+		 <% end %>
+	</tr>
+</table>
+
+<div class="rolagem" dir="div">
+	<table>
+		<% contrato_servicos.each do |contrato_servico| %>
+			<tr>
+				<td width="150"><%= contrato_servico.produto.nome %></td>
+				<td width="75" align="center"><%= contrato_servico.quantidade %></td>
+				<% if @contrato.moeda == 1 %>
+					<td width="100"><%= format_decimal(contrato_servico.unitario_gs) %></td>
+					<td width="100"><%= format_decimal(contrato_servico.total_gs) %></td>
+				<% else %>
+					<td width="100"><%= format_decimal(contrato_servico.unitario_us) %></td>
+					<td width="100"><%= format_decimal(contrato_servico.total_us) %></td>
+				<% end %>
+				<td><%= link_to '', contrato_servico, contrato_id: contrato_servico.contrato_id, method: :delete, class: 'icon-trash', title: t('DELETE'), data: { confirm: 'Esta Seguro?' }  %></td>
+			</tr>
+		<% end %>
+	</table>
+</div>
+<div class="acessos">
+	<%= link_to t('NEW'), new_contrato_servico_path(contrato_id: @contrato.id, moeda: @contrato.moeda, cotacao: @contrato.cotacao), :class => "button add" %>
+	<%= link_to 'Seguir', financas_contrato_path(@contrato), class: "button next" %>
+</div>

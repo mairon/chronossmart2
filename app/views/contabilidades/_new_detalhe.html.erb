@@ -1,0 +1,173 @@
+
+<% form_for(cobros_detalhe) do |f| %>
+  <%= f.error_messages %>
+  <%= f.hidden_field :cobro_id  %>
+  <%= f.hidden_field :persona_id,   :value => @cobro.persona_id %>
+  <%= f.hidden_field :persona_nome, :value => @cobro.persona_nome  %>
+  <%= f.hidden_field :data,         :value => @cobro.data  %>
+  <%= f.hidden_field :venda_id %>
+<div class="group_cd">
+  <table>
+    <tr height="35">
+      <td align="right">Documento :</td>
+      <td><%= f.text_field :documento_nome, 
+                           :size     => 20 ,
+                           :readonly => "readonly"%></td>
+      <td align="right">N. Doc.:</td>
+      <td><%= f.text_field :documento_numero_01, 
+                           :size     => 2 ,
+                           :readonly => "readonly"%>
+          <%= f.text_field :documento_numero_02,
+                           :size     => 2 ,
+                           :readonly => "readonly"%>
+          <%= f.text_field :documento_numero,
+                           :size     => 20 ,
+                           :readonly => "readonly"%></td>
+      <td align="right">Cuota :</td>
+      <td><%= f.text_field :cota,
+                           :size     => 10 ,
+                           :readonly => "readonly"%></td>
+      <td align="right">Vencimento :</td>
+      <td><%= f.date_select :vencimento ,
+                            :readonly => "readonly"%></td>
+    </tr>
+
+<!-- VALORES DOLAR!-->
+
+    <tr height="35">
+      <% if @cobro.moeda == 0 %>
+
+
+            <td align="right"> Valor U$:</td>
+            <td><%= f.text_field :valor_dolar,
+                                 :size     => 15 ,
+                                 :readonly => "readonly"%></td>
+                                 <%= f.hidden_field :valor_guarani %>
+            <td align="right">Anterior Dolar:</td>
+            <td><%= f.text_field :anterior_dolar,
+                                 :size     => 15 ,
+                                 :readonly => "readonly"%></td>
+                                 <%= f.hidden_field :anterior_guarani %>
+
+            <td align="right">Saldo Dolar:</td>
+            <td><%= f.text_field :saldo_dolar,
+                                 :size     => 15 ,
+                                 :readonly => "readonly"%></td>
+                                 <%= f.hidden_field :saldo_guarani %>
+
+
+      <% else %>
+
+      <!-- VALORES GUARANI !-->
+
+            <td align="right">Valor Gs.:</td>
+            <td><%= f.text_field :valor_guarani,
+                                 :size     => 15 ,
+                                 :readonly => "readonly"%></td>
+                                 <%= f.hidden_field :valor_dolar %>
+            <td align="right">Anterior Gs.:</td>
+            <td><%= f.text_field :anterior_guarani,
+                                 :size     => 15,
+                                 :readonly => "readonly" %></td>
+                                 <%= f.hidden_field :anterior_dolar %>
+            <td align="right">Saldo Gs.:</td>
+            <td><%= f.text_field :saldo_guarani,
+                                 :size     => 15,
+                                 :readonly => "readonly" %></td>
+                                 <%= f.hidden_field :saldo_dolar %>
+      <% end %>
+    </tr>
+
+    <tr height="35">
+      <td></td>
+      <td colspan="6">
+        <fieldset>
+          <table>
+            <tr>
+             <% if @cobro.moeda == 0 %>
+
+                    <td><%= t('DISCOUNT') %> :</td>
+                    <td><%= f.text_field :desconto_dolar,
+                                         :size   => 15,
+                                         :value  => 0 %></td>
+                                         <%= f.hidden_field :desconto_guarani %>
+
+                    <td><%= t('INTERES') %> .:</td>
+                    <% if current_user.tipo == 0 %>
+                      <td><%= f.text_field :interes_dolar,
+                                           :size   => 15,
+                                           :value  => 0%></td>
+                                           <%= f.hidden_field :interes_guarani %>
+                    <% else %>
+                      <td><%= f.text_field :interes_dolar,
+                                           :size   => 15,
+                                           :value  => 0,
+                                           :readonly => "readonly"%></td>
+                                           <%= f.hidden_field :interes_guarani %>
+                    <% end %>
+
+
+                    <td>U$ : </td>
+                    <td><%= f.text_field :cobro_dolar,
+                                         :size => 15,
+                                         :onblur => "CotacaoPagoGs(),CotacaoPagoDolar()" %></td>
+                                         <%= f.hidden_field :cobro_guarani %>
+             <% else %>
+                    <td align="right"><%= t('DISCOUNT') %> :</td>
+                    <td><%= f.text_field :desconto_guarani,
+                                         :size   => 15,
+                                         :value  => 0 %></td>
+                                         <%= f.hidden_field :desconto_dolar %>
+
+                    <td align="right"><%= t('INTERES') %> :</td>
+                    <% if current_user.tipo == 0 %>
+                      <td><%= f.text_field :interes_guarani,
+                                           :size   => 15,
+                                           :value  => 0%></td>
+                                           <%= f.hidden_field :interes_dolar %>
+                     <% else %>
+                      <td><%= f.text_field :interes_guarani,
+                                           :size   => 15,
+                                           :value  => 0,
+                                           :readonly => "readonly"%></td>
+                                           <%= f.hidden_field :interes_dolar %>
+                     <% end %>
+
+
+                    <td align="right">Valor :</td>
+                    <td><%= f.text_field :cobro_guarani,
+                                         :size   => 15,
+                                         :onblur => "CotacaoPagoDolar()" %></td>
+                                         <%= f.hidden_field :cobro_dolar %>
+             <% end %>
+            </tr>
+            <tr>
+              <td align="right">Estado:</td>
+              <td colspan="2"><%= f.radio_button :estado,0, :Checked => "True"%> Parte</td>
+              <td><%= f.radio_button :estado,1%> Cancelacion</td>
+              
+            </tr>
+          </table>
+          
+        </fieldset>
+      </td>
+      <td valign="bottom">
+        <%= f.submit t('SAVE') %>
+      </td>
+    </tr>
+
+  </table></div>
+  
+  <script>
+    //ABRI POPUP-----------------------------------------------------------------
+    document.onkeydown=function(e)
+    {
+      var id      = document.getElementById("cobros_detalhe_cobro_id") .value;
+      if(e.which == 113)
+        window.open('/cobros/busca_cliente/'+id, 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=10, WIDTH=1400, HEIGHT=400');
+    }
+    //FIM ABRI POPUP----------------------------------------------------------------
+
+  </script>
+<% end %>
+

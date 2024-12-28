@@ -1,0 +1,125 @@
+  <div class="steps">
+      <ul class="steps-container">
+          <li style="width:33%;" class="activated">
+              <div class="step">
+                <div class="step-image"><span><div class="step-current">1</div></span></div>
+                
+              </div>
+          </li>
+          <li style="width:33%;" class="activated">
+              <div class="step">
+                <div class="step-image"><span><div class="step-current">2</div></span></div>
+                
+              </div>
+          </li>
+          <li style="width:33%;" class="activated">
+              <div class="step">
+                <div class="step-image"><span><div class="step-current">3</div></span></div>
+                
+              </div>
+          </li>
+      </ul>
+      <div class="step-bar" style="width: 100%;"></div>
+  </div>
+
+<div class="tab_container">
+	<div class="group" style="padding: 5px">
+		<h2>
+		<% if @compra.moeda.to_i == 0 %>
+			<span style="color:green">
+			Total U$:<%= format_decimal( @compra.total_dolar.to_f ) %>
+			</span>
+			Desc. U$: <span style="color:green"><%= format_decimal( @compra.desconto_dolar.to_f ) %></span>
+			Total c/ Descuento U$: <span style="color:green"><%= format_decimal( @compra.total_dolar.to_f - @compra.desconto_dolar.to_f ) %></span>
+
+		<% elsif @compra.moeda.to_i == 1 %>
+			<span style="color:red">
+			Total Gs.:<%= format_int( @compra.total_guarani.to_f ) %>
+			</span>
+			Desc. Gs.: <span style="color:red"><%= format_int( @compra.desconto_guarani.to_f ) %></span>
+			Total c/ Descuento Gs.: <span style="color:red"><%= format_int( @compra.total_guarani.to_f - @compra.desconto_guarani.to_f ) %></span>
+		<% else %>
+			<span style="color:blue">
+			Total R$:<%= format_decimal( @compra.total_real.to_f ) %>
+			</span>
+			Desc. R$: <span style="color:blue"><%= format_decimal( @compra.desconto_real.to_f ) %></span>
+			Total c/ Descuento R$: <span style="color:blue"><%= format_decimal( @compra.total_real.to_f - @compra.desconto_real.to_f ) %></span>
+		<% end %>
+		</b>
+		</h2>
+	</div>
+		<table>
+			<tr>
+				<td>
+					<table>
+						<tr>
+							<td>
+								<div id="compras_financas" class="group">
+									<% if @compra.tipo.to_i == 0 %>
+										<%= render partial: "compras_financas/index_co", :locals=>{:compras_financas => @compra.compras_financas} %>
+									<% else %>
+										<%= render partial: "compras_financas/index_cr", :locals=>{:compras_financas => @compra.compras_financas} %>
+									<% end %>
+								</div>
+							</td>
+						</tr>
+						<tr>
+						 	<td>
+								 <div id="compras_financas">
+									<% if (@compra.moeda == 0 and @sum_dolar.to_f > 0) or (@compra.moeda == 1 and @sum_guarani.to_f > 0) or (@compra.moeda == 2  and @sum_real.to_f > 0) %>
+										<% if @compra.tipo.to_i == 0 %>
+											<%= render :partial=>"/compras_financas/new_financa_co", :locals=>{:compras_financa=>ComprasFinanca.new(:compra_id=>@compra.id)} %>
+										<% else %>
+											<%= render :partial=>"/compras_financas/new_financa_cre", :locals=>{:compras_financa=>ComprasFinanca.new(:compra_id=>@compra.id)} %>
+										<% end %>
+
+									<% elsif (@compra.moeda == 0 and @sum_dolar.to_f < 0) or (@compra.moeda == 1 and @sum_guarani.to_f < 0) or (@compra.moeda == 2  and @sum_real.to_f < 0) %>
+										<div class="alert alert-danger" align="center" style="margin: 10px">
+											<h1><b>Monto Mayor que los Titulos aplicados!</b></h1>
+										</div>
+									<% elsif (@compra.moeda == 0 and @sum_dolar.to_f == 0) or (@compra.moeda == 1 and @sum_guarani.to_f == 0) or (@compra.moeda == 2  and @sum_real.to_f == 0) %>
+										<div class="alert alert-success" align="center" style="margin: 10px">
+											<h1> <b>Operacion Concluida Click en X para Salir!</b></h1>	
+										</div>
+									<% end %>
+								 </div>
+							</td>
+						</tr>
+					 </table>
+				</div>
+			 </td>
+		 </tr>
+	 </table>
+
+	<div class="buttons">
+		<% if @compra.tipo_compra == 0 %>
+		  <%= link_to t('BACK'), compra_path(@compra), class: "btn btn-default back" %>
+		  <%= link_to 'Comprovante', '#', onclick: "Comprovante(#{@compra.id})", class: "btn btn-default print" %>
+			<% if (@compra.moeda == 0 and @sum_dolar.to_f == 0) or (@compra.moeda == 1 and @sum_guarani.to_f == 0) or (@compra.moeda == 2  and @sum_real.to_f == 0) %>
+			<% end %>
+
+		<% elsif @compra.tipo_compra == 1 %>
+
+		  <%= link_to t('BACK'), compras_custos_compra_path(@compra), class: "btn btn-default back" %>
+		  <%= link_to 'Comprovante', '#', onclick: "Comprovante(#{@compra.id})", class: "btn btn-default print" %>
+			<% if (@compra.moeda == 0 and @sum_dolar.to_f == 0) or (@compra.moeda == 1 and @sum_guarani.to_f == 0) or (@compra.moeda == 2  and @sum_real.to_f == 0) %>
+			<% end %>
+
+		<% elsif @compra.tipo_compra == 3 %>
+
+		  <%= link_to t('BACK'), compra_path(@compra), class: "btn btn-default back" %>
+		  <%= link_to 'Comprovante', '#', onclick: "Comprovante(#{@compra.id})", class: "btn btn-default print" %>
+			<% if (@compra.moeda == 0 and @sum_dolar.to_f == 0) or (@compra.moeda == 1 and @sum_guarani.to_f == 0) or (@compra.moeda == 2  and @sum_real.to_f == 0) %>
+			<% end %>
+
+		<% end %>
+	</div>
+</div>
+<%= hidden_field_tag :id, @compra.id %>
+<script>
+	$(".next").focus()
+	  function Comprovante(id){
+    window.open('/compras/'+ id +'/comprovante', 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=100, WIDTH=600, HEIGHT=400');
+  }
+</script>
+

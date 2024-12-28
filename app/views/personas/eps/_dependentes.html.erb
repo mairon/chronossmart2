@@ -1,0 +1,24 @@
+<div class="panel">
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-12">
+        <h3>Dependientes</h3>
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <table class="list">
+          <% Persona.where(vend_responsavel_id: @persona.id).each do |dp| %>
+
+          <tr class="<%= cycle("cor1", "cor2")%>">
+            <td width="250"><%= dp.nome %></td>
+            <td width="100"><%= dp.turma.nome unless dp.turma.nil? %></td>
+          </tr>
+          <% end %>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

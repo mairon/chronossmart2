@@ -1,0 +1,130 @@
+<body onload="window.print()">
+<style type="text/css">
+@font-face {
+  font-family: 'prox';
+	src: url("/assets/fonts/proxima-nova.otf") format("opentype");  
+}
+
+	body {
+		font-family: 'prox';
+	}
+
+.receipt-container {
+    width: 750px;
+    padding: 4px;
+    margin: auto;
+}
+	.container-company-logo {
+    margin-top: 2px;
+    border: 1px solid #c9d3dd;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    float: left;
+    background: #ffffff;
+}
+
+.container-company-logo .company-logo {
+    height: 98px;
+    width: 98px;
+    position: relative;
+    border: 0px;
+    margin-top: 0px;
+}
+
+.solid-line {
+    border-width: 2px 0px 0px;
+    border-style: solid;
+    color: #000;
+}
+
+.receipt-info-column-1 {
+    max-width: 390px;
+    padding: 0px 15px;
+    float: left;
+}
+
+.receipt-info-container {
+    display: table;
+    padding: 15px 0px;
+    width: 100%;
+    font-size: 15px;
+}
+.receipt-info-column-2 {
+    float: right;
+    text-align: right;
+    max-width: 230px;
+    word-wrap: break-word;
+}
+.receipt-details {
+    padding: 5px 0px;
+    text-align: justify;
+}
+.receipt-date {
+    padding-bottom: 55px;
+}
+
+.receipt-detail-container {
+    width: 100%;
+    text-align: center;
+}
+</style>
+
+<div class="group receipt-container">
+<hr class="solid-line">
+<div class="receipt-info-container">
+	<div class="receipt-info-column-1">
+		<span style="font-size: 16px">
+			<%= image_tag('logo-doc.png', height: 30) %> <br>
+			<small>
+				<%= current_unidade.direcao %> nº <%= current_unidade.numero %> - <%= current_unidade.bairro %><br>
+				<%= current_unidade.telefone %> <br>
+				CNPJ: <%= current_unidade.ruc %>
+			</small>
+		</span>
+	</div>
+<div class="receipt-info-column-2">
+	<span style="font-size: 16px">
+		#<%= @pago.id.to_s.rjust(6,'0')%>
+	</span>
+</div>	
+</div>
+
+<hr class="solid-line">
+<table style="width: 100%; padding: 30px 0px 5px;">
+				<tr>
+					<td style="flex: 1; font-size: 30px;"><strong><span class="condensed">RECIBO</span></strong></td>
+					<td style="flex: 1; text-align: right;"><span style="font-size: 38px;" class="condensed semi-bold">
+					<% if @pago.moeda.to_i == 0 %>
+						<span style="font-size: 28px;" class="gray condensed semi-bold">U$</span> <%= format_decimal(@tot_cobro_us) %></span></td>
+					<% elsif @pago.moeda.to_i == 1 %>
+						<span style="font-size: 28px;" class="gray condensed semi-bold">Gs</span> <%= format_int(@tot_cobro_gs) %></span></td>
+					<% else %>
+						<span style="font-size: 28px;" class="gray condensed semi-bold">R$</span> <%= format_decimal(@tot_cobro_rs) %></span></td>
+					<% end %>
+					
+				</tr>
+			</table>
+			<hr class="dotted-line"/>
+
+			<div class="receipt-detail-container">
+				<div class="receipt-details">Recebemos de: <strong><%= current_unidade.nome_sys %></strong></div>
+				<div class="receipt-details">A quantia de: 
+				<strong>
+					<% if @pago.moeda.to_i == 0 %>
+						<span class="gray condensed semi-bold">U$</span> <%= format_decimal(@tot_cobro_us) %></span></td>
+					<% elsif @pago.moeda.to_i == 1 %>
+						<span class="gray condensed semi-bold">Gs</span> <%= format_int(@tot_cobro_gs) %></span></td>
+					<% else %>
+						<span class="gray condensed semi-bold">R$</span> <%= format_decimal(@tot_cobro_rs) %></span></td>
+					<% end %>
+				</strong>
+			</div>
+
+			<div class="receipt-details" align="right">Correspondente à: <strong><%= @pago.pagos_financas.last.descricao %></strong></div>
+			
+			<br>
+
+			<div class="receipt-date"><%= current_unidade.cidade.nome %>, <%= @pago.data.strftime("%d/%m/%Y")%>.</div>__________________________________________________<div class="receipt-company"> <%= @pago.persona.nome %> <br><%= @pago.persona.ruc %></div>
+			</div>
+			</div>

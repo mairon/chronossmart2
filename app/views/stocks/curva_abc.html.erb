@@ -1,0 +1,150 @@
+  <h1 id="header">Curva ABC p/ Producto</h1>
+  <style type="text/css">
+    select {
+      width: 300px;
+    }
+  </style>
+  <div class="group">
+    <h2>
+      <%= form_tag resultado_curva_abc_stocks_path, :method => "get" do %>
+        <table>
+         <tr>
+            <td align="right">Fecha:</td>
+            <td colspan="2"> 
+              <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+              <div class="input-group-addon-f">
+                <span class="icon-calendar"></span>
+              </div> 
+            <td style="padding-left: 5px">Hasta</td>
+            <td>
+              <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+              <div class="input-group-addon-f">
+                <span class="icon-calendar"></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td align="right">Clase/Marca:</td>
+            <td colspan="4" style="padding-right: 4px">
+              <%= select("busca", "clase",
+                Clase.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },
+                {prompt: 'Todos...'}) %>
+            </td>
+          </tr>
+          <tr>
+            <td align="right">Grupo:</td>
+            <td colspan="4" style="padding-right: 4px">
+              <%= select("busca", "grupo",
+                Grupo.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },
+                {prompt: 'Todos...'}) %>
+            </td>
+          </tr>
+
+          <tr>
+            <td></td>
+            <td>
+              <fieldset>
+                <legend>Moneda</legend>
+                <input id         = "moeda"
+                       name       = "moeda"
+                       type       = "radio"
+                       value      = "0" />Dolar
+
+                <input id    ="moeda"
+                       name  ="moeda"
+                       type  ="radio"
+                       value ="1"
+                       checked />Guaranies
+
+              </fieldset>
+            </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+              <fieldset>
+                <legend>Parametros Curva ABC</legend>
+                <input id="orden" name="orden" type="radio" value="1" /> Cantidad
+
+                <input id="orden" name="orden" type="radio" value= "2" checked/> Facturación
+              </fieldset>
+            </td>
+          </tr>
+            <input name="a" id="a"  size="5" type="hidden" value="80"/>
+            <input name="b" id="b"  size="5" type="hidden" value="15"/>
+            <input name="c" id="c"  size="5" type="hidden" value="5"/>
+
+          <tr>
+            <td></td>
+            <td>
+              <a href="#" class="acao btn btn-default" style="cursor:pointer;" id="myModalLabel" data-toggle="modal" data-width="500" data-height="781" data-target="#myiframe" data-dismiss="modal">Informe</a>
+              <input type="submit" class="btn btn-default" value="Excel" onclick="Tipo('1')"/>
+            </td>
+          </tr>
+
+          <input type="hidden" name="tipo" id="tipo" size="5" value="0"/>
+        </table>
+      <% end %>
+
+    </h2>
+  </div>
+
+<div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 1100px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel">Listado de Curva ABC</h4>
+      </div>
+      <div class="modal-body" align="center">
+        <div class="embed-responsive embed-responsive-16by9" style="height: 460px">
+          <iframe class="embed-responsive-item" id="iframeModal" frameborder="0 " border="0"></iframe>
+        </div>
+      </div>      
+    </div>
+  </div>
+</div>
+
+<script>
+  $('#busca_cliente').selectize();
+  $('#busca_vendedor').selectize();
+  $('#busca_clase').selectize();
+  $('#busca_produto').selectize();
+  $('#busca_grupo').selectize();
+
+
+( function($) {
+  
+function iframeModalOpen(){
+
+    $('.acao').on('click', function(e) {
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+      
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+      
+      // stampiamo i nostri dati nell'iframe
+      $("#myiframe iframe").attr({
+        'src': '/stocks/resultado_curva_abc?' + $('form').serialize(),
+        'height': height,
+        'width': width,
+        'allowfullscreen':''
+      });
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#myiframe').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+    });
+  }
+  
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+  
+  } ) ( jQuery );
+
+</script>

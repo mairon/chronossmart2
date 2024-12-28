@@ -1,0 +1,27 @@
+
+<h1 align="right" id="header">Pagare</h1>
+
+<div class="buttons">
+    <a href="/pagares/print/<%=@pagare.id%>" class="button print">Pagare</a>
+    <a href="javascript:void(0)" class="button print" onClick="Contrato()">Contrato</a>
+    <a href="/pagares/autorizacao_desc/<%=@pagare.id%>" class="button print">Autorizacion <%= t('DESCRIPTION') %></a>
+     <%= link_to t('BACK'), edit_pagare_path(@pagare),:class => 'button' %>      	
+     <%= link_to 'salir', pagares_path,:class => 'button' %>      	
+</div>
+
+<%= render :partial=>"index_detalhe", :locals=>{:pagares_detalhes=> @pagare.pagares_detalhes} %>
+<%= hidden_field_tag :id, @pagare.id %>
+
+<script>
+
+	function Pagare()                //
+	{
+		window.open('' + document.getElementById('id').value, 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	}
+
+	function Contrato()                //
+	{
+		window.open('/pagares/contrato/' + document.getElementById('id').value, 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	}
+</script>
+

@@ -1,0 +1,5 @@
+<% if params[:liquidacao] == '0' %>
+  <%= render partial: 'clientes/forms/pendentes' %>
+<% elsif params[:liquidacao] == '1' %>
+  <%= render partial: 'clientes/forms/pagos' %>
+<% end %>

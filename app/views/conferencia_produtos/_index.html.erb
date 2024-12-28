@@ -1,0 +1,62 @@
+<table class="head_grid">
+  <tr>
+    <td width="50"><%= t('CODE') %></td>
+    <td width="450">Producto</td>
+    <td width="100" align="right">Saldo Anterior</td>
+    <td width="100" align="right">Novo Saldo</td>
+    <td width="100" align="right">Dif.</td>
+    <td width="100" align="right">Costo Gs.</td>
+    <td width="100" align="right">Sobr./Falt.</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+<% tot_ant = 0 %>
+<% tot_dif = 0 %>
+<% tot_saldo_novo = 0 %>
+<% tot_div = 0 %>
+  <table>
+    <% conferencia_produtos.each do |conferencia_produto| %>
+    <% if (conferencia_produto.quantidade.to_f - conferencia_produto.saldo_anterior.to_f)  < 0 %>
+      <% negativo = "style=\" color:red \" " %>
+    <% end %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="50"><%= conferencia_produto.produto_id.to_s.rjust(6,'0') %></td>
+        <td width="450"><%= conferencia_produto.produto_nome %></td>
+        <td width="100" align="right"><%= format_decimal(conferencia_produto.saldo_anterior)%></td>
+        <td width="100" align="right"><%= format_decimal(conferencia_produto.quantidade)%></td>
+        <td width="100" align="right" <%= raw negativo %>><%= format_decimal(conferencia_produto.quantidade.to_f - conferencia_produto.saldo_anterior.to_f) %></td>
+        <% if @conferencia.moeda.to_i == 0 %>
+          <td width="100" align="right"><%= format_decimal(conferencia_produto.custo_medio_us )%></td>
+          <td width="100" align="right" <%= raw negativo %> >
+            <%= format_decimal((conferencia_produto.quantidade.to_f - conferencia_produto.saldo_anterior.to_f) * conferencia_produto.custo_medio_us.to_f) %>
+          </td>
+          <% tot_dif += ((conferencia_produto.quantidade.to_f - conferencia_produto.saldo_anterior.to_f) * conferencia_produto.custo_medio_us.to_f) %>
+        <% else %>
+          <td width="100" align="right"><%= format_int(conferencia_produto.custo_medio_gs )%></td>
+          <td width="100" align="right" <%= raw negativo %> >
+            <%= format_int((conferencia_produto.quantidade.to_f - conferencia_produto.saldo_anterior.to_f) * conferencia_produto.custo_medio_gs.to_f) %>
+          </td>
+          <% tot_dif += ((conferencia_produto.quantidade.to_f - conferencia_produto.saldo_anterior.to_f) * conferencia_produto.custo_medio_gs.to_f) %>
+        <% end %>
+
+        <% tot_saldo_novo += conferencia_produto.quantidade.to_f %>
+        <% tot_div += (conferencia_produto.quantidade.to_f - conferencia_produto.saldo_anterior.to_f) %>
+        <% tot_ant += conferencia_produto.saldo_anterior.to_f %>
+        <td><%= link_to '', edit_conferencia_produto_path(conferencia_produto), class: 'icon-pencil' %></td>
+        <td><%= link_to '', conferencia_produto, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+<table class="head_grid">
+  <tr>
+    <td width="500"></td>
+    <td width="100" align="right"><b><%= format_decimal(tot_ant)%></b></td>
+    <td width="100" align="right"><b><%= format_decimal(tot_saldo_novo)%></b></td>
+    <td width="100" align="right"><b><%= format_decimal(tot_div)%></b></td>
+    <td width="100"></td>
+    <td width="100" align="right"><b><%= format_int(tot_dif)%></b></td>
+  </tr>
+</table>
+

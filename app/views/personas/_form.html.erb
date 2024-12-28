@@ -1,0 +1,197 @@
+<%= form_for(@persona, html: {:multipart => true}) do |f| %>
+  <div class="row">
+    <!--breadcrumbs end -->
+    <% if @persona.errors.any? %>
+      <div class="col-md-12">
+        <div class="alert alert-block alert-danger fade in">
+          <button data-dismiss="alert" class="close close-sm" type="button">
+            <i class="fa fa-times"></i>
+          </button>
+          <h4><%= pluralize(@persona.errors.count, "error") %> no fue posible grabar:</h4>
+          <ul>
+          <% @persona.errors.full_messages.each do |msg| %>
+            <li><strong><%= msg %></strong></li>
+          <% end %>
+          </ul>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-center">
+        <header class="panel-heading">
+          Persona [<%= t('EDITION') %>]
+        </header>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-4">
+              <label><%= t('DOC_PER') %></label>
+              <%= f.text_field :ruc, size: 13, required: false, class: 'panel-field', autofocus: true %>
+            </div>
+
+            <div class="col-md-8">
+              <label><%= t('NAME') %> Fantasia</label>
+              <%= f.text_field :nome, class: 'panel-field', required: true %>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <label>Razão Social</label>
+              <%= f.text_field :nome_fatura, class: 'panel-field' %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+            <label><%= t('SEGMENT') %></label>
+            <%= f.collection_select :seguimento_id, Seguimento.all( :select => 'id,nome',
+                  :order  => '2' ),:id,:nome,{:prompt => 'Selecione '} %>
+            </div>
+
+            <div class="col-md-6">
+              <label>Telefone 01</label>
+              <%= f.text_field :telefone, size: 21, class: 'panel-field' %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <label>E-mail</label>
+              <%= f.email_field :email, size: 36, class: 'panel-field' %>
+            </div>
+
+            <div class="col-md-6">
+              <label>Telefone 02</label>
+              <%= f.text_field :telefone2, size: 21, class: 'panel-field' %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <label>Responsáble</label>
+              <%= f.collection_select :vend_responsavel_id, Persona.where(tipo_cliente: 1, tipo_aluno: 0).select('id,nome'),:id,:nome,{:prompt => 'Selecione '} %>
+
+            </div>
+
+            <% turma = Turma.where(unidade_id: current_unidade.id).order(:id) %>
+            <% unless turma.blank? %>
+              <div class="col-md-6">
+                <label>Turma</label>
+                <%= f.collection_select :turma_id, turma,:id, :nome, { :prompt => 'Selecione' }%>
+              </div>
+            <% end %>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+            <label>Centro de Costo</label>
+            <%= f.collection_select :centro_custo_id, CentroCusto.all( :select => 'id,nome',
+                  :order  => '2' ),:id,:nome,{:prompt => 'Selecione '} %>
+            </div>
+
+            <div class="col-md-6">
+            <label>Color</label>
+            <input id="persona_color_tag" name="persona[color_tag]" type="color" class="panel-field" />
+            </div>
+
+          </div>
+
+          <div class="row">
+            <div class="col-md-12" align="center">
+              <hr>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-2" align="center">
+              <%= f.check_box :tipo_cliente, checked: true %><br> Cliente
+            </div>
+
+            <div class="col-md-2" align="center">
+              <%= f.check_box :tipo_fornecedor %><br> <%= t('PROVIDER') %>
+            </div>
+
+            <div class="col-md-2" align="center">
+              <%= f.check_box :tipo_banco %><br> Banco
+            </div>
+
+            <div class="col-md-2" align="center">
+              <%= f.check_box :tipo_funcionario %><br> <%= t('EMPLOYEE') %>
+            </div>
+
+            <div class="col-md-2" align="center">
+              <%= f.check_box :tipo_vendedor %><br> Vendedor
+            </div>
+
+            <div class="col-md-2" align="center">
+              <%= f.check_box :tipo_indicador %><br> Indicador
+            </div>
+
+            <div class="col-md-2" align="center">
+              <%= f.check_box :tipo_chofer %><br> Chofer
+            </div>
+            <% if Empresa.last.segmento.to_i == 1%>
+              <div class="col-md-2" align="center">
+                <%= f.check_box :tipo_aluno %><br> Aluno
+              </div>
+            <% end %>
+
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-md-12">
+              <label><%= t('CITY') %></label>
+              <%= f.collection_select :cidade_id, Cidade.find_by_sql("SELECT C.ID, (E.NOME || ' > ' ||  C.NOME || ' > ' || D.NOME) AS NOME FROM CIDADES C
+
+INNER JOIN DISTRITOS D
+ON D.ID = C.DISTRITO_ID
+
+INNER JOIN ESTADOS E
+ON E.ID = D.ESTADO_ID
+
+ORDER BY 2
+"), :id, :nome, {prompt: 'Selecione a cidade'} %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <label><%= t('ADDRESS') %></label>
+              <%= f.text_field :direcao, class: 'panel-field' %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-8">
+              <label>Bairro</label>
+              <%= f.text_field :bairro, class: 'panel-field' %>
+            </div>
+
+            <div class="col-md-4">
+              <label>Nº</label>
+              <%= f.text_field :residencia_numero, class: 'panel-field' %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <label>Complemento</label>
+              <%= f.text_area :direcao_complemento, placeholder: 'Complemento', rows: 3, class: 'panel-field' %>
+            </div>
+
+          </div>
+         <div class="footer-buttons">
+            <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+            <%= link_to t('BACK'), personas_path, :class => "btn btn-back" %>
+         </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+	$('#persona_seguimento_id, #persona_centro_custo_id, #persona_cidade_id, #persona_turma_id, #persona_vend_responsavel_id').selectize();
+</script>

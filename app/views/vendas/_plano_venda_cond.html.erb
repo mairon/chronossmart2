@@ -1,0 +1,18 @@
+<div class="panel">
+  <header class="panel-heading" style="font-family: 'prox'; font-size: 18px; padding-bottom: 10px;">
+    Condiciones del Plan de Venta
+  </header>
+  <div class="panel-body">
+    <table class="list">
+    <% @venda.plano_venda.plano_venda_conds.each do |pv| %>
+      <% if pv.quantidade != 0 %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="80"><%= pv.nome %></td>
+        <td width="150"><%= pv.quantidade.to_i %>x de <%= format_decimal(pv.valor_us) %></td>                    
+        <td width="250"><small><%= pv.obs %></small></td>
+      </tr>
+      <% end %>
+    <% end %>
+    </table>
+  </div> 
+</div>

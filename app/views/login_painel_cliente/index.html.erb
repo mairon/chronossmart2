@@ -1,0 +1,25 @@
+<%= form_tag :action => "logar_cliente", :html => { :id => "login_form" }  do  %>
+	<% unless notice.blank? %>
+		<div class="message errormsg" align="center">
+			<a class="close" data-dismiss="alert"></a>
+			<%= flash[:notice] %>
+		</div>	
+	<% end %>
+	<p>
+		<label>Usuário:</label>
+		<br />
+		<%= text_field_tag :usuario_nome,nil, :class => 'text-passwd', autofocus: true %>
+
+	</p>
+	<!--Usuario!-->
+	<p>
+		<label>Senha:</label>
+		<br />
+		<%= password_field_tag :usuario_senha,nil, :class => 'text-passwd' %>
+	</p>
+	<p class="formend" align="center">
+			<%= submit_tag 'Entrar', 'data-disable-with' => "Aguarde...", class: "btn btn-green", id: "submit", "data-plus-as-tab" => "false"  %>
+	</p>
+		<small style="float:right; margin-top:8px;" > <span class="style3">Powered by</span>  <a href="https://chronos.com.py" target="_blank"><b>Chronos Software</b></a>
+
+<% end %>

@@ -1,0 +1,28 @@
+
+<%= form_for(produto_composicao) do |f| %>
+  <%= f.hidden_field :produto_id %>
+  <div class="group">
+    <table>
+      <tr>
+        <td colspan="4" width="400">
+          <label>Producto</label>
+          <%= f.collection_select :componente_id, Produto.all( select: ' id,nome', order: '2'),:id,:nome, { prompt: 'Selecione la Composicion' } %>
+        </td>
+        <td>
+          <label>Cantidad</label>
+          <%= f.telephone_field :quantidade, size: 15 %>
+        </td>
+        <td style="padding-top: 25px">
+          <%= f.submit t('SAVE'), :class => "button add", :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %>
+        </td>
+      </tr>
+    </table>
+    <div class="footer-buttons">
+      <%= link_to 'Finalizar', produtos_path , :class => "btn btn-blue" %>
+    </div>
+  </div>
+<% end %>
+
+<script>
+  $('#produto_composicao_componente_id').selectize();
+</script>

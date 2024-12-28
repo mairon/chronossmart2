@@ -1,0 +1,68 @@
+<h1 id="header">
+  <% case params[:tipo] %>
+  <% when '0' %>
+    Promoción
+  <% when '1' %>
+    Cashback por Producto
+  <% when '2' %>
+    Cashback Volume de Venta
+  <% end %>
+  - [Edición]
+</h1>
+<div class="group">
+
+<%= form_for(@promo) do |f| %>
+  <% if params[:action] %>
+    <%= f.hidden_field :tipo, value: params[:tipo] %>  
+  <% end %>
+  
+  <% if @promo.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@promo.errors.count, "error") %> prohibited this promo from being saved:</h2>
+
+      <ul>
+      <% @promo.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <table>
+    <tr>
+      <td>
+      <label>Descripcíon</label>
+        <%= f.text_field :nome, size: 70, autofocus: true, required: true %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <label>Validad</label>
+        <%= f.date_select :valid_inicio %> - <%= f.date_select :valid_final %>
+      </td>
+    </tr>
+      <tr>
+      <td>
+        <label>Tabla de Precio</label>
+        <%= f.collection_select :tabela_preco_id, TabelaPreco.select('id,nome').order('2'), :id,:nome, { prompt: true },{required: true} %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label>Inicio Vigência Cashback</label>
+        <%= f.text_field :inicio_cashback, size: 30%>
+      </td>
+    </tr>    
+    <tr>
+      <td>
+        <label>Prazo Cashback</label>
+        <%= f.text_field :valid_cashback, size: 30 %>
+      </td>
+    </tr>        
+  </table>
+  <div class="footer-buttons">
+    <%= f.submit "Seguir", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    <%= link_to 'Volver', promos_path, :class => "btn btn-back" %>
+  </div>
+  <% end %>
+</div>

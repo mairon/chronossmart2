@@ -1,0 +1,39 @@
+<%= form_tag "/venda_romaneios/baixa_romaneio" do %>
+<%= hidden_field_tag :venda_id, params[:venda_id] %>
+<table class="head_grid">
+  <tr>
+  	<td width="40" align="center"><input type="checkbox" id="selectAllM" value="selectAllM" onclick="checkclick()"></td>
+    <td width="80" align="center">Cod.</td>
+    <td width="80" align="center"><%= t('DATE') %></td>
+    <td width="100">Remisión</td>
+    <td width="100">Compra</td>
+    <td width="200">Chofer</td>
+    <td width="100" align="right">Ctd. Neto</td>
+    <td width="100" align="right">Monto</td>
+  </tr>
+ </table>
+ <div class="rolagem" id="div">
+    <table>
+      <% @venda_romaneios.each do |nota| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+        	<input type="hidden" name="valor_<%= nota.id %>" id="valor_<%= nota.id %>" value="<%= format_int(nota.tot_gs) %>" />
+        	<td width="40" align="center"><%= check_box_tag "romaneio[romaneios_ids][]", nota.id, false, { :class => 'm', onclick: "soma(this)" }  %>
+          <td width="80" align="center"> <%= nota.id.to_s.rjust(6,'0') %></td>
+          <td width="80" align="center"> <%= nota.data.strftime("%d/%m/%y") unless nota.data.blank? %></td>
+          <td width="100" align="left"> <%= nota.not_remicao_doc %></td>
+          <td width="100" align="left"> <%= nota.documento_numero %></td>
+          <td width="200" align="left"><small><%= nota.chofer_nome %></small></td>
+          <td width="100" align="right"> <%= format_peso(nota.qtd) %></td>
+          <td width="100" align="right"> <%= format_int(nota.tot_gs) %></td>
+        </tr>
+      <% end %>
+    </table>
+ </div>  
+<br>
+<table>
+  <tr>
+    <td><%= submit_tag "Aplicar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %></td>
+    <td width="132"><input type="text" name="valor" id="valor" value="0" size="15" dir="rtl"></td>
+  </tr>	
+</table>
+<% end %>

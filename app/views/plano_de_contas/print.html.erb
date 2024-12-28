@@ -1,0 +1,49 @@
+<h1 align="center" id="header">Plan de <%= t('ACCOUNT') %></h1>
+<div class="group">
+  <table border="0">
+    <tr>
+      <td width="50"  align="left" >Cod.</td>
+      <td width="580" align="left">Descripcion</td>
+    </tr>
+    </table>
+    <div class="rolagem">
+      <table>
+        <% @plano_de_contas.each do |documento| %>
+
+                  <%
+              #CLASE
+               if documento.codigo[02..14]== ""
+                  varcodigo = documento.codigo[0..01]
+              #GRUPO
+               elsif documento.codigo[04..10]== ""
+                     varcodigo = documento.codigo[0..03]
+              #SUB_GRUPO
+               elsif documento.codigo[7..8]== ""
+                     varcodigo = documento.codigo[0..6]
+              #ITEM
+               elsif documento.codigo[11..3]== ""
+                     varcodigo = documento.codigo[0..10]
+              #SUB_ITEM
+               else
+                     varcodigo = documento.codigo
+
+               end
+       %>
+
+          <tr class = "<%= cycle("cor1", "cor2") %>">
+                <% if documento.codigo[02..14]== ""%>
+                        <td width="580"><b><%=  documento.codigo%></b> - <%=  documento.descricao %></td>
+                <% elsif documento.codigo[04..10]== ""%>
+                        <td width="580"> &nbsp&nbsp&nbsp <b><%=  documento.codigo%></b> - <%=  documento.descricao %></td>
+                <% elsif documento.codigo[7..8]== ""%>
+                        <td width="580"> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b><%=  documento.codigo%></b> - <%=  documento.descricao %></td>
+                <% elsif documento.codigo[11..3]== ""%>
+                        <td width="580"> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b><%=  documento.codigo%></b> - <%=  documento.descricao %></td>
+                <%else%>
+                        <td width="580"> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b><%=  documento.codigo%></b> - <%=  documento.descricao %></td>
+                <%end%>
+          </tr>
+        <% end %>
+      </table>      
+    </div>
+</div>

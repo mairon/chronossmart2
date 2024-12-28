@@ -1,0 +1,41 @@
+<% sub_qtd = 0 %>
+<% sub_tot = 0 %>
+<% quebra1 = '' %>
+<table>
+  <% @vendas.each do |cp| %>
+    <% if quebra1 != cp.terminal_nome %>
+
+      <% if quebra1 != "" %>
+
+        <tr class="head">
+          <td colspan="3" align="right"><%= format_int(sub_qtd.to_f,) %></td>
+          <td align="right"><%= format_int(sub_tot.to_f) %></td>
+        </tr>
+
+        <% sub_qtd = 0 %>
+        <% sub_tot = 0 %>
+
+       <% end %>
+      <tr>
+        <td class="head" colspan="5"><%= quebra1 = cp.terminal_nome %></td>
+      </tr>
+
+    <% end %>
+
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+    	<td width="100"><%= cp.turno_nome %></td>
+      <td width="100"><%= cp.usuario_nome %></td>
+      <td width="300"><%= cp.produto_nome %></td>
+      <td width="40" align="right"><%= format_int(cp.quantidade) %></td>
+      <td width="70" align="right"><%= format_int(cp.valor) %></td>
+      <% sub_qtd += cp.quantidade.to_f %>
+      <% sub_tot += cp.valor.to_f %>
+    </tr>
+  <% end %>
+  <tr class="head">
+    <td colspan="4" align="right"><%= format_int(sub_qtd.to_f) %></td>
+    <td align="right"><%= format_int(sub_tot.to_f) %></td>
+  </tr>
+
+</table>

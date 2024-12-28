@@ -1,0 +1,146 @@
+  <div class="steps">
+      <ul class="steps-container">
+          <li style="width:33%;" class="activated">
+              <div class="step">
+                <div class="step-image"><span><div class="step-current">1</div></span></div>
+                
+              </div>
+          </li>
+          <li style="width:33%;" class="activated">
+              <div class="step">
+                <div class="step-image"><span><div class="step-current">2</div></span></div>
+                
+              </div>
+          </li>
+          <li style="width:33%;">
+              <div class="step">
+                <div class="step-image"><span><div class="step-current">3</div></span></div>
+                
+              </div>
+          </li>
+      </ul>
+      <div class="step-bar" style="width: 66%;"></div>
+  </div>
+
+<div class="group">
+		<h2>
+		<% if @compra.moeda.to_i == 0 %>
+			<span style="color:green">
+			Total U$:<%= format_decimal( @compra.total_dolar.to_f ) %>
+			</span>
+			Desc. U$: <span style="color:green"><%= format_decimal( @compra.desconto_dolar.to_f ) %></span>
+			Total c/ Descuento U$: <span style="color:green"><%= format_decimal( @compra.total_dolar.to_f - @compra.desconto_dolar.to_f ) %></span>
+
+		<% elsif @compra.moeda.to_i == 1 %>
+			<span style="color:red">
+			Total Gs.:<%= format_int( @compra.total_guarani.to_f ) %>
+			</span>
+			Desc. Gs.: <span style="color:red"><%= format_int( @compra.desconto_guarani.to_f ) %></span>
+			Total c/ Descuento Gs.: <span style="color:red"><%= format_int( @compra.total_guarani.to_f - @compra.desconto_guarani.to_f ) %></span>
+		<% else %>
+			<span style="color:blue">
+			Total R$:<%= format_decimal( @compra.total_real.to_f ) %>
+			</span>
+			Desc. R$: <span style="color:blue"><%= format_decimal( @compra.desconto_real.to_f ) %></span>
+			Total c/ Descuento R$: <span style="color:blue"><%= format_decimal( @compra.total_real.to_f - @compra.desconto_real.to_f ) %></span>
+		<% end %>
+		| Competência: <%= @compra.competencia.strftime("%m/%Y") %>
+		</h2>	 
+		</div>
+	<input type="hidden" name="cotacao" id="cotacao"/>
+	<table>
+		<tr>
+			<td>
+				<table>
+					<tr>
+						<td>
+							<div class="group">
+								<table class="head_grid">
+								  <tr>
+								  <td width="110">Compt.</td>
+								  <td width="150"><%= t('UNIT') %></td>
+								  <td width="290">Clasificación</td>
+								  <td width="100" align="right"><%= t('VALUE') %></td>
+								  <td width="30"></td>
+								  </tr>
+								</table>
+
+								<div class="rolagem" dir="div" style="height: 100px">
+								  <% tot = 0 %>
+								  <table>
+								    <% @compra_custos.each do |compras_custo| %>
+								      <tr class="<%= cycle("cor1", "cor2")%>">
+								        <td width="110"><%= compras_custo.data.to_date.strftime("%d/%m/%y") %></td>
+								        <td width="150"><%= compras_custo.unidade.unidade_nome %></td>
+								        <td width="290"><%= compras_custo.rubro.descricao %></td>
+								        <% if @compra.moeda == 0 %>
+								          <td width="100" align="right"><%= format_decimal( compras_custo.valor_us )%></td>
+								          <% tot += compras_custo.valor_us %>
+								        <% elsif @compra.moeda == 2 %>
+								          <td width="100" align="right"><%= format_decimal( compras_custo.valor_rs )%></td>
+								          <% tot += compras_custo.valor_rs %>
+								        <% else %>
+								          <td width="100" align="right"><%= format_int( compras_custo.valor_gs )%></td>
+								          <% tot += compras_custo.valor_gs %>
+								        <% end %>
+								        <td><%= link_to '', compras_custo, method: :delete, class: 'icon-trash', title: t('DELETE'), data: { confirm: 'Esta Seguro?' }  %></td>
+								      </tr>
+								    <% end %>
+								  </table>
+								</div>
+								<table  class="head_grid">
+								  <tr>
+								    <td width="530"></td>
+								    <% if @compra.moeda == 1 %>
+								      <td width="100" align="right"> <b> <%= format_int( tot ) %></b></td>
+									  <% else %>
+								      <td width="100" align="right"> <b> <%= format_decimal( tot )%></b></td>
+								    <% end %>
+								    <td width="30"></td>
+								  </tr>
+								</table>
+
+
+							</div>
+
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div>
+							<% if (@compra.moeda == 0 and @saldo_us == 0 ) or (@compra.moeda == 1 and @saldo_gs.to_i == 0 ) or (@compra.moeda == 2 and @saldo_rs == 0 ) %>
+								<div class="alert alert-success" align="center" style="margin: 10px">
+									<h1><b>Operacion Concluida Click en Seguir!</b></h1>
+								</div>
+							<% else %>
+								<%= render partial: "compras_custos/new_custo", locals: {compras_custo: ComprasCusto.new(compra_id: @compra.id)} %>
+							<% end %>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	<div class="modal-footer">
+		<a href="/compras/<%=params[:id]%>/edit_gasto" class="button back" ><%= t('BACK') %></a>
+		<% if @compra.moeda == 0 %>
+			<% if (format_decimal((@compra.total_dolar.to_f - (@compra.retencao_us.to_f + @compra.desconto_dolar.to_f)) - @compra.compras_custos.sum(:valor_us).to_f).to_f == 0) %>
+				<%= link_to 'Seguir', compras_financa_compra_path(@compra), class: "btn btn-info next", "data-plus-as-tab" => "false" %>
+			<% end %>
+		<% elsif @compra.moeda == 2 %>
+			<% if (format_decimal((@compra.total_real.to_f - @compra.desconto_real.to_f) - @compra.compras_custos.sum(:valor_rs).to_f).to_f == 0) %>
+				<%= link_to 'Seguir', compras_financa_compra_path(@compra), class: "btn btn-info next", "data-plus-as-tab" => "false" %>
+			<% end %>
+		<% else %>
+			<% if (format_decimal((@compra.total_guarani.to_f - (@compra.retencao_gs.to_f + @compra.desconto_guarani.to_f)) - @compra.compras_custos.sum(:valor_gs).to_f).to_f == 0) %>
+				<%= link_to 'Seguir', compras_financa_compra_path(@compra), class: "btn btn-info next", "data-plus-as-tab" => "false" %>
+			<% end %>
+		<% end %>
+	</div>
+</div>
+
+<%= hidden_field_tag :id, @compra.id %>
+<script>
+	$(".next").focus()
+</script>

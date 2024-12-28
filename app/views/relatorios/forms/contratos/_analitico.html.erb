@@ -1,0 +1,66 @@
+<% tot      = 0 %>
+<% tot_fix  = 0 %>
+<% tot_reco = 0 %>
+
+	<table>
+		<% @contratos.each do |c| %>
+		<tr class = "<%= cycle("cor1", "cor2") %>">
+			<td width="30"><%= c.id.to_s.rjust(6,'0') %></td>
+			<td width="40"><%= c.documento_numero %></td>
+			<td width="30"><%= c.status %></td>
+			<td width="40" align="center"><%= c.data.to_date.strftime("%d/%m/%y") unless c.data.blank? %></td>
+			<td width="40" align="center"><%= c.data_final.to_date.strftime("%d/%m/%y") unless c.data_final.blank? %></td>
+      <td width="120">
+        <small><%= c.centro_custo_nome %></small>
+      </td>
+
+      <td width="150">
+        <small><%= c.persona_nome %></small>
+      </td>
+      <td width="45">
+        <% if c.tipo.to_i == 0 %>
+          Mensal
+          <% tot_reco += 1 %>
+        <% else %>
+          Valor Fixo 
+          <% tot_fix  += 1 %>
+        <% end %>
+      </td>
+      <td width="150"> <small><%= c.produto_nome %></small></td>
+      
+      <% if c.moeda.to_i == 0 %>
+        <td width="15">U$</td>
+        <td width="40" align="right"><%= c.quantidade %></td>
+        <td width="40" align="right"><%= format_decimal(c.unitario_us) %></td>
+        <td width="40" align="right"><%= format_decimal(c.unitario_us.to_f * c.quantidade.to_f) %></td>
+        <% tot += c.unitario_us.to_f * c.quantidade.to_f %>
+      <% elsif c.moeda.to_i == 1 %>
+        <td width="15">Gs.</td>
+        <td width="40" align="right"><%= c.quantidade %></td>
+        <td width="40" align="right"><%= format_int(c.unitario_gs) %></td>
+        <td width="40" align="right"><%= format_int(c.unitario_gs.to_f * c.quantidade.to_f) %></td>
+        <% tot += c.unitario_gs.to_f * c.quantidade.to_f %>
+      <% else %>
+        <td width="15">R$</td>
+        <td width="40" align="right"><%= c.quantidade %></td>
+        <td width="40" align="right"><%= format_decimal(c.unitario_rs) %></td>
+        <td width="40" align="right"><%= format_decimal(c.unitario_rs.to_f * c.quantidade.to_f) %></td>
+        <% tot += c.unitario_rs.to_f * c.quantidade.to_f %>
+      <% end %>		
+      </tr>
+		<% end %>
+		<tr class="head">
+			<td colspan="12"></td>
+			<td width="40" align="right"><%= format_decimal(tot) %></td>
+		</tr>
+	</table>
+	<table>
+		<tr class="head">
+			<td>Valor Fixo:</td>
+			<td><%= tot_fix %></td>
+		</tr>
+		<tr class="head">
+			<td>Mensal:</td>
+			<td><%= tot_reco %></td>
+		</tr>		
+	</table>

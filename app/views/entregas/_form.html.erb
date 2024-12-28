@@ -1,0 +1,116 @@
+<%= form_for(@entrega) do |f| %>
+  <% if @entrega.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@entrega.errors.count, "error") %> prohibited this entrega from being saved:</h2>
+
+      <ul>
+      <% @entrega.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+  <li><a href="#tab1"> Entregas - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+  <div id="tab1" class="tab_content">
+    <table>
+      <tr>
+        <td width="1000">
+          <fieldset>
+            <table>
+              <tr>
+                <td align="right"><%= t('DATE') %>:</td>
+                <td><%= f.date_select :data %></td>              
+              </tr>
+              <tr>
+                <td align="right">Tipo:</td>
+                <td>
+                  <%= f.radio_button :tipo, 0, onclick: 'SetaTipo(0)' %>Rodados Proprios
+                  <%= f.radio_button :tipo, 1, onclick: 'SetaTipo(1)' %>Transportadoras
+                </td>
+              </tr>
+              <tr>
+                <td align="right">Responsable:</td>
+                <td colspan="4">
+                  <%= f.collection_select :persona_id, Persona.all( :select => ' id,nome', :conditions => ["tipo_funcionario = 1"], :order  => '2' ), :id, :nome,{:prompt => 'Selecione'},{:class => "selc_medium"} %>
+                     <%= image_tag("load.gif",
+                                                  :align => "absmiddle",
+                                                  :border => 0,
+                                                  :id => "spinner",
+                                                  :width => 21,
+                                                  :height => 21,
+                                                  :style =>"display: none;" ) %>                          
+                </td>
+              </tr>
+              <tr>
+                <td align="right"><span id='label_rodado'>Rodado:</span></td>                    
+                <td colspan="4"><span id='input_rodado'>
+                  <%= f.collection_select :rodado_id, Rodado.where(grupo_rubro_codigo: '2.06.001').order('placa').select('id,placa'), :id, :placa,{:prompt => 'Selecione'},{:class => "selc_medium"} %>
+                  </span>
+                       
+                </td>
+              </tr>
+              <tr>             
+                <td align="right"></td>                    
+                <td><%= f.text_area :obs, rows: 5, cols: 80, placeholder: 'Concepto:'  %></td>
+              </tr>                 
+            </table>
+          </fieldset>
+        </td>
+      </tr>
+    </table>
+  </div>      
+  <div class="buttons">
+    <%= f.submit :value => " Seguir ", :class => "button" %>
+    <%= link_to t('BACK'), entregas_path, :class => "button back" %>        
+  </div>
+</div>
+<% end %>
+
+<script type="text/javascript">
+  function SetaTipo(v){
+    if( v == '0'){
+      $("#label_rodado").css('display','block');
+      $("#input_rodado").css('display','block');
+      $.ajax({
+        type: "GET",
+         url: "/entregas/dynamic_tipo_entrega?tipo=0",
+        beforeSend: function(){
+          $('#spinner').show();
+        },
+        success: function(response){
+          $('#spinner').hide();
+        }
+      });      
+    }else{
+      $("#label_rodado").css('display','none');
+      $("#input_rodado").css('display','none');
+      $.ajax({
+        type: "GET",
+         url: "/entregas/dynamic_tipo_entrega?tipo=1",
+        beforeSend: function(){
+          $('#spinner').show();
+        },
+        success: function(response){
+          $('#spinner').hide();
+        }
+      });      
+    }
+  }
+
+$(document).ready(function () {
+jQuery.validator.setDefaults({
+    success: "valid"
+  });
+
+  $('form').validate({
+    rules: {
+    "entrega[persona_id]": {required: true},
+    }
+  });
+});
+</script>

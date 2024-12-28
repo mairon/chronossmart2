@@ -1,0 +1,21 @@
+<div class="panel">
+  <div class="panel-content">
+		<table class="head_grid">
+			<tr>
+				<td width="150">R.T.</td>
+				<td width="80" align="right">Qtd</td>
+			</tr>
+		</table>
+		<div class="rolagem" dir="div" style="height:80px">
+			<table>
+				<% @venda.vendas_ordem_servs.each do |o| %>
+					<tr class = "<%= cycle("cor1", "cor2") %>">
+						<td width="150"><%= o.ordem_serv.id %></td>
+						<td width="80" align="right"><%= format_int((o.ordem_serv.ordem_serv_prods.where(status: true).sum(:quantidade) ).to_f + (o.ordem_serv.ordem_serv_prods.where(status: false).sum(:quantidade)).to_f) %></td>
+						<td><%= link_to '', o, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+					</tr>
+				<% end %>
+			</table>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,184 @@
+<h1 id="header">Pagos - Edicion</h1>
+<%= form_for(@pagos_detalhe) do |f| %>
+  <%= f.hidden_field :pago_id  %>
+  <%= f.hidden_field :persona_id,   :value => @pagos_detalhe.pago.persona_id %>
+  <%= f.hidden_field :persona_nome, :value => @pagos_detalhe.pago.persona_nome  %>
+  <%= f.hidden_field :data,         :value => @pagos_detalhe.pago.data  %>
+  <%= f.hidden_field :moeda,        :value => @pagos_detalhe.pago.moeda  %>
+  <%= f.hidden_field :compra_id %>
+  <input type="hidden" id="cotacao" value="<%= @pagos_detalhe.pago.cotacao %>"/>
+  <div class="group_cd">
+    <table>
+      <tr height="35">
+        <td align="right">Documento :</td>
+        <td><%= f.text_field :documento_nome,
+                             :size     => 24 ,
+                             :readonly => "readonly"%></td>
+                             <td align="right">Sector :</td>
+        <td><%= f.text_field :clase_produto,
+                             :size     => 24%></td>
+
+        <td align="right">N. Doc.:</td>
+        <td><%= f.text_field :documento_numero_01,
+                             :size     => 3 ,
+                             :readonly => "readonly"%>
+            <%= f.text_field :documento_numero_02,
+                             :size     => 3 ,
+                             :readonly => "readonly"%>
+            <%= f.text_field :documento_numero,
+                             :size     => 15 ,
+                             :readonly => "readonly"%></td>
+        <td align="right">Cuota :</td>
+        <td><%= f.text_field :cota,
+                             :size     => 10 ,
+                             :readonly => "readonly"%></td>
+        <td align="right">Vencimento :</td>
+        <td><%= f.date_select :vencimento ,
+                              :readonly => "readonly"%></td>
+      </tr>
+
+  <!-- VALORES DOLAR!-->
+  <% if @pagos_detalhe.pago.moeda == 0 %>
+      <tr height="35">
+        <td>Valor U$:</td>
+        <td><%= f.text_field :valor_dolar,
+                             :size     => 15 ,
+                             :readonly => "readonly"%></td>
+                             <%= f.hidden_field :valor_guarani %>
+        <td>Anterior Dolar:</td>
+        <td><%= f.text_field :anterior_dolar,
+                             :size     => 15 ,
+                             :readonly => "readonly"%></td>
+                             <%= f.hidden_field :anterior_guarani %>
+
+        <td>Saldo Dolar:</td>
+        <td><%= f.text_field :saldo_dolar,
+                             :size     => 15 ,
+                             :readonly => "readonly"%></td>
+                             <%= f.hidden_field :saldo_guarani %>
+
+      </tr>
+
+<!-- VALORES REAL!-->
+  <% elsif @pagos_detalhe.pago.moeda == 2 %>
+      <tr height="35">
+        <td>Valor U$:</td>
+        <td><%= f.text_field :valor_real,
+                             :size     => 15 ,
+                             :readonly => "readonly"%></td>
+                             <%= f.hidden_field :valor_guarani %>
+        <td>Anterior Dolar:</td>
+        <td><%= f.text_field :anterior_real,
+                             :size     => 15 ,
+                             :readonly => "readonly"%></td>
+                             <%= f.hidden_field :anterior_guarani %>
+
+        <td>Saldo Dolar:</td>
+        <td><%= f.text_field :saldo_real,
+                             :size     => 15 ,
+                             :readonly => "readonly"%></td>
+                             <%= f.hidden_field :saldo_guarani %>
+
+      </tr>
+
+  <% else %>
+
+  <!-- VALORES GUARANI !-->
+      <tr height="35">
+         <td>Valor Gs.:</td>
+        <td><%= f.text_field :valor_guarani,
+                             :size     => 15 ,
+                             :readonly => "readonly"%></td>
+                             <%= f.hidden_field :valor_dolar %>
+
+        <td>Anterior Gs.:</td>
+        <td><%= f.text_field :anterior_guarani,
+                             :size     => 15,
+                             :readonly => "readonly" %></td>
+                             <%= f.hidden_field :anterior_dolar %>
+
+        <td>Saldo Gs.:</td>
+        <td><%= f.text_field :saldo_guarani,
+                             :size     => 15,
+                             :readonly => "readonly" %></td>
+                             <%= f.hidden_field :saldo_dolar %>
+      </tr>
+  <% end %>
+
+    </table>
+    <br/>
+
+    <!-- TOTAIS!-->
+    <table>
+      <tr>
+        <td>
+          <fieldset>
+            <table>
+
+              <tr>
+               <% if @pagos_detalhe.pago.moeda == 0 %>
+
+                    <td><%= t('DISCOUNT') %> :</td>
+                    <td><%= f.text_field :desconto_dolar,
+                                         :size   => 15%></td>
+
+                    <td><%= t('INTERES') %> .:</td>
+                    <td><%= f.text_field :interes_dolar,
+                                         :size   => 15%></td>
+
+                    <td>Pago U$ : </td>
+                    <td><%= f.text_field :pago_dolar,
+                                         :size => 15 %></td>
+                <% elsif @pagos_detalhe.pago.moeda == 2 %>
+                    <td><%= t('DISCOUNT') %> :</td>
+                    <td><%= f.text_field :desconto_real,
+                                         :size   => 15%></td>
+
+                    <td><%= t('INTERES') %> .:</td>
+                    <td><%= f.text_field :interes_real,
+                                         :size   => 15%></td>
+
+                    <td>Gs.:</td>
+                    <td><%= f.text_field :pago_real,
+                                         :size   => 15 %></td>
+               <% else %>
+                    <td><%= t('DISCOUNT') %> :</td>
+                    <td><%= f.text_field :desconto_guarani,
+                                         :size   => 15%></td>
+
+                    <td><%= t('INTERES') %> .:</td>
+                    <td><%= f.text_field :interes_guarani,
+                                         :size   => 15%></td>
+
+                    <td>Gs.:</td>
+                    <td><%= f.text_field :pago_guarani,
+                                         :size   => 15 %></td>
+               <% end %>
+              </tr>
+              <tr>
+                <td>Estado:</td>
+                <td colspan="2"><%= f.radio_button :estado,0, :Checked => "True"%> Parte</td>
+                <td><%= f.radio_button :estado,1%> Cancelacion</td>
+              </tr>
+            </table>
+          </fieldset>
+        </td>
+        <td><%= f.submit t('SAVE') %> | <a href="/pagos/show/<%=@pagos_detalhe.pago_id%>" ><%= t('BACK') %></a></td>
+      </tr>
+    </table>
+  </div>
+
+  <script>
+    //ABRI POPUP-----------------------------------------------------------------
+    document.onkeydown=function(e)
+    {
+      var cliente = document.getElementById("pagos_detalhe_persona_id") .value;
+      var id      = document.getElementById("pagos_detalhe_pago_id") .value;
+      if(e.which == 113)
+        window.open('/pagos/busca_proveedor/'+id +'?busca=' + cliente, 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=10, WIDTH=1300, HEIGHT=400');
+    }
+    //FIM ABRI POPUP----------------------------------------------------------------
+
+  </script>
+<% end %>
+

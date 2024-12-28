@@ -1,0 +1,27 @@
+<h1 id="header">persona_docs</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_persona_doc_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Documento</t>
+            <td>Doc attach</t>
+            <td>Nome</t>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @persona_docs.each do |persona_doc| %>
+      <tr>
+                  <td><%= persona_doc.documento_id %></td>
+                  <td><%= persona_doc.doc_attach %></td>
+                  <td><%= persona_doc.nome %></td>
+                <td><%= link_to 'Editar', edit_persona_doc_path(persona_doc) %></td>
+        <td><%= link_to 'Borrar', persona_doc, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

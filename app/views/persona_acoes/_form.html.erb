@@ -1,0 +1,71 @@
+<%= form_for(@persona_acao) do |f| %>
+  <% if @persona_acao.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@persona_acao.errors.count, "error") %> prohibited this persona_acao from being saved:</h2>
+
+      <ul>
+      <% @persona_acao.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> persona_acoes - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">acao_id :</td>                    
+                      <td><%= f.number_field :acao_id %></td>
+                                      
+                      <td align="right"><%= t('DATE') %> :</td>                    
+                      <td><%= f.date_select :data %></td>
+                                      
+                      <td align="right">persona_id :</td>                    
+                      <td><%= f.number_field :persona_id %></td>
+                                      
+                      <td align="right">obs :</td>                    
+                      <td><%= f.text_area :obs %></td>
+                                      
+                      <td align="right">responsavel_id :</td>                    
+                      <td><%= f.number_field :responsavel_id %></td>
+                                      
+                      <td align="right">horas :</td>                    
+                      <td><%= f.time_select :horas %></td>
+                                      
+                      <td align="right">retorno :</td>                    
+                      <td><%= f.check_box :retorno %></td>
+                                      
+                      <td align="right">status :</td>                    
+                      <td><%= f.number_field :status %></td>
+                                      
+                      <td align="right">retorno_data :</td>                    
+                      <td><%= f.date_select :retorno_data %></td>
+                                      
+                      <td align="right">retorno_horas :</td>                    
+                      <td><%= f.time_select :retorno_horas %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), persona_acoes_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

@@ -1,0 +1,19 @@
+<h1>Listing cobros_financas</h1>
+
+<table>
+  <tr>
+  </tr>
+
+<% @cobros_financas.each do |cobros_financa| %>
+  <tr>
+     <%  cobros_financa.update_attribute :moeda, cobros_financa.cobro.moeda%>
+    <td><%= link_to 'Show', cobros_financa %></td>
+    <td><%= link_to 'Edit', edit_cobros_financa_path(cobros_financa) %></td>
+    <td><%= link_to 'Destroy', cobros_financa, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New cobros_financa', new_cobros_financa_path %>

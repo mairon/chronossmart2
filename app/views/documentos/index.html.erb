@@ -1,0 +1,54 @@
+<h1 id="header">Catastros > Documentos</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), {:action => 'new'}, :class => 'button add' %>
+</div>
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="55" align="center"><%= t('CODE') %></td>
+      <td width="300"><%= t('DOC') %></td>
+      <td width="50" align="center">Sigla</td>
+      <td width="50" align="center">Fiscal</td>
+      <td width="50" align="center"><%= t('PURCHASE') %></td>
+      <td width="50" align="center">Gasto</td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+
+
+    <table>
+      <% for documento in @documentos %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="55" align="center"><%= documento.id.to_s.rjust(6,'0') %></td>
+          <td width="300" align="left"><%= documento.nome %></td>
+          <td width="50" align="center"><%= documento.sigla %></td>
+          <td width="50" align="center">
+            <% if documento.fiscal.to_i == 0 %>
+              NO
+            <% else %>
+              SI
+            <% end %>
+          </td>
+          <td width="50" align="center">
+            <% if documento.compra.to_i == 0 %>
+              NO
+            <% else %>
+              SI
+            <% end %>
+          </td>
+          <td width="50" align="center">
+            <% if documento.gastos.to_i == 0 %>
+              NO
+            <% else %>
+              SI
+            <% end %>
+          </td>
+
+          <td><%= link_to '', edit_documento_path(documento), class: 'icon-pencil' %></td>
+          <td><%= link_to '', documento, :confirm => 'Estas Seguro?', method: :delete, class: 'icon-trash' %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+

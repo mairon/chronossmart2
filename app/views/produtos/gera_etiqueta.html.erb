@@ -1,0 +1,40 @@
+<div class="panel">
+  <h1 id="header">
+    Gera Etiqueta <%= t('PRODUCT') %>
+  </h1>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-4">
+        <label><%= t('PRODUCT') %></label>
+        <%= select("busca", "produto", Produto.all(select: 'id,nome',order: 'nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos' }) %>
+      </div>
+
+      <div class="col-md-2">
+        <label>Status</label>
+        <%= select_tag 'status', options_for_select([["SIN PRECIO", "SIN_PRECIO"],["CON PRECIO", "CON_PRECIO"]]) %>
+      </div>
+
+      <div class="col-md-2">
+        <label>Cantidad</label>
+        <%= text_field_tag :ctd, nil, class: 'panel-field' %>
+      </div>
+      <div class="col-md-2">
+        <label>.</label>
+        <input type="button" class="btn btn-info" onclick="GeraEtiqueta()" value="Gerar Etiqueta"/>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $('#busca_produto').selectize();
+
+
+
+  function GeraEtiqueta(){
+    produto  = document.getElementById('busca_produto').value
+    status  = document.getElementById('status').value
+    ctd  = document.getElementById('ctd').value
+    window.open("/produtos/etiquetas?status="+status+"&id="+produto+"&ctd="+ctd+"&commit=buscar", 'Pagina', ' SCROLLBARS=NO, TOP=10, LEFT=50, WIDTH=1100, HEIGHT=650');
+  }
+</script>

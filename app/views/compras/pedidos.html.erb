@@ -1,0 +1,117 @@
+		<%= form_tag :action => 'add_pedidos',:id => @compra.id  do %>
+	<ul class="tabs">
+	  <li><a href="#tab1">Compra Pedidos - [<%= t('EDITION') %>]</a></li>
+	</ul>
+	<div class="tab_container">
+	<div class="group" style="padding: 5px;">
+		Provedor: <%= @compra.persona.nome %> Doc.: <%= @compra.documento_numero %>
+	</div>
+	<br/>
+	<div>
+	<table>
+		<tr>
+			<td>
+			<div class="group">				
+					<h2>Pedido Pendentes</h2>
+						<table class="head_grid">
+							<tr>
+								<td width="15"></td>
+								<td width="40">Pedido</td>
+								<td width="45"><%= t('DATE') %></td>
+								<td width="50" align="right">Cantidad</td>
+								<td width="15"></td>
+								<td width="50" align="right">Total</td>
+								<td width="50" align="right">Ingresado</td>
+							</tr>
+						</table>
+
+						<div class="rolagem" dir="div" style="height: 150px">
+							<table>
+								<% @pedidos_pendentes.each do |p| %>
+									<tr class= "<%= cycle( "cor1", "cor2" )%>">
+										<td width="15"><%= check_box_tag "lanz_ids[]", p.id %></td>
+										<td width="40"><%= p.id.to_s.rjust(6,'0') %></td>
+										<td width="45"><%= p.data.strftime("%d/%m/%y") %></td>
+										<td width="50" align="right"><%= p.pedido_compra_produtos.sum('quantidade') %></td>
+
+										<% if p.moeda.to_i == 0 %>
+											<td width="15"><b>U$</b></td>
+											<td width="50" align="right"><%= number_to_currency(p.pedido_compra_produtos.sum('total_dolar'), :format=>' %n ', :separeitor => ',' ) %></td>
+										<% elsif p.moeda.to_i == 1 %>
+											<td width="15"><b>G$</b></td>
+											<td width="50" align="right"><%= number_to_currency(p.pedido_compra_produtos.sum('total_dolar'), :format=>' %n ', :separeitor => ',' ) %></td>
+										<% else %>
+											<td width="15"><b>R$</b></td>
+											<td width="50" align="right"><%= number_to_currency(p.pedido_compra_produtos.sum('total_real'), :format=>' %n ', :separeitor => ',' ) %></td>
+										<% end %>
+										<td width="50" align="right"><%= ComprasProduto.sum(:quantidade, :conditions => "pedido_compra_id = #{p.id}") %></td>
+									</tr>
+								<% end %>
+							</table>
+						</div>
+							<%= submit_tag "Selecionar", :disable_with => "Aguarde...", class: 'button' %>
+						<% end %>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+			<div class="group">
+				
+			<h2>Pedido a Facturar</h2>
+				<table class="head_grid">
+					<tr>
+						<td width="40">Pedido</td>
+						<td width="45"><%= t('DATE') %></td>
+						<td width="50" align="right">Cantidad</td>
+						<td width="15"></td>
+						<td width="50" align="right">Total</td>
+					</tr>
+				</table>
+
+				<div class="rolagem" dir="div" style="height: 150px">
+					<table>
+						<% @pedidos_faturas.each do |pf| %>
+							<tr class= "<%= cycle( "cor1", "cor2" )%>">
+								<td width="40"><%= pf.pedido_compra_id.to_s.rjust(6,'0') %></td>
+								<td width="45"><%= pf.pedido_compra.data.strftime("%d/%m/%y") %></td>
+								<td width="50" align="right"><%= pf.pedido_compra.pedido_compra_produtos.sum('quantidade') %></td>
+								<% if pf.pedido_compra.moeda.to_i == 0 %>
+									<td width="15"><b>U$</b></td>
+									<td width="50" align="right"><%= number_to_currency(pf.pedido_compra.pedido_compra_produtos.sum('total_dolar'), :format=>' %n ', :separeitor => ',' ) %></td>
+								<% elsif pf.pedido_compra.moeda.to_i == 1 %>
+									<td width="15"><b>G$</b></td>
+									<td width="50" align="right"><%= number_to_currency(pf.pedido_compra.pedido_compra_produtos.sum('total_guarani'), :format=>' %n ', :separeitor => ',' ) %></td>
+								<% else %>
+									<td width="15"><b>R$</b></td>
+									<td width="50" align="right"><%= number_to_currency(pf.pedido_compra.pedido_compra_produtos.sum('total_real'), :format=>' %n ', :separeitor => ',' ) %></td>
+
+								<% end %>
+
+								<td width="10"><%= link_to t('DELETE'), pf, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'ui-icon ui-icon-trash' %></td>
+							</tr>
+						<% end %>
+					</table>
+				</div>	
+				</div>
+			</td>
+		</tr>
+	</table>
+	</div>
+	<div class="buttons">
+		<%= link_to(t('BACK'), edit_compra_path(@compra), class: 'button back') %>
+		<%= link_to('Seguir', "#", class: 'button next', onclick: "ValidaPedido(#{@compra.compras_pedidos.count('id')})" ) %>
+	</div>
+</div>
+
+<script>
+	function ValidaPedido(count_pedido){
+		if ( count_pedido == '0'){
+				alert('Insira um Pedido!');
+		}else{
+			location.href="/compras/<%= @compra.id %>"
+
+		};
+	}
+
+</script>

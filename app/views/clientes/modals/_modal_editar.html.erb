@@ -1,0 +1,46 @@
+<div class="modal fade" id="editar-cliente" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary">
+        <h1 style="font-size: 16px; font-weight: bold; padding: 0px !important; color: #fff">Titulo #<span id="data-titulo">
+        </h1>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 5px 20px 20px 20px">
+        <div class="panel-content" id="pagina-edit"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+  $('#editar-cliente').on('shown.bs.modal', function(event) {
+    $("#data-titulo").text($(event.relatedTarget).data('titulo-descr'));
+
+
+    url="/clientes/"+ $(event.relatedTarget).data('id') +"/edit";
+
+    AjaxEdit(url);
+
+    function AjaxEdit(url){
+
+      $('#spinner2').show();
+    }
+
+    function processReqChange(){
+      if (req.readyState == 4) {
+        if (req.status ==200) {
+            onSuccess:$('#spinner2').hide();
+            $('#pagina-edit').html(req.responseText);
+
+        } else {
+            alert("Houve um problema ao obter os dados:n" + req.statusText);
+        }
+      }
+    }
+
+  });
+</script>

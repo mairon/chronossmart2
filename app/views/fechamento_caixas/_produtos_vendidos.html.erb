@@ -1,0 +1,43 @@
+<div class="panel">
+  <header class="panel-heading">
+  	<b>Productos Vendidos</b>
+  </header>
+
+		<table  class="head_grid">
+			<tr>
+				<td width="300">Productos</td>
+				<td width="70" align="right">Ctd.</td>
+				<td width="70" align="right">Unit.</td>
+				<td width="70" align="right"><%= t('DESCRIPTION') %></td>
+				<td width="70" align="right">Total</td>
+			</tr>
+		</table>
+		<div class="rolagem" dir="div" style="height: 360px;">
+			<table>
+				<% qtd  = 0 %>
+				<% desc = 0 %>
+				<% tot  = 0 %>
+				<% @produtos_vendidos.each do |pv| %>
+					<tr class = "<%= cycle("cor1", "cor2") %>">
+						<td width="300"><%= link_to "#{pv.produto_id.to_s.rjust(4,'0')}-#{pv.produto_nome}", produtos_fechamento_caixa_path(@fechamento_caixa.id, produto_id: pv.produto_id), target: '_blank' %></td>
+						<td width="70" align="right"><%= pv.qtd.to_f %></td>						
+						<td width="70" align="right"><%= format_int(pv.unit) %></td>
+						<td width="70" align="right"><%= format_int(pv.desc_gs) %></td>
+						<td width="70" align="right"><%= format_int(pv.tot.to_f - pv.desc_gs.to_f) %></td>
+					</tr>
+					<% qtd += pv.qtd.to_f %>
+					<% desc += pv.desc_gs.to_f %>
+					<% tot += (pv.tot.to_f - pv.desc_gs.to_f) %>
+				<% end %>
+			</table>
+		</div>
+		<table  class="head_grid head">
+			<tr>
+				<td width="300"></td>
+				<td width="70" align="right"><b><%= qtd.to_f %></b></td>
+				<td width="70" align="right"></td>
+				<td width="70" align="right"><b><%= format_int(desc) %></b></td>
+				<td width="70" align="right"><b><%= format_int(tot) %></b></td>
+			</tr>
+		</table>
+</div>

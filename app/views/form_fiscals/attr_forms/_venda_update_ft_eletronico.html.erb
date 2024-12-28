@@ -1,0 +1,221 @@
+<%= form_tag "#", remote: true, id: "send_fatura" do %>
+	<%= hidden_field_tag :cod_proc, @venda.id %>
+	<%= hidden_field_tag :sigla_proc, 'VT' %>
+	<%= hidden_field_tag :data, @venda.data %>
+	<%= hidden_field_tag :status, 1 %>
+	<%= hidden_field_tag :tipo, @venda.tipo %>
+	<%= hidden_field_tag :persona_id, @venda.persona_id %>
+	<%= hidden_field_tag :cota, 1 %>
+	<%= hidden_field_tag :tipo_op, 9 %>
+	<%= hidden_field_tag :moeda, @venda.moeda %>
+	<%= hidden_field_tag :tot_gs, @tot_des_gs.to_i %>
+	<table>
+		<% if @venda.persona.cidade.blank? %>
+	   <div class="alert alert-danger" role="alert">
+	      Atualize a Cidade do Cadastro <%= link_to 'Aqui', "#", onclick: "OpenPersonaEdit()" %>    
+	   </div>
+   <% end %>
+
+	<% if @venda.persona_nome != 'CONSUMIDOR FINAL' %>
+		<% ruc = @venda.persona.ruc %>
+		<% nome = @venda.persona.nome_fatura %>
+	<% else %>
+		<% ruc = '' %>
+		<% nome = '' %>
+	<% end %>
+	<tr>
+		
+		<% if (PersonaProduto.where(persona_id: @venda.persona_id).count(:id).to_i == 0) %>
+			<td colspan="2">
+				<label>RUC</label>
+				<%= text_field_tag :ruc, ruc, class: 'panel-field'  %>
+			</td>
+		<% else %>
+			<td colspan="2">
+				<label>RUC</label>
+				<%= text_field_tag :ruc, ruc, readonly: true, style: 'border:1px solid red', class: 'panel-field'  %>
+			</td>
+		<% end %>
+		<%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner-add-prod", width: 15, height: 15, style: "position: relative; left: 150px; top: 20px; display: none;") %>
+
+	</tr>
+	<tr>
+		
+		<% if (PersonaProduto.where(persona_id: @venda.persona_id).count(:id).to_i == 0) %>
+			<td colspan="2">
+				<label>Nombre</label>
+				<%= text_field_tag :persona_nome, nome, readonly: true, class: 'panel-field', size: 50 %></td>
+		<% else %>
+			<td colspan="2">
+				<label>Nombre</label>
+				<%= text_field_tag :persona_nome, nome, readonly: true, style: 'border:1px solid red', class: 'panel-field' , size: 50 %>
+			</td>
+		<% end %>
+	</tr>
+	<tr>
+		<td  colspan="2">
+			<label>E-mail</label>
+			<%= text_field_tag :email, @venda.persona.email, readonly: true , size: 50%>
+		</td>
+	</tr>
+
+		<tr>
+		<% if current_unidade.id  == 1 %>
+			<td>
+				<label>Factura</label>
+				<%= select("busca", "doc", FormFiscal.all(:select => 'id,doc,doc_01,doc_02',:conditions => ["tipo_doc = 1 and status = 0 and terminal_id = #{@venda.terminal_id} and unidade_id = #{@venda.unidade_id}"],limit: 40,:order => 'CAST(doc as integer)').collect {|p| [ p.doc_01 << '.' << p.doc_02 << '.' << p.doc, p.id ] },:class => "select")  %></td></td>
+		<% else %>
+			<td>
+				<label>Factura</label>
+				<%= select("busca", "doc", FormFiscal.all(:select => 'id,doc,doc_01,doc_02',:conditions => ["tipo_doc = 1 and status = 0 and terminal_id = #{@venda.terminal_id} and unidade_id = #{@venda.unidade_id}"],limit: 40,:order => 'CAST(doc as integer)').collect {|p| [ p.doc_01 << '.' << p.doc_02 << '.' << p.doc, p.id ] },:class => "select")  %></td></td>
+		<% end %>
+			<td style="padding-top: 25px;">
+				<a href="javascript:void(0)" class="btn btn-green" id="submit_fatura2">Facturar</a>
+			</td>
+		</tr>
+	</table>
+<% end %>          
+
+
+<div class="modal fade" id="ModalStatusFe" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="row" align="center" style="padding: 15px">
+        	<div class="col-md-12">
+	        	<h1 id="data-status">Verificando Datos</h1>
+            <div id="data-erro-status" class='alert alert-danger'  role='alert' hidden> <ul></ul></div>
+            <div id="data-success-status" class='alert alert-success'  role='alert' hidden> <ul></ul></div>
+	        	<div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+
+  function OpenPersonaEdit(){
+    window.open('/personas/<%= @venda.persona_id %>/edit?form=resumido', 'Pagina', ' SCROLLBARS=YES,  LEFT=100, WIDTH=650, HEIGHT=300');
+  };
+
+  $().ready(function() {
+    // validate signup form on keyup and submit
+    $("form").validate({
+      rules: {
+        ruc: "required",
+        persona_nome: "required"
+        }
+    });
+  });
+
+
+	  $("#submit_fatura2").click(function() {
+	  	$('.lds-ring').show("slow");
+	  	$("#ModalStatusFe").modal();
+	    $.ajax({
+	        type: 'POST',
+	        url:  '/form_fiscals/venda_update_ft',
+	        data: $('#send_fatura').serialize(),
+	        dataType: "JSON",
+	        success: function(data) {
+	        	if (data['fe']['success'] == false){
+	            $("#data-erro-status").show();
+	            $.each(data['fe']['errores'], function(i, error) {
+	              $("#data-erro-status").append("<p>"+ data['fe']['errores'][i].error  +"</p>")
+	            })
+	        		$('.lds-ring').hide("slow");
+	        	} else {
+	 						$("#data-success-status").show();
+	            $.each(data['fe']["result"]['deList'], function(i, cdc) {
+	              $("#data-success-status").append("<p>"+ data['fe']["result"]["deList"][i].cdc  +"</p>")
+	            })
+
+	        		location.reload();
+	        	}
+
+	          console.log(data);
+	        },
+
+	        error: function (jqXHR, exception) {
+		        var msg = '';
+		        if (jqXHR.status === 0) {
+		            msg = 'Not connect.\n Verify Network.';
+		        } else if (jqXHR.status == 404) {
+		            msg = 'Requested page not found. [404]';
+		        } else if (jqXHR.status == 500) {
+		            msg = 'Internal Server Error [500].';
+		        } else if (exception === 'parsererror') {
+		            msg = 'Requested JSON parse failed. '
+
+		        } else if (exception === 'timeout') {
+		            msg = 'Time out error.';
+		        } else if (exception === 'abort') {
+		            msg = 'Ajax request aborted.';
+		        } else {
+		            msg = 'Uncaught Error.\n' + jqXHR.responseText;
+		        }
+		        $("#data-erro-status").show();
+		        $("#data-erro-status").append("<p>"+ msg +"</p>")
+		    },
+	    });
+	  });
+
+
+
+  	$(document).ready(function() {
+  		$("#spinner-add-prod").show("fast")
+      $.ajax({
+          type: 'GET',
+          url:  '/buscas/busca_ruc?ruc=' + $("#ruc").val(),
+          dataType: "JSON",
+          success: function(data) {
+            console.log(data);
+            if (data["fe"]["success"] == true) {
+            	if (data["fe"]["result"].respuesta_codigo == '0502') {
+            		$("#persona_nome").val(data["fe"]["result"].razon_social);
+            	}else{
+            		alert(data["fe"]["result"].respuesta_mensaje)
+            	}
+            }else{
+            	alert(data["fe"]["error"])
+            }
+            $("#spinner-add-prod").hide("fast");
+          }
+      });  		
+  	});
+
+
+  	$("#ruc").change(function(){
+  		$("#spinner-add-prod").show("fast")
+      $.ajax({
+          type: 'GET',
+          url:  '/buscas/busca_ruc?ruc=' + $("#ruc").val(),
+          dataType: "JSON",
+          success: function(data) {
+            console.log(data);
+            if (data["fe"]["success"] == true) {
+            	if (data["fe"]["result"].respuesta_codigo == '0502') {
+            		$("#persona_nome").val(data["fe"]["result"].razon_social);
+            	}else{
+            		alert(data["fe"]["result"].respuesta_mensaje)
+            	}
+            }else{
+            	alert(data["fe"]["error"])
+            }
+            $("#spinner-add-prod").hide("fast");
+          }
+      });  		
+  	});
+  </script>
+
+  <style>
+  label.error {
+    margin: 0px 10px 0px 10px;
+    width: auto;
+    color: red;
+  }
+  </style>
+

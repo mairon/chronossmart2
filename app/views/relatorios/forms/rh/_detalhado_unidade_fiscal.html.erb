@@ -1,0 +1,186 @@
+
+<% pd = "AND ID = #{params[:busca]["empregado"]}" unless params[:busca]["empregado"].blank?%>
+<% Persona.where("estado = 0 and tipo_funcionario = 1 and unidade_id = #{params[:busca]["unidade"]} #{pd}").each do |p| %>
+<% sqld = "SELECT DU.DATA,
+     (DU.DATA || ' ' || DU.ENTRADA) AS D_ENTRADA,
+     (DU.DATA || ' ' || DU.SAIDA) AS D_SAIDA,
+     (DU.DATA || ' ' || DU.ALMOCO_ENTRADA) AS D_BREAK,
+     (DU.DATA || ' ' || DU.ALMOCO_SAIDA )AS D_B_BREAK,
+     DU.OBS,
+     (SELECT CP.CHECKPOINT FROM CHECK_POINTS CP WHERE CP.CHECKPOINT::DATE = DU.DATA AND CP.CHECK_POINT_TYPE = '0' AND CP.PERSONA_ID = #{p.id} LIMIT 1 ) AS ENTRADA,
+     (SELECT CP.CHECKPOINT FROM CHECK_POINTS CP WHERE CP.CHECKPOINT::DATE = DU.DATA AND CP.CHECK_POINT_TYPE = '1' AND CP.PERSONA_ID = #{p.id} LIMIT 1 ) AS SAIDA,
+     (SELECT CP.CHECKPOINT FROM CHECK_POINTS CP WHERE CP.CHECKPOINT::DATE = DU.DATA AND CP.CHECK_POINT_TYPE = '2' AND CP.PERSONA_ID = #{p.id} LIMIT 1 ) AS BREAK,
+     (SELECT CP.CHECKPOINT FROM CHECK_POINTS CP WHERE CP.CHECKPOINT::DATE = DU.DATA AND CP.CHECK_POINT_TYPE = '3' AND CP.PERSONA_ID = #{p.id} LIMIT 1 ) AS B_BREAK,
+     (SELECT S.OBS FROM PERSONA_ESCALAS S WHERE S.PERSONA_ID = #{p.id} AND S.DATA = DU.DATA  LIMIT 1 ) AS SOLICITUDE_MOTIVO,
+     (SELECT S.TIPO FROM PERSONA_ESCALAS S WHERE S.PERSONA_ID = #{p.id} AND S.DATA = DU.DATA  LIMIT 1 ) AS TIPO_ESCALA,
+     DU.UTIL
+FROM DIAS_UTEIS DU
+WHERE DU.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
+ORDER BY DU.DATA
+"
+
+@dias_uteis =  DiasUtei.find_by_sql(sqld)
+%>
+
+
+<style type="text/css">
+    #line_items {
+    page-break-before: always;
+  }
+
+</style>
+<div id="line_items">
+<table id="line_items">
+
+  <% tot_hr    = 0 %>
+  <% tot_min   = 0 %>
+  <% d_tot_hr  = 0 %>
+  <% d_tot_min = 0 %>
+  <% conf_reg = 0 %>
+  <% tot_dias = 0 %>
+  <% count_escala = 0 %>
+  <tr>
+    <td colspan="5" class="head"><%= p.nome %></td>
+  </tr>
+
+  <% @dias_uteis.each do |cp| %>
+  <tr class="<%= cycle("cor1", "cor2")%>">
+    <td width="50" align="center"><%= cp.data.to_date.strftime("%d/%m/%y") %></td>
+    <td width="50"> <%= l(cp.data.to_date, :format => :dia_semana, locale: 'es') %></td>
+
+    <td width="50" align="center">
+    <%  unless cp.entrada.blank? %>
+      <% entrada_comercial = "#{cp.entrada.to_time.strftime("%Y-%m-%d")} 07:00:00".to_time %>
+      <% if cp.entrada.to_time < entrada_comercial %>
+        <%= entrada_comercial.to_datetime.strftime("%H:%M") %>
+      <% else %>
+        <%= cp.entrada.to_time.to_datetime.strftime("%H:%M") %>
+      <% end %>
+    <% end %>
+
+    <% unless cp.entrada.blank? %>
+      <% conf_reg += 1 %>
+    <% end %>
+    <td width="50" align="center">
+      <%= cp.break.to_datetime.strftime("%H:%M") unless cp.break.blank? %>
+    </td>
+    <% unless cp.break.blank? %>
+      <% conf_reg += 1 %>
+    <% end %>
+
+      <td width="50" align="center">
+        <%= cp.b_break.to_datetime.strftime("%H:%M") unless cp.b_break.blank? %>
+      </td>
+    <% unless cp.b_break.blank? %>
+      <% conf_reg += 1 %>
+    <% end %>
+
+    <td width="50" align="center"><%= cp.saida.to_datetime.strftime("%H:%M") unless cp.saida.blank? %></td>
+    <% unless cp.saida.blank? %>
+      <% conf_reg += 1 %>
+    <% end %>
+
+    <% if l(cp.data.to_date, :format => :dia_semana, locale: 'es') == 'sábado' %>
+      <% if conf_reg == 2 %>
+        <% entrada_comercial = "#{cp.entrada.to_time.strftime("%Y-%m-%d")} 07:00:00".to_time %>
+        <% if cp.entrada.to_time < entrada_comercial %>
+          <% entrada = entrada_comercial %>
+        <% else %>
+          <% entrada =  cp.entrada.to_time %>
+        <% end %>
+
+        <td width="50" align="center">
+          <%= Time.at((cp.saida.to_time - entrada)).utc.strftime("%H:%M") %>
+        </td>
+        <% tot_hr += (60 * Time.at((cp.saida.to_time - entrada)).utc.strftime("%H").to_i) %>
+        <% tot_min += (Time.at((cp.saida.to_time - entrada)).utc.strftime("%M").to_i) %>
+      <% else %>
+        <td width="50" align="center">
+          <% unless cp.tipo_escala.nil? %>
+            --
+            <% count_escala += 1 %>
+          <% else %>
+            <% if cp.util != false %>
+              Diver
+            <% end %>
+          <% end %>
+        </td>
+
+      <% end %>
+
+    <% else %>
+    <% if l(cp.data.to_date, :format => :dia_semana, locale: 'es') != 'domingo' %>
+      <% if conf_reg == 4 %>
+        <td width="50" align="center">
+
+          <% entrada_comercial = "#{cp.entrada.to_time.strftime("%Y-%m-%d")} 07:00:00".to_time %>
+          <% if cp.entrada.to_time < entrada_comercial %>
+            <% entrada = entrada_comercial %>
+          <% else %>
+            <% entrada =  cp.entrada.to_time %>
+          <% end %>
+
+          <%  volta_break_30 = (cp.break.to_datetime + 30.minutes).to_time unless cp.break.blank? %>
+          <% if cp.entrada.to_time < volta_break_30 %>
+            <% b_break_30 = volta_break_30 %>
+          <% else %>
+            <% b_break_30 = cp.b_break.to_time %>
+          <% end %>
+
+
+          <%= Time.at((cp.break.to_time - entrada) + (cp.saida.to_time - b_break_30.to_time)).utc.strftime("%H:%M") %>
+          </td>
+        <% tot_hr += (60 * Time.at((cp.break.to_time - entrada) + (cp.saida.to_time - b_break_30.to_time)).utc.strftime("%H").to_i) %>
+        <% tot_min += (Time.at((cp.break.to_time - entrada) + (cp.saida.to_time - b_break_30.to_time)).utc.strftime("%M").to_i) %>
+      <% else %>
+        <td width="50" align="center">
+          <% unless cp.tipo_escala.nil? or cp.util == false %>
+            --
+            <% count_escala += 1%>
+          <% else %>
+            <% if cp.util != false %>
+              Diver
+            <% end %>
+          <% end %>
+        </td>
+      <% end %>
+      <% else %>
+      <td></td>
+    <% end %>
+
+    <% end %>
+    <% tot_dias += 1 %>
+
+
+
+    <!--  dias uteis !-->
+    <% if l(cp.data.to_date, :format => :dia_semana, locale: 'es') != 'domingo' %>
+      <% if l(cp.data.to_date, :format => :dia_semana, locale: 'es') == 'sábado' %>
+          <% Time.at((cp.d_break.to_time - cp.d_entrada.to_time)).utc.strftime("%H:%M") %></td>
+          <% d_tot_hr += (60 * Time.at((cp.d_break.to_time - cp.d_entrada.to_time)).utc.strftime("%H").to_i) %>
+          <% d_tot_min += (Time.at((cp.d_break.to_time - cp.d_entrada.to_time)).utc.strftime("%M").to_i) %>
+
+      <% else %>
+          <% Time.at(( cp.d_break.to_time - cp.d_entrada.to_time) + (cp.d_saida.to_time - cp.d_b_break.to_time)).utc.strftime("%H:%M") %>
+          <% d_tot_hr += (60 * Time.at((cp.d_break.to_time - cp.d_entrada.to_time) + (cp.d_saida.to_time - cp.d_b_break.to_time)).utc.strftime("%H").to_i) %>
+          <% d_tot_min += (Time.at((cp.d_break.to_time - cp.d_entrada.to_time) + (cp.d_saida.to_time - cp.d_b_break.to_time)).utc.strftime("%M").to_i) %>
+
+      <% end %>
+    <% end %>
+    <% conf_reg = 0 %>
+
+    <td><%= cp.solicitude_motivo %><%= cp.obs %></td>
+
+  </tr>
+  <% end %>
+  <tr>
+    <td colspan="6">Total de Dias <%= tot_dias %> | Dias No Trabajados <%= count_escala %> | Dias Trabajados  <%= tot_dias.to_i -  count_escala.to_i %></td>
+    <% hm = (tot_hr + tot_min).divmod(60) %>
+    <td align="center"><%= hm.join(':') %></td>
+    <% dhm = (d_tot_hr + d_tot_min).divmod(60) %>
+
+  </tr>
+</table>
+</div>
+<% end %>
+

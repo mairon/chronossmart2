@@ -1,0 +1,595 @@
+
+<style type="text/css">
+  input.cota{
+    height: 44px;
+    width: 60px;
+    font-size: 22px;
+    float: left;
+    border-radius: 0px;
+  }
+
+  input.vencimento{
+    height: 44px;
+    width: 120px;
+    font-size: 22px;
+    float: left;
+    border-radius: 0px;
+  }
+
+  input.valores{
+    height: 44px;
+    width: 268px;
+    font-size: 22px;
+    border-radius: 0px;
+    margin: 5px;
+    padding: 5px;
+  }
+
+  input.padrao_height{
+    height: 44px;
+    font-size: 22px;
+    border-radius: 0px;
+  }
+
+
+  input.valores_desc{
+    height: 44px;
+    width: 125px;
+    font-size: 22px;
+    float: left;
+    border-radius: 0px;
+  }
+
+  .descp{
+    font-size: 22px;
+  }
+
+  .styled-select select {
+    width: 268px;
+    padding: 5px;
+    font-size: 16px;
+    border-radius: 0;
+    height: 44px;
+    -webkit-appearance: none;
+    margin-left: 5px;
+    margin-bottom: 5px;
+  }
+  #valor{
+    border:2px solid red;
+  }
+
+  #desc_gs{
+    border:2px solid red;
+    height: 44px;
+    width: 120px;
+    font-size: 22px;
+    margin: 5px;
+    padding: 5px;
+
+
+  }
+  #int_gs{
+    border:2px solid green;
+    height: 44px;
+    width: 120px;
+    font-size: 22px;
+    margin: 5px;
+    padding: 5px;
+
+  }
+
+</style>
+
+
+<% abertura = AberturaCaixa.last(:conditions => ["status = true and usuario_id = #{current_user.id} and unidade_id = #{current_unidade.id}"]) %>
+<%= form_tag gerar_cotas_credito_vendas_path, :id => "FinancaForm", :method => "get" do %>
+  <%= hidden_field_tag :id, @venda.id %>
+  <%= hidden_field_tag :persona_id,nil, :value => @venda.persona_id %>
+  <%= hidden_field_tag :persona_nome,nil, :value =>  @venda.persona_nome %>
+  <%= hidden_field_tag :cotacao,nil,      :value => @venda.cotacao.to_i %>
+  <%= hidden_field_tag :cotacao_real,nil,      :value => @venda.cotacao_real.to_i %>
+  <%= hidden_field_tag :cotacao_rs_us,nil,      :value => @venda.cotacao_rs_us.to_f %>
+  <%= hidden_field_tag :usuario_id,nil,   :value => current_user.id %>
+  <%= hidden_field_tag :ruc,nil,          :value => @venda.ruc%>
+  <%= hidden_field_tag :direcao,nil,      :value => @venda.direcao%>
+  <%= hidden_field_tag :cidade_nome,nil,  :value => @venda.cidade_nome%>
+  <%= hidden_field_tag :cidade_id,nil,    :value => @venda.cidade_id %>
+  <%= hidden_field_tag :bairro,nil,       :value => @venda.bairro%>
+  <%= hidden_field_tag :vendedor_id,nil,  :value => @venda.vendedor_id%>
+  <%= hidden_field_tag :vendedor_nome,nil, :value => @venda.vendedor_nome%>
+  <%= hidden_field_tag :controle_caixa,nil, :value => abertura.id unless abertura.nil? %>
+  <%= hidden_field_tag :data_caixa,nil,:value => @venda.data_caixa %>
+  <%= hidden_field_tag :cheque_status, nil, :value => 0 %>
+  <%= hidden_field_tag :cotacao_gs_ps, nil,:value => @venda.cotacao_gs_ps %>
+  <%= hidden_field_tag :saldo_antecipado, nil, :value => @saldo_antecipado.to_i %>
+  <%= hidden_field_tag :nota_credito_id, nil %>
+  <%= hidden_field_tag :fact_ad_01, nil %>
+  <%= hidden_field_tag :fact_ad_02, nil %>
+  <%= hidden_field_tag :fact_ad, nil %>
+  <%= hidden_field_tag :saldo_limite_credito, @cliente_saldo %>
+
+
+    <input type="hidden" name="valor_sem_us" id="valor_sem_us"
+      value="<%= (@produto_sum_dolar.to_f - VendasFinanca.sum("(coalesce(valor_dolar,0) - coalesce(interes_us,0)) + coalesce(desconto_dolar,0)", :conditions=> ["venda_id = #{@venda.id}"]).to_f).to_f %>" />
+    <input type="hidden" name="valor_sem_gs" id="valor_sem_gs"
+      value="<%= format_int(@produto_sum_guarani.to_f - VendasFinanca.sum("(coalesce(valor_guarani,0) - coalesce(interes_gs,0)) + coalesce(desconto_guarani,0)", :conditions=> ["venda_id = #{@venda.id}"]).to_f).gsub('.','') %>" />
+    <input type="hidden" name="valor_sem_rs" id="valor_sem_rs"
+      value="<%= @produto_sum_real.to_f - VendasFinanca.sum(:valor_real, :conditions=> ["venda_id = #{@venda.id}"]).to_f %>" />
+    <input type="hidden" name="valor_sem_ps" id="valor_sem_ps"
+      value="<%= @produto_sum_guarani / @venda.cotacao_gs_ps.to_f %>" />
+
+    <input type="hidden" name="sub_valor_us" id="sub_valor_us" value="<%= @produto_sum_dolar.to_f - VendasFinanca.sum("(coalesce(valor_dolar,0) - coalesce(interes_us,0)) + coalesce(desconto_dolar,0)", :conditions=> ["venda_id = #{@venda.id}"]).to_f %>" />
+    <input type="hidden" name="sub_valor_gs" id="sub_valor_gs" value="<%= @produto_sum_real.to_f - VendasFinanca.sum(:valor_real, :conditions=> ["venda_id = #{@venda.id}"]).to_f %>" />
+
+  <input type="hidden" name="user" id="user" value="<%= current_user.tipo %>" />
+  <table>
+    <tr>
+      <td class="descp" align="right"><%= t('DATE') %>:</td>
+      <td>
+        <input type="text" name="data" id="data" class="valores" value="<%= (Time.now.to_date).strftime("%d/%m/%Y")%>" onkeyup="Formatadata(this,event)" required />
+      </td>
+    </tr>
+    <tr>
+      <td align="right" class="descp">Tipo:</td>
+      <td>
+        <div class="styled-select">
+          <%= select("busca", "forma_pago", (FormaPago.select('id,nome').order( 'id')).collect {|p| [ p.nome, p.id ] },{},{onchange: "fp(this.options[this.selectedIndex].value)", autofocus: true})  %>
+        <input type="hidden" name="forma_pg" id="forma_pg" value="1"/>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td align="right" class="descp"><%= t('COIN') %>:</td>
+      <td>
+        <div class="styled-select">
+          <select name="moeda" id="moeda" onchange="contado();">
+            <option value="1">1 - GUARANIES</option>
+            <option value="0">0 - DOLARES</option>
+            <option value="2">2 - REALES</option>
+            <option value="3">3 - PESO</option>
+          </select>
+        </div>
+      </td>
+    </tr>
+    <tr id="tr-btn-nota-credito" hidden>
+      <td align="right" class="descp"></td>
+      <td>
+          <a href="#" title="" class="button" onclick="BuscaNC()">Buscar Nota de Credito</a>
+      </td>
+    </tr>
+
+    <tr id="tr-btn-pago-antecipado" hidden>
+      <td align="right" class="descp"></td>
+      <td>
+        <a href="#" title="" class="button" onclick="BuscaPA()">Buscar pago antecipado</a>
+      </td>
+    </tr>
+
+    <tr id="tr-btn-bandeira" hidden>
+      <td align="right" class="descp">Bandeira:</td>
+      <td>
+      <div class="styled-select">
+        <%=  select("busca", "cartao_bandeiras", (CartaoBandeira.order('id')).collect {|p| [ p.nome, p.id ] }) %>
+      </div>
+      </td>
+    </tr>
+
+    <tr id="tr-btn-nr-comprovante" hidden>
+      <td align="right" class="descp">NºCompro.:</td>
+      <td>
+        <input type="text" name="nr_comprovante" id="nr_comprovante" class="valores"/>
+      </td>
+    </tr>
+
+    <tr id="tr-cheque" hidden>
+      <td align="right" class="descp">Cheque nº:</td>
+      <td>
+        <input type="text" name="cheque" id="cheque" class="valores"/>
+      </td>
+    </tr>
+
+    <tr id="tr-cheque-banco" hidden>
+      <td align="right" class="descp">Banco:</td>
+      <td>
+        <div class="styled-select">
+          <%= select("busca", "banco_id", (Persona.where(tipo_banco: 1).order('nome')).collect {|p| [ p.nome, p.id ] }, {prompt: 'Selecione lo Banco'}) %>
+        </div>
+      </td>
+    </tr>
+
+    <tr id="tr-cheque-titular" hidden>
+      <td align="right" class="descp">Titular:</td>
+      <td>
+        <input type="text" name="titular" id="titular" class="valores"/>
+      </td>
+    </tr>
+
+    <tr id="tr-cheque-diferido" hidden>
+      <td align="right" class="descp">Diferido:</td>
+      <td>
+        <input type="text" name="diferido" id="diferido" class="valores" value="<%= (@venda.data.to_date).strftime("%d/%m/%Y")%>" onkeyup="Formatadata(this,event)" />
+      </td>
+    </tr>
+
+    <tr id="tr-transf_bancaria" hidden>
+      <td align="right" class="descp">Cuenta:</td>
+      <td>
+        <div class="styled-select">
+       <%= select("busca", "conta_id", (Conta.where(tipo: 1).order('nome')).collect {|p| [ p.nome, p.id ] }, {prompt: 'Selecione la Cuenta'}) %>
+        </div>
+      </td>
+    </tr>
+
+    <tr hidden id="tr-credito">
+      <td align="right" class="descp">Cuotas:</td>
+      <td colspan="2">
+        <input type="tel" class="padrao_height" name="cota" id="cota" value="0" size="1" style="margin: 5px" />
+        <span style="font-size: 21px;">1º Venc:</span>
+        <input type="tel" name="vencimento" id="vencimento" style="width: 140px" readonly="readonly" class="padrao_height date" value="<%= (@venda.data.to_date + 30).strftime("%d/%m/%Y")%>"  size="10"  required/>
+      </td>
+    </tr>
+
+    <tr hidden id="tr-local-pago">
+      <td align="right" class="descp">Local Pago:</td>
+      <td>
+        <div class="styled-select">
+          <select name="local_pago" id="local_pago" onchange="SetLocalPago();">
+            <option value="L">LOCAL</option>
+            <option value="R">RESIDENCIA</option>
+          </select>
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td align="right" class="descp"></td>
+      <td>
+        <input type="telephone"  name="desc_gs" id="desc_gs"  size="6"  class="valores_desc" onchange="ApliDesc()" placeholder="Desc." />
+        <input type="telephone"  name="int_gs" id="int_gs"  size="6"  class="valores_desc" onchange="ApliInt()" placeholder="Int." />
+      </td>
+    </tr>
+    <tr>
+      <td align="right" class="descp"> Valor:</td>
+      <td width="100">
+        <input type="telephone"  name="valor" id="valor"  size="15" value="<%= format_int(@produto_sum_guarani.to_f - VendasFinanca.sum("(coalesce(valor_guarani,0) - coalesce(interes_gs,0)) + coalesce(desconto_guarani,0)", :conditions=> ["venda_id = #{@venda.id}"]).to_f).gsub('.','') %>" onchange="Vuelto()" class="valores" />
+      </td>
+      <td colspan='2' align="right">
+
+        <%= submit_tag t('SAVE'), :class=>'button add', :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %>
+      </td>
+    </tr>
+    <tr id="tr-vuelto">
+      <td align="right" class="descp">Vuelto:</td>
+      <td>
+        <input type="telephone" name="vuelto" id="vuelto"  size="15" value="0" onchange="DescontoInversoGs()" class="valores"/>
+      </td>
+    </tr>
+  </table>
+<% end %>
+
+
+<script>
+  function fp(v) {
+    $("#forma_pg").val(v);
+    if( v == '2'){ // credito
+
+
+
+      $("#tr-credito").show();
+      $("#tr-local-pago").show();
+      var obs = $("#obs_content").val();
+      $("#obs").val("LOCAL PAGO : " + $("#local_pago").val() + ' \ \n ' + obs)
+
+      $("#cota").val('1');
+      $("#cheque_status").val('0');
+
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").hide();
+
+    } else if( v == '1' ){ // contado
+      $("#tr-vuelto").show();
+
+      $("#cota").val('0');
+      $("#cheque_status").val('0');
+
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      var obs = $("#obs_content").val();
+      $("#obs").val(obs);
+
+
+    } else if( v == '3' || v == '4' ){ //tarjetas credito/debito
+      $("#tr-btn-bandeira").show();
+      $("#tr-btn-nr-comprovante").show();
+
+      $("#cheque_status").val('0');
+
+      $("#tr-credito").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      var obs = $("#obs_content").val();
+      $("#obs").val(obs);
+
+
+    } else if( v == '5'){ //cheque ao dia
+      $("#tr-cheque").show();
+      $("#tr-cheque-banco").show();
+      $("#tr-cheque-titular").show();
+      $("#tr-vuelto").show();
+
+      $("#cheque_status").val('1');
+
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      var obs = $("#obs_content").val();
+      $("#obs").val(obs);
+
+
+      //validacao
+      jQuery.validator.setDefaults({
+        success: "valid"
+      });
+
+      $('#FinancaForm').validate({
+        rules: {
+        "cheque": {required: true},
+        "banco": {required: true},
+        "titular": {required: true}
+        }
+      });
+
+    } else if( v == '6'){
+      $("#tr-cheque").show();
+      $("#tr-cheque-banco").show();
+      $("#tr-cheque-titular").show();
+      $("#tr-cheque-diferido").show();
+      $("#tr-vuelto").show();
+
+      $("#cheque_status").val('1');
+
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      var obs = $("#obs_content").val();
+      $("#obs").val(obs);
+
+
+      //validacao
+      jQuery.validator.setDefaults({
+        success: "valid"
+      });
+
+      $('#FinancaForm').validate({
+        rules: {
+        "cheque": {required: true},
+        "banco": {required: true},
+        "titular": {required: true}
+        }
+      });
+
+    } else if( v == '15'){
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-transf_bancaria").show();
+      $("#cota").val('0');
+
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      var obs = $("#obs_content").val();
+      $("#obs").val(obs);
+
+
+    } else if( v == '12'){
+      // var valor_venda = $("#saldo_antecipado").val()
+      // var valor_antec = $("#valor_sem_gs").val()
+      // if( ( parseFloat( valor_venda ) -  parseFloat( valor_antec ) ) < 0 ){
+      //   alert('Saldo insuficiente! Forma de Pago No Autorazada!');
+      //   document.getElementById('busca_forma_pago').value   = 1
+      //   $("#busca_forma_pago").focus();
+
+      // }
+      $("#tr-btn-nota-credito").hide();
+      $("#cota").val('0');
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").show();
+      $("#tr-local-pago").hide();
+      var obs = $("#obs_content").val();
+      $("#obs").val(obs);
+
+
+    } else{
+      $("#cheque_status").val('0');
+      $(".title_venc").css('display','none');
+      $(".content_venc").css('display','none');
+      $(".title_nr_comprovante").css('display','none');
+      $(".content_nr_comprovante").css('display','none');
+      $("#tr-local-pago").hide();
+      var obs = $("#obs_content").val();
+      $("#obs").val(obs);
+
+    }
+  }
+
+  function SetLocalPago(){
+    var obs = $("#obs_content").val();
+    $("#obs").val("LOCAL PAGO : " + $("#local_pago").val() + ' \n ' + obs)
+  }
+
+  function contado(){
+    moeda = $("#moeda").val();
+    sem_us =  $('#valor_sem_us').val();
+    sem_gs =  $('#valor_sem_gs').val();
+    sem_rs =  $('#valor_sem_rs').val();
+    sem_ps =  $('#valor_sem_ps').val();
+
+    if (moeda == '0'){
+      $("#valor").val(sem_us).css('border',"2px solid green").attr("step",".01");
+    } else if (moeda == '1'){
+
+      $("#valor").val(sem_gs).css('border',"2px solid red").attr("step","any");
+      valor_gs = $("#valor").val()
+    }else if (moeda == '2'){
+      $("#valor").val(sem_rs).css('border',"2px solid blue").attr("step",".01");
+    }else if (moeda == '3'){
+      $("#valor").val(sem_ps).css('border',"2px solid black").attr("step",".01");
+    }
+
+  }
+
+  function Vuelto(){
+    moeda = $("#moeda").val();
+    sem_us    = $('#valor_sem_us').val();
+    sem_gs    = $('#valor_sem_gs').val();
+    sem_rs    = $('#valor_sem_rs').val();
+    sem_ps    = $('#valor_sem_ps').val();
+    ctz_gs_us = $("#cotacao").val();
+    ctz_gs_rs = $("#cotacao_real").val();
+    ctz_gs_ps = $("#cotacao_gs_ps").val();
+    valor = $("#valor").val();
+    forma_pago = $('#busca_forma_pago').val();
+
+    if (forma_pago != '5'){
+      if (forma_pago != '6'){
+        if (forma_pago != '3'){
+          if (forma_pago != '4'){
+            if (forma_pago != '15'){
+              if (moeda == '1'){
+
+                if ( parseFloat(valor) != parseFloat(sem_gs) ){
+                  if ( parseFloat(valor) < parseFloat(sem_gs) ){
+                    desc = (parseFloat(sem_gs) - parseFloat(valor));
+                    $("#desc_gs").val(desc);
+                    $("#int_gs").val('0');
+                  };
+
+                  if ( parseFloat(valor) > parseFloat(sem_gs) ){
+                    desc = (parseFloat(valor) - parseFloat(sem_gs));
+                    $("#desc_gs").val('0');
+                    $("#int_gs").val('0');
+                    $("#vuelto").val(desc);
+                  };
+                }
+
+              } else if (moeda == '0'){
+                if ( parseFloat(valor) > parseFloat(sem_us) ){
+                  restante_vuelto_gs = (parseFloat(valor) - parseFloat(sem_us));
+                  $("#vuelto").val(parseFloat(restante_vuelto_gs));
+                }else{
+                  $("#vuelto").val(0);
+                }
+              } else if (moeda == '2'){
+                if ( parseFloat(valor) > parseFloat(sem_rs) ){
+                  restante_vuelto_gs = (parseFloat(valor) - parseFloat(sem_rs));
+                  $("#vuelto").val(number_format( restante_vuelto_gs,2, ',', '.'));
+                }else{
+                  $("#vuelto").val(0);
+                }
+              } else if (moeda == '3'){
+                if ( parseFloat(valor) > parseFloat(sem_ps) ){
+                  restante_vuelto_gs = (parseFloat(valor) - parseFloat(sem_ps));
+                  $("#vuelto").val(parseInt(restante_vuelto_gs));
+                }else{
+                  $("#vuelto").val(0);
+                }
+              };
+            }
+          }
+        }
+      }
+    }
+  }
+
+  function ApliDesc(){
+    moeda = $("#moeda").val();
+    valor_us    = $('#valor_sem_us').val();
+    valor_gs    = $('#valor_sem_gs').val();
+    valor_rs    = $('#valor_sem_rs').val();
+    var desc    = $("#desc_gs").val()
+    if (moeda == '0'){
+
+      $("#valor").val(parseFloat(valor_us) - parseFloat(desc));
+    } else if (moeda == '1'){
+      var desc = $("#desc_gs").val()
+      $("#valor").val(parseInt(valor_gs) - parseInt(desc));
+
+    } else if (moeda == '2'){
+      var desc = $("#desc_gs").val()
+      $("#valor").val(parseFloat(valor_rs) - parseFloat(desc));
+
+    }
+  }
+
+
+  function ApliInt(){
+    moeda = $("#moeda").val();
+    valor_us    = $('#valor_sem_us').val();
+    valor_gs    = $('#valor_sem_gs').val();
+    valor_rs    = $('#valor_sem_rs').val();
+    var int     = $("#int_gs").val()
+    if (moeda == '0'){
+
+      $("#valor").val(parseFloat(valor_us) + parseFloat(int));
+    } else if (moeda == '1'){
+      var desc = $("#desc_gs").val()
+      $("#valor").val(parseInt(valor_gs) + parseInt(int));
+
+    } else if (moeda == '2'){
+      var desc = $("#desc_gs").val()
+      $("#valor").val(parseFloat(valor_rs) + parseFloat(int));
+
+    }
+  }
+
+
+  function BuscaNC(){
+      window.open("/vendas/busca_nota_credito?persona_id=<%= @venda.persona_id %>", '', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=850, HEIGHT=400');
+  };
+
+  function BuscaPA(){
+      window.open("/vendas/busca_pago_antecipado?moeda=<%= @venda.moeda %>&persona_id=<%= @venda.persona_id %>&venda_id=<%= @venda.id %>", '', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=850, HEIGHT=400');
+  };
+</script>

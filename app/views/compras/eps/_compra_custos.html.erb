@@ -1,0 +1,67 @@
+<h1 id="header">
+Gastos - 
+<%= link_to t('DOC'), edit_gasto_compra_path(@compra) %> &#8250;
+<%= link_to t('CLASSIFICATION'), compras_custos_compra_path(@compra), class: 'active' %> &#8250;
+<%= link_to t('FINANCIAL'), compras_financa_compra_path(@compra) %>
+
+</h1>
+	<div class="group">
+		<h2 class="header" style="margin-left: 12px">
+		<%= t('PROVIDER') %>: <b> <%= @compra.persona_nome %></b> |
+		<% if @compra.moeda.to_i == 0 %>
+			<span style="color:green">
+			Total U$:<%= format_decimal( @compra.total_dolar.to_f ) %>
+			</span>
+			Desc. U$: <span style="color:green"><%= format_decimal( @compra.desconto_dolar.to_f ) %></span>
+			Total c/ Desc. U$: <span style="color:green"><%= format_decimal( @compra.total_dolar.to_f - @compra.desconto_dolar.to_f ) %></span>
+
+		<% elsif @compra.moeda.to_i == 1 %>
+			<span style="color:red">
+			Total Gs.:<%= format_int( @compra.total_guarani.to_f ) %>
+			</span>
+			Desc. Gs.: <span style="color:red"><%= format_int( @compra.desconto_guarani.to_f ) %></span>
+			Total c/ Desc. Gs.: <span style="color:red"><%= format_int( @compra.total_guarani.to_f - @compra.desconto_guarani.to_f ) %></span>
+		<% else %>
+			<span style="color:blue">
+			Total R$:<%= format_decimal( @compra.total_real.to_f ) %>
+			</span>
+			Desc. R$: <span style="color:blue"><%= format_decimal( @compra.desconto_real.to_f ) %></span>
+			Total c/ Desc. R$: <span style="color:blue"><%= format_decimal( @compra.total_real.to_f - @compra.desconto_real.to_f ) %></span>
+		<% end %>
+		</h2>	 
+		<input type="hidden" name="cotacao" id="cotacao"/>
+		
+		<%= render :partial=>"compras_custos/index", :locals=>{:compras_custos => @compra.compras_custos} %>
+
+		<div align="center" style="padding: 10px">
+			<% if (@compra.moeda == 0 and @saldo_us == 0 ) or (@compra.moeda == 1 and @saldo_gs.to_i == 0 ) or (@compra.moeda == 2 and @saldo_rs == 0 ) %>
+				<div class="alert alert-success" align="center" style="margin: 10px">
+					<h1><b>Registro Concluida Click en Seguir!</b></h1>
+				</div>
+			<% else %>
+				<%= render partial: "compras_custos/new_custo", locals: {compras_custo: ComprasCusto.new(compra_id: @compra.id)} %>
+			<% end %>
+		</div>
+	</div>
+
+	<div class="footer-buttons" style="padding-bottom: 20px">
+		<a href="/compras/<%=params[:id]%>/edit_gasto" class="btn btn-back" ><%= t('BACK') %></a>
+		<% if @compra.moeda == 0 %>
+			<% if (format_decimal((@compra.total_dolar.to_f - (@compra.desconto_dolar.to_f)) - @compra.compras_custos.sum(:valor_us).to_f).to_f == 0) %>
+				<%= link_to 'Seguir', compras_financa_compra_path(@compra), class: "btn btn-info next", "data-plus-as-tab" => "false" %>
+			<% end %>
+		<% elsif @compra.moeda == 2 %>
+			<% if (format_decimal((@compra.total_real.to_f - @compra.desconto_real.to_f) - @compra.compras_custos.sum(:valor_rs).to_f).to_f == 0) %>
+				<%= link_to 'Seguir', compras_financa_compra_path(@compra), class: "btn btn-info next", "data-plus-as-tab" => "false" %>
+			<% end %>
+		<% else %>
+			<% if (format_decimal((@compra.total_guarani.to_f - (@compra.desconto_guarani.to_f)) - @compra.compras_custos.sum(:valor_gs).to_f).to_f == 0) %>
+				<%= link_to 'Seguir', compras_financa_compra_path(@compra), class: "btn btn-info next", "data-plus-as-tab" => "false" %>
+			<% end %>
+		<% end %>
+	</div>
+
+<%= hidden_field_tag :id, @compra.id %>
+<script>
+	$(".next").focus()
+</script>

@@ -1,0 +1,33 @@
+  <table class="head_grid">
+    <tr>
+      <td width="80" align="center">Cod.</td>
+      <td width="80" align="center"><%= t('DATE') %></td>
+      <td width="450" align="center">Proveedor</td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+
+    <table>
+
+      <% for pago in @pagos %>
+
+        <tr class = "<%= cycle( "cor1", "cor2" )%>">
+
+          <td width="80"  align="center"><%= pago.id %> </td>
+          <td width="80"  align="center"><%= pago.data.strftime("%d/%m/%Y")%></td>
+          <td width="450" align="left"><%= pago.persona_nome%></td>
+          <td><%= link_to 'Editar', edit_pago_path(pago) %></td>
+          <td><%= link_to t('DELETE'), pago, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+
+
+        </tr>
+      <% end %>
+    </table>
+
+  </div>
+<%= will_paginate @pagos, :update => 'pagina', :options => {:prev_label => '<< Anterior',:next_label => 'Próximo >>'}%>
+
+
+
+
+

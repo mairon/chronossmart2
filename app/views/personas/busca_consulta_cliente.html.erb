@@ -1,0 +1,49 @@
+<style type="text/css">
+  td{
+    padding: 5px;
+  }
+  input[type="text"]{
+    height: 12px;
+    width: 12px;
+    text-align:center;
+    background:none;
+    border:none;
+    outline:none;
+    margin:0;
+    padding:0;
+  }
+
+  input[type="text"]:focus{
+    background-image: url("/assets/ui-icons_222222_256x240.png");
+    background-position: -32px -3px;
+    background-repeat: no-repeat;
+    border:none;
+    outline:none; 
+  }
+</style>
+<table class="head_grid">
+  <tr>
+    <td width="12"></td>
+    <td width="70" align="center">Laz.</td>
+    <td width="400">Persona</td>
+    <td width="100"align="center">Ruc</td>
+  </tr>
+</table>
+
+<div class="rolagem" id="div">
+  <table>
+    <% count = 0 %>
+    <% for persona in @personas %>
+      <tr class = "<%= cycle("cor2", "cor1")%>"  onMouseOver="javascript:this.style.backgroundColor='#949494'" onMouseOut="javascript:this.style.backgroundColor=''"onclick="Fecha('<%= persona.id %>')">
+        <td><input type="text" id="<%= count %>" value="" size="1"
+                  onkeypress="Fecha('<%= persona.id %>')"  data-plus-as-tab="false" ></td>      
+        <td class="<%= count %>" width="70"align="center"><%= persona.id.to_s.rjust(8,'0') %></td>
+        <td class="<%= count %>" width="400"align="left"><%= persona.nome %> - <%= persona.nome_fatura %></td>
+        <td class="<%= count %>" width="100"align="center"><%= persona.ruc %></td>
+      </tr>
+      <% count += 1 %>
+    <% end %>
+    <input type="hidden" id="foco" value="-1">
+  </table>
+</div>
+<%= will_paginate @personas, :update => 'pagina',:prev_label => '<< Anterior',:next_label => 'Próximo >>'%>

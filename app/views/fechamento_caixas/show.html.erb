@@ -1,0 +1,77 @@
+<div class="row">
+	<div class="col-md-12">
+		<%= render 'infos' %>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-7">
+		<div class="row">
+			<div class="col-md-12">
+				<%= render 'mov_efetivo_gs' %>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<%= render 'fechamento_gs' %>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<%= render 'fechamento_us' %>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<%= render 'fechamento_rs' %>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<%= render 'fechamento_ps' %>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-5">
+		<div class="row">
+			<div class="col-md-12">
+				<%= render 'tranf_saldos' %>
+				<%= render 'produtos_vendidos' %>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="myModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel">Nuevo Lanzamiento</h4>
+      </div>
+      <div class="modal-body">
+      	<div class="group">
+        	<%= render :partial=>"fechamento_caixa_dts/new_dt", :locals=>{:fechamento_caixa_dt=>FechamentoCaixaDt.new(:fechamento_caixa_id=>@fechamento_caixa.id)} %>
+      	</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(".acao").click(function() {
+    $('#myModal').modal('show');
+    $('#myModal').on('shown.bs.modal', function () {
+      $('#cobros_detalhe_cobro_guarani').focus();
+      $('#cobros_detalhe_cobro_guarani').select();
+        
+    })
+  });
+</script>

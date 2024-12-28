@@ -1,0 +1,110 @@
+<h1 id="header">Escala Empleado</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_persona_escala_path, :class => "btn add" %>
+  <a href="#" class="btn btn-blue"  data-toggle="modal" data-target="#modal-multi-data"> Lanzamento por Periodo</a>
+
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="50">Código</td>
+    <td width="200">Empleado</td>
+    <td width="50" align="center">Fecha</td>
+    <td width="80" align="center">Dia de la Semana</td>
+    <td width="200">Motivo</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @persona_escalas.includes(:persona).each do |persona_escala| %>
+      <tr>
+        <td width="50"><%= persona_escala.id.to_s.rjust(6,'0') %></td>
+        <td width="50">
+          <% if persona_escala.tipo.to_i == 0 %>
+            Sabados Libres
+          <% elsif persona_escala.tipo.to_i == 1 %>
+            Vacacciones
+          <% elsif persona_escala.tipo.to_i == 2 %>
+            Permiso Maternidad
+          <% end %>
+        </td>
+        <td width="200"><%= persona_escala.persona.nome %></td>
+        <td width="50" align="center"><%= persona_escala.data.strftime("%d/%m/%y") %></td>
+        <td width="80"><%= l(persona_escala.data.to_date, :format => :dia_semana, locale: 'es') %></td>
+        <td width="200"> <small><%= persona_escala.obs %></small></td>
+        <td><%= link_to '', edit_persona_escala_path(persona_escala), class: 'icon-pencil' %></td>
+        <td><%= link_to '', persona_escala, :confirm => 'Estas Seguro?', :method => :delete , class: 'icon-trash' %></td>
+      </tr>
+      <% end %>
+  </table>
+</div>
+
+<div class="modal fade" id="modal-multi-data" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary">
+        <h1 style="font-size: 16px; font-weight: bold; color: #fff">Lanzamento por Periodo</h1>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 5px 20px 20px 20px">
+        <%= form_tag multi_datas_persona_escalas_path, :method => "get" do %>
+          <div class="row">
+            <di class="col-md-12">
+              <label >Empleado</label>
+              <%= select("busca", "persona",
+                Persona.all(:select => 'id,nome', conditions: 'tipo_funcionario = 1 and estado = 0', order: '2').collect {|p| [ p.nome, p.id ] },
+                { :prompt => 'Selecione Empleado'},{:style => "width:250px"}) %>
+            </di>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+                <label >Inicio</label>
+                <div class="input-group">
+                  <%= text_field_tag :inicio, nil, onkeyup: "Formatadata(this,event)", required: true %>
+                  <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" >
+                      <i class="icon-calendar" aria-hidden="true"></i>
+                    </button>
+                  </span>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <label >Final</label>
+                <div class="input-group">
+                  <%= text_field_tag :final, nil, onkeyup: "Formatadata(this,event)", required: true %>
+                  <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" >
+                      <i class="icon-calendar" aria-hidden="true"></i>
+                    </button>
+                  </span>
+                </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <label>Tipo</label>
+              <%= radio_button_tag :tipo, 0,  :Checked => "True" %> Sabados Libres
+              <%= radio_button_tag :tipo, 1 %> Vacacciones
+              <%= radio_button_tag :tipo, 2 %> Permiso Maternidad
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <label>Motivo </label>
+              <%= text_area_tag :obs, nil, cols: 15, rows: 5 %>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12"><%= submit_tag 'Grabar', class: 'btn btn-blue' %></div>
+          </div>
+        <% end %>
+
+      </div>
+    </div>
+  </div>
+</div>

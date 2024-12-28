@@ -1,0 +1,91 @@
+<style type="text/css">
+
+	.page-break { display:block; clear:both; page-break-after:always; }
+	.header {
+		border-collapse: collapse;
+		font-size: 9px;
+	}
+	.r_header {
+		font-weight: bold;
+		background-color: #777777;
+		height: 20px;
+		font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	}
+	td{
+		padding: 8px;
+		padding: 3px;
+		margin: 0px;
+		font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	}
+
+	tr.cor2 {
+  background-color: #fff;
+	}
+
+tr.cor1 {
+  background-color: #f9f2f2;
+}
+
+
+</style>
+
+<% 
+
+		if params[:lancamento].to_s != "1"
+				if params[:moeda] == "0"
+					moeda = "#{t('ONLY').upcase} #{t('RELEASE').upcase}s #{t('EM').upcase} U$"
+				elsif params[:moeda] == "1"
+					moeda = "#{t('ONLY').upcase} #{t('RELEASE').upcase}s #{t('EM').upcase} G$"
+				else
+					moeda = "#{t('ONLY').upcase} #{t('RELEASE').upcase}s #{t('EM').upcase} R$"
+				end
+			else
+				if params[:moeda] == "0"
+					moeda = "#{t('ALL_RELEASES').upcase} #{t('EM').upcase} U$"
+				elsif params[:moeda] == "1"
+					moeda = "#{t('ALL_RELEASES').upcase} #{t('EM').upcase} G$"
+				else
+					moeda = "#{t('ALL_RELEASES').upcase} #{t('EM').upcase} R$"
+				end
+			end
+			unless params[:busca]["persona"].blank?
+					per = Persona.find_by_id(params[:busca]["persona"], :select => 'id,nome')
+					per = per.nome
+			else
+					per = 'TODOS'
+			end
+
+			if params[:detalhe].to_s == '0'
+				detalhe = "RESUMEN"
+			else
+				detalhe = "DETALHADO"
+			end
+%>
+<table width="100%">
+	<tr>
+		<td align="center" colspan="8"><%= current_unidade.nome_sys %></td>
+	</tr>
+	<tr>
+		<td align="center" colspan="8">Listado Compras</td>
+	</tr>
+
+	<tr>
+		<td align="left" colspan="8">De....: <%= params[:inicio] %> hasta <%=params[:final] %></td>
+	</tr>
+
+	<tr>
+		<td align="left" colspan="8">Proveedor..: <%= per %></td>
+	</tr>
+</table>
+<table width="100%">
+	<tr>
+		<td class="r_header" width="40" align="center"><%= t('CODE') %></td>
+		<td class="r_header" width="40" align="center"><%= t('DATE') %></td>
+		<td class="r_header" width="40">Compra </td>
+		<td class="r_header" width="40">Tipo </td>
+		<td class="r_header" width="350">Proveedor</td>
+		<td class="r_header" width="100">Doc </td>
+		<td class="r_header" width="70" align="right">Ctd.</td>
+		<td class="r_header" width="70" align="right">Total. </td>
+	</tr> 
+</table>

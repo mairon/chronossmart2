@@ -1,0 +1,189 @@
+<h1 id="header">
+  Historico de Acessos
+  <div class="pull-right">
+    <a href="#" id="print" class="btn print">Imprimir</a>  
+  </div>
+</h1>  
+
+   <div class="group">
+    <%= form_tag resultado_historico_acesso_usuarios_path, :method => "get" do %>
+      <h2>
+        <table>
+          <tr>
+            <td colspan="2"> 
+              <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+            <td style="padding-left: 10px">Hasta</td>
+            <td>
+              <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+            </td>
+            <td align="right">Proceso:</td>
+            <td>
+              <select name="processo" id="processo">
+                  <option>TransferenciaConta</option>
+                  <option>Persona</option>
+                  <option>Cobro</option>
+                  <option>Conta</option>
+                  <option>Adelanto</option>
+                  <option>Conferencia</option>
+                  <option>NotaCreditoProveedor</option>
+                  <option>NotaCredito</option>
+                  <option>Pago</option>
+                  <option>AberturaCaixa</option>
+                  <option>Usuario</option>
+                  <option>Produto</option>
+                  <option>Compra</option>
+                  <option>Venda</option>
+                  <option>VendasFinanca</option>
+                  <option>VendasProduto</option>
+              </select>
+            </td>
+            <td align="right">Usuario:</td>
+            <td>
+              <%=   select("busca", "usuario", Usuario.all(:select => 'id,usuario_nome',:order => 'usuario_nome').collect {|p| [ p.usuario_nome, p.id ] }, {prompt: 'Todos'}, {required: true})  %>
+            </td>
+            <td>Actividad</td>
+            <td>
+              <select name="acao" id="acao">
+                <option></option>
+                <option>create</option>
+                <option>destroy</option>
+                <option>update</option>
+              </select>
+            </td>            
+
+            <td><input type="button" class="btn btn-blue" onclick="pesquisa()" value="Buscar"/></td>
+
+            <td>
+            	<%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;") %>
+            </td>
+          </tr>
+        </table>
+      </h2>
+      <% end %>
+   	</div>
+   	<div id="pagina"></div>
+  <script language="javascript">
+  function pesquisa(){
+    url="/usuarios/resultado_historico_acesso?" + $('form').serialize();
+    ajax(url);
+  }
+
+
+   function ajax(url){
+    $('#spinner').show();
+      req = null;
+
+      if (window.XMLHttpRequest) {
+
+        req = new XMLHttpRequest();
+        req.onreadystatechange = processReqChange;
+        req.open("GET",url,true);
+        req.send(null);
+
+      } else if (window.ActiveXObject) {
+
+         req = new ActiveXObject("Microsoft.XMLHTTP");
+
+         if (req) {
+
+
+
+            req.onreadystatechange = processReqChange;
+
+            req.open("GET",url,true);
+            req.send();
+
+         }
+
+      }
+
+   }
+
+
+
+   function processReqChange(){
+    if (req.readyState == 4) {
+      if (req.status ==200) {
+        onSuccess:$('#spinner').hide();
+
+        document.getElementById('pagina').innerHTML = req.responseText;
+        } else {
+
+         	alert("Houve um problema ao obter os dados:n" + req.statusText);
+         }
+
+      }
+
+   }
+
+  function pdv(v){
+    location.href="/vendas/new?tipo_venda=" + v;
+  }
+
+</script>
+<script>
+  $(function () {
+		$("#pagina").on("click", ".pagination a", function () {
+        $.ajax({
+        method: "get",
+        url: this.href,
+        beforeSend: function(){
+        $("#spinner").show("fast");
+        },
+        success: function(retorno){
+        $('#spinner').hide("slow");
+        $("#pagina").html(retorno).fadeIn( "slow" );
+        }
+        });
+        return false;
+      }
+    );
+  });
+
+</script>
+
+<script>
+
+    $("#print").on("click", function () {
+        event.preventDefault();
+        $('#myiframe').modal('show');
+        var width  = $(this).attr('data-width') || 640;
+        var height = $(this).attr('data-height') || 760;
+
+        var allowfullscreen = $(this).attr('data-video-fullscreen');
+
+        $("#myiframe iframe").attr({
+
+          'src': '/usuarios/resultado_historico_acesso?print=true&' + $('form').serialize(),
+          'height': height,
+          'width': width,
+          'allowfullscreen':''
+        });
+
+        $('#myiframe').on('hidden.bs.modal', function(){
+          $(this).find('iframe').html("");
+          $(this).find('iframe').attr("src", "");
+        });
+    });
+
+
+</script>
+
+
+<div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 1100px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('LISTING') %>  Historico Aceso</h4>
+      </div>
+      <div class="modal-body" align="center">
+        <div class="embed-responsive embed-responsive-16by9" style="height: 460px">
+          <iframe class="embed-responsive-item" id="iframeModal" frameborder="0 " border="0"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

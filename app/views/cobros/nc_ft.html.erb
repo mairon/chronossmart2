@@ -1,0 +1,4 @@
+<h1 align="right" id="header"><%= t('CHARGE') %>s - <%= t('VOUCHER') %>s</h1>
+<%= t('VOUCHER') %>s
+<%= render :partial=>"/cobro_nc_fts/new_nc_ft", :locals=>{:cobro_nc_ft=>CobroNcFt.new(:cobro_id=>@cobro.id)} %>
+

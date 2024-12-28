@@ -1,0 +1,29 @@
+<h1>Novo menu</h1>
+
+<%= form_for(@menu) do |f| %>
+<table>
+	<tr>
+		<td>Codigo:</td>
+		<td><%= f.text_field :codigo, autofocus: 'true' %></td>
+	</tr>
+	<tr>
+		<td>url:</td>
+		<td><%= f.text_field :url %></td>
+	</tr>
+	<tr>
+		<td><%= t('NAME') %>:</td>
+		<td><%= f.text_field :nome %></td>
+	</tr>
+	<tr>
+    <td align="right">Sub :</td>                    
+    <td><%= f.check_box :sub %></td>		
+	</tr>	
+	
+</table>
+  <p>
+    <%= f.submit "Create" %>
+  </p>
+
+<% end %>
+
+<%= link_to 'Back', menus_path %>

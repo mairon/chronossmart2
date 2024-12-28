@@ -1,0 +1,11 @@
+<div class="grid">
+  <%= render :partial=>'/produtos_tributs/index', :locals=>{:produtos_tribut => @produto, :produtos_tributs => @produto.produtos_tributs} %>
+</div>
+
+<% prod_tribut = ProdutosTribut.count(:id, :conditions => ["produto_id = #{@produto.id} and regime_id = #{current_unidade.regime_id}"]) %>
+
+<% if prod_tribut.to_i == 0 %>
+	<div class="group">
+	  <%= render :partial => '/produtos_tributs/new_tributs', :locals=>{:produtos_tribut=>ProdutosTribut.new(:produto_id=>@produto.id)}%>
+	</div>
+<% end %>

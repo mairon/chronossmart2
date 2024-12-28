@@ -1,0 +1,122 @@
+	<div class="row">
+		<div class="col-md-10">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="panel">
+						<div class="panel-content">
+							<h1>
+								<p>Producto: <b> <%= @produto.nome %></b></p>	
+							</h1>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-6">
+					<div class="panel">
+						<div class="panel-content">
+						<h1>Compras</h1>
+						<div class="row">
+							<di class="col-md-12">
+
+								<table class="head_grid">
+								   <tr>
+								      <td width="50" align="center">Fecha</td>
+								      <td width="50" align="center">Compra</td>
+								      <td width="150">Proveedores</td>
+								      <td width="80" align="right">CTD</td>
+								      <td width="80" align="right">Unit</td>
+								      <td width="80" align="right">Tot</td>
+								   </tr>
+								</table>
+
+								<div class="rolagem" id="div" style="height: 345px;">
+									<table>
+										<% @entradas.each do |s| %>
+										<tr class = "<%= cycle( "cor1", "cor2" )%>">
+											<td width="50" align="center"><%= s.data.strftime("%d/%m/%y") %></td>
+											<td width="50" align="center"><%= s.venda_id %></td>
+											<td width="150"><%= s.persona.nome unless s.persona.nil? %></td>
+											<td width="80" align="right"><%= s.entrada %></td>
+											<td width="80" align="right"><%= format_int(s.unitario_guarani) %></td>
+											<td width="80" align="right"><%= format_int(s.entrada.to_f * s.unitario_guarani.to_f) %></td>
+										</tr>
+										<% end %>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-6">
+					<div class="panel">
+						<div class="panel-content">
+						<h1>Ventas</h1>
+						<div class="row">
+							<di class="col-md-12">
+
+								<table class="head_grid">
+								   <tr>
+								      <td width="50" align="center">Fecha</td>
+								      <td width="50" align="center">Venta</td>
+								      <td width="150">Cliente</td>
+								      <td width="80" align="right">CTD</td>
+								      <td width="80" align="right">Unit</td>
+								      <td width="80" align="right">Tot</td>
+								   </tr>
+								</table>
+
+								<div class="rolagem" id="div" style="height: 345px; font-size: 10px">
+									<table>
+										<% @saidas.each do |s| %>
+										<tr class = "<%= cycle( "cor1", "cor2" )%>">
+											<td width="50" align="center"><%= s.data.strftime("%d/%m/%y")%></td>
+											<td width="50" align="center"><%= s.venda_id %></td>
+											<td width="150"><%= s.persona.nome unless s.persona.nil? %></td>
+											<td width="80" align="right"><%= s.saida %></td>
+											<td width="80" align="right"><%= format_int(s.unitario_guarani) %></td>
+											<td width="80" align="right"><%= format_int(s.saida.to_f * s.unitario_guarani.to_f) %></td>
+										</tr>
+										<% end %>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="col-md-2">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="panel">
+						
+						<div class="panel-content">
+							<h1>Ubicación</h1>	
+							<%= @produto.locacao %> teste
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="panel">
+						
+						<div class="panel-content">
+							<h1>Converciones</h1>
+							<div class="group">
+							<%= @produto.fabricante_cod %>
+							<%=raw @produto.obs.gsub(/\n/, '<br/>') %>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>			
+		</div>
+	</div>
+
+

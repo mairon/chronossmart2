@@ -1,0 +1,102 @@
+<div class="group">
+<%= form_for(Transacao.new) do |f| %>
+  <div class="row">
+    <div class="col-md-6">
+      <label>Operação</label>
+      <%= f.select :operacao, [['Compra', 0], ['Venda', 1]] %>
+    </div>
+    <div class="col-md-6">
+      <label><%= t('DATE') %></label>
+      <%= f.text_field :data, value: Time.now.strftime("%d/%m/%Y"), size: 10, required: true, class: "panel-field date", autofocus: true %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Favorecido</label>
+      <%= f.collection_select :persona_id, Persona.order(:nome),:id, :nome,{:prompt => 'Selecione'}, {required: true, class: 'persona_cv'} %>
+    </div>      
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <label>Doc.</label>
+      <%= f.text_field :documento_numero, class: "panel-field date" %>
+    </div>
+  </div>  
+  <div class="row">
+    <div class="col-md-6">
+      <%= panel_field_d3_label 'Taxa',f,:taxa %>
+    </div>
+  </div>
+  <div class="row venda" hidden>
+    <div class="col-md-6">
+      <%= panel_field_d3_label 'Credito USDT',f, :credito_usdt %>
+    </div>
+
+    <div class="col-md-6">
+      <%= panel_field_d3_label 'Debito R$',f, :debito_rs %>
+    </div>    
+  </div>
+
+    <div class="row compra" hidden>
+    <div class="col-md-6">
+      <%= panel_field_d3_label 'Debito USDT',f, :debito_usdt %>
+    </div>    
+
+    <div class="col-md-6">
+      <%= panel_field_d3_label 'Credito R$',f, :credito_rs %>
+    </div>    
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <br>
+      <%= f.text_area :obs, class: "panel-field", placeholder: 'Obs.', rows: '3' %>
+    </div>
+  </div>
+  
+  <div class="footer-buttons">
+    <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+  </div>    
+<% end %>
+</div>
+
+<script>
+
+$(document).ready(function() {
+
+  if ($("#transacao_operacao").val() == '1') {
+    $(".venda").show();
+    $(".compra").hide();
+
+  } else if ($("#transacao_operacao").val() == '0') {
+    $(".compra").show();
+    $(".venda").hide();
+  };
+
+  $("#transacao_operacao").change(function() {
+    if ($("#transacao_operacao").val() == '1') {
+      $(".venda").show();
+      $(".compra").hide();
+
+    } else if ($("#transacao_operacao").val() == '0') {
+      $(".compra").show();
+      $(".venda").hide();
+    };
+  })
+});
+
+  $("#transacao_credito_usdt").change(function() {
+    var calc = eval( parseFloat( $("#transacao_taxa").val().replace(/\./g, "").replace(",", ".") ) * $("#transacao_credito_usdt").val().replace(/\./g, "").replace(",", ".") )
+    $("#transacao_debito_rs").val(number_format( calc,3, ',', '.') )
+
+  });
+
+  $("#transacao_debito_usdt").change(function() {
+    var calc = eval( parseFloat( $("#transacao_taxa").val().replace(/\./g, "").replace(",", ".") ) * $("#transacao_debito_usdt").val().replace(/\./g, "").replace(",", ".") )
+    $("#transacao_credito_rs").val(number_format( calc,3, ',', '.') )
+
+  });
+
+$('.persona_cv').selectize();
+</script>

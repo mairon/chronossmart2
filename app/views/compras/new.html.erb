@@ -1,0 +1,11 @@
+<% if params[:tipo_compra] == 'cmimp' %>
+	<%= render :partial => "/compras/eps/form_compra_importacao" %>
+<% else %>
+	<% if params[:fiscal] == 'true' %>
+		<%= render :partial => "/compras/eps/form_compra_interna_fiscal" %>
+	<% else %>
+		<%= render :partial => "/compras/eps/form_compra_interna" %>
+	<% end %>
+<% end %>
+
+

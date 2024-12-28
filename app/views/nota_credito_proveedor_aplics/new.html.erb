@@ -1,0 +1,67 @@
+<h1>New nota_credito_proveedor_aplic</h1>
+
+<% form_for(@nota_credito_proveedor_aplic) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :nota_credito_proveedor_id %><br />
+    <%= f.text_field :nota_credito_proveedor_id %>
+  </p>
+  <p>
+    <%= f.label :data %><br />
+    <%= f.date_select :data %>
+  </p>
+  <p>
+    <%= f.label :persona_id %><br />
+    <%= f.text_field :persona_id %>
+  </p>
+  <p>
+    <%= f.label :persona_nome %><br />
+    <%= f.text_field :persona_nome %>
+  </p>
+  <p>
+    <%= f.label :documento_numero_01 %><br />
+    <%= f.text_field :documento_numero_01 %>
+  </p>
+  <p>
+    <%= f.label :documento_numero_02 %><br />
+    <%= f.text_field :documento_numero_02 %>
+  </p>
+  <p>
+    <%= f.label :documento_numero %><br />
+    <%= f.text_field :documento_numero %>
+  </p>
+  <p>
+    <%= f.label :cota %><br />
+    <%= f.text_field :cota %>
+  </p>
+  <p>
+    <%= f.label :valor_dolar %><br />
+    <%= f.text_field :valor_dolar %>
+  </p>
+  <p>
+    <%= f.label :valor_guarani %><br />
+    <%= f.text_field :valor_guarani %>
+  </p>
+  <p>
+    <%= f.label :valor_real %><br />
+    <%= f.text_field :valor_real %>
+  </p>
+  <p>
+    <%= f.label :moeda %><br />
+    <%= f.text_field :moeda %>
+  </p>
+  <p>
+    <%= f.label :clase_produto %><br />
+    <%= f.text_field :clase_produto %>
+  </p>
+  <p>
+    <%= f.label :tipo %><br />
+    <%= f.text_field :tipo %>
+  </p>
+  <p>
+    <%= f.submit 'Create' %>
+  </p>
+<% end %>
+
+<%= link_to 'Back', nota_credito_proveedor_aplics_path %>

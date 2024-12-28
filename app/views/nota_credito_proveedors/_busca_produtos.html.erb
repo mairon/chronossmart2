@@ -1,0 +1,86 @@
+<div class="group">  
+  <table class="head_grid">
+    <tr>
+      <td width="200"><%= t('UNIT') %></td>
+      <td width="200">Deposito</td>
+      <td width="450">Producto</td>
+      <td width="70" align="right">Costo</td>
+      <td width="70" align="right">Saldo</td>
+    </tr>
+  </table>
+
+  <div class="rolagem" dir="div" style="height: 200px;">
+    <table>
+      <% @produtos.each do |p| %>
+        <% if @nota_credito_proveedor.moeda.to_i == 0 %>
+          <tr class = "<%= cycle("cor1", "cor2") %> "  
+          		onMouseOver="javascript:this.style.backgroundColor='#949494'"
+              onMouseOut="javascript:this.style.backgroundColor=''"
+              style="cursor: pointer"
+              onClick="Fecha( '<%= p.deposito_id %>',
+              								'<%= p.deposito_nome %>',
+                              '<%= p.produto_id %>',
+                              '<%= p.produto_nome %>',
+                              '<%= format_decimal(p.custo_medio_us) %>',
+                              '<%= format_int(p.stock) %>')">
+        <% else %>
+
+          <tr class = "<%= cycle("cor1", "cor2") %> "  
+              onMouseOver="javascript:this.style.backgroundColor='#949494'"
+              onMouseOut="javascript:this.style.backgroundColor=''"
+              style="cursor: pointer"
+              onClick="Fecha( '<%= p.deposito_id %>',
+                              '<%= p.deposito_nome %>',
+                              '<%= p.produto_id %>',
+                              '<%= p.produto_nome %>',
+                              '<%= format_int(p.custo_medio_gs) %>',
+                              '<%= format_int(p.stock) %>')">
+
+
+        <% end %>
+
+          <td width="200"><%= p.unidade_nome %></td>
+          <td width="200"><%= p.deposito_nome %></td>
+          <td width="450"><%= p.produto_nome %></td>
+
+          <% if @nota_credito_proveedor.moeda.to_i == 0 %>
+            <td width="70" align="right"><%= format_decimal(p.custo_medio_us) %></td>
+          <% else %>
+            <td width="70" align="right"><%= format_int(p.custo_medio_gs) %></td>
+          <% end %>
+          <td width="70" align="right"><b><%= format_int(p.stock) %></b></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>  
+
+<input type="hidden" value="<%= @nota_credito_proveedor.moeda %>" id="moeda">
+
+
+<script>
+    function Fecha(deposito_id,deposito_nome,produto_id,produto_nome,custo_medio,stock){
+    document.getElementById('nota_credito_proveedor_produto_deposito_id').value         = deposito_id;
+    document.getElementById('nota_credito_proveedor_produto_deposito_nome').value       = deposito_nome;
+    document.getElementById('nota_credito_proveedor_produto_produto_id').value          = produto_id;
+    document.getElementById('nota_credito_proveedor_produto_produto_nome').value        = produto_nome;
+    document.getElementById('nota_credito_proveedor_produto_quantidade').value  = stock;
+    document.getElementById('max_qtd').value  = stock;
+    if(document.getElementById('moeda').value == 0){
+      document.getElementById('nota_credito_proveedor_produto_unitario_dolar').value    = custo_medio;
+      document.getElementById('nota_credito_proveedor_produto_total_dolar').value       = custo_medio;
+
+    } if(document.getElementById('moeda').value == 1){
+      document.getElementById('nota_credito_proveedor_produto_unitario_guarani').value  = custo_medio;
+      document.getElementById('nota_credito_proveedor_produto_total_guarani').value     = custo_medio;
+
+    }if(document.getElementById('moeda').value == 2){
+      document.getElementById('nota_credito_proveedor_produto_unitario_real').value     = custo_medio;
+      document.getElementById('nota_credito_proveedor_produto_total_real').value        = custo_medio;
+    }
+
+    document.getElementById('nota_credito_proveedor_produto_quantidade').focus();
+  }
+	
+	
+</script>

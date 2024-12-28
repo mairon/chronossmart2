@@ -1,0 +1,337 @@
+<style>
+	.page-break { display:block; clear:both; page-break-after:always; }
+table {
+		font-family:Lucida Console;
+		font-size:10px;
+		border-collapse: collapse;
+	}
+	table td{
+		height:20px;
+
+	}
+	.header{
+		font-size: 12px;
+		border:1px solid black;
+	  -moz-border-radius:8px;
+	  -webkit-border-radius:8px;
+	  padding:10px;
+
+
+	}
+	.obs{
+		font-size: 7px;
+	}
+
+tr.cor2 {
+    background: #c0d9c0;
+}
+
+tr.cor1 {
+    background: white;
+}
+
+</style>
+<body>
+<% @amostras.each do |a| %>
+<div class="page-break">
+
+	<table>
+		<tr>
+			<td colspan="5">
+				<div >
+					<table>
+				    <tr>
+				    	<td colspan="2"><%= wicked_pdf_image_tag('logo_biosollo.png', :width => 150, :height => 80) %></td>
+				    	<td width="700" align="center" valign="bottom">
+				    		<p>Km 4 Super Carretera - Teléfono: (061) 573 616</p>
+				    		<p>www.biosollo.com.py - biosollo@biosollo.com.py - Ciudad del Este - Paraguay</p>
+				    	</td>
+				    </tr>
+			    </table>
+			    </div>
+	  	</td>
+		</tr>
+
+    <tr>
+    	<td heigth="100"></td>
+    </tr>
+
+		<tr>
+			<td width="1500" colspan='2'>
+				<div class="header">
+					<table>
+				    <tr height="20">
+				    	<td>Solicitante:</td>
+				    	<td  width="400"><%= a.empresa_nome %></td>
+
+				    	<td>Control:</td>
+				    	<td><%= a.amostra.to_s.rjust(6,'0') %></td>
+
+				    </tr>
+
+				    <tr height="20">
+				    	<td>Propietário:</td>
+				    	<td>
+				    		<% if a.solicitante == '' %>
+				    			NO INFORMADO
+				    		<% else %>
+				    			<%= a.solicitante %>
+				    		<% end %>
+				    	</td>
+				    </tr>
+
+				    <tr height="20">
+				    	<td>Dirección:</td>
+				    	<td><%= a.local_coleta %></td>
+				    </tr>
+
+						<tr height="20">
+				    	<td>Ident. Muestra:</td>
+				    	<td> <%= 'LT : ' << a.lote unless a.lote.to_s.blank? %> - PT : <%= a.detalhe_amostra %></td>
+
+				    	<td><%= t('DATE') %> Ingresso:</td>
+				    	<td><%= a.data.to_date.strftime("%d/%m/%Y") %></td>
+
+				    </tr>
+					</table>
+				</div>
+
+			</td>
+		</tr>
+
+    <tr>
+    	<td heigth="100"></td>
+    </tr>
+
+		<tr>
+			<td width="1500" colspan='5' align="center">
+				<div class="header">
+						<h2>Resultado de Análisis de Correctivo - Calcario</h2>
+				</div>
+			</td>
+		</tr>
+    <tr>
+    	<td heigth="100"></td>
+    </tr>
+
+    <tr>
+	    	<td valign="top">
+	    		<div class="header">
+	    		<table>
+	    			<tr style="border-bottom: 1px solid black">
+	    				<td width="210"><b>Determinaciónes</b></td>
+	    				<td width="300" align="center"></td>
+	    				<td width="400" align="center"><b>Resultado (%)</b></td>
+	    			</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Cálcio </td>
+	    				<td align="center">
+	    					<% calcio = AmostraEnsaio.find_by_metodo_id( 85, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    					Ca
+	    				</td>
+	    				<td align="center">
+								<%= number_to_currency( calcio.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    				</td>
+		    		</tr>
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Óxido de Cálcio </td>
+	    				<td align="center">
+	    					CaO
+	    				</td>
+	    				<td align="center">
+								<%= number_to_currency( (calcio.resultado.to_f * 1.40), :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    				</td>
+		    		</tr>
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Magnésio </td>
+	    				<td align="center">
+	    					<% magnesio = AmostraEnsaio.find_by_metodo_id( 88, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    					Mg
+	    				</td>
+	    				<td align="center">
+								<%= number_to_currency( magnesio.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    				</td>
+		    		</tr>
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Óxido de Magnesio </td>
+	    				<td align="center">
+	    					MgO
+	    				</td>
+	    				<td align="center">
+								<%= number_to_currency( (magnesio.resultado.to_f * 1.66), :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    				</td>
+		    		</tr>
+	    		</table>
+	    		</div>
+	    	</td>
+    	</td>
+    </tr>
+
+    <tr>
+    	<td heigth="100"></td>
+    </tr>
+
+    <tr>
+	    	<td valign="top">
+	    		<div class="header">
+	    		<table>
+	    			<tr style="border-bottom: 1px solid black">
+	    				<td width="200"><b>Análisis granulométrica (ABNT)</b></td>
+	    				<td width="300" align="center"><b>mm</b></td>
+	    				<td width="400" align="center"><b>Resultado (%)</b></td>
+	    			</tr>
+
+  					<% p = EntradaResultEnsaio.find_by_metodo_id( 180, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,cal_p10_result,cal_p20_result,cal_p50_result,cal_fundo_result') %>
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>TAMIZ 10 </td>
+	    				<td align="center">
+								2.00
+	    				</td>
+	    				<td align="center">
+	    					<% if p != nil %>
+		    					<%= number_to_currency( p.cal_p10_result.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    					<% end %>
+	    				</td>
+		    		</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>TAMIZ 20 </td>
+	    				<td align="center">
+	    					0,84
+	    				</td>
+	    				<td align="center">
+	    					<% if p != nil %>
+		    					<%= number_to_currency( p.cal_p20_result.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    					<% end %>
+
+	    				</td>
+		    		</tr>
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>TAMIZ 50 </td>
+	    				<td align="center">
+	    					0,30
+	    				</td>
+	    				<td align="center">
+
+	    					<% if p != nil %>
+		    					<%= number_to_currency( p.cal_p50_result.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    					<% end %>
+
+	    				</td>
+		    		</tr>
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>FONDO </td>
+	    				<td align="center">1.00</td>
+	    				<td align="center">
+	    					<% if p != nil %>
+		    					<%= number_to_currency( p.cal_fundo_result.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    					<% end %>
+	    				</td>
+		    		</tr>
+						<tr height="20">
+							<td>
+							</td>
+						</tr>
+	    			<tr class="<%= cycle("cor1", "cor2") %>"  style="border-top: 1px solid black">
+	    				<td>Poder de Neutralización en CaCo<small style="position: absolute;margin-top:6px">3</small></td>
+	    				<td align="center">
+	    					PN
+	    				</td>
+
+	    				<td align="center">
+	    					<% if p != nil %>
+	    						<% entrada_result_e = EntradaResultEnsaio.find_by_metodo_id( 180, :conditions => ["amostra = ?", a.amostra], :select => 'id,entrada_result_id, cal_volume_gasto,cal_peso_amostra') %>
+	    					  <% entrada_result = EntradaResult.find_by_id(entrada_result_e.entrada_result_id) %>
+		    					<%= number_to_currency( pn =  ((25 * (10 * entrada_result.prova_valor.to_f  - entrada_result_e.cal_volume_gasto * entrada_result.pb) ) / entrada_result_e.cal_peso_amostra), :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    					<% end %>
+	    				</td>
+		    		</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Reactividad de las Partículas</td>
+	    				<td align="center">
+	    					ER
+	    				</td>
+
+	    				<td align="center">
+	    					<% if p != nil %>
+		    					<%= number_to_currency( er = (p.cal_p10_result.to_f + p.cal_p20_result.to_f + p.cal_p50_result.to_f + p.cal_fundo_result.to_f), :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    					<% end %>
+	    				</td>
+		    		</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Poder Relativo de neutralización total</td>
+	    				<td align="center">
+	    					PRNT
+	    				</td>
+	    				<td align="center">
+	    					<% if p != nil %>
+		    					<%= number_to_currency( (pn.to_f * er.to_f) / 100, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    					<% end %>
+	    				</td>
+		    		</tr>
+
+	    		</table>
+	    	</div>
+	    	<br>
+	    		
+	    	</td>
+    	</td>
+    </tr>
+    <tr>
+    	<td heigth="120">
+    		Metodología: Manual de análisis químicos de suelo, plantas y fertilizantes, 2009.
+				<br/>
+				<br/>
+
+    	</td>
+    </tr>
+    <tr>
+    	<td>
+    		<table>
+    			<tr>
+	    			<td width="300"></td>
+	    			<td width="600">
+	    				<div class="header">
+		    				<table>
+		    					<td>Ciudad del Este, <%= @revisao_result.data.strftime("%d") %>/<%= @revisao_result.data.strftime("%m") %>/<%= @revisao_result.data.strftime("%Y") %></td>
+		    				</table>
+		    			</div>
+	    			</td>
+    			</tr>
+			    <tr>
+			    	<td heigth="150"></td>
+			    </tr>
+
+    			<tr>
+	    			<td width="300"></td>
+	    			<td width="600"  align="center">
+	    				<div class="header">
+		    				<table>
+		    					<td  align="center">
+		    					 <p> <%= wicked_pdf_image_tag('firma_alex.png', :width => 50, :height => 50) %></p>
+		    					 <p>____________________________________</p>
+		    					 <p>Alexson Bobato</p>
+		    					 <p>Gerente Comercial</p>
+		    					</td>
+		    				</table>
+		    			</div>
+	    			</td>
+    			</tr>
+			    <tr>
+			    	<td heigth="120"></td>
+			    </tr>
+
+
+    		</table>
+    	</td>
+    </tr>
+
+	</table>
+</div>
+<% end %>
+</body>
+
+

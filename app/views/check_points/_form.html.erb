@@ -1,0 +1,35 @@
+<%= form_for(CheckPoint.new) do |f| %>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Date/Hora</label>
+      <%= f.text_field :checkpoint, id: 'datecheck' %>
+      <%= f.hidden_field :unidade_id, value: current_unidade.id %>
+    </div>
+    <div class="col-md-12">
+        <label>Empleado</label>
+        <%= f.collection_select :persona_id, Persona.all( :select => ' id, nome', :conditions => ["tipo_funcionario = 1 and estado = 0"], :order  => '2' ), :id, :nome, {:prompt => "Selecione"}, {required: true} %>
+    </div>
+
+    <div class="col-md-12">
+      <label>Tipo</label>
+      <%= f.select :check_point_type, options_for_select([['Entrada', 0], ['Salida', 1], ['Almuerzo Entrada', 2], ['Almuerzo Salida', 3]]), {:prompt => "Selecione"}, {class: 'panel-field', required: true} %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12" align="center">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    </div>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+  $('#check_point_persona_id, #check_point_check_point_type').selectize();
+
+
+ $('#datecheck').datetimepicker({
+ dateFormat: 'yymmdd',
+ timeFormat: 'hhmm'
+ });
+
+</script>

@@ -1,0 +1,73 @@
+<body onload="window.print()">
+<style type="text/css">
+      td{
+    font-family: Arial;
+    font-size: 12px;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-transform: uppercase;
+  }
+</style>
+
+<table>
+    <tr>
+      <td colspan="6"><hr></td>
+    </tr>
+
+    <tr>
+      <td  colspan="3" align="center">DEVOLUCIÓN</td>
+    </tr>
+  
+    <tr>
+        <td colspan="3"><%= Time.now.strftime("%d/%m/%y - %H:%M") %></td>
+    </tr>
+    <tr>
+        <td colspan="3"><b>DV <%= @venda.id.to_s.rjust(6,'0') %></b></td>
+    </tr>
+    <tr>
+      <td colspan="3">Comanda: <%= @venda.cartao.nome unless @venda.cartao.nil? %></td>
+    </tr>
+    <tr>
+        <td colspan="3"><%= @venda.persona_nome %></td>
+    </tr>
+    <tr>
+        <td colspan="3"><%= @venda.obs %></td>
+    </tr>
+
+    <tr>
+      <td colspan="6"><hr></td>
+    </tr>
+      <tr>
+        <td width="200"><b>Productos</b></td>
+        <td width="50" align="right"><b>Ctd.</b></td>
+        <td width="50" align="right"><b>Unit.</b></td>
+        <td width="50" align="right"><b>Tot.</b></td>
+      </tr>
+    <tr>
+      <td colspan="6"><hr></td>
+    </tr>
+    <% indice = 1 %>
+    <% tot = 0 %>
+    <% @venda.venda_devolucaos.each do |p| %>
+        <tr>
+          <td width="200"><%= p.produto.nome %></td>
+          <td width="50" align="right"><%= p.quantidade.to_i %></td>
+          <td width="50" align="right"><%= format_int(p.unit_gs) %></td>
+          <td width="50" align="right"><%= format_int(p.quantidade.to_i * p.unit_gs.to_f) %></td>
+        </tr>
+
+        <% indice += 1 %>
+        <% tot += p.quantidade.to_i * p.unit_gs.to_f %>
+
+        <tr>
+          <td colspan="6"><hr></td>
+        </tr>        
+        <tr>
+          <td width="200">Total ==> </td>
+          <td width="50" align="right"></td>
+          <td width="50" align="right"></td>
+          <td width="50" align="right"><%= format_int(tot) %></td>
+        </tr>
+
+    <% end %>
+</table>

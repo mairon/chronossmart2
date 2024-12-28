@@ -1,0 +1,132 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content">
+        <h1 id="header">
+          Fluxo de Caixa Realizado
+        </h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-sm-12">
+  <%= form_tag fluxo_caixa_realizado_relatorios_path, :method => "get" do %>
+  <div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content">
+          <table>
+            <tr>
+              <td align="center">Periodo:</td>
+              <td> 
+                <%= text_field_tag :inicio, params[:inicio], size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+                <div class="input-group-addon-f">
+                  <span class="icon-calendar"></span>
+                </div> 
+              </td>
+
+              <td style="padding-left: 5px"><%= t('TO') %> </td>
+
+              <td>
+                <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)", readonly: true %>
+                <div class="input-group-addon-f">
+                  <span class="icon-calendar"></span>
+                </div>
+              </td>
+
+              <% if params[:formato] != '1' %>
+                <td style="padding-left: 10px"><%= t('COIN') %>:</td>
+                <td> 
+                  <%= select_tag "moeda",
+                    options_for_select([[ "Dolar", 0],
+                      ["Guarani", 1],
+                      ["Reais", 2]], selected: params[:moeda]), :prompt => 'Selec. Moeda', required: true %>    
+                </td>
+              <% end %>
+                <td>Contas:</td>
+                <td style="padding-top: 3px" width="160">
+                  <%= select_tag "busca_conta", options_for_select(Conta.all(:select => 'id,nome',:order => 'nome').collect{ |u| [u.nome, u.id]}, selected: params[:busca_conta]), 
+                  {:prompt => 'Todas as contas', multiple: true} %>
+                </td>
+
+              <td align="right"  style="padding-left: 10px"> 
+                <%= submit_tag 'Filtrar', class: "btn btn-default", :disable_with => "Aguarde", "data-plus-as-tab" => "false" %>
+                <% if params[:final].to_i > 0 %>
+                  <a class="acao btn btn-green" id="myModalLabel" data-toggle="modal" data-width="500" data-height="781" data-target="#myiframe" data-dismiss="modal" />Imprimir</a>
+                  <%= link_to "Excel", resultado_fluxo_caixa_realizado_relatorios_path(inicio: params[:inicio], final: params[:final], moeda: params[:moeda], busca_conta: params[:busca_conta], format: "xls"), :class => "acao btn btn-blue" %>
+                <% end %>
+
+              </td>
+            </tr>
+          </table>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>
+
+<% if params[:final].to_i > 0 %>
+  <%= render "/relatorios/forms/fluxo_caixa/todas_contas_moeda_detalhado_realizado" %>
+<% end %>
+</div>
+</div>
+
+
+<div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 1100px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel"><%= t('LISTING') %> de Fluxo de Caixa Realizado</h4>
+      </div>
+      <div class="modal-body" align="center">
+        <div class="embed-responsive embed-responsive-16by9" style="height: 460px">
+          <iframe class="embed-responsive-item" id="iframeModal" frameborder="0 " border="0"></iframe>
+        </div>
+      </div>      
+    </div>
+  </div>
+</div>
+
+<script>
+
+$('#busca_conta').selectize();
+
+( function($) {
+  
+function iframeModalOpen(){
+
+    $('.acao').on('click', function(e) {
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+      
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+      
+      // stampiamo i nostri dati nell'iframe
+      $("#myiframe iframe").attr({
+        'src': '/relatorios/resultado_fluxo_caixa_realizado?' + $('form').serialize(),
+        'height': height,
+        'width': width,
+        'allowfullscreen':''
+      });
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#myiframe').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+    });
+  }
+  
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+  
+  } ) ( jQuery );
+
+</script>

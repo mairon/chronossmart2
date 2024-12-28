@@ -1,0 +1,135 @@
+   <h1 id="header">Cierre de Caja</h1>   
+   <div class="group">
+         <%= form_tag resultado_fechamento_caixa_relatorios_path, :method => "get" do %>
+            <table>
+
+               <tr>
+                  <td>
+                    <label>Fecha</label>
+                    <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+                    <div class="input-group-addon-f">
+                      <span class="icon-calendar"></span>
+                    </div>
+
+                  </td>
+               </tr>
+
+               <tr>
+                  <td>
+                    <label>Terminal</label>
+                    <%= select("busca", "terminal", Terminal.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Selecione lo Terminal'}) %>
+                  </td>
+               </tr>
+
+               <tr>
+                  <td>
+                    <label>Usuario</label>
+                    <%= select("busca", "usuario", Usuario.all(:select => 'id,usuario_nome',:order => 'usuario_nome').collect {|p| [ p.usuario_nome, p.id ] }, { prompt: 'Todos'}) %>
+                  </td>
+               </tr>
+
+          <tr>
+            <td colspan="4" class="footer-buttons">
+              <input  id="button" class="acao btn btn-green" value="Informe"  style="cursor:pointer;" id="myModalLabel" data-toggle="modal" data-width="500" data-height="781" data-target="#myiframe" data-dismiss="modal" />
+              <input  id="button" type="submit" class="btn btn-blue" value="Excel" onclick = "Tipo('1')"/>
+          </tr>
+          <input type="hidden" name="tipo" id="tipo" size="5" value="0"/>
+
+        </table>
+     <% end %>
+</div>
+
+
+<div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 1100px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel">Listado de Cierre de Caja</h4>
+      </div>
+      <div class="modal-body" align="center">
+        <div class="embed-responsive embed-responsive-16by9" style="height: 460px">
+          <iframe class="embed-responsive-item" id="iframeModal" frameborder="0 " border="0"></iframe>
+        </div>
+      </div>      
+    </div>
+  </div>
+</div>
+
+<script>
+  $('#busca_proveedor').selectize();
+
+
+  $(document).ready(function() {
+    $(".TipoCompra").click(function() {
+      $("#tipo_compra").val($(this).attr('data-value'));
+      $(".TipoCompra").css("border-bottom", "none");
+      $(".TipoCompra").css("color", "#918f8f");
+      $(this).css("border-bottom", "2px solid #B94A48");
+      $(this).css("text-align", "center");
+      $(this).css("color", "#B94A48");
+    });
+
+    $(".Status").click(function() {
+      $("#status").val($(this).attr('data-value'));
+      $(".Status").css("border-bottom", "none");
+      $(".Status").css("color", "#918f8f");
+      $(this).css("border-bottom", "2px solid #B94A48");
+      $(this).css("text-align", "center");
+      $(this).css("color", "#B94A48");
+    });
+
+    $(".Detalhe").click(function() {
+      $("#detalhe").val($(this).attr('data-value'));
+      $(".Detalhe").css("border-bottom", "none");
+      $(".Detalhe").css("color", "#918f8f");
+      $(this).css("border-bottom", "2px solid #B94A48");
+      $(this).css("text-align", "center");
+      $(this).css("color", "#B94A48");
+    });
+
+    $(".Moeda").click(function() {
+      $("#moeda").val($(this).attr('data-value'));
+      $(".Moeda").css("border-bottom", "none");
+      $(".Moeda").css("color", "#918f8f");
+      $(this).css("border-bottom", "2px solid #B94A48");
+      $(this).css("text-align", "center");
+      $(this).css("color", "#B94A48");
+    });
+  });
+
+( function($) {
+  
+function iframeModalOpen(){
+
+    $('.acao').on('click', function(e) {
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+      
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+      
+      // stampiamo i nostri dati nell'iframe
+      $("#myiframe iframe").attr({
+        'src': '/relatorios/resultado_fechamento_caixa?' + $('form').serialize(),
+        'height': height,
+        'width': width,
+        'allowfullscreen':''
+      });
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#myiframe').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+    });
+  }
+  
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+  
+  } ) ( jQuery );
+
+</script>

@@ -1,0 +1,58 @@
+<div class="panel-content">
+  <h1>
+    Custos Diretos 
+    <div style="float:right; margin-top: -15px; margin-right: 15px">
+      <a class="button add" data-toggle="modal" data-target="#add_custo">ADD</a>
+    </div>
+  </h1>
+  <div>
+    <table class="head_grid">
+      <tr>
+        <td width="130">Responsável</td>
+        <td width="130">Cargo</td>
+        <td width="35"></td>
+        <td width="60" align="right"><%= t('VALUE') %></td>
+      </tr>
+    </table>
+    <div class="rolagem" dir="div" style="height: 220px">
+       <table>
+          <% contrato_custos.each do |cs| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="130"><%= cs.persona.nome %></td>
+              <td width="130"><%= cs.cargo.nome %></td>
+              <% if @contrato.moeda.to_i == 0 %>
+                <td width="15" align="center"><span class="us">U$</span></td>
+                <td width="60" align="right"><b><span class="us"><%= format_decimal(cs.persona.salario) %></span></b></td>
+              <% elsif @contrato.moeda.to_i == 1 %>
+                <td width="15" align="center"><span class="gs">Gs</span></td>
+                <td width="60" align="right"><b><span class="gs"><%= format_int(cs.persona.salario) %></span></b></td>
+              <% elsif @contrato.moeda.to_i == 2 %>
+                <td width="15" align="center"><span class="rs">R$</span></td>
+                <td width="60" align="right"><b><span class="rs"><%= format_decimal(cs.persona.salario) %></span></b></td>
+              <% end %>
+              <td><%= link_to '', cs, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+            </tr>
+          <% end %>
+       </table>
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="add_custo">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel">Custo Direto</h4>
+      </div>
+      <div class="modal-body">
+        <%= render partial: '/contrato_custos/new_custo', :locals=>{:contrato_custo => ContratoCusto.new(:contrato_id=>@contrato.id)}%>
+      </div>
+    </div>
+  </div>
+</div>

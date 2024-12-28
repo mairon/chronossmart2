@@ -1,0 +1,33 @@
+<h1 id="header">sub_grupo_precos</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_sub_grupo_preco_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Sub grupo</td>
+            <td><%= t('UNIT') %></td>
+            <td>Porcen tabela 01</td>
+            <td>Porcen tabela 02</td>
+            <td>Porcen tabela 03</td>
+            <td>Porcen tabela 04</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @sub_grupo_precos.each do |sub_grupo_preco| %>
+      <tr>
+                  <td><%= sub_grupo_preco.sub_grupo_id %></td>
+                  <td><%= sub_grupo_preco.unidade_id %></td>
+                  <td><%= sub_grupo_preco.porcen_tabela_01 %></td>
+                  <td><%= sub_grupo_preco.porcen_tabela_02 %></td>
+                  <td><%= sub_grupo_preco.porcen_tabela_03 %></td>
+                  <td><%= sub_grupo_preco.porcen_tabela_04 %></td>
+                <td><%= link_to 'Editar', edit_sub_grupo_preco_path(sub_grupo_preco) %></td>
+        <td><%= link_to t('DELETE'), sub_grupo_preco, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

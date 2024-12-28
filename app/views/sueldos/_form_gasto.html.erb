@@ -1,0 +1,490 @@
+<body onload="DataCompra(),SueldoSetaValor(),CampoCompra(),ExibeDivCompraFinanca(),ExibeDivCompraDetalheFatura()">
+  Detalhes Financieros - Edicion
+  <% form_for(compra) do |f| %>
+    <%= f.error_messages  %>
+    <div class="group_cd">
+       <%= f.hidden_field :sueldo_id %>
+       <table>
+          <tr>
+             <td>
+                <table>
+                 <tr height="35">
+                   <td width="90" align="right"><%= t('DATE') %>:</td>
+                   <td><%= f.date_select :data ,{},{:onblur => "GastoCotacao()"} %></td>
+                                      <%= hidden_field_tag( 'key' ) %>
+
+                 </tr>
+
+                 <tr height="35">
+                   <td width="90" align="right">Cotacion :</td>
+                       <td><%= text_field :compra,
+                                          :cotacao ,
+                                          { :size    => 15,:value => compra.cotacao,
+                                            :onfocus  => remote_function(:update => "key",
+                                                                        :url    => { :action => :get_moeda_gastos},
+                                                                                     :with   => "'key='+ key.value ") } %>*
+                   </td>
+
+                 </tr>
+
+                 <tr height="35">
+                   <td width="90" align="right">Unidad:</td>
+                   <td><%= f.collection_select :unidade_id, Unidade.all(:select => 'id',:order => '1'),:id,:id %></td>
+                 </tr>
+                 </table>
+                 <table>
+                   <tr>
+                     <td width="90"></td>
+                     <td>
+                       <fieldset>
+                         <legend><%= t('COIN') %></legend>
+                          <% if current_unidade.moeda.to_i == 0 %>
+                            <%= f.radio_button :moeda, 1,  :onblur => "MoedaCompra('1')" %> <%= t('GUARANIS') %>
+                            <%= f.radio_button :moeda, 0, :onblur => "MoedaCompra('0')",  :Checked => "True" %> Dolar
+                            <%= f.radio_button :moeda, 2, :onblur => "MoedaCompra('2')" %> Real
+                          <% elsif current_unidade.moeda.to_i == 1 %>
+                            <%= f.radio_button :moeda, 1,  :onblur => "MoedaCompra('1')",  :Checked => "True" %> <%= t('GUARANIS') %>
+                            <%= f.radio_button :moeda, 0, :onblur => "MoedaCompra('0')" %> Dolar
+                            <%= f.radio_button :moeda, 2 , :onblur => "MoedaCompra('2')"%> Real
+
+                          <% elsif current_unidade.moeda.to_i == 2 %>
+                            <%= f.radio_button :moeda, 1,  :onblur => "MoedaCompra('1')" %> <%= t('GUARANIS') %>
+                            <%= f.radio_button :moeda, 0, :onblur => "MoedaCompra('0')" %> Dolar
+                            <%= f.radio_button :moeda, 2, :onblur => "MoedaCompra('2')",  :Checked => "True" %> Real
+                          <% end %>
+
+                         <input type="hidden" id="moeda" value="<%= current_unidade.moeda.to_i %>"/>
+                       </fieldset>
+                     </td>
+
+                     <td>
+                       <fieldset>
+                         <legend>Tipo</legend>
+
+                         <%= f.radio_button :tipo, 0,  :Checked => "True",  :onblur => "TipoCompra('0'),ExibeDivCompraFinanca(),ExibeDivCompraDetalheFatura()"%> Contado
+                         <%= f.radio_button :tipo, 1,  :onblur => "TipoCompra('1'),ExibeDivCompraFinanca(),ExibeDivCompraDetalheFatura()" %> Credito
+                         <input type="hidden" id="tipo" value="<%= compra.tipo %>"/>
+                         *
+                       </fieldset>
+
+                     </td>
+
+                   </tr>
+
+                 </table>
+
+                   <%= f.hidden_field :tipo_compra, :value => 1 %>
+                <table>
+                   <tr height="35">
+                     <td align="right">Rubros :</td>
+                      <td><%= f.collection_select :rubro_id, Rubro.all( :select => 'id,descricao',
+                                                             :order  => 'descricao' ),:id,
+                                                                              :descricao%></td>
+
+                   </tr>
+
+                   <tr height="35">
+                      <td align="right">Beneficiario :</td>
+                     <td colspan="3">
+                     <%= f.text_field :persona_nome ,:value =>@sueldo.persona_nome%>
+                      <%= f.hidden_field :despachante_id, :value => 0  %>
+                     </td>
+                   </tr>
+
+         <!--    DOCUMENTO       !-->
+
+                   <tr height="35">
+                      <td align="right">Documento:</td>
+                     <td><%= f.collection_select :documento_id, Documento.all( :select => 'id,nome',
+                                                                                :order  => '1' ),:id,
+                                                                                                 :nome %></td>
+                   </tr>
+                        <%= f.hidden_field :documento_numero_01,
+                                           :value => '000'%>
+                        <%= f.hidden_field :documento_numero_02,
+                                           :value => '000'%>
+
+                        <%= f.hidden_field :documento_numero,
+                                           :value => '000'%>
+
+                        <%= f.hidden_field :documento_timbrado,
+                                         :value => '000'%>
+
+
+       <!--       VALORES FATURA     !-->
+
+                   <tr>
+                      <td colspan="7">
+
+                         <div id="MOEDA_FATURA_DOLAR" style="display:none;">
+                           <table>
+                              <tr>
+                                <td>
+                                   <tr>
+                                    <td><%= f.hidden_field :exentas_dolar,
+                                                         :size   => 10,
+                                                         :value  => ''
+                                                         %></td>
+
+
+                                    <td><%= f.hidden_field :gravadas_05_dolar,
+                                                         :size   => 10,
+                                                         :onblur => "MascaraMoeda(this),
+                                                                     CompraGravada05Dolar()" %></td>
+
+                                    <td><%= f.hidden_field :gravadas_10_dolar,
+                                                         :size   => 10,
+                                                         :onblur => "MascaraMoeda(this),
+                                                                     CompraGravada10Dolar()" %></td>
+                                  </tr>
+                                  <tr>
+                                    <td><%= f.hidden_field :imposto_05_dolar,
+                                                         :size   => 10,
+                                                         :onblur => "MascaraMoeda(this)"%></td>
+
+                                    <td><%= f.hidden_field :imposto_10_dolar,
+                                                         :size   => 10,
+                                                         :onblur => "MascaraMoeda(this)"%></td>
+                                  </tr>
+                                  <tr>
+                                    <td align="right" width="85">Total U$.:</td>
+                                    <td><%= f.text_field :total_dolar,
+                                                         :size   => 10,
+                                                         :onblur => "MascaraMoeda(this)"%></td>
+
+                                  </tr>
+                                                                    <tr>
+
+                                    <td><%= f.hidden_field :desconto_dolar,
+                                                         :size   => 10,
+                                                         :onblur => "MascaraMoeda(this)"%></td>
+
+                                  </tr>
+
+                               </td>
+                             </tr>
+                          </table>
+                       </div>
+                     </td>
+                    </tr>
+                    <tr>
+                       <td colspan="7">
+
+                         <div id="MOEDA_FATURA_GUARANI" style="display:none;">
+                           <table>
+                              <tr>
+                                <td>
+                                   <tr>
+                                    <td><%= f.hidden_field :exentas_guarani,
+                                                         :size => 10 %></td>
+
+                                    <td><%= f.hidden_field :gravadas_05_guarani,
+                                                         :size   => 10,
+                                                         :onblur => "CompraGravada05Gs()"%></td>
+
+                                    <td><%= f.hidden_field :gravadas_10_guarani,
+                                                         :size   => 10,
+                                                         :onblur => "CompraGravada10Gs()"%></td>
+                                  </tr>
+                                  <tr>
+                                    <td><%= f.hidden_field :imposto_05_guarani,
+                                                         :size =>10 %></td>
+
+                                    <td><%= f.hidden_field :imposto_10_guarani,
+                                                         :size => 10 %></td>
+                                  </tr>
+                                  <tr>
+
+                                    <td align="right" width="85">Total Gs.:</td>
+                                    <td><%= f.text_field :total_guarani,
+                                                         :size   => 10,
+                                                         :value  => ( $totprov.to_f - $totdesc.to_f ) %></td>
+                                  </tr>
+                                  <tr>
+                                    <td><%= f.hidden_field :desconto_guarani,
+                                                           :size   => 10 %></td>
+
+
+                                  </tr>
+                               </td>
+                             </tr>
+                          </table>
+                       </div>
+
+                       </td>
+                    </tr>
+
+                 </table>
+             </td>
+
+        <!--    FINANCEIRO   !-->
+
+             <td valign="top">
+                <fieldset>
+                   <legend>Datos Financieros</legend>
+
+         <!--    FINANCEIRO   CREDITO    !-->
+
+              <div id="TIPO_CREDITO" style="display:none;">
+                <table>
+              <!--    COTA 01    !-->
+                     <tr>
+                       <td>
+                          <div id="CREDITO_PARCELA_DOLAR" style="display:none;">
+                             <table>
+                                <tr>
+                                 <td>
+                                   <fieldset>
+                                     <legend>Entrega</legend>
+                                     <%= f.radio_button :entrega_dolar, 0,  :Checked => "True",:onblur => "EntregaCompraCreditoDolar('0'),ExibeDivDadosContaEntregaDolar()"%> No
+                                     <%= f.radio_button :entrega_dolar, 1,:onblur => "EntregaCompraCreditoDolar('1'),ExibeDivDadosContaEntregaDolar()" %> Si
+                                     <input type="hidden" id="entrega_dolar"/>
+                                     *
+                                   </fieldset>
+                                 </td>
+
+                                 <td width="85" align="right">N. Cuotas : </td>
+                                 <td><input type="text" id="parcela_dolar" onblur="CalculoCotasCompraCreditoDolar()" size="1" value="<%= compra.cota_dolar %>"/>*</td>
+                                 <%= f.hidden_field :cota_dolar %>
+                                </tr>
+                            </table>
+                          </div>
+                          <div id="CREDITO_PARCELA_GUARANI" style="display:none;">
+                             <table>
+                                <tr>
+                                 <td>
+                                   <fieldset>
+                                     <legend>Entrga</legend>
+                                     <%= f.radio_button :entrega_guarani, 0,  :Checked => "True",:onblur => "EntregaCompraCreditoGuarani('0'),ExibeDivDadosContaEntregaGuarani()"%> No
+                                     <%= f.radio_button :entrega_guarani, 1,:onblur => "EntregaCompraCreditoGuarani('1'),ExibeDivDadosContaEntregaGuarani()" %> Si
+                                     <input type="hidden" id="entrega_guarani"/>
+                                     *
+                                   </fieldset>
+                                 </td>
+                                <td width="85" align="right">N. Cuotas : </td>
+                                <td><input type="text" id="parcela_guarani" onblur="CalculoCotasCompraCreditoGuarani()" size="1" value="<%= compra.cota_guarani %>"/>*</td>
+                                <%= f.hidden_field :cota_guarani %>
+                                </tr>
+                            </table>
+                          </div>
+                       </td>
+                     </tr>
+                     <tr>
+                       <td>
+                          <div id="CREDITO_MOEDA_DOLAR_01" style="display:none;">
+                             <table>
+                             <tr>
+                                <td>Cuota 01 U$ : </td>
+                                <td><%= f.text_field :cota_dolar_01,
+                                                     :size   => 10,
+                                                     :onblur => "MascaraMoeda(this)" %></td>
+                             </tr>
+                             </table>
+                          </div>
+
+                          <div id="CREDITO_MOEDA_GUARANI_01" style="display:none;">
+                             <table>
+                             <tr>
+                                <td>Cuota 01 Gs. : </td>
+                                <td><%= f.text_field :cota_guarani_01,
+                                                     :size => 10 %></td>
+                             </tr>
+                             </table>
+                          </div>
+                        </td>
+                        <td>Vencimento : </td>
+                        <td><%= f.date_select :data_cota_01 %></td>
+                    </tr>
+              <!--    COTA 02    !-->
+                    <tr>
+                       <td>
+                          <div id="CREDITO_MOEDA_DOLAR_02" style="display:none;">
+                             <table>
+                             <tr>
+                                <td>Cuota 02 U$ : </td>
+                                <td><%= f.text_field :cota_dolar_02,
+                                                     :size   => 10,
+                                                     :onblur => "MascaraMoeda(this)" %></td>
+                             </tr>
+                             </table>
+                          </div>
+
+                          <div id="CREDITO_MOEDA_GUARANI_02" style="display:none;">
+                             <table>
+                             <tr>
+                                <td>Cuota 02 Gs. : </td>
+                                <td><%= f.text_field :cota_guarani_02,
+                                                     :size => 10 %></td>
+                             </tr>
+                             </table>
+                          </div>
+                        </td>
+                        <td>Vencimento : </td>
+                        <td><%= f.date_select :data_cota_02,
+                                            :size => 15 %></td>
+                    </tr>
+              <!--    COTA 03    !-->
+                    <tr>
+                       <td>
+                          <div id="CREDITO_MOEDA_DOLAR_03" style="display:none;">
+                             <table>
+                             <tr>
+                                <td>Cuota 03 U$ : </td>
+                                <td><%= f.text_field :cota_dolar_03,
+                                                     :size   => 10,
+                                                     :onblur => "MascaraMoeda(this)" %></td>
+                             </tr>
+                             </table>
+                          </div>
+
+                          <div id="CREDITO_MOEDA_GUARANI_03" style="display:none;">
+                             <table>
+                             <tr>
+                                <td>Cuota 03 Gs. : </td>
+                                <td><%= f.text_field :cota_guarani_03,
+                                                     :size => 10 %></td>
+                             </tr>
+                             </table>
+                          </div>
+                        </td>
+                        <td>Vencimento : </td>
+                        <td><%= f.date_select :data_cota_03,
+                                              :size => 10 %></td>
+                    </tr>
+              <!--    COTA 04    !-->
+                    <tr>
+                       <td>
+                          <div id="CREDITO_MOEDA_DOLAR_04" style="display:none;">
+                             <table>
+                             <tr>
+                                <td>Cuota 04 U$ : </td>
+                                <td><%= f.text_field :cota_dolar_04,
+                                                     :size   => 10,
+                                                     :onblur => "MascaraMoeda(this)" %></td>
+                             </tr>
+                             </table>
+                          </div>
+
+                          <div id="CREDITO_MOEDA_GUARANI_04" style="display:none;">
+                             <table>
+                             <tr>
+                                <td>Cuota 04 Gs. : </td>
+                                <td><%= f.text_field :cota_guarani_04,
+                                                     :size   => 10 %></td>
+                             </tr>
+                             </table>
+                          </div>
+                        </td>
+                        <td>Vencimento : </td>
+                        <td><%= f.date_select :data_cota_04,
+                                            :size => 10 %></td>
+                    </tr>
+              <!--    COTA 05    !-->
+                    <tr>
+                       <td>
+                          <div id="CREDITO_MOEDA_DOLAR_05" style="display:none;">
+                             <table>
+                             <tr>
+                                <td>Cuota 05 U$ : </td>
+                                <td><%= f.text_field :cota_dolar_05,
+                                                     :size   => 10,
+                                                     :onblur => "MascaraMoeda(this)" %></td>
+                             </tr>
+                             </table>
+                          </div>
+
+                          <div id="CREDITO_MOEDA_GUARANI_05" style="display:none;">
+                             <table>
+                             <tr>
+                                <td>Cuota 05 Gs. : </td>
+                                <td><%= f.text_field :cota_guarani_05,
+                                                     :size => 10 %></td>
+                             </tr>
+                             </table>
+                          </div>
+                        </td>
+                        <td>Vencimento : </td>
+                        <td><%= f.date_select :data_cota_05 %></td>
+                    </tr>
+              <!--    COTA 06    !-->
+                    <tr>
+                       <td>
+                          <div id="CREDITO_MOEDA_DOLAR_06" style="display:none;">
+                             <table>
+                             <tr>
+                                <td>Cuota 06 U$ : </td>
+                                <td><%= f.text_field :cota_dolar_06,
+                                                     :size   => 10,
+                                                     :onblur => "MascaraMoeda(this)" %></td>
+                             </tr>
+                             </table>
+                          </div>
+
+                          <div id="CREDITO_MOEDA_GUARANI_06" style="display:none;">
+                             <table>
+                             <tr>
+                                <td>Cuota 06 Gs. : </td>
+                                <td><%= f.text_field :cota_guarani_06,
+                                                     :size => 10 %></td>
+                             </tr>
+                             </table>
+                          </div>
+                        </td>
+                        <td>Vencimento : </td>
+                        <td><%= f.date_select :data_cota_06 %></td>
+                    </tr>
+                 </table>
+              </div>
+                        <!--    FINANCEIRO   CONTADO    !-->
+
+              <div id="TIPO_CONTADO" style="display:none;">
+                 <table>
+                    <tr>
+                     <td>Conta:</td>
+                     <td><%= f.collection_select :conta_id, Conta.all( :select => 'id,nome',
+                                                                                :order  => '1' ),:id,
+                                                                                                 :nome %></td>
+                     <td>Cheque :</td>
+                     <td><%= f.text_field :cheque,
+                                          :size => 15 %></td>
+                    </tr>
+                    <tr>
+                       <td colspan="2"></td>
+                      <td>Diferido : </td>
+                      <td><%= f.date_select :diferido %></td>
+                    </tr>
+                 </table>
+              </div>
+
+               </fieldset>
+             </td>
+          </tr>
+          <tr>
+            <td align="right" valign="top">Descripcion :</td>
+            <td align="left" colspan="6"><%= f.text_area :descricao,
+                                :size =>  '75x3'%></td>
+          </tr>
+
+       </table>
+
+
+    </div>
+    <a href="/sueldos/<%=params[:id]%>" ><< Seguir</a> |
+    <%= f.submit "Seguir>>" %>
+
+
+  <%end%>
+</body>
+
+<script>
+
+
+    //ABRI POPUP-----------------------------------------------------------------
+    document.onkeydown=function(e)
+    {
+      if(e.which == 113)
+        window.open('/personas/persona_compra', 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=10, WIDTH=1000, HEIGHT=400');
+    }
+    //FIM ABRI POPUP----------------------------------------------------------------
+
+</script>

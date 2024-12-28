@@ -1,0 +1,83 @@
+<h1>New pedido_compra_produto</h1>
+
+<% form_for(@pedido_compra_produto) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :pedido_compra_id %><br />
+    <%= f.text_field :pedido_compra_id %>
+  </p>
+  <p>
+    <%= f.label :data %><br />
+    <%= f.date_select :data %>
+  </p>
+  <p>
+    <%= f.label :moeda %><br />
+    <%= f.text_field :moeda %>
+  </p>
+  <p>
+    <%= f.label :cotacao %><br />
+    <%= f.text_field :cotacao %>
+  </p>
+  <p>
+    <%= f.label :clase_produto %><br />
+    <%= f.text_field :clase_produto %>
+  </p>
+  <p>
+    <%= f.label :produto_id %><br />
+    <%= f.text_field :produto_id %>
+  </p>
+  <p>
+    <%= f.label :produto_nome %><br />
+    <%= f.text_field :produto_nome %>
+  </p>
+  <p>
+    <%= f.label :quantidade %><br />
+    <%= f.text_field :quantidade %>
+  </p>
+  <p>
+    <%= f.label :unitario_dolar %><br />
+    <%= f.text_field :unitario_dolar %>
+  </p>
+  <p>
+    <%= f.label :unitario_guarani %><br />
+    <%= f.text_field :unitario_guarani %>
+  </p>
+  <p>
+    <%= f.label :total_dolar %><br />
+    <%= f.text_field :total_dolar %>
+  </p>
+  <p>
+    <%= f.label :total_guarani %><br />
+    <%= f.text_field :total_guarani %>
+  </p>
+  <p>
+    <%= f.label :deposito_id %><br />
+    <%= f.text_field :deposito_id %>
+  </p>
+  <p>
+    <%= f.label :deposito_nome %><br />
+    <%= f.text_field :deposito_nome %>
+  </p>
+  <p>
+    <%= f.label :unidade_created %><br />
+    <%= f.text_field :unidade_created %>
+  </p>
+  <p>
+    <%= f.label :usuario_created %><br />
+    <%= f.text_field :usuario_created %>
+  </p>
+  <p>
+    <%= f.label :unidade_updated %><br />
+    <%= f.text_field :unidade_updated %>
+  </p>
+  <p>
+    <%= f.label :usuario_updated %><br />
+    <%= f.text_field :usuario_updated %>
+  </p>
+  <p>
+    <%= f.submit 'Create' %>
+  </p>
+<% end %>
+
+<%= link_to 'Back', pedido_compra_produtos_path %>

@@ -1,0 +1,2 @@
+module ClaseTabelaPrecosHelper
+end

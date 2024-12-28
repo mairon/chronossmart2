@@ -1,0 +1,77 @@
+<div class="panel">
+  <h1 id="header">
+  Autorizaciones
+  <div class="pull-right">
+    <a class="modalButton-frma btn btn-blue" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-autorizacao"><i class="icon-white icon-refresh"></i></a>
+  </div>        
+  </h1>
+  <div class="panel-content">
+    <% if @plano_venda.status == 0 %>
+      <h1 class="rs">Pendiente</h1>
+      <% elsif @plano_venda.status == 1 %>
+      <div class="Mensagem" id="observacao">
+        <p>
+          <label>Aprovado por </label>
+        <p>
+          <label>Obs</label>
+          <%= @plano_venda.autorizacao_obs %>
+        </p>
+      </div>
+      <% elsif @plano_venda.status == 2 %>
+        <h1 class="gs">Rechazado</h1>
+        <p>
+          <label>Aprovado por </label>
+          <%= Usuario.find(@plano_venda.autorizado_por ).usuario_nome %> </p>
+        <p>
+          <label>Obs</label>
+          <%= @plano_venda.autorizacao_obs %>
+        </p>
+    <% end %>
+  </div>
+</div>
+
+
+<div class="modal fade" id="modal-autorizacao" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel">Autorización</h4>
+      </div>
+      <div class="modal-body">
+        <%= form_for(@plano_venda) do |f| %>
+          <div class="row panel-modal-body">
+            <div class="col-md-12">
+              <label>Status</label>
+              <%= f.select :status, [['Pendiente', 0], ['Aprobado', 1], ['Rezachado', 2]] %>
+            </div>
+            <div class="col-md-6">
+              <label>Aprobado por</label>
+              <% if @plano_venda.autorizado_por.blank? %>
+                <b><%= current_user.usuario_nome %></b>
+                <%= f.hidden_field :autorizado_por, value: current_user.id %>
+              <% else %>
+                <%= @plano_venda.autorizado_por %>
+              <% end %>
+            </div>
+            <div class="col-md-12">
+              <label>Obs.</label>
+              <%= f.text_area :autorizacao_obs, class: "panel-field", rows: 5, required: true %>
+            </div>
+
+           <div class="col-md-12">
+              <br>
+              <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+           </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $('#plano_venda_status').selectize();
+</script>

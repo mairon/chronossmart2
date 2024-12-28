@@ -1,0 +1,93 @@
+<div class="group">
+<%= form_for(Transacao.new) do |f| %>
+  <div class="row">
+    <div class="col-md-6">
+      <label>Operação</label>
+      <%= f.select :operacao, [['Recebimento', 2], ['Pagamento', 3]], {}, {class: 'op-rp'} %>
+    </div>
+    <div class="col-md-6">
+      <label><%= t('DATE') %></label>
+      <%= f.text_field :data, value: Time.now.strftime("%d/%m/%Y"), size: 10, required: true, class: "panel-field date", autofocus: true %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Favorecido</label>
+      <%= f.collection_select :persona_id, Persona.order(:nome),:id, :nome,{:prompt => 'Selecione'}, {required: true, class: 'persona_rp'} %>
+    </div>      
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <label>Doc.</label>
+      <%= f.text_field :documento_numero, class: "panel-field date" %>
+    </div>
+  </div>  
+
+  <div class="row">
+    <div class="col-md-6">
+      <label><%= t('ACCOUNT') %></label>
+      <%= f.collection_select :conta_id, Conta.all(:select => ' id,nome', :conditions => ["unidade_id = #{current_unidade.id}"], :order => '2'),:id, :nome,{:prompt => 'Selecione'}, {required: true, class: 'conta_id'} %>
+    </div>
+  </div>
+  <div class="row recebimento" hidden>
+    <div class="col-md-6">
+      <%= panel_field_d3_label 'Credito USDT',f, :credito_usdt %>
+    </div>
+
+    <div class="col-md-6">
+      <%= panel_field_d3_label 'Credito R$',f, :credito_rs %>
+    </div>    
+  </div>
+
+    <div class="row pagamento" hidden>
+    <div class="col-md-6">
+      <%= panel_field_d3_label 'Debito R$',f, :debito_rs %>
+    </div>    
+
+    <div class="col-md-6">
+      <%= panel_field_d3_label 'Debito USDT',f, :debito_usdt %>
+    </div>    
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <br>
+      <%= f.text_area :obs, class: "panel-field", placeholder: 'Obs.', rows: '3' %>
+    </div>
+  </div>
+  
+  <div class="footer-buttons">
+    <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+  </div>    
+<% end %>
+</div>
+
+<script>
+
+$(document).ready(function() {
+
+  if ($(".op-rp").val() == '2') {
+    $(".recebimento").show();
+    $(".pagamento").hide();
+
+  } else if ($(".op-rp").val() == '3') {
+    $(".pagamento").show();
+    $(".recebimento").hide();
+  };
+
+  $(".op-rp").change(function() {
+    if ($(".op-rp").val() == '2') {
+      $(".recebimento").show();
+      $(".pagamento").hide();
+
+    } else if ($(".op-rp").val() == '3') {
+      $(".pagamento").show();
+      $(".recebimento").hide();
+    };
+  })
+});
+
+$('.persona_rp').selectize();
+
+</script>

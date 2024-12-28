@@ -1,0 +1,104 @@
+<body onload="ImputFocus('produtos_roteiro_setor')">
+<h1 align="right" id="header">Productos</h1>  
+<style>
+  .head_grid td{
+    border:1px solid;
+    border-collapse: collapse;
+  }
+</style>
+   <ul class="tabs">
+        <li><a href="#tab1">Table de Precios - [<%= t('EDITION') %>]</a></li>
+   </ul>
+
+   <div class="tab_container">
+      <div id="tab2" class="tab_content">
+        <div class="group">
+          <p>
+            Producto : <b> <%= @produto.nome %></b> - Ref. <b><%= @produto.fabricante_cod %></b>
+          </p>
+        </div>
+
+      <div class="grid">
+        <table class="head_grid">
+            <tr>
+              <td width="120" align="center" rowspan="2"><%= t('UNIT') %></td>
+              <td align="center" colspan="3">Consumidor Final</td>
+              <td align="center" colspan="3">Cliente Especial</td>
+              <td align="center" colspan="3">Colaboradores</td>
+              <td align="center" colspan="3">Tabla 04</td>
+            </tr>
+            <tr>
+              <td width="70" align="right">U$</td>
+              <td width="70" align="right">G$</td>
+              <td width="70" align="right">R$</td>
+
+              <td width="70" align="right">U$</td>
+              <td width="70" align="right">G$</td>
+              <td width="70" align="right">R$</td>
+
+              <td width="70" align="right">U$</td>
+              <td width="70" align="right">G$</td>
+              <td width="70" align="right">R$</td>
+
+              <td width="70" align="right">U$</td>
+              <td width="70" align="right">G$</td>
+              <td width="70" align="right">R$</td>
+            </tr>
+
+        </table>
+
+        <div class="rolagem" dir="div">
+          <table>
+          <% @tabela.each do |t| %>
+          <% if t.unidade_id.to_i == current_unidade.id.to_i %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="120"><%= t.unidade.unidade_nome %></td>
+              <td width="71" align="right"> <%= number_to_currency(t.preco_1_us, :format=>' %n ', :separator => ",")  %></td>
+              <td width="71" align="right"> <%= number_to_currency(t.preco_1_gs.to_i.round(-3), :format=>' %n ', :precision => 0)  %> </td>
+              <td width="74" align="right"> <%= number_to_currency(t.preco_1_rs, :format=>' %n ', :separator => ",")  %></td>
+
+              <td width="71" align="right"> <%= number_to_currency(t.preco_2_us, :format=>' %n ', :separator => ",")  %></td>
+              <td width="71" align="right"> <%= number_to_currency(t.preco_2_gs.to_i.ceil, :format=>' %n ', :precision => 0)  %> </td>
+              <td width="74" align="right"> <%= number_to_currency(t.preco_2_rs, :format=>' %n ', :separator => ",")  %></td>
+
+              <td width="71" align="right"> <%= number_to_currency(t.preco_3_us, :format=>' %n ', :separator => ",")  %></td>
+              <td width="71" align="right"> <%= number_to_currency(t.preco_3_gs.to_i.round(-3), :format=>' %n ', :precision => 0)  %> </td>
+              <td width="74" align="right"> <%= number_to_currency(t.preco_3_rs, :format=>' %n ', :separator => ",")  %></td>
+
+              <td width="71" align="right"> <%= number_to_currency(t.preco_4_us, :format=>' %n ', :separator => ",")  %></td>
+              <td width="71" align="right"> <%= number_to_currency(t.preco_4_gs.to_i.round(-3), :format=>' %n ', :precision => 0) %> </td>
+              <td width="74" align="right"> <%= number_to_currency(t.preco_4_rs, :format=>' %n ', :separator => ",")  %></td>
+              <td><%= link_to 'Editar', edit_produtos_tabela_preco_path(t) %></td>
+            </tr>
+          <% end %>
+
+          <% end %>
+          </table>
+        </div>
+
+      </div>
+
+       <div class="buttons">
+           <%= link_to t('BACK'), produto_path(@produto), :class => "button back" %>
+       </div>
+      </div>
+   </div>
+</body>
+
+
+<script>
+  //ABRI POPUP-----------------------------------------------------------------
+document.onkeydown=function(e)
+{
+    if(e.which == 113)
+        window.open('/produtos/busca_composicao_produto', 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=10, WIDTH=1000, HEIGHT=400');
+}
+     
+//FIM ABRI POPUP----------------------------------------------------------------
+
+
+</script>
+
+
+
+

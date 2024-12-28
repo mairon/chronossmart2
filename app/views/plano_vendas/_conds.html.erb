@@ -1,0 +1,48 @@
+<div class="modal fade" id="modal-cond" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('DOC') %></h4>
+      </div>
+      <div class="modal-body group">
+				<%= form_for(PlanoVendaCond.new) do |f| %>
+				<%= f.hidden_field :plano_venda_id, value: @plano_venda.id %>
+				<div class="row">
+					<div class="col-md-3">
+						<label>Tipo</label>
+						<%= f.select :nome, [['USADO', 'USADO'], ['INICIAL', 'INICIAL'], ['REFUERZO', 'REFUERZO'], ['CUOTA', 'CUOTA'], ['CONTADO', 'CONTADO']] %>
+					</div>
+
+					<div class="col-md-3">
+						<label>Cant.</label>
+						<%= f.telephone_field :quantidade, size: 9, value: 1 %>
+					</div>
+
+					<div class="col-md-3">
+				    <% if @plano_venda.moeda.to_i == 0 %>
+				    	<label>Monto U$</label>
+				    	<%= f.telephone_field :valor_us, value: format_decimal(@plano_venda.valor_us.to_f - @plano_venda.plano_venda_conds.sum("valor_us * quantidade").to_f), class: "money_us panel-field", dir: "rtl" , step: ".01" %>
+				    <% elsif @plano_venda.moeda.to_i == 1 %>
+				      <%= field_gs_label 'Monto Gs.', f, :valor_gs, value: format_int(@plano_venda.valor_gs.to_f  - @plano_venda.plano_venda_conds.sum("valor_gs * quantidade").to_f) %>
+				    <% elsif @plano_venda.moeda.to_i == 2 %>
+				      
+				    <% end %>		
+					</div>
+					<div class="col-md-3">
+						<br>
+						<%= f.text_area :obs, class: "panel-field", placeholder: 'Obs.', rows: '1' %>
+					</div>
+					<div class="col-md-1">
+						<br>
+						<%= f.submit :value => "Add", :class => "btn btn-green" %>
+					</div>	
+
+				</div>
+				<% end %>        
+      </div>
+    </div>
+  </div>
+</div>

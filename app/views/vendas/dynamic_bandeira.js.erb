@@ -1,0 +1,16 @@
+<% if params[:edit] == '1' %>
+	$('#vendas_financa_cartao_bandeira_id').empty();
+	$('#vendas_financa_cartao_bandeira_id').append('<option value="">SELECIONA LA BANDEIRA.</option>');
+
+	<% for ne in @bandeiras %>
+	  $('#vendas_financa_cartao_bandeira_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+	<% end %>
+
+<% else %>
+	$('#busca_cartao_bandeiras').empty();
+	$('#busca_cartao_bandeiras').append('<option value="">SELECIONA LA BANDEIRA</option>');
+
+	<% for ne in @bandeiras %>
+	  $('#busca_cartao_bandeiras').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+	<% end %>
+<% end %>

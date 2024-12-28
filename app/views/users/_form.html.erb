@@ -1,0 +1,68 @@
+<%= form_for(@user) do |f| %>
+  <% if @user.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h2>
+
+      <ul>
+      <% @user.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> users - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+
+                      <td align="right">id :</td>
+                      <td><%= f.number_field :id %></td>
+
+                      <td align="right">pseudo :</td>
+                      <td><%= f.text_area :pseudo %></td>
+
+                      <td align="right">firstname :</td>
+                      <td><%= f.text_area :firstname %></td>
+
+                      <td align="right">lastname :</td>
+                      <td><%= f.text_area :lastname %></td>
+
+                      <td align="right">email :</td>
+                      <td><%= f.text_area :email %></td>
+
+                      <td align="right">role :</td>
+                      <td><%= f.text_area :role %></td>
+
+                      <td align="right">mobile_auth :</td>
+                      <td><%= f.text_area :mobile_auth %></td>
+
+                      <td align="right">persona_id :</td>
+                      <td><%= f.number_field :persona_id %></td>
+
+                      <td align="right">status :</td>
+                      <td><%= f.check_box :status %></td>
+                                      </tr>
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', users_path, :class => "button back" %>
+      </div>
+
+    </div>
+<% end %>

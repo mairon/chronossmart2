@@ -1,0 +1,31 @@
+<h1 id="header">presupuesto_cotas</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_presupuesto_cota_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Cuotas</t>
+            <td>Valor gs</t>
+            <td>Valor rs</t>
+            <td>Valor us</t>
+            <td>Vencimento</t>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @presupuesto_cotas.each do |presupuesto_cota| %>
+      <tr>
+                  <td><%= presupuesto_cota.cuotas %></td>
+                  <td><%= presupuesto_cota.valor_gs %></td>
+                  <td><%= presupuesto_cota.valor_rs %></td>
+                  <td><%= presupuesto_cota.valor_us %></td>
+                  <td><%= presupuesto_cota.vencimento %></td>
+                <td><%= link_to 'Editar', edit_presupuesto_cota_path(presupuesto_cota) %></td>
+        <td><%= link_to 'Borrar', presupuesto_cota, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

@@ -1,0 +1,12 @@
+//= require jquery
+//= require jquery_ujs
+//= require select2
+//= require jquery.maskMoney
+//= require abas
+//= require ui/jquery.ui.core
+//= require ui/jquery.ui.widget
+//= require ui/jquery.ui.position
+//= require ui/jquery.ui.button
+//= require ui/jquery.ui.menu
+//= require ui/jquery.ui.menubar
+//= require ui/jquery.ui.datepicker

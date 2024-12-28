@@ -1,0 +1,49 @@
+<h1 id="header">Clases/Marcas</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_clase_path, :class => 'button add' %>
+  <%= link_to 'Add Tabela Precios', clases_path(gera_tabelas: 'true'), :class => 'btn btn-blue' %>
+</div>
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="55" align="center"><%= t('CODE') %></td>
+      <td width="300" >Descripción</td>
+      <td width="80" align="right">Cantidad Productos Relacionados</td>
+      <td width="55"></td>
+    </tr>
+  </table>
+  <div class="rolagem" id="div">
+    <table>
+      <% @clases.each do |c|  %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="50" align="center"><%= link_to c.id.to_s.rjust(6,'0'), clase_path(c.id) %></td>
+          <td width="300" align="left"><%= c.descricao %></td>
+          <td width="80" align="right"><%= Produto.count(:id, conditions: "clase_id = #{c.id}") %></td>
+          <td width="80" align="left"><%= c.clase_tabela_preco.count(:id) %></td>
+          <td><%= link_to '', clase_path(c), class: 'icon-list' %></td>
+          <td><%= link_to '', edit_clase_path(c), class: 'icon-pencil' %></td>
+          <td><%= link_to '', c, :confirm => 'Estas Seguro?', :method => :delete , class: 'icon-trash'%></td>
+        </tr>
+
+        <% if params[:gera_tabelas] == 'true' %>
+          <%
+            unidade = Unidade.where(id: current_unidade.id)
+            tabela = TabelaPreco.all
+            unidade.each do |u|
+              tabela.each do |t|
+                #gera preco tabela preco
+                ClaseTabelaPreco.create( :clase_id            => c.id,
+                                         :unidade_id       => u.id.to_i,
+                                         :tabela_preco_id  => t.id.to_i
+                                       )
+
+              end
+            end
+          %>
+        <% end %>
+
+
+      <% end %>
+    </table>
+  </div>
+</div>

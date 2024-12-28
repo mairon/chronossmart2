@@ -1,0 +1,94 @@
+<style>
+  .decr td{
+    padding: 18px;
+  }
+</style>
+<%= form_for(promo_dt) do |f| %>
+  <% if promo_dt.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(promo_dt.errors.count, "error") %> prohibited this promo_dt from being saved:</h2>
+
+      <ul>
+      <% promo_dt.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= f.hidden_field :promo_id %>
+  <div class="row">
+    <div class="col-md-2">
+      <label>Cod/Barra</label>
+        <%= text_field :cod, :busca, :placeholder => 'Ref. / Cod. Barra', autofocus: true, class: 'panel-field' %>
+    </div>
+    <div class="col-md-4">
+      <label>Producto</label>
+      <%= f.text_field :produto_nome, class: 'autocomplete panel-field', required: true, autofocus: true %>
+       <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+       <%= f.hidden_field :produto_id %> 
+    </div>
+    <div class="col-md-2">
+      <%= panel_field_us_label 'Desc %',f,:desc_porce, required: true %>
+    </div>
+    <div class="col-md-1 padding-btn">
+      <%= f.submit t('SAVE'), :disable_with => "Aguarde...", :class => "btn btn-green", "data-plus-as-tab" => "false" %>
+    </div>
+  </div>
+
+<% end %>
+
+
+<script>
+
+$("#cod_busca").change(function(){
+  $.ajax({url: "/buscas/busca_compra_produto",
+          type: 'GET',
+          beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+          data: "cod=" + escape($("#cod_busca").val()) +
+                "&id="+ $("#id").val(),
+          error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                  alert('Producto no Encontrado'); 
+                  $('#cod_busca').focus();
+                  $('#cod_busca').val('');
+              },
+          success: function(grade){
+
+            $('#label_ref').append(grade["produto"].fabricante_cod);
+            $('#label_nome').append(grade["produto"].nome);
+            $('#label_cor').append(grade["produto"].cor);
+            $('#label_tamanho').append(grade["produto"].tamanho);
+            $('#label_conf').empty();
+            $('#promo_dt_produto_id').val(grade["produto"].produto_id);
+
+        }
+      });
+});
+
+
+$(function() {
+  $( "#promo_dt_produto_nome" ).autocomplete({
+      source: function( request, response ) {
+      $("#sppiner").addClass("sppiner_show");
+      $.ajax({
+        url: "/buscas/search_all_produtos",
+        dataType: "json",
+        data: {
+          tipo: 'DESCRIPCION',
+          busca: request.term
+        },
+        success: function( data ) {
+          response( data );
+          $("#sppiner").removeClass("sppiner_show");
+        },
+      });
+    },
+    minLength: 2,
+    select: function( event, ui ) {
+      $("#promo_dt_produto_id").val("");
+      $( "#promo_dt_produto_nome" ).val(ui.item.label);
+      $('#promo_dt_produto_id').val(ui.item.id);
+      return false;
+    }
+  });
+});  
+</script>

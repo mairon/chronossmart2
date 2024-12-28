@@ -1,0 +1,27 @@
+<h1 id="header">entrega_vendas</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_entrega_venda_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td>Entrega</td>
+    <td>Venda</td>
+    <td>Status</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @entrega_vendas.each do |entrega_venda| %>
+      <tr>
+        <td><%= entrega_venda.entrega_id %></td>
+        <td><%= entrega_venda.venda_id %></td>
+        <td><%= entrega_venda.status %></td>
+        <td><%= link_to 'Editar', edit_entrega_venda_path(entrega_venda) %></td>
+        <td><%= link_to t('DELETE'), entrega_venda, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

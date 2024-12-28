@@ -1,0 +1,26 @@
+<table>
+  <% tot_us = 0 %>
+  <% tot_gs = 0 %>
+  <% tot_rs = 0 %>
+
+  <% @financas.to_a.group_by(&:plano_de_conta_nome).map do |plano_de_conta_nome, items| %>
+    <tr class = "<%= cycle( "cor1", "cor2" )%>">
+      <td width="280"><%= plano_de_conta_nome %></td>
+        <td width="70" align="right"><%= format_decimal(items.map { |item| item[:entrada_dolar].to_f if item[:moeda] == 0 }.compact.sum) %></td>
+        <td width="70" align="right"><%= format_int(items.map { |item| item[:entrada_guarani].to_f if item[:moeda] == 1 }.compact.sum) %></td>
+        <td width="70" align="right"><%= format_decimal(items.map { |item| item[:entrada_real].to_f if item[:moeda] == 2 }.compact.sum) %></td>
+    </tr>
+    <% tot_us += items.map { |item| item[:entrada_dolar].to_f if item[:moeda] == 0 }.compact.sum %>
+    <% tot_gs += items.map { |item| item[:entrada_guarani].to_f if item[:moeda] == 1 }.compact.sum %>
+    <% tot_rs += items.map { |item| item[:entrada_real].to_f if item[:moeda] == 2 }.compact.sum %>
+  <% end %>
+
+
+  <tr class="head">
+    <td></td>
+    <td align="right"><%= format_decimal(tot_us) %></td>
+    <td align="right"><%= format_int(tot_gs) %></td>
+    <td align="right"><%= format_decimal(tot_rs) %></td>
+  </tr>
+
+</table>

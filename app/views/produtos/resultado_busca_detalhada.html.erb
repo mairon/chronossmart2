@@ -1,0 +1,101 @@
+<h1 align="right" id="header">Actualiza Productos</h1>
+<body onload="CampoBuscaTipo()">
+   <div class="group">
+      <h2>
+        <table>
+         <%= form_tag resultado_busca_detalhada_produtos_path, :method => "get" do %>
+          <tr>
+            <td align="right">Marca:</td>
+            <td>
+              <%= select("filtro", "clase", 
+                Clase.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },
+                {:selected => params[:filtro]["clase"],:include_blank => true}, {:style => "width:250px"}) %>
+            </td>
+            <td align="right">Grupo :</td>
+            <td>
+              <%= select("filtro", "grupo", 
+                Grupo.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },
+                {:selected => params[:filtro]["grupo"], :include_blank => true},{:style => "width:250px"})   %>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="right">Sub-Grupo :</td>
+            <td>
+              <%= select("filtro", "sub_grupo", 
+                SubGrupo.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },
+                {:selected => params[:filtro]["sub_grupo"], :include_blank => true },{:style => "width:250px"})   %>
+            </td>
+          </tr>
+          <tr>
+            <td align="right">Filtro:</td>
+            <td>
+            <select name="tipo" id="tipo" style="width:250px;">
+               <option>DESCRIPCION</option>
+               <option>REFERENCIA</option>
+               <option>CODIGO</option>
+            </select>
+
+            </td>
+            <td></td>
+            <td><input id="busca" name="busca" type="text" onkeydown = "f(this)" onkeypress ="return bloqEnter(event)" size="43" value="<% params[:busca]%>"  />
+            <%= submit_tag 'Filtrar', class: 'button' %>
+            <%= image_tag("load.gif",
+                          :align => "absmiddle",
+                          :border => 0,
+                          :id => "spinner",
+                          :width => 21,
+                          :height => 21,
+                          :style =>"display: none;" ) %></td>
+          </tr>
+
+
+         <% end %>
+        </table>
+      </h2> 
+   </div>
+
+<style type="text/css">
+  
+.rolagem_horiz
+{
+    border: 1px solid #cccccc;
+    background: white;
+    overflow-y:auto;
+    padding: 1px 1px 1px 1px;
+} 
+</style>
+<div class="rolagem_horiz" id="div">
+<table class="head_grid">
+  <tr>
+    <td width="50">Laz.</td>
+    <td width="80">Cod Impl</td>
+    <td width="80">Status</td>
+    <td width="400">Producto</td>
+    <td width="150">Cod. Fabri.</td>
+    <td width="200">Marca</td>
+  </tr>
+    <%= form_tag update_multiple_produtos_path :method => :put do %>
+      <% for produto in @produtos %>
+        <%= fields_for "products[]", produto do |f| %>
+          <tr class = "<%= cycle("cor1", "cor2")%>">
+            <td width="50"> <%=h produto.id.to_s.rjust(6,'0') %></td>
+            <td width="50"> <%=h produto.cod_implantacao %></td>
+            <td width="80" align="center"><%= f.check_box :status %></td>
+            <td width="400"> <%= f.text_field :nome, size: 50 %></td>
+            <td width="150"> <%= f.text_field :fabricante_cod, size: 20, placeholder: 'Cod. Fabricante' %></td>
+
+            <td width="200">
+              <%= f.collection_select :clase_id, Clase.all( :select => 'id,descricao',
+                                   :order  => 'descricao' ), :id,
+                                  :descricao,{prompt: 'Selecione a Marca'},{:class => "selc_medium", style:"width:250px"} %>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+      <%= submit_tag "Atulizar Datos" , :class => "button delete", :disable_with => "Aguarde..." %>
+    <% end %>
+    </table>
+    </div>
+</div>
+

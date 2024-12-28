@@ -1,0 +1,71 @@
+<%= form_for(troca_produtos) do |f| %>
+	<% if troca_produtos.errors.any? %>
+		<div id="error_explanation">
+			<h2><%= pluralize(troca_produtos.errors.count, "error") %> prohibited this troca_produtos from being saved:</h2>
+
+			<ul>
+			<% troca_produtos.errors.full_messages.each do |msg| %>
+				<li><%= msg %></li>
+			<% end %>
+			</ul>
+		</div>
+	<% end %>
+
+	<p id="valor_total"></p>
+	<div class="tab_container">
+		<div id="tab1" class="tab_content">
+			<table>
+				<td hidden=""><%= f.text_field :troca_id, :value => params[:troca_id] %></td>
+				<tr>
+					<td width="19"></td>
+					<td align="right">Produto:</td>
+					<td><%= text_field_tag :produto_nome,'', size: 72 %></td>
+					<td><%= link_to 'Buscar Productos', "#", onclick: "BucaProdutosFaturados('#{@troca.persona_id}', ' #{@troca.vendedor_id}')", :class => "button add" %></td>
+					<%= f.hidden_field :produto_id, :value => 0  %>
+				</tr>
+			</table>
+			<table>
+				<tr>
+					<td align="right">Cantidad:</td>
+					<td><%= f.number_field :quantidade, max: 5 %></td>
+					<td width="100"></td>
+					<td align="right">Status:</td>
+					<td><%= f.radio_button :status, 0, :Checked => "True" %> Entrada
+						  <%= f.radio_button :status, 1 %> Saida </td>
+				</tr>
+				<tr>
+					<td align="right">Unitário G$:</td>
+					<td><%= f.text_field :unitario_gs, size:23, :disabled=>true %></td>
+					<td width="100"></td>
+					<td align="right">Total G$:</td>
+					<td><%= f.text_field :total_gs, size:23, :disabled=>true %></td>
+				</tr>
+			</table>
+		</div>
+
+		<div class="buttons">
+			<%= f.submit :value => t('SAVE'), :class => "button add", :style => "margin-left:20px" %>
+			<% if @valor_total_atual == 0 %>
+				<%= link_to ' Finalizar', trocas_path, :class => "btn btn-danger next", :style => "margin-left:20px" %>
+			<% end %>
+		</div>
+	</div>
+<% end %>
+
+<script type="text/javascript">
+
+	function BucaProdutosFaturados(persona, vendedor){
+		if ($("input[type='radio'][name='troca_produto[status]']:checked").val() == 0){
+			window.open('/trocas/busca_produtos_faturados?persona_id=' + persona + '&vendedor_id=' + vendedor, 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+		} else {
+			window.open('/produtos/busca_venda_produtos_faturados?persona_id=' + persona + '&vendedor_id=' + vendedor, 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+		}
+	}
+
+	$("#troca_produto_quantidade").on('change', function(){
+		var produto_gs_total = eval(parseFloat($("#troca_produto_unitario_gs").val().replace(/\./g, "").replace(",", ".")) * $(this).val());
+
+		$("#troca_produto_total_gs").val(number_format(produto_gs_total, 0, ',', '.'));
+	});
+
+</script>

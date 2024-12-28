@@ -1,0 +1,67 @@
+
+<%= form_for(nota_remicao_produto) do |f| %>
+  <%= f.hidden_field :nota_remicao_id %>
+  <%= f.hidden_field :estado,        :value => @nota_remicao.estado %>
+  <%= f.hidden_field :data,          :value => @nota_remicao.data %>
+  <%= f.hidden_field :deposito_id,   :value => @nota_remicao.deposito_id %>
+  <%= f.hidden_field :deposito_nome, :value => @nota_remicao.deposito_nome %>
+  <%= f.hidden_field :persona_id,    :value => @nota_remicao.destino_unidade_id %>
+  <%= f.hidden_field :persona_nome,  :value => @nota_remicao.destino_unidade_nome %>        
+  <div class="group">
+    <div class="row">
+      <div class="col-md-4">
+        <label>Producto</label>
+        <%= f.text_field :produto_nome, class: 'autocomplete panel-field', required: true, autofocus: true %>
+        <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+        <%= f.hidden_field :produto_id %>               
+      </div>
+      <div class="col-md-2">
+        <label>Bruto</label>
+        <%= f.telephone_field :bruto, size: 9, class: 'money_3' %>
+      </div>
+
+      <div class="col-md-2">
+        <label>Tara</label>
+        <%= f.telephone_field :tara, size: 9, class: 'money_3' %>
+      </div>
+
+      <div class="col-md-2">
+        <label>Neto</label>
+        <%= f.telephone_field :quantidade, size: 9, class: 'money_3' %>
+      </div>
+      <div class="col-md-2 padding-btn">
+        <%= f.submit t('SAVE'), :disable_with => "Aguarde...", :class => "btn btn-green", "data-plus-as-tab" => "false" %>
+      </div>
+    </div>
+  </div>    
+<% end %>
+
+
+<script>
+$(function() {
+  $( "#nota_remicao_produto_produto_nome" ).autocomplete({
+      source: function( request, response ) {
+      $("#sppiner").addClass("sppiner_show");
+      $.ajax({
+        url: "/buscas/search_all_produtos",
+        dataType: "json",
+        data: {
+          tipo: 'DESCRIPCION',
+          busca: request.term
+        },
+        success: function( data ) {
+          response( data );
+          $("#sppiner").removeClass("sppiner_show");
+        },
+      });
+    },
+    minLength: 2,
+    select: function( event, ui ) {
+      $("#nota_remicao_produto_produto_id").val("");
+      $( "#nota_remicao_produto_produto_nome" ).val(ui.item.label);
+      $('#nota_remicao_produto_produto_id').val(ui.item.id);
+      return false;
+    }
+  });
+});  
+</script>

@@ -1,0 +1,18 @@
+<h1>Listing tabela_preco_produtos</h1>
+
+<table>
+  <tr>
+  </tr>
+
+<% for tabela_preco_produto in @tabela_preco_produtos %>
+  <tr>
+    <td><%= link_to 'Show', tabela_preco_produto %></td>
+    <td><%= link_to 'Edit', edit_tabela_preco_produto_path(tabela_preco_produto) %></td>
+    <td><%= link_to 'Destroy', tabela_preco_produto, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New tabela_preco_produto', new_tabela_preco_produto_path %>

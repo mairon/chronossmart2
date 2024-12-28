@@ -1,0 +1,24 @@
+<div class="group">
+	<tr>
+		<td colspan='2'>
+			<p style="padding: 5px; font-size:16px">A Receber em <%= params[:dtContaReceber] %></p>
+		</td>
+	</tr>
+	<table class="head_grid">
+		<tr>
+			<td width="300">Caixa</td>
+			<td width="150" align="center"><%= t('VALUE') %></td>
+		</tr>
+	</table>
+
+	<div class="rolagem" dir="div">
+		<table>
+			<% @contas.each do |conta| %>
+				<tr>
+					<td width="300"><%= conta.nome %></td>
+					<td width="150" align="center"><%= format_decimal(conta.divida_valor) %></td>
+				</tr>
+			<% end %>
+		</table>
+	</div>
+</div>

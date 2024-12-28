@@ -1,0 +1,2 @@
+module PersonaLocaisEntregasHelper
+end

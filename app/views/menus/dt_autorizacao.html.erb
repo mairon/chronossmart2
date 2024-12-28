@@ -1,0 +1,7 @@
+<% if params[:proc] == 'VT' %>
+	<%= render 'menus/dt_vendas' %>
+<% elsif params[:proc] == 'CB' %>	
+	<%= render 'menus/dt_cobros' %>
+<% elsif params[:proc] == 'CBP' %>	
+	<%= render 'menus/dt_nota_credito' %>
+<% end %>

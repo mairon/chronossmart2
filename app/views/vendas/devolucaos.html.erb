@@ -1,0 +1,175 @@
+<div class="panel">
+  <h1 id="header">Devolucion Venta: <%= @venda.id.to_s.rjust(6,'0') %> | Cliente: <%= @venda.persona.nome %></h1>
+</div>
+
+<div class="panel">
+  <div class="panel-content list">
+    <table>
+      <tr class="head_grid">
+        <td align="center" width="50">Cod.</td>
+        <td align="right" width="50">Qtd.</td>
+        <td width="350">Descripción</td>
+        <td width="70" align="right">Unit</td>
+        <td width="70" align="right">Tot</td>
+        <td width="70" align="right">Saldo</td>
+      </tr>
+      <% @venda.vendas_produtos.each do |vp| %>
+      <% saldo_prod = vp.quantidade.to_f - VendaDevolucao.where(vendas_produto_id: vp.id).sum(:quantidade) %>
+        <tr class = "<%= cycle( "cor1", "cor2" ) %>"
+                  
+                  onClick="Fecha( '<%= vp.produto_nome %>',
+                                  '<%= vp.produto_id %>',
+                                  '<%= vp.id %>',
+                                  '<%= saldo_prod.to_i %>',
+                                  '<%= format_int(vp.unitario_guarani) %>',
+                                  '<%= format_int(vp.total_guarani) %>',
+                                  '<%= format_decimal(vp.unitario_dolar) %>',
+                                  '<%= format_decimal(vp.total_dolar) %>',
+                                  )">
+          <td align="center" width="50"><%= vp.id.to_s.rjust(6,'0')%></td>
+          <td align="right" width="50"><%= vp.quantidade.to_i %></td>
+          <td width="350"><%= vp.produto_nome %></td>
+          <td width="70" align="right"><%= format_int(vp.unitario_guarani) %></td>
+          <td width="70" align="right"><%= format_int(vp.total_guarani) %></td>
+          <td align="right" width="50"><b><%= saldo_prod.to_i %></b></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-content list">
+    <table>
+      <tr class="head_grid">
+        <td align="center" width="50">Cod.</td>
+        <td align="right" width="50">Qtd.</td>
+        <td width="350">Descripción</td>
+        <td width="70" align="right">Unit</td>
+        <td width="70" align="right">Tot</td>
+      </tr>
+      <% @venda.venda_devolucaos.each do |vp| %>
+        <tr class="<%= cycle( "cor1", "cor2" ) %>">
+          <td align="center" width="50"><%= vp.id.to_s.rjust(6,'0')%></td>
+          <td align="right" width="50"><%= vp.quantidade.to_i %></td>
+          <td width
+          ="350"><%= vp.produto.nome %></td>
+          <td width="70" align="right"><%= format_int(vp.unit_gs) %></td>
+          <td width="70" align="right"><%= format_int(vp.tot_gs) %></td>
+          <td><%= link_to '', vp, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+  <div class="panel-footer">
+    <%= link_to 'salir', venda_devolucaos_url , :class => "btn btn-default next" %>
+    <a href="javascript:void(0)" class="btn btn-blue" onClick="Ticket()">Comprovante</a>
+  </div>
+
+</div>
+
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="modal_devolucao">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h1 class="modal-title" id="myModalLabel" align="center"><label id="prod-label"></label></h1>
+      </div>
+      <div class="modal-body" style="padding: 0px 0px 10px 0px">
+        <div class="group" align="center">
+        <%= form_for(VendaDevolucao.new) do |f| %>
+        <%= f.hidden_field :moeda, value: @venda.moeda %>
+        <%= f.hidden_field :venda_id, value: @venda.id %>
+        <%= f.hidden_field :produto_id %>
+        <%= f.hidden_field :vendas_produto_id %>
+        <div class="row">
+          <div class="col-md-12">
+          <label>Fecha</label>         
+            <%= f.date_select :data %>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <%= field_gs_label 'Qtd', f, :quantidade %>
+          </div>
+        </div>
+        <% if @venda.moeda.to_i == 0 %>
+          <div class="row">
+            <div class="col-md-12">    
+              <%= field_us_label 'Unit. U$',f,:unit_us, readonly: true %>
+            </div>
+            <div class="col-md-12">    
+              <%= field_us_label 'Tot. U$',f,:tot_us, readonly: true %>
+            </div>
+          </div> 
+
+          <%= f.hidden_field :unit_gs %>
+          <%= f.hidden_field :tot_gs %>
+          <%= f.hidden_field :unit_rs %>
+          <%= f.hidden_field :tot_rs %>
+        <% elsif @venda.moeda.to_i == 1 %>
+          <div class="row">
+            <div class="col-md-12">    
+              <%= field_gs_label 'Unit. Gs.',f,:unit_gs, readonly: true %>
+            </div>
+            <div class="col-md-12">    
+              <%= field_gs_label 'Tot. Gs.',f,:tot_gs, readonly: true %>
+            </div>
+          </div>
+         
+          <%= f.hidden_field :unit_us %>
+          <%= f.hidden_field :tot_us %>
+          <%= f.hidden_field :unit_rs %>
+          <%= f.hidden_field :tot_rs %>
+
+        <% elsif @venda.moeda.to_i == 2 %>
+          <div class="row">
+            <div class="col-md-12">    
+              <%= field_gs_label 'Unit. R$',f,:unit_rs, readonly: true %>
+            </div>
+            <div class="col-md-12">    
+              <%= field_gs_label 'Tot. R$',f,:tot_rs, readonly: true %>
+            </div>
+          </div>
+          <%= f.hidden_field :unit_us %>
+          <%= f.hidden_field :tot_us %>
+          <%= f.hidden_field :unit_gs %>
+          <%= f.hidden_field :tot_gs %>
+
+        <% end %>
+
+        <div class="footer-buttons">
+          <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>  
+        </div>
+
+        <% end %>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    function Fecha(produto_nome, produto_id, vendas_produto_id, quantidade, unit_gs, tot_gs, unit_us, tot_us){
+      $('#modal_devolucao').modal('show');
+      $("#prod-label").text(produto_nome);      
+      $("#venda_devolucao_produto_id").val(produto_id);
+      $("#venda_devolucao_vendas_produto_id").val(vendas_produto_id);
+      $("#venda_devolucao_quantidade").val(quantidade);
+      $("#venda_devolucao_unit_gs").val(unit_gs);
+      $("#venda_devolucao_tot_gs").val(tot_gs);
+      $("#venda_devolucao_unit_us").val(unit_us);
+      $("#venda_devolucao_tot_us").val(tot_us);
+      
+    }
+
+    function Ticket(){
+      window.open('/vendas/' + <%= @venda.id %> + '/comprovante_devolucao', '', ' SCROLLBARS=YES, TOP=150, LEFT=100, WIDTH=300, HEIGHT=500');
+    }
+
+  </script>

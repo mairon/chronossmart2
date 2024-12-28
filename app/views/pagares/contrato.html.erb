@@ -1,0 +1,148 @@
+<table align="center">
+	<tr>
+		<td width="50">
+		</td>
+
+		<td>
+			<table align="center" >
+				<tr height="100">  			     
+					<td colspan="2" align="center" >	
+						<FONT FACE="Arial" size="6">
+							<b>
+								<u>
+									CONTRATO DE COMPRA - VENTA
+								<u>
+							</b>
+						</FONT>					
+					</td>
+				</tr>
+
+				<!--CONTEUDO!-->
+				<tr height="50" >  			     
+					<td colspan="2" align="justify" width="200">	
+						<FONT FACE="Arial" size="4">
+		En el Distrito de  Santa Rita, Departamento del Alto Paraná, República del Paraguay, a los <%= (@pagare.data.strftime('%d').to_i).por_extenso.upcase%> (<%= @pagare.data.strftime('%d')%>)  
+		días  del  mes de <%= @pagare.data.strftime('%B')%>  del año de <%= (@pagare.data.strftime('%Y').to_i).por_extenso.upcase%> (<%= @pagare.data.strftime('%Y')%>), comparecen por una
+		 parte la firma UNIJET MÁQUINAS Y SERVICIO SOCIEDAD ANÓNIMA, constituida por ESCRITURA PÚBLICA Nº DIEZ Y SIETE (17), ante la Notaria Pública CARMEN NOEMI  BURGOS VECCA, Titular del 
+		Registro Nº 431,  representada por los esposos VILSON BEILNER, con cédula de identidad Nº 4.111.130,  y LUCIANA MARIA WERKAUSER, con cédula de identidad Nº 5.165.917,  con domicilio en 
+		la Localidad de Santa Rita, Departamento del Alto Paraná, denominado en adelante como <b>LA FIRMA VENDEDORA</b>, y por otra parte el señor <b><%= @pagare.persona_nome %></b>,  de nacionalidad 
+		<%= @pagare.nacionalidade %>, de estado civil casado, con Cédula  de  Identidad Paraguaya Nº <%= @pagare.persona_ruc %>, domiciliado en la ciudad de <%= @pagare.cidade_nome%>,  Departamento del
+		<%= @pagare.estado_nome%>, denominado en adelante como el <b>COMPRADOR</b>.- Siendo estas personas mayores  de  edad y hábiles para contratar, convienen  en  celebrar el presente 
+		<b>CONTRATO  DE COMPRA VENTA DE  UNA MÁQUINA</b>, que se regirá por las siguientes cláusulas y condiciones:------
+		<br />
+		<b>PRIMERA</b>: La Firma UNIJET MÁQUINAS Y SERVICIO SOCIEDAD ANÓNIMA, dice que por el  presente  instrumento vende y  transfiere a favor del señor <b><%= @pagare.persona_nome %></b>,
+		 una MÁQUINA de su propiedad, en el estado en que se encuentra, con las siguientes características:
+		 <% if @pagare.tipo != '' %>
+		 	TIPO:<%= @pagare.m_tipo %>- 
+		<% end %>
+
+		 <% if @pagare.marca != '' %>
+		 	MARCA:<%= @pagare.marca %>- 
+		<% end %>
+
+		 <% if @pagare.ano != '' %>
+		 	AÑO:<%= @pagare.ano %>- 
+		<% end %> 
+
+		 <% if @pagare.chassi != '' %>
+		 	CHASSIS Nº:<%= @pagare.chassi %>- 
+		<% end %>
+
+		 <% if @pagare.motor != '' %>
+		 	MOTOR Nº:<%= @pagare.motor %>- 
+		<% end %> 
+
+		 <% if @pagare.seria != '' %>
+		 	SERIE:<%= @pagare.seria %>- 
+		<% end %>
+
+		 <% if @pagare.obs != '' %>
+		 	Obs.:<%= @pagare.obs %>- 
+		<% end %>
+		la máquina vendida fue debidamente inspeccionada por EL COMPRADOR quien lo recibe de conformidad.------
+
+		<br />
+		<b>SEGUNDA</b>: El monto de la venta  establecido de común acuerdo entre las partes, asciende a la suma total de <%= @pagare.valor_dolar.to_f.por_extenso_em_dolares.upcase %> 
+		(<%= number_to_currency(@pagare.valor_dolar, :format=>' %n ', :separator => ',') %>U$), que el comprador  propone y se obliga a pagar de la siguiente forma, 
+		<% if @pagare.entrega_dolar.to_f > 0 %>
+		 	<%= @pagare.entrega_dolar.to_f.por_extenso_em_dolares.upcase %>  (<%= number_to_currency(@pagare.entrega_dolar, :format=>' %n ', :separator => ',') %>U$)  a la firma de este contrato y la restante cantidad en
+		<% end %>
+        <%= @pd.size %> pagaré de
+		<% @pd.each do |pd|%>
+			<%= pd.valor_dolar.to_f.por_extenso_em_dolares.upcase %>  (<%= number_to_currency(pd.valor_dolar, :format=>' %n ', :separator => ',') %>U$) con vencimiento el <%= pd.vencimento.strftime("%d/%m/%Y")%>.
+		<% end %>.------
+
+		<br />
+		<b>TERCERA</b>: Al hacerse la tradición de lo vendido, los VENDEDORES desisten de los derechos de propiedad, posesión y dominio que sobre la mencionada máquina tenían y lo transmiten al 
+		COMPRADOR.- El COMPRADOR a partir de la fecha adquiere la obligación de pagar los impuestos municipales que pesan sobre el mismo y asume todas las responsabilidades civiles  y/o  penales inherentes  al  daño  que  pudiera  ocasionar  a  terceros  e  intereses  de terceros  emergentes de su uso.------
+
+		<br />
+		<b>CUARTA</b>: El  COMPRADOR  queda  autorizado  a  circular  libremente  con la  mencionada MÁQUINA  dentro  del  territorio  Nacional  y  en  el  Extranjero, como  ser  por  el  Brasil,
+		  Argentina  y otros, para  lo  cual  deberá realizar todas las gestiones que les exijan  las  autoridades  competentes, para  la  libre  circulación  de la máquina  objeto  de  este  documento.------
+
+		<br />
+		<b>QUINTA</b>: LOS VENDEDORES se comprometen a firmar la Escritura de Transferencia Definitiva a nombre del COMPRADOR y/o a nombre de la persona que este indique, cuando el mismo lo solicite,  corriendo 100% de los  gastos  a  cargo  del  COMPRADOR.------
+
+		<br />
+		<b>SEXTA</b>: Por la falta de pago de la cuota el comprador caerá en mora y el vendedor se reserva el derecho de recuperar la máquina de referencia sin necesidad de interpelación judicial
+         ni extrajudicial, quedando la entrega en concepto de alquiler por el uso y desgaste de la máquina objeto de este contrato.------
+		<br />     
+		<b>SEPTIMA</b>: El  presente  contrato  surte  efecto  entre  los  herederos  de  las  partes  en  caso  de  fallecimiento  de alguno  de  ellos.------
+		<br />
+        <b>OCTAVA</b>: En caso de incumplimiento de algunas de las cláusulas establecidas en el presente contrato o de que surjan entre las partes cuestiones no previstas en la misma se someterán
+		 a los Tribunales competentes de la ciudad de Santa Rita.---------------------------------------------------------------------En prueba de conformidad y aceptación del presente contrato, firman las partes  en 
+		dos (2) ejemplares de un mismo tenor y a un solo efecto, en el lugar y fecha enunciados precedentemente.------
+						</FONT>					
+					</td>
+				</tr>
+
+				<tr width="1200" height="120">
+					<td valign="bottom">
+						<FONT FACE="Arial" size="4">
+
+				    	<b>
+				    	....................................................
+				    	</b>
+						</FONT>					
+
+					</td>
+					<td valign="bottom">
+						<FONT FACE="Arial" size="4">
+				    	<b>
+				    	....................................................
+				    	</b>
+						</FONT>					
+
+					</td>
+
+				</tr>
+
+				<tr>
+					<td width="1200">
+						<FONT FACE="Arial" size="4">
+				    	<b>
+				    	&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Vendedores
+				    	</b>
+						</FONT>					
+
+					</td>
+					<td>
+						<FONT FACE="Arial" size="4">
+				    	<b>
+				    	&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Comprador
+				    	</b>
+						</FONT>					
+
+					</td>
+				</tr>
+
+			</table>
+		</td>
+
+		<td width="50">
+		</td>
+
+	</tr>
+<table>
+
+

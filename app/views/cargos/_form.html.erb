@@ -1,0 +1,30 @@
+<h1 id="header">Cargos - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+    <%= form_for(@cargo) do |f| %>
+      <% if @cargo.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@cargo.errors.count, "error") %> prohibited this cargo from being saved:</h2>
+
+          <ul>
+          <% @cargo.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+
+      <table>
+        <tr>
+          <td>
+            <label>Cargo</label>
+            <%= f.text_field :nome, autofocus: true, required: true  %>
+          </td>
+        </tr>
+      </table>
+      <div class="footer-buttons">
+        <%= f.submit "Gravar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+        <%= link_to t('BACK'), cargos_path, :class => "btn btn-back" %>
+      </div>
+    <% end %>
+</div>

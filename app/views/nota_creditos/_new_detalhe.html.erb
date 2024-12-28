@@ -1,0 +1,86 @@
+<%= form_for(nota_creditos_detalhe) do |f| %>
+   <%= f.hidden_field :nota_credito_id  %>
+   <%= f.hidden_field :produto_id  %>
+   <%= f.hidden_field :venda_id  %>
+   <%= f.hidden_field :documento_numero_01  %>
+   <%= f.hidden_field :documento_numero_02  %>
+   <%= f.hidden_field :documento_numero  %>
+   <%= f.hidden_field :documento_id, :value => @nota_credito.documento_id  %>
+   <%= f.hidden_field :documento_nome, :value => @nota_credito.documento_nome  %>
+   <%= f.hidden_field :deposito_id  %>
+   <%= f.hidden_field :deposito_nome  %>
+   <%= f.hidden_field :codigo%>
+   <%= f.hidden_field :fabricante_cod%>
+   <%= f.hidden_field :data, :value => @nota_credito.data%>
+   <%= f.hidden_field :clase_produto, :value => @nota_credito.clase_produto%>
+   <%= f.hidden_field :cotacao, :value => @nota_credito.cotacao%>
+   <%= f.hidden_field :persona_id, :value => @nota_credito.persona_id%>
+   <%= f.hidden_field :persona_nome, :value => @nota_credito.persona_nome%>
+   <%= f.hidden_field :tipo, :value => @nota_credito.tipo%>
+   <%= f.hidden_field :moeda, :value => @nota_credito.moeda %>
+<div class="group">
+   <table>
+      <tr>
+        <td align="right">Producto:</td>
+        <td colspan="5">
+          <%= f.text_field :produto_nome, size: 60, :readonly => "readonly" %>
+        </td>
+        <td>Cantidad:</td>
+        <td><%= f.text_field :quantidade, size: 5 %></td>
+          <%= f.hidden_field :taxa %>
+      </tr>
+      <% if @nota_credito.moeda == 0 %>
+          <tr>
+             <%= field_us 'Unit U$:',f,:unitario_dolar,:onblur => "NotaCreditoUnitGs(),NotaCreditoUnitUs()" %>
+
+             <%= f.hidden_field :unitario_guarani  %>
+
+             <%= field_us 'Total U$:',f,:total_dolar %>
+             <td>
+               <%= f.submit t('SAVE'),:class => 'button' %>
+          </td>
+             <%= f.hidden_field :total_guarani  %>
+             <%= f.hidden_field :iva_dolar %>
+             <%= f.hidden_field :iva_guarani  %>
+          </tr>
+      <% else %>
+          <tr>
+             <td>Unit Gs.:</td>
+
+             <%= field_gs 'Unit Gs.:',f,:unitario_guarani,:onblur => "NotaCreditoUnitGs(),NotaCreditoTotalUs()" %>
+
+             <%= f.hidden_field :unitario_dolar %>
+
+             <%= field_gs 'Total Gs.:',f,:total_guarani,:onblur => "NotaCreditoUnitGs(),NotaCreditoTotalDolar(),NotaCreditoTotalGs()" %>
+
+             <td>
+             <%= f.submit t('SAVE'),:class => 'button' %>
+             </td>
+
+             <%= f.hidden_field :total_dolar  %>
+             <%= f.hidden_field :iva_guarani  %>
+             <%= f.hidden_field :iva_dolar %>
+
+          </tr>
+      <% end %>
+   </table>
+<% end %>
+  </div>
+
+
+<script>
+  
+function NotaCreditoUnitUs(){
+
+    var total = eval( parseFloat( document.getElementById('nota_creditos_detalhe_unitario_dolar').value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById('nota_creditos_detalhe_quantidade').value.replace(/\./g, "").replace(",", ".") ) )  ;
+    document.getElementById('nota_creditos_detalhe_total_dolar').value = ( number_format(total,2, ',', '.') );
+}
+
+function NotaCreditoUnitGs(){
+
+    var total = eval( parseFloat( document.getElementById('nota_creditos_detalhe_unitario_guarani').value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById('nota_creditos_detalhe_quantidade').value.replace(/\./g, "").replace(",", ".") ) )  ;
+    document.getElementById('nota_creditos_detalhe_total_guarani').value = ( number_format(total,0, ',', '.') );
+}
+
+
+</script>

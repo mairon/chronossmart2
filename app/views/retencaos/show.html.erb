@@ -1,0 +1,26 @@
+<ul class="tabs">
+   <li><a href="#tab1"><%= t('VOUCHER') %> de Retención - [Productos]</a></li>
+</ul>
+
+<div class="tab_container">
+  <div id="tab1" class="tab_content">      
+      <div class="group">
+        <h2><b>Proveedor:</b> <%= @retencao.persona_nome %></h2>
+				<%= render 'faturas' %>
+        <%= render partial: "/retencao_docs/new_doc", locals: {retencao_doc: RetencaoDoc.new(retencao_id: @retencao.id)} %>
+
+        <div class="grid">
+          <%= render partial: "/retencao_docs/index", locals: {retencao_docs: @retencao.retencao_docs} %>
+        </div>
+
+      </div>
+
+      </div>
+    </div>
+    <div class="buttons">
+      <%= link_to t('BACK'), edit_retencao_path(@retencao),:class =>'button back' %>
+      <%= link_to 'Finalizar', retencaos_path,:class =>'button delete' %>
+    </div>
+  </div>
+</div>
+

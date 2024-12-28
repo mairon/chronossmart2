@@ -1,0 +1,13 @@
+<table>
+	<% @visitas.each do |v| %>
+		<tr>
+			<td width="80" align="center" ><%= v.data.strftime("%d/%m/%Y") %></td>
+			<td width="80" align="center" ><%= data_retorno = (v.data.to_date + v.periodo.to_i).strftime("%d/%m/%Y") %></td>
+			<td width="80" align="center" ><%= data_retorno.to_date - Time.now.to_date %></td>
+			<td width="200"><%= v.consultor_nome %></td>
+			<td width="200"><%= v.persona_nome %></td>
+			<td width="200"><%= v.servico_nome %></td>
+			<td width="80" align="center"><%= v.nc %></td>
+		</tr>
+	<% end %>	
+</table>

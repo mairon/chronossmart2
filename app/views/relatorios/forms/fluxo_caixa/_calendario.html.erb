@@ -1,0 +1,380 @@
+<style type="text/css">
+
+	.simple-calendar {
+		-moz-user-select: none;
+		border: 1px solid #999;
+		border-radius: 6px 6px 6px 6px;
+		color: #333333;
+		font-family: Arial,sans-serif;
+		font-size: 1.1em;
+		margin: 10px auto;
+		padding: 0.4em;
+		width: 90%;
+
+		.day {
+			border:1px solid red;
+		}
+
+		.wday-0 {
+			border: 0 none;
+			font-weight: bold;
+			padding: 0.7em 0.3em;
+			text-align: center;
+		}
+
+		.wday-1 {
+			border: 0 none;
+			font-weight: bold;
+			padding: 0.7em 0.3em;
+			text-align: center;
+		}
+
+		.wday-2 {
+			border: 0 none;
+			font-weight: bold;
+			padding: 0.7em 0.3em;
+			text-align: center;
+		}
+
+		.wday-3 {
+			border: 0 none;
+			font-weight: bold;
+			padding: 0.7em 0.3em;
+			text-align: center;
+		}
+		.wday-4 {
+			border: 0 none;
+			font-weight: bold;
+			padding: 0.7em 0.3em;
+			text-align: center;
+		}
+
+		.wday-5 {
+			border: 0 none;
+			font-weight: bold;
+			padding: 0.7em 0.3em;
+			text-align: center;
+		}
+
+		.wday-6 {
+			border: 0 none;
+			font-weight: bold;
+			padding: 0.7em 0.3em;
+			text-align: center;
+		}
+
+		.today {}
+
+		.past {
+			border: 0 none;
+			padding: 1px;
+		}
+		.future {}
+
+		.start-date {}
+
+		.prev-month {}
+		.next-month { }
+		.current-month {}
+
+		.has-events {}
+	}
+
+	.calendar-contant td{
+		width: 300px;
+
+	}
+
+	.calendar-contant .entradas-anteriores p{
+		background-color: #b9ebb9;
+		padding: 3px;
+		margin-bottom: 5px;
+		border-radius: 3px;
+		color: #7b7575;
+	}
+
+	.calendar-contant .proximas-entradas p{
+		background-color: #90e38a;
+		padding: 3px;
+		margin-bottom: 5px;
+		border-radius: 3px;
+	}
+
+	.calendar-contant .saidas-anteriores p{
+		background-color: #fcd0d7;
+		padding: 3px;
+		margin-bottom: 5px;
+		border-radius: 3px;
+		color: #7b7575;
+	}
+
+	.calendar-contant .proximas-saidas p{
+		background-color: #e2a5a5;
+		padding: 3px;
+		margin-bottom: 5px;
+		border-radius: 3px;
+	}
+
+	.calendar-contant .totais p{
+		background-color: #FFFFFF;
+		padding: 3px;
+		margin-bottom: 5px;
+		border-radius: 3px;
+		font-size:10px;
+	}
+
+	.calendar-contant .totais-anteriores p{
+		background-color: #FFFFFF;
+		padding: 3px;
+		margin-bottom: 5px;
+		border-radius: 3px;
+		font-size:10px;
+		color: #7b7575;
+	}
+
+	.calendar-contant .proximas-entradas span{
+		float: right;
+	}
+
+	.calendar-contant .entradas-anteriores span{
+		float: right;
+	}
+
+	.calendar-contant .proximas-saidas span{
+		float: right;
+	}
+
+	.calendar-contant .saidas-anteriores span{
+		float: right;
+	}
+
+	.calendar-contant .totais span{
+		float: right;
+		color: #179425;
+	}
+
+	.calendar-contant .totais-anteriores span{
+		float: right;
+		color: #7bbe7b;
+	}
+
+	.calendar-contant tr{
+		padding-bottom: 3px;
+	}
+
+	.calendar-contant a {
+			color: #272525;
+			text-decoration: none;
+	}
+
+</style>
+
+
+<%= month_calendar do |date| %>
+
+	<% if params[:moeda].eql?('1') %>
+
+		<% receber = Cliente.where(vencimento: date, liquidacao: 0).sum('divida_guarani - cobro_guarani') %>
+            <% acumulado_receber = Cliente.where("vencimento < '#{date}' AND liquidacao = 0").sum('divida_guarani - cobro_guarani') %>
+
+		<% pagar = Proveedore.where(vencimento: date, liquidacao: 0).sum('divida_guarani - pago_guarani') %>
+		<% acumulado_pagar = Proveedore.where("vencimento < '#{date}' AND liquidacao = 0").sum('divida_guarani - pago_guarani') %>
+
+		<% efetivos = Financa.where("data < '#{date}' AND tipo = 0").sum('entrada_guarani - saida_guarani') + Financa.where("data < '#{date}' AND tipo = 1").sum('entrada_guarani - saida_guarani') %>
+		<% diferido = Financa.where("data <> '#{date}' AND cheque_status = 1 AND diferido = '#{date}'").sum('entrada_guarani - saida_guarani') %>
+		<% emitido = Financa.where("data <> '#{date}' AND cheque_status = 1 AND diferido = '#{date}'").sum('saida_guarani') %>
+
+		<% total_receber = receber.to_f + diferido.to_f + efetivos.to_f %>
+		<% total_pagar = pagar.to_f + emitido.to_f %>
+		<% saldo = receber.to_f - pagar.to_f %>
+		<% acumulado = acumulado_receber.to_f - acumulado_pagar.to_f %>
+
+	<%	elsif params[:moeda].eql?('0') %>
+
+		<% receber = Cliente.where(vencimento: date, liquidacao: 0).sum('divida_dolar - cobro_dolar') %>
+		<% acumulado_receber = Cliente.where("vencimento < '#{date}' AND liquidacao = 0").sum('divida_dolar - cobro_dolar') %>
+
+		<% pagar = Proveedore.where(vencimento: date, liquidacao: 0).sum('divida_dolar') %>
+		<% acumulado_pagar = Proveedore.where("vencimento < '#{date} AND liquidacao = 0").sum('divida_dolar - pago_dolar') %>
+
+		<% efetivos = Financa.where("data < '#{date}' AND tipo = 0").sum('entrada_dolar - saida_dolar') + Financa.where("data < '#{date}' AND tipo = 1").sum('entrada_dolar - saida_dolar') %>
+		<% diferido = Financa.where("data <> '#{date}' AND cheque_status = 1 AND diferido = '#{date}'").sum('entrada_dolar - saida_dolar') %>
+		<% emitido = Financa.where("data <> '#{date}' AND cheque_status = 1 AND diferido = '#{date}'").sum('saida_dolar') %>
+
+		<% total_receber = receber.to_f + diferido.to_f + efetivos.to_f %>
+		<% total_pagar = pagar.to_f + emitido.to_f %>
+		<% saldo = receber.to_f - pagar.to_f %>
+		<% acumulado = acumulado_receber.to_f - acumulado_pagar.to_f %>
+
+	<% end %>
+
+	<input type="hidden" id="moeda" name="" value="<%= params[:moeda] %>"></input>
+	<% if date.to_date < Time.now.strftime("%Y/%m/%d").to_date %>
+		<input type="hidden" id="moeda" name="" value="<%= params[:moeda] %>"></input>
+
+		<table class="calendar-contant">
+			<tr>
+				<td align="right"><b><%= date.to_date.strftime("%d") %></b></td>
+			</tr>
+			<tr>
+				<td class="entradas-anteriores">
+					<a data-dtEfetivo="<%= date.to_date.strftime("%d/%m/%y") %>" class="openEfetivos">
+						<p>Inicial: <span><b><%= format_decimal(efetivos.to_f) %>(+)</b></span></p>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="entradas-anteriores">
+					<a data-dtContaReceber="<%= date.to_date.strftime("%d/%m/%y") %>" class="openDetalhesReceber">
+						<p>Receber: <span><b><%= format_decimal(receber.to_f) %>(+)</b></span></p>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="entradas-anteriores">
+					<a data-dtChequeDiferido="<%= date.to_date.strftime("%d/%m/%y") %>" class="openChequesDiferidos">
+						<p>Diferidos: <span><b><%= format_decimal(diferido.to_f) %>(+)</b></span></p>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="saidas-anteriores">
+					<a data-dtContaPagar="<%= date.to_date.strftime("%d/%m/%y") %>" class="openDetalhesPagar">
+						<p>Pagar: <span><b><%=  format_decimal(pagar.to_f) %>(-)</b></span></p>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="saidas-anteriores">
+					<a data-dtChequeEmitido="<%= date.to_date.strftime("%d/%m/%y") %>" class="openChequeEmitido">
+						<p>Emitidos: <span><b><%= format_decimal(emitido.to_f) %>(-)</b></span></p>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="totais-anteriores">
+					<a>
+						<p>Saldo Final: <span><b><%=  format_decimal(efetivos.to_f + saldo.to_f) %>(=)</b></span></p>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="totais-anteriores">
+					<a data-dtAtrasoReceber="<%= date.to_date.strftime("%d/%m/%y") %>" class="openAtrasoReceber">
+						<p>Em atraso receber: <span style="color: #f87979"><b><%=  format_decimal(acumulado_receber.to_f) %>(=)</b></span></p>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="totais">
+					<a data-dtAtrasoPagar="<%= date.to_date.strftime("%d/%m/%y") %>" class="openAtrasoPagar">
+						<p style="font-size:10px; color:#7b7575">Em atraso pagar: <span style="color: #f87979"><b><%=  format_decimal(acumulado_pagar.to_f) %>(=)</b></span></p>
+					</a>
+				</td>
+			</tr>
+		</table>
+	<% else %>
+		<input type="hidden" id="moeda" name="" value="<%= params[:moeda] %>"></input>
+
+		<table class="calendar-contant">
+			<tr>
+				<td align="right"><b><%= date.to_date.strftime("%d") %></b></td>
+			</tr>
+			<tr>
+				<td class="proximas-entradas">
+					<a data-dtEfetivo="<%= date.to_date.strftime("%d/%m/%y") %>" class="openEfetivos">
+						<p>Inicial: <span><b><%= format_decimal(efetivos.to_f) %>(+)</b></span></p>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="proximas-entradas">
+					<a data-dtContaReceber="<%= date.to_date.strftime("%d/%m/%y") %>" class="openDetalhesReceber">
+						<p>Receber: <span><b><%= format_decimal(receber.to_f) %>(+)</b></span></p>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="proximas-entradas">
+					<a data-dtChequeDiferido="<%= date.to_date.strftime("%d/%m/%y") %>" class="openChequesDiferidos">
+						<p>Diferidos: <span><b><%= format_decimal(diferido.to_f) %>(+)</b></span></p>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="proximas-saidas">
+					<a data-dtContaPagar="<%= date.to_date.strftime("%d/%m/%y") %>" class="openDetalhesPagar">
+						<p>Pagar: <span><b><%=  format_decimal(pagar.to_f) %>(-)</b></span></p>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="proximas-saidas">
+					<a data-dtChequeEmitido="<%= date.to_date.strftime("%d/%m/%y") %>" class="openChequeEmitido">
+						<p>Emitidos: <span><b><%= format_decimal(emitido.to_f) %>(-)</b></span></p>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="totais">
+					<a data-dtEfetivo="<%= date.to_date.strftime("%d/%m/%y") %>" class="openSaldo">
+						<p>Saldo: <span><b><%=  format_decimal(efetivos.to_f + saldo.to_f) %>(=)</b></span></p>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="totais">
+					<a data-dtAtrasoReceber="<%= date.to_date.strftime("%d/%m/%y") %>" class="openAtrasoReceber">
+						<p>Em atraso receber: <span style="color: #ff2121"><b><%=  format_decimal(acumulado_receber.to_f) %>(=)</b></span></p>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td class="totais">
+					<a data-dtAtrasoPagar="<%= date.to_date.strftime("%d/%m/%y") %>" class="openAtrasoPagar">
+						<p>Em atraso pagar: <span style="color: #ff2121"><b><%=  format_decimal(acumulado_pagar.to_f) %>(=)</b></span></p>
+					</a>
+				</td>
+			</tr>
+		</table>
+	<% end %>
+<% end %>
+
+
+<script type="text/javascript">
+	$(".openDetalhesReceber").click(function(moeda){
+		window.open('/relatorios/resultado_detalhe_a_receber?dtContaReceber=' + $(this).attr('data-dtcontareceber') + '&moeda=' + $("#moeda").val(),
+						 'Pagina', ' SCROLLBARS=YES, TOP=800, LEFT=1200, WIDTH=1200, HEIGHT=800');
+	});
+
+	$(".openChequesDiferidos").click(function(){
+		window.open('/relatorios/resultado_detalhe_cheques_diferidos?dtChequeDiferido=' + $(this).attr('data-dtChequeDiferido') + '&moeda=' + $("#moeda").val(),
+						'Pagina', ' SCROLLBARS=YES, TOP=800, LEFT=1200, WIDTH=1200, HEIGHT=800');
+	});
+
+	$(".openSaldo").click(function(){
+		window.open('/relatorios/resultado_detalhe_efetivo?dtEfetivo=' + $(this).attr('data-dtEfetivo') + '&moeda=' + $("#moeda").val(),
+						'Pagina', ' SCROLLBARS=YES, TOP=800, LEFT=1200, WIDTH=1200, HEIGHT=800');
+	});
+
+	$(".openDetalhesPagar").click(function(){
+		window.open('/relatorios/resultado_detalhe_a_pagar?dtContaPagar=' + $(this).attr('data-dtContaPagar') + '&moeda=' + $("#moeda").val(),
+						'Pagina', ' SCROLLBARS=YES, TOP=800, LEFT=1200, WIDTH=1200, HEIGHT=800');
+	});
+
+	$(".openChequeEmitido").click(function(){
+		window.open('/relatorios/resultado_detalhe_cheques_emitidos?dtChequeEmitido=' + $(this).attr('data-dtChequeEmitido') + '&moeda=' + $("#moeda").val(),
+						'Pagina', ' SCROLLBARS=YES, TOP=800, LEFT=1200, WIDTH=1200, HEIGHT=800');
+	});
+
+	$(".openAtrasoReceber").click(function(){
+		window.open('/relatorios/resultado_detalhe_atraso_receber?dtAtrasoReceber=' + $(this).attr('data-dtAtrasoReceber') + '&moeda=' + $("#moeda").val(),
+						'Pagina', ' SCROLLBARS=YES, TOP=800, LEFT=1200, WIDTH=1200, HEIGHT=800');
+	});
+
+	$(".openAtrasoPagar").click(function(){
+		window.open('/relatorios/resultado_detalhe_atraso_pagar?dtAtrasoPagar=' + $(this).attr('data-dtAtrasoPagar') + '&moeda=' + $("#moeda").val(),
+						'Pagina', ' SCROLLBARS=YES, TOP=800, LEFT=1200, WIDTH=1200, HEIGHT=800');
+	});
+</script>
+

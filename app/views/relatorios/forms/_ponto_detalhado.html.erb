@@ -1,0 +1,82 @@
+<% tot_hr  = 0 %>
+<% tot_min = 0 %>
+<% tot_hr_saida  = 0 %>
+<% tot_min_saida = 0 %>
+<% tot_hmt = 0  %>
+<% quebra  = '' %>
+<% sub_quebra  = '' %>
+<table>
+	<% @dias_trabalhos.each do |dt| %>
+
+		<% if quebra != dt.persona_nome or sub_quebra != dt.created_at.to_date.strftime("%d/%m/%y") %>
+		  <% if quebra != '' %>
+		    <tr class="head">
+		  		<td colspan="4"></td>
+						<% hm = ( (tot_hr_saida + tot_min_saida) - (tot_hr + tot_min) ).divmod(60) %>
+					<td align="center"><% hm.join(':') %></td>
+					<% tot_hmt += ( (tot_hr_saida + tot_min_saida) - (tot_hr + tot_min) ) %>
+
+	        <% tot_hr = 0 %>
+	        <% tot_min = 0 %>
+
+	        <% tot_hr_saida = 0 %>
+	        <% tot_min_saida = 0 %>
+	    	</tr>
+
+		    <% end %>
+
+
+
+		    <tr class="head">
+			  	<td class="head" colspan="3">
+			  		<% quebra = dt.persona_nome %> <%= dt.persona_nome %>
+			  	</td>
+				</tr>
+			  		<% sub_quebra = dt.created_at.to_date.strftime("%d/%m/%y") %>
+				</tr>
+		<% end %>
+
+		<tr class = "<%= cycle("cor1", "cor2") %>">
+			<td width="80" align="center"><%= dt.id %> - <%= dt.created_at.to_date.strftime("%d/%m/%y") %></td>
+			<td width="100"> <%= l(dt.created_at.to_date, :format => :dia_semana, locale: 'es') %></td>
+			<td width="250"><%= dt.persona_nome %></td>
+			<td width="80" align="center"><%= dt.check_point_type %></td>
+			<td width="80" align="center"><%= Time.at(dt.created_at).strftime("%H:%M") %></td>
+
+			<% if dt.check_point_type == 'ENTRADA' %>
+				<% tot_hr += (60 * Time.at(dt.created_at.to_time).strftime("%H").to_i) %>
+				<% tot_min += (Time.at(dt.created_at.to_time).strftime("%M").to_i) %>
+			<% elsif dt.check_point_type == 'SALIDA' %>
+				<% tot_hr_saida += (60 * Time.at(dt.created_at.to_time).strftime("%H").to_i) %>
+				<% tot_min_saida += (Time.at(dt.created_at.to_time).strftime("%M").to_i) %>
+			<% end %>
+		</tr>
+	<% end %>
+  <tr class="head">
+		<td colspan="4"></td>
+			<% hm = ( (tot_hr_saida + tot_min_saida) - (tot_hr + tot_min) ).divmod(60) %>
+		<td align="center"><% hm.join(':') %></td>
+		<% tot_hmt += ( (tot_hr_saida + tot_min_saida) - (tot_hr + tot_min) )  %>
+
+    <% tot_hr = 0 %>
+    <% tot_min = 0 %>
+
+    <% tot_hr_saida = 0 %>
+    <% tot_min_saida = 0 %>
+	</tr>
+
+  <tr class="head">
+		<td colspan="4"></td>
+			<% hmt = (tot_hmt).divmod(60) %>
+		<td align="center"><% hmt.join(':') %></td>
+	</tr>
+
+</table>
+<%
+#a  = Time.parse('2015-12-31 22:00:00 +0100')
+#b = Time.parse('2015-12-31 02:00:00 +0100')
+
+#a - b
+#=> 72000.0 # difference in seconds
+#(a - b) / 3600
+%>

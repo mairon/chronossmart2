@@ -1,0 +1,2 @@
+module CulturasHelper
+end

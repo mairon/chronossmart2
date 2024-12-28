@@ -1,0 +1,34 @@
+<h1 align="right" id="header"><%= t('CHARGE') %>s</h1>
+
+<div class="group">
+  <table>
+    <tr>
+      <td width="80" align="center">Cod.</td>
+      <td width="80" align="center"><%= t('DATE') %></td>
+      <td width="250" align="center">Clientes</td>
+
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+
+    <table>
+
+      <% for d in @cobros_detalhes %>
+      <% d.update_attribute :updated_at, '2014-06-21 15:19:29.154908' %>
+        <tr class = "<%= cycle( "cor1", "cor2" )%>">
+          <td><%= d.id %></td>
+          <td><%= d.moeda %></td>
+          <td><%= d.documento_numero %></td>
+          <td><%= d.cobro_id %></td>
+
+
+        </tr>
+      <% end %>
+    </table>
+
+  </div>
+</div>
+
+
+
+

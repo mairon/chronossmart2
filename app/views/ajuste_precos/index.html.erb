@@ -1,0 +1,35 @@
+<h1 id="header">Ajuste de Precios</h1>
+<div class="acessos">
+	<%= link_to t('NEW'), new_ajuste_preco_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+	<tr>
+		<td width="200">Grupo</td>
+		<td width="200">Sub-grupo</td>
+		<td width="70" align="right">Porcen</td>
+		<td width="70">Tipo</td>
+	</tr>
+</table>
+
+<div class="rolagem" dir="div">
+	<table>
+		<% @ajuste_precos.each do |ajuste_preco| %>
+			<tr class = "<%= cycle("cor1", "cor2") %>">
+				<td width="200"><%= ajuste_preco.grupo.descricao unless ajuste_preco.grupo.blank? %></td>
+				<td width="200"><%= ajuste_preco.sub_grupo.descricao unless ajuste_preco.sub_grupo_id.blank? %></td>
+				<td width="70" align="right"><%=  ajuste_preco.porcen_1.to_f %>%</td>
+				<td width="70">
+					<% if ajuste_preco.tipo == 0 %>
+						Descuento
+						<% else %>
+						Adcionado
+					<% end %>
+				</td>
+				<td><%= link_to '', edit_ajuste_preco_path(ajuste_preco), class: 'icon-pencil', title: 'Modificar' %></td>
+				<td><%= link_to '', ajuste_preco, method: :delete, class: 'icon-trash', title: t('DELETE'), data: { confirm: 'Esta Seguro?' } %></td>
+			</tr>
+		<% end %>
+	</table>
+</div>
+

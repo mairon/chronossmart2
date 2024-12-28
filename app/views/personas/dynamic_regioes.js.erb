@@ -1,0 +1,5 @@
+$('#persona_regiao_id').empty();
+$('#persona_regiao_id').append('<option value="">Selecione a Região</option>');
+<% for ne in @regioes %>
+  $('#persona_regiao_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+<% end %>

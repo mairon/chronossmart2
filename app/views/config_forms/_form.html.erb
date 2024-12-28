@@ -1,0 +1,159 @@
+<style type="text/css">
+  
+input[type="number"]{
+  width: 40px;
+}
+
+</style>
+<%= form_for(@config_form) do |f| %>
+  <% if @config_form.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@config_form.errors.count, "error") %> prohibited this config_form from being saved:</h2>
+
+      <ul>
+      <% @config_form.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> Config Formulario - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+  <div id="tab1" class="tab_content">
+    <table>
+      
+            <tr>
+              <td align="right">Nombre:</td>
+              <td colspan="3"><%= f.text_field :nome, size: 53, autofocus: true %></td>
+              <td align="right">Unidad:</td>
+              <td><%= f.collection_select :unidade_id, Unidade.select('id,unidade_nome').order('2'), :id, :unidade_nome, { prompt: 'Selecione lo unidad' } %></td>
+            </tr>
+              <tr>              
+                <td align="right">Modelo:</td>
+                <td><%= f.select :modelo, ([["Matricial", "0"],
+                    ["Laser 1 via", "1"],
+                    ["Laser 3 via", "2"]]) %></td>
+                <td align="right">Modelo <%= t('DATE') %>:</td>
+                <td><%= f.select :m_data, ([["dd/mm/YYYY", "0"],
+                    ["dd de mm de YYYY", "1"]]) %></td>
+                <td align="right">Terminal:</td>
+                <td><%= f.collection_select :terminal_id, Terminal.select('id,nome').order('2'), :id, :nome, { prompt: 'Selecione lo terminal' } %></td>
+              </tr>
+
+              <tr>
+                <td align="right">Espaço01:</td>
+                <td><%= f.text_field :space_01, size: 20 %></td>
+              </tr>              
+              <tr>
+                <td align="right">Espaço02:</td>
+                <td><%= f.text_field :space_02, size: 20 %></td>
+              </tr>              
+              <tr>
+                <td align="right">Nº Controle:</td>
+                <td><b>x:</b><%= f.text_field :n_fatura_x, size: 20 %> <b>Y:</b> <%= f.text_field :n_fatura_y, size: 20 %></td>
+                <td colspan="4"><small>impressão do numero de fatura para controle.</small></td>
+              </tr>
+              <tr>
+                <td align="right">Dia:</td>
+                <td><b>x:</b><%= f.text_field :dia_x, size: 20 %><b>y:</b><%= f.text_field :dia_y, size: 20 %></td>
+              </tr>
+              <tr>
+                <td align="right">Mês:</td>
+                <td><b>x:</b><%= f.text_field :mes_x, size: 20 %><b>y:</b><%= f.text_field :mes_y, size: 20 %></td>
+              </tr>
+              <tr>
+                <td align="right">Ano:</td>
+                <td><b>x:</b><%= f.text_field :ano_x, size: 20 %><b>y:</b><%= f.text_field :ano_y, size: 20 %></td>
+              </tr>
+              <tr>
+                <td align="right">Credito:</td>
+                <td><b>x:</b><%= f.text_field :cred_x, size: 20 %><b>y:</b><%= f.text_field :cred_y, size: 20 %></td>
+              </tr>
+              <tr>
+                <td align="right">Contado:</td>
+                <td><b>x:</b><%= f.text_field :cont_x, size: 20 %><b>y:</b><%= f.text_field :cont_y, size: 20 %></td>
+              </tr>
+
+              <tr>
+                <td align="right">Vencimento:</td>
+                <td><b>x:</b><%= f.text_field :venc_x, size: 20 %><b>y:</b><%= f.text_field :venc_y, size: 20 %></td>
+              </tr>
+
+              <tr>
+                <td align="right">Cliente:</td>
+                <td><b>x:</b><%= f.text_field :cliente_x, size: 20 %><b>y:</b><%= f.text_field :cliente_y, size: 20 %></td>
+              </tr>
+              <tr>
+                <td align="right">RUC:</td>
+                <td><b>x:</b><%= f.text_field :ruc_x, size: 20 %><b>y:</b><%= f.text_field :ruc_y, size: 20 %></td>
+              </tr>
+              <tr>
+                <td align="right">Dirección:</td>
+                <td><b>x:</b><%= f.text_field :direcao_x, size: 20 %><b>y:</b><%= f.text_field :direcao_y, size: 20 %></td>
+              </tr>
+              <tr>
+                <td align="right">Telefone:</td>
+                <td><b>x:</b><%= f.text_field :telefone_x, size: 20 %><b>y:</b><%= f.text_field :telefone_y, size: 20 %></td>
+              </tr>
+
+              <tr>
+                <td align="right">Obs:</td>
+                <td><b>x:</b><%= f.text_field :obs_x, size: 20 %><b>y:</b><%= f.text_field :obs_y, size: 20 %></td>
+              </tr>
+
+              <tr>
+                <td align="right">OS:</td>
+                <td><b>x:</b><%= f.text_field :os_x, size: 20 %><b>y:</b><%= f.text_field :os_y, size: 20 %></td>
+              </tr>
+
+
+              <tr>
+                <td align="right">Box Produtos:</td>
+                <td><b>x:</b><%= f.text_field :box_produto_x, size: 20 %><b>y:</b><%= f.text_field :box_produto_y, size: 20 %></td>
+              </tr>
+              <tr>
+                <td align="right">Sub Tot.Exento:</td>
+                <td><b>x:</b><%= f.text_field :sub_tot_ext_x, size: 20 %><b>y:</b><%= f.text_field :sub_tot_ext_y, size: 20 %></td>
+              </tr>
+              <tr>
+                <td align="right">Sub Tot.05%:</td>
+                <td><b>x:</b><%= f.text_field :sub_tot_05_x, size: 20 %><b>y:</b><%= f.text_field :sub_tot_05_y, size: 20 %></td>
+              </tr>
+              <tr>
+                <td align="right">Sub Tot.10%:</td>
+                <td><b>x:</b><%= f.text_field :sub_tot_10_x, size: 20 %><b>y:</b><%= f.text_field :sub_tot_10_y, size: 20 %></td>
+              </tr>
+              <tr>
+                <td align="right">En Letras:</td>
+                <td><b>x:</b><%= f.text_field :en_letras_x, size: 20 %><b>y:</b><%= f.text_field :en_letras_y, size: 20 %></td>
+              </tr>
+              <tr>
+                <td align="right">Tot.Valores:</td>
+                <td><b>x:</b><%= f.text_field :tot_x, size: 20 %><b>y:</b><%= f.text_field :tot_y, size: 20 %></td>
+              </tr>
+
+              <tr>
+                <td align="right">IVA 05%:</td>
+                <td><b>x:</b><%= f.text_field :iva_05_x, size: 20 %><b>y:</b><%= f.text_field :iva_05_y, size: 20 %></td>
+              </tr>
+              <tr>
+                <td align="right">IVA 10%:</td>
+                <td><b>x:</b><%= f.text_field :iva_10_x, size: 20 %><b>y:</b><%= f.text_field :iva_10_y, size: 20 %></td>
+              </tr>
+              <tr>
+                <td align="right">Tot.IVA:</td>
+                <td><b>x:</b><%= f.text_field :tot_iva_x, size: 20 %><b>y:</b><%= f.text_field :tot_iva_y, size: 20 %></td>
+              </tr>
+           
+    </table>
+  </div>
+  <div class="buttons">
+    <%= f.submit :value => t('SAVE'), :class => "button" %>
+    <%= link_to t('BACK'), config_forms_path, :class => "button back" %>        
+  </div>
+</div>
+<% end %>

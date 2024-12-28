@@ -1,0 +1,50 @@
+<%= form_for(@nota) do |f| %>
+  <% if @nota.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@nota.errors.count, "error") %> prohibited this nota from being saved:</h2>
+
+      <ul>
+      <% @nota.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> notas - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">descricao :</td>                    
+                      <td><%= f.text_area :descricao %></td>
+                                      
+                      <td align="right">usuario_id :</td>                    
+                      <td><%= f.number_field :usuario_id %></td>
+                                      
+                      <td align="right">negocio_id :</td>                    
+                      <td><%= f.number_field :negocio_id %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', notas_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

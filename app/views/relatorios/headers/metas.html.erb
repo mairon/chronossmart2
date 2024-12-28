@@ -1,0 +1,43 @@
+<% if params[:moeda] == "0" %>
+	<% md = "Dolar" %>
+<% elsif params[:moeda] == "1" %>
+	<% md = "Guaranies" %>
+<% else %>
+	<% md = "Real" %>
+<% end %>
+
+<table width="755">
+	<tr>
+		<td align="center"><%= $empresa_nome %></td>
+	</tr>
+	<tr>
+		<td align="center">METAS</td>
+	</tr>
+
+	<tr>
+		<td align="left">De....: <%= params[:inicio] %> hasta <%=params[:final] %></td>
+	</tr>
+
+	<tr>
+		<td align="left"><%= t('COIN') %>...: <%= md %></td>
+	</tr>
+
+	<tr>		
+		<td>
+			<hr>
+			<table>
+				<tr>
+					<td width="35" align="center" >Cod.</td>
+					<td width="80" align="center" >Inicio</td>
+					<td width="80" align="center" >Final</td>
+					<td width="450" align="left" ><%= t('CONCEPT') %>:</td>
+					<td width="80" align="right" >Min.</td>
+					<td width="80" align="right" >Max.</td>
+				</tr>	
+			</table>
+			<hr>
+		</td>
+	</tr>
+
+
+</table>

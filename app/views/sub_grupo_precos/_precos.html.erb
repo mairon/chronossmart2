@@ -1,0 +1,39 @@
+<%= form_for(sub_grupo_preco) do |f| %>
+  <% if sub_grupo_preco.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(sub_grupo_preco.errors.count, "error") %> prohibited this sub_grupo_preco from being saved:</h2>
+
+      <ul>
+      <% sub_grupo_preco.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <table>
+    <tr>
+      <td width="1000">
+        <fieldset>
+
+          <table>
+            <tr>
+              <td align="right">Tabela :</td>
+              <td><%= f.text_field :tabela_preco_id %></td>
+
+              <td align="right">% :</td>
+              <td><%= f.text_field :porcen %></td>
+
+              <td align="right">Max Descuento:</td>
+              <td><%= f.text_field :max_desc %></td>
+            </tr>
+          </table>
+        </fieldset>
+      </td>
+    </tr>
+  </table>
+  <div class="buttons">
+    <%= f.submit :value => t('SAVE'), :class => "button" %>
+    <%= link_to t('BACK'), "/sub_grupos/#{@sub_grupo_preco.sub_grupo_id}", :class => "button back" %>
+  </div>
+<% end %>

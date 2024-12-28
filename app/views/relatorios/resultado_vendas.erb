@@ -1,0 +1,13 @@
+<% if params[:detalhe] == "2" %>
+  <%= render :partial => 'relatorios/forms/por_produto' %>
+<% elsif params[:detalhe] == "3" %>
+	<%= render :partial => 'relatorios/forms/por_bico' %>
+<% elsif params[:detalhe] == "4" %>
+	<%= render :partial => 'relatorios/forms/venda_vendedor_cliente' %>
+<% elsif params[:detalhe] == "5" %>
+	<%= render :partial => 'relatorios/forms/venda_resumo_vendedor' %>
+<% elsif params[:detalhe] == "6" %>
+	<%= render :partial => 'relatorios/forms/venda_vendedor_produto' %>
+<% else %>
+  <%= render :partial => 'relatorios/forms/resumido_e_detalhado' %>
+<% end %>

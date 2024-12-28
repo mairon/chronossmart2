@@ -1,0 +1,67 @@
+<%= form_for(@cobros_adelanto) do |f| %>
+  <% if @cobros_adelanto.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@cobros_adelanto.errors.count, "error") %> prohibited this cobros_adelanto from being saved:</h2>
+
+      <ul>
+      <% @cobros_adelanto.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> <%= t('CHARGE') %>s_adelantos - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+                <%= f.hidden_field :cobro_id %>
+                  <%= f.hidden_field :data, :value => @cobros_adelanto.cobro.data %>
+                  <%= f.hidden_field :persona_id, :value => @cobros_adelanto.cobro.persona_id %>
+                  <%= f.hidden_field :moeda, :value => @cobros_adelanto.cobro.moeda %>
+
+                  <table>
+                    <tr>
+                        <td align="right">Documento :</td>
+                        <td><%= f.text_field :documento_numero_01, :size => 5 %>-<%= f.text_field :documento_numero_02, :size => 5 %>-<%= f.text_field :documento_numero, :size => 15 %></td>
+                        <td align="right">Cuota :</td>
+                        <td><%= f.text_field :cota, :size => 5, :readonly => "readonly" %></td>
+
+                            <%=  field_us 'Valor U$:',f,:valor_us %>
+                            <%=  field_gs 'Valor Gs.:',f,:valor_gs %>
+                            <%=  field_us 'Valor R$:',f,:valor_rs %>
+                      </td>
+                    </tr>
+                    <tr>
+
+                      <td></td>
+                      <td>
+                        <fieldset>
+                          <%= f.radio_button :liquidacao, 0, :checked => 'checked' %>Parte
+                          <%= f.radio_button :liquidacao, 1 %>Cancelacion
+                        </fieldset>
+                        </td>
+                        <td colspan="2" align="right">
+                          <%= f.submit t('SAVE'), :class => 'button' %>
+                        </td>
+
+                    </tr>
+                  </table>
+                </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= link_to t('BACK'), cobro_adelanto_cobro_path(@cobros_adelanto.cobro_id), :class => "button back" %>
+      </div>
+
+    </div>
+<% end %>

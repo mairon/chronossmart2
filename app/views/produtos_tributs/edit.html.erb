@@ -1,0 +1,64 @@
+<%= form_for(@produtos_tribut) do |f| %>
+  <%= f.hidden_field :produtos_tribut_id %>
+  <%= f.hidden_field :produto_id %>
+  <%= f.hidden_field :regime_id%>
+  <%= f.hidden_field :unidade_id %>
+  <div class="group">
+  <div class="group">
+
+      <table>
+        <tr>
+          <td align="right">Tipo ICMS :</td>
+            <td  colspan="3">
+              <fieldset>
+              <%= f.radio_button :tipo_icms, 0 %> Isento
+              <%= f.radio_button :tipo_icms, 1 %> Tributado
+              <%= f.radio_button :tipo_icms, 2,  :Checked => "True"  %> Subst. Tributaria
+              </fieldset>
+            </td>
+        </tr>
+
+        <tr>        
+          <td align="right">Alíquota % ICMS  :</td>        
+          <td><%= f.text_field :aliq_icms, :size => 20 %></td>
+
+          <td align="right">Redução % ICMS  :</td>        
+          <td><%= f.text_field :reducao_icms, :size => 20 %></td>
+        </tr>
+        
+        <tr>
+          <td align="right">CST :</td>        
+          <td><%= f.text_field :cst, :size => 20 %></td>
+
+          <td align="right">NCM :</td>        
+          <td><%= f.text_field :ncm, :size => 20 %></td>
+        </tr>
+
+        <tr>
+          <td align="right">Situação Tributária :</td>
+            <td  colspan="4">
+              <fieldset>
+              <%= f.radio_button :situacao_trib, 0,  :Checked => "True" %> 01 - Situação Tributável
+              <%= f.radio_button :situacao_trib, 1 %> 06 - Situação Tributável(alíquota zero)
+              </fieldset>
+            </td>
+        </tr>
+
+        <tr>
+          <td align="right">Alíquota % PIS  :</td>        
+          <td><%= f.text_field :aliq_pis, :size => 20 %></td>
+
+          <td align="right">Alíquota % Cofins  :</td>        
+          <td><%= f.text_field :aliq_cofins, :size => 20 %></td>
+        </tr>      
+
+        <tr>
+          <td>
+            <%= f.submit t('SAVE'), :class => 'button', :disable_with => "Aguarde..." %>          
+          </td>
+        </tr>
+      </table>
+<% end %>
+
+</div>
+

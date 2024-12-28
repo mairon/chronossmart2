@@ -1,0 +1,11 @@
+<% if params[:tipo_adelanto] == '0' %><!-- prestamo de proveedor / entrada em caixa/banco !-->  
+	<%= render '/adelantos/forms/form_prest_prov' %>
+<% elsif params[:tipo_adelanto] == '1' %><!-- antecipo de cliente / entrada em caixa/banco !-->
+	<%= render '/adelantos/forms/form_ante_cli' %>
+<% elsif params[:tipo_adelanto] == '2' %><!-- antecipo a empleado / saida em caixa/banco !-->
+	<%= render '/adelantos/forms/form_ante_emp' %>
+<% elsif params[:tipo_adelanto] == '3' %><!-- prestamo a cliente / saida em caixa/banco !-->
+	<%= render '/adelantos/forms/form_prest_cli' %>
+<% elsif params[:tipo_adelanto] == '4' %><!-- antecipo a proveedor / saida em caixa/banco !-->	
+	<%= render '/adelantos/forms/form_ante_prov' %>
+<% end %>

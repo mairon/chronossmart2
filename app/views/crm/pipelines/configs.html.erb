@@ -1,0 +1,31 @@
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel">
+        <h1 id="header">
+          CONFIG. <%= @pipeline.nome %>
+          <div class="pull-right">
+            <%= link_to 'Pipe', crm_pipeline_path(@pipeline), :class => "btn btn-blue" %>
+            <%= link_to 'Salir', crm_pipelines_path, :class => "btn" %>
+          </div>
+        </h1>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+
+      <%= render "crm/pipelines/etapas" %>
+
+    </div>
+    <div class="col-md-6">
+      <%= render "crm/pipelines/usuarios" %>
+    </div>  
+  </div>
+
+
+<style>
+  .list-group-item{
+    margin-bottom: 8px;
+  }
+</style>

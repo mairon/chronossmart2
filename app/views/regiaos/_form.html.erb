@@ -1,0 +1,87 @@
+<%= form_for(@regiao) do |f| %>
+  <% if @regiao.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@regiao.errors.count, "error") %> prohibited this regiao from being saved:</h2>
+
+      <ul>
+      <% @regiao.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> Regiãos - [<%= t('EDITION') %>]</a></li>
+</ul>
+<style type="text/css">
+  select{ width: 300px;}
+</style>
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+                <table>
+                  <tr>
+                    <td align="right">País:</td>
+                    <td>
+                      <%= f.collection_select :paise_id, Paise.all(:order => '2'),:id,:nome, {prompt: 'Selecione o País'},{ autofocus: true } %>
+                      <%= image_tag("load.gif",
+                        :align => "absmiddle",
+                        :border => 0,
+                        :id => "spinner",
+                        :width => 21,
+                        :height => 21,
+                        :style =>"display: none;" ) %>
+
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Estado:</td>
+                    <td><%= f.collection_select :estado_id, Estado.all(:order => '2'),:id,:nome, {prompt: 'Selecione o Estado'} %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right"><%= t('NAME') %>:</td>  
+                    <td><%= f.text_field :nome, size: 60 %></td>
+                  </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button", :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %>
+        <%= link_to t('BACK'), regiaos_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>
+
+<script type="text/javascript">
+ $(document).ready(function() {
+      $("#regiao_paise_id").change(function() {
+        var data=$('#regiao_paise_id').val();
+        $.ajax({
+          type: "GET",
+           url: "/regiaos/dynamic_estados/"+data,
+          data: data,
+          beforeSend: function()
+          {
+              $('#spinner').show();
+          },
+
+          success: function(response)
+          {
+            $('#spinner').hide();
+          }
+
+        });
+    });
+
+  });
+</script>

@@ -1,0 +1,114 @@
+<div class="panel">
+	<div class="panel-body">
+		<div class="row">
+			<div class="col-md-10">
+				<h3><%= t('RULES') %></h3>
+				<label>Tabla Precio</label>
+				<b><%= @persona.tabela_preco.nome unless @persona.tabela_preco.blank? %></b>
+				<% vend = Persona.find_by_id(@persona.vend_responsavel_id) %>
+
+        <label><%= t('CLASSIFICATION') %></label>
+        <b><%= @persona.classificacao %></b>
+
+				<label>Vendedor</label>
+				<b><%= vend.nome unless vend.nil? %></b>
+				<label>Status</label>
+        <% if @persona.estado.to_i == 0 %>
+          <span class="btn-success"><%= t('ACTIVE_S') %></span>
+        <% else %>
+          <span class="btn-danger">Bloqueado</span>
+        <% end %>
+				 <label>Obs.</label>
+				 <b><%= @persona.observacao %></b>
+
+			</div>
+			<div class="col-md-2">
+  			<a class="modalButton-frma panel-icon-right" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-regras">
+  				<%= image_tag("icon-edit.png", width: '13') %>
+  			</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modal-regras" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('RULES') %> de Negócio</h4>
+      </div>
+      <div class="modal-body">
+				<%= form_for(@persona) do |f| %>
+					<div class="row panel-modal-body">
+						<div class="col-md-12">
+	            <label><%= t('PRECISION_TABLE') %></label>
+              <%= f.collection_select :tabela_preco_id, TabelaPreco.select('id,nome').order('2'), :id, :nome, {prompt: 'Selecione'} %>
+
+						</div>
+
+						<div class="col-md-12">
+							<label>Vendedor</label>
+                <%= f.collection_select :vend_responsavel_id, Persona.where(tipo_vendedor: 1).select('id,nome').order('2'), :id, :nome, {prompt: 'Selecione'},{ style: "width: 100%;"} %>
+             </div>
+
+						<div class="col-md-12">
+							<label>Obs.</label>
+							<%= f.text_area :observacao, placeholder: 'Complemento', cols: 76, rows: 3, class: 'panel-field' %>
+						</div>
+
+						<div class="col-md-12">
+              <%= f.check_box :estado %> Bloquear
+            </div>
+
+
+            <div class="col-md-12">
+              <label><%= t('CLASSIFICATION') %></label>
+                <%= f.select :classificacao, [['A','A'],['B','B'],['C','C'],['D','D'],['E','E'],['F','F']], {prompt: 'Selecione'} %>
+             </div>
+	         <div class="col-md-12">
+	         		<br>
+	            <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+	         </div>
+					</div>
+
+      	<% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$('#persona_tabela_preco_id').selectize();
+$('#persona_vend_responsavel_id').selectize();
+$('#persona_classificacao').selectize();
+
+( function($) {
+
+function iframeModalOpen(){
+
+    $('.acao').on('click', function(e) {
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+
+      // stampiamo i nostri dati nell'iframe
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#myiframe').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+    });
+  }
+
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+
+  } ) ( jQuery );
+
+</script>

@@ -1,0 +1,42 @@
+<table class="fields">
+  <tr>
+     <td align="right">Centro de Costo:</td>
+     <td><%= f.collection_select :centro_custo_id, 
+                CentroCusto.all( :conditions => ["active = true"],
+                             :select => 'id,nome',
+                             :order  => '1' ),:id,
+                             :nome, { :prompt => 'Selecione lo centro de costo' } %>
+      </td>
+     <td align="right">Cuenta:</td>
+     <td><%= f.collection_select :rubro_grupo_id, 
+               PlanoDeConta.all( :select => 'id,descricao',
+                          :conditions => ["length(codigo) = 8"],
+                          :order  => '2' ),:id,
+                          :descricao,{:prompt => 'Selecione lo Grupo'} %>
+                             </td>
+
+    <td align="right">Clasificación:</td>
+    <td><%= f.collection_select :rubro_id, 
+               Rubro.all( :select => 'id,descricao',
+                          :order  => '2' ),:id,
+                          :descricao,{:prompt => 'Selecione lo Rubro'} %>
+    </td>
+    <td>
+      <table>
+        <tr id="CENTRO_CUSTO_DOLAR" style="display:none">
+          <td>U$</td>
+          <td><%= f.text_field :valor_us, :size => 15 %></td>
+        </tr>
+        <tr id="CENTRO_CUSTO_GUARANI"  style="display:none">
+          <td>G$</td>
+          <td><%= f.text_field :valor_gs, :size => 15 %></td>
+        </tr>
+      </table>
+    </td>
+    <td>
+      <%= f.check_box :_destroy %>
+      <%= f.label :_destroy, "Remove" %>
+      
+    </td>
+  </tr>
+</table>

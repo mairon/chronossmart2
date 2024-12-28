@@ -1,0 +1,101 @@
+<h1 id="header"><%= t('EMPLOYEE') %>s</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_funcionario_personas_path, :class => "button add" %>
+  <%= link_to t('LISTING'), '#', :class => "button print", :onclick => 'SeguirCobros()' %>
+</div>
+<div class="acessos">
+  <form action="#">
+    <%= hidden_field_tag :per, 'EMPLEADO' %>
+    <%= hidden_field_tag :tipo, 'DESCRIPCION' %>
+    <%= check_box_tag :l_unidade, '1', checked: true %> Unidad
+    <%= check_box_tag :l_ruc, '1', checked: true %> RUC/CI.
+    <%= check_box_tag :l_telefone, '1', checked: true %> Tel
+    <%= check_box_tag :l_email, '1', checked: true %> E-mail
+    <%= check_box_tag :l_direcao, '1', checked: true %> Direcion
+    <%= check_box_tag :l_cargo, '1', checked: true %> Cargo
+    <%= check_box_tag :l_ingreso, '1', checked: true %> Ingreso
+    <%= check_box_tag :l_salario, '1', checked: true %> Sueldo
+  </form>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="100">Cod.</td>
+    <td width="200">Unidade</td>
+    <td width="200">Nome</td>
+    <td width="100">Doc</td>
+    <td width="200">Cargo</td>
+    <td width="200">Setor</td>
+    <td width="100">Antigüedad</td>
+    <td width="80" align="center">Status</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @personas.each do |p| %>
+    <% if current_user.tipo.to_i !=0  %>
+    <% if p.cargo_id.to_i != 36 %>
+      <% if p.cargo_id.to_i != 34 %>
+        <% if p.cargo_id.to_i != 35 %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="100"><%= link_to p.id.to_s.rjust(6,'0'), show_funcionario_persona_path(p.id) %></td>
+        <td width="200"><%= p.unidade.unidade_nome %></td>
+        <td width="200"><%= p.nome %></td>
+        <td width="100"><%= p.ruc %></td>
+        <td width="200"><%= p.cargo.nome unless p.cargo.nil? %></td>
+        <td width="200"><%= p.setor %></td>
+        <td width="100" align="center">
+          <%= p.data_entrada.to_date.strftime("%d/%m/%Y") unless p.data_entrada.blank? %>
+          <br>
+          <%= ((Time.now.to_date - p.data_entrada.to_date).to_i  / 365)  unless p.data_entrada.blank? %> Años
+        </td>
+
+        <td width="80"align="center">
+          <% if p.estado.to_i == 0 %>
+            <span class="btn-success"><%= t('ACTIVE_S') %></span>
+          <% else %>
+            <span class="btn-danger">Bloqueado</span>
+          <% end %>
+        </td>
+
+        <td><%= link_to '', edit_funcionario_persona_path(p), class: 'icon-pencil' %></td>
+      </tr>
+      <% end %>
+      <% end %>
+      <% end %>
+      <% else %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+                <td width="100"><%= link_to p.id.to_s.rjust(6,'0'), show_funcionario_persona_path(p.id) %></td>
+                <td width="200"><%= p.unidade.unidade_nome %></td>
+                <td width="200"><%= p.nome %></td>
+                <td width="100"><%= p.ruc %></td>
+                <td width="200"><%= p.cargo.nome unless p.cargo.nil? %></td>
+                <td width="200"><%= p.setor %></td>
+                <td width="100" align="center">
+                  <%= p.data_entrada.to_date.strftime("%d/%m/%Y") unless p.data_entrada.blank? %>
+                  <br>
+                  <%= ((Time.now.to_date - p.data_entrada.to_date).to_i  / 365)   unless p.data_entrada.blank?%> Años
+                </td>
+
+                <td width="80"align="center">
+                  <% if p.estado.to_i == 0 %>
+                    <span class="btn-success"><%= t('ACTIVE_S') %></span>
+                  <% else %>
+                    <span class="btn-danger">Bloqueado</span>
+                  <% end %>
+                </td>
+
+                <td><%= link_to '', edit_funcionario_persona_path(p), class: 'icon-pencil' %></td>
+              </tr>      
+      <% end %>
+    <% end %>
+  </table>
+</div>
+
+<script>
+  function SeguirCobros(){
+    url2="/personas/busca_cliente?" + $('form').serialize();
+    location.href=url2 ;
+  }
+</script>

@@ -1,0 +1,75 @@
+<body>
+	<div class="group">
+	<h1 align="left" id="header">Dividas	</h1>
+		<h2>
+			<%= form_tag busca_persona_dividas_personas_path, :method => "get" do %>
+				<input id      ="busca"
+						 name       ="busca"
+						 type       ="search"
+						 size       ="60"
+						 placeholder ="Busca"
+						 value="<%= params[:busca]%>"
+						 autofocus
+						 onKeyUp="pesquisa(this.value)"/>
+
+			<%= image_tag("load.gif",
+					 :align => "absmiddle",
+					 :border => 0,
+					 :id => "spinner",
+					 :width => 21,
+					 :height => 21,
+					 :style =>"display: none;" ) %>
+			<% end %>
+
+		 </h2>
+
+		<div id="pagina">
+		</div>
+
+		<script language="javascript">
+
+
+			function pesquisa(valor){
+				url="/personas/busca_persona_dividas?busca="+valor;
+
+				ajax(url);
+			}
+
+			function ajax(url) {
+				req = null;
+
+				if (window.XMLHttpRequest) {
+					req = new XMLHttpRequest();
+
+					req.onreadystatechange = processReqChange;
+
+					req.open("GET",url,true);
+
+					req.send(null);
+
+				} else if (window.ActiveXObject) {
+
+					req = new ActiveXObject("Microsoft.XMLHTTP");
+
+					if (req) {
+						req.onreadystatechange = processReqChange;
+
+						req.open("GET",url,true);
+
+						req.send();
+					}
+				}
+			}
+
+			function processReqChange() {
+				if (req.readyState == 4) {
+					if (req.status ==200) {
+						document.getElementById('pagina').innerHTML = req.responseText;
+					} else {
+						alert("Houve um problema ao obter os dados:n" + req.statusText);
+					}
+				}
+			}
+		</script>
+	</div>
+</body>

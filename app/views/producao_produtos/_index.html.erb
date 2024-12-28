@@ -1,0 +1,56 @@
+
+<div class="group">
+   <table class="head_grid">
+      <tr>
+         <td width="50" align="center">DP</td>
+         <td width="80" align="center"><%= t('DATE') %></td>
+         <td width="200">Responsable</td>
+         <td width="200">Producto</td>
+         <td width="80" align="right">Requisitado</td>
+         <td width="80" align="right">Devolvido</td>
+         <td width="80" align="right">Costo</td>
+         <td width="80" align="right">Total</td>
+      </tr>
+   </table>
+   <div class="rolagem" dir="div">
+      <table>
+         <% entrada = 0 %>
+         <% saida   = 0 %>
+         <% indice  = 1 %>
+         <% @total  = 0 %>
+         <% producao_produtos.each do |producao_produto| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+               <td width="50" align="center"><%=h producao_produto.deposito_id %></td>
+               <td width="80" align="center"><%=h producao_produto.data.strftime("%d/%m/%y") %></td>
+               <td width="200" align="left"><small><%=h producao_produto.responsavel_nome %></small></td>
+               <td width="200" align="left"><small><%=h producao_produto.produto_nome %></small></td>
+               <% if  producao_produto.status == 0 %>
+                  <td width="80" align="right"><%=h producao_produto.quantidade.to_i %></td>
+                  <td width="80" align="right">0</td>
+                  <% saida +=  producao_produto.quantidade %>
+                  <% @total += ( producao_produto.quantidade * producao_produto.custo_dolar )%>
+               <% else %>
+                  <td width="80" align="right">0</td>
+                  <td width="80" align="right"><%= producao_produto.quantidade.to_i %></td>
+                  <% entrada +=  producao_produto.quantidade %>
+                  <% @total -= ( producao_produto.quantidade *  producao_produto.custo_dolar) %>
+               <% end %>
+
+               <td width="80" align="right"><%= number_to_currency( producao_produto.custo_dolar, :format =>' %n ', :separator => ",")   %></td>
+               <td width="80" align="right"><%=h number_to_currency( producao_produto.quantidade * producao_produto.custo_dolar, :format =>' %n ', :separator => ",") %></td>
+               <td><%= link_to '', producao_produto, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+            </tr>
+            <% indice += 1 %>
+         <% end %>
+      </table>
+   </div>
+   <table>
+      <tr>
+         <td width="735"></td>
+         <td width="80" align="right"><%= number_to_currency( saida, :format =>' %n ', :separator => ",") %></td>
+         <td width="80" align="right"><%= number_to_currency( entrada, :format =>' %n ', :separator => ",") %></td>
+         <td width="100" align="right"></td>
+         <td width="100" align="right"><%= number_to_currency( @total, :format =>' %n ', :separator => ",")%></td>
+      </tr>
+   </table>
+</div>

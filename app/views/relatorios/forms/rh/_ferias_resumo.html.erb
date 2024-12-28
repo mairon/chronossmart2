@@ -1,0 +1,77 @@
+
+<% per = "AND ID = #{params[:busca]["empregado"]}" unless params[:busca]["empregado"].blank? %>
+<% uni = "AND UNIDADE_ID = #{params[:busca]["unidade"]}" unless params[:busca]["unidade"].blank? %>
+<% personas = Persona.where("estado= 0 and tipo_funcionario = 1 #{uni} #{per}").order('nome') %>
+<table>
+  <tr class="head_grid">
+    <td>Sucursal</td>
+    <td>Empleado</td>
+    <td align="center">Fecha Ingreso</td>
+    <td align="center">Antigüidad Años</td>
+    <td align="center">Saldo Dias</td>
+    <td align="right">Remuneración</td>
+  </tr>
+  <% personas.each do |p| %>
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td width="200"><%= p.unidade.unidade_nome %></td>
+      <td width="200"><%= p.persona_id.to_s.rjust(6,'0') %>-<%= p.nome %></td>
+      <td width="80" align="center"><%= p.data_entrada.strftime("%d/%m/%Y") %></td>
+      <td width="30" align="center"><%= ((Time.now.to_date - p.data_entrada.to_date ) / 365).to_i  %> </td>
+      <td width="50" align="center">
+            <% quebra = '' %>
+            <% sub_count = 0 %>
+            <% anos_causado = 0 %>
+            <% saldo_dias = p.saldo_ferias %>
+              <% anterior = p.saldo_ferias %>
+              <% p.saldo_ferias %>
+            <% count_fds = 0 %>
+            <% p.persona_ferias.order('inicio').each do |d| %>
+              <% if quebra != d.inicio.strftime("%Y") %>
+
+                  <% if quebra != "" %>
+
+                    <% sub_count = 0 %>
+
+                  <% end %>
+
+
+                    <% quebra = d.inicio.strftime("%Y") %>
+
+                      <% anos = (( ("#{quebra}-#{p.data_entrada.strftime("%m")}-#{p.data_entrada.strftime("%d")}").to_date - p.data_entrada.to_date).to_i  / 365) %>
+                      <% if anos <= 5 %>
+                        <% anos_causado = 12 %>
+                      <% elsif anos > 5  and anos <= 10 %>
+                        <% anos_causado = 18 %>
+                      <% elsif anos > 10 %>
+                        <% anos_causado = 30 %>
+                      <% end %>
+                    <% saldo_dias += anos_causado %>
+               <% end %>
+
+                <% DiasUtei.where("data BETWEEN '#{d.inicio}' and '#{d.final}'").each do |ut| %>
+                  <% if ut.util == false %>
+                    <% count_fds += 1 %>
+                  <% end %>
+                  <% if anos_causado.to_i != 30 %>
+                    <% if l(ut.data.to_date, :format => :dia_semana, locale: 'es') == 'domingo' and ut.util == true %>
+                      <% count_fds += 1 %>
+                    <% end %>
+                  <% end %>
+                <% end %>
+
+
+                <% ferias_tiradas = ((d.inicio.to_date..d.final.to_date).count - count_fds.to_i) %>
+                <% saldo_dias -= ferias_tiradas %>
+
+                <% sub_count += (d.inicio.to_date..d.final.to_date).count %>
+                <% count_fds = 0 %>
+            <% end %>
+          <%= saldo_dias %>
+      </td>
+      <td align="right" width="70">
+        <% salario_dia = (p.salario.to_f / 30) %>
+        <%= format_int((salario_dia.to_f * saldo_dias.to_i)) %>
+      </td>
+    </tr>
+  <% end %>
+</table>

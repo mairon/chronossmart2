@@ -1,0 +1,33 @@
+<table>
+  <tr>    
+    <td width="120" align="center">Cod. Fabricante</td>
+    <td width="400" align="center">Produto</td>    
+    <td width="50" align="center">Saldo</td>
+    <td width="300" align="center">Fabricante</td>
+    <td width="120" align="center">Cod.</td>
+    <td width="50" align="center">Referencia</td>
+
+  </tr>
+</table>
+
+<div class="rolagem" id="div">
+  <table>
+
+    <% for produto in @produtos %>
+      <% entradas = Stock.sum( :entrada,:conditions => ['produto_id = ?',produto.id] ) %>
+      <% saidas   = Stock.sum( :saida  ,:conditions => ['produto_id = ?',produto.id] ) %>
+      <% stock    = entradas - saidas %>
+      <tr class = "<%= cycle( "cor1", "cor2" )%>"
+          onMouseOver="javascript:this.style.backgroundColor='#949494'"
+          onMouseOut="javascript:this.style.backgroundColor=''"
+          onClick="Fecha('<%= produto.nome %>','<%= produto.id %>','<%= produto.codigo %>','<%= produto.fabricante_cod %>')">
+        <td width="120" align="center"> <%=h produto.fabricante_cod%> </td>
+        <td width="400" align="left">   <%=h produto.nome%> </td>
+        <td width="50"  align="center"> <%=h format( "%.3f",stock.to_f ) %> </td>
+        <td width="300" align="left">   <%=h produto.fabricante %> </td>
+        <td width="120" align="center"> <%=h produto.codigo%> </td>
+        <td width="50"  align="center"> <%=h produto.referencia%> </td>
+      </tr>
+    <% end %>
+  </table>
+</div>

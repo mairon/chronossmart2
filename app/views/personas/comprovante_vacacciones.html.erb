@@ -1,0 +1,89 @@
+<style>
+  .group td{
+    padding: 6px;
+    font-size: 12px;
+  }
+
+</style>
+<table>
+  <tr>
+    <td align="left"><%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 90) %></td>
+  </tr>
+</table>
+
+<div class="group" align="center">
+
+  <table>
+    <tr>
+      <td width="200"></td>
+      <td width="300"><%= current_unidade.cidade.nome %> <%= Time.now.strftime("%d de %B de %Y")%></td>
+    </tr>
+    <tr>
+      <td>Señor(a):</td>
+    </tr>
+    <tr>
+      <td cospan="2"><%= @persona.nome %></td>
+    </tr>
+  </table>
+  <br>
+  <table>
+
+    <tr>
+      <td style="text-align: justify;" width="500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Tengo el agrado de dirigirme a Ud. a fin de notificarle su periodo de vacaciones. Que las vacaciones que le correspodem de acuerdo a su antigüedad, es de:
+        <% anos = (( ("2023-#{@persona.data_entrada.strftime("%m")}-#{@persona.data_entrada.strftime("%d")}").to_date - @persona.data_entrada.to_date).to_i  / 365) %>
+                      <% if anos <= 5 %>
+                        <%= anos_causado = 12 %>
+                      <% elsif anos > 5  and anos <= 10 %>
+                        <%= anos_causado = 18 %>
+                      <% elsif anos > 10 %>
+                        <%= anos_causado = 30 %>
+                      <% end %>
+
+                      (<%= I18n.with_locale(:es) { (anos_causado).to_i.to_words.upcase } %>)
+
+         días hábiles, correspondiente al periodo año 2022.
+      </td>
+    </tr>
+
+    <tr>
+      <td style="text-align: justify;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Conforme su solicitud, cumplimos en informar-le que las podrá usufructuar los periodos de </td>
+    </tr>
+    <tr>
+      <td cospan="2">
+        <table>
+        <% @persona.persona_ferias.where("date_part('year', inicio) = '2023'").order('inicio').each do |d| %>
+          <tr>
+            <td width="150" align="center"> De <%= d.inicio.strftime("%d/%m/%y") %> hasta <%= d.final.strftime("%d/%m/%y") %></td>
+            <td width="50" align="center"><%= ferias_tiradas = ((d.inicio.to_date..d.final.to_date).count ) %> días</td>
+          </tr>
+        <% end %>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Debiendo reintegrarse a sus tareas en fecha  <%= (@persona.persona_ferias.where("date_part('year', inicio) = '2023'").last.final.to_date + 1).strftime("%d/%m/%y") %> em su horario habitual.</td>
+    </tr>
+    <tr>
+      <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sírvase firmar la presente como constancia de notificación.</td>
+    </tr>
+    <tr>
+      <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Si otro particular, le saludo atentamente.</td>
+    </tr>
+
+  </table>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <p>___________________________________</p>
+  <p>Recibí la presente notificación:</p>
+
+  <br>
+  <br>
+  <br>
+
+  <p>Aclaración:.............................</p>
+</div>

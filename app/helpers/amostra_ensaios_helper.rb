@@ -1,0 +1,2 @@
+module AmostraEnsaiosHelper
+end

@@ -1,0 +1,5 @@
+<% if params[:formato] == 'ticket' %>
+	<%= render partial:  "/vendas/eps/pagare_ticket" %>
+<% else %>
+	<%= render partial:  "/vendas/eps/pagare_A4 " %>	
+<% end %>

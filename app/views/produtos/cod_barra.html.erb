@@ -1,0 +1,31 @@
+<h1 id="header">Producto - [Detalhe] <b><%= @produto.nome %></b></h1>
+<div class="acessos">
+  <%= link_to 'Tabla de Precio', produto_path(@produto.id), :class => "button" %>
+  <%= link_to 'Código de Barras', cod_barra_produto_path(@produto.id), :class => "btn btn-info" %>
+  <%= link_to 'Productos Agregado', composicao_produto_path(@produto.id), :class => "button" %>
+</div>
+<table class="head_grid">
+    <tr>
+      <td width="700">Código Barras</td>
+      <td width="42"></td>
+    </tr>
+</table>
+
+<div class="rolagem" dir="div" style="height: 180px">
+  <table>
+  <% @produto_barras.each do |prod_ba| %>
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td width="700"><%= prod_ba.barra %></td>
+      <td><%= link_to '', prod_ba, method: :delete, data: { confirm: 'Estas Seguro?' }, class: 'icon-trash' %></td>
+    </tr>
+  <% end %>
+  </table>
+</div>
+<div class="group">
+  <%= render :partial => '/produto_barras/form', :locals=>{:produto_barra=>ProdutoBarra.new(:produto_id=>@produto.id)}%>
+</div>
+<!-- Modal -->
+  <div class="buttons">
+    <%= link_to t('BACK'), edit_produto_path(@produto), :class => "button back" %>
+    <%= link_to 'Finalizar', produtos_path , :class => "button delete"%>
+  </div>

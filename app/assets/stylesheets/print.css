@@ -1,0 +1,28 @@
+p {
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 12px;
+color: #0000CC;
+}
+h2 {
+    background-color:#9090a9;
+    font-size: 75%;
+    color: white;
+    padding: 0px -20px 0px;
+    margin: 0;
+}
+h5 {
+color: #FFCC33;
+font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+a:link {
+color: #FF9900;
+}
+a:visited {
+color: #FF9A00;
+}
+a:hover {
+color: #FF9A00;
+}
+a:active {
+color: #FF9A00;
+}

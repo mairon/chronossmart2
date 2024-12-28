@@ -1,0 +1,42 @@
+<table>
+  <tr>
+    <td width="35"></td>
+    <td width="120">Ref.</td>
+    <td width="450">Producto</td>
+    <td width="70" align="right">Precio</td>
+    <td width="70" align="right">Stock</td>
+
+  </tr>
+</table>
+
+<div class="rolagem" id="div">
+  <table>
+    <% count = 0 %>
+    <% @produtos.each do |p| %>
+      <tr class = "<%= cycle( "cor1", "cor2" )%>"
+          onMouseOver="javascript:this.style.backgroundColor='#949494'"
+          onMouseOut="javascript:this.style.backgroundColor=''">
+
+      <td  width="35"><input type="text" id="<%= count %>" value="<%= count %>" size="2" style="border: none;"
+                onkeypress="Fecha( '<%= p.nome %>',
+                                    '<%= p.produto_id %>',
+                                    '<%= number_to_currency(p.preco_1_gs, :format=>'%n', :precision => 0)  %> ',
+                                    '<%= number_to_currency(p.preco_1_us, :format=>'%n', :separator => ",")  %> ',
+                                    '<%= number_to_currency(p.preco_1_rs, :format=>'%n', :separator => ",")  %> ' )" data-plus-as-tab="false" ></td>
+        <td width="120"> <%= p.fabricante_cod %> </td>
+        <td width="450"> <%= p.nome %> </td>
+        <% if params[:moeda].to_s == '0' %>
+          <td width="71" align="right"><b><%= number_to_currency(p.preco_1_us, :format=>' %n ', :separator => ",")  %></b></td>
+        <% elsif params[:moeda].to_s == '1' %>
+          <td width="71" align="right"><b> <%= number_to_currency(p.preco_1_gs, :format=>' %n ', :precision => 0)  %></b></td>
+        <% else %>
+          <td width="71" align="right"><b> <%= number_to_currency(p.preco_1_rs, :format=>' %n ', :separator => ",")  %></b></td>
+        <% end %>
+        <td width="71" align="right"> <%= p.stock.to_f %> </td>
+
+      </tr>
+      <% count += 1 %>
+    <% end %>
+    <input type="hidden" id="foco" value="-1">
+  </table>
+</div>

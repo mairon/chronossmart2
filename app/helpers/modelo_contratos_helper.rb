@@ -1,0 +1,2 @@
+module ModeloContratosHelper
+end

@@ -1,0 +1,388 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <ss:Styles>
+    <ss:Style ss:ID="1">
+      <ss:Font ss:Bold="1"/>
+      <ss:Alignment ss:Horizontal="Center"/>
+      <ss:Interior ss:Pattern="Gray25"/>
+    </ss:Style>
+    <ss:Style ss:ID="2">
+      <ss:Alignment ss:Horizontal="Center"/>
+    </ss:Style>
+  </ss:Styles>
+  <Worksheet ss:Name="Sheet1">
+    <Table>
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String"><B>Control.</B></Data></Cell>
+        <Cell><Data ss:Type="String">Empresa</Data></Cell>
+        <Cell><Data ss:Type="String">Solicitante</Data></Cell>
+        <Cell><Data ss:Type="String">Muestra</Data></Cell>
+        <Cell><Data ss:Type="String">Prof.</Data></Cell>
+        <Cell><Data ss:Type="String">Lote</Data></Cell>
+        <Cell><Data ss:Type="String">Ca</Data></Cell>
+        <Cell><Data ss:Type="String">Mg</Data></Cell>
+        <Cell><Data ss:Type="String">K</Data></Cell>
+        <Cell><Data ss:Type="String">Al</Data></Cell>
+        <Cell><Data ss:Type="String">H + Al</Data></Cell>
+        <Cell><Data ss:Type="String">S. Bases</Data></Cell>
+        <Cell><Data ss:Type="String">CTC</Data></Cell>
+        <Cell><Data ss:Type="String">C</Data></Cell>
+        <Cell><Data ss:Type="String">MO</Data></Cell>
+        <Cell><Data ss:Type="String">Sat. Al</Data></Cell>
+        <Cell><Data ss:Type="String">V %</Data></Cell>
+        <Cell><Data ss:Type="String">P</Data></Cell>
+        <Cell><Data ss:Type="String">Fe</Data></Cell>
+        <Cell><Data ss:Type="String">Mn</Data></Cell>
+        <Cell><Data ss:Type="String">Cu</Data></Cell>
+        <Cell><Data ss:Type="String">Zn</Data></Cell>
+        <Cell><Data ss:Type="String">pH H2O</Data></Cell>
+        <Cell><Data ss:Type="String">pH SMP</Data></Cell>
+        <Cell><Data ss:Type="String">pH CaCI2</Data></Cell>
+        <Cell><Data ss:Type="String">Arena</Data></Cell>
+        <Cell><Data ss:Type="String">Limo</Data></Cell>
+        <Cell><Data ss:Type="String">Arcilla</Data></Cell>
+        <Cell><Data ss:Type="String">Boro</Data></Cell>
+        <Cell><Data ss:Type="String">Azufre</Data></Cell>
+        <Cell><Data ss:Type="String">P rem</Data></Cell>
+        <Cell><Data ss:Type="String">Na</Data></Cell>
+        <Cell><Data ss:Type="String">Ca/Mg</Data></Cell>
+        <Cell><Data ss:Type="String">Ca/K</Data></Cell>
+        <Cell><Data ss:Type="String">Mg/K</Data></Cell>
+        <Cell><Data ss:Type="String">Ca %</Data></Cell>
+        <Cell><Data ss:Type="String">Mg %</Data></Cell>
+        <Cell><Data ss:Type="String">K %</Data></Cell>
+        <Cell><Data ss:Type="String">H+Al %</Data></Cell>
+        <Cell><Data ss:Type="String">Al %</Data></Cell>
+      </Row>
+    <% quebra = "" %>
+    <% @amostras.each do |a| %>
+      <% if a.solicitante == '' %>
+        <% soli = a.empresa_nome %>
+      <% else %>
+        <% soli = a.solicitante %>
+      <% end %>
+
+      <% if quebra != soli %>
+        <% if quebra != "" %>
+          <Row>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+          </Row>
+        <% end %>
+        <%= quebra = soli %>
+      <% end %>
+      <Row>
+        <Cell ss:StyleID="1"><Data ss:Type="String"><%= a.amostra.to_s.rjust(6,'0') %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= a.empresa_nome %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= a.solicitante %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= a.detalhe_amostra %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= a.profundidade %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= a.lote %></Data></Cell>
+        <% calcio = AmostraEnsaio.find_by_metodo_id( 134, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if calcio != nil %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= calcio.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% magnesio = AmostraEnsaio.find_by_metodo_id( 38, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if magnesio != nil %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= magnesio.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% potasio = AmostraEnsaio.find_by_metodo_id( 29, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if potasio != nil %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= potasio.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% aluminio = AmostraEnsaio.find_by_metodo_id( 16, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if aluminio != nil %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= aluminio.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% ph_smp = AmostraEnsaio.find_by_metodo_id( 41, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if ph_smp != nil %>
+          <% h_aluminio_result = case  ph_smp.resultado %>
+            <% when 8 then 1.12 %>
+            <% when 7.9 then 1.21 %>
+            <% when 7.8 then 1.30 %>
+            <% when 7.7 then 1.40 %>
+            <% when 7.6 then 1.51 %>
+            <% when 7.5 then 1.62 %>
+            <% when 7.4 then 1.75 %>
+            <% when 7.3 then 1.89 %>
+            <% when 7.2 then 2.03 %>
+            <% when 7.1 then 2.19 %>
+            <% when 7.0 then 2.36 %>
+            <% when 6.9 then 2.54 %>
+            <% when 6.8 then 2.74 %>
+            <% when 6.7 then 2.95 %>
+            <% when 6.6 then 3.18 %>
+            <% when 6.5 then 3.42 %>
+            <% when 6.4 then 3.68 %>
+            <% when 6.3 then 3.97 %>
+            <% when 6.2 then 4.28 %>
+            <% when 6.1 then 4.61 %>
+            <% when 6.0 then 4.96 %>
+            <% when 5.9 then 5.35 %>
+            <% when 5.8 then 5.76 %>
+            <% when 5.7 then 6.21 %>
+            <% when 5.6 then 6.69 %>
+            <% when 5.5 then 7.20 %>
+            <% when 5.4 then 7.76 %>
+            <% when 5.3 then 8.36 %>
+            <% when 5.2 then 9.00 %>
+            <% when 5.1 then 9.70 %>
+            <% when 5.0 then 10.45 %>
+            <% when 4.9 then 11.26 %>
+            <% when 4.8 then 12.13 %>
+            <% when 4.7 then 13.06 %>
+            <% when 4.6 then 14.08 %>
+            <% when 4.5 then 15.16 %>
+            <% when 4.4 then 16.33 %>
+            <% when 4.3 then 17.60 %>
+            <% when 4.2 then 18.96 %>
+            <% when 4.1 then 20.42 %>
+            <% when 4.0 then 22.00 %>
+            <% when 3.9 then 23.70 %>
+            <% when 3.8 then 25.53 %>
+            <% when 3.7 then 27.50 %>
+            <% when 3.6 then 29.63 %>
+            <% when 3.5 then 31.92 %>
+          <% end %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= h_aluminio_result.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% if calcio != nil %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= s_b = (calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f).round(2)  %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% if calcio != nil %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= ctc_result = ((calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f) + h_aluminio_result.to_f).round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+
+        <% carbono = AmostraEnsaio.find_by_metodo_id( 11, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if carbono != nil %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= carbono.resultado.to_f.round(2) %></Data></Cell>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= (carbono.resultado.to_f * 1.72).to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+
+
+        <% aluminio = AmostraEnsaio.find_by_metodo_id( 16, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if aluminio != nil %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= ((aluminio.resultado.to_f * 100) / (aluminio.resultado.to_f + calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f)).to_f.round(2)  %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% if calcio != nil %>
+         <Cell ss:StyleID="2"><Data ss:Type="String"><%= resul_sat_base = (((calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f) * 100) / ( (calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f) + h_aluminio_result.to_f)).round(2)  %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% fosforo = AmostraEnsaio.find_by_metodo_id( 13, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if fosforo != nil  %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= fosforo.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% ferro = AmostraEnsaio.find_by_metodo_id( 33, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if ferro != nil %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= ferro.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% manganes = AmostraEnsaio.find_by_metodo_id( 32, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if manganes != nil %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= manganes.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% cobre = AmostraEnsaio.find_by_metodo_id( 30, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if cobre != nil  %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= cobre.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+
+        <% zinco = AmostraEnsaio.find_by_metodo_id( 31, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if zinco != nil  %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= zinco.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% ph_h2o = AmostraEnsaio.find_by_metodo_id( 15, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if ph_h2o != nil  %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= ph_h2o.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% ph_smp = AmostraEnsaio.find_by_metodo_id( 41, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if ph_smp != nil  %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= ph_smp.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+
+        <% ph_caci = AmostraEnsaio.find_by_metodo_id( 14, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if ph_caci != nil  %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= ph_caci.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% argila = EntradaResultEnsaio.find_by_metodo_id( 140, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,resultado_silte') %>
+        <% silte = EntradaResultEnsaio.find_by_metodo_id( 140, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,resultado_silte') %>
+        <% areia = EntradaResultEnsaio.find_by_metodo_id( 140, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,resultado_silte') %>
+        <% if areia != nil %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= (100 - (argila.resultado.to_f + silte.resultado_silte.to_f)).round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% if silte != nil %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= silte.resultado_silte.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% if argila != nil %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= argila.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% boro = AmostraEnsaio.find_by_metodo_id( 40, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if boro != nil  %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= boro.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% enchofre = AmostraEnsaio.find_by_metodo_id( 22, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if enchofre != nil  %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= enchofre.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+        <% p_rem = AmostraEnsaio.find_by_metodo_id( 42, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if p_rem != nil  %>
+            <Cell ss:StyleID="2"><Data ss:Type="String"><%= p_rem.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+
+        <% na = AmostraEnsaio.find_by_metodo_id( 28, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,lido') %>
+        <% if na != nil %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= na.resultado.to_f.round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+
+
+        <% if calcio != nil %>
+          <Cell ss:StyleID="2"><Data ss:Type="String"><%= (calcio.resultado.to_f / magnesio.resultado.to_f).round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+        <% if calcio != nil %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= (calcio.resultado.to_f / potasio.resultado.to_f).round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+        <% if magnesio != nil %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= (magnesio.resultado.to_f / potasio.resultado.to_f).round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+        <% if calcio != nil %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= ((calcio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+        <% if magnesio != nil %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= ((magnesio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+        <% if potasio != nil %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= ((potasio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+        <% if aluminio != nil %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= ((h_aluminio_result.to_f * 100 ) / ctc_result.to_f).round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+        <% if aluminio != nil %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= ((aluminio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) %></Data></Cell>
+        <% else %>
+          <Cell ss:StyleID="2"><Data ss:Type="String">NS</Data></Cell>
+        <% end %>
+      </Row>
+    <% end %>
+    </Table>
+  </Worksheet>
+</Workbook>

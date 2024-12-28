@@ -1,0 +1,29 @@
+<h1 id="header">Regiões</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_regiao_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="250"><%= t('COUNTRY') %></td>
+    <td width="250">Estado</td>
+    <td width="350">Região</td>
+    <td width="80" align="center"><%= t('CITIES') %></td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @regiaos.each do |regiao| %>
+      <tr class = "<%= cycle("cor1", "cor2")%>" >
+        <td width="250"><%= regiao.paise.nome unless regiao.paise_id.blank? %></td>
+        <td width="250"><%= regiao.estado.nome unless regiao.estado_id.blank? %></td>
+        <td width="350"><%= regiao.nome %></td>
+        <td width="80" align="center"><%= link_to regiao.cidades.count(:id).to_s.rjust(4,'0'), regiao_path(regiao) %></td>
+        <td><%= link_to 'Editar', edit_regiao_path(regiao) %></td>
+        <td><%= link_to t('DELETE'), regiao, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

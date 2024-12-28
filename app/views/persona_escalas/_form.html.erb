@@ -1,0 +1,58 @@
+<%= form_for(@persona_escala) do |f| %>
+  <% if @persona_escala.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@persona_escala.errors.count, "error") %> prohibited this persona_escala from being saved:</h2>
+
+      <ul>
+      <% @persona_escala.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> Escala Empleado - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td>
+              <label>Empleado</label>
+              <%= f.collection_select :persona_id,
+                    Persona.all( :select     => 'id,nome,tipo_funcionario',
+                    :conditions => ["tipo_funcionario = 1 and estado = 0"],
+                    :order      => '2'),:id,:nome %>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Fecha </label>
+              <%= f.date_select :data %>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Motivo </label>
+              <%= f.text_area :obs, cols: 15, rows: 5 %>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Tipo</label>
+              <input id="tipo" name="tipo" type="radio" value="0"  checked/> Sabados Libres
+              <input id="tipo" name="tipo" type="radio" value="1"/> Vacacciones
+              <input id="tipo" name="tipo" type="radio" value="2"/> Permiso Maternidad
+            </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', persona_escalas_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

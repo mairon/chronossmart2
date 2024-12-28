@@ -1,0 +1,184 @@
+<body onload="window.print()">
+<style type="text/css">
+  table {
+    font-family:Lucida Console, Courier ;font-size:10px;
+  }
+</style>
+
+
+  <table align="left" valign="top">
+    <tr>
+      <td colspan="4" align="center">
+          ---------------------------------------------------------------------------------------------------------
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <b>
+          <%= session[:empresa_nome] %>
+        </b>
+     </td>
+      <td align="right">
+          <b>
+            COMPROVANTE DEVOLUCIÓN DE CHEQUE.:<%= @dev_cheque_cliente.id.to_s.rjust(6,'0') %>
+          </b>
+     </td>
+    </tr>
+
+    <tr>
+
+      <td align="right" colspan="2">
+             Fecha :<%= @dev_cheque_cliente.data.strftime("%d/%m/%Y") %>
+       </td>
+    </tr>
+    <tr>
+
+      <td align="right" colspan="2">
+             Hora :<%=Time.now.strftime("%H:%M:%S")%>
+       </td>
+    </tr>
+
+    <tr>
+      <td colspan="4" align="center">
+          ---------------------------------------------------------------------------------------------------------
+      </td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        Moneda:
+          <% if @dev_cheque_cliente.moeda == 0 %>
+            DOLARES
+          <% elsif @dev_cheque_cliente.moeda == 1 %>
+            GUARANIES
+          <% elsif @dev_cheque_cliente.moeda == 2 %>
+            REALES
+          <% end %>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="4">
+        Cliente: <%= @dev_cheque_cliente.persona.nome %>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        Motivo: <%= @dev_cheque_cliente.motivos_dev_cheque.nome %>
+      </td>
+    </tr>
+
+
+    <tr>
+      <td colspan="4">
+        Cuenta: <%= @dev_cheque_cliente.conta.nome %>
+      </td>
+    </tr>
+
+     <tr>
+       <td colspan="4" align="center">
+          ---------------------------------------------------------------------------------------------------------
+      </td>
+    </tr>
+
+    <tr>
+      <td align="left" colspan="2">
+   <table>
+        <tr>
+          <td width="70">Lanz.</td>
+          <td width="100"><%= t('CHECKS') %></td>
+          <td width="200">Banco</td>
+          <td width="200">Titular</td>
+          <td width="80" align="right"><%= t('VALUE') %></td>
+        </tr>
+   </table>
+   <div class="rolagem" id="div">
+      <table>
+         <% tot_us = 0 %>
+         <% tot_gs = 0 %>
+         <% @dev_dts.each do |l| %>
+            <tr class = "<%= cycle("cor1", "cor2")%>">
+              <td width="70"><%= l.id.to_s.rjust(6,'0') %></td>
+              <td width="100"><%= l.cheque %></td>
+              <td width="200"><%= l.banco %></td>
+              <td width="200"><%= l.titula %></td>
+              <% if @dev_cheque_cliente.moeda.to_i == 0 %>
+                <td width="80" align="right"><b> <%= format_decimal( l.valor_us ) %></b></td>
+                <% tot_us += l.valor_us.to_f %>
+              <% else %>
+                <td width="80" align="right"><b><%= format_int(l.valor_gs )%></b></td>
+                <% tot_gs += l.valor_gs.to_f %>
+              <% end %>
+
+            </tr>
+         <% end %>
+         <tr class="head">
+           <td colspan="4" align="right" height="25"><b>Totales ==></b></td>
+           <% if @dev_cheque_cliente.moeda.to_i == 0 %>
+           <td align="right"><b><%= format_decimal(tot_us) %></b></td>
+           <% else %>
+           <td align="right"><b><%= format_int(tot_gs) %></b></td>
+           <% end %>
+         </tr>
+      </table>
+      </td>
+    </tr>
+
+     <tr>
+       <td colspan="4" align="center">
+          ---------------------------------------------------------------------------------------------------------
+      </td>
+    </tr>
+
+
+    <tr>
+      <td align="left" colspan="2">
+        <table>
+        </table>
+      </td>
+    </tr>
+
+  
+    <tr height="220">
+      <td valign="top" colspan="2">
+          Concepto : <%= @dev_cheque_cliente.obs %>
+      </td>
+    </tr>
+
+  
+    <tr>
+      <td  colspan="2">
+        -------------------------------------------
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="2">
+                <%=  current_user.usuario_nome %>
+            </td>
+    </tr>
+
+    <tr>
+      <td align="center" colspan="4">
+        ---------------------------------------------------------------------------------------------------------
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="2">
+          Hecho por : <%=current_user.usuario_nome %>
+          Unidade por : <%=current_unidade.unidade_nome%>
+      </td>
+    </tr>
+
+      <td align="center" colspan="4">
+      </td>
+
+  </table>
+
+</body>
+
+
+
+
+

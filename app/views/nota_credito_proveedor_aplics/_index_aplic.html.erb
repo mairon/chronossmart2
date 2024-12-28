@@ -1,0 +1,30 @@
+        <div class="group">
+            <table class="head_grid">
+                <tr>
+                    <td width="80" align="center"><%= t('DATE') %></td>
+                    <td width="200" align="center"><%= t('DOC') %></td>
+                    <td width="50" align="center"><%= t('SHARE') %></td>
+                    <td width="100" align="center"><%= t('VALUE') %></td>
+                </tr>
+            </table>
+            <div class="rolagem" dir="div"  style="height: 160px">
+                <table>
+                    <% nota_credito_proveedor_aplics.each do |ncd| %>
+                    <tr class = "<%= cycle("cor1", "cor2") %> ">
+                        <td width="80" align="center"><%=h ncd.data.strftime("%d/%m/%Y") %></td>
+                        <td width="200" align="center"><%=h ncd.documento_numero_01 %> - <%=h ncd.documento_numero_02 %> - <%=h ncd.documento_numero %></td>
+                        <td width="50" align="center"><%=h ncd.cota %></td>
+                        <% if @nota_credito_proveedor.moeda.to_f == 0 %> 
+                            <td width="100" align="right"><%= number_to_currency( ncd.valor_dolar,    :format=>' %n ', :separator => ",") %></td>
+                        <% elsif @nota_credito_proveedor.moeda.to_f == 1 %>
+                            <td width="100" align="right"><%= number_to_currency( ncd.valor_guarani,    :format=>' %n ', :precision => 0 ) %></td>
+                        <% else %>
+                            <td width="100" align="right"><%= number_to_currency( ncd.valor_real,    :format=>' %n ', :separator => ",") %></td>
+                        <% end %>
+
+                        <td><%= link_to '', ncd, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+                    </tr>
+                    <% end %>
+                </table>
+            </div>
+        </div>

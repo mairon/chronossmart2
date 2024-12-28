@@ -1,0 +1,51 @@
+<table>
+<% tot_qtd_vd = 0 %>
+<% tot_ved_vd = 0 %>
+<% tot_des_vd = 0 %>
+<% tot_qtd_nc = 0 %>
+<% tot_nc = 0 %>
+<% tot = 0 %>
+
+<% @vendas.each do |v| %>
+	<tr class = "<%= cycle("cor1", "cor2") %>">
+		<td width="300"><%= v.vendedor %></td>
+		<td width="70" align="right"><%= format_int( v.qtd_vd ) %></td>
+		<% if params[:moeda] == '0' %>
+			<td width="70" align="right"><%= format_decimal(v.tot_vd_us) %></td>
+			<% tot += v.tot_vd_us.to_f %>
+		<% else %>
+			<td width="70" align="right"><%= format_int(v.tot_vd_gs.to_f) %></td>
+			<td width="70" align="right"><%= format_int(v.desc_gs.to_f) %></td>
+
+			<td width="70" align="right"><%= format_int(v.qtd_nc.to_f) %></td>
+			<td width="70" align="right"><%= format_int(v.tot_nc_gs.to_f) %></td>
+			<td width="70" align="right"><%= format_int( (v.tot_vd_gs.to_f - v.desc_gs.to_f) + v.tot_nc_gs.to_f ) %></td>
+
+
+			<% tot_qtd_vd += v.qtd_vd.to_f %>
+			<% tot_ved_vd += v.tot_vd_gs.to_f %>
+			<% tot_des_vd += v.desc_gs.to_f %>
+			<% tot_qtd_nc += v.qtd_nc.to_f %>
+			<% tot_nc += v.tot_nc_gs.to_f %>
+			<% tot += ( (v.tot_vd_gs.to_f - v.desc_gs.to_f) + v.tot_nc_gs.to_f) %>
+
+		<% end %>
+	</tr>
+<% end %>
+<tr class="head" height="15">
+	<td></td>
+		<td width="70" align="right"><%= format_int(tot_qtd_vd.to_f) %></td>
+		<% if params[:moeda] == '0' %>
+			<td width="70" align="right"><%= format_decimal(tot) %></td>
+		<% else %>
+
+
+			<td width="70" align="right"><%= format_int(tot_ved_vd.to_f) %></td>
+			<td width="70" align="right"><%= format_int(tot_des_vd.to_f) %></td>
+			<td width="70" align="right"><%= format_int(tot_qtd_nc.to_f) %></td>
+			<td width="70" align="right"><%= format_int(tot_nc.to_f) %></td>
+			<td width="70" align="right"><%= format_int( tot.to_f ) %></td>
+
+		<% end %>
+</tr>
+</table>

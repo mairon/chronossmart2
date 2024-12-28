@@ -1,0 +1,187 @@
+<% count = 1 %>
+<% @pd.each do |pd| %>
+
+<table align="center" class="break">
+	<tr>
+		<td width="20">
+		</td>
+
+		<td>
+			<table align="center" width="800" >
+				<tr height="120">  			     
+					<td colspan="2" align="right" >	
+						<FONT FACE="Arial" size="2">
+							SANTA RITA, _______ de ________________ de _______
+						</FONT>					
+					</td>
+				</tr>
+
+				<tr height="30">  			     
+					<td  align="left" >	
+						<FONT FACE="Arial" size="2">
+							Señores,
+						</FONT>					
+					</td>
+				</tr>
+
+				<tr height="30">  			     
+					<td  align="left" >	
+						<FONT FACE="Arial" size="2">
+							<b><%= @pagare.persona_nome%></b>
+						</FONT>					
+					</td>
+				</tr>
+
+				<tr height="30">  			     
+					<td  align="left" >	
+						<FONT FACE="Arial" size="2">
+							SANTA RITA - ALTO PARANA
+						</FONT>					
+					</td>
+				</tr>
+
+				<tr height="30">  			     
+					<td  align="left" >	
+						<FONT FACE="Arial" size="2">
+							<b><u>Presente</u></b>
+						</FONT>					
+					</td>
+				</tr>
+				<tr height="30">  			     
+					<td  align="left" >	
+						<FONT FACE="Arial" size="2">
+							De nuestra consideración
+						</FONT>					
+					</td>
+				</tr>
+
+				<tr height="30">  			     
+					<td></td>	
+					<td  align="left" >	
+						<FONT FACE="Arial" size="2">
+							Tenemos el agrado de dirigirnos a Usted(es) para informarles que la 
+						</FONT>					
+					</td>
+				</tr>
+
+				<tr height="30">  			     
+					<td colspan="2" align="left" >	
+						<FONT FACE="Arial" size="2">
+							empresa <%= $empresa_nome %>, nos ha cedido un pagare firmado por Usted, que detallamos a continuación:
+						</FONT>					
+					</td>
+				</tr>
+
+				<!--CONTEUDO!-->
+				<tr height="50" >  			     
+					<td colspan="2" align="justify" width="150">	
+						<FONT FACE="Arial" size="2">
+							<table id="grid">
+								<tr id="grid">
+									<td id="grid" width="280" align="center"><b>VALOR U$D. </b></td>
+									<td  id="grid"width="280" align="center"><b>NUMERO </b></td>
+									<td id="grid" width="280" align="center"><b><%= t('DATE').upcase %> VENCIMIENTO </b></td>
+
+								</tr>
+								<tr id="grid">
+									<td id="grid" width="300" align="center"><b> <%= number_to_currency(pd.valor_dolar, :format=>' %n ', :separator => ',') %> </b></td>
+									<td id="grid" width="300" align="center"><b> <%=count%>/<%=@pd.size%> </b></td>
+									<td id="grid" width="300" align="center"><b> <%=pd.vencimento.strftime("%d/%m/%Y")%> </b></td>
+								</tr>
+								<% count += 1 %>
+							</table>
+
+
+						</FONT>					
+					</td>
+				</tr>
+
+				<tr height="30">  			     
+					<td></td>	
+					<td  align="left" >	
+						<FONT FACE="Arial" size="2">
+							Por medio de la presente se le(s) comunica que el(los) pagare(s)
+						</FONT>					
+					</td>
+				</tr>
+
+				<tr height="30">  			     
+					<td colspan="2" align="left" >	
+						<FONT FACE="Arial" size="2">
+							obra(n) en por de Banco______________________________y que deberá pasar a hacer efectivo el dia del 
+						</FONT>					
+					</td>
+				</tr>
+
+				<tr height="30">  			     
+					<td  colspan="2" align="left" >	
+						<FONT FACE="Arial" size="2">
+							vencimiento en cualquiera de nuestras sucursales.
+						</FONT>					
+					</td>
+				</tr>
+
+
+				<tr height="30">  			     
+					<td></td>	
+					<td align="left" >	
+						<FONT FACE="Arial" size="2">
+							Sin otro particular les saludamos cordialmente.
+						</FONT>					
+					</td>
+				</tr>
+
+
+				<tr  height="150">
+					<td valign="bottom">
+						<FONT FACE="Arial" size="2">
+
+				    	<b>
+				    	....................................................
+				    	</b>
+						</FONT>					
+
+					</td>
+					<td valign="bottom" align="right">
+						<FONT FACE="Arial" size="2">
+				    	<b>
+				    	....................................................
+				    	</b>
+						</FONT>					
+
+					</td>
+
+				</tr>
+
+				<tr>
+					<td >
+						<FONT FACE="Arial" size="2">
+					    	<b>
+						    	<%= @pagare.persona_nome %>
+							<br/>
+						    	&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp C.I. <%= @pagare.persona_ruc %>
+					    	</b>
+						</FONT>					
+					</td>
+				</tr>
+
+			</table>
+		</td>
+
+		<td width="20">
+		</td>
+
+	</tr>
+<table>
+<% end %>
+
+<style type="text/css">
+#grid	table {
+		border-collapse: collapse;
+		font-size: 10px
+	}
+#grid	td, tr {
+		border: 1px solid black;
+	}
+</style>
+

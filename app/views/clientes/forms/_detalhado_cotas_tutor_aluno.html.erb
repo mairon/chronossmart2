@@ -1,0 +1,231 @@
+
+  <% quebra     = "" %>
+  <% quebra2    = "" %>
+  <% tutor      = "" %>
+  
+  <% tutor_div   = 0 %>
+  <% tutor_pg    = 0 %>
+  <% tutor_saldo = 0 %>
+
+  <% aluno_div   = 0 %>
+  <% aluno_pg    = 0 %>
+  <% aluno_saldo = 0 %>
+
+  <% geral_div   = 0 %>
+  <% geral_pg    = 0 %>
+  <% geral_saldo = 0 %>
+
+  <table>
+    <thead class="report-header">
+      <tr>
+        <td colspan="10" class="title" align="center">
+          <%= current_unidade.nome_sys %> <br>
+          Cuentas a Recebir Detallado Tutor/Aluno
+        </td>
+      </tr>
+      <tr>
+        <td colspan="10">Fecha: <%= params[:inicio] %> hasta <%= params[:final] %></td>
+      </tr>
+
+      <%
+
+          if params[:filtro].to_s == '0'
+            filtro = 'En Abertas'
+          elsif params[:filtro].to_s == '1'
+            filtro = 'Canceladas'
+          else
+            filtro = 'Todos'
+          end
+
+          if params[:moeda].to_s == '0'
+            moeda = 'Dolar'
+          elsif params[:moeda].to_s == '1'
+            moeda = 'Guaranies'
+          else
+            moeda = 'Reales'
+          end
+      %>
+
+
+      <tr>
+        <td colspan="10">Filtro: <%= filtro %></td>
+      </tr>
+
+      <tr>
+        <td colspan="10">Moneda: <%= moeda %></td>
+      </tr>
+      <tr class="td-header">
+        <td align="center" width="50">Fecha</td>
+        <td align="center" width="50">Venc.</td>
+        <td align="center" width="50">Fecha PG</td>
+        <td width="120">Centro de Costo</td>
+        <td width="280">Desc.</td>
+        <td width="50">Doc.</td>
+        <td width="40" align="center">Cuota</td>
+        <td width="70" align="right">Monto</td>
+        <td width="70" align="right">Pg</td>
+        <td width="70" align="right">Saldo</td>
+      </tr>
+    </thead>
+
+
+    <% @clientes.each do |c| %>
+      <% tutor      = c.vend_responsavel_nome %>
+      <% if quebra != c.vend_responsavel_nome %>
+
+          <% if quebra2 != "" %>
+               <tr>
+                  <td colspan="7"><b>Total Aluno <%= quebra2 %></b></td>
+                  <td width="70" align="right"><%= format_int(aluno_div.to_f) %></td>
+                  <td width="70" align="right"><%= format_int(aluno_pg.to_f) %></td>
+                  <td width="70" align="right"><%= format_int(aluno_saldo.to_f) %></td>
+               </tr>
+
+               <tr>
+                  <td></td>
+               </tr>     
+            <% aluno_div   = 0 %>
+            <% aluno_pg    = 0 %>
+            <% aluno_saldo = 0 %>
+          <% end %>
+
+          <% if quebra != "" %>             
+           <tr>
+              <td colspan="7"><b>Total <%= quebra %> </b></td>
+              <td width="70" align="right"><%= format_int(tutor_div.to_f) %></td>
+              <td width="70" align="right"><%= format_int(tutor_pg.to_f) %></td>
+              <td width="70" align="right"><%= format_int(tutor_saldo.to_f) %></td>
+
+            </tr>
+            <tr>
+              <td></td>
+            </tr>
+            <% tutor_div   = 0 %>
+            <% tutor_pg    = 0 %>
+            <% tutor_saldo = 0 %>
+
+          <% end %>
+
+
+          <tr>
+            <td class="head" colspan="10" style="background: #fa4736; color: #fff"><%= quebra = c.vend_responsavel_nome %></td>
+          </tr>
+
+        <% end %>
+
+
+
+        <% if quebra2 != c.persona_nome  %>
+          <% if quebra2 != "" and tutor_saldo.to_i != 0  %>
+            <tr>
+              <td colspan="7"><b>Total Aluno <%= quebra2 %></b></td>
+              <td width="70" align="right"><%= format_int(aluno_div.to_f) %></td>
+              <td width="70" align="right"><%= format_int(aluno_pg.to_f) %></td>
+              <td width="70" align="right"><%= format_int(aluno_saldo.to_f) %></td>
+            </tr>
+
+            <tr>
+              <td></td>
+            </tr>
+
+            <% aluno_div   = 0 %>
+            <% aluno_pg    = 0 %>
+            <% aluno_saldo = 0 %>
+
+          <% end %>
+
+          <tr>
+            <td class="head" colspan="10" style="background: #1e479c; color: #fff"><%= quebra2 = c.persona_nome %></td>
+          </tr>
+
+        <% end %>
+
+
+      <% if params[:moeda] == '0' %>
+        <% saldo_dolar = (c.divida_dolar.to_f - c.anterior_us.to_f) %>
+      <% elsif params[:moeda] == '1' %>
+        <% saldo_guarani = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+      <% else %>
+        <% saldo_real = (c.divida_real.to_f - c.anterior_rs.to_f) %>
+      <% end %>
+
+      <tr class = "<%= cycle( "cor1", "cor2" ) %>" >
+
+        <td width="50"  align="center"><%= c.data.strftime("%d/%m/%y")%></td>
+        <td width="50"  align="center"><%= c.vencimento.strftime("%d/%m/%y")%></td>
+        <td width="50"  align="center"><%= c.pg_data.to_date.strftime("%d/%m/%y") unless c.pg_data.nil? %></td>
+        <td width="120"><small><%= c.centro_custo_nome %></small></td>
+        <td width="280">
+          <small>
+            <%= c.descricao %>
+
+            <% unless c.venda_id.blank? %>
+            <% JSON.parse(c.array_venda_produtos.to_s.gsub('\"', '"').gsub('}","{', '},{').gsub('{"{', '[{').gsub('}"}', '}]')).each do |p| %>
+              <li><%= p["produto_nome"] %></li>
+            <% end %>
+
+            <% end %>
+
+          </small>
+        </td>
+        <td width="50"><%= c.documento_numero %></td>
+        <td width="40"  align="center"><%= c.cota %>/<%= c.tot_cotas %></td>
+        <% if params[:moeda] == '0' %>
+          <td width="70" align="right"><%= format_decimal(c.divida_dolar.to_f) %></td>
+          <td width="70" align="right"><%= format_decimal(c.anterior_us.to_f) %></td>
+          <td width="70" align="right"><%= format_decimal(saldo_dolar.to_f) %></td>
+
+        <% elsif params[:moeda] == '1' %>
+          <td width="70" align="right"><%= format_int(c.divida_guarani.to_f) %></td>
+          <td width="70" align="right"><%= format_int(c.anterior_gs.to_f) %></td>
+          <td width="70" align="right"><%= format_int(saldo_guarani.to_f) %></td>
+
+          <% tutor_div   += c.divida_guarani.to_f %>
+          <% tutor_pg    += c.anterior_gs.to_f %>
+          <% tutor_saldo += saldo_guarani.to_f %>
+
+          <% aluno_div   += c.divida_guarani.to_f %>
+          <% aluno_pg    += c.anterior_gs.to_f %>
+          <% aluno_saldo += saldo_guarani.to_f %>
+
+          <% geral_div   += c.divida_guarani.to_f %>
+          <% geral_pg    += c.anterior_gs.to_f %>
+          <% geral_saldo += saldo_guarani.to_f %>
+
+        <% else %>
+          <td width="70" align="right"><%= format_decimal(c.divida_real.to_f) %></td>
+          <td width="70" align="right"><%= format_decimal(c.anterior_rs.to_f) %></td>
+          <td width="70" align="right"><%= format_decimal(saldo_real.to_f) %></td>
+
+        <% end %>
+      </tr>
+    <% end %>
+  <% if params[:moeda] == '1' %>
+    <tr class="head">
+      <td colspan="7"><b>Total Aluno <%= quebra2 %></b></td>
+      <td width="70" align="right"><%= format_int(aluno_div.to_f) %></td>
+      <td width="70" align="right"><%= format_int(aluno_pg.to_f) %></td>
+      <td width="70" align="right"><%= format_int(aluno_saldo.to_f) %></td>
+    </tr>
+
+    <tr class="head">
+      
+      <td colspan="7"><b>Total <%= quebra %> </b></td>
+      <td width="70" align="right"><%= format_int(tutor_div.to_f) %></td>
+      <td width="70" align="right"><%= format_int(tutor_pg.to_f) %></td>
+      <td width="70" align="right"><%= format_int(tutor_saldo.to_f) %></td>
+    </tr>
+
+    <tr class="head">
+      
+      <td colspan="7"><b>Total General </b></td>
+      <td width="70" align="right"><%= format_int(geral_div.to_f) %></td>
+      <td width="70" align="right"><%= format_int(geral_pg.to_f) %></td>
+      <td width="70" align="right"><%= format_int(geral_saldo.to_f) %></td>
+    </tr>
+
+  <% else %>
+
+  <% end %>
+  </table>
+</div>

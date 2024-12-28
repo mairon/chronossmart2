@@ -1,0 +1,41 @@
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="150" align="center"><%= t('DOC') %></td>
+      <td width="50" align="center"><%= t('SHARE') %></td>
+      <td width="80" align="right">U$</td>
+      <td width="80" align="right">G$</td>
+      <td width="80" align="right">R$</td>
+    </tr>
+  </table>
+  <div class="rolagem_cobro" dir="div">
+    <table>
+      <% tot_us = 0 %>
+      <% tot_gs = 0 %>
+      <% tot_rs = 0 %>
+      <% pagos_adelantos.each do |pagos_financa| %>
+        <tr class = "<%= cycle( "cor1", "cor2" )%>">
+          <td width="150" align="left"><%= pagos_financa.documento_numero_01 %>-<%= pagos_financa.documento_numero_02 %>-<%= pagos_financa.documento_numero %></td>
+          <td width="50" align="left"><%= pagos_financa.cota %></td>
+          <td width="80" align="right"><%= number_to_currency( pagos_financa.valor_us,      :format =>' %n ', :separator => ',' )%></td>
+          <% tot_us += pagos_financa.valor_us %>
+          <td width="80" align="right"><%= number_to_currency( pagos_financa.valor_gs,      :format =>' %n ', :precision => 0 )%></td>
+          <% tot_gs += pagos_financa.valor_gs %>
+           <td width="80" align="right"><%= number_to_currency( pagos_financa.valor_rs,      :format =>' %n ', :separator => ',' )%></td>
+          <% tot_rs += pagos_financa.valor_rs %>
+          <td><%= link_to 'Editar', edit_pagos_financa_path(pagos_financa) %></td>
+          <td><%= link_to t('DELETE'), pagos_financa, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+
+  <table class="head_grid">
+    <tr>
+      <td width="205"></td>
+        <td width="80" align="right"><%= number_to_currency( tot_us,      :format =>' %n ', :separator => ',' )%></td>
+        <td width="80" align="right"><%= number_to_currency( tot_gs,      :format =>' %n ', :precision => 0 )%></td>
+        <td width="80" align="right"><%= number_to_currency( tot_rs,      :format =>' %n ', :separator => ',' )%></td>
+    </tr>
+  </table>
+</div>

@@ -1,0 +1,135 @@
+<%= form_for( @romaneio ) do |f| %>
+  <div class="box-panel" style="display: table; margin: 0 auto;">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Romaneio
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <% unless @romaneio.nota_remicao_id.blank? %>
+            <% nc =  NotaRemicao.find(@romaneio.id)%>
+            <% params[:doc_01] = nc.documento_numero_01 %>
+            <% params[:doc_02]  = nc.documento_numero_02 %>
+            <% params[:doc]  = nc.documento_numero %>
+          <% end %>
+
+          <% unless @romaneio.persona_id.blank? %>
+            <% params[:persona_id] = @romaneio.persona_id %>
+            <% params[:persona_nome] = @romaneio.persona_nome %>
+          <% end %>
+
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-6">
+                <label>Nota Remisión Codigo</label>
+                 <%= f.text_field :nota_remicao_id, value: params[:nota_remicao_id], class: 'panel-field' %>
+              </div>
+              <div class="col-md-6">
+                <label>Doc.</label>
+                <%= text_field_tag :documento_numero_01, params[:doc_01], size: 3 %>-<%= text_field_tag :documento_numero_02, params[:doc_02], size: 3 %>-<%= text_field_tag :documento_numero, params[:doc], size: 10 %>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <hr>
+              </div>
+            </div>
+
+
+            <div class="row">
+              <div class="col-md-12">
+                <label>Cliente</label>
+                <%= f.text_field :persona_nome, value: params[:persona_nome], required: true, class: 'autocomplete panel-field' %>
+                 <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+                <%= f.hidden_field :persona_id, value: params[:persona_id] %>
+              </div>
+            </div> 
+
+            <div class="row">
+                <% persona_id = "and persona_id = #{params[:persona_id]}" unless params[:persona_id].blank?  %>
+                <% contrato = Contrato.where("id > 0 #{persona_id}").select('id,documento_numero') %>
+                <% unless contrato.blank? %>
+                  <div class="col-md-6">
+                    <label>Contratos</label>
+                    <%= f.collection_select :contrato_id, contrato,:id, :documento_numero, { :prompt => 'Selecione' }%>
+                  </div>
+                <% end %>
+            </div>                         
+
+            <div class="row">
+              <div class="col-md-6">
+                <label><%= t('DATE') %></label>
+                <%= f.text_field :data, value: Time.now.strftime("%d/%m/%Y"),  class: "panel-field date" %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Doc.</label>
+                <%= f.text_field :documento_numero, class: 'panel-field' %>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-12">
+                <label>Obs</label>
+                <%= f.text_area :obs, class: 'panel-field', rows: 5 %>
+              </div>
+            </div>
+
+          <div class="footer-buttons">
+            <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+          </div>    
+
+          </div>
+        </div>
+      </div>
+    </div>   
+  </div>
+<% end %>
+  
+  <script>
+      $('#romaneio_motivo, #romaneio_contrato_id, #romaneio_cidade_id, #romaneio_chofer_id, #romaneio_rodado_cv_id, #romaneio_rodado_cr_id').selectize();    
+
+  $(function() {
+    $( "#romaneio_persona_nome" ).autocomplete({
+        source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+        $.ajax({
+          url: "/personas/busca?per=CLIENTE",
+          dataType: "json",
+
+          data: {
+            tipo: 'DESCRIPCION',
+            busca: request.term
+          },
+          beforeSend: function(){
+          $("#spinner").addClass("sppiner_show");
+          },
+
+          success: function( data ) {
+            $("#sppiner").removeClass("sppiner_show");
+            response( data );
+          },
+        });
+      },
+      minLength: 2,
+      change: function( event, ui ) {
+        $("#romaneio_persona_id").val("");
+        $('#romaneio_persona_id').val(ui.item.id);
+        return false;
+      }
+    });
+    $( "#romaneio_persona_nome" ).change(function(){
+      if ($( "#romaneio_persona_id" ).val() == ''){
+      }
+    });
+  });      
+  </script>
+
+  <style>
+    div#contents{
+      background: none !important;
+    }
+  </style>

@@ -1,0 +1,53 @@
+<%= form_for(@ordem_serv_prod) do |f| %>
+  <% if @ordem_serv_prod.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@ordem_serv_prod.errors.count, "error") %> prohibited this ordem_serv_prod from being saved:</h2>
+
+      <ul>
+      <% @ordem_serv_prod.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> ordem_serv_prods - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">ordem_serv :</td>                    
+                      <td><%= f.text_field :ordem_serv %></td>
+                                      
+                      <td align="right">deposito :</td>                    
+                      <td><%= f.text_field :deposito %></td>
+                                      
+                      <td align="right">produto :</td>                    
+                      <td><%= f.text_field :produto %></td>
+                                      
+                      <td align="right">quantidade :</td>                    
+                      <td><%= f.number_field :quantidade %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), ordem_serv_prods_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

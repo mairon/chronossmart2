@@ -1,0 +1,197 @@
+<div class="group">
+	<table>
+		<tr height="20">
+			<td align="right">Venta N.:</td>
+			<td width="100"><%= @venda.id %></td>
+
+			<td align="right">Doc:</td>
+			<td width="100"><%= @venda.documento_numero_01 << '-' << @venda.documento_numero_02 << '-' << @venda.documento_numero %></td>
+
+
+			<td align="right"><%= t('DATE') %> :</td>
+			<td width="100"> <%= @venda.data.strftime("%d/%m/%Y") %></td>
+
+			<td align="right"><%= t('COIN') %> :</td>
+			<% if @venda.moeda == 0%>
+				<td width="100">Dolar</td>
+			<% else %>
+				<td width="100">Guaranies</td>
+			<% end %>
+
+			<td align="right">Tipo :</td>
+			<% if @venda.tipo == 0%>
+				<td width="100">Contado</td>
+			<% else %>
+				<td width="100">Credito</td>
+			<% end %>
+
+		</tr>
+
+		<tr height="20">
+			<td align="right">Vendedor :</td>
+			<td colspan="8"><%= @venda.vendedor_nome %></td>
+		</tr>
+
+		<tr height="20">
+			<td align="right">Cliente :</td>
+			<td colspan="8"><%= @venda.persona_nome %> Ruc.: <%= @venda.ruc %></td>
+		</tr>
+		
+	</table>
+</div>
+
+<fieldset>
+  <legend>Productos</legend>
+  	<table>
+		  <tr>
+		  	<td align="center" width="100" >Cod.</td>
+		    <td align="center" width="350" >Producto</td>
+		    <td align="center" width="80" >Cantidad</td>
+		    <td align="center" width="80" >Unit</td>
+   		    <td align="center" width="80" >Tot.</td>
+	        <td align="center" width="80" >Iva</td>
+   		    <td align="center" width="80" ><%= t('DESCRIPTION') %></td>
+		  </tr>
+	  </table>
+	  
+	<div class="rolagem_cobro" dir="div">
+	<table>
+	  <% qtd  = 0 %>
+	  <% tot  = 0 %>
+	  <% iva  = 0 %>
+	  <% desc = 0 %>
+
+
+	  <% @vp.each do |index_produto| %>	
+	  	<tr  class="<%= cycle("cor1", "cor2") %>">
+			<td width="100" align="center"> <%= index_produto.fabricante_cod %> </td>
+			<td width="350" align="left"> <%= truncate( index_produto.produto_nome, :length => 36 ) %> </td>
+			<td width="80" align="center"> <%= format("%.3f",index_produto.quantidade.to_f) %> </td>
+		    <% qtd  += index_produto.quantidade.to_f %>
+
+			<% if index_produto.moeda == 0 %>
+				<td width="80" align="right"><%= number_to_currency(index_produto.unitario_dolar, :format=>' %n ', :separeitor =>  "," ) %> </td>
+				<td width="80" align="right"><%= number_to_currency(index_produto.total_dolar, :format=>' %n ', :separeitor =>  "," ) %> </td>
+				<td width="80" align="right"><%= number_to_currency( index_produto.quantidade * index_produto.iva_dolar , :format=>' %n ', :separeitor =>  "," ) %> </td>
+
+			    <% tot  += index_produto.total_dolar.to_f %>
+			    <% iva  += index_produto.quantidade.to_f * index_produto.iva_dolar.to_f %>
+			<% else %>
+				<td width="80" align="right"><%= number_to_currency(index_produto.unitario_guarani, :format=>' %n ', :precision => 0) %> </td>
+				<td width="80" align="right"><%= number_to_currency(index_produto.total_guarani, :format=>' %n ', :precision => 0) %> </td>
+				<td width="80" align="right"><%= number_to_currency(index_produto.quantidade * index_produto.iva_guarani , :format=>' %n ', :precision => 0 ) %> </td>
+			    <% tot  += index_produto.total_guarani.to_f %>
+			    <% iva  += index_produto.quantidade.to_f * index_produto.iva_guarani.to_f %>
+
+			<% end %>
+			<td width="80" align="right"><%= index_produto.total_desconto %> </td>
+   	        <% desc += index_produto.total_desconto.to_f %>
+
+	    </tr>
+	  <% end %>
+	</table>
+	</div>
+
+	<table>
+		<tr>
+			<td width="450"></td>
+			<td width="80" align="center"><%= number_to_currency( qtd, :format=>' %n ', :separeitor =>  "," ) %> </td>
+			<td width="80"></td>
+			<td width="80" align="right"><%= number_to_currency( tot, :format=>' %n ', :separeitor =>  "," ) %> </td>
+			<td width="80" align="right"><%= number_to_currency( iva, :format=>' %n ', :separeitor =>  "," ) %> </td>
+			<td width="80" align="right"><%= number_to_currency( desc, :format=>' %n ', :separeitor =>  "," ) %> </td>
+		</tr>
+	</table>
+</fieldset>
+
+<!-- FORM DE PAGO !-->
+
+<fieldset>
+  <legend>Forma de Pago</legend>
+  	<div class="group">
+	  <table>
+  		  <tr>
+  		  	<td>Contado/Entrega</td>
+  		  </tr>
+		  <tr>
+		  	<td align="center" width="100" >Cod</td>
+		    <td align="center" width="250" ><%= t('ACCOUNT') %></td>
+		    <td align="center" width="80" ><%= t('CHECKS') %></td>
+		    <td align="center" width="80" >DIf</td>
+   		    <td align="center" width="80" >Total</td>
+		  </tr>
+	  </table>
+	  
+	<div class="rolagem_cobro" dir="div">
+	<table>
+	  <% totct = 0 %>
+	  <% @vfc.each do |ct| %>	
+	  	<tr  class="<%= cycle("cor1", "cor2") %>">
+			<td width="100" align="center"> <%= ct.id %> </td>
+			<td width="250" align="left"> <%= truncate( ct.conta_nome, :length => 36 ) %> </td>
+			<td width="80" align="center"> <%= ct.cheque %> </td>
+			<td width="80" align="center"> <%= ct.diferido.strftime("%d/%m/%Y") %> </td>
+			<% if ct.moeda == 0 %>
+				<td width="80" align="right"><%= number_to_currency( ct.valor_dolar_contado, :format=>' %n ', :separeitor =>  "," ) %> </td>
+		  	    <% totct += ct.valor_dolar_contado.to_f %>
+			<% else %>
+				<td width="80" align="right"><%= number_to_currency( ct.valor_guarani_contado, :format=>' %n ', :precision => 0 ) %> </td>
+			    <% totct += ct.valor_guarani_contado.to_f %>
+			<% end %>
+	    </tr>
+	  <% end %>
+
+	</table>
+	</div>
+	<table>
+		<tr>
+			<td width="520"></td>
+			<td width="80" align="right"><%= number_to_currency( totct.to_f, :format=>' %n ', :separeitor =>  "," ) %> </td>
+		</tr>
+	</table>	
+   </div>
+	
+	<br />
+	
+   <div class="group">     
+  	<table>
+  		  <tr>
+  		  	<td>Credito</td>
+  		  </tr>
+		  <tr>
+		  	<td align="center" width="100" >cota</td>
+		    <td align="center" width="100" ><%= t('EXPIRATION') %></td>
+   		    <td align="center" width="80" >Total</td>
+   		    <td align="center" width="80" >Local Pago</td>
+		  </tr>
+	  </table>
+	  
+	<div class="rolagem_cobro" dir="div">
+	<table>
+	  <% totcr = 0 %>
+	  <% @vfcr.each do |cr| %>	
+	  	<tr  class="<%= cycle("cor1", "cor2") %>">
+			<td width="100" align="center"> <%= cr.cota %> </td>
+			<% if cr.moeda == 0 %>
+				<td width="80" align="right"><%= number_to_currency( cr.cota_dolar_01, :format=>' %n ', :separeitor =>  "," ) %> </td>
+		  	    <% totcr += cr.cota_dolar_01.to_f %>
+			<% else %>
+				<td width="80" align="right"><%= number_to_currency( cr.cota_guarani_01, :format=>' %n ', :precision => 0 ) %> </td>
+			    <% totcr += cr.cota_guarani_01.to_f %>
+			<% end %>
+			<td width="80" align="center"> <%= cr.local_pago %> </td>
+	    </tr>
+	  <% end %>
+
+	</table>
+	</div>
+	<table>
+		<tr>
+			<td width="200"></td>
+			<td width="80" align="right"><%= number_to_currency( totcr.to_f, :format=>' %n ', :separeitor =>  "," ) %> </td>
+		</tr>
+	</table>
+   </div>	
+	
+</fieldset>
+

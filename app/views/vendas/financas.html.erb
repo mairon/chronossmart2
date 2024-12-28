@@ -1,0 +1,126 @@
+<style type="text/css">
+  .rolagem td, .head_grid td, .acessos a, label{
+    cursor:pointer;
+    color: #000 !important;
+    font-size: 14px;
+  }
+</style>
+
+<h1 style="font-size: 22px;" class="bold">
+  <b>Venta <%= @venda.id.to_s.rjust(6,'0')%> <%= "| Vendedor: #{Persona.find(@venda.vendedor_id).nome}" unless @venda.vendedor_id.blank? %></b>
+</h1>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="panel">
+      <div class="panel-content">
+        <h1>
+          Cliente: <%= @venda.persona_nome %> <%= "| Comanda: #{@venda.cartao.nome}" unless @venda.cartao.blank? %> 
+          <div class="pull-right" style="margin-top: -10px">
+            <%= form_for(@venda) do |vdc| %>
+              <%= hidden_field_tag :tela, 'financas' %>
+              <%= vdc.collection_select :terminal_id, Terminal.where(unidade_id: current_unidade.id).select('id,nome').order('2'), :id, :nome, { prompt: 'Selecione o Terminal' } %>
+
+                <script type="text/javascript">
+                  $(document).ready(function() {
+                    $('#venda_terminal_id').change(function() {
+                        $("#edit_venda_<%= @venda.id %>").submit();
+                    });
+                  });
+                </script>              
+            <% end %>
+          </div>
+        </h1>
+      </div>
+    </div>
+  
+    <%= render 'cashback' %>
+      <% if @venda_config.caixa_separado == true %>
+        <% @abertura = AberturaCaixa.last(:conditions => ["status = true and usuario_id = #{current_user.id} and unidade_id = #{current_unidade.id}"])%>
+        <% if @abertura %>
+          <%= render 'forma_pago' %>
+          <div class="partial-fatuamento" hidden>
+            <% if current_unidade.environment_production_fiscal == true %>
+              <%= render 'faturamento_eletronico' %>
+            <% else %>
+              <%= render 'faturamento' %>
+            <% end %>
+          </div>
+
+          
+        <% else %>
+          <div class="alert alert-danger"  role="alert">
+           Es necesario acier la apertura de Caja para seguir! <strong><a href="/abertura_caixas" target="_blank" class="alert-link">Abrir</a></strong>
+          </div>
+        <% end %>
+      <% else %>
+        <%= render 'forma_pago' %>
+        
+
+        <div class="partial-fatuamento" hidden>
+          <% if current_unidade.environment_production_fiscal == true %>
+            <%= render 'faturamento_eletronico' %>
+          <% else %>
+            <%= render 'faturamento' %>
+          <% end %>
+        </div>
+        
+      <% end %>
+  </div>
+  
+  <div class="col-md-6">
+    <div class="row">
+      <div class="col-md-12">
+          <%= render 'financeiro_total' %>
+      </div>
+    </div>
+
+    <% if @venda_config.caixa_separado == 1 %>
+      <div class="row">
+        <div class="col-md-12">
+          <%= render 'financeiro_produtos' %>
+        </div>
+      </div>
+    <% end %> 
+
+
+    
+      <div class="row">
+        <div class="col-md-12">
+          <%= render 'financeiro_list_forma_pagos' %>
+        </div>
+      </div>
+    
+    <% unless @venda.plano_venda.blank? %>
+      <div class="row">
+        <div class="col-md-12">
+          <%= render 'plano_venda_cond' %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @venda_config.vincula_gasto == true %>
+      <div class="row">
+        <div class="col-md-12">
+          <%= render 'financeiro_gastos' %>
+        </div>
+      </div>
+    <% end %> 
+
+  </div>  
+</div>
+
+
+<script type="text/javascript">
+  $('.lista-produtos').scrollTop($('.lista-produtos')[0].scrollHeight);
+</script>
+
+
+
+<% if (@venda.moeda.to_i == 1 and @saldo_gs.to_i == 0) || (@venda.moeda.to_i == 0 and @saldo_us.to_i == 0) || (@venda.moeda.to_i == 2 and @saldo_rs.to_i == 0) %>
+  <script>
+    $(".content-forma-pago").hide();
+    $(".content-btns").show();
+    $(".partial-fatuamento").show();
+  </script>
+<% end %>

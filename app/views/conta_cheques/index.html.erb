@@ -1,0 +1,37 @@
+<h1 id="header">Conta cheques</h1>
+<div class="acessos">
+  <%= link_to 'Gerar Cheque', gerador_cheque_conta_cheques_path(:conta_id => @conta), :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td width = "150">Conta</td>
+            <td width = "100" align="center">Numero</td>
+            <td width = "300" >Observacao</td>
+            <td width = "150" align="center">Status</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @conta_cheques.each do |conta_cheque| %>
+      <tr>
+                  <td width = "150"><%= conta_cheque.conta.nome %></td>
+                  <td width = "100" align="center"><%= conta_cheque.numero %></td>
+                  <td width = "300"><%= truncate(conta_cheque.obs, length: 30) %></td>
+                  <% case conta_cheque.status %>
+                    <% when 0 %>
+                      <td width = "150" align="center">Pendente</td>
+                    <% when 1 %>
+                      <td width = "150" align="center">Ativo</td>
+                    <% when 2 %>
+                      <td width = "150" align="center">Cancelado</td>
+                    <% when 3 %>
+                      <td width = "150" align="center">Devolvido</td>
+                  <% end %>
+                <td><%= link_to 'Editar', edit_conta_cheque_path(conta_cheque) %></td>
+        <td><%= link_to 'Borrar', conta_cheque, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+

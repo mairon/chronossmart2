@@ -1,0 +1,224 @@
+<%= form_for(@persona, html: {:multipart => true}) do |f| %>
+
+  <div class="row">
+    <!--breadcrumbs end -->
+    <% if @persona.errors.any? %>
+      <div class="col-md-12">
+        <div class="alert alert-block alert-danger fade in">
+          <button data-dismiss="alert" class="close close-sm" type="button">
+            <i class="fa fa-times"></i>
+          </button>
+          <h4><%= pluralize(@persona.errors.count, "error") %> no fue posible grabar:</h4>
+          <ul>
+          <% @persona.errors.full_messages.each do |msg| %>
+            <li><strong><%= msg %></strong></li>
+          <% end %>
+          </ul>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%= f.hidden_field :tabela_preco_id, value: TabelaPreco.first.id %>
+  <%= f.hidden_field :tipo_funcionario, value: 1 %>
+  <%= hidden_field_tag :tipo_func, '1' %>
+
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-center">
+        <header class="panel-heading">
+          <%= t('EMPLOYEE') %> [<%= t('EDITION') %>]
+        </header>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-4">
+              <label>Doc.</label>
+              <%= f.text_field :ruc, size: 13, required: false, class: 'panel-field', autofocus: true %>
+            </div>
+
+            <div class="col-md-8">
+              <label><%= t('NAME') %></label>
+              <%= f.text_field :nome, class: 'panel-field', required: true %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <label>Unidade</label>
+              <%= f.collection_select :unidade_id, Unidade.all( :select => 'id,unidade_nome',
+                    :order  => '2' ),:id,:unidade_nome,{:prompt => 'Selecione '} %>
+            </div>
+            <div class="col-md-4">
+              <label>Sector</label>
+              <%= f.text_field :setor, size: 21, class: 'panel-field' %>
+            </div>
+
+            <div class="col-md-4">
+              <label>Cargo</label>
+              <%= f.collection_select :cargo_id, Cargo.all( :select => 'id,nome',
+                    :order  => '2' ),:id,:nome,{:prompt => 'Selecione '} %>
+            </div>
+
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <label>E-mail</label>
+              <%= f.email_field :email, class: 'panel-field' %>
+            </div>
+
+
+            <div class="col-md-6">
+              <label>E-mail Comercial</label>
+              <%= f.email_field :email_comercial, class: 'panel-field' %>
+            </div>
+
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <label>Nº Contrato</label>
+              <%= f.text_field :nr_contrato, class: 'panel-field' %>
+            </div>
+
+
+            <div class="col-md-6">
+              <label>Estado de Antecedente</label>
+              <%= f.select :estado_antecedente, [['', ''],['Actualizado', 'Actualizado'], ['Vencido', 'Vencido']], {class: 'panel-field'} %>
+            </div>
+
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <label>Telefone 01</label>
+              <%= f.text_field :telefone, size: 21, class: 'panel-field' %>
+            </div>
+
+            <div class="col-md-6">
+              <label>Telefone 02</label>
+              <%= f.text_field :telefone2, size: 21, class: 'panel-field' %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <label><%= t("DATE")%> Nasc.</label>
+              <%= f.date_select :data_nascimento, class: 'panel-field', start_year: 1950 %>
+            </div>
+
+            <div class="col-md-6">
+              <label><%= t("DATE")%> Ingresso</label>
+              <%= f.date_select :data_entrada, class: 'panel-field', start_year: 1950 %>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <label>Brigada</label>
+              <%= f.collection_select :brigada_id, Brigada.all( :select => 'id,nome',
+                    :order  => '2' ),:id,:nome,{:prompt => 'Selecione '} %>
+            </div>
+
+            <div class="col-md-6">
+              <label>Comite</label>
+              <%= f.collection_select :comite_id, Comite.all( :select => 'id,nome',
+                    :order  => '2' ),:id,:nome,{:prompt => 'Selecione '} %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12" align="center">
+              <hr>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <label><%= t('ADDRESS') %></label>
+              <%= f.text_field :direcao, class: 'panel-field' %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-8">
+              <label>Bairro</label>
+              <%= f.text_field :bairro, class: 'panel-field' %>
+            </div>
+
+            <div class="col-md-4">
+              <label>Nº</label>
+              <%= f.text_field :residencia_numero, class: 'panel-field' %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <label>Complemento</label>
+              <%= f.text_area :direcao_complemento, placeholder: 'Complemento', cols: 76, rows: 3, class: 'panel-field' %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <fieldset>
+                <legend>Nivel educativo</legend>
+                <%= f.radio_button :escolaridade, 'Primario' %> Primario
+                <%= f.radio_button :escolaridade, 'Secundario' %> Secundario
+                <%= f.radio_button :escolaridade, 'Tecnico' %> Tecnico
+                <%= f.radio_button :escolaridade, 'Universitario' %> Universitario
+                <%= f.radio_button :escolaridade, 'Otro' %> Otro
+                <br>
+                Especifique: <%= f.text_field :escolaridade_outros, size: 80 %>
+              </fieldset>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <label>Perfil</label>
+              <%= f.text_field :perfil, class: 'panel-field' %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12" align="center">
+              <hr>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <label>Status</label>
+              <%= f.select :estado, [['ACTIVO', 0 ],['BLOQUEADO', 1]], {class: 'panel-field'} %>
+            </div>
+            <div class="col-md-3">
+              <label>Saldo Vacciones</label>
+              <%= f.text_field :saldo_ferias, class: 'panel-field' %>
+            </div>
+
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <%= field_gs_label 'Salario',f,:salario %>
+            </div>
+            <div class="col-md-4">
+              <%= field_gs_label 'Salario Minimo',f,:salario_minimo %>
+            </div>
+            <div class="col-md-4">
+              <%= field_gs_label 'Valor IPS Desc.',f,:ips %>
+            </div>
+          </div>
+         <div class="footer-buttons">
+            <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+            <%= link_to t('BACK'), personas_path, :class => "btn btn-back" %>
+         </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+  $('#persona_cargo_id, #persona_brigada_id, #persona_comite_id').selectize();
+  $('#persona_unidade_id').selectize();
+</script>

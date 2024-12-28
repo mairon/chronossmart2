@@ -1,0 +1,159 @@
+<body onload="ImputFocus('inicio')">
+	<ul class="tabs">
+		<li>
+			<a href="#tab1">Gerar Cuotas Venta <%= @venda.id %></a>
+		</li>
+	</ul>
+	<div class="tab_container">
+		<div id="tab1" class="tab_content">
+			<%= form_tag gerar_cotas_credito_vendas_path, :method => "get" do%>
+				<%= hidden_field_tag :id, @venda.id %>
+				<%= hidden_field_tag :persona_id,nil, :value => @venda.persona_id %>
+				<%= hidden_field_tag :persona_nome,nil, :value =>  @venda.persona_nome %>
+				<%= hidden_field_tag :cotacao,nil,      :value => @venda.cotacao.to_i %>
+	      		<%= hidden_field_tag :ruc,nil,          :value => @venda.ruc%>
+	      		<%= hidden_field_tag :direcao,nil,      :value => @venda.direcao%>
+	      		<%= hidden_field_tag :cidade_nome,nil,  :value => @venda.cidade_nome%>
+	      		<%= hidden_field_tag :cidade_id,nil,    :value => @venda.cidade_id %>
+	      		<%= hidden_field_tag :bairro,nil,       :value => @venda.bairro%>
+	      		<%= hidden_field_tag :vendedor_id,nil,  :value => @venda.vendedor_id%>
+	      		<%= hidden_field_tag :vendedor_nome,nil,:value => @venda.vendedor_nome%>
+	      		<%= hidden_field_tag :clase_produto,nil,:value => @venda.clase_produto %>			
+		        <%= hidden_field_tag :data,nil, :value => @venda.data%>  	 
+			
+			<table>
+				<tr>
+					<td align="right"> Primeiro Venc.:</td>
+					<td>
+					<input name="venci" id="venci"  size="10"  onkeyup="Formatadata(this,event)", value="<%= @venda.data.strftime("%d/%m/%Y")%>" />
+					</td>
+				</tr>
+				<tr>
+					<td align="right"><%= t('COIN') %> :</td>
+					<td>
+					<fieldset>
+						<%= radio_button_tag :moeda, 0,  :Checked => "True" %> Dolar
+						<%= radio_button_tag :moeda, 1 %> Guaranies
+					</fieldset></td>
+				</tr>
+				<tr>
+					<td align="right"> Cuotas:</td>
+					<td>
+					<input name="cotas" id="cotas"  size="10" />
+					</td>
+				</tr>
+				<tr>
+					<td align="right"> Valor U$:</td>
+					<td>
+					<input name="valor_us" id="valor_us"  size="15" value="<%= @produto_sum_dolar %>" />
+					</td>
+					<td align="right"> Gs.:</td>
+					<td>
+					<input name="valor_gs" id="valor_gs"  size="15" value="<%= @produto_sum_guarani %>" />
+					</td>
+				</tr>
+				<tr>
+					<td align="right">Local de Pago :</td>
+					<td>
+					<fieldset>
+                               <%= radio_button_tag :local_pago,  'C', :checked => true %> Caja
+                               <%= radio_button_tag :local_pago,  'D' %> Domicilio                              
+					</fieldset></td>
+				</tr>
+				
+				
+			</table>
+			<!--DETALHES FATURA!-->
+			<table>
+				<tr> 
+					<td></td>
+					<td>
+					<table>
+						<tr>
+							<td>
+							<fieldset>
+								<legend>
+									Factura?
+								</legend>
+								<%= radio_button_tag :fatura, '0',
+								                   :Checked     => 'True'%> No
+								<%= radio_button_tag :fatura, '1'%> Si
+							</fieldset></td>
+						</tr>
+					</table></td>
+				</tr>
+				<tr>
+					<td align="right">Factura a Nombre de.:</td>
+					<td colspan="2"><%= text_field_tag :fatura_legal,
+														nil,
+            										   :size => 37,
+            										   :value => @venda.persona_nome,
+            										   :onkeypress  => "return bloqEnter(event)",
+            										   :onkeyup     => "f(this),EnterTab(event,'vendas_financa_documento_numero_02')"%> </td>
+            										   
+					<td colspan="2">Ruc.:<%= text_field_tag :fatura_legal_ruc,
+														  nil,
+            											  :size => 15,
+            											  :value => @venda.ruc,
+            											  :onkeypress  => "return bloqEnter(event)",
+            											  :onkeyup     => "f(this),EnterTab(event,'vendas_financa_documento_numero_02')"%> </td>
+				</tr>
+				<% if current_user.tipo == 2 %>
+				<% numero = Fatura.maximum(:documento_numero,:conditions => ["documento_numero_02 = '002'"])%>
+				<tr>
+					<td align="right">Factura N.:</td>
+					<td><%= text_field_tag :documento_numero_01,
+									   	   nil,
+								           :size => 3,
+            							   :value => '001',
+            							   :onkeypress  => "return bloqEnter(event)",
+            							   :onkeyup     => "f(this),EnterTab(event,'vendas_financa_documento_numero_02')"%> -
+
+					<%= text_field_tag :documento_numero_02,
+									   nil,
+  									   :size        => 3,
+  									   :value       => '002',
+  									   :onkeypress  => "return bloqEnter(event)",
+  									   :onkeyup     => "f(this),EnterTab(event,'vendas_financa_documento_numero')"%> -
+					<%= text_field_tag :documento_numero,
+									   nil,
+            						   :size        => 16,
+            						   :value       => (numero.to_i + 1).to_s.rjust(7,'0'),
+            						   :onkeypress  => "return bloqEnter(event)",
+						               :onkeyup     => "f(this),EnterTab(event,'vendas_financa_submit')"%></td>
+					<td colspan='2' align="right"><%= f.submit t('SAVE'), :class=>'button' %></td>
+					<% else %>
+
+					<% numero = Fatura.maximum(:documento_numero,:conditions => ["documento_numero_02 = '001'"])%>
+				<tr>
+					<td align="right">Factura N.:</td>
+					<td><%= text_field_tag :documento_numero_01,
+									   	   nil,
+            							   :size => 3,
+            							   :value => '001',
+            							   :onkeypress  => "return bloqEnter(event)",
+            							   :onkeyup     => "f(this),EnterTab(event,'vendas_financa_documento_numero_02')"%> -
+					<%= text_field_tag :documento_numero_02,
+									   nil,
+            						   :size        => 3,
+            						   :value       => '001',
+            						   :onkeypress  => "return bloqEnter(event)",
+            						   :onkeyup     => "f(this),EnterTab(event,'vendas_financa_documento_numero')"%> -
+					<%= text_field_tag :documento_numero,
+									   nil,
+						               :size        => 16,
+            						   :value       => (numero.to_i + 1).to_s.rjust(7,'0'),
+            						   :onkeypress  => "return bloqEnter(event)",
+            						   :onkeyup     => "f(this),EnterTab(event,'vendas_financa_submit')"%></td>
+					<td colspan='2' align="right"><%= submit_tag t('SAVE'), :class=>'button', :disable_with => "Aguarde..." %></td>
+					<% end %>
+				</tr>
+			</table>
+			<% end %>
+		</div>
+		<div class="buttons">
+			<a href="/vendas/<%= @venda.id.to_i %>/vendas_financa" class="button back"><%= t('BACK') %> </a>
+		</div>
+		
+	</div>
+</body>

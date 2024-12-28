@@ -1,0 +1,33 @@
+<h1 id="header">usuario_perfils</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_usuario_perfil_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Usuario</td>
+            <td>Menu</td>
+            <td>C</td>
+            <td>R</td>
+            <td>U</td>
+            <td>D</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @usuario_perfils.each do |usuario_perfil| %>
+      <tr>
+                  <td><%= usuario_perfil.usuario_id %></td>
+                  <td><%= usuario_perfil.menu_id %></td>
+                  <td><%= usuario_perfil.c %></td>
+                  <td><%= usuario_perfil.r %></td>
+                  <td><%= usuario_perfil.u %></td>
+                  <td><%= usuario_perfil.d %></td>
+                <td><%= link_to 'Editar', edit_usuario_perfil_path(usuario_perfil) %></td>
+        <td><%= link_to t('DELETE'), usuario_perfil, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

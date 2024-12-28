@@ -1,0 +1,1211 @@
+<% centro_custos = CentroCusto.where(active: true) %>
+
+<table>
+
+<tr class="header" border='1'>
+	<td colspan="37">Contratos Fixos</td>
+</tr>
+
+<tr class="header" border='1'>
+	<td rowspan="2">Centro de Custo</td>
+	<td align="center" colspan="3">Janeiro</td>
+	<td align="center" colspan="3">Fevereiro</td>
+	<td align="center" colspan="3">Março</td>
+	<td align="center" colspan="3">Abril</td>
+	<td align="center" colspan="3">Maio</td>
+	<td align="center" colspan="3">Junho</td>
+	<td align="center" colspan="3">Julho</td>
+	<td align="center" colspan="3">Agosto</td>
+	<td align="center" colspan="3">Setembro</td>
+	<td align="center" colspan="3">Outubro</td>
+	<td align="center" colspan="3">Novembro</td>
+	<td align="center" colspan="3">Dezembro</td>
+</tr>
+
+<tr>
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+	
+</tr>
+
+	<% tot_f_01 = 0 %>
+	<% tot_f_02 = 0 %>
+	<% tot_f_03 = 0 %>
+	<% tot_f_04 = 0 %>
+	<% tot_f_05 = 0 %>
+	<% tot_f_06 = 0 %>
+	<% tot_f_07 = 0 %>
+	<% tot_f_08 = 0 %>
+	<% tot_f_09 = 0 %>
+	<% tot_f_10 = 0 %>
+	<% tot_f_11 = 0 %>
+	<% tot_f_12 = 0 %>
+	<% tot_f_all = 0 %>
+
+	<% tot_mf_01 = 0 %>
+	<% tot_mf_02 = 0 %>
+	<% tot_mf_03 = 0 %>
+	<% tot_mf_04 = 0 %>
+	<% tot_mf_05 = 0 %>
+	<% tot_mf_06 = 0 %>
+	<% tot_mf_07 = 0 %>
+	<% tot_mf_08 = 0 %>
+	<% tot_mf_09 = 0 %>
+	<% tot_mf_10 = 0 %>
+	<% tot_mf_11 = 0 %>
+	<% tot_mf_12 = 0 %>
+	<% tot_mf_all = 0 %>
+
+
+	<% tot_cf_01 = 0 %>
+	<% tot_cf_02 = 0 %>
+	<% tot_cf_03 = 0 %>
+	<% tot_cf_04 = 0 %>
+	<% tot_cf_05 = 0 %>
+	<% tot_cf_06 = 0 %>
+	<% tot_cf_07 = 0 %>
+	<% tot_cf_08 = 0 %>
+	<% tot_cf_09 = 0 %>
+	<% tot_cf_10 = 0 %>
+	<% tot_cf_11 = 0 %>
+	<% tot_cf_12 = 0 %>
+	<% tot_cf_all = 0 %>
+
+	<% tot_r_01 = 0 %>
+	<% tot_r_02 = 0 %>
+	<% tot_r_03 = 0 %>
+	<% tot_r_04 = 0 %>
+	<% tot_r_05 = 0 %>
+	<% tot_r_06 = 0 %>
+	<% tot_r_07 = 0 %>
+	<% tot_r_08 = 0 %>
+	<% tot_r_09 = 0 %>
+	<% tot_r_10 = 0 %>
+	<% tot_r_11 = 0 %>
+	<% tot_r_12 = 0 %>
+	<% tot_r_all = 0 %>
+
+	<% tot_mr_01 = 0 %>
+	<% tot_mr_02 = 0 %>
+	<% tot_mr_03 = 0 %>
+	<% tot_mr_04 = 0 %>
+	<% tot_mr_05 = 0 %>
+	<% tot_mr_06 = 0 %>
+	<% tot_mr_07 = 0 %>
+	<% tot_mr_08 = 0 %>
+	<% tot_mr_09 = 0 %>
+	<% tot_mr_10 = 0 %>
+	<% tot_mr_11 = 0 %>
+	<% tot_mr_12 = 0 %>
+	<% tot_mr_all = 0 %>
+
+
+	<% tot_cr_01 = 0 %>
+	<% tot_cr_02 = 0 %>
+	<% tot_cr_03 = 0 %>
+	<% tot_cr_04 = 0 %>
+	<% tot_cr_05 = 0 %>
+	<% tot_cr_06 = 0 %>
+	<% tot_cr_07 = 0 %>
+	<% tot_cr_08 = 0 %>
+	<% tot_cr_09 = 0 %>
+	<% tot_cr_10 = 0 %>
+	<% tot_cr_11 = 0 %>
+	<% tot_cr_12 = 0 %>
+	<% tot_cr_all = 0 %>
+
+
+	<% centro_custos.each do |cc| %>
+		<tr class = "<%= cycle("cor1", "cor2") %>">
+			<td width="150"><%= cc.nome %></td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 1 %>
+					<%= format_decimal( f_01 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '01' ").sum("valor_rs")) %>
+				<% else %>
+					<%= format_decimal( f_01 = 0) %>
+				<% end %>		
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 1 %>
+					<%= format_decimal( mf_01 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 1 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '01' ").sum("contrato_servicos.quantidade").to_f) %>
+				<% else %>
+					<%= format_decimal( mf_01 = 0) %>
+				<% end %>
+			</td>
+
+			<td align="right" width="20">
+				<% if params[:par_med].to_i >= 1 %>
+					<%= cf_01 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '01' ").count("id").to_i %>
+				<% else %>
+					<%= format_decimal( cf_01 = 0) %>
+				<% end %>
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 2 %>
+					<%= format_decimal(f_02 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '02' ").sum("valor_rs"))  %>
+				<% else %>
+					<%= format_decimal(f_02 = 0) %>
+				<% end %>
+
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 2 %>
+	
+				<%= format_decimal( mf_02 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 1 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '02' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mf_02 = 0) %>
+				<% end %>
+
+				</td>
+
+			<td align="right" width="20">
+				<% if params[:par_med].to_i >= 2 %>
+					<%= cf_02 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '02' ").count("id").to_i %>
+				<% else %>
+					<%= format_decimal(cf_02 = 0) %>
+				<% end %>
+
+			</td>
+
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 3 %>
+	
+					<%= format_decimal(f_03 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '03' ").sum("valor_rs"))  %>
+				<% else %>
+					<%= format_decimal(f_03 = 0) %>
+				<% end %>
+
+			</td>
+
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 3 %>
+	
+					<%= format_decimal( mf_03 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 1 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '03' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mf_03 = 0) %>
+				<% end %>
+
+			</td>
+
+
+			<td align="right" width="20">
+				<% if params[:par_med].to_i >= 3 %>
+
+					<%= cf_03 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '03' ").count("id").to_i %>
+				<% else %>
+					<%= format_decimal(cf_03 = 0) %>
+				<% end %>
+
+			</td>
+
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 4 %>
+	
+					<%= format_decimal(f_04 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '04' ").sum("valor_rs"))  %>
+
+				<% else %>
+					<%= format_decimal(f_04 = 0) %>
+				<% end %>
+
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 4 %>
+	
+					<%= format_decimal( mf_04 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 1 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '04' ").sum("contrato_servicos.quantidade").to_f)  %>
+
+				<% else %>
+					<%= format_decimal(mf_04 = 0) %>
+				<% end %>
+
+			</td>
+
+
+			<td align="right" width="20">
+				<% if params[:par_med].to_i >= 4 %>
+					<%= cf_04 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '04' ").count("id").to_i %>
+				<% else %>
+					<%= format_decimal(cf_04 = 0) %>
+				<% end %>
+
+			</td>
+
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 5 %>
+					<%= format_decimal(f_05 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '05' ").sum("valor_rs"))  %>
+				<% else %>
+					<%= format_decimal(f_05 = 0) %>
+				<% end %>
+				
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 5 %>
+					<%= format_decimal( mf_05 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 1 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '05' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mf_05 = 0) %>
+				<% end %>
+				
+			</td>
+
+
+			<td align="right" width="20">
+				<% if params[:par_med].to_i >= 5 %>
+				<%= cf_05 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '05' ").count("id").to_i  %>
+				<% else %>
+					<%= format_decimal(cf_05 = 0) %>
+				<% end %>
+				
+			</td>
+
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 6 %>
+					<%= format_decimal(f_06 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '06' ").sum("valor_rs"))  %>
+				<% else %>
+					<%= format_decimal(f_06 = 0) %>
+				<% end %>
+				
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 6 %>
+					<%= format_decimal( mf_06 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 1 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '04' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mf_06 = 0) %>
+				<% end %>
+				
+			</td>
+
+
+			<td align="right" width="20">
+				<% if params[:par_med].to_i >= 6 %>
+				<%= cf_06 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '06' ").count("id").to_i %>
+				<% else %>
+					<%= format_decimal(cf_06 = 0) %>
+				<% end %>
+				
+			</td>
+
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 7 %>
+					<%= format_decimal(f_07 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '07' ").sum("valor_rs"))  %>
+				<% else %>
+					<%= format_decimal(f_07 = 0) %>
+				<% end %>
+				
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 7 %>
+					<%= format_decimal( mf_07 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 1 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '07' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mf_07 = 0) %>
+				<% end %>
+				
+			</td>
+
+			<td align="right" width="20">
+				<% if params[:par_med].to_i >= 7 %>
+				<%= cf_07 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '07' ").count("id").to_i  %>
+				<% else %>
+					<%= format_decimal(cf_07 = 0) %>
+				<% end %>
+				
+			</td>
+
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 8 %>
+					<%= format_decimal(f_08 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '08' ").sum("valor_rs"))  %>
+				<% else %>
+					<%= format_decimal(f_08 = 0) %>
+				<% end %>
+				
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 8 %>
+					<%= format_decimal( mf_08 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 1 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '08' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mf_08 = 0) %>
+				<% end %>
+				
+			</td>
+
+			<td align="right" width="20">
+				<% if params[:par_med].to_i >= 8 %>
+				<%= cf_08 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '08' ").count("id").to_i  %>
+				<% else %>
+					<%= format_decimal(cf_08 = 0) %>
+				<% end %>
+				
+			</td>
+
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 9 %>
+					<%= format_decimal(f_09 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '09' ").sum("valor_rs"))  %>
+				<% else %>
+					<%= format_decimal(f_09 = 0) %>
+				<% end %>
+				
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 9 %>
+					<%= format_decimal( mf_09 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 1 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '09' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mf_09 = 0) %>
+				<% end %>
+				
+			</td>
+
+
+			<td align="right" width="20">
+				<% if params[:par_med].to_i >= 9 %>
+				<%= cf_09 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '09' ").count("id").to_i  %>
+				<% else %>
+					<%= format_decimal(cf_09 = 0) %>
+				<% end %>
+				
+			</td>
+
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 10 %>
+					<%= format_decimal(f_10 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '10' ").sum("valor_rs"))  %>
+				<% else %>
+					<%= format_decimal(f_10 = 0) %>
+				<% end %>
+				
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 10 %>
+					<%= format_decimal( mf_10 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 1 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '10' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mf_10 = 0) %>
+				<% end %>
+				
+			</td>
+
+
+			<td align="right" width="20">
+				<% if params[:par_med].to_i >= 10 %>
+				<%= cf_10 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '10' ").count("id").to_i  %>
+				<% else %>
+					<%= format_decimal(cf_10 = 0) %>
+				<% end %>
+				
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 11 %>
+					<%= format_decimal(f_11 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '11' ").sum("valor_rs"))  %>
+				<% else %>
+					<%= format_decimal(f_11 = 0) %>
+				<% end %>
+				
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 11 %>
+					<%= format_decimal( mf_11 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 1 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '11' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mf_11 = 0) %>
+				<% end %>
+				
+			</td>
+
+
+			<td align="right" width="20">
+				<% if params[:par_med].to_i >= 11 %>
+				<%= cf_11 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '11' ").count("id").to_i  %>
+				<% else %>
+					<%= format_decimal(cf_11 = 0) %>
+				<% end %>
+				
+			</td>
+
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 12 %>
+					<%= format_decimal(f_12 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '12' ").sum("valor_rs"))  %>
+				<% else %>
+					<%= format_decimal(f_12 = 0) %>
+				<% end %>
+				
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 12 %>
+					<%= format_decimal( mf_12 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 1 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '12' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mf_12 = 0) %>
+				<% end %>
+				
+			</td>
+
+
+			<td align="right" width="20">
+				<% if params[:par_med].to_i >= 12 %>
+				<%= cf_12 = Contrato.where("tipo = 1 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '12' ").count("id").to_i  %>
+				<% else %>
+					<%= format_decimal(cf_12 = 0) %>
+				<% end %>
+				
+			</td>
+
+		</tr>
+
+		<% tot_f_01 += f_01.to_f %>
+		<% tot_f_02 += f_02.to_f %>
+		<% tot_f_03 += f_03.to_f %>
+		<% tot_f_04 += f_04.to_f %>
+		<% tot_f_05 += f_05.to_f %>
+		<% tot_f_06 += f_06.to_f %>
+		<% tot_f_07 += f_07.to_f %>
+		<% tot_f_08 += f_08.to_f %>
+		<% tot_f_09 += f_09.to_f %>
+		<% tot_f_10 += f_10.to_f %>
+		<% tot_f_11 += f_11.to_f %>
+		<% tot_f_12 += f_12.to_f %>
+
+		<% tot_mf_01 += mf_01.to_f %>
+		<% tot_mf_02 += mf_02.to_f %>
+		<% tot_mf_03 += mf_03.to_f %>
+		<% tot_mf_04 += mf_04.to_f %>
+		<% tot_mf_05 += mf_05.to_f %>
+		<% tot_mf_06 += mf_06.to_f %>
+		<% tot_mf_07 += mf_07.to_f %>
+		<% tot_mf_08 += mf_08.to_f %>
+		<% tot_mf_09 += mf_09.to_f %>
+		<% tot_mf_10 += mf_10.to_f %>
+		<% tot_mf_11 += mf_11.to_f %>
+		<% tot_mf_12 += mf_12.to_f %>
+
+
+		<% tot_cf_01 += cf_01.to_f %>
+		<% tot_cf_02 += cf_02.to_f %>
+		<% tot_cf_03 += cf_03.to_f %>
+		<% tot_cf_04 += cf_04.to_f %>
+		<% tot_cf_05 += cf_05.to_f %>
+		<% tot_cf_06 += cf_06.to_f %>
+		<% tot_cf_07 += cf_07.to_f %>
+		<% tot_cf_08 += cf_08.to_f %>
+		<% tot_cf_09 += cf_09.to_f %>
+		<% tot_cf_10 += cf_10.to_f %>
+		<% tot_cf_11 += cf_11.to_f %>
+		<% tot_cf_12 += cf_12.to_f %>
+
+		<% tot_f_all  += (f_01.to_f + f_02.to_f + f_03.to_f + f_04.to_f + f_05.to_f + f_06.to_f + f_07.to_f + f_08.to_f + f_09.to_f + f_10.to_f + f_11.to_f + f_12.to_f) %>
+		<% tot_cf_all += (cf_01.to_f + cf_02.to_f + cf_03.to_f + cf_04.to_f + cf_05.to_f + cf_06.to_f + cf_07.to_f + cf_08.to_f + cf_09.to_f + cf_10.to_f + cf_11.to_f + cf_12.to_f) %>
+		<% tot_mf_all += (mf_01.to_f + mf_02.to_f + mf_03.to_f + mf_04.to_f + mf_05.to_f + mf_06.to_f + mf_07.to_f + mf_08.to_f + mf_09.to_f + mf_10.to_f + mf_11.to_f + mf_12.to_f) %>
+		
+
+	<% end %>
+	<tr class = "<%= cycle("cor1", "cor2") %>">	
+			<tr class="head">
+				<td>Total Fixos</td>
+				<td align="right"><%= format_decimal(tot_f_01) %></td>
+				<td align="right"><%= format_decimal(tot_mf_01) %></td>
+				<td align="right"><%= tot_cf_01.to_i %></td>
+				<td align="right"><%= format_decimal(tot_f_02) %></td>
+				<td align="right"><%= format_decimal(tot_mf_02) %></td>
+				<td align="right"><%= tot_cf_02.to_i %></td>
+				<td align="right"><%= format_decimal(tot_f_03) %></td>
+				<td align="right"><%= format_decimal(tot_mf_03) %></td>
+				<td align="right"><%= tot_cf_03.to_i %></td>
+				<td align="right"><%= format_decimal(tot_f_04) %></td>
+				<td align="right"><%= format_decimal(tot_mf_04) %></td>
+				<td align="right"><%= tot_cf_04.to_i %></td>
+				<td align="right"><%= format_decimal(tot_f_05) %></td>
+				<td align="right"><%= format_decimal(tot_mf_05) %></td>
+				<td align="right"><%= tot_cf_05.to_i %></td>
+				<td align="right"><%= format_decimal(tot_f_06) %></td>
+				<td align="right"><%= format_decimal(tot_mf_06) %></td>
+				<td align="right"><%= tot_cf_06.to_i %></td>
+				<td align="right"><%= format_decimal(tot_f_07) %></td>
+				<td align="right"><%= format_decimal(tot_mf_07) %></td>
+				<td align="right"><%= tot_cf_07.to_i %></td>
+				<td align="right"><%= format_decimal(tot_f_08) %></td>
+				<td align="right"><%= format_decimal(tot_mf_08) %></td>
+				<td align="right"><%= tot_cf_08.to_i %></td>
+				<td align="right"><%= format_decimal(tot_f_09) %></td>
+				<td align="right"><%= format_decimal(tot_mf_09) %></td>
+				<td align="right"><%= tot_cf_09.to_i %></td>
+				<td align="right"><%= format_decimal(tot_f_10) %></td>
+				<td align="right"><%= format_decimal(tot_mf_10) %></td>
+				<td align="right"><%= tot_cf_10.to_i %></td>
+				<td align="right"><%= format_decimal(tot_f_11) %></td>
+				<td align="right"><%= format_decimal(tot_mf_11) %></td>
+				<td align="right"><%= tot_cf_11.to_i %></td>
+				<td align="right"><%= format_decimal(tot_f_12) %></td>
+				<td align="right"><%= format_decimal(tot_mf_12) %></td>
+				<td align="right"><%= tot_cf_12.to_i %></td>
+
+			</tr>
+	</tr>
+</table>
+
+
+<br>
+<br>
+<br>
+
+<table>
+
+<tr class="header" border='1'>
+	<td colspan="37">Contratos Recorrentes</td>
+</tr>
+
+
+<tr class="header" border='1'>
+	<td rowspan="2">Centro de Custo</td>
+	<td align="center" colspan="3">Janeiro</td>
+	<td align="center" colspan="3">Fevereiro</td>
+	<td align="center" colspan="3">Março</td>
+	<td align="center" colspan="3">Abril</td>
+	<td align="center" colspan="3">Maio</td>
+	<td align="center" colspan="3">Junho</td>
+	<td align="center" colspan="3">Julho</td>
+	<td align="center" colspan="3">Agosto</td>
+	<td align="center" colspan="3">Setembro</td>
+	<td align="center" colspan="3">Outubro</td>
+	<td align="center" colspan="3">Novembro</td>
+	<td align="center" colspan="3">Dezembro</td>
+</tr>
+
+<tr>
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+
+	<td align="right">Fatur.</td>
+	<td align="right">Qtd m2</td>
+	<td align="right">Qtd</td>
+	
+</tr>
+
+	<% centro_custos.each do |cc| %>
+		<tr class = "<%= cycle("cor1", "cor2") %>">
+			<td width="150"><%= cc.nome %></td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 1 %>
+					<%= format_decimal( r_01 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '01' ").sum("valor_rs").to_f)  %>
+				<% else %>
+					<%= format_decimal(r_01 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 1 %>
+					<%= format_decimal( mr_01 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 0 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '01' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mr_01 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="40">
+				<% if params[:par_med].to_i >= 1 %>
+					<%= cr_01 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '01' ").count("id").to_i %>
+					<% else %>
+						<%= format_decimal(cr_01) %>
+					<% end %>
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 2 %>
+					<%= format_decimal(r_02 =  Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '02' ").sum("valor_rs").to_f)  %>
+				<% else %>
+					<%= format_decimal(r_02 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 2 %>
+					<%= format_decimal( mr_02 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 0 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '02' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mr_02 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="40">
+				<% if params[:par_med].to_i >= 2 %>
+					<%= cr_02 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '02' ").count("id").to_i %>
+					<% else %>
+						<%= format_decimal(cr_02 = 0) %>
+					<% end %>
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 3 %>
+					<%= format_decimal( r_03 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '03' ").sum("valor_rs").to_f)  %>
+				<% else %>
+					<%= format_decimal(r_03 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 3 %>
+					<%= format_decimal( mr_03 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 0 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '03' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mr_03 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="40">
+				<% if params[:par_med].to_i >= 3 %>
+					<%= cr_03 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '03' ").count("id").to_i %>
+					<% else %>
+						<%= format_decimal(cr_03 = 0 ) %>
+					<% end %>
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 4 %>
+					<%= format_decimal( r_04 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '04' ").sum("valor_rs").to_f)  %>
+				<% else %>
+					<%= format_decimal(r_04 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 4 %>
+					<%= format_decimal( mr_04 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 0 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '04' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(r_04 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="40">
+				<% if params[:par_med].to_i >= 4 %>
+					<%= cr_04 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '04' ").count("id").to_i %>
+					<% else %>
+						<%= format_decimal(cr_04 = 0 ) %>
+					<% end %>
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 5 %>
+					<%= format_decimal( r_05 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '05' ").sum("valor_rs").to_f)  %>
+				<% else %>
+					<%= format_decimal(r_05 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 5 %>
+					<%= format_decimal( mr_05 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 0 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '05' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mr_05 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="40">
+				<% if params[:par_med].to_i >= 5 %>
+					<%= cr_05 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '05' ").count("id").to_i %>
+					<% else %>
+						<%= format_decimal(cr_05 = 0) %>
+					<% end %>
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 6 %>
+					<%= format_decimal( r_06 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '06' ").sum("valor_rs").to_f)  %>
+				<% else %>
+					<%= format_decimal(r_06 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 6 %>
+					<%= format_decimal( mr_06 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 0 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '06' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mr_06 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="40">
+				<% if params[:par_med].to_i >= 6 %>
+					<%= cr_06 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '06' ").count("id").to_i %>
+					<% else %>
+						<%= format_decimal(cr_06 = 0) %>
+					<% end %>
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 7 %>
+					<%= format_decimal( r_07 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '07' ").sum("valor_rs").to_f)  %>
+				<% else %>
+					<%= format_decimal(r_07 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 7 %>
+					<%= format_decimal( mr_07 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 0 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '07' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mr_07 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="40">
+				<% if params[:par_med].to_i >= 7 %>
+					<%= cr_07 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '07' ").count("id").to_i %>
+					<% else %>
+						<%= format_decimal(cr_07 = 0 ) %>
+					<% end %>
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 8 %>
+					<%= format_decimal( r_08 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '08' ").sum("valor_rs").to_f)  %>
+				<% else %>
+					<%= format_decimal(r_08 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 8 %>
+					<%= format_decimal( mr_08 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 0 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '08' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mr_08 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="40">
+				<% if params[:par_med].to_i >= 8 %>
+					<%= cr_08 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '08' ").count("id").to_i %>
+					<% else %>
+						<%= format_decimal(cr_08 = 0 ) %>
+					<% end %>
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 9 %>
+					<%= format_decimal( r_09 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '09' ").sum("valor_rs").to_f)  %>
+				<% else %>
+					<%= format_decimal(r_09 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 9 %>
+					<%= format_decimal( mr_09 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 0 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '09' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mr_09 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="40">
+				<% if params[:par_med].to_i >= 9 %>
+					<%= cr_09 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '09' ").count("id").to_i %>
+					<% else %>
+						<%= format_decimal(cr_09 = 0) %>
+					<% end %>
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 10 %>
+					<%= format_decimal( r_10 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '10' ").sum("valor_rs").to_f)  %>
+				<% else %>
+					<%= format_decimal(r_10 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 10 %>
+					<%= format_decimal( mr_10 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 0 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '10' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mr_10 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="40">
+				<% if params[:par_med].to_i >= 10 %>
+					<%= cr_10 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '10' ").count("id").to_i %>
+					<% else %>
+						<%= format_decimal(cr_10 = 0 ) %>
+					<% end %>
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 11 %>
+					<%= format_decimal( r_11 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '11' ").sum("valor_rs").to_f)  %>
+				<% else %>
+					<%= format_decimal(r_11 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 11 %>
+					<%= format_decimal( mr_11 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 0 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '11' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mr_11 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="40">
+				<% if params[:par_med].to_i >= 11 %>
+					<%= cr_11 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '11' ").count("id").to_i %>
+					<% else %>
+						<%= format_decimal(cr_11 = 0 ) %>
+					<% end %>
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 12 %>
+					<%= format_decimal( r_12 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '12' ").sum("valor_rs").to_f)  %>
+				<% else %>
+					<%= format_decimal(r_12 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="60">
+				<% if params[:par_med].to_i >= 12 %>
+					<%= format_decimal( mr_12 = Contrato.joins(:contrato_servicos).where("contratos.tipo = 0 AND contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}' and date_part('month', contratos.DATA) = '12' ").sum("contrato_servicos.quantidade").to_f)  %>
+				<% else %>
+					<%= format_decimal(mr_12 = 0 ) %>
+				<% end %>
+
+					
+			</td>
+
+			<td align="right" width="40">
+				<% if params[:par_med].to_i >= 12 %>
+					<%= cr_12 = Contrato.where("tipo = 0 AND centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) = '12' ").count("id").to_i %>
+					<% else %>
+						<%= format_decimal(cr_12 = 0) %>
+					<% end %>
+			</td>
+		</tr>
+
+		<% tot_r_01 += r_01.to_f %>
+		<% tot_r_02 += r_02.to_f %>
+		<% tot_r_03 += r_03.to_f %>
+		<% tot_r_04 += r_04.to_f %>
+		<% tot_r_05 += r_05.to_f %>
+		<% tot_r_06 += r_06.to_f %>
+		<% tot_r_07 += r_07.to_f %>
+		<% tot_r_08 += r_08.to_f %>
+		<% tot_r_09 += r_09.to_f %>
+		<% tot_r_10 += r_10.to_f %>
+		<% tot_r_11 += r_11.to_f %>
+		<% tot_r_12 += r_12.to_f %>
+
+
+		<% tot_mr_01 += mr_01.to_f %>
+		<% tot_mr_02 += mr_02.to_f %>
+		<% tot_mr_03 += mr_03.to_f %>
+		<% tot_mr_04 += mr_04.to_f %>
+		<% tot_mr_05 += mr_05.to_f %>
+		<% tot_mr_06 += mr_06.to_f %>
+		<% tot_mr_07 += mr_07.to_f %>
+		<% tot_mr_08 += mr_08.to_f %>
+		<% tot_mr_09 += mr_09.to_f %>
+		<% tot_mr_10 += mr_10.to_f %>
+		<% tot_mr_11 += mr_11.to_f %>
+		<% tot_mr_12 += mr_12.to_f %>
+
+		<% tot_cr_01 += cr_01.to_f %>
+		<% tot_cr_02 += cr_02.to_f %>
+		<% tot_cr_03 += cr_03.to_f %>
+		<% tot_cr_04 += cr_04.to_f %>
+		<% tot_cr_05 += cr_05.to_f %>
+		<% tot_cr_06 += cr_06.to_f %>
+		<% tot_cr_07 += cr_07.to_f %>
+		<% tot_cr_08 += cr_08.to_f %>
+		<% tot_cr_09 += cr_09.to_f %>
+		<% tot_cr_10 += cr_10.to_f %>
+		<% tot_cr_11 += cr_11.to_f %>
+		<% tot_cr_12 += cr_12.to_f %>
+		<% tot_r_all += (r_01.to_f + r_02.to_f + r_03.to_f + r_04.to_f + r_05.to_f + r_06.to_f + r_07.to_f + r_08.to_f + r_09.to_f + r_10.to_f + r_11.to_f + r_12.to_f) %>
+		<% tot_cr_all += (cr_01.to_f + cr_02.to_f + cr_03.to_f + cr_04.to_f + cr_05.to_f + cr_06.to_f + cr_07.to_f + cr_08.to_f + cr_09.to_f + cr_10.to_f + cr_11.to_f + cr_12.to_f) %>
+		
+
+	<% end %>
+	<tr class = "<%= cycle("cor1", "cor2") %>">	
+			<tr class="head">
+				<td>Total Recorrente</td>
+				<td align="right"><%= format_decimal(tot_r_01) %></td>
+				<td align="right"><%= format_decimal(tot_mr_01) %></td>
+				<td align="right"><%= tot_cr_01.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_02) %></td>
+				<td align="right"><%= format_decimal(tot_mr_02) %></td>
+				<td align="right"><%= tot_cr_02.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_03) %></td>
+				<td align="right"><%= format_decimal(tot_mr_03) %></td>
+				<td align="right"><%= tot_cr_03.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_04) %></td>
+				<td align="right"><%= format_decimal(tot_mr_04) %></td>
+				<td align="right"><%= tot_cr_04.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_05) %></td>
+				<td align="right"><%= format_decimal(tot_mr_05) %></td>
+				<td align="right"><%= tot_cr_05.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_06) %></td>
+				<td align="right"><%= format_decimal(tot_mr_06) %></td>
+				<td align="right"><%= tot_cr_06.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_07) %></td>
+				<td align="right"><%= format_decimal(tot_mr_07) %></td>
+				<td align="right"><%= tot_cr_07.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_08) %></td>
+				<td align="right"><%= format_decimal(tot_mr_08) %></td>
+				<td align="right"><%= tot_cr_08.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_09) %></td>
+				<td align="right"><%= format_decimal(tot_mr_09) %></td>
+				<td align="right"><%= tot_cr_09.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_10) %></td>
+				<td align="right"><%= format_decimal(tot_mr_10) %></td>
+				<td align="right"><%= tot_cr_10.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_11) %></td>
+				<td align="right"><%= format_decimal(tot_mr_11) %></td>
+				<td align="right"><%= tot_cr_11.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_12) %></td>
+				<td align="right"><%= format_decimal(tot_mr_12) %></td>
+				<td align="right"><%= tot_cr_12.to_i %></td>
+
+			</tr>
+	</tr>
+
+
+		<tr class = "<%= cycle("cor1", "cor2") %>">	
+			<tr class="head">
+				<td>Total Fixo + Recorrente</td>
+				<td align="right"><%= format_decimal(tot_r_01 + tot_f_01.to_f) %></td>
+				<td align="right"><%= format_decimal(tot_mr_01 + tot_mf_01.to_f) %></td>
+				<td align="right"><%= tot_cr_01.to_i + tot_cf_01.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_02 + tot_f_02.to_f) %></td>
+				<td align="right"><%= format_decimal(tot_mr_02 + tot_mf_02.to_f) %></td>
+				<td align="right"><%= tot_cr_02.to_i + tot_cf_02.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_03 + tot_f_03.to_f) %></td>
+				<td align="right"><%= format_decimal(tot_mr_03 + tot_mf_03.to_f) %></td>
+				<td align="right"><%= tot_cr_03.to_i + tot_cf_03.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_04 + tot_f_04.to_f) %></td>
+				<td align="right"><%= format_decimal(tot_mr_04 + tot_mf_04.to_f) %></td>
+				<td align="right"><%= tot_cr_04.to_i + tot_cf_04.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_05 + tot_f_05.to_f) %></td>
+				<td align="right"><%= format_decimal(tot_mr_05 + tot_mf_05.to_f) %></td>
+				<td align="right"><%= tot_cr_05.to_i + tot_cf_05.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_06 + tot_f_06.to_f) %></td>
+				<td align="right"><%= format_decimal(tot_mr_06 + tot_mf_06.to_f) %></td>
+				<td align="right"><%= tot_cr_06.to_i + tot_cf_06.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_07 + tot_f_07.to_f) %></td>
+				<td align="right"><%= format_decimal(tot_mr_07 + tot_mf_07.to_f) %></td>
+				<td align="right"><%= tot_cr_07.to_i + tot_cf_07.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_08 + tot_f_08.to_f) %></td>
+				<td align="right"><%= format_decimal(tot_mr_08 + tot_mf_08.to_f) %></td>
+				<td align="right"><%= tot_cr_08.to_i + tot_cf_08.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_09 + tot_f_09.to_f) %></td>
+				<td align="right"><%= format_decimal(tot_mr_09 + tot_mf_09.to_f) %></td>
+				<td align="right"><%= tot_cr_09.to_i + tot_cf_09.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_10 + tot_f_10.to_f) %></td>
+				<td align="right"><%= format_decimal(tot_mr_10 + tot_mf_10.to_f) %></td>
+				<td align="right"><%= tot_cr_10.to_i + tot_cf_10.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_11 + tot_f_11.to_f) %></td>
+				<td align="right"><%= format_decimal(tot_mr_11 + tot_mf_11.to_f) %></td>
+				<td align="right"><%= tot_cr_11.to_i + tot_cf_11.to_i %></td>
+				<td align="right"><%= format_decimal(tot_r_12 + tot_f_12.to_f) %></td>
+				<td align="right"><%= format_decimal(tot_mr_12 + tot_mf_12.to_f) %></td>
+				<td align="right"><%= tot_cr_12.to_i + tot_cf_12.to_i %></td>
+			</tr>
+	</tr>
+</table>
+
+<br>
+<br>
+<br>
+<table>
+	<tr class="head">
+		<td>Centro Custos</td>
+		<td align="right">Faturamento</td>
+		<td align="right">Qtd m2</td>
+		<td align="right">Qtd</td>
+		<td align="right">Média</td>
+	</tr>
+
+	<% tot_f     = 0 %>
+	<% tot_m_qtd = 0 %>
+	<% tot_qtd   = 0 %>
+
+		<% centro_custos.each do |cc| %>
+			<tr class = "<%= cycle("cor1", "cor2") %>">
+				<td width="150"><%= cc.nome %></td>
+
+				<td align="right" width="60"><%= format_decimal( r_f_01 = Contrato.where("centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) <= '#{params[:par_med]}' ").sum("valor_rs")) %></td>
+				<% tot_f += r_f_01 %>
+
+				<td align="right" width="60"><%= format_decimal( mr = Contrato.joins(:contrato_servicos).where("contratos.centro_custo_id = #{cc.id} and date_part('year', contratos.DATA) = '#{params[:ano]}'  and date_part('month', DATA) <= '#{params[:par_med]}'").sum("contrato_servicos.quantidade").to_f)  %></td>				
+				<% tot_m_qtd += mr %>
+
+				<td align="right" width="60"><%= format_int( r_q = Contrato.where("centro_custo_id = #{cc.id} and date_part('year', DATA) = '#{params[:ano]}' and date_part('month', DATA) <= '#{params[:par_med]}' ").count("id")) %></td>
+
+				<% tot_qtd += r_q %>
+
+				<td align="right" width="60"><%= format_decimal(r_f_01.to_f / params[:par_med].to_i ) %></td>
+			</tr>
+		<% end %>
+		<tr class="head">
+			<td></td>
+			<td align="right"><%= format_decimal(tot_f) %></td>
+			<td align="right"><%= format_decimal(tot_m_qtd) %></td>
+			<td align="right"><%= format_int(tot_qtd) %></td>
+			<td align="right"><%= format_decimal(tot_f.to_f / params[:par_med].to_i ) %></td>
+		</tr>
+</table>
+
+
+<style type="text/css">
+  table {
+    border-collapse: collapse;
+    font-size: 10px
+  }
+  .titulo {
+    font-size: 22px
+  }
+  td, tr {
+    border: 1px solid black;
+  }
+</style>

@@ -1,0 +1,2 @@
+module VendasAnalizesHelper
+end

@@ -1,0 +1,34 @@
+<h1>Listing nc_proveedor_faturas</h1>
+
+<table>
+  <tr>
+    <th>Nc proveedor</th>
+    <th>Persona</th>
+    <th>Persona <%= t('NAME') %></tth>
+    <th>Documento numero 01</th>
+    <th>Documento numero 02</th>
+    <th>Documento numero</th>
+    <th>Status</th>
+    <th><%= t('DATE') %></th>
+  </tr>
+
+<% @nc_proveedor_faturas.each do |nc_proveedor_fatura| %>
+  <tr>
+    <td><%=h nc_proveedor_fatura.nc_proveedor_id %></td>
+    <td><%=h nc_proveedor_fatura.persona_id %></td>
+    <td><%=h nc_proveedor_fatura.persona_nome %></td>
+    <td><%=h nc_proveedor_fatura.documento_numero_01 %></td>
+    <td><%=h nc_proveedor_fatura.documento_numero_02 %></td>
+    <td><%=h nc_proveedor_fatura.documento_numero %></td>
+    <td><%=h nc_proveedor_fatura.status %></td>
+    <td><%=h nc_proveedor_fatura.data %></td>
+    <td><%= link_to 'Show', nc_proveedor_fatura %></td>
+    <td><%= link_to 'Edit', edit_nc_proveedor_fatura_path(nc_proveedor_fatura) %></td>
+    <td><%= link_to 'Destroy', nc_proveedor_fatura, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New nc_proveedor_fatura', new_nc_proveedor_fatura_path %>

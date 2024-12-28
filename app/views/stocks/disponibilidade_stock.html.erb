@@ -1,0 +1,138 @@
+  <h1 id="header">Disponibilidad del Stock</h1>
+  <div class="group">
+    <h2>
+      <%= form_tag resultado_disponibilidade_stock_stocks_path, :method => "get" do %>
+       <table>
+          <tr>
+            <td align="right">Marca :</td>
+            <td>
+              <%= select("busca", "sub_grupo", SubGrupo.all(:select => 'id, descricao').collect {|p| [ p.descricao, p.id ] },
+                                                                                          { :prompt => 'Seleccione la Marca'},
+                                                                                          {:class   => "selc_medium"} )   %></td>
+          </tr>
+
+          <tr>
+            <td align="right">Colección :</td>
+            <td>
+              <%= select("busca", "colecao", Colecao.all(:select => 'id, nome').collect {|p| [ p.nome, p.id ] },
+                                                                                          { :prompt => 'Seleccione la colección'},
+                                                                                          {:class   => "selc_medium"} )   %>
+              <%= image_tag("load.gif",
+                  :align => "absmiddle",
+                  :border => 0,
+                  :id => "spinner",
+                  :width => 21,
+                  :height => 21,
+                  :style =>"display: none;" ) %>
+
+            </td>
+          </tr>
+
+          <tr>
+            <td align="right">Producto :</td>
+
+            <td>
+              <%=   select("busca", "produto", Produto.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] },
+                                                                                                          {:prompt => 'Todos...'},
+                                                                                                          {:class   => "selc_medium"} )   %></td>
+          </tr>
+          <tr>
+            <td align="right">Deposito :</td>
+            <td>
+              <%= select("busca", "deposito", Deposito.all(:select => 'id, nome', :conditions => ["unidade_id = #{current_unidade.id}"]).collect {|p| [ p.nome, p.id ] },
+                                                                                          {:class   => "selc_medium"} )   %></td>
+          </tr>
+
+          <tr>
+             <td></td>
+             <td>
+                <table>
+                   <tr>
+                        <td>
+                          <fieldset>
+                             <legend>Moneda :</legend>
+                            <input id         = "status"
+                                   name       = "status"
+                                   type       = "radio"
+                                   value      = "0"
+                                   checked
+                                   onkeypress = "return bloqEnter(event)"
+                                   onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />A comprar
+
+                            <input id    ="status"
+                                   name  ="status"
+                                   type  ="radio"
+                                   value ="1"
+                                   onkeypress = "return bloqEnter(event)"
+                                   onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />A vender
+
+                            <input id    ="status"
+                                   name  ="status"
+                                   type  ="radio"
+                                   value ="2"
+                                   onkeypress = "return bloqEnter(event)"
+                                   onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />OK
+
+                            <input id    ="status"
+                                   name  ="status"
+                                   type  ="radio"
+                                   value ="3"
+                                   onkeypress = "return bloqEnter(event)"
+                                   onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Todos
+
+                          </fieldset>
+
+                        </td>
+
+                   </tr>
+                </table>
+             </td>
+          </tr>
+
+          <tr height="35">
+            <td></td>
+            <td>
+               <input  id      ="button"
+                       type    ="submit"
+                       class   = "button_info"
+                       value   ="Informe"
+                       onclick = "Tipo('0')"/>
+
+               <input type     = "submit"
+                      class   = "button_info"
+                      value    = "Excel"
+                      onclick  = "Tipo('1')"/>
+            </td>
+          </tr>
+          <input type="hidden" name="tipo" id="tipo"  size="5" value="0"/>
+
+        </table>
+      <% end %>
+
+    </h2>
+  </div>
+
+
+<script>
+$("#busca_sub_grupo").change(function() {
+
+      var data=$('#busca_sub_grupo').val();
+      $.ajax({
+
+        type: "POST",
+         url: "/dynamic_dispo_stock/"+data,
+        data: data,
+
+        beforeSend: function()
+        {
+            $('#spinner').show();
+        },
+
+        success: function(response)
+        {
+          $('#spinner').hide();
+        }
+
+      });
+  });
+</script>

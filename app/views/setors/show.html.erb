@@ -1,0 +1,23 @@
+<p>
+  <b><%= t('NAME') %>:</b>
+  <%=h @setor.nome %>
+</p>
+
+<p>
+  <b>Sigla:</b>
+  <%=h @setor.sigla %>
+</p>
+
+<p>
+  <b>Responsavel:</b>
+  <%=h @setor.responsavel_id %>
+</p>
+
+<p>
+  <b>Responsavel <%= t('NAME') %>:</b>
+  <%=h @setor.responsavel_nome %>
+</p>
+
+
+<%= link_to 'Edit', edit_setor_path(@setor) %> |
+<%= link_to 'Back', setors_path %>

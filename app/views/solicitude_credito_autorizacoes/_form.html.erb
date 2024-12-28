@@ -1,0 +1,50 @@
+<%= form_for(@solicitude_credito_autorizacao) do |f| %>
+  <% if @solicitude_credito_autorizacao.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@solicitude_credito_autorizacao.errors.count, "error") %> prohibited this solicitude_credito_autorizacao from being saved:</h2>
+
+      <ul>
+      <% @solicitude_credito_autorizacao.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> solicitude_credito_autorizacoes - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">solicitude_credio_id :</td>                    
+                      <td><%= f.number_field :solicitude_credio_id %></td>
+                                      
+                      <td align="right">status :</td>                    
+                      <td><%= f.number_field :status %></td>
+                                      
+                      <td align="right">obs :</td>                    
+                      <td><%= f.text_area :obs %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', solicitude_credito_autorizacoes_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

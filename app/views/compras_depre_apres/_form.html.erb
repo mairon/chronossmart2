@@ -1,0 +1,74 @@
+<%= form_for(@compras_depre_apre) do |f| %>
+  <% if @compras_depre_apre.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@compras_depre_apre.errors.count, "error") %> prohibited this compras_depre_apre from being saved:</h2>
+
+      <ul>
+      <% @compras_depre_apre.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> compras_depre_apres - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">compra_id :</td>                    
+                      <td><%= f.number_field :compra_id %></td>
+                                      
+                      <td align="right">anos :</td>                    
+                      <td><%= f.number_field :anos %></td>
+                                      
+                      <td align="right">moeda :</td>                    
+                      <td><%= f.number_field :moeda %></td>
+                                      
+                      <td align="right">depre_us :</td>                    
+                      <td><%= f.text_field :depre_us %></td>
+                                      
+                      <td align="right">depre_gs :</td>                    
+                      <td><%= f.text_field :depre_gs %></td>
+                                      
+                      <td align="right">depre_rs :</td>                    
+                      <td><%= f.text_field :depre_rs %></td>
+                                      
+                      <td align="right">apre_us :</td>                    
+                      <td><%= f.text_field :apre_us %></td>
+                                      
+                      <td align="right">apre_gs :</td>                    
+                      <td><%= f.text_field :apre_gs %></td>
+                                      
+                      <td align="right">apre_rs :</td>                    
+                      <td><%= f.text_field :apre_rs %></td>
+                                      
+                      <td align="right">compras_produto_id :</td>                    
+                      <td><%= f.number_field :compras_produto_id %></td>
+                                      
+                      <td align="right"><%= t('DATE') %> :</td>                    
+                      <td><%= f.date_select :data %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), compras_depre_apres_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

@@ -1,0 +1,29 @@
+<h1 id="header">persona_ferias</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_persona_feria_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Inicio</t>
+            <td>Final</t>
+            <td>Persona</t>
+            <td>Status</t>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @persona_ferias.each do |persona_feria| %>
+      <tr>
+                  <td><%= persona_feria.inicio %></td>
+                  <td><%= persona_feria.final %></td>
+                  <td><%= persona_feria.persona_id %></td>
+                  <td><%= persona_feria.status %></td>
+                <td><%= link_to 'Editar', edit_persona_feria_path(persona_feria) %></td>
+        <td><%= link_to 'Borrar', persona_feria, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

@@ -1,0 +1,43 @@
+
+<h1 id="header">Productos a Cambiar</h1>
+
+<table class="head_grid">
+	<tr>
+		<td width="50" align="center">Cod.</td>
+		<td width="250">Producto</td>
+		<td width="50" align="center">Qtd</td>
+		<td width="90" align="center">Unitario G$</td>
+		<td width="90" align="center">Total G$</td>
+		<td width="70" align="center">Status</td>
+	</tr>
+</table>
+
+<div class="rolagem" dir="div">
+	<table>
+		<% troca_produtos.each do |troca_produto| %>
+			<tr>
+				<td width="50" align="center"><%= troca_produto.id %></td>
+				<td width="250"><%= troca_produto.produto.nome %></td>
+				<td width="50" align="center"><%= troca_produto.quantidade %></td>
+				<td width="90" align="center"><%= format_decimal(troca_produto.unitario_gs.to_f) %></td>
+				<td width="90" align="center"><%= format_decimal(troca_produto.total_gs.to_f) %></td>
+				<td width="70" align="center">
+					<% if troca_produto.status == false %>
+							<img alt="Icon" src="/assets/green_arrow.png" width="12" />
+					<% else %>
+							<img alt="Icon" src="/assets/red_arrow.png" width="12" />
+					<% end %>
+				</td>
+				 <td><%= link_to '', troca_produto, method: :delete, class: 'icon-trash', title: t('DELETE'), data: { confirm: 'Esta Seguro?' } %></td>
+			</tr>
+		<% end %>
+	</table>
+</div>
+
+<% if @valor_total_atual.to_i < 0 %>
+	<font color="red" style="font-size:20px; margin-left:430px;">Total G$: <%= format_decimal(@valor_total_atual .to_f) %></font>
+<% else %>
+	<font color="green" style="font-size:20px; margin-left:430px;">Total G$: <%= format_decimal(@valor_total_atual .to_f) %></font>
+<% end %>
+
+

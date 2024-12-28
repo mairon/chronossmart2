@@ -1,0 +1,135 @@
+<% if @venda_config.caixa_separado.to_i == 1 %>
+  <a href="/vendas/painel_cobranca_venda" class="btn btn-green">Finalizar</a>
+<% else %>
+  <a href="/vendas" class="btn btn-green">Finalizar</a>
+<% end %>
+
+<a href="javascript:void(0)" class="btn btn-blue" onClick="ComprovanteVenda()"><%= t('VOUCHER') %></a>
+<a href="javascript:void(0)" class="btn btn-blue" onClick="PagareVenda()">Pagare</a>
+
+
+
+<script>
+
+  function ValidVenda(){
+    var saldo = parseInt( document.getElementById("fac").value.replace(/\./g, "").replace(",", "."))
+    var sum   = parseInt( document.getElementById("sum").value.replace(/\./g, "").replace(",", ".") )
+      if (( saldo - sum ) == 0 ){
+        if(<%= @venda_config.caixa_separado.to_i %> == '1'){
+          if(<%= @venda.tipo_venda.to_i %> == '0'){
+
+            $.ajax({
+                type: 'PUT',
+                url:  '/vendas/'+ <%= @venda.id %>,
+                data: $('.edit_venda').serialize(),
+                dataType: "JSON",
+                success: function(data) {
+                    console.log(data);
+                }
+            });
+            window.open('/vendas/' + document.getElementById('id').value + '/comprovante01', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+            location.href="/vendas/painel_cobranca_venda"
+          }else{
+
+            $.ajax({
+                type: 'PUT',
+                url:  '/vendas/'+ <%= @venda.id %>,
+                data: $('.edit_venda').serialize(),
+                dataType: "JSON",
+                success: function(data) {
+                    console.log(data);
+                }
+            });
+
+            location.href="/vendas/new?tipo_venda=<%= @venda.tipo_venda %>"
+          }
+        }else{
+
+          $.ajax({
+              type: 'PUT',
+              url:  '/vendas/'+ <%= @venda.id %>,
+              data: $('.edit_venda').serialize(),
+              dataType: "JSON",
+              success: function(data) {
+                  console.log(data);
+              }
+          });
+
+          location.href="/vendas/new?tipo_venda=<%= @venda.tipo_venda %>"
+        }
+      }else{
+        alert('Financiero no Cerra con la suma de los Productos!')
+      };
+
+  }
+
+  function ComprovanteVenda(){
+        window.open('/vendas/send_print?proc=ticket_comprovante&venda_id=' + <%= @venda.id %> , '', ' SCROLLBARS=YES, TOP=150, LEFT=100, WIDTH=400, HEIGHT=500');
+
+  }
+
+function PagareVenda(){
+    window.open('/vendas/' + document.getElementById('id').value + '/pagare', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+function PagareEscritura(){
+    window.open('/vendas/' + document.getElementById('id').value + '/pagare_escritura', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+function PagareUsado(){
+    window.open('/vendas/' + document.getElementById('id').value + '/pagare_usado', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+  function Pagare(){
+    
+      window.open('/vendas/' + document.getElementById('id').value + '/pagaret', '', ' SCROLLBARS=YES, TOP=150, LEFT=100, WIDTH=300, HEIGHT=500');
+    }   
+  
+  function CertificadoVenda(){
+      window.open('/vendas/' + document.getElementById('id').value + '/certificado_venda', '', ' SCROLLBARS=YES, TOP=150, LEFT=100, WIDTH=300, HEIGHT=500');
+    }  
+
+  function ListaProdutos(){
+    window.open('/vendas/' + document.getElementById('id').value, '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=800');
+  }
+
+
+  function ComprovanteEntrega(){
+    window.open('/vendas/' + document.getElementById('id').value + '/comprovante_entrega', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+
+
+  function FaturaVenda(){
+    window.open('/vendas/' + document.getElementById('id').value+'/fatura', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+  function fecha(){
+    self.close();
+  }
+
+$(window).keydown(function(event) {
+  if(event.ctrlKey && event.keyCode == 71) {
+      location.href="/vendas/" + document.getElementById('id').value +"/gerador_cotas"
+    event.preventDefault();
+  }
+  if(event.ctrlKey && event.keyCode == 67) {
+    window.open('/vendas/' + document.getElementById('id').value + '/comprovante', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+
+    event.preventDefault();
+  }
+
+  if(event.ctrlKey && event.keyCode == 70) {
+    window.open('/vendas/' + document.getElementById('id').value+'/fatura', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+
+    event.preventDefault();
+  }
+
+
+  if(event.ctrlKey && event.keyCode == 80) {
+    window.open('/vendas/' + document.getElementById('id').value + '/pagare', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+    event.preventDefault();
+  }
+
+});
+</script>

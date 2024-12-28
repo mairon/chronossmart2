@@ -1,0 +1,136 @@
+<body onload="DataFinal(),CampoInicio()">
+  <h1 id="header">Proyeccion de Compras</h1>
+  
+  <style type="text/css">
+    select {
+      width: 600px;
+    }
+  </style>
+  <div class="group">
+    <h2>
+      <%= form_tag resultado_projecao_compras_stocks_path, :method => "get" do%>
+        <table>          
+          <tr>
+            <td align="right"> Fecha:</td>
+            <td><input name       = "inicio"
+                       id         = "inicio"
+                       size       = "10"
+                       type       = "text"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'final')" />
+                Hasta
+                <input name       = "final"
+                       id         = "final"
+                       size       = "10"
+                       type       = "text"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'campo_clase')" /></td>
+          </tr>
+
+          <tr>
+            <td align="right">Clase :</td>
+            <td>
+              <%= text_field_tag( 'campo_clase',
+                                   nil,
+                                   :id       => "campo_clase",
+                                   :size     => 5) %>
+
+              <%=   select("busca", "clase", Clase.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },                 
+                                                                                          { :include_blank => true },
+                                                                                          { :onkeypress    => "return bloqEnter(event)",
+                                                                                            :onkeyup       => "EnterTab(event,'campo_grupo')" })   %></td>
+          </tr>
+
+          <tr>
+            <td align="right">Grupo :</td>
+
+            <td>
+              <%= text_field_tag( 'campo_grupo',
+                                   nil,
+                                   :id       => "campo_grupo",
+                                   :size       => 5
+                              ) %>
+
+              <%=   select("busca", "grupo", Grupo.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] }, 
+                                                                                          { :include_blank => true },
+                                                                                          { :onkeypress    => "return bloqEnter(event)",
+                                                                                            :onkeyup       => "EnterTab(event,'campo_produto')" })   %></td>
+          </tr>
+
+          <tr>
+            <td align="right">Sub-Grupo :</td>
+
+            <td>
+              <%= text_field_tag( 'campo_grupo',
+                                   nil,
+                                   :id       => "campo_grupo",
+                                   :size       => 5
+                              ) %>
+
+              <%=   select("busca", "sub_grupo", SubGrupo.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] }, 
+                                                                                          { :include_blank => true },
+                                                                                          { :onkeypress    => "return bloqEnter(event)",
+                                                                                            :onkeyup       => "EnterTab(event,'campo_produto')" })   %></td>
+          </tr>
+
+
+          <tr>
+            <td align="right">Producto :</td>
+
+            <td>
+              <%= text_field_tag( 'campo_produto',
+                                   nil,
+                                  :id       => "campo_produto",
+                                  :size     => 5) %>
+
+
+              <%=   select("busca", "produto", Produto.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] }, 
+                                                                                                          { :include_blank => true },
+                                                                                                          { :onkeypress    => "return bloqEnter(event)",
+                                                                                                            :onkeyup       => "EnterTab(event,'busca_deposito')" })   %></td>
+          </tr>
+
+          <tr>
+            <td align="right">Deposito :</td>
+
+            <td>
+              <%=   select("busca", "deposito", Deposito.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] }, 
+                                                                                                            { :include_blank => true },
+                                                                                                            { :onkeypress    => "return bloqEnter(event)",
+                                                                                                              :onkeyup       => "EnterTab(event,'filtro')" })   %></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+              <input  id      ="button"
+                      type    ="submit"
+                      class   = "button_info"
+                      value   ="Informe"
+                      onclick = "Tipo('0')"/>
+
+              <input type     = "submit"
+                     class   = "button_info"
+                     value    = "Excel"
+                     onclick  = "Tipo('1')"/>
+
+
+            <input  id      ="button"            
+                    type    ="submit"
+                    class   = "button_info"
+                    value   ="Planilha"
+                    onclick = "Tipo('2')"/>
+            </td>
+
+          </tr>
+
+          <input type  = "hidden"
+                 name  = "tipo"
+                 id    = "tipo"
+                 size  = "5"
+                 value = "0"/>
+        </table>
+      <% end %>
+
+    </h2>
+  </div>
+</body>
+
+

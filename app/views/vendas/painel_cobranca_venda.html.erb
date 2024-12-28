@@ -1,0 +1,92 @@
+<style type="text/css">
+  .rolagem td, .head_grid td, .acessos a{
+    cursor:pointer;
+    color: #000 !important;
+    font-size: 14px;
+  }
+</style>
+<% count_v = 0 %>
+<% count_a = 0 %>
+<h1 id="header">Painel de Cobranzas [Pendentes]</h1>
+<div class="acessos">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="row">
+        <div class="col-md-8">
+          <form action="#" id="form_painel_venda">
+            <%= search_field_tag :filtro_comanda, nil, placeholder: 'Comanda', class: 'panel-field', autofocus: true, onkeyup: "pesquisa(this.value)", autocomplete: 'off' %>
+          </form>
+          
+        </div>
+        <div class="col-md-4"><%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none; margin-top: 10px") %></div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <a href="/vendas?processo=venda-finalizada" title="" class="btn btn-default">Bajadas</a>
+        <a href="javascript:window.location.reload(true)" class="btn btn-default"><i class="icon-refresh"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="pagina"></div>
+
+<script type="text/javascript">
+  function OpenCobraca(id){
+    window.location = '/vendas/'+ id +'/financas';
+
+  };
+
+  function pesquisa(valor){
+    url="/vendas/busca_painel_cobranca_venda?" + $('form').serialize();
+    ajax(url);
+  }
+
+</script>
+
+<%= javascript_include_tag 'busca_ajax' %>
+
+<script>
+    document.onkeydown=function(e)
+    {
+      if(e.which == 27)
+        self.close();
+
+      if(e.keyCode == 40){
+            valor = parseInt($("#foco").val()) + 1;
+            $("#foco").val(valor)
+             campo     = '#'+ valor
+             c_campo   = '.'+ valor
+             ant_campo = '.'+ (valor - 1)
+            $(campo).focus()
+
+            if ((valor - 1)%2 == 0){
+              $(ant_campo).css('backgroundColor','#fff');
+            }else{
+              $(ant_campo).css('backgroundColor','#fff');
+            };
+
+            $(c_campo).css('backgroundColor','#e6ebf2');
+
+           return false;
+         }
+
+         if(e.keyCode == 38){
+            valor = parseInt($("#foco").val()) - 1;
+            $("#foco").val(valor)
+             campo     = '#'+ valor
+             c_campo   = '.'+ valor
+             ant_campo = '.'+ (valor + 1)
+            $(campo).focus()
+            if ((valor + 1)%2 == 0){
+              $(ant_campo).css('backgroundColor','#fff');
+            }else{
+              $(ant_campo).css('backgroundColor','#fff');
+            };
+
+            $(c_campo).css('backgroundColor','#e6ebf2');
+           return false;
+         }
+    }
+  </script>

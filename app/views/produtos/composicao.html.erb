@@ -1,0 +1,99 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-md-2">
+          <%= image_tag @produto.picture, class: 'img-thumbnail' %>
+        </div>
+        <div class="col-md-9">
+          <label><i class="icon-tag"></i> <b><%= @produto.id.to_s.rjust(6,'0')%>-<%= @produto.nome %></b></label>
+        </div>
+        <div class="col-md-1" align="right">
+          <%= link_to image_tag("icon-edit.png", width: '13'), edit_produto_path(@produto), class: 'btn btn-default' %>
+
+          <%= link_to  produto_path(:id => @produto.id), :confirm => 'Estas Seguro?', :method => :delete, :class => "btn btn-danger", style:"margin-top: 5px" do %>
+            <i class="icon-white icon-trash"></i>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <%= link_to produto_path(@produto.id) do %>
+    <div class="panel">
+      <header class="panel-heading link-prod">
+        <div class="row">
+          <div class="col-md-2">
+            <div class="tag-volante">
+              <%= image_tag "lista.png", height: '20' %>
+            </div>
+          </div>
+          <div class="col-md-10">
+            <p><b>Lista de Precio</b></p>
+          </div>
+        </div>
+      </header>
+    </div>
+    <% end %>
+  </div>
+
+  <div class="col-md-6">
+    <div class="panel">
+      <%= link_to composicao_produto_path(@produto.id) do %>
+      <header class="panel-heading link-prod">
+        <div class="row">
+          <div class="col-md-2">
+            <div class="tag-capacidade">
+              <%= image_tag "formula.png", height: '25' %>
+            </div>
+          </div>
+          <div class="col-md-10">
+            <p><b>Composición del Producto / Formula</b></p>
+          </div>
+        </div>
+      </header>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-body">
+				<div class="grid">
+				  <%= render :partial=>"produto_composicaos/index_composicao", :locals=>{:produto_composicao => @produto, :produto_composicaos => @produto.produto_composicao} %>
+				</div>
+				<%= render :partial => '/produto_composicaos/new_composicao', :locals=>{:produto_composicao=>ProdutoComposicao.new(:produto_id=>@produto.id)}%>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style type="text/css">
+  .link-prod:hover{
+    background-color: #e6ebf2 !important;
+  }
+  .panel-heading{
+    padding: 10px;
+  }
+  .tag-volante{
+    background-color: #2abb9b;
+    padding: 0px 25px;
+    border-radius: 100px;
+    display: table;
+  }
+
+  .tag-capacidade{
+    background-color: #f2b968;
+    padding: 0px 25px;
+    border-radius: 100px;
+    display: table;
+  }
+</style>

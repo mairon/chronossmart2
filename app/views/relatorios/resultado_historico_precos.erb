@@ -1,0 +1,14 @@
+
+<div class="group">
+    <table>
+      <% @historico_preco.each do |hist| %>
+         <% cod = Produto.find_by_id(hist.produto_id);%>
+         <tr class = "<%= cycle("cor1", "cor2") %>">
+             <td width="80"  align="center">   <%=  hist.data.strftime("%d/%m/%Y")%></td>
+             <td width="400" align="left">     <%=  hist.produto_nome %></td>
+             <td width="100" align="right">    <%=  number_to_currency(hist.preco_venda_guarani, :format=>' %n ', :precision => 0 )  %></td>
+             <td width="100" align="right">    <%=  number_to_currency(hist.preco_venda_dolar, :format=>' %n ', :separeitor => "," )  %></td>
+        </tr>
+      <% end %>
+    </table>
+</div>

@@ -1,0 +1,53 @@
+<% total  = 0 %>
+
+<div class="group" style="width:400px">
+	<tr>
+		<td colspan='2'>
+			<p style="padding: 5px; font-size:16px">Caixas</p>
+		</td>
+	</tr>
+	<table class="head_grid">
+		<tr>
+			<td width="300">Caixa</td>
+			<td width="150" align="right"><%= t('VALUE') %></td>
+		</tr>
+	</table>
+
+	<div class="rolagem" dir="div" style="height:150px">
+		<table>
+			<% @caixas.each do |caixa| %>
+				<tr>
+					<td width="300"><%= caixa.nome %></td>
+					<td width="150" align="right"><%= format_decimal(caixa.valor) %></td>
+				</tr>
+				<%= total  = total.to_f + caixa.valor.to_f %>
+			<% end %>
+		</table>
+		<p style="float: right; margin-right:20px"><b>Total: <%= format_decimal(total.to_f) %></b></p>
+	</div>
+</div>
+<div class="group" style="width:400px">
+	<tr>
+		<td colspan='2'>
+			<p style="padding: 5px; font-size:16px">Bancos</p>
+		</td>
+	</tr>
+	<table class="head_grid">
+		<tr>
+			<td width="300">Banco</td>
+			<td width="150" align="center"><%= t('VALUE') %></td>
+		</tr>
+	</table>
+
+	<div class="rolagem" dir="div" style="height:150px">
+		<table>
+			<% @bancos.each do |banco| %>
+				<tr>
+					<td width="300"><%= banco.nome %></td>
+					<td width="150" align="center"><%= format_decimal(banco.valor) %></td>
+				</tr>
+			<% end %>
+		</table>
+		<p style="float: right; margin-right:20px"><b>Total: <%= format_decimal(total.to_f) %></b></p>
+	</div>
+</div>

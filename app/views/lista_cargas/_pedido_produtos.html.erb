@@ -1,0 +1,81 @@
+<%= form_tag "/lista_cargas/#{@lista_carga.id}/add_produtos" do %>
+	<div class="group">
+		<h2>
+			<% if params[:presupuesto_id].present? %>
+				Pedido: <%= params[:presupuesto_id] %> - Cliente: <%= @pedido.persona.nome %> <a href="#" title="+ Detalhes" onclick="DetalhePedido(<%= params[:presupuesto_id] %>)">+ Detalhes</a>
+			<% end %>
+		</h2>
+		<table class="head_grid">
+			<tr>
+				<td width="40" align="right">Peso</td>
+				<td width="250">Producto</td>
+				<td width="40" align="right">Qtd.</td>
+				<td width="40" align="right">Stock</td>
+				<td width="40" align="right">Env.</td>
+				<td width="72" align="right">Pendente</td>
+			</tr>
+		</table>
+		<% if params[:presupuesto_id].present? %>
+			<div class="rolagem" dir="div" style="height: 160px">
+			<table>
+				<% pd_saldo = 0 %>
+				<% @pedido_produtos.each do |pp| %>
+					<%= fields_for "products[]", pp do |f| %>
+					<%= f.hidden_field :lista_carga_id, value: @lista_carga.id %>
+					<%= f.hidden_field :produto_id, value: pp.produto_id %>
+					<%= f.hidden_field :presupuesto_id, value: pp.presupuesto_id %>
+					<%= f.hidden_field :presupuesto_produto_id, value: pp.id %>
+					<tr class="<%= cycle("cor1", "cor2")%>">
+						<td width="40" align="right"><%= pp.peso.to_f %></td>
+						<td width="250"><%= pp.produto_nome %></td>						
+						<td width="40" align="right"><%= pp.quantidade.to_f %></td>
+						<td width="40" align="right"><%= pp.stock.to_f %></td>
+						<td width="40" align="right"><%= pp.qtd_enviado.to_f %></td>
+						<td width="72" align="right">
+
+							<% if (pp.quantidade.to_f - pp.qtd_enviado.to_f) > 0 and pp.stock.to_f > 0 %>
+
+								<% if (pp.quantidade.to_f - pp.qtd_enviado.to_f) >= pp.stock.to_f %>
+									<% saldo = (pp.stock.to_f - pp.qtd_enviado.to_f)  %>
+								<% elsif pp.stock.to_f >= (pp.quantidade.to_f - pp.qtd_enviado.to_f) %>
+									<% saldo = (pp.quantidade.to_f - pp.qtd_enviado.to_f) %>
+								<% end %>
+							<% end %>
+							<% if saldo.to_i <= 0 %>
+								<%= f.telephone_field :quantidade, value: saldo.to_i, dir: "rtl", :class => "form-control", disabled: true  %>
+							<% else %>	
+								<%= f.telephone_field :quantidade, value: saldo.to_i, :class => "form-control", dir: "rtl"  %>
+							<% end %>
+							
+							<% pd_saldo += saldo.to_i %>
+						</td>
+					</tr>
+					<% end %>	
+				<% end %>
+			</table>
+			</div>
+		<table class="head_grid">
+		  <tr>
+		    <td width="130"><%= submit_tag " Add Productos ",:disable_with => "Aguarde...", :class => "button"  %></td>
+		    <td width="285"></td>
+		    <td width="60" align="right" style="padding-right: 10px"><%= pd_saldo %></td>
+		  </tr>  
+		</table>
+	</div>
+<% end %>
+
+<script type="text/javascript">
+$('#selectAllM').click(function() {
+   if (this.checked) {
+       $('.m').each(function() {
+           this.checked = true;
+       });
+   } else {
+      $('.m').each(function() {
+           this.checked = false;
+       });
+   } 
+});
+</script>
+
+<% end %>

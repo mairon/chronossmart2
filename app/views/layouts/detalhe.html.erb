@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <title>Chornos</title>
+    <%= stylesheet_link_tag 'application', 'themes/base/jquery.ui.all', :media => 'all'%>
+    <%= javascript_include_tag 'application', 'cadastros' %>
+  </head>
+  <body data-plus-as-tab="true">
+    <div class="cabeca">
+      <span class="style1">Chronos</span>
+      <span class="style2">
+        Unidad:   <%= current_user.usuario_nome %>
+        Usuario:   <%= current_unidade.unidade_nome %>
+        <% if session[:logged] %>
+          <%= link_to "logout", login_path(1) ,:method => :delete %>
+        <% end %>
+      </span>
+    </div>
+
+    <div id="contents">
+      <%= yield :layout %>
+    </div>
+  </body>
+  <script>
+    $(function(){
+      $(".money_us").maskMoney({thousands:".", decimal:","});
+      $(".money_gs").maskMoney({thousands:".", decimal:",", precision:0, defaultZero: true});
+      $(".select").select2();
+      $(".selc_medium").select2();
+      $(".selc_mini").select2();
+    })
+  </script>
+</html>

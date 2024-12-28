@@ -1,0 +1,93 @@
+<div class="row">
+  <div class="col-md-10">
+    <div class="panel">
+      <h1 id="header">
+        Transações
+        <div class="pull-right">
+          <%= link_to 'Compra/Venda', '#', class: 'button add', 'data-toggle' => "modal", 'data-target' => "#form_cv", 'data-dismiss' => "modal", 'aria-labe' => "Close" %>
+          <%= link_to 'Pagamento/Recebimento', '#', class: 'button add', 'data-toggle' => "modal", 'data-target' => "#form_pr", 'data-dismiss' => "modal", 'aria-labe' => "Close" %>
+        </div>
+      </h1>
+    <div class="panel-body">
+      <%= form_tag "#", :method => "get", id: "form_v" do %>
+        <div class="row">
+          <div class="col-md-4">
+            <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+              <div class="input-group-addon-f" style="margin-right: 5px">
+                <span class="icon-calendar"></span>
+              </div>
+
+
+          <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+              <div class="input-group-addon-f">
+                <span class="icon-calendar"></span>
+              </div>
+
+          </div>
+          <div class="col-md-4">
+            <%= select("busca", "persona", Persona.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Favorecido'}) %>
+          </div>
+
+          <div class="col-md-3">
+            <%= select_tag :operacao, options_for_select([ ["Operações", ""], ["Compra","0"], ["Vendas","1"],["Pagamento","3"], ["Recebimento","2"]]) %>
+          </div>
+
+          <div class="col-md-1">
+            <input type="button" class="btn btn-blue" onclick="pesquisa()" value="Buscar"/>
+            <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinner", :width => 21, :height => 21, :style =>"display: none;" ) %>
+          </div>
+      </div>
+      <% end %>
+    </div>
+  </div>
+     <div id="pagina"></div>    
+  </div>
+  <div class="col-md-2">
+    <%= render 'saldos' %>
+  </div>
+
+</div>
+
+
+<script language="javascript">
+  function pesquisa(valor){
+    url="/transacoes/busca?" + $('#form_v').serialize();
+    ajax(url);
+  }
+  $('#busca_persona, #operacao').selectize();
+</script>
+
+<%= javascript_include_tag 'busca_ajax' %>
+
+<div class="modal fade" id="form_cv" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 400px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('NEW') %> Compra/Venda</h4>
+      </div>
+      <div class="modal-body">
+        <%= render 'form_cv' %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="form_pr" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 400px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('NEW') %> Pagamento/Recebimento</h4>
+      </div>
+      <div class="modal-body">
+        <%= render 'form_pr' %>
+      </div>
+    </div>
+  </div>
+</div>

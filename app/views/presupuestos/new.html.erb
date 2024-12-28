@@ -1,0 +1,5 @@
+<% if Empresa.last.segmento.to_i == 1 %>
+	<%= render 'form_educacao' %>
+<% else %>
+	<%= render 'form_comercial' %>
+<% end %>

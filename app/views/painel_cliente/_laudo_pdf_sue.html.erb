@@ -1,0 +1,1111 @@
+<style type="text/css">
+	.page-break { display:block; clear:both; page-break-after:always;  }
+	table {
+		font-family:Lucida Console;
+		font-size:11px;
+		border-collapse: collapse;
+	}
+	table td{
+		height:25px;
+
+	}
+	.header{
+		font-size: 12px;
+		border:1px solid black;
+	  -moz-border-radius:8px;
+	  -webkit-border-radius:8px;
+
+
+	}
+	.obs{
+		font-size: 7px;
+	}
+
+</style>
+<body>
+<% @amostras.each do |a| %>
+<div class="page-break">
+
+	<table>
+		<tr>
+			<td colspan="5">
+				<div >
+					<table>
+				    <tr>
+				    	<td colspan="2"><%= wicked_pdf_image_tag('logo_biosollo.png', :width => 150, :height => 80) %></td>
+				    	<td width="700" align="center" valign="bottom">
+				    		<p>Km 4 Super Carretera - Teléfono: (061) 573 616</p>
+				    		<p>www.biosollo.com.py - biosollo@biosollo.com.py - Ciudad del Este - Paraguay</p>
+				    	</td>
+				    </tr>
+			    </table>
+			    </div>
+	  	</td>
+		</tr>
+
+		<tr>
+			<td width="1500" colspan='2'>
+				<div class="header">
+					<table>
+				    <tr height="20">
+				    	<td>Solicitante:</td>
+				    	<td  width="500" colspan="3"><%= a.empresa_nome %></td>
+				    </tr>
+
+				    <tr height="20">
+				    	<td>Proprietário:</td>
+				    	<td width="300"><%= a.solicitante %></td>
+				    	<td><%= t('DATE') %> Ingreso:</td>
+				    	<td><%= a.data.to_date.strftime("%d/%m/%Y") %></td>
+				    </tr>
+
+				    <tr height="20">
+				    	<td>Dirección:</td>
+				    	<td><%= a.local_coleta %></td>
+				    	<td><%= t('DATE') %> Liberación:</td>
+				    	<td><%= @revisao_result.data.to_date.strftime("%d/%m/%Y") %></td>
+				    </tr>
+
+						<tr height="20">
+				    	<td>Ident. Muestra:</td>
+				    	<td>
+	    	    		 <%= 'LT: ' + a.lote.to_s unless a.lote.to_s.blank? %>  
+	    	    		 <%= '- PT: ' + a.detalhe_amostra.to_s unless a.detalhe_amostra.to_s.blank? %>
+	    	    		 <%=  '- PROF: ' + a.profundidade.to_s unless a.profundidade.to_s.blank?  %>
+									
+    	    		 </td>
+
+				    	<td>Control:</td>
+				    	<td><%= a.amostra.to_s.rjust(6,'0') %></td>
+				    </tr>
+					</table>
+				</div>
+
+			</td>
+		</tr>
+		<tr>
+			<td width="1500" colspan='5' align="center">
+				<div class="header">
+						<h2>Resultado de Analisis del Suelo</h2>
+				</div>
+			</td>
+		</tr>
+
+    <tr>
+	    	<td width="525" valign="top">
+	    		<table border="1">
+	    			<tr>
+	    				<td width="180"><b>ELEMENTOS</b></td>
+	    				<td width="0" align="center"></td>
+	    				<td width="80" align="center" style="font-size:9px;"><b>Cmol/dm³</b></td>
+	    				<td width="85" align="center"><b>BAJO</b></td>
+	    				<td width="85" align="center"><b>MEDIO</b></td>
+	    				<td width="85" align="center"><b>ALTO</b></td>
+	    			</tr>
+	    			<tr>
+	    				<td width="160">Cálcio </td>
+	    				<td width="100" align="center"><b>Ca</b></td>
+	    				<% calcio = AmostraEnsaio.find_by_metodo_id( 134, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if calcio != nil %>
+		    				<td width="70" align="center"><%= number_to_currency( calcio.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+		    					<% if calcio.resultado.to_f <= 2.011 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+		    					<% elsif calcio.resultado.to_f > 2.011 and  calcio.resultado.to_f <= 4.0 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+
+		    					<% elsif calcio.resultado.to_f > 4.0 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    					<% end %>
+		    				<% else %>
+			    				<td width="70" align="center">NS</td>
+	    						<td></td>
+	    						<td></td>
+	    						<td></td>
+	    				<% end %>
+	    			</tr>
+
+	    			<tr>
+	    				<td>Magnesio</td>
+	    				<td align="center"><b>Mg</b></td>
+	    				<% magnesio = AmostraEnsaio.find_by_metodo_id( 38, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if magnesio != nil %>
+		    				<td width="50" align="center"><%= number_to_currency( magnesio.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+	    					<% if magnesio.resultado.to_f <= 0.411 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+	    					<% elsif magnesio.resultado.to_f > 0.411 and  magnesio.resultado.to_f <= 0.811 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+	    					<% elsif magnesio.resultado.to_f >  0.811 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+	    					<% end %>
+		    			<% else %>
+		    				<td width="50" align="center">NS</td>
+    						<td></td>
+    						<td></td>
+    						<td></td>
+	    				<% end %>
+	    			</tr>
+
+	    			<tr>
+	    				<td>Potásio</td>
+	    				<td align="center"><b>K</b></td>
+	    				<% potasio = AmostraEnsaio.find_by_metodo_id( 29, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if potasio != nil %>
+		    				<td width="50" align="center"><%= number_to_currency( potasio.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+	    					<% if potasio.resultado.to_f <= 0.1511 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+	    					<% elsif potasio.resultado.to_f > 0.1511 and  potasio.resultado <= 0.3011 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+	    					<% elsif potasio.resultado.to_f >  0.3011 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+	    					<% end %>
+		    			<% else %>
+	    					<td width="50" align="center">NS</td>
+    						<td></td>
+    						<td></td>
+    						<td></td>
+	    				<% end %>
+	    			</tr>
+
+	    			<tr>
+	    				<td> Alumínio</td>
+	    				<td align="center"><b>Al</b></td>
+	    				<% aluminio = AmostraEnsaio.find_by_metodo_id( 16, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if aluminio != nil %>
+		    				<td width="50" align="center"><%= number_to_currency( aluminio.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+	    					<% if aluminio.resultado.to_f <= 0.511 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+	    					<% elsif aluminio.resultado.to_f > 0.511 and  aluminio.resultado <= 1.011 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+	    					<% elsif aluminio.resultado.to_f >  1.011 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+	    					<% end %>
+		    			<% else %>
+		    				<td width="50" align="center">NS</td>
+    						<td></td>
+    						<td></td>
+    						<td></td>
+	    				<% end %>
+	    			</tr>
+
+	    			<tr>
+	    				<td>H + Alumínio</td>
+	    				<td align="center"><b>H+Al</b></td>
+	    				<% ph_smp = AmostraEnsaio.find_by_metodo_id( 41, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if ph_smp != nil %>
+		    				<td width="50" align="center">
+		    					<% h_aluminio_result = case  ph_smp.resultado %>
+		    						<% when 8 then 1.12 %>
+		    						<% when 7.9 then 1.21 %>
+		    						<% when 7.8 then 1.30 %>
+		    						<% when 7.7 then 1.40 %>
+		    						<% when 7.6 then 1.51 %>
+		    						<% when 7.5 then 1.62 %>
+		    						<% when 7.4 then 1.75 %>
+		    						<% when 7.3 then 1.89 %>
+		    						<% when 7.2 then 2.03 %>
+		    						<% when 7.1 then 2.19 %>
+		    						<% when 7.0 then 2.36 %>
+		    						<% when 6.9 then 2.54 %>
+		    						<% when 6.8 then 2.74 %>
+		    						<% when 6.7 then 2.95 %>
+		    						<% when 6.6 then 3.18 %>
+		    						<% when 6.5 then 3.42 %>
+		    						<% when 6.4 then 3.68 %>
+		    						<% when 6.3 then 3.97 %>
+		    						<% when 6.2 then 4.28 %>
+		    						<% when 6.1 then 4.61 %>
+		    						<% when 6.0 then 4.96 %>
+		    						<% when 5.9 then 5.35 %>
+		    						<% when 5.8 then 5.76 %>
+		    						<% when 5.7 then 6.21 %>
+		    						<% when 5.6 then 6.69 %>
+		    						<% when 5.5 then 7.20 %>
+		    						<% when 5.4 then 7.76 %>
+		    						<% when 5.3 then 8.36 %>
+		    						<% when 5.2 then 9.00 %>
+		    						<% when 5.1 then 9.70 %>
+		    						<% when 5.0 then 10.45 %>
+		    						<% when 4.9 then 11.26 %>
+		    						<% when 4.8 then 12.13 %>
+		    						<% when 4.7 then 13.06 %>
+		    						<% when 4.6 then 14.08 %>
+		    						<% when 4.5 then 15.16 %>
+		    						<% when 4.4 then 16.33 %>
+		    						<% when 4.3 then 17.60 %>
+		    						<% when 4.2 then 18.96 %>
+		    						<% when 4.1 then 20.42 %>
+		    						<% when 4.0 then 22.00 %>
+		    						<% when 3.9 then 23.70 %>
+		    						<% when 3.8 then 25.53 %>
+		    						<% when 3.7 then 27.50 %>
+		    						<% when 3.6 then 29.63 %>
+		    						<% when 3.5 then 31.92 %>
+		    					<% end %>
+		    					<%= number_to_currency( h_aluminio_result.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+		    				</td>
+		    					<% if h_aluminio_result.to_f <= 2.011 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+		    					<% elsif h_aluminio_result.to_f > 2.011 and  h_aluminio_result.to_f <= 4.011 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+		    					<% elsif h_aluminio_result.to_f >  4.011 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    					<% end %>
+	    					<% else %>
+									<td width="50" align="center">NS</td>
+									<td></td>
+	    						<td></td>
+	    						<td></td>
+	    				<% end %>
+	    			</tr>
+
+						<tr>
+	    				<td><%= t('SUM') %> de Bases</td>
+	    				<td align="center"><b>S</b></td>
+	    				<% if calcio != nil %>
+		    				<td width="50" align="center"><%= number_to_currency( s_b = (calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f).round(2) , :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+		    					<% if (s_b.to_f.round(3)) <= 2.611 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+										<% elsif (s_b.to_f.round(3)) > 2.611 and (s_b.to_f.round(3)) <= 5.4 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+		    					<% elsif (s_b.to_f.round(3)) >  5.4 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    					<% end %>
+	    					<% else %>
+	    					<td width="50" align="center">NS</td>
+    						<td></td>
+    						<td></td>
+    						<td></td>
+	    				<% end %>
+	    			</tr>
+
+						<tr>
+	    				<td>CTC</td>
+	    				<td align="center"><b>T</b></td>
+	    				<% if calcio != nil %>
+		    				<td width="50" align="center"><%= number_to_currency( ctc_result = ((calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f) + h_aluminio_result.to_f).round(2)  , :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+		    				<% if ((calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f) + h_aluminio_result.to_f) <= 5 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+	    					<% elsif((calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f) + h_aluminio_result.to_f) > 5 and ((calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f) + h_aluminio_result.to_f) <= 10 %>
+		    						<td>============</td>
+		    						<td>========</td>
+		    						<td></td>
+	    					<% elsif ((calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f) + h_aluminio_result.to_f) >  10 %>
+	    						<td>============</td>
+		    					<td>============</td>
+		    					<td>=====</td>
+	    					<% end %>
+	    				<% else %>
+	    					<td width="50" align="center">NS</td>
+    						<td></td>
+    						<td></td>
+    						<td></td>
+							<% end %>
+	    			</tr>
+
+	    			<tr>
+		  				<td colspan="2"></td>
+		  				<td align='center'><b>g/dm³</b></td>
+		  				<td colspan="3"></td>
+	    			</tr>
+
+						<tr>
+	    				<td>Carbono</td>
+	    				<td align="center"><b>C</b></td>
+	    				<% carbono = AmostraEnsaio.find_by_metodo_id( 11, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if carbono != nil %>
+		    				<td width="50" align="center"><%= number_to_currency( carbono.resultado  , :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+		    				<% if carbono.resultado.to_f <= 8.011 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+		    				<% elsif carbono.resultado.to_f > 8.011 and carbono.resultado <= 14.011 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+		    				<% elsif carbono.resultado.to_f >  14.011 %>
+	    						<td>============</td>
+		    					<td>============</td>
+		    					<td>=====</td>
+		    				<% end %>
+		    			<% else %>
+	    					<td width="50" align="center">NS</td>
+    						<td></td>
+    						<td></td>
+    						<td></td>
+	    				<% end %>
+	    			</tr>
+
+						<tr>
+	    				<td>M. Orgánica</td>
+	    				<td align="center"><b>MO</b></td>
+	    				<% if carbono != nil %>
+		    				<td width="50" align="center"><%= number_to_currency( carbono.resultado.to_f * 1.72 , :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+		    					<% if (carbono.resultado.to_f * 1.72) <= 14.011 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+		    					<% elsif (carbono.resultado.to_f * 1.72) > 14.011 and (carbono.resultado.to_f * 1.72) <= 24.011 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+		    					<% elsif (carbono.resultado.to_f * 1.72) >  24.011 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    					<% end %>
+		    				<% else %>
+	    					<td width="50" align="center">NS</td>
+    						<td></td>
+    						<td></td>
+    						<td></td>
+	    				<% end %>
+	    			</tr>
+
+	    			<tr>
+	    				<td colspan="2"></td>
+	    				<td align='center'><b>%</b></td>
+	    				<td colspan="3"></td>
+	    			</tr>
+
+						<tr>
+	    				<td>Sat. Alumínio</td>
+	    				<td align="center"><b>Al</b></td>
+	    				<% aluminio = AmostraEnsaio.find_by_metodo_id( 16, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if aluminio != nil %>
+		    				<td width="50" align="center"><%= number_to_currency( (aluminio.resultado.to_f * 100) / (aluminio.resultado.to_f + calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f) , :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+									<% if ((aluminio.resultado.to_f * 100) / (aluminio.resultado.to_f + calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f)) <= 10.011 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+		    					<% elsif ((aluminio.resultado.to_f * 100) / (aluminio.resultado.to_f + calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f)) > 10.011 and ((aluminio.resultado.to_f * 100) / (aluminio.resultado.to_f + calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f)) <= 20.011 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+		    					<% elsif ((aluminio.resultado.to_f * 100) / (aluminio.resultado.to_f + calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f)) >  20.011 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    					<% end %>
+		    				<% else %>
+	    					<td width="50" align="center">NS</td>
+    						<td></td>
+    						<td></td>
+    						<td></td>
+
+	    				<% end %>
+	    			</tr>
+
+						<tr>
+	    				<td>Sat. Bases </td>
+	    				<td align="center"><b>V</b></td>
+	    				<% if calcio != nil %>
+		    				<td width="50" align="center"><%= number_to_currency( resul_sat_base = (((calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f) * 100) / ( (calcio.resultado.to_f + magnesio.resultado.to_f + potasio.resultado.to_f) + h_aluminio_result.to_f)) , :format=>' %n ', :separeitor => ",", :precision => 2) %>
+		    				</td>
+		    				<% if resul_sat_base.to_f <= 50.011 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+		    				<% elsif resul_sat_base.to_f > 50.011 and resul_sat_base.to_f <= 70.011 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+		    				<% elsif resul_sat_base.to_f >  70.011 %>
+	    						<td>============</td>
+		    					<td>============</td>
+		    					<td>=====</td>
+		    				<% end %>
+		    			<% else %>
+	    					<td width="50" align="center">NS</td>
+    						<td></td>
+    						<td></td>
+    						<td></td>
+	    				<% end %>
+	    			</tr>
+
+	    			<tr>
+		  				<td colspan="2"></td>
+		  				<td align='center'><b>mg/dm³</b></td>
+		  				<td colspan="3"></td>
+	    			</tr>
+
+						<tr>
+	    				<td> Fósforo</td>
+	    				<td align="center"><b>P</b></td>
+	    				<% fosforo = AmostraEnsaio.find_by_metodo_id( 13, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if fosforo != nil %>
+		    				<td width="50" align="center">
+		    					<%= number_to_currency( fosforo.resultado, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+		    				</td>
+	    					<% if fosforo.resultado.to_f <= 6.011 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+	    					<% elsif fosforo.resultado.to_f > 6.011 and fosforo.resultado <= 9.011 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+	    					<% elsif fosforo.resultado.to_f >  9.011 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+	    					<% end %>
+    					<% else %>
+	    					<td width="50" align="center">NS</td>
+    						<td></td>
+    						<td></td>
+    						<td></td>
+    					<% end %>
+	    			</tr>
+
+						<tr>
+	    				<td>Hierro</td>
+	    				<td align="center"><b>Fe</b></td>
+	    				<% ferro = AmostraEnsaio.find_by_metodo_id( 33, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if ferro != nil %>
+		    				<td width="50" align="center"><%= number_to_currency( ferro.resultado, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+	    					<% if ferro.resultado.to_f <= 15.011 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+	    					<% elsif ferro.resultado.to_f > 15.011 and ferro.resultado <= 40.011 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+	    					<% elsif ferro.resultado.to_f >  40.011 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+	    					<% end %>
+		    			<% else %>
+	    					<td width="50" align="center">NS</td>
+    						<td></td>
+    						<td></td>
+    						<td></td>
+		    			<% end %>
+	    			</tr>
+
+						<tr>
+	    				<td>Manganeso</td>
+	    				<td align="center"><b>Mn</b></td>
+	    				<% manganes = AmostraEnsaio.find_by_metodo_id( 32, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if manganes != nil %>
+		    				<td width="50" align="center"><%= number_to_currency( manganes.resultado, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+	    					<% if manganes.resultado.to_f <= 4.011 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+	    					<% elsif manganes.resultado.to_f > 4.011 and manganes.resultado <= 8.011 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+	    					<% elsif manganes.resultado.to_f >  8.011 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+	    					<% end %>
+		    			<% else %>
+	    				  <td width="50" align="center">NS</td>
+    						<td></td>
+    						<td></td>
+    						<td></td>
+	    				<% end %>
+	    			</tr>
+
+						<tr>
+	    				<td>Cobre</td>
+	    				<td align="center"><b>Cu</b></td>
+	    				<% cobre = AmostraEnsaio.find_by_metodo_id( 30, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if cobre != nil %>
+		    				<td width="50" align="center"><%= number_to_currency( cobre.resultado, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+	    					<% if cobre.resultado.to_f <= 0.411 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+	    					<% elsif cobre.resultado.to_f > 0.411 and cobre.resultado <= 1.511 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+	    					<% elsif cobre.resultado.to_f >  1.511 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+
+	    					<% end %>
+    					<% else %>
+	    					<td width="50" align="center">NS</td>
+    						<td></td>
+    						<td></td>
+    						<td></td>
+	    				<% end %>
+	    			</tr>
+
+						<tr>
+	    				<td>Zinc</td>
+	    				<td align="center"><b>Zn</b></td>
+	    				<% zinco = AmostraEnsaio.find_by_metodo_id( 31, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if zinco != nil %>
+		    				<td width="50" align="center"><%= number_to_currency( zinco.resultado, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+	    					<% if zinco.resultado.to_f <= 0.811 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+	    					<% elsif zinco.resultado.to_f > 0.811 and zinco.resultado <= 1.511 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+	    					<% elsif zinco.resultado.to_f >  1.511 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+
+	    					<% end %>
+	  					<% else %>
+		    				<td width="50" align="center">NS</td>
+	  						<td></td>
+	  						<td></td>
+	  						<td></td>
+	    				<% end %>
+	    			</tr>
+
+						<tr>
+	    				<td height="6"></td>
+	    			</tr>
+
+						<tr>
+	    				<td>pH H2O</td>
+	    				<td align="center"></td>
+	    				<% ph_h2o = AmostraEnsaio.find_by_metodo_id( 15, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if ph_h2o != nil %>
+			    				<td width="50" align="center"><%= number_to_currency( ph_h2o.resultado, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+				    					<% if ph_h2o.resultado.to_f <= 5.411 %>
+				    						<td>=====</td>
+				    						<td></td>
+				    						<td></td>
+				    					<% elsif ph_h2o.resultado.to_f > 5.411 and ph_h2o.resultado.to_f <= 6.011 %>
+				    						<td>============</td>
+				    						<td>=====</td>
+				    						<td></td>
+				    					<% elsif ph_h2o.resultado.to_f >  6.011 %>
+					    					<td>============</td>
+				    						<td>============</td>
+				    						<td>=====</td>
+				    					<% end %>
+			    			<% else %>
+			    				<td width="50" align="center">NS</td>
+	    						<td></td>
+	    						<td></td>
+	    						<td></td>
+		    			<% end %>
+	    			</tr>
+
+
+						<tr>
+	    				<td>pH SMP</td>
+	    				<td align="center"></td>
+	    				<% ph_smp = AmostraEnsaio.find_by_metodo_id( 41, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if ph_smp != nil %>
+		    				<td width="50" align="center"><%= number_to_currency( ph_smp.resultado, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+	    					<% if ph_smp.resultado.to_f <= 5.411 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+	    					<% elsif ph_smp.resultado.to_f > 5.411 and ph_smp.resultado.to_f <= 5.511 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+	    					<% elsif ph_smp.resultado.to_f >  5.511 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+
+	    					<% end %>
+    				<% else %>
+	    				<td width="50" align="center">NS</td>
+  						<td></td>
+  						<td></td>
+  						<td></td>
+    				<% end %>
+	    		</tr>
+
+					<tr>
+    				<td>pH CaCl2</td>
+    				<td align="center"></td>
+    				<% ph_caci = AmostraEnsaio.find_by_metodo_id( 14, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+    				<% if ph_caci != nil %>
+	    				<td width="50" align="center"><%= number_to_currency( ph_caci.resultado, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+
+    					<% if ph_caci.resultado.to_f <= 5.411 %>
+    						<td>=====</td>
+    						<td></td>
+    						<td></td>
+    					<% elsif ph_caci.resultado.to_f > 5.411 and ph_caci.resultado.to_f <= 5.511 %>
+    						<td>============</td>
+    						<td>=====</td>
+    						<td></td>
+    					<% elsif ph_caci.resultado.to_f >  5.511 %>
+    						<td>============</td>
+    						<td>============</td>
+    						<td>=====</td>
+    					<% end %>
+					<% else %>
+    				<td width="50" align="center">NS</td>
+  						<td></td>
+  						<td></td>
+  						<td></td>
+  				<% end %>
+  			</tr>
+
+				<tr>
+  				<td colspan="2"><b>GRANULOMETRIA</b></td>
+  				<td align="center"><b>%</b></td>
+  				<td colspan="3"></td>
+  			</tr>
+
+						<tr>
+	    				<td>Arena</td>
+	    				<td align="center"></td>
+	    				<% argila = EntradaResultEnsaio.find_by_metodo_id( 140, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,resultado_silte') %>
+	    				<% silte = EntradaResultEnsaio.find_by_metodo_id( 140, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,resultado_silte') %>
+	    				<% areia = EntradaResultEnsaio.find_by_metodo_id( 140, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,resultado_silte') %>
+	    				<% if areia != nil %>
+		    				<td width="50" align="center">
+		    					<%= number_to_currency( 100 - (argila.resultado.to_f + silte.resultado_silte.to_f), :format=>' %n ', :separeitor => ",", :precision => 2) %>
+		    				</td>
+	    					<% if areia.resultado.to_f <= 5.411 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+	    					<% elsif areia.resultado.to_f > 5.411 and areia.resultado.to_f <= 5.511 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+	    					<% elsif areia.resultado.to_f >  5.511 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+	    					<% end %>
+		    			<% else %>
+	    					<td width="50" align="center">NS</td>
+    						<td></td>
+    						<td></td>
+    						<td></td>
+    					<% end %>
+	    			</tr>
+
+						<tr>
+	    				<td>Limo</td>
+	    				<td align="center"></td>
+	    				<% if silte != nil %>
+		    				<td width="50" align="center"><%= number_to_currency( silte.resultado_silte, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+	    					<% if silte.resultado.to_f <= 5.411 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+	    					<% elsif silte.resultado.to_f > 5.411 and silte.resultado.to_f <= 5.511 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+	    					<% elsif silte.resultado.to_f >  5.511 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+	    					<% end %>
+			    		<% else %>
+	    					<td width="50" align="center">NS</td>
+    						<td></td>
+    						<td></td>
+    						<td></td>
+	    				<% end %>
+	    			</tr>
+
+	    			<tr>
+	    				<td>Arcilla</td>
+	    				<td align="center"></td>
+	    				<% if argila != nil %>
+		    				<td width="50" align="center"><%= number_to_currency( argila.resultado, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+	    					<% if argila.resultado.to_f <= 5.411 %>
+		    						<td>=====</td>
+		    						<td></td>
+		    						<td></td>
+	    					<% elsif argila.resultado.to_f > 5.411 and argila.resultado.to_f <= 5.511 %>
+		    						<td>============</td>
+		    						<td>=====</td>
+		    						<td></td>
+	    					<% elsif argila.resultado.to_f >  5.511 %>
+		    						<td>============</td>
+		    						<td>============</td>
+		    						<td>=====</td>
+	    					<% end %>
+		    			<% else %>
+		    				<td width="50" align="center">NS</td>
+    						<td></td>
+    						<td></td>
+    						<td></td>
+	    				<% end %>
+	    			</tr>
+
+	    		</table>
+	    </td>
+	    <!-- Lado direito -->
+    	<td width="300"  style="height:0.78cm;" valign="top">
+	    		<table border='1'>
+	    			<tr><td colspan="2" align="center"><h3>OTROS ELEMENTOS</h3></td></tr>
+
+	    			<tr>
+	    				<td></td>
+	    				<td align="center"><b>mg/dm³</b></td>
+	    			</tr>
+
+	    			<tr>
+	    				<td width="150" align="center">Boro:</td>
+	    				<% boro = AmostraEnsaio.find_by_metodo_id( 40, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if boro != nil %>
+			    				<td width="150" align="center"><%= number_to_currency( boro.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+		    			<% else %>
+		    				<td width="150" align="center">NS</td>
+	    				<% end %>
+	    			</tr>
+
+	    			<tr>
+	    				<td width="150" align="center">Azufre:</td>
+	    				<% enchofre = AmostraEnsaio.find_by_metodo_id( 22, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if enchofre != nil %>
+		    				<td align="center">
+		    					 <%= number_to_currency( enchofre.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+		    				</td>
+		    			<% else %>
+		    			<td align="center">NS</td>
+		    			<% end %>
+	    			</tr>
+	    			<tr>
+	    				<td align="center">P rem:</td>
+	    				<% p_rem = AmostraEnsaio.find_by_metodo_id( 42, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if p_rem != nil %>
+		    				<td  align="center">
+			    					 <%= number_to_currency( p_rem.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+		    				</td>
+	    				<% else %>
+		    				<td align="center"> NS</td>
+	    				<% end %>
+	    			</tr>
+
+	    			<tr>
+	    				<td width="150" align="center">Na:</td>
+	    				<% na = AmostraEnsaio.find_by_metodo_id( 28, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    				<% if na != nil %>
+			    				<td align="center">
+			    						 <%= number_to_currency( na.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+			    				</td>
+	    				<% else %>
+			    				<td  align="center">NS</td>
+	    				<% end %>
+	    			</tr>
+	    		</table>
+
+					<table>
+						<tr>
+							<td style="height:0.50cm;"></td>
+						</tr>
+					</table>
+
+
+	    		<table border="1">
+						<tr>
+							<tr><td colspan="3" align="center">
+								<h3>RELACIONES</h3>
+								<p>(Cmol/dm³)</p>
+							</td></tr>
+						</tr>
+						<tr>
+							<td align="center" width="100">Ca/Mg</td>
+							<td align="center" width="100">Ca/K</td>
+							<td align="center" width="100">Mg/K</td>
+						</tr>
+
+	    			<tr>
+	    				<% if calcio != nil %>
+	    				<td align="center"><%= number_to_currency( calcio.resultado.to_f / magnesio.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+		    			<td align="center"><%= number_to_currency( calcio.resultado.to_f / potasio.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+							<td align="center"><%= number_to_currency( magnesio.resultado.to_f / potasio.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+							<% else %>
+	    				<td align="center"></td>
+		    			<td align="center"></td>
+							<td align="center"></td>
+	    				<% end %>
+	    			</tr>
+					</table>
+
+
+					<table>
+						<tr>
+							<td width="300" style="height:0.50cm;" align="center"><small>*NS = No Solicitado</small></td>
+						</tr>
+					</table>
+					<table border="1">
+						<tr>
+							<td align="center" colspan="4"><h3>PARTICIPACION DE LOS ELEMENTOS EN LA CTC DEL SUELO (%)</h3></td>
+						</tr>
+						<tr>
+							<td>ELEMENTOS</td>
+							<td align="center"  width="70">BAJO</td>
+							<td align="center"  width="70">MEDIO</td>
+							<td align="center"  width="70">ALTO</td>
+						</tr>
+	    			<tr>
+	    				<!-- % de elementos na ctc -->
+	    				<td align="center">Ca</td>
+	    				<% if calcio != nil %>
+		    						<% if ctc_result.to_f >= 8 %>
+				    					<% if ((calcio.resultado.to_f * 100 ) / ctc_result).round(2) <= 35 %>
+			    						<td>===<%= number_to_currency( ((calcio.resultado.to_f * 100 ) / ctc_result).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+			    						<td></td>
+			    						<td></td>
+				    					<% elsif ((calcio.resultado.to_f * 100 ) / ctc_result).round(2) > 35 and  ((calcio.resultado.to_f * 100 ) / ctc_result).round(2) <= 50 %>
+			    						<td>==========</td>
+			    						<td>===<%= number_to_currency( ((calcio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+			    						<td></td>
+				    					<% elsif ((calcio.resultado.to_f * 100 ) / ctc_result).round(2) >  50 %>
+			    						<td>==========</td>
+			    						<td>==========</td>
+			    						<td>===<%= number_to_currency( ((calcio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+				    					<% end %>
+			    					<% else %>
+				    					<% if ((calcio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) <= 26 %>
+				    						<td>===<%= number_to_currency( ((calcio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+				    						<td></td>
+				    						<td></td>
+				    					<% elsif ((calcio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) > 26 and  ((calcio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) <= 34 %>
+				    						<td>=======</td>
+				    						<td>===<%= number_to_currency( ((calcio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+				    						<td></td>
+				    					<% elsif ((calcio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) >  34 %>
+				    						<td>==========</td>
+				    						<td>==========</td>
+				    						<td>===<%= number_to_currency( ((calcio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+				    					<% end %>
+		    						<% end %>
+		    				<% else %>
+	    						<td></td>
+	    						<td></td>
+	    						<td></td>
+	    				<% end %>
+	    			</tr>
+	    			<tr>
+	    				<td align="center">Mg</td>
+	    				<% if magnesio != nil %>
+		    					<% if ctc_result.to_f >= 8 %>
+			    					<% if ((magnesio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) <= 13 %>
+			    						<td>===<%= number_to_currency( ((magnesio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+			    						<td></td>
+			    						<td></td>
+			    					<% elsif ((magnesio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) > 13 and  ((magnesio.resultado.to_f * 100 ) / ctc_result).round(2) <= 20 %>
+			    						<td>=======</td>
+			    						<td>===<%= number_to_currency( ((magnesio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+			    						<td></td>
+			    					<% elsif ((magnesio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) >  20 %>
+				    						<td>==========</td>
+				    						<td>==========</td>
+				    						<td>===<%= number_to_currency( ((magnesio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+			    					<% end %>
+		    					<% else %>
+			    					<% if ((magnesio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) <= 13 %>
+			    						<td>===<%= number_to_currency( ((magnesio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+			    						<td></td>
+			    						<td></td>
+			    					<% elsif ((magnesio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) > 13 and  ((magnesio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) <= 18 %>
+			    						<td>=======</td>
+			    						<td>===<%= number_to_currency( ((magnesio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+			    						<td></td>
+			    					<% elsif ((magnesio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) >  18 %>
+				    						<td>==========</td>
+				    						<td>==========</td>
+				    						<td>===<%= number_to_currency( ((magnesio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+			    					<% end %>
+		    					<% end %>
+		    				<% else %>
+	    						<td></td>
+	    						<td></td>
+	    						<td></td>
+	    				<% end %>
+	    			</tr>
+	    			<tr>
+	    				<td align="center">K</td>
+	    				<% if potasio != nil %>
+		    					<% if ctc_result.to_f >= 8 %>
+			    					<% if ((potasio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) <= 3 %>
+			    						<td>===<%= number_to_currency( ((potasio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+			    						<td></td>
+			    						<td></td>
+			    					<% elsif ((potasio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) > 3 and  ((potasio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) <= 5 %>
+			    						<td>=======</td>
+			    						<td>===<%= number_to_currency( ((potasio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+			    						<td></td>
+			    					<% elsif ((potasio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) >  5 %>
+				    						<td>==========</td>
+				    						<td>==========</td>
+				    						<td>===<%= number_to_currency( ((potasio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+			    					<% end %>
+		    					<% else %>
+			    					<% if ((potasio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) <= 3 %>
+			    						<td>===<%= number_to_currency( ((potasio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+			    						<td></td>
+			    						<td></td>
+			    					<% elsif ((potasio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) > 3 and  ((potasio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) <= 5 %>
+			    						<td>=======</td>
+			    						<td>===<%= number_to_currency( ((potasio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+			    						<td></td>
+			    					<% elsif ((potasio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) >  5 %>
+				    						<td>==========</td>
+				    						<td>==========</td>
+				    						<td>===<%= number_to_currency( ((potasio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %></td> 
+			    					<% end %>
+		    					<% end %>
+		    				<% else %>
+	    						<td></td>
+	    						<td></td>
+	    						<td></td>
+	    				<% end %>
+	    			</tr>
+	    			<tr>
+	    				<td align="center">H+Al</td>
+	    				<% if  ph_smp != nil %>
+		    						<% if ((h_aluminio_result.to_f * 100 ) / ctc_result.to_f).round(2) <= 15 %>
+			    						<td>===<%= number_to_currency( ((h_aluminio_result.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %> 
+			    						<td></td>
+			    						<td></td>
+		    						<% elsif ((h_aluminio_result.to_f * 100 ) / ctc_result.to_f).round(2) > 15 and  ((h_aluminio_result.to_f * 100 ) / ctc_result.to_f).round(2) <= 20 %>
+			    						<td>=======</td>
+			    						<td>===<%= number_to_currency( ((h_aluminio_result.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %> 
+			    						<td></td>
+		    						<% elsif ((h_aluminio_result.to_f * 100 ) / ctc_result.to_f).round(2) >  20 %>
+			    						<td>==========</td>
+			    						<td>==========</td>
+			    						<td>===<%= number_to_currency( ((h_aluminio_result.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %> 
+		    					<% end %>
+		    				<% else %>
+	    						<td></td>
+	    						<td></td>
+	    						<td></td>
+	    				<% end %>
+	    			</tr>
+	    			<tr>
+	    				<td align="center">Al</td>
+	    				<% if aluminio != nil %>
+		    					<% if ((aluminio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) <= 0.01 %>
+			    						<td>===<%= number_to_currency( ((aluminio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %> 
+			    						<td></td>
+			    						<td></td>
+		    					<% elsif ((aluminio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) > 0.01 and  ((aluminio.resultado * 100 ) / ctc_result.to_f).round(2) <= 5 %>
+			    						<td>=======</td>
+			    						<td>===<%= number_to_currency( ((aluminio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %> 
+			    						<td></td>
+		    					<% elsif ((aluminio.resultado.to_f * 100 ) / ctc_result.to_f).round(2) >  5 %>
+			    						<td>==========</td>
+			    						<td>==========</td>
+			    						<td>===<%= number_to_currency( ((aluminio.resultado.to_f * 100 ) / ctc_result.to_f).round(2), :format=>' %n ', :separeitor => ",", :precision => 2) %> 
+		    					<% end %>
+		    				<% else %>
+	    						<td></td>
+	    						<td></td>
+	    						<td></td>
+	    				<% end %>
+	    			</tr>
+
+						<tr>
+	    				<td colspan="4">Ciudad del Este,<%= Time.now.strftime("%d") %>/<%= Time.now.strftime("%m") %>/<%= Time.now.strftime("%Y") %></td>
+	    			</tr>
+
+
+						<tr>
+		    				<td colspan="4" align="center">
+		    					 <p><%= wicked_pdf_image_tag('firma_alex.png', :width => 50, :height => 50) %></p>
+		    					 <p>____________________________________</p>
+		    					 <p>Alexson Bobato</p>
+		    					 <p>Gerente Comercial</p>
+
+		    				</td>
+	    			</tr>
+							<tr>
+		    				<td colspan="4" align="center" >
+		    					<table border='1'>
+										<tr>
+										   <td style="height:1.30cm;" colspan="2" width="600"><b>Extractores: </b></td>
+										</tr>
+										<tr>
+										   <td style="height:0.12cm;" align="right">Mehlich I:</td>
+										   <td style="height:0.12cm;">P - K - Cu - Mn - Fe - Zn - Na</td>
+										</tr>
+										<tr>
+										   <td style="height:0.12cm;" align="right">Dicromato:</td>
+										   <td style="height:0.12cm;">C</td>
+										</tr>
+										<tr>
+										   <td style="height:0.12cm;" align="right">KCl:</td>
+										   <td style="height:0.12cm;">Ca - Mg - Al</td>
+										</tr>
+										<tr>
+										   <td style="height:0.12cm;" align="right">HCl:</td>
+										   <td style="height:0.12cm;">B</td>
+										</tr>
+										<tr>
+										   <td style="height:0.12cm;" align="right">Ca<small>3</small>(PO<small>4</small>)<small>2</small>:</td>
+										   <td style="height:0.12cm;">S</td>
+										</tr>
+										<tr>
+										   <td style="height:0.12cm;" align="right">CaCl<small>2</small>:</td>
+										   <td style="height:0.12cm;">P remanescente</td>
+										</tr>
+										<tr>
+										   <td colspan="2">C.Org x 1.724-walkley-Back modificado = Mat.Org(mo)</td>
+										</tr>	
+									</table>
+		    				</td>
+	    			</tr>
+	    		</table>
+
+    	</td>
+    </tr>
+
+	</table>
+</div>
+<% end %>
+
+</body>

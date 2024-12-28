@@ -1,0 +1,47 @@
+
+<div class="row">
+  <div class="col-md-12">
+  <div class="group">
+     <table class="head_grid">
+       <td width="80" align="center">Tipo</td>
+       <td width="80" align="center">Año Ref</td>
+       <td width="80" align="center">Inicio</td>
+       <td width="80" align="center">Final</td>
+       <td width="50" align="center">Dias</td>
+       <td width="50" align="center">Saldo</td>
+     </table>
+     <div id="div">
+       <table>
+        <% saldo_dias = @recisao_func.persona.saldo_ferias %>
+        <tr>
+          <td>ANTERIOR</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td align="center"><%= anterior = @recisao_func.persona.saldo_ferias %></td>
+          <td align="center"><%= @recisao_func.persona.saldo_ferias %></td>
+        </tr>
+        <% count_fds = 0 %>
+        <% @recisao_func.persona.persona_ferias.order('inicio').each do |d| %>
+          <% if d.tipo == 'CAUSADAS' %>
+            <% tag =  'us' %>
+          <% else %>
+            <% tag =  'rs' %>
+          <% end %>
+
+          <tr class="<%= cycle("cor1", "cor2")%>">
+            <td width="80" align="center" class="<%= tag %>"><%= d.tipo %></td>
+            <td width="80" align="center" class="<%= tag %>"><%= d.ano_ref %></td>
+            <td width="80" align="center"><%= d.inicio.strftime("%d/%m/%y") %></td>
+            <td width="80" align="center"><%= d.final.strftime("%d/%m/%y") %></td>
+            <td width="50" align="center"><%= d.dias %></td>
+            <td width="50" align="center"><%= saldo_dias += d.dias.to_i %></td>
+            
+            
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  </div>
+</div>
+</div>

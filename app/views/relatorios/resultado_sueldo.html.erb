@@ -1,0 +1,146 @@
+<% quebra = '' %>
+<% sub_deb_us = 0 %>
+<% sub_deb_gs = 0 %>
+<% sub_deb_rs = 0 %>
+
+<% sub_cre_us = 0 %>
+<% sub_cre_gs = 0 %>
+<% sub_cre_rs = 0 %>
+
+<% tot_deb_us = 0 %>
+<% tot_deb_gs = 0 %>
+<% tot_deb_rs = 0 %>
+
+<% tot_cre_us = 0 %>
+<% tot_cre_gs = 0 %>
+<% tot_cre_rs = 0 %>
+
+<% saldo_us = 0 %>
+<% saldo_gs = 0 %>
+<% saldo_rs = 0 %>
+
+<table>
+  <% @sueldo_detalhes.each do |s| %>
+    <% if quebra != s.data.to_date.strftime("%m/%Y") %>
+
+      <% if quebra != "" %>
+
+        <tr class="head">
+          <td colspan="4"></td>
+
+          <% if params[:moeda] == '0' %>
+            <td align="right"><%= format_decimal(sub_deb_us) %></td>
+            <td align="right"><%= format_decimal(sub_cre_us) %></td>
+          <% elsif params[:moeda] == '1' %>
+            <td align="right"><%= format_int(sub_deb_gs) %></td>
+            <td align="right"><%= format_int(sub_cre_gs) %></td>
+          <% else %>
+            <td align="right"><%= format_decimal(sub_deb_rs) %></td>
+            <td align="right"><%= format_decimal(sub_cre_rs) %></td>
+          <% end %>
+
+
+          <% saldo_us = sub_cre_us - sub_deb_us %>
+          <% saldo_gs = sub_cre_gs - sub_deb_gs %>
+          <% saldo_rs = sub_cre_rs - sub_deb_rs %>
+          
+        </tr>
+        <% sub_deb_us = 0 %>
+        <% sub_deb_gs = 0 %>
+        <% sub_deb_rs = 0 %>
+
+        <% sub_cre_us = 0 %>
+        <% sub_cre_gs = 0 %>
+        <% sub_cre_rs = 0 %>
+
+        <% saldo_us = 0 %>
+        <% saldo_gs = 0 %>
+        <% saldo_rs = 0 %>
+
+      <% end %>
+
+      <td class="head" colspan="5"><%= quebra = s.data.to_date.strftime("%m/%Y") %> - <%= Date::MONTHNAMES[s.data.to_date.strftime("%m").to_i].to_s %> </td>
+
+    <% end %>
+
+
+    <tr class = "<%= cycle("cor1", "cor2")%>">
+      <td width="30"><%= s.sueldo_id.to_s.rjust(6,'0') %></td>
+      <td width="45" width="center"><%= s.data.to_date.strftime("%d/%m/%y") %></td>
+      <td width="100"><%= s.tipo %></td>
+      <td width="300"><%= s.descricao %></td>
+      <% if params[:moeda] == '0' %>
+        <td align="right" width="50"><%= format_decimal(s.debito_us) %></td>
+        <td align="right" width="50"><%= format_decimal(s.credito_us) %></td>
+      <% elsif params[:moeda] == '1' %>
+        <td align="right" width="60"><%= format_int(s.debito_gs) %></td>
+        <td align="right" width="60"><%= format_int(s.credito_gs) %></td>
+      <% else %>
+        <td align="right" width="50"><%= format_decimal(s.debito_rs) %></td>
+        <td align="right" width="50"><%= format_decimal(s.credito_rs) %></td>
+      <% end %>
+
+      <% sub_deb_us += s.debito_us.to_f %>
+      <% sub_deb_gs += s.debito_gs.to_f %>
+      <% sub_deb_rs += s.debito_rs.to_f %>
+
+      <% sub_cre_us += s.credito_us.to_f %>
+      <% sub_cre_gs += s.credito_gs.to_f %>
+      <% sub_cre_rs += s.credito_rs.to_f %>
+
+      <% tot_deb_us += s.debito_us.to_f %>
+      <% tot_deb_gs += s.debito_gs.to_f %>
+      <% tot_deb_rs += s.debito_rs.to_f %>
+
+      <% tot_cre_us += s.credito_us.to_f %>
+      <% tot_cre_gs += s.credito_gs.to_f %>
+      <% tot_cre_rs += s.credito_rs.to_f %>
+
+    </tr>
+  <% end %>
+
+    <tr class="head">
+      <td colspan="4"></td>
+      <% if params[:moeda] == '0' %>
+        <td align="right"><%= format_decimal(sub_deb_us) %></td>
+        <td align="right"><%= format_decimal(sub_cre_us) %></td>
+      <% elsif params[:moeda] == '1' %>
+        <td align="right"><%= format_int(sub_deb_gs) %></td>
+        <td align="right"><%= format_int(sub_cre_gs) %></td>
+      <% else %>
+        <td align="right"><%= format_decimal(sub_deb_rs) %></td>
+        <td align="right"><%= format_decimal(sub_cre_rs) %></td>
+      <% end %>
+
+      <% saldo_us = sub_cre_us - sub_deb_us %>
+      <% saldo_gs = sub_cre_gs - sub_deb_gs %>
+      <% saldo_rs = sub_cre_rs - sub_deb_rs %>
+      
+    </tr>
+    <% sub_deb_us = 0 %>
+    <% sub_deb_gs = 0 %>
+    <% sub_deb_rs = 0 %>
+
+    <% sub_cre_us = 0 %>
+    <% sub_cre_gs = 0 %>
+    <% sub_cre_rs = 0 %>
+
+    <% saldo_us = 0 %>
+    <% saldo_gs = 0 %>
+    <% saldo_rs = 0 %>
+
+    <tr class="head">
+      <td colspan="4"></td>
+
+     <% if params[:moeda] == '0' %>
+        <td align="right"><%= format_decimal(tot_deb_us) %></td>
+        <td align="right"><%= format_decimal(tot_cre_us) %></td>
+      <% elsif params[:moeda] == '1' %>
+        <td align="right"><%= format_int(tot_deb_gs) %></td>
+        <td align="right"><%= format_int(tot_cre_gs) %></td>
+      <% else %>
+        <td align="right"><%= format_decimal(tot_deb_rs) %></td>
+        <td align="right"><%= format_decimal(tot_cre_rs) %></td>
+      <% end %>
+    </tr>
+</table>

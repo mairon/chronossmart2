@@ -1,0 +1,57 @@
+<%= form_for(@operacao_fiscal) do |f| %>
+  <% if @operacao_fiscal.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@operacao_fiscal.errors.count, "error") %> prohibited this operacao_fiscal from being saved:</h2>
+
+      <ul>
+      <% @operacao_fiscal.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> operacao_fiscals - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>                                      
+                    <td align="right">Tipo :</td>                    
+                    <td><%= f.radio_button :tipo, 0 %>Entrada <%= f.radio_button :tipo, 1 %>Saida</td>
+                  </tr>
+                  <tr>
+                    <td align="right">CFOP :</td>                    
+                    <td><%= f.text_field :cfop, size: 15 %></td>
+                  </tr>
+                  <tr>
+                                      
+                    <td align="right">Nome :</td>                    
+                    <td><%= f.text_field :nome %></td>
+                  </tr>
+                  <tr>
+                                      
+                    <td align="right">Descrição :</td>                    
+                    <td><%= f.text_area :desc, rows: 3, cols: 55 %></td>
+                  </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), operacao_fiscals_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

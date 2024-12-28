@@ -1,0 +1,26 @@
+<h1 align="right" id="header">Personas Multiples Atulizaciónes</h1>
+
+
+  <div class="group">
+    <h2>
+      <%= form_tag resultado_busca_detalhada_personas_path, :method => "get" do%>
+      Tipo:
+        <select name="per" id="per" onKeyUp    ="EnterTab(event,'busca')">
+          <option></option>
+          <option>CLIENTE</option>
+          <option>CORPORATIVO</option>
+          <option>DESPACHANTE</option>
+          <option>EMPLEADO</option>
+          <option>FABRICANTE</option>
+          <option>LABORATORIO</option>
+          <option>MAYORISTA</option>
+          <option>PROVEEDOR</option>
+          <option>VENDEDOR</option>
+        </select>
+        <%= submit_tag 'Filtrar', class: 'button' %>
+      <% end %>
+    </h2>
+  </div>
+
+
+

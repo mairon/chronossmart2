@@ -1,0 +1,31 @@
+<h1>New pagares_detalhe</h1>
+
+<% form_for(@pagares_detalhe) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :pagare_id %><br />
+    <%= f.text_field :pagare_id %>
+  </p>
+  <p>
+    <%= f.label :data %><br />
+    <%= f.date_select :data %>
+  </p>
+  <p>
+    <%= f.label :vencimento %><br />
+    <%= f.date_select :vencimento %>
+  </p>
+  <p>
+    <%= f.label :cota %><br />
+    <%= f.text_field :cota %>
+  </p>
+  <p>
+    <%= f.label :valor_guarani %><br />
+    <%= f.text_field :valor_guarani %>
+  </p>
+  <p>
+    <%= f.submit 'Create' %>
+  </p>
+<% end %>
+
+<%= link_to 'Back', pagares_detalhes_path %>

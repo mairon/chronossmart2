@@ -1,0 +1,50 @@
+<%= form_for(@pipeline_usuario) do |f| %>
+  <% if @pipeline_usuario.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@pipeline_usuario.errors.count, "error") %> prohibited this pipeline_usuario from being saved:</h2>
+
+      <ul>
+      <% @pipeline_usuario.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> pipeline_usuarios - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">pipeline_id :</td>                    
+                      <td><%= f.number_field :pipeline_id %></td>
+                                      
+                      <td align="right">usuario_id :</td>                    
+                      <td><%= f.number_field :usuario_id %></td>
+                                      
+                      <td align="right">permissao :</td>                    
+                      <td><%= f.number_field :permissao %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', pipeline_usuarios_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

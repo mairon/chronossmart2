@@ -1,0 +1,27 @@
+<h1 id="header">Plano de <%= t('ACCOUNT') %></h1>
+<div class="acessos">
+  <%= link_to t('NEW'),  new_plano_de_conta_path, :class => "button add" %>
+  <%= link_to 'PDF',  print_plano_de_contas_path, :class => "button print" %>
+</div>
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="200" ><%= t('CODE') %></td>
+      <td width="580"><%= t('DESCRIPTION') %></td>
+      <td width="150" align="center">Competência meses</td>
+    </tr>
+    </table>
+    <div class="rolagem">
+      <table>
+        <% @plano_de_contas.each do |documento| %>
+          <tr class = "<%= cycle("cor1", "cor2") %>">
+            <td width="200"><%= documento.codigo %></td>
+            <td width="580"><%=  documento.descricao %></td>
+            <td width="150" align="center"><%=  documento.competencia %></td>
+            <td><%= link_to '', edit_plano_de_conta_path(documento), class: 'icon-pencil' %></td>
+            <td><%= link_to '', documento, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+          </tr>
+        <% end %>
+      </table>      
+    </div>
+</div>

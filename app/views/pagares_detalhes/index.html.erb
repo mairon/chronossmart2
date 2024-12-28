@@ -1,0 +1,28 @@
+<h1>Listing pagares_detalhes</h1>
+
+<table>
+  <tr>
+    <th>Pagare</th>
+    <th><%= t('DATE') %></th>
+    <th><%= t('EXPIRATION') %></th>
+    <th>Cota</th>
+    <th>Valor guarani</th>
+  </tr>
+
+<% @pagares_detalhes.each do |pagares_detalhe| %>
+  <tr>
+    <td><%=h pagares_detalhe.pagare_id %></td>
+    <td><%=h pagares_detalhe.data %></td>
+    <td><%=h pagares_detalhe.vencimento %></td>
+    <td><%=h pagares_detalhe.cota %></td>
+    <td><%=h pagares_detalhe.valor_guarani %></td>
+    <td><%= link_to 'Show', pagares_detalhe %></td>
+    <td><%= link_to 'Edit', edit_pagares_detalhe_path(pagares_detalhe) %></td>
+    <td><%= link_to 'Destroy', pagares_detalhe, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New pagares_detalhe', new_pagares_detalhe_path %>

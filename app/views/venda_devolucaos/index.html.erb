@@ -1,0 +1,50 @@
+<div class="panel">
+  <h1 id="header">
+    Devoluciones
+    <div class="pull-right">
+      <a class="acao_rm btn button add">Buscar Ventas</a>
+    </div>
+  </h1>
+</div>
+
+<div class="panel">
+  <div class="panel-content">
+    <table class="head_grid">
+       <tr>
+          <td width="70"align="center">Cod.</td>
+          <td width="70"align="center">Fecha</td>
+          <td width="350" >Persona</td>
+          <td width="70"align="right">Monto</td>
+       </tr>
+    </table>
+
+    <div class="rolagem" id="div">    
+      <table>
+        <% @venda_devolucaos.each do |vd| %>
+        <tr>
+          <td width="70" align="center"><%= link_to vd.id.to_s.rjust(6,'0'), devolucaos_venda_path(vd.tabela_id) %></td>
+          <td width="70" align="center"><%= vd.data.strftime("%d/%m/%y") %></td>
+          <td width="350"><%= vd.persona.nome %></td>
+          <td width="70" align="right"><%= format_int(vd.cobro_guarani) %></td>
+        </tr>
+        <% end %>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="modal_devolucao">
+  <div class="modal-dialog" role="document" style="width: 850px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel" align="center">Busca Ventas</h4>
+      </div>
+      <div class="modal-body" style="padding: 10px 0px 10px 0px">
+        <%= render partial: "modal_vendas" %>
+      </div>
+    </div>
+  </div>
+</div>

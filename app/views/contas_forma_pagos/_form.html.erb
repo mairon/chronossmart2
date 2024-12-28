@@ -1,0 +1,47 @@
+<%= form_for(@contas_forma_pago) do |f| %>
+  <% if @contas_forma_pago.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@contas_forma_pago.errors.count, "error") %> prohibited this contas_forma_pago from being saved:</h2>
+
+      <ul>
+      <% @contas_forma_pago.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> contas_forma_pagos - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">conta_id :</td>                    
+                      <td><%= f.number_field :conta_id %></td>
+                                      
+                      <td align="right">forma_pago_id :</td>                    
+                      <td><%= f.number_field :forma_pago_id %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', contas_forma_pagos_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

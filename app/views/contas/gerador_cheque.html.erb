@@ -1,0 +1,32 @@
+<%= form_tag "/contas/gera_docs" do %>
+  
+<ul class="tabs">
+      <li><a href="#tab1"> conta cheques - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>            
+            <% text_field_tag :conta_id, value: @conta.id %>          
+            <tr>
+              <td align="right">obs :</td>                    
+              <td><%= text_field_tag :obs %></td>
+            </tr>         
+                                             
+          </tr>
+
+          <tr>
+            <td align="right">Doc Inicio:</td>
+            <td><%= number_field_tag :doc_inicio %></td>
+            <td align="right">Final:</td>
+            <td><%= number_field_tag :doc_final %></td>
+          </tr>
+          <td><%= submit_tag " Grabar ", :disable_with => "Aguarde...", :class => "button"  %></td>
+        </table>
+      </div>
+      
+     
+
+    </div>
+<% end %>

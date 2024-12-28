@@ -1,0 +1,72 @@
+<div class="panel">
+  <div  class="panel-body">
+    <% if @pago.moeda.to_i == 0 %>  
+      <table>
+        <tr>
+          <td align="right">Total Titulos (+):</td>
+          <td align="right" width="70"><%= format_decimal( @tot_pago_us.to_f ) %></td>
+        </tr>
+        <tr>
+          <td align="right"> <%= t('DISCOUNT') %> (-):</td>
+          <td align="right"><%= format_decimal( @tot_des_us.to_f ) %></td>
+        </tr>
+        <tr>
+          <td align="right"> <%= t('INTEREST') %> (+):</td>
+          <td align="right"><%= format_decimal( @tot_int_us.to_f ) %></td>
+        </tr>
+        <tr>
+          <td align="right"><%= t('ADVANCE') %> Aplicados (-):</td>
+          <td align="right"><%= format_decimal( @tot_ade_us.to_f ) %></td>
+        </tr>
+        <tr>
+          <td align="right"><b>Saldo Pagar:</b></td>
+          <td align="right"><strong><%= format_decimal( @fecha_result_us.to_f ) %></strong></td>
+        </tr>
+      </table>
+      <% elsif @pago.moeda == 1 %>
+        <table>
+          <tr>
+            <td align="right">Total Titulos (+):</td>
+            <td align="right" width="70"><%= format_int( @tot_pago_gs.to_f ) %></td>
+          </tr>
+          <tr>
+            <td align="right"> <%= t('DISCOUNT') %> (-):</td>
+            <td align="right"><%= format_int( @tot_des_gs.to_f ) %></td>
+          </tr>
+          <tr>
+            <td align="right"> <%= t('INTEREST') %> (+):</td>
+            <td align="right"><%= format_int( @tot_int_gs.to_f ) %></td>
+          </tr>
+          <tr>
+            <td align="right"><strong>Saldo Pagar:</strong></td>
+            <td align="right"><strong><%= format_int( @fecha_result_gs.to_f ) %></strong></td>
+          </tr>
+        </table>
+
+      <% else %>
+
+        <table>
+          <tr>
+            <td align="right">Total Titulos (+):</td>
+            <td align="right" width="70"><%= format_decimal( @tot_pago_rs.to_f ) %></td>
+          </tr>
+          <tr>
+            <td align="right"> <%= t('DISCOUNT') %> (-):</td>
+            <td align="right"><%= format_decimal( @tot_desc_rs.to_f ) %></td>
+          </tr>
+          <tr>
+            <td align="right"> <%= t('INTEREST') %> (+):</td>
+            <td align="right"><%= format_decimal( @tot_int_rs.to_f ) %></td>
+          </tr>
+          <tr>
+            <td align="right"><%= t('ADVANCE') %> Aplicados (-):</td>
+            <td align="right"><%= format_decimal( @tot_ade_rs.to_f ) %></td>
+          </tr>
+          <tr>
+            <td align="right"><b>Saldo Pagar:</b></td>
+            <td align="right"><strong><%= format_decimal( @fecha_result_rs.to_f ) %></strong></td>
+          </tr>
+        </table>
+      <% end %>
+    </div>
+  </div>

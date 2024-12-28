@@ -1,0 +1,1172 @@
+<%= form_tag gerar_cotas_credito_vendas_path, :method => "get", remote: true do %>
+  <%= hidden_field_tag :id, @venda.id %>
+  <%= hidden_field_tag :tipo %>
+  <% if @venda_config.caixa_separado == true %>
+    <%= hidden_field_tag :controle_caixa, @abertura.id %>
+  <% else %>
+    <%= hidden_field_tag :controle_caixa, @venda.controle_caixa %>
+  <% end %>
+  <%= hidden_field_tag :valor_sem_gs, format_int(@saldo_gs) %>
+  <%= hidden_field_tag :valor_sem_us, format_decimal(@saldo_us) %>
+  <%= hidden_field_tag :valor_sem_rs, format_decimal(@saldo_rs) %>
+  <%= hidden_field_tag :usuario_id, current_user.id %>
+  <%= hidden_field_tag :cheque_status, 0 %>
+  <div class="panel">
+    <div class="panel-content content-forma-pago" align="center">
+      <h1>Forma de Pago</h1>
+        <ul >
+          <% FormaPago.where(venda: true).order(1).each do |fp| %>
+          <a href="#" id="<%= fp.id %>"  onclick="fp(<%= fp.id %>)" class="btn btn-blue" style='width: 160px;display: inline-grid;
+    font-size: revert; margin: 5px'>
+            <li><%= fp.id %> <%= fp.nome %></li>
+          </a>
+          <% end %>
+        </ul>
+        <input type="hidden" name="forma_pg" id="forma_pg" value="1"/>
+        <hr>
+    </div>
+
+    <div class="panel-content" align="center" >
+      <div class="row">
+        
+        <div class="col-md-12 content-btns"  align="left">
+          <% if @venda_config.caixa_separado == 1 %>
+            <a href="/vendas/painel_cobranca_venda" class="btn btn-blue"><%= t('BACK') %></a>
+          <% else %>
+            <a href="/vendas/<%= @venda.id.to_i %>" class="btn btn-blue"><%= t('BACK') %></a>
+          <% end %>
+          <%= link_to "Productos", venda_path(@venda.id), class: 'btn btn-blue' %>
+          
+          <% if Empresa.last.segmento.to_i == 2 %>
+            <a href="javascript:void(0)" class="btn btn-blue" onClick="CertificadoVenda()">Certificado Venta</a>
+            <a href="javascript:void(0)" class="btn btn-blue" onClick="PagareEscritura()">Pagare Escritura</a>
+            <a href="javascript:void(0)" class="btn btn-blue" onClick="PagareUsado()">Pagare Usado</a>
+            <%= link_to 'Contrato', '#', class: 'btn btn-blue', 'data-toggle' => "modal", 'data-target' => "#modal-dados-contrato", 'data-dismiss' => "modal" %>            
+          <% end %>
+        </div>
+        <div class="col-md-12 content-btns" hidden align="left">
+          <%= render 'btn-financa' %>          
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modal-forma-pagamento" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="close-button">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <h4 class="modal-title" id="myModalLabel"></h4>
+        </div>
+        <div class="modal-body">
+          <div class="panel">
+            <div class="panel-content" id="div-form-pg">
+              <div class="row">
+                <div class="col-md-12" id="tr-moeda" hidden>
+                  <label><%= t('COIN') %></label>
+                  <%= select_tag "moeda", options_for_select([['GUARANIES', '1'], ['DOLARES', '0'], ['REALES', '2']], selected: @venda.moeda), {onchange: "contado()" } %>
+                </div>
+
+                <div class="col-md-12" id="tr-btn-nota-credito" hidden>
+                  <a href="#" title="" class="btn btn-blue" onclick="BuscaNC()">Buscar Nota de Credito</a>
+                </div>
+
+
+                <div class="col-md-12" id="tr-doc-nr" hidden>
+                  <label>Doc.</label>
+                  <%= text_field_tag :fact_ad_01, nil, size: 5 %>-<%= text_field_tag :fact_ad_02, nil, size: 5 %>-<%= text_field_tag :fact_ad, nil, size: 15 %>
+                </div>
+
+
+                <div class="col-md-12" id="tr-btn-pago-antecipado" hidden align="center">
+                  <a href="#" title="" class="btn btn-blue" onclick="BuscaPA()">Buscar pago antecipado</a>
+                </div>
+
+                <div class="col-md-12">
+                  <div class="row">
+                    <div class="col-md-6" id="tr-btn-bandeira" hidden>
+                      <label>Tarjeta Bandeira</label>
+                      <%=  select("busca", "cartao_bandeiras", (CartaoBandeira.order('id')).collect {|p| [ p.nome, p.id ] }) %>
+                    </div>
+                    <div class="col-md-6" id="tr-btn-nr-comprovante" hidden>
+                      <label>NºCompro</label>
+                      <input type="text" name="nr_comprovante" id="nr_comprovante" class="valores"/>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-12">
+                  <div class="row">
+                    <div class="col-md-6" id="tr-cheque" hidden>
+                      <label>Cheque nº</label>
+                      <input type="text" name="cheque" id="cheque" class="valores"/>
+                    </div>
+                    <div class="col-md-6" id="tr-cheque-banco" hidden>
+                      <label>Banco Origen</label>
+                      <%= select("busca", "banco_id", (Persona.where(tipo_banco: 1).order('nome')).collect {|p| [ p.nome, p.id ] }, {prompt: 'Selecione lo Banco'}) %>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-12" id="tr-cheque-titular" hidden>
+                  <label>Titular</label>
+                  <input type="text" name="titular" id="titular" class="valores"/>
+                </div>
+
+                <div class="col-md-12" id="tr-cheque-diferido" hidden>
+                  <label>Diferido</label>
+                  <input type="text" name="diferido" id="diferido" class="valores" value="<%= (@venda.data.to_date).strftime("%d/%m/%Y")%>" onkeyup="Formatadata(this,event)" />
+                </div>
+
+                <div class="col-md-12" id="tr-transf_bancaria" hidden>
+                  <label>Cuenta</label>
+                  <%= select("busca", "conta_id", (Conta.where(tipo: 1).order('nome')).collect {|p| [ p.nome, p.id ] }, {prompt: 'Selecione la Cuenta'}) %>
+                </div>
+
+                <div class="col-md-12" id="tr-credito" hidden>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Cuotas</label>
+                      <input type="tel" class="padrao_height" name="cota" id="cota" value="0" size="2" />
+                      <% unless @venda.plano_venda.blank? %>
+                        /
+                        <input type="text" class="padrao_height" name="tot_cotas" id="tot_cotas" value="<%= @venda.plano_venda.tot_cotas %>" size="2" />
+                      <% else %>
+                        /
+                        <input type="text" class="padrao_height" name="tot_cotas" id="tot_cotas" value="1" size="2" />                      
+                      <% end %>
+                    </div>
+                    <div class="col-md-4">
+                      <label>.</label>
+                      <%= check_box_tag :cota_fixa, '1' %> Cota Fija
+                    </div>
+                    <div class="col-md-4">
+                      <label>1º Venc</label>
+                      <input type="tel" name="vencimento" id="vencimento" readonly="readonly" class="padrao_height date" value="<%= (@venda.data.to_date + 30).strftime("%d/%m/%Y")%>"  size="10"  required/>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-12"  id="tr-gs">
+                  <label>Valor</label>
+                  <input type="tel"  name="valor_gs" id="valor_gs"  size="15" value="<%= format_int(@saldo_gs)%>" onchange="Vuelto()" class="valores money_gs" />
+                </div>
+
+
+                <div class="col-md-12"  id="tr-us" hidden>
+                  <label>Valor</label>
+                  <input type="tel"  name="valor_us" id="valor_us"  size="15" value="<%= format_decimal(@saldo_us)%>" onchange="Vuelto()" class="valores money_us" />
+                </div>
+
+                <div class="col-md-12"  id="tr-rs" hidden>
+                  <label>Valor</label>
+                  <input type="tel"  name="valor_rs" id="valor_rs"  size="15" value="<%= format_decimal(@saldo_rs)%>" onchange="Vuelto()" class="valores money_us" />
+                </div>
+
+
+                <div class="col-md-12"  id="tr-vuelto">
+                  <label>Vuelto</label>
+                  <input type="tel" name="vuelto" id="vuelto"  size="15" value="0" onchange="DescontoInversoGs()" class="valores"/>
+                </div>
+                <div class="col-md-12"  id="tr-obs">
+                  <br>
+                  <%= text_area_tag :obs, nil, placeholder: 'Concepto'  %>
+                </div>                
+                <div class="col-md-12">
+                  <br>
+                  <%= submit_tag t('SAVE'), :class=>'button add', :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+<!-- btn dentro de _btn-financa!-->
+<%= render "dados_contrato" %>
+
+<script>
+  function ListaProdutos(){
+    window.open('/vendas/' + document.getElementById('id').value, '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=800');
+  }
+
+
+  
+
+
+  document.onkeydown= function(e) {
+    //LISTA DE PRODUTOS
+    if(e.which == 187){ //+
+      $('#modal-faturamento').modal('show');
+    };
+
+    if(e.which == 112){ //F1
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('CONTADO');
+      $("#forma_pg").val('1');
+
+
+      $("#tr-vuelto").show();
+      $("#tr-moeda").show();
+      $("#cota").val('0');
+      $("#cheque_status").val('0');
+
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+
+
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+    };
+
+    if(e.which == 113){ //F2
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('CREDITO');
+      $("#forma_pg").val('2');
+
+
+      $("#tr-moeda").hide();
+      $("#moeda").val('<%= @venda.moeda %>');
+      $("#div-form-pg").show();
+      $("#tr-credito").show();
+      $("#tr-local-pago").show();
+
+      $("#cota").val('1');
+      $("#cheque_status").val('0');
+
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+    };
+
+
+    if(e.which == 114){ //F3
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('TARJ. DE DEBITO');
+      $("#forma_pg").val('3');
+
+      $("#tr-btn-bandeira").show();
+      $("#tr-btn-nr-comprovante").show();
+      $("#cheque_status").val('0');
+      $("#tr-credito").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+    }
+
+
+    if(e.which == 115){ //F4
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('TARJ. DE CREDITO');
+      $("#forma_pg").val('4');
+
+      $("#tr-btn-bandeira").show();
+      $("#tr-btn-nr-comprovante").show();
+      $("#cheque_status").val('0');
+      $("#tr-credito").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+    };
+
+    if(e.which == 117){ //F6
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('CHEQUE AO DIA');
+      $("#forma_pg").val('5');
+
+      $("#tr-cheque").show();
+      $("#tr-cheque-banco").show();
+      $("#tr-cheque-titular").show();
+      $("#tr-vuelto").hide();
+
+      $("#cheque_status").val('1');
+
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+
+
+      //validacao
+      jQuery.validator.setDefaults({
+        success: "valid"
+      });
+
+      $('#FinancaForm').validate({
+        rules: {
+        "cheque": {required: true},
+        "banco": {required: true},
+        "titular": {required: true}
+        }
+      });
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+    };
+
+if(e.which == 118){ //F7
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('CHEQUE');
+      $("#forma_pg").val('6');
+
+      $("#tr-cheque").show();
+      $("#tr-cheque-banco").show();
+      $("#tr-cheque-titular").show();
+      $("#tr-moeda").show();
+      $("#tr-cheque-diferido").show();
+      $("#tr-vuelto").hide();
+      $("#cheque_status").val('1');
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+
+      //validacao
+      jQuery.validator.setDefaults({
+        success: "valid"
+      });
+
+      $('#FinancaForm').validate({
+        rules: {
+        "cheque": {required: true},
+        "banco": {required: true},
+        "titular": {required: true}
+        }
+      });
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+    };
+
+
+if(e.which == 120){ //F9
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('PG ANTECIPADO');
+      $("#tr-btn-nota-credito").hide();
+      $("#cota").val('0');
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").show();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+    };
+
+
+  if(e.which == 121){ //F10
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('TRANSF. BANC.');
+      $("#forma_pg").val('15');
+
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-transf_bancaria").show();
+      $("#cota").val('0');
+      $("#tr-moeda").show();
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").show();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").show();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      var obs = $("#obs_content").val();
+      $("#obs").val(obs);
+
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+    };
+
+
+  }
+</script>
+
+
+
+<script>
+  function fp(v) {
+    $("#forma_pg").val(v);
+    if( v == '2'){ // credito
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('CREDITO');
+
+      $("#tr-moeda").hide();
+      $("#tr-doc-nr").hide();
+      $("#moeda").val('<%= @venda.moeda %>');
+      $("#div-form-pg").show();
+      $("#tr-credito").show();
+      $("#tr-local-pago").show();
+
+      $("#cota").val('1');
+      $("#cheque_status").val('0');
+
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+      $("#valor_gs").val($("#valor_sem_gs").val());
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+
+    } else if( v == '1' ){ // contado
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('CONTADO');
+
+
+      $("#tr-vuelto").show();
+      $("#tr-moeda").show();
+      $("#cota").val('0');
+      $("#cheque_status").val('0');
+      $("#tr-doc-nr").hide();
+
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+      $("#valor_gs").val($("#valor_sem_gs").val());
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+
+    } else if( v == '18' ){ // contado
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('VALE');
+
+
+      $("#tr-vuelto").show();
+      $("#tr-moeda").show();
+      $("#cota").val('0');
+      $("#cheque_status").val('0');
+      $("#tr-doc-nr").hide();
+
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+      $("#valor_gs").val($("#valor_sem_gs").val());
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+
+    } else if( v == '3' ){ //tarjetas debito
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('TARJ. DE DEBITO');
+
+      $("#tr-btn-bandeira").show();
+      $("#tr-btn-nr-comprovante").show();
+      $("#tr-doc-nr").hide();
+
+      $("#cheque_status").val('0');
+
+      $("#tr-credito").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+      $("#valor_gs").val($("#valor_sem_gs").val());
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+
+
+    } else if( v == '4' ){ //tarjetas credito
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('TARJ. DE CREDITO');
+
+      $("#tr-btn-bandeira").show();
+      $("#tr-btn-nr-comprovante").show();
+      $("#tr-doc-nr").hide();
+
+      $("#cheque_status").val('0');
+
+      $("#tr-credito").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+      $("#valor_gs").val($("#valor_sem_gs").val());
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+
+    } else if( v == '5'){ //cheque ao dia
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('CHEQUE AO DIA');
+
+      $("#tr-cheque").show();
+      $("#tr-doc-nr").hide();
+      $("#tr-cheque-banco").show();
+      $("#tr-cheque-titular").show();
+      $("#tr-vuelto").show();
+
+      $("#cheque_status").val('1');
+
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+      var obs = $("#obs_content").val();
+      $("#obs").val(obs);
+
+
+      //validacao
+      jQuery.validator.setDefaults({
+        success: "valid"
+      });
+
+      $('#FinancaForm').validate({
+        rules: {
+        "cheque": {required: true},
+        "banco": {required: true},
+        "titular": {required: true}
+        }
+      });
+
+    }else if( v == '13'){ //cheque ao dia
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('CHEQUE DIFERIDO');
+
+      $("#tr-cheque").show();
+      $("#tr-doc-nr").hide();
+      $("#tr-cheque-banco").show();
+      $("#tr-cheque-titular").show();
+      $("#tr-vuelto").show();
+
+      $("#cheque_status").val('1');
+
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque-diferido").show();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+      var obs = $("#obs_content").val();
+      $("#obs").val(obs);
+
+
+      //validacao
+      jQuery.validator.setDefaults({
+        success: "valid"
+      });
+
+      $('#FinancaForm').validate({
+        rules: {
+        "cheque": {required: true},
+        "banco": {required: true},
+        "titular": {required: true}
+        }
+      });
+
+    } else if( v == '6'){
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('CHEQUE');
+
+      $("#tr-cheque").show();
+      $("#tr-moeda").show();
+      $("#tr-doc-nr").hide();
+      $("#tr-cheque-banco").show();
+      $("#tr-cheque-titular").show();
+      $("#tr-cheque-diferido").show();
+      $("#tr-vuelto").show();
+
+      $("#cheque_status").val('1');
+
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+      $("#valor_gs").val($("#valor_sem_gs").val());
+      var obs = $("#obs_content").val();
+      $("#obs").val(obs);
+
+
+      //validacao
+      jQuery.validator.setDefaults({
+        success: "valid"
+      });
+
+      $('#FinancaForm').validate({
+        rules: {
+        "cheque": {required: true},
+        "banco": {required: true},
+        "titular": {required: true}
+        }
+      });
+
+    } else if( v == '15'){
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('TRANSF. BANC.');
+
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-doc-nr").hide();
+      $("#tr-transf_bancaria").show();
+      $("#cota").val('0');
+      $("#tr-moeda").show();
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").show();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").show();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#valor_gs").val($("#valor_sem_gs").val());
+
+
+    } else if( v == '12'){
+      // var valor_venda = $("#saldo_antecipado").val()
+      // var valor_antec = $("#valor_sem_gs").val()
+      // if( ( parseFloat( valor_venda ) -  parseFloat( valor_antec ) ) < 0 ){
+      //   alert('Saldo insuficiente! Forma de Pago No Autorazada!');
+      //   document.getElementById('busca_forma_pago').value   = 1
+      //   $("#busca_forma_pago").focus();
+
+      // }
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('PG ANTECIPADO');
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-doc-nr").hide();
+      $("#cota").val('0');
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").show();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+      $("#valor_gs").val($("#valor_sem_gs").val());
+
+} else if( v == '18'){
+      // var valor_venda = $("#saldo_antecipado").val()
+      // var valor_antec = $("#valor_sem_gs").val()
+      // if( ( parseFloat( valor_venda ) -  parseFloat( valor_antec ) ) < 0 ){
+      //   alert('Saldo insuficiente! Forma de Pago No Autorazada!');
+      //   document.getElementById('busca_forma_pago').value   = 1
+      //   $("#busca_forma_pago").focus();
+
+      // }
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('APLIC. NOTA DE CREDITO');
+      $("#tr-btn-nota-credito").show();
+      $("#tr-doc-nr").show();
+      $("#cota").val('1');
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+      $("#valor_gs").val($("#valor_sem_gs").val());
+      $("#valor_gs").attr('readonly', false);
+
+    } else if( v == '19'){
+      // var valor_venda = $("#saldo_antecipado").val()
+      // var valor_antec = $("#valor_sem_gs").val()
+      // if( ( parseFloat( valor_venda ) -  parseFloat( valor_antec ) ) < 0 ){
+      //   alert('Saldo insuficiente! Forma de Pago No Autorazada!');
+      //   document.getElementById('busca_forma_pago').value   = 1
+      //   $("#busca_forma_pago").focus();
+
+      // }
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('APLIC. NOTA RETENCIÓN');
+
+      liquido = $("#valor_sem_gs").val().replace(/\./g, "").replace(",", ".");
+      saldo   = ((liquido / 11) * 0.70);
+
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-doc-nr").show();
+      $("#cota").val('1');
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+      $("#valor_gs").val( number_format( saldo,0, ',', '.')  );
+      $("#valor_gs").attr('readonly', false);
+
+    } else if( v == '21'){
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('MERMA');
+
+      $("#tr-vuelto").hide();
+      $("#tr-moeda").hide();
+      $("#cota").val('0');
+      $("#cheque_status").val('0');
+      $("#tr-doc-nr").hide();
+
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").show();
+      $("#valor_gs").val($("#valor_sem_gs").val());
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+
+    } else if( v == '22'){
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('USO INTERNO');
+
+      $("#tr-vuelto").hide();
+      $("#tr-moeda").hide();
+      $("#cota").val('0');
+      $("#cheque_status").val('0');
+      $("#tr-doc-nr").hide();
+
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").show();
+      $("#valor_gs").val($("#valor_sem_gs").val());
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+
+    } else if( v == '9'){
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('PEDIDOS YA');
+
+      $("#tr-vuelto").hide();
+      $("#tr-moeda").hide();
+      $("#cota").val('0');
+      $("#cheque_status").val('0');
+      $("#tr-doc-nr").hide();
+
+      $("#tr-credito").hide();
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+      $("#valor_gs").val($("#valor_sem_gs").val());
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+
+    } else if( v == '23'){
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('INICIAL');
+
+      $("#tr-moeda").hide();
+      $("#tr-doc-nr").hide();
+      $("#moeda").val('<%= @venda.moeda %>');
+      $("#div-form-pg").show();
+      $("#tr-credito").show();
+      $("#tr-local-pago").show();
+
+      $("#cota").val('1');
+      $("#tot_cotas").val('1');
+      $("#cheque_status").val('0');
+
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+      $("#valor_gs").val($("#valor_sem_gs").val());
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+
+    }  else if( v == '24'){
+      $('#modal-forma-pagamento').modal('show');
+      $('.modal-title').text('USADO');
+
+      $("#tr-moeda").hide();
+      $("#tr-doc-nr").hide();
+      $("#moeda").val('<%= @venda.moeda %>');
+      $("#div-form-pg").show();
+      $("#tr-credito").show();
+      $("#tr-local-pago").show();
+
+      $("#cota").val('1');
+      $("#tot_cotas").val('1');
+      $("#cheque_status").val('0');
+
+      $("#tr-btn-bandeira").hide();
+      $("#tr-btn-nr-comprovante").hide();
+      $("#tr-cheque").hide();
+      $("#tr-cheque-banco").hide();
+      $("#tr-cheque-titular").hide();
+      $("#tr-cheque-diferido").hide();
+      $("#tr-btn-nota-credito").hide();
+      $("#tr-vuelto").hide();
+      $("#tr-btn-pago-antecipado").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+      $("#valor_gs").val($("#valor_sem_gs").val());
+
+      $('#modal-forma-pagamento').on('shown.bs.modal', function() {
+        $('.add').focus();
+      })
+
+    }
+
+
+     else{
+      $("#div-form-pg").show();
+      $("#cheque_status").val('0');
+      $(".title_venc").css('display','none');
+      $(".content_venc").css('display','none');
+      $(".title_nr_comprovante").css('display','none');
+      $(".content_nr_comprovante").css('display','none');
+      $("#tr-local-pago").hide();
+      $("#tr-transf_bancaria").hide();
+      $("#tr-obs").hide();
+      var obs = $("#obs_content").val();
+      $("#obs").val(obs);
+
+    }
+  }
+
+  function SetLocalPago(){
+    var obs = $("#obs_content").val();
+    $("#obs").val("LOCAL PAGO : " + $("#local_pago").val() + ' \n ' + obs)
+  }
+
+  function contado(){
+    moeda = $("#moeda").val();
+    sem_us =  $('#valor_sem_us').val();
+    sem_gs =  $('#valor_sem_gs').val();
+    sem_rs =  $('#valor_sem_rs').val();
+    sem_ps =  $('#valor_sem_ps').val();
+
+    if (moeda == '0'){
+      $("#tr-us").show();
+      $("#tr-gs").hide();
+      $("#tr-rs").hide();
+    } else if (moeda == '1'){
+      $("#tr-us").hide();
+      $("#tr-gs").show();
+      $("#tr-rs").hide();
+    }else if (moeda == '2'){
+      $("#tr-us").hide();
+      $("#tr-gs").hide();
+      $("#tr-rs").show();
+    }else if (moeda == '3'){
+    }
+
+  }
+
+  function Vuelto(){
+    moeda = $("#moeda").val();
+    sem_us    = $('#valor_sem_us').val();
+    sem_gs    = $('#valor_sem_gs').val();
+    sem_rs    = $('#valor_sem_rs').val();
+    sem_ps    = $('#valor_sem_ps').val();
+    ctz_gs_us = $("#cotacao").val();
+    ctz_gs_rs = $("#cotacao_real").val();
+    ctz_gs_ps = $("#cotacao_gs_ps").val();
+
+    if (moeda == '0'){
+      valor = $("#valor_us").val();
+    } else if (moeda == '1'){
+      valor = $("#valor_gs").val();
+    } else if (moeda == '2'){
+      valor = $("#valor_rs").val();
+    };
+
+    forma_pago = $('#busca_forma_pago').val();
+
+    if (forma_pago != '5'){
+      if (forma_pago != '6'){
+        if (forma_pago != '3'){
+          if (forma_pago != '4'){
+            if (forma_pago != '15'){
+              if (moeda == '1'){
+
+                if ( parseFloat(valor) != parseFloat(sem_gs) ){
+                  if ( parseFloat(valor) < parseFloat(sem_gs) ){
+                    desc = (parseFloat(sem_gs) - parseFloat(valor));
+                    $("#desc_gs").val(desc);
+                    $("#int_gs").val('0');
+                  };
+
+                  if ( parseFloat(valor) > parseFloat(sem_gs) ){
+                    desc = (parseFloat(valor.replace(/\./g, "").replace(",", ".")) - parseFloat(sem_gs.replace(/\./g, "").replace(",", ".")));
+                    $("#vuelto").val( number_format(desc,0, ',', '.')  );
+                  };
+                }
+
+              } else if (moeda == '0'){
+                if ( parseFloat(valor) > parseFloat(sem_us) ){
+                  convert_rs = (parseFloat(sem_gs.replace(/\./g, "").replace(",", ".")) / parseFloat(<%= @venda.cotacao.to_f %>))
+
+                  restante_vuelto_gs = (parseFloat(valor.replace(/\./g, "").replace(",", ".")) - parseFloat(convert_rs));
+
+                  $("#vuelto").val(number_format( (parseFloat(restante_vuelto_gs) * parseFloat(<%= @venda.cotacao.to_f %>) ) ,0, ',', '.'));
+                }else{
+                  $("#vuelto").val(0);
+                }
+              } else if (moeda == '2'){
+                if ( parseFloat(valor) > parseFloat(sem_rs) ){
+
+                  convert_rs = (parseFloat(sem_gs.replace(/\./g, "").replace(",", ".")) / parseFloat(<%= @venda.cotacao_real.to_f %>))
+
+                  restante_vuelto_gs = (parseFloat(valor.replace(/\./g, "").replace(",", ".")) - parseFloat(convert_rs));
+
+                  $("#vuelto").val(number_format( (parseFloat(restante_vuelto_gs) * parseFloat(<%= @venda.cotacao_real.to_f %>) ) ,0, ',', '.'));
+                }else{
+                  $("#vuelto").val(0);
+                }
+              } else if (moeda == '3'){
+                if ( parseFloat(valor) > parseFloat(sem_ps) ){
+                  restante_vuelto_gs = (parseFloat(valor) - parseFloat(sem_ps));
+                  $("#vuelto").val(parseInt(restante_vuelto_gs));
+                }else{
+                  $("#vuelto").val(0);
+                }
+              };
+            }
+          }
+        }
+      }
+    }
+  }
+
+  function ApliDesc(){
+    moeda = $("#moeda").val();
+    valor_us    = $('#valor_sem_us').val();
+    valor_gs    = $('#valor_sem_gs').val();
+    valor_rs    = $('#valor_sem_rs').val();
+    var desc    = $("#desc_gs").val()
+    if (moeda == '0'){
+
+      $("#valor").val(parseFloat(valor_us) - parseFloat(desc));
+    } else if (moeda == '1'){
+      var desc = $("#desc_gs").val()
+      $("#valor").val(parseInt(valor_gs) - parseInt(desc));
+
+    } else if (moeda == '2'){
+      var desc = $("#desc_gs").val()
+      $("#valor").val(parseFloat(valor_rs) - parseFloat(desc));
+
+    }
+  }
+
+
+  function ApliInt(){
+    moeda = $("#moeda").val();
+    valor_us    = $('#valor_sem_us').val();
+    valor_gs    = $('#valor_sem_gs').val();
+    valor_rs    = $('#valor_sem_rs').val();
+    var int     = $("#int_gs").val()
+    if (moeda == '0'){
+
+      $("#valor").val(parseFloat(valor_us) + parseFloat(int));
+    } else if (moeda == '1'){
+      var desc = $("#desc_gs").val()
+      $("#valor").val(parseInt(valor_gs) + parseInt(int));
+
+    } else if (moeda == '2'){
+      var desc = $("#desc_gs").val()
+      $("#valor").val(parseFloat(valor_rs) + parseFloat(int));
+
+    }
+  }
+
+
+  function BuscaNC(){
+      window.open("/vendas/busca_nota_credito?id=<%= @venda.id %>&persona_id=<%= @venda.persona_id %>", '', ' SCROLLBARS=YES, TOP=0, LEFT=50, WIDTH=1250, HEIGHT=500');
+  };
+
+  function BuscaPA(){
+      window.open("/vendas/busca_pago_antecipado?moeda=<%= @venda.moeda %>&persona_id=<%= @venda.persona_id %>&venda_id=<%= @venda.id %>", '', ' SCROLLBARS=YES, TOP=0, LEFT=50, WIDTH=850, HEIGHT=400');
+  };
+
+
+</script>
+
+      <script>
+        document.onkeydown=function(e)
+        {
+          if(e.which == 27)
+            window.location.href = "/vendas/painel_cobranca_venda";
+        }
+      </script>

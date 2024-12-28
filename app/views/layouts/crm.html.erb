@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang=""> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Chronos Smart | <%= current_unidade.unidade_nome %></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <link rel="shortcut icon" href="/assets/icon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <%= stylesheet_link_tag 'application', 'themes/base/jquery.ui.all', :media => 'all' %>
+    <%= javascript_include_tag 'application' %>
+    <%= csrf_meta_tag %>
+
+  </head>
+  <body data-plus-as-tab="true">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/menus" class="navbar-brand"><%= image_tag "logo.png", class: 'brand-l' %></a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
+          <%= render "layouts/menu", cached: true %>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /container -->
+    </nav>
+
+    <div id="back">
+      <% if flash[:notice] or flash[:observacao] %>
+        <div class="Mensagem" id="observacao">
+          <%= flash[:observacao] %>
+          <%= flash[:notice] %>
+        </div>
+      <% end %>
+      <div class="Mensagem_error" id="observacao">
+        <%= flash[:error] %>
+      </div>      
+      <div class="box-panel-crm">
+        <div class="to-print" align="center">
+          <%= image_tag "logo-login.png", width: '100' %>
+          <br>
+          <%= current_unidade.unidade_nome %>
+        </div>
+        
+        <%= yield :layout %>
+      </div>
+    </div>
+
+    <div class="footer">
+      Copyright © 2011 - <%= Time.now.strftime("%Y") %> - Chronos - Powered by <a href="http://chronos.com.py">Chronos</a>
+    </div>
+
+</html>

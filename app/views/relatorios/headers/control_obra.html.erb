@@ -1,0 +1,39 @@
+<table width="755" >
+	<tr>
+		<td align="center"><%= $empresa_nome %></td>
+	</tr>
+	<tr>
+		<td align="center">CONTROL DE OBRA</td>
+	</tr>
+
+	<tr>
+		<td align="left">De....: <%= params[:inicio] %> hasta <%=params[:final] %></td>
+	</tr>
+
+	<tr>
+	<% p = Persona.find_by_id(params[:busca]["persona"])%>
+		<td align="left">Cliente...: <%= params[:busca]["persona"] unless params[:busca]["persona"].blank?  %> </td>
+	</tr>
+
+	<tr>		
+		<td>
+			<hr>
+			<table>
+				<tr>
+					<td width="35" align="center" ></td>
+					<td width="35" align="center" >Cod.</td>
+					<td width="500" align="left" >Nombre</td>
+					<td width="300" align="left" >Rubro</td>
+					<td width="80" align="center" ><%= t('DOC') %></td>
+					<td width="70" align="center" ><%= t('COIN') %></td>
+					<td width="70" align="right" >Valor U$</td>
+					<td width="70" align="right" >Valor G$</td>
+					
+				</tr>	
+			</table>
+			<hr>
+		</td>
+	</tr>
+
+
+</table>

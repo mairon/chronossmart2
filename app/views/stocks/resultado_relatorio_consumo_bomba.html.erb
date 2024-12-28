@@ -1,0 +1,113 @@
+<h1 align="right" id="header">.</h1>
+Listado Cobros
+<div class="group">
+  <table>
+    <tr>
+      <td width="100" align="center">Fecha</td>
+      <td width="100" align="center">Unit.</td>
+      <td width="100" align="center">Total</td>
+      <td width="100" align="center">Cantidad</td>
+
+    </tr>
+  </table>
+
+  <div class="rolagem" id="div">
+    <table>
+
+      <% quebra         = "" %>
+      <% quebra2        = "" %>
+      <% subunitario    = 0 %>
+      <% subtotal       = 0 %>
+      <% subquantidade  = 0 %>
+      <% subtotalbomba  = 0 %>
+      <% tottotal       = 0 %>
+      <% totquantidade  = 0 %>
+
+      <%= @stocks.each do |stock|%>
+
+                 <% if quebra != stock.produto_nome  %>
+                    <% if quebra2 != stock.quantidade_bomba  %>
+
+                    <% if quebra != "" %>
+                       <% if quebra2 != "" %>
+
+                         <tr>
+                             <td colspan="5"></td>
+                             <td align="right"><%= number_to_currency(subdivida, :format=>' %n ', :separator => ",") %></td>
+                         </tr>
+
+                         <tr>
+                             <td></td>
+                         </tr>
+
+                         <% subunitario   = 0 %>
+                         <% subtotal      = 0 %>
+                         <% subquantidade = 0 %>
+                         <% subtotalbomba = 0 %>
+
+                       <%end%>
+                    <%end%>
+
+                    <td colspan="1"></td>
+                    <td colspan="3"><%=h quebra = stock.produto_nome%></td>
+                    <td><%=h quebra2 = number_to_currency(stock.quantidade_bomba.to_f, :format=>' %n ', :precision => 0 )%></td>
+
+                   <%end%>
+                 <%end%>
+
+                 <tr class = "<%= cycle( "cor1", "cor2" )%>">
+                     <td width="100" align="center">  <%=h stock.data.strftime("%d/%m/%Y")%> </td>
+                     <td width="100" align="right">   <%=h number_to_currency(stock.unitario_guarani, :format=>' %n ', :precision => 0)%> </td>
+                     <td width="100" align="right">   <%=h number_to_currency(stock.unitario_guarani * stock.saida , :format=>' %n ', :precision => 0)%> </td>
+                     <td width="100" align="center">  <%= number_to_currency(stock.saida, :format=>' %n ', :precision => 0 ) %></td>
+                 </tr>
+
+                 <%  subunitario   = subunitario + stock.unitario_guarani %>
+                 <%  subtotal      = subtotal +  ( stock.unitario_guarani *  stock.saida )%>
+                 <%  subquantidade = subquantidade +  stock.saida %>
+                 <%  subtotalbomba = stock.quantidade_bomba %>
+                 <%  tottotal      = tottotal +  ( stock.unitario_guarani *  stock.saida )%>
+                 <%  totquantidade = totquantidade +  stock.saida %>
+
+      <% end %>
+
+
+      <tr>
+          <td colspan="1"></td>
+          <td align="right"><%= number_to_currency(subunitario, :format=>' %n ', :precision => 0 ) %></td>
+          <td align="right"><%= number_to_currency(subtotal, :format=>' %n ', :precision => 0 ) %></td>
+          <td align="center"><%= number_to_currency(subquantidade, :format=>' %n ', :precision => 0 ) %></td>
+          <td align="center"><%= number_to_currency(subtotalbomba, :format=>' %n ', :precision => 0 ) %></td>
+          <td width="100" align="right">Saldo :</td>
+          <td align="right"><%= number_to_currency(subtotalbomba + subquantidade , :format=>' %n ', :precision => 0 ) %></td>
+      </tr>
+
+
+      <tr>
+          <td></td>
+      </tr>
+
+   </table>
+
+</div>
+
+
+  <table>
+      <br/>
+      <tr>
+          <td width="160"></td>
+          <td>Total:</td>
+          <td width="100" align="right"><%= number_to_currency(tottotal, :format=>' %n ', :precision => 0) %></td>
+          <td width="100" align="center"><%= number_to_currency(totquantidade, :format=>' %n ', :precision => 0) %></td>
+      </tr>
+</table>
+
+
+
+</div>
+
+<a href="/stocks/resultado_relatorio_consumo_bomba.pdf?inicio=<%=params[:inicio]%>&final=<%=params[:final]%>&busca[turno]=<%=params[:busca]["turno"]%>&busca[bomba]=<%=params[:busca]["bomba"]%>&commit=Busca">Gerar(Pdf)</a> |
+<a href="/stocks/resultado_relatorio_consumo_bomba.xls?inicio=<%=params[:inicio]%>&final=<%=params[:final]%>&busca[turno]=<%=params[:busca]["turno"]%>&busca[bomba]=<%=params[:busca]["bomba"]%>&commit=Busca">Gerar(Excel)</a> |
+<%= link_to 'Volver', :action => "index" %>
+
+

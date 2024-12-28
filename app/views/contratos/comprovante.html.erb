@@ -1,0 +1,110 @@
+  <div class="panel-content">    
+    <% tot_s  = 0 %>
+    <% tot_g  = 0 %>
+    <% tot_st = 0 %>
+    <% tot_cd = 0 %>
+    <div>
+    <table >
+      <tr>
+        <td colspan="2"><b>Cliente: <%= @contrato.persona.nome %></b></td>
+      </tr>
+      <% @contra_servis.each do |cs| %>      
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="100">Contrato/Serviço Vendido</td>
+          <td width="450"><%= cs.produto.nome %></td>
+          <td><span class="us">(+)</span></td>
+          <% if @contrato.moeda.to_i == 0 %>
+            <td width="100" align="right"><%= format_decimal(cs.total_us) %></td>
+            <% tot_s += cs.total_us.to_f %>
+          <% elsif @contrato.moeda.to_i == 1 %>
+            <td width="100" align="right"><%= format_int(cs.total_gs) %></td>
+            <% tot_s += cs.total_gs.to_f %>
+          <% elsif @contrato.moeda.to_i == 2 %>
+            <td width="100" align="right"><%= format_decimal(cs.total_rs) %></td>
+            <% tot_s += cs.total_rs.to_f %>
+          <% end %>
+        </tr>
+      <% end %>
+      <% gastos = Compra.where(contrato_id: @contrato.id) %>
+      <% gastos.each do |g| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="100">Despesas Relacion.</td>
+          <td width="450"><small><%= g.descricao %></small></td>
+          <td><span class="gs">(-)</span></td>
+          <% if @contrato.moeda.to_i == 0 %>
+            <td align="right" width="100"><%= format_decimal(g.total_dolar) %></td>
+            <% tot_s -= g.total_dolar.to_f %>
+            <% tot_g += g.total_dolar.to_f %>
+          <% elsif @contrato.moeda.to_i == 1 %>
+            <td align="right" width="100"><%= format_int(g.total_guarani) %></td>
+            <% tot_s -= g.total_guarani.to_f %>
+            <% tot_g += g.total_guarani.to_f %>
+          <% else %>
+            <td align="right" width="100"><%= format_decimal(g.total_real) %></td>
+            <% tot_s -= g.total_real.to_f %>
+            <% tot_g += g.total_real.to_f %>
+            <% end %>
+        </tr>
+      <% end %>
+      <tr style="background-color: #9999">
+        <td colspan="2"><b>Total Despesas Diretas</b></td>
+        <td><b>(=)</b></td>
+        <td align="right"><b><%= format_int(tot_g) %></b></td>
+      </tr>
+
+       
+
+
+      <% @contrato.contrato_custos.each do |cc| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="100">Diretos</td>
+          <% if @contrato.moeda.to_i == 0 %>
+            <td width="200"><%= cc.persona.nome %> - <%= cc.quantidade %> x <%= format_decimal(cc.valor_us) %></td>
+            <td><span class="us">(-)</span></td>
+            <td align="right" width="60"><%= format_int(cc.quantidade.to_f * cc.valor_us.to_f) %></td>
+            <% tot_s -= (cc.quantidade.to_f * cc.valor_us.to_f) %>
+            <% tot_cd += cc.quantidade.to_f * cc.valor_us.to_f %>
+
+          <% elsif @contrato.moeda.to_i == 1 %>
+            <td width="200"><%= cc.persona.nome %> - <%= cc.quantidade %> x <%= format_int(cc.valor_gs) %></td>
+            <td><span class="gs">(-)</span></td>
+            <td align="right" width="60"><%= format_int(cc.quantidade.to_f * cc.valor_gs.to_f) %></td>
+            <% tot_s -= (cc.quantidade.to_f * cc.valor_gs.to_f) %>
+            <% tot_cd += cc.quantidade.to_f * cc.valor_gs.to_f %>
+
+          <% elsif @contrato.moeda.to_i == 2 %>
+            <td width="200"><%= cc.persona.nome %> - <%= cc.quantidade %> x <%= format_decimal(cc.valor_rs) %></td>
+            <td><span class="rs">(-)</span></td>
+            <td align="right" width="60"><%= format_int(cc.quantidade.to_f * cc.valor_rs.to_f) %></td>
+            <% tot_s -= (cc.quantidade.to_f * cc.valor_rs.to_f) %>
+            <% tot_cd += cc.quantidade.to_f * cc.valor_rs.to_f %>
+
+          <% end %>
+        </tr>
+
+        <tr style="background-color: #9999">
+          <td colspan="2"><b>Total Diretos</b></td>
+          <td><b>(=)</b></td>
+          <td align="right"><b><%= format_int(tot_cd) %></b></td>
+        </tr>        
+      <% end %>
+
+
+      <tr style="background-color: #9999">
+        <td colspan="2"><b>Resultado</b></td>
+        <td><b>(=)</b></td>
+        <% if @contrato.moeda.to_i == 1 %>
+          <td align="right"><b><%= format_int(tot_s) %></b></td>
+        <% else %>
+          <td align="right"><b><%= format_decimal(tot_s) %></b></td>
+        <% end %>
+      </tr>
+
+
+
+      
+      
+    
+    </table>
+  </div>
+</div>

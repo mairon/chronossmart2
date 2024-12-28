@@ -1,0 +1,44 @@
+<h1 id="header">Resumen de Cuentas</h1>   
+<div class="group">
+     <%= form_tag resultado_resumo_contas_financas_path, :method => "get" do%>
+    <table>
+	   <input type="hidden" name="filtro"  id="filtro"   size="10" value="1" />
+      <tr>
+      <td width="325"> 
+        <label>Periodo</label>
+        <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+        <div class="input-group-addon-f">
+          <span class="icon-calendar"></span>
+        </div>
+
+        <div class="date-separ"><%= t('TO') %></div>
+        <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+        <div class="input-group-addon-f">
+        <span class="icon-calendar"></span>
+        </div>                  
+      </td>
+    </tr>
+
+      <tr>
+        <td>
+          <label><%= t('ACCOUNT') %></label>
+             <%= select("busca", "conta", Conta.all( :select => 'id,nome',:conditions => ["unidade_id = #{current_unidade.id}"],:order => 'nome').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Todos'}) %>
+          </td>
+       </tr>
+
+       <tr>
+          <td width="4" class="footer-buttons">
+             <input type="submit" value="Informe" onclick="Tipo('0')" class=" btn btn-green"/>
+             <input type="submit" value="Excel" onclick="Tipo('1')" class=" btn btn-blue"/>
+          </td>
+       </tr>
+
+       <input type="hidden" name="tipo" id="tipo"  size="5" value="0"/>
+     </table>
+  <% end %>
+</div>
+
+
+<script>
+  $('#busca_conta').selectize();
+</script>

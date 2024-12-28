@@ -1,0 +1,154 @@
+
+<div class="group">
+      <table class="head_grid">
+         <tr >
+            <td width="80" align="center"><%= t('DATE') %></td>
+            <td width="150" align="center"><%= t('DOC') %></td>
+            <td width="50" align="center">Sector</td>
+            <td width="150" align="center">N. <%= t('DOC') %></td>
+            <td width="80" align="center"><%= t('SHARE') %></td>
+            <td width="80" align="center">Venc.</td>
+            <td width="100" align="center">Valor </td>
+            <td width="100" align="center">Anter.</td>
+            <td width="100" align="center">Saldo </td>
+
+         </tr>
+      </table>
+      <div class="rolagem_cobro" dir="div">
+        <% ind = 0 %>
+        <% tot_div = 0 %>
+        <% tot_ant = 0 %>
+        <% tot_saldo = 0 %>
+         <table>
+            <%  @proveedor.each do |pv| %>
+               <% anterior_dolar     = Proveedore.sum(:pago_dolar, :conditions => ["persona_id = ? AND documento_numero = ? AND cota = ?",pv.persona_id,pv.documento_numero,pv.cota]) %>
+
+               <% anterior_guarani   = Proveedore.sum(:pago_guarani, :conditions => ["persona_id = ? AND documento_numero = ? AND cota = ?",pv.persona_id,pv.documento_numero,pv.cota]) %>
+
+               <% anterior_real   = Proveedore.sum(:pago_real, :conditions => ["persona_id = ? AND documento_numero = ? AND cota = ?",pv.persona_id,pv.documento_numero,pv.cota]) %>
+
+               <%  saldo_dolar   = pv.divida_dolar - anterior_dolar %>
+               <%  saldo_guarani = pv.divida_guarani - anterior_guarani %>
+               <%  saldo_real    = pv.divida_real - anterior_real %>
+
+               <tr class = "<%= cycle( "cor1", "cor2" )%>"
+                   onMouseOver="javascript:this.style.backgroundColor='#949494'"
+                   onMouseOut="javascript:this.style.backgroundColor=''"
+                   onClick="Fecha('<%= pv.vencimento.strftime("%d").to_i %>',
+                       '<%= pv.vencimento.strftime("%m").to_i %>',
+                       '<%= pv.vencimento.strftime("%Y").to_i %>',
+                       '<%= pv.documento_nome %>',
+                       '<%= pv.documento_numero_01 %>',
+                       '<%= pv.documento_numero_02 %>',
+                       '<%= pv.documento_numero %>',
+                       '<%= pv.cota %>',
+                       '<%= pv.clase_produto.to_i %>',
+                       '<%= number_to_currency( pv.divida_dolar.to_f, :format =>' %n ', :separator => ",") %>',
+                       '<%= number_to_currency( pv.divida_guarani, :format =>' %n ', :precision => 0) %>',
+                       '<%= number_to_currency( pv.divida_real, :format =>' %n ', :separator => ",") %>',
+                       '<%= number_to_currency( anterior_dolar.to_f, :format =>' %n ', :separator => ",") %>',
+                       '<%= number_to_currency( anterior_guarani, :format =>' %n ', :precision => 0) %>',
+                       '<%= number_to_currency( anterior_real, :format =>' %n ', :separator => ",") %>',
+                       '<%= number_to_currency( saldo_dolar.to_f, :format =>' %n ', :separator => ",") %>',
+                       '<%= number_to_currency( saldo_guarani, :format =>' %n ', :precision => 0) %>',
+                       '<%= number_to_currency( saldo_real, :format =>' %n ', :separator => ",") %>',
+                       '<%= pv.compra_id %>')">
+
+                  <td width="80"  align="center"><%= pv.data.strftime("%d/%m/%Y")%></td>
+
+                  <% if pv.documento_nome == "FACTURA CREDITO" %>
+                     <td width="150" align="left">FCR</td>
+                  <% else %>
+                     <td width="150" align="left"><%= pv.documento_nome %></td>
+                  <% end %>
+                  <td width="50" align="left"><%= pv.clase_produto %></td>
+                  <td width="150" align="center"><%= pv.documento_numero_01%>-<%= pv.documento_numero_02%>-<%= pv.documento_numero%></td>
+                  <td width="80"  align="center"><%= pv.cota%></td>                  
+                  <td width="80"  align="center"><%= pv.vencimento.strftime("%d/%m/%Y")%></td>
+
+                  <% if @pago.moeda == 0 %>
+                    <td width="100" align="right">    <%= number_to_currency( pv.divida_dolar, :format =>' %n ', :separator => ",")%></td>
+                    <td width="100" align="right">    <%= number_to_currency( anterior_dolar, :format =>' %n ', :separator => ",")%></td>
+                    <td width="100" align="right">    <%= number_to_currency( saldo_dolar, :format =>' %n ', :separator => ",")%></td>
+                    <% tot_div += pv.divida_dolar %>
+                    <% tot_ant += anterior_dolar %>
+                    <% tot_saldo += saldo_dolar %>
+
+                  <% elsif @pago.moeda == 1 %> 
+                    <td width="100" align="right">    <%= number_to_currency( pv.divida_guarani, :format =>' %n ', :precision => 0)%></td>
+                    <td width="100" align="right">    <%= number_to_currency( anterior_guarani, :format =>' %n ', :precision => 0)%></td>
+                    <td width="100" align="right">    <%= number_to_currency( saldo_guarani, :format =>' %n ', :precision => 0)%></td>
+                    <% tot_div += pv.divida_guarani %>
+                    <% tot_ant += anterior_guarani %>
+                    <% tot_saldo += saldo_guarani %>
+
+                  <% else %>
+                    <td width="100" align="right">    <%= number_to_currency( pv.divida_real, :format =>' %n ', :separator => ",")%></td>
+                    <td width="100" align="right">    <%= number_to_currency( anterior_real, :format =>' %n ', :separator => ",")%></td>
+                    <td width="100" align="right">    <%= number_to_currency( saldo_real, :format =>' %n ', :separator => ",")%></td>
+                    <% tot_div += pv.divida_real %>
+                    <% tot_ant += anterior_real %>
+                    <% tot_saldo += saldo_real %>
+                  <% end %>
+                  <% ind += 1 %>
+               </tr>
+            <% end %>
+         </table>
+      </div>
+         <table class="head_grid">
+           <tr >
+             <td width="550">Lazamientos : <%= ind %></td>
+              <% if @pago.moeda == 1 %>
+                <td width="100" align="right">    <%= number_to_currency( tot_div, :format =>' %n ', :precision => 0)%></td>
+                <td width="100" align="right">    <%= number_to_currency( tot_ant, :format =>' %n ', :precision => 0)%></td>
+                <td width="100" align="right">    <%= number_to_currency( tot_saldo, :format =>' %n ', :precision => 0)%></td>
+              <% else %>
+                <td width="100" align="right">    <%= number_to_currency( tot_div, :format =>' %n ', :separator => ",")%></td>
+                <td width="100" align="right">    <%= number_to_currency( tot_ant, :format =>' %n ', :separator => ",")%></td>
+                <td width="100" align="right">    <%= number_to_currency( tot_saldo, :format =>' %n ', :separator => ",")%></td>
+              <% end %>
+           </tr>
+         </table>
+
+   <input type="hidden" id="moeda" name="moeda" value="<%= @pago.moeda %>"/>
+</div>
+<script>
+   function Fecha(vencimento3,vencimento2,vencimento1,documento_nome,documento_numero_01,documento_numero_02,documento_numero,cota,clase_produto,valor_dolar,valor_guarani,valor_real,anterior_dolar,anterior_guarani,anterior_real,saldo_dolar,saldo_guarani,saldo_real,compra_id)
+   {
+      document.getElementById('pagos_detalhe_vencimento_3i').value         = vencimento3;
+      document.getElementById('pagos_detalhe_vencimento_2i').value         = vencimento2;
+      document.getElementById('pagos_detalhe_vencimento_1i').value         = vencimento1;
+      document.getElementById('pagos_detalhe_documento_nome').value        = documento_nome;
+      document.getElementById('pagos_detalhe_documento_numero_01').value   = documento_numero_01;
+      document.getElementById('pagos_detalhe_documento_numero_02').value   = documento_numero_02;
+      document.getElementById('pagos_detalhe_documento_numero').value      = documento_numero;
+      document.getElementById('pagos_detalhe_cota').value                  = cota;
+      document.getElementById('pagos_detalhe_clase_produto').value         = clase_produto;
+      document.getElementById('pagos_detalhe_valor_dolar').value           = valor_dolar;
+      document.getElementById('pagos_detalhe_valor_guarani').value         = valor_guarani;
+      document.getElementById('pagos_detalhe_valor_real').value            = valor_real;
+      document.getElementById('pagos_detalhe_anterior_dolar').value        = anterior_dolar;
+      document.getElementById('pagos_detalhe_anterior_guarani').value      = anterior_guarani;
+      document.getElementById('pagos_detalhe_anterior_real').value         = anterior_real;
+      document.getElementById('pagos_detalhe_saldo_dolar').value           = saldo_dolar;
+      document.getElementById('pagos_detalhe_saldo_guarani').value         = saldo_guarani;
+      document.getElementById('pagos_detalhe_saldo_real').value           = saldo_real;
+      document.getElementById('pagos_detalhe_compra_id').value             = compra_id;
+
+      if( document.getElementById('moeda').value == 0){
+         document.getElementById('pagos_detalhe_pago_dolar').value            = saldo_dolar;
+         document.getElementById("pagos_detalhe_pago_dolar").focus()
+      }
+      else if( document.getElementById('moeda').value == 1){
+         document.getElementById('pagos_detalhe_pago_guarani').value          = saldo_guarani;
+         document.getElementById("pagos_detalhe_pago_guarani").focus()
+
+      }
+      else{
+         document.getElementById('pagos_detalhe_pago_real').value          = saldo_real;
+         document.getElementById("pagos_detalhe_pago_real").focus()
+
+      }
+   }
+
+</script>

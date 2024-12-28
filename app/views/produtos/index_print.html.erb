@@ -1,0 +1,30 @@
+<table>
+        <tr>
+          <td width="150">Produto</td>
+          <td width="40" align="right">Cantidad</td>
+        </tr>
+
+      <% quebra = "" %>
+
+      <% for produto in @produtos %>
+      <% if quebra != produto.sub_grupo_nome %>
+
+        <% if quebra != "" %>
+
+          <tr class="head">
+            <td colspan="5" align="right"></td>
+            <td align="right"></td>
+            <td></td>           
+          </tr>
+
+         <% end %>
+         <tr>
+          <td class="head" colspan="5" style="background: #ccc"><%= quebra = produto.sub_grupo_nome %></td>
+         </tr>
+      <% end %>
+        <tr>
+          <td width="150" align="left"> <%= produto.nome %> </td>
+          <td width="40" align="center"><%= format_int(produto.stock.to_f) %></td>
+        </tr>
+      <% end %>
+    </table>

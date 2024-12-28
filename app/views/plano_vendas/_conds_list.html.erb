@@ -1,0 +1,27 @@
+<%= form_tag update_individual_plano_vendas_path :method => :put do %>
+	<%= hidden_field_tag :id, @plano_venda.id %>
+	<table class="list">
+		<tr>
+			<td></td>
+			<td align="right">Qtd</td>
+			<td align="right">Monto</td>
+		</tr>
+	<% @plano_venda.plano_venda_conds.each do |pv| %>
+		<%= fields_for "conds[]", pv do |f| %>
+			<tr class = "<%= cycle("cor1", "cor2") %>">
+				<td width="80"><b><%= pv.nome %></b></td>
+				<td width="100"><%= f.telephone_field :quantidade, size: 10, class: "money_gs", precision: 0, dir: "rtl", step: "any" %></td>
+				<td width="100"><%= f.telephone_field :valor_us, size: 10, class: "money_us", precision: 2, dir: "rtl", step: "any" %></td>
+				<td><%= link_to '', pv, :confirm => 'Seguro?', :method => :delete, class: 'icon-trash' %></td>
+			</tr>
+		<% end %>
+	<% end %>
+		<tr>
+			<td colspan="2"></td>
+			<td align="right"><b class="bold"><%= format_decimal(@plano_venda.plano_venda_conds.sum("quantidade * valor_us")) %></b></td>
+		</tr>
+		<tr>
+			<td colspan="2"><%= submit_tag "Actualizar" , :class => "btn btn-green", :disable_with => "Aguarde..." %></td>
+		</tr>
+	</table>
+<% end %>

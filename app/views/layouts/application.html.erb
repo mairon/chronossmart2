@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+		<title>Chronos Smart | <%= current_unidade.unidade_nome %></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <link rel="shortcut icon" href="/assets/icon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+		<%= stylesheet_link_tag 'application', 'themes/base/jquery.ui.all', :media => 'all'%>
+		<%= javascript_include_tag 'application' %>
+		<%= csrf_meta_tag %>
+	</head>
+  <body data-plus-as-tab="true">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/menus" class="navbar-brand"><%= image_tag "logo.png", class: 'brand-l' %></a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
+          <%= render "layouts/menu" %>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /container -->
+    </nav>
+
+		<% if flash[:notice] or flash[:observacao] %>
+			<div class="Mensagem" id="observacao">
+				<%= flash[:observacao] %>
+				<%= flash[:notice] %>
+			</div>
+		<% end %>
+		<div class="Mensagem_error" id="observacao">
+			<%= flash[:error] %>
+		</div>
+		<div id="back">
+			<div id="contents">
+        <div class="to-print" align="center">
+          <%= image_tag "logo-login.png", width: '100' %>
+          <br>
+          <%= current_unidade.unidade_nome %>
+        </div>
+				<%= yield :layout %>
+				
+				<% session[:modal] = "false" %>
+			</div>
+		</div>
+			<script>
+				document.onkeyup = function(e) {
+					if(e.which == 115){
+						window.open('/produtos/consulta_stock', 'Pagina', ' SCROLLBARS=NO, TOP=10, LEFT=0, WIDTH=1500, HEIGHT=650');
+					}
+
+					if(e.which == 117){
+						window.open('/produtos/consulta_stock', 'Pagina', ' SCROLLBARS=NO, TOP=10, LEFT=0, WIDTH=1500, HEIGHT=650');
+					}
+
+					if(e.which == 118){
+						window.open('/personas/consulta_cliente', '', ' SCROLLBARS=NO, TOP=10, LEFT=50, WIDTH=1200, HEIGHT=650');
+					}
+
+					if(e.which == 107){
+						document.getElementById('salvar').focus();
+					}
+				}
+			</script>
+
+    <div class="footer">
+      Copyright © 2011 - <%= Time.now.strftime("%Y") %> - <img src="/assets/icon.png" height="16">  - Powered by <a href="http://chronos.com.py">Chronos</a>
+    </div>
+
+</html>

@@ -1,0 +1,426 @@
+<div class="group">
+	<table>
+		<tr>
+			<td colspan="5"></td>
+			<td colspan="10" >
+			<b><font size="2"> COMPRAS MERCADERIAS INTERNAS </font></b>
+			</td>
+		</tr>
+		
+		<% iva_10 = ( ( 10.00 / 100 ) + 1.00).to_f %>
+		<% iva_05 = ( ( 5.00 / 100 ) + 1.00).to_f %>
+		<% cp_ex     = 0 %>
+		<% cp_gv_05  = 0 %>
+		<% cp_ip_05  = 0 %>
+		<% cp_gv_10  = 0 %>
+		<% cp_ip_10  = 0 %>
+		<% cp_tot = 0 %>
+		
+		<% @compra.each do |cp| %>
+		   <% if cp.tipo_compra == 0  %>
+		     <tr>			   
+			   <td align="center" ><%= cp.data.to_date.strftime("%d/%m/%Y") %></td>
+			   <td align="center"> <%= number_to_currency(cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			   <% if cp.documento_id == 3 %>
+			      <td align="center" >FCR</td>
+			   <% elsif cp.documento_id == 2 %>
+			      <td align="center" >FC</td>
+			   <% end %>
+			   <td align="left" ><%= cp.rn %></td>
+			   <td width="90" align="center"> <%= cp.dn_01 %> - <%= cp.dn_02 %> - <%= cp.dn %> </td>
+			   <td align="left" ><%= cp.persona_nome %></td>
+			   <td width="70" align="center" ><%= cp.persona_ruc %></td>
+			   			   
+			   <% if cp.moeda == 0 %>
+   			      <td align="right" >0</td>
+   			      <td align="right" > <%= number_to_currency( ex = cp.exd.to_f * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_05 = ( cp.gv_05_d.to_f - ( ( cp.gv_05_d.to_f / 1.05 ) * 0.05 ) ) * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( ip_05 = ( ( cp.gv_05_d.to_f / 1.05 * 0.05 ) ) * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_10 = ( cp.gv_10_d.to_f - ( ( cp.gv_10_d.to_f / 1.1 )* 0.10) ) * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" ><%= number_to_currency( ip_10 = ( ( ( cp.gv_10_d.to_f / 1.1 )* 0.10)  *  cp.cot_vd.to_f ), :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( tot = cp.tot_d.to_f * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>			      
+   			      <td align="right" >0</td>
+   			      
+               <% else %>               
+               
+   			      <td align="right" >0</td>               
+   			      <td align="right" > <%= number_to_currency( ex = cp.exg.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_05 = cp.gv_05_g.to_f - cp.ip_05_g.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( ip_05 = cp.ip_05_g.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_10 = cp.gv_10_g.to_f - cp.ip_10_g.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( ip_10 = cp.ip_10_g.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( tot =  cp.tot_g.to_f, :format=>' %n ', :precision => 0) %></td>			      
+   			      <td align="right" >0</td>
+			   <% end %>
+			   
+			   <% cp_ex     += ex.to_f %>
+			   <% cp_gv_05  += gv_05.to_f %>
+			   <% cp_ip_05  += ip_05.to_f %>
+			   <% cp_gv_10  += gv_10.to_f %>
+			   <% cp_ip_10  += ip_10.to_f %>
+			   <% cp_tot += tot.to_f %>
+			   
+	    
+   		     </tr>
+	       <% end %>
+	    <% end %>
+
+		<tr>
+			<td colspan="8"></td>
+			<td align="right" >0</td>
+			<td align="right" ><%= number_to_currency( cp_ex, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cp_gv_05, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cp_ip_05, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cp_gv_10, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cp_ip_10, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cp_tot, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" >0</td>
+		</tr>
+
+
+		<tr>
+			<td colspan="5"></td>
+			<td colspan="10" >
+			<b><font size="3">Compra De Bienes </font></b>
+			</td>
+		</tr>
+		
+		<% cpb_ex     = 0 %>
+		<% cpb_gv_05  = 0 %>
+		<% cpb_ip_05  = 0 %>
+		<% cpb_gv_10  = 0 %>
+		<% cpb_ip_10  = 0 %>
+		<% cpb_tot = 0 %>
+
+		<% @compra.each do |cp| %>
+		   <% if cp.tipo_compra == 3  %>
+		      <tr>
+			   <td align="center" ><%= cp.data.to_date.strftime("%d/%m/%Y") %></td>
+			   <td align="center"> <%= number_to_currency(cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			   <% if cp.documento_id == 3 %>
+			      <td align="center" >FCR</td>
+			   <% elsif cp.documento_id == 2 %>
+			      <td align="center" >FC</td>
+			   <% end %>
+			   <td align="left" ><%= cp.rn %></td>
+			   <td align="center"> <%= cp.dn_01 %> - <%= cp.dn_02 %> - <%= cp.dn %> </td>
+			   <td align="left" ><%= cp.persona_nome %></td>
+			   <td align="center" ><%= cp.persona_ruc %></td>
+			   			   
+			   <% if cp.moeda == 0 %>
+   			      <td align="right" >0</td>
+   			      <td align="right" > <%= number_to_currency( ex = cp.exd.to_f * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_05 = ( cp.gv_05_d.to_f - ( ( cp.gv_05_d.to_f / 1.05 ) * 0.05 ) ) * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( ip_05 = ( ( cp.gv_05_d.to_f / 1.05 * 0.05 ) ) * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_10 = ( cp.gv_10_d.to_f - ( ( cp.gv_10_d.to_f / 1.1 )* 0.10) ) * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" ><%= number_to_currency( ip_10 = ( ( ( cp.gv_10_d.to_f / 1.1 )* 0.10)  *  cp.cot_vd.to_f ), :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( tot = cp.tot_d.to_f * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>			      
+   			      <td align="right" >0</td>
+               <% else %>               
+   			      <td align="right" >0</td>               
+   			      <td align="right" > <%= number_to_currency( ex = cp.exg.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_05 = cp.gv_05_g.to_f - cp.ip_05_g.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( ip_05 = cp.ip_05_g.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_10 = cp.gv_10_g.to_f - cp.ip_10_g.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( ip_10 = cp.ip_10_g.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( tot =  cp.tot_g.to_f, :format=>' %n ', :precision => 0) %></td>			      
+   			      <td align="right" >0</td>
+			   <% end %>
+			   
+			   <% cpb_ex     += ex.to_f %>
+			   <% cpb_gv_05  += gv_05.to_f %>
+			   <% cpb_ip_05  += ip_05.to_f %>
+			   <% cpb_gv_10  += gv_10.to_f %>
+			   <% cpb_ip_10  += ip_10.to_f %>
+			   <% cpb_tot += tot.to_f %>
+			   
+ 		     </tr>
+		   <% end %>
+	    <% end %>
+
+		<tr>
+			<td colspan="7"></td>
+			<td align="right" >0</td>			
+			<td align="right" ><%= number_to_currency( cpb_ex, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cpb_gv_05, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cpb_ip_05, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cpb_gv_10, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cpb_ip_10, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cpb_tot, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" >0</td>			
+		</tr>
+
+		<tr>
+			<td colspan="5"></td>
+			<td colspan="10" >
+			<b><font size="2"> GASTOS  INTERNAS </font></b>
+			</td>
+
+		</tr>
+		<% cpg_ex     = 0 %>
+		<% cpg_gv_05  = 0 %>
+		<% cpg_ip_05  = 0 %>
+		<% cpg_gv_10  = 0 %>
+		<% cpg_ip_10  = 0 %>
+		<% cpg_tot = 0 %>
+
+		<% @compra.each do |cp| %>
+		   <% if cp.tipo_compra == 1  %>
+		      <tr>
+			   <td align="center" ><%= cp.data.to_date.strftime("%d/%m/%Y") %></td>
+			   <td align="center"> <%= number_to_currency(cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			   <% if cp.documento_id == 3 %>
+			      <td align="center" >FCR</td>
+			   <% elsif cp.documento_id == 2 %>
+			      <td align="center" >FC</td>
+			   <% end %>
+			   <td align="left" ><%= cp.rn %></td>
+			   <td align="center"> <%= cp.dn_01 %> - <%= cp.dn_02 %> - <%= cp.dn %> </td>
+			   <td align="left" ><%= cp.persona_nome %></td>
+			   <td align="center" ><%= cp.persona_ruc %></td>
+			   			   			   			   
+			   <% if cp.moeda == 0 %>
+   			      <td align="right" >0</td>
+   			      <td align="right" > <%= number_to_currency( ex = cp.exd.to_f * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_05 = ( cp.gv_05_d.to_f - ( ( cp.gv_05_d.to_f / 1.05 ) * 0.05 ) ) * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( ip_05 = ( ( cp.gv_05_d.to_f / 1.05 * 0.05 ) ) * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_10 = ( cp.gv_10_d.to_f - ( ( cp.gv_10_d.to_f / 1.1 )* 0.10) ) * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" ><%= number_to_currency( ip_10 = ( ( ( cp.gv_10_d.to_f / 1.1 )* 0.10)  *  cp.cot_vd.to_f ), :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( tot = cp.tot_d.to_f * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>			      
+   			      <td align="right" >0</td>
+               <% else %>               
+   			      <td align="right" >0</td>
+               
+   			      <td align="right" > <%= number_to_currency( ex = cp.exg.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_05 = cp.gv_05_g.to_f - cp.ip_05_g.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( ip_05 = cp.ip_05_g.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_10 = cp.gv_10_g.to_f - cp.ip_10_g.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( ip_10 = cp.ip_10_g.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( tot =  cp.tot_g.to_f, :format=>' %n ', :precision => 0) %></td>			      
+   			      <td align="right" >0</td>
+			   <% end %>
+			   
+			   <% cpg_ex     += ex.to_f %>
+			   <% cpg_gv_05  += gv_05.to_f %>
+			   <% cpg_ip_05  += ip_05.to_f %>
+			   <% cpg_gv_10  += gv_10.to_f %>
+			   <% cpg_ip_10  += ip_10.to_f %>
+			   <% cpg_tot += tot.to_f %>
+			   
+		      </tr>
+		   <% end %>
+	    <% end %>
+
+		<tr>
+			<td colspan="7"></td>
+			<td align="right" >0</td>			
+			<td align="right" ><%= number_to_currency( cpg_ex, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cpg_gv_05, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cpg_ip_05, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cpg_gv_10, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cpg_ip_10, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cpg_tot, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" >0</td>
+		</tr>
+
+
+		<tr>
+			<td colspan="5"></td>
+			<td colspan="10" >
+			<b><font size="3"> Nota de Credito </font></b>
+			</td>
+
+		</tr>
+		<% nc_ex     = 0 %>
+		<% nc_gv_05  = 0 %>
+		<% nc_ip_05  = 0 %>
+		<% nc_gv_10  = 0 %>
+		<% nc_ip_10  = 0 %>
+		<% nc_tot = 0 %>
+
+		<% @compra.each do |cp| %>
+		   <% if cp.tipo_compra == 4  %>
+		      <tr>
+			   <td align="center" ><%= cp.data.to_date.strftime("%d/%m/%Y") %></td>
+			   <td align="center"> <%= number_to_currency(cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			   <td align="center" >NC</td>
+			   <td align="left" ><%= cp.rn %></td>
+			   <td align="center"> <%= cp.dn_01 %> - <%= cp.dn_02 %> - <%= cp.dn %> </td>
+			   <td align="left" ><%= cp.persona_nome %></td>
+			   <td align="center" ><%= cp.persona_ruc %></td>
+			   			   
+			   			   
+			   <% if cp.moeda == 0 %>
+   			      <td align="right" >0</td>
+   			      <td align="right" > <%= number_to_currency( ex = cp.exd.to_f * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_05 = ( cp.gv_05_d.to_f - ( ( cp.gv_05_d.to_f / 1.05 ) * 0.05 ) ) * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( ip_05 = ( ( cp.gv_05_d.to_f / 1.05 * 0.05 ) ) * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_10 = ( cp.gv_10_d.to_f - ( ( cp.gv_10_d.to_f / 1.1 )* 0.10) ) * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" ><%= number_to_currency( ip_10 = ( ( ( cp.gv_10_d.to_f / 1.1 )* 0.10)  *  cp.cot_vd.to_f ), :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( tot = cp.tot_d.to_f * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>			      
+   			      <td align="right" >0</td>
+               <% else %>               
+   			      <td align="right" >0</td>
+               
+   			      <td align="right" > <%= number_to_currency( ex = cp.exg.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_05 = cp.gv_05_g.to_f - ( cp.gv_05_g.to_f / 11 ), :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( ip_05 = cp.gv_05_g.to_f / 11 , :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_10 = cp.gv_10_g.to_f - (cp.gv_10_g.to_f / 11), :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( ip_10 = cp.gv_10_g.to_f / 11, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( tot =  cp.tot_g.to_f, :format=>' %n ', :precision => 0) %></td>			      
+   			      <td align="right" >0</td>
+			   <% end %>
+			   
+			   <% nc_ex     += ex.to_f %>
+			   <% nc_gv_05  += gv_05.to_f %>
+			   <% nc_ip_05  += ip_05.to_f %>
+			   <% nc_gv_10  += gv_10.to_f %>
+			   <% nc_ip_10  += ip_10.to_f %>
+			   <% nc_tot += tot.to_f %>
+			   
+		      </tr>
+		   <% end %>
+	    <% end %>
+
+		<tr>
+			<td colspan="7"></td>
+			<td align="right" >0</td>			
+			<td align="right" ><%= number_to_currency( nc_ex, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( nc_gv_05, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( nc_ip_05, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( nc_gv_10, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( nc_ip_10, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( nc_tot, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" >0</td>
+		</tr>
+
+
+
+		<tr>
+			<td colspan="5"></td>
+			<td colspan="10" >
+			<b> <font size="3"> COMPRA DE IMPORTACION </font></b>
+			</td>
+
+		</tr>
+		<% fac_com    = 0 %>
+		<% cpi_ex     = 0 %>
+		<% cpi_gv_05  = 0 %>
+		<% cpi_ip_05  = 0 %>
+		<% cpi_gv_10  = 0 %>
+		<% cpi_ip_10  = 0 %>
+		<% cpi_tot = 0 %>
+		<% bs_imp  = 0 %>
+
+		<% @compra.each do |cp| %>
+		   <% if cp.tipo_compra == 2  %>
+		      <tr>
+			   <td align="center" ><%= cp.data.to_date.strftime("%d/%m/%Y") %></td>
+			   <td align="center"> <%= number_to_currency(cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			   <% if cp.documento_id == 3 %>
+			      <td align="center" >FCR</td>
+			   <% elsif cp.documento_id == 2 %>
+			      <td align="center" >FC</td>
+			   <% elsif cp.documento_id ==11 %>
+			      <td align="center" >IV</td>
+			   <% end %>
+			   <td align="left" ><%= cp.rn %></td>
+			   <td align="center"> <%= cp.dn_01 %> - <%= cp.dn_02 %> - <%= cp.dn %> </td>
+			   <td align="left" ><%= cp.persona_nome %></td>
+			   <td align="center" ><%= cp.persona_ruc %></td>
+			   			   
+			<!--DOCUMENTO INVOCE -->
+			   <% if cp.documento_id == 11 %>
+			   
+     			   <% invoce = Compra.find_by_id(cp.compra_id,:select =>'id,valor_imponible,iva_despacho_guarani')%>			   
+     			   <% sum_doc = ComprasDocumento.sum(:imposto_10_guarani,:conditions => ["compra_id = ?",cp.compra_id])%>
+									
+   			         <td align="right" >  <%= number_to_currency(fac = invoce.valor_imponible, :format=>' %n ', :precision => 0) %></td>
+   			         <td align="right" > 0</td>
+			         <td align="right" > 0</td>
+			         <td align="right" > 0</td>
+			         <td align="right" > <%= number_to_currency( gv_10 = (( invoce.iva_despacho_guarani - sum_doc.to_f ) * 10 ), :format=>' %n ', :precision => 0) %></td>
+			         <td align="right" > <%= number_to_currency( ip_10 = ( invoce.iva_despacho_guarani - sum_doc.to_f ) , :format=>' %n ', :precision => 0) %></td>
+			         <td align="right" > <%= number_to_currency( tot =  gv_10.to_f + ip_10.to_f , :format=>' %n ', :precision => 0) %></td>			      
+   			         <td align="right" > <%= number_to_currency( bs  =  invoce.valor_imponible, :format=>' %n ', :precision => 0) %></td>
+
+               <% else %>			
+                  			   
+			      <% if cp.moeda == 0 %>
+   			         <td align="right" > <% fac = 0%> </td>
+   			      <td align="right" > <%= number_to_currency( ex = cp.exd.to_f * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_05 = 0, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( ip_05 = 0, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( gv_10 = ( cp.gv_10_d.to_f - ( ( cp.gv_10_d.to_f / 1.1 )* 0.10) ) * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" ><%= number_to_currency( ip_10 = ( ( ( cp.gv_10_d.to_f / 1.1 )* 0.10)  *  cp.cot_vd.to_f ), :format=>' %n ', :precision => 0) %></td>
+			      <td align="right" > <%= number_to_currency( tot = cp.tot_d.to_f * cp.cot_vd.to_f, :format=>' %n ', :precision => 0) %></td>			      
+
+   			         <td align="right" > <%bs  = 0%> </td>
+                  <% else %>               
+   			         <td align="right" > <% fac = 0%></td>               
+   			         <td align="right" > <%= number_to_currency( ex = cp.exg.to_f, :format=>' %n ', :precision => 0) %></td>
+   			         <td align="right" > <%= number_to_currency( gv_05 = 0, :format=>' %n ', :precision => 0) %></td>
+			         <td align="right" > <%= number_to_currency( ip_05 = 0, :format=>' %n ', :precision => 0) %></td>
+			         <td align="right" > <%= number_to_currency( gv_10 = cp.gv_10_g.to_f - cp.ip_10_g.to_f, :format=>' %n ', :precision => 0) %></td>
+			         <td align="right" > <%= number_to_currency( ip_10 = cp.ip_10_g.to_f, :format=>' %n ', :precision => 0) %></td>
+			         <td align="right" > <%= number_to_currency( tot =  cp.tot_g.to_f, :format=>' %n ', :precision => 0) %></td>			      
+   			         <td align="right" > <%bs  = 0%></td>
+			      <% end %>
+			   <% end %>
+
+			<% end %>
+			   <% fac_com    += fac.to_f %>			   
+			   <% cpi_ex     += ex.to_f %>
+			   <% cpi_gv_05  += gv_05.to_f %>
+			   <% cpi_ip_05  += ip_05.to_f %>
+			   <% cpi_gv_10  += gv_10.to_f %>
+			   <% cpi_ip_10  += ip_10.to_f %>
+			   <% cpi_tot += tot.to_f %>
+			   <% bs_imp  += bs.to_f %>			   
+
+		   </tr>
+	    <% end %>
+
+		<tr>
+			<td colspan="7"></td>
+			<td align="right" ><%= number_to_currency( fac_com, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cpi_ex, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cpi_gv_05, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cpi_ip_05, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cpi_gv_10, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cpi_ip_10, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cpi_tot, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( bs_imp, :format=>' %n ', :precision => 0) %></td>
+		</tr>
+
+		<tr class="head">
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td colspan="2">
+			<b>Total General</b>
+			</td>
+			<td align="right" ><%= number_to_currency( fac_com, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cp_ex + cpb_ex + cpg_ex + nc_ex  + cpi_ex, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cp_gv_05 + cpb_gv_05 + cpg_gv_05 + nc_gv_05 + cpi_gv_05, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cp_ip_05 + cpb_ip_05 + cpg_ip_05 + nc_ip_05 + cpi_ip_05, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cp_gv_10 + cpb_gv_10 + cpg_gv_10 + nc_gv_10 + cpi_gv_10, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cp_ip_10 + cpb_ip_10 + cpg_ip_10 + nc_ip_10 + cpi_ip_10, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( cp_tot + cpb_tot + cpg_tot + nc_tot + cpi_tot, :format=>' %n ', :precision => 0) %></td>
+			<td align="right" ><%= number_to_currency( bs_imp, :format=>' %n ', :precision => 0) %></td>
+		</tr>
+
+	</table>
+</div>
+<style type="text/css">
+	table {
+		border-collapse: collapse;
+		font-size: 9px
+	}
+	td, tr {
+		border: 1px solid black;
+	}
+	
+</style>

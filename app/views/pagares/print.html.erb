@@ -1,0 +1,160 @@
+<% @pd.each do |pd|%>
+			<table class="break">
+				<tr>
+					<td width="20"></td>
+					<td>
+			<table align="center"  >
+
+				<tr height="220">  			     
+					<td colspan="4" align="center">	
+					    <FONT FACE="Arial" size="6">
+                              <b>
+					          PAGARE A LA ORDEN
+                              </b>
+      			        </FONT>					
+					</td>
+				</tr>
+
+		<tr>
+			<td colspan="4" align="center">
+			<FONT FACE="Arial" size="4">
+				-------------------------------------------------------------------------------------------------------------------
+			</FONT>
+			</td>
+		</tr>
+
+				<tr>  			     
+					<td  colspan="1" align="left" width="900">	
+					    <FONT FACE="Arial" size="4">
+					          <b><%= $empresa_nome %>, <%= @pagare.data.strftime("%d")%> de  <%= @pagare.data.strftime("%B")%> del <%= @pagare.data.strftime("%Y")%> </b>
+      			        </FONT>					
+					</td>
+					<td align="right">
+                        <div style="    border: 1px solid black;height:30px;width:300px;-moz-border-radius:8px;-webkit-border-radius:8px;">
+						    <FONT FACE="Arial" size="4">
+						       <%=  pd.cota %> de <%=  @pagare.cota %>  Nr. <%=  @pagare.id%>
+	      			        </FONT>					
+                       </div>
+					</td>
+				</tr>
+
+
+				<tr>
+					<td align="left">
+					   <FONT FACE="Arial" size="4">
+	                       <b>
+							    Vencimiento.: <%=  ( pd.vencimento ).strftime("%d/%m/%Y")%>
+	                       </b>
+   			           </FONT>					
+					</td>
+
+					<td align="right">
+                       <% if @pagare.moeda == 0 %>
+	                            <div style="    border: 1px solid black;height:30px;width:300px;-moz-border-radius:8px;-webkit-border-radius:8px;">
+								    <FONT FACE="Arial" size="5">					 
+								        <b> 
+		                            	Por U$S. <%= number_to_currency(pd.valor_dolar, :format=>' %n ', :separator => ',') %>
+										</b>
+   			    		        </FONT>									        
+                                </div>                                   
+
+							  <% else %>
+
+	                            <div style="    border: 1px solid black;height:30px;width:300px;-moz-border-radius:8px;-webkit-border-radius:8px;">
+								    <FONT FACE="Arial" size="5">					 
+								        <b> 
+		                            	Por GS. <%= number_to_currency(pd.valor_guarani, :format=>' %n ', :precision => 0) %>
+										</b>
+   			    		        </FONT>									        
+                                </div>
+							  <% end %>
+					</td>						
+				</tr>
+
+				<tr>
+					<td align="left" colspan="4">
+					   <FONT FACE="Arial" size="4">
+   			           </FONT>					
+					</td>
+				</tr>
+
+
+		        <tr >
+			       <td colspan="4" align="center">
+			            <FONT FACE="Arial" size="4">
+				-------------------------------------------------------------------------------------------------------------------
+			            </FONT>
+			       </td>
+		        </tr>
+		        <tr height="200">
+			       <td colspan="2" align="justify">
+			       	<table border="0" cellspacing="5" cellpadding="5">
+						   <tr>
+						   	<td width="2"></td>
+						   	<td align="justify">
+Así mismo La Empresa podrá optar en recibir dicha suma en guaraníes al cambio corriente en el mercado libre tipo vendedor del día del pago efectivo, más los intereses y accesorios legales que correspondan en su caso en dólares  Estadounidenses o en Guaraníes también al cambio corriente en el mercado libre tipo de vendedor del día del pago efectivo, por igual valor recibido en MERCADERIAS, a mi (nuestra) entera satisfacción, según factura:                                                                          
+Interés: Queda pactado un interés del ____% mensual, pagadero por la empresa, en forma unilateral, podrá determinar la variación, en mas de dicho porcentajes de acuerdo al promedio ponderado de las tasas activas del mercado por cada tipo de operación.
+Mora: La falta de pago a su vencimiento del capital y/o de los intereses pactados y/o cualquier accesorios relacionado con este pagare, me (nos) constituirá en mora automática de pleno derecho (Art. 424 del Código Civil) sin necesidad de interpelación judicial o extra judicial alguna.
+Cláusula Penal: El simple vencimiento establecerá la mora, autorizando la inclusión de mi Nombre Personal o Razón Social que represente, a la base de datos de Informconf conforme a lo establecido en la Ley 1682/01, como también para que se pueda proveer la información a terceros interesados.
+Jurisdicción y Domicilio: El/los obligado/s fija/n domicilios especial/es y a todos los efectos legales en el/ los lugar/ es más abajo, donde se tendrán por valides todas las comunicaciones y/o notificaciones extrajudiciales que se llegaren a participar. Las partes, a todos sus efectos legales, convienen en aceptar en forma voluntaria y de mutuo acuerdo, la competencia y jurisdicción de cualquiera de los Juzgados y Tribunales que conforman la VI Circunscripción Judicial del Alto Paraná, a elección del acreedor, en caso de tener que efectuarse alguna reclamación por la vía judicial, declarando cualquier otra que pudiera corresponder.
+
+							</td>
+						   	<td width="2"></td>
+
+						   </tr>
+					   </table>
+
+  			            </FONT>
+			       </td>
+		        </tr>
+		<tr>
+			<td colspan="4" align="center">
+			<FONT FACE="Arial" size="4">
+				-------------------------------------------------------------------------------------------------------------------
+			</FONT>
+			</td>
+		</tr>
+
+
+		<tr  height="140" valign="bottom">
+                   <td >DEUDOR :  <%= @pagare.persona_nome%></td>
+                   <td > CO-DEUDOR : <%= @pagare.co_deodor %></td>
+		        </tr>
+
+		        <tr>
+                   <td >Ruc/Ci :<%= @pagare.persona_ruc %></td>
+                   <td >Ruc/Ci :<%= @pagare.co_deodor_ruc %></td>
+		        </tr>
+
+		        <tr>
+                   <td >Aclaracion de Firma : _________________________________________</td>
+                   <td  >Aclaracion de Firma : _________________________________________</td>
+
+		        </tr>
+
+
+			        <tr height="130">
+	                   <td valign="top">Domicilio : <%= @pagare.domicilio %></td>
+			        </tr>
+
+
+		        </tr>
+		        <tr>
+                   <td >Firma : _________________________________________</td>
+                   <td >Firma :_________________________________________</td>
+                   <td ><br /><br /><br /><br /><br /><br /></td>
+
+		        </tr>
+    
+		        </tr>
+			</table>
+					
+		       </td>
+					<td width="20">
+					</td>
+
+				</tr>
+			</table>
+			
+<% end %>
+

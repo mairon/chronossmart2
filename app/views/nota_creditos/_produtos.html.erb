@@ -1,0 +1,80 @@
+<div class="group">
+   <table class="head_grid">
+      <tr>
+         <td width="80" align="center"><%= t('DATE') %></td>
+         <td width="200"><%= t('VOUCHER') %></td>
+         <td width="450">Producto</td>
+         <td width="70" align="right">Cantidad</td>
+         <td width="70" align="right">Unit.</td>
+         <td width="70" align="right">Total</td>
+      </tr>
+   </table>
+   <div class="rolagem" dir="div" style="height: 200px" >
+<table>
+   <% @vendas_produtos.each do |vp| %>
+  <tr class = "<%= cycle("cor1", "cor2") %>"
+      onMouseOver = "javascript:this.style.backgroundColor='#949494'"
+      onMouseOut  = "javascript:this.style.backgroundColor=''"
+      onclick     = "Fecha('<%= vp.produto_id %>',
+                           '<%= vp.produto_nome %>',
+                           '<%= vp.taxa.to_i %>',
+                           '<%= vp.fabricante_cod %>',
+                           '<%= vp.quantidade.to_i %>',
+                           '<%= format_decimal( vp.unitario_dolar ) %>',
+                           '<%= format_decimal( vp.total_dolar ) %>',
+                           '<%= format_decimal( vp.iva_dolar ) %>',
+                           '<%= format_int( vp.unitario_guarani ) %>',
+                           '<%= format_int( vp.total_guarani )%>',
+                           '<%= format_int( vp.iva_guarani ) %>',
+                           '<%= vp.deposito_id %>',
+                           '<%= vp.deposito_nome %>',
+                           '<%= vp.venda_id %>',
+                           '<%= vp.venda.documento_numero_01 %>',
+                           '<%= vp.venda.documento_numero_02 %>',
+                           '<%= vp.venda.documento_numero %>'
+                             )">
+
+    <td width="80" align="center"><%= vp.data.strftime("%d/%m/%y") %></td>
+    <td width="200"><%= vp.venda.id.to_s.rjust(6,'0') %>/<%= vp.venda.documento_numero.to_s.rjust(6,'0') %></td>
+    <td width="450"><%= vp.fabricante_cod %> - <%= vp.produto_nome %></td>
+    <td width="70" align="right"><b><%= vp.quantidade.to_f %></b ></td>
+    <% if @nota_credito.moeda  == '0' %>
+      <td width="70" align="right"><%= format_decimal(vp.unitario_dolar ) %></td>
+      <td width="70" align="right"><%= format_decimal(vp.total_dolar ) %></td>
+    <% else %>
+      <td width="70" align="right"><%= format_int(vp.unitario_guarani ) %></td>
+      <td width="70" align="right"><%= format_int(vp.total_guarani ) %></td>
+    <% end %>
+  </tr>
+<% end %>
+</table>
+</div>
+</div>
+
+    <script language="javascript">
+
+      function Fecha(produto_id,produto_nome,taxa,fabricante_cod,quantidade,unitario_dolar,total_dolar,iva_dolar,unitario_guarani,total_guarani,iva_guarani,deposito_id,deposito_nome,venda_id,documento_numero_01,documento_numero_02,documento_numero)
+      {
+        document.getElementById('nota_creditos_detalhe_produto_id').value            = produto_id;
+        document.getElementById('nota_creditos_detalhe_produto_nome').value          = produto_nome;
+        document.getElementById('nota_creditos_detalhe_taxa').value                  = taxa;
+        document.getElementById('nota_creditos_detalhe_fabricante_cod').value        = fabricante_cod;
+        document.getElementById('nota_creditos_detalhe_quantidade').value            = quantidade;
+        document.getElementById('nota_creditos_detalhe_unitario_dolar').value        = unitario_dolar;
+        document.getElementById('nota_creditos_detalhe_total_dolar').value           = total_dolar;
+        document.getElementById('nota_creditos_detalhe_iva_dolar').value             = iva_dolar;
+        document.getElementById('nota_creditos_detalhe_unitario_guarani').value      = unitario_guarani;
+        document.getElementById('nota_creditos_detalhe_total_guarani').value         = total_guarani;
+        document.getElementById('nota_creditos_detalhe_iva_guarani').value           = iva_guarani;
+        document.getElementById('nota_creditos_detalhe_deposito_id').value           = deposito_id;
+        document.getElementById('nota_creditos_detalhe_deposito_nome').value         = deposito_nome;
+        document.getElementById('nota_creditos_detalhe_venda_id').value              = venda_id;
+        document.getElementById('nota_creditos_detalhe_documento_numero_01').value   = documento_numero_01;
+        document.getElementById('nota_creditos_detalhe_documento_numero_02').value   = documento_numero_02;
+        document.getElementById('nota_creditos_detalhe_documento_numero').value      = documento_numero;
+        document.getElementById('nota_creditos_detalhe_quantidade').focus()
+        self.close();
+      }
+
+    </script>
+

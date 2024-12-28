@@ -1,0 +1,6 @@
+$('#busca_rubro').empty();
+$('#busca_rubro').append('<option value="">Todos..</option>');
+
+<% for ne in @rubros %>
+  $('#busca_rubro').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.descricao %>').change());
+<% end %>

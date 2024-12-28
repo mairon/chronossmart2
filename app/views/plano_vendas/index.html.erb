@@ -1,0 +1,61 @@
+<div class="panel">
+  <h1 id="header">
+    Plan de Ventas
+    <div class="pull-right">
+      <%= link_to t('NEW'), new_plano_venda_path, :class => 'button add' %>
+    </div>
+  </h1>
+</div>
+
+
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="60" align="center">Cod.</td>
+      <td width="80" align="center"><%= t('DATE') %></td>
+      <td width="150">Vendedor</td>
+      <td width="250">Cliente</td>
+      <td width="150">Producto</td>
+      <td width="150">Condición</td>
+      <td width="100">Status</td>
+      <td width="60">SC</td>
+    </tr>
+   </table>
+   <div class="rolagem" id="div">
+      <table>
+         <% @plano_vendas.each do |nota| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="60" align="center"> <%= link_to nota.id.to_s.rjust(6,'0'), plano_venda_path(nota) %></td>
+              <td width="80" align="center"> <%= nota.data.strftime("%d/%m/%y") unless nota.data.blank? %></td>
+              <td width="150"> <%= Persona.find(nota.vendedor_id).nome unless nota.vendedor_id.nil?  %></td>
+              <td width="250"> <%= nota.persona_nome unless nota.persona.nil? %></td>
+              <td width="150"> <%= nota.produto.nome unless nota.produto.nil? %></td>
+              <td width="150"> <small><%= nota.tabela_preco.nome %></small></td>
+              <td width="100"> 
+                <% if nota.status == 0 %>
+                  <span class="rs">Pendiente</span>
+                <% elsif nota.status == 1 %>
+                  <span class="us">Aprovado</span>
+                <% elsif nota.status == 2 %>
+                  <span class="us">Rezachado</span>
+                <% end %>
+              </td>
+              <% if nota.status == 1 %>
+                <td width="60">
+                  <% if nota.solicitude_creditos.blank? %>
+                    <%= link_to 'Nuevo SC', new_solicitude_credito_path(plano_venda_id: nota.id) %>
+                  <% else %>
+                    <%= link_to nota.solicitude_creditos.last.id.to_s.rjust(6,'0'), solicitude_credito_path(nota.solicitude_creditos.last.id) %>
+                  <% end  %>
+                </td>
+              <% else %>
+                <td width="60"></td>
+              <% end %>
+              <td><%= link_to '', edit_plano_venda_path(nota), class: 'icon-pencil' %></td>
+              <td><%= link_to '', nota, confirm: 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+             
+            </tr>
+         <% end %>
+      </table>
+   </div>  
+</div>

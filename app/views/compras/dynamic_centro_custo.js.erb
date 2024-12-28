@@ -1,0 +1,5 @@
+$('#compras_custo_centro_custo_id').empty();
+$('#compras_custo_centro_custo_id').append('<option value="">Selecione lo Centro de Costo</option>');
+<% for ne in @rubros %>
+  $('#compras_custo_centro_custo_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+<% end %>

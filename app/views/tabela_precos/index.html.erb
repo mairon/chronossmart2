@@ -1,0 +1,37 @@
+<h1 id="header"><%= t('FORM_OF_PAYMENT') %></h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_tabela_preco_path, :class => "button add" %>
+</div>
+<div class="group">
+		
+  <table class="head_grid">
+    <tr>
+      <td width="80" align="center"><%= t('CODE') %></td>
+      <td width="200"><%= t('DESCRIPTION') %></td>
+      <td width="50">Status</td>
+      <td width="65"></td>
+    </tr>
+  </table>
+
+  <div class="rolagem" dir="div">
+    <table>
+      <% @tabela_precos.each do |tabela_preco| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="80" align="center"><%= tabela_preco.id.to_s.rjust(6,'0') %></td>
+          <td width="200"><%= tabela_preco.nome %></td>
+          <td width="50">
+            <% if tabela_preco.status == true %>
+              <span class="btn-success"><%= t('ACTIVE_S') %></span>
+            <% else %>
+              <span class="btn-danger">Bloqueado</span>
+            <% end %>
+          </td>
+          <td><%= ProdutosTabelaPreco.count(:id, conditions: "tabela_preco_id = #{tabela_preco.id}") %></td>
+          <td><%= link_to '', edit_tabela_preco_path(tabela_preco), class: 'icon-pencil' %></td>
+          <td><%= link_to '', tabela_preco, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %>
+          <td><%= link_to 'Generar Tabela Prods', gera_tabela_produtos_tabela_precos_path(id: tabela_preco) %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

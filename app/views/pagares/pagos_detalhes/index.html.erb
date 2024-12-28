@@ -1,0 +1,18 @@
+<h1>Listing pagos_detalhes</h1>
+
+<table>
+  <tr>
+  </tr>
+
+<% for pagos_detalhe in @pagos_detalhes %>
+  <tr>
+    <td><%= link_to 'Show', pagos_detalhe %></td>
+    <td><%= link_to 'Edit', edit_pagos_detalhe_path(pagos_detalhe) %></td>
+    <td><%= link_to 'Destroy', pagos_detalhe, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New pagos_detalhe', new_pagos_detalhe_path %>

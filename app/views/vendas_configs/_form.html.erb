@@ -1,0 +1,175 @@
+<%= form_for(@vendas_config) do |f| %>
+  <div class="box-panel" style="display: table; margin: 0 auto;">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Regras Gerais
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+
+            <table>
+              <tr>
+                <td>
+                  <label>Unidad</label>
+                  <%= f.collection_select :unidade_id, Unidade.select('id,unidade_nome').order('2'), :id, :unidade_nome, { prompt: 'Selecione la unidad' } %></td>
+              </tr>
+
+              <tr>
+                <td>
+                  <label>Cliente Padrão</label>
+                  <%= f.collection_select :persona_id, Persona.where("tipo_cliente = 1 and nome ilike '%CLIENTE%'").select('id,nome').order('2'), :id, :nome, { prompt: 'Selecione o Cliente' } %></td>
+              </tr>
+
+              <tr>
+                <td>
+                  <label>Vendedor Padrão</label>
+                 <%= f.collection_select :vendedor_id, Persona.where(tipo_vendedor: 1).select('id,nome').order('2'), :id, :nome, { prompt: 'Selecione o Cliente' } %></td>
+              </tr>
+              <tr>
+                <td>
+                  <label>Tabela de preço limite</label>
+                  <%= f.collection_select :tabela_preco_id_limite, TabelaPreco.select('id,nome').order('2'), :id, :nome, { prompt: 'Selecione la unidad' } %></td>                  
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  <label>Senha Liberación</label>
+                  <%= f.password_field :senha, class: 'panel-field' %>
+                </td>
+              </tr>
+
+
+              <tr>
+                <td><%= f.check_box :controle_caixa %> Abertura de Caixa Obrigatório?</td>
+              </tr>
+
+
+              <tr>
+                <td><%= f.check_box :caixa_separado %> Caixa separado?</td>
+              </tr>
+
+              <tr>
+                <td><%= f.check_box :data %> Habilitar para alterar <%= t('DATE') %></td>
+              </tr>
+
+              <tr>
+                <td><%= f.check_box :entrega %> Habilitar Entrega</td>
+              </tr>
+
+              <tr>
+                <td><%= f.check_box :os %> Orden Servicio?</td>
+              </tr>
+
+              <tr>
+                <td><%= f.check_box :romaneio %> Romaneios?</td>
+              </tr>
+             
+              <tr>
+                <td><%= f.check_box :altera_vendedor_obrig %> Alterar Vendedor Obrigatório</td>
+              </tr>
+
+              <tr>
+                <td><%= f.check_box :multi_moeda %> Multi Moedas</td>
+              </tr>
+
+              <tr>
+                <%= field_us_label 'Max Desc.:',f,:max_desc %>
+              </tr>
+
+            </table>
+
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <div class="panel">
+              <h1 id="header">
+                Produtos
+                <div class="pull-right">
+                </div>
+              </h1>
+
+              <div class="panel-body">
+                <table>
+
+                  <tr>
+                    <td><%= f.check_box :desc_prod %> Autorização para Desconto Produto</td>
+                  </tr>
+
+                  <tr>
+                    <td><%= f.check_box :edita_valores %> Editar Valores</td>
+                  </tr>
+
+                  <tr>
+                    <td><%= f.check_box :stock_negativo %> Vender Stock Negativo?</td>
+                  </tr>
+
+                  <tr>
+                    <td><%= f.check_box :barra_balanca %> Busca produto por código de barras gerado por balança</td>
+                  </tr>
+
+                  <tr>
+                    <td><%= f.check_box :add_produto_direto %> Add produto direto quando le o código de barras</td>
+                  </tr>
+
+                  <tr>
+                    <td><%= f.check_box :busca_barra %> Busca com código de barras  </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <label>Focus em qual campo, quando abrir venda</label>
+                      <%= f.telephone_field :focus_first, class: 'panel-field' %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label>Casas Decimais Dolar</label>
+                      <%= f.telephone_field :unit_us_decimal, class: 'panel-field' %>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <div class="panel">
+              <h1 id="header">
+                Financeiro
+                <div class="pull-right">
+                </div>
+              </h1>
+
+              <div class="panel-body">
+                <table>
+                  <tr>
+                    <td><%= f.check_box :vincula_gasto %> Vincula Gastos/Compras</td>
+                  </tr>                  
+                </table>
+              </div>
+              <div class="footer-buttons">
+                <%= f.submit "Gravar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+                <%= link_to t('BACK'), cobros_path, :class => "btn btn-back" %>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% end %>
+
+<script>
+  $("select").selectize();
+</script>

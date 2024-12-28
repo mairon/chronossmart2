@@ -1,0 +1,45 @@
+<%= form_for(pagos_adelanto) do |f| %>
+  <% if pagos_adelanto.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(pagos_adelanto.errors.count, "error") %> prohibited this pagos_adelanto from being saved:</h2>
+
+      <ul>
+      <% pagos_adelanto.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= f.hidden_field :pago_id %>
+  <%= f.hidden_field :data, :value => @pago.data %>
+  <%= f.hidden_field :persona_id, :value => @pago.persona_id %>
+  <%= f.hidden_field :moeda, :value => @pago.moeda %>
+
+  <table>
+    <tr>
+        <td align="right">Documento :</td>
+        <td><%= f.text_field :documento_numero_01, :size => 5 %>-<%= f.text_field :documento_numero_02, :size => 5 %>-<%= f.text_field :documento_numero, :size => 15 %></td>
+        <td align="right">Cuota :</td>
+        <td><%= f.text_field :cota, :size => 5, :readonly => "readonly" %></td>
+
+            <%=  field_us 'Valor U$:',f,:valor_us %>
+            <%=  field_gs 'Valor Gs.:',f,:valor_gs %>
+            <%=  field_us 'Valor R$:',f,:valor_rs %>
+      </td>
+    </tr>
+    <tr>
+
+      <td></td>
+      <td>
+        <fieldset>
+          <%= f.radio_button :liquidacao, 0, :checked => 'checked' %>Parte
+          <%= f.radio_button :liquidacao, 1 %>Cancelacion
+        </fieldset>
+        </td>
+        <td colspan="2" align="right">
+          <%= f.submit t('SAVE'), :class => 'button' %>
+        </td>
+
+    </tr>
+  </table>
+  <% end %>

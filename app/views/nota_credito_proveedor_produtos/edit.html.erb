@@ -1,0 +1,12 @@
+<h1>Editing nota_credito_proveedor_produto</h1>
+
+<% form_for(@nota_credito_proveedor_produto) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @nota_credito_proveedor_produto %> |
+<%= link_to 'Back', nota_credito_proveedor_produtos_path %>

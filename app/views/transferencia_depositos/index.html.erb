@@ -1,0 +1,97 @@
+<h1 id="header">Transferencia de Depósitos</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_transferencia_deposito_path, :class => 'button add' %>
+</div>
+<div class="group">
+    <%= form_tag busca_transferencia_depositos_path, :method => "get", :remote => "true" do %>
+      <table>
+        <tr>  
+          <tr>
+            <td width="10" align="right"><%= t('SINCE') %>:</td>
+              <td colspan="2"> 
+                <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+                <div class="input-group-addon-f">
+                  <span class="icon-calendar"></span>
+                </div>
+              </td>
+              <td width="100" align="right">&nbsp Unidad Origen:</td><td><%= select_tag :unidade_origem_id, options_from_collection_for_select(Unidade.all, 'id', 'unidade_nome'), {prompt: 'Selecione lo Deposito'} %><td>
+              <td width="100" align="right">Depósito Origen:</td><td><%= select_tag :deposito_origem_id, options_from_collection_for_select(Unidade.all, 'id', 'unidade_nome'), {prompt: 'Selecione lo Deposito'} %><td>
+          </tr> 
+        <tr>
+          <td align="right"><%= t('TO') %>:</td>
+            <td colspan="2">
+              <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+              <div class="input-group-addon-f">
+                <span class="icon-calendar"></span>
+              </div>
+          </td>
+          <td width="100" align="right">Unidad Destino:</td><td><%= select_tag :unidade_destino_id, options_from_collection_for_select(Unidade.all, 'id', 'unidade_nome'), {prompt: 'Selecione lo Deposito'} %><td>
+          <td width="100" align="right">Depósito Destino:</td><td><%= select_tag :deposito_destino_id, options_from_collection_for_select(Unidade.all, 'id', 'unidade_nome'), {prompt: 'Selecione lo Deposito'} %><td> 
+          <td colspan="4">
+            <input type="button" class="btn btn-default" onclick="pesquisa()" value="Buscar"/>
+            <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;") %>
+          </td>
+      </table>
+    <input type="hidden" id="seta" value="0"/>
+    <% end %>
+    <div id="pagina">
+    </div>
+</div>    
+<script language="javascript">
+  function pesquisa(valor){
+    url="/transferencia_depositos/busca?" + $('form').serialize();
+    ajax(url);
+  }
+</script>
+<%= javascript_include_tag 'busca_ajax' %>
+</div>
+
+<script type="text/javascript">
+
+  $("#unidade_origem_id").change(function() {
+    var data=$('#unidade_origem_id').val();
+    $.ajax({
+
+      type: "POST",
+       url: "/transf_deposito_origem/"+data+"?tela=index",
+      data: data,
+
+      beforeSend: function()
+      {
+          $('#spinnero').show();
+      },
+
+      success: function(response)
+      {
+        $('#spinnero').hide();
+      }
+
+    });
+  });
+
+
+  $("#unidade_destino_id").change(function() {
+    var data=$('#unidade_destino_id').val();
+    $.ajax({
+      
+      type: "POST",
+      url: "/transf_deposito_destino/"+data+"?tela=index",
+      data: data,
+
+      beforeSend: function()
+      {
+          $('#spinnerd').show();
+      },
+
+      success: function(response)
+      {
+        $('#spinnerd').hide();
+      }
+
+    });
+  });
+</script>
+
+
+
+

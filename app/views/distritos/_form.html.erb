@@ -1,0 +1,47 @@
+<%= form_for(@distrito) do |f| %>
+  <% if @distrito.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@distrito.errors.count, "error") %> prohibited this distrito from being saved:</h2>
+
+      <ul>
+      <% @distrito.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> distritos - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">nome :</td>                    
+                      <td><%= f.text_field :nome %></td>
+                                      
+                      <td align="right">departamento_id :</td>                    
+                      <td><%= f.number_field :departamento_id %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', distritos_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

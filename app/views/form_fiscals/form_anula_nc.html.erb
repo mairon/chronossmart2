@@ -1,0 +1,35 @@
+<h1 id="header">Fomulario Fiscal - [Edición]</h1>
+<div class="group">
+
+<%= form_tag "/form_fiscals/anula_nc" do %>
+
+<%= hidden_field_tag :id, params[:id] %>
+	<table>
+		<tr>
+			<td align="center">
+				<h1><b>Doc Nº: <%= @form_fiscal.doc_01 %>.<%= @form_fiscal.doc_02 %>.<%= @form_fiscal.doc %></b></h1>
+			</td>
+		</tr>
+		<% if params[:status] == '2' %>
+		<tr>
+			<td>
+				<label>Motivo</label>
+				<%= text_area_tag :motivo, nil, required: true %>
+			</td>
+		</tr>
+		<% end %>
+		<tr>
+		<tr>
+			<td align="center">
+				<% if params[:status] == "0" %>
+					<%= hidden_field_tag :status, params[:status] %>
+					<%= submit_tag " RETROCEDER DOCUMENTO ", :disable_with => "Aguarde...", :class => "btn btn-warning", alert: 'Esta seguro de RETROCEDER esse documento!' %>
+				<% else %>
+				<%= hidden_field_tag :status, params[:status] %>
+				<%= submit_tag " ANULAR DOCUMENTO ", :disable_with => "Aguarde...", :class => "btn btn-danger", alert: 'Esta seguro de ANULAR esta documento!' %>
+				<% end %>
+			</td>
+		</tr>
+	</table>
+</div>
+<% end %>

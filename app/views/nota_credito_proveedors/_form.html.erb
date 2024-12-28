@@ -1,0 +1,174 @@
+<%= form_for(@nota_credito_proveedor) do |f| %>
+    <% if @nota_credito_proveedor.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@nota_credito_proveedor.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @nota_credito_proveedor.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+	<ul class="tabs">
+	  <li><a href="#tab1">N.C. Proveedor - [<%= t('EDITION') %>]</a></li>
+	</ul>
+
+  <div class="tab_container">
+    <div id="tab1" class="tab_content">
+      <table>
+        <tr>
+          <td align="right"> <%= t('DATE') %>:</td>
+          <td><%= f.date_select :data %></td>
+        </tr>
+
+        <tr>
+            <td>Cotizacion U$:</td>
+            <td>  <%= text_field :nota_credito_proveedor, :cotacao, :size     => 10,
+                                 :value    => @nota_credito_proveedor.cotacao.to_i %>
+          Cotz. Real
+          <%= text_field :nota_credito_proveedor, :cotacao_real ,
+                                        :size     => 10,
+                                        :value    => @nota_credito_proveedor.cotacao_real.to_i %>
+
+            </td>
+        	</tr>
+	        <tr>
+	          <td align="right">Proveedor:</td>
+	          <td colspan="2"><%= f.text_field :persona_nome, size: 75 %>
+	          	<%= f.hidden_field :persona_id %></td>
+	        </tr>
+					<tr>
+  					<td align="right">Numero:</td>
+            <td>
+                <%= f.text_field :documento_numero_01,:size => 3, :maxlength => 3 %>-<%= f.text_field :documento_numero_02,:size => 3, :maxlength => 3 %>-<%= f.text_field :documento_numero,   :size => 10, :maxlength => 20 %>
+            </td>
+          </tr>
+         	<tr>
+            <td></td>
+            <td>
+              <table>
+                <tr>
+                  <td width="200">
+                      <fieldset>
+                      <legend>Operación</legend>
+
+                        <%= f.radio_button :operacao, 0,  :Checked => "True" %> Devoluciones
+                        <br/>
+                        <%= f.radio_button :operacao, 1 %> Descuentos
+                      </fieldset>
+                  </td>
+
+                  <td>
+                    <fieldset>
+                    <legend><%= t('COIN') %></legend>
+
+                    <%= f.radio_button :moeda, 0,  :Checked => "True" %> Dolar
+                    <br/>
+                    <%= f.radio_button :moeda, 1 %> Guaranis
+                    <%= f.radio_button :moeda, 2 %> Reales
+                    </fieldset>
+                  </td>
+             	<td>
+	             	<fieldset>
+	              <legend>Tipo</legend>
+	              <%= f.radio_button :tipo, 0 %> Contado
+	              <br/>
+	              <%= f.radio_button :tipo, 1,  :Checked => "True" %> Credito
+	             	</fieldset>
+             	</td>
+            </tr>
+          </table>
+         </td>
+        </tr>
+        <tr>
+          <td align="right">Concepto:</td>
+          <td><%= f.text_area :concepto, :cols => 75, :rows => 5 %></td>
+        </tr>
+      </table>
+    </table>
+  </div>
+ <div class="buttons">
+       <%= f.submit "Seguir",:disable_with => "Aguarde..." , :class => "btn btn-default add", "data-plus-as-tab" => "false" %>
+      <%= link_to t('BACK'), nota_credito_proveedors_path,:class => 'button back' %>
+  </div>
+</div>
+
+  <% end %>
+
+  <script>
+    //cotacao
+    $(document).ready(function() {
+      $.ajax({url: '/buscas/cotz_us_compra',
+              type: 'POST',
+              beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+              data: 'data=' + $('#nota_credito_proveedor_data_3i').val()+'/'+
+                              $('#nota_credito_proveedor_data_2i').val()+'/'+
+                              $('#nota_credito_proveedor_data_1i').val(),
+              success: function(data){
+              $('#nota_credito_proveedor_cotacao').val(number_format(data, 0, ',', '.'));} });
+
+      $.ajax({url: '/buscas/cotz_rs_compra',
+              type: 'POST',
+              beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+              data: 'data=' + $('#nota_credito_proveedor_data_3i').val()+'/'+
+                              $('#nota_credito_proveedor_data_2i').val()+'/'+
+                              $('#nota_credito_proveedor_data_1i').val(),
+              success: function(data){
+              $('#nota_credito_proveedor_cotacao_real').val(number_format(data, 0, ',', '.'));} });
+
+    });
+  </script>
+
+
+  <script>
+
+    $(function() {
+      $( "#nota_credito_proveedor_persona_nome" ).autocomplete({
+          source: function( request, response ) {
+          $.ajax({
+            url: "/personas/busca",
+            dataType: "json",
+            data: {
+              tipo: 'DESCRIPCION',
+              busca: request.term
+            },
+            success: function( data ) {
+              response( data );
+            },
+          });
+        },
+        minLength: 2,
+        change: function( event, ui ) {
+          $("#nota_credito_proveedor_persona_id").val("");
+          $('#nota_credito_proveedor_persona_id').val(ui.item.id);
+          return false;
+        }
+      });
+      $( "#nota_credito_proveedor_persona_nome" ).change(function(){
+      });
+    });
+    function fecha()
+    {
+      self.close();
+    }
+    //ABRI POPUP-----------------------------------------------------------------
+    document.onkeydown=function(e)
+    {
+      if(e.which == 113)
+        window.open('/personas/persona_nota_credito_proveedor', 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=10, WIDTH=1000, HEIGHT=450');
+    }
+    //FIM ABRI POPUP----------------------------------------------------------------
+
+  </script>
+</body>
+
+
+
+
+
+
+

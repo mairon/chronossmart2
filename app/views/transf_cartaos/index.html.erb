@@ -1,0 +1,27 @@
+<h1 id="header">Transf Tarjetas</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_transf_cartao_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="50"><%= t('DATE') %></td>
+    <td width="250">Cuenta <%= t('SOURCE_S') %></td>
+    <td width="250">Cuenta destino</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @transf_cartaos.each do |transf_cartao| %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td width="50" align="center"><%= transf_cartao.data.strftime("%d/%m/%y") %></td>
+        <td width="250" ><%= transf_cartao.origem %></td>
+        <td width="250" ><%= transf_cartao.destino %></td>
+        <td><%= link_to 'Editar', edit_transf_cartao_path(transf_cartao) %></td>
+        <td><%= link_to t('DELETE'), transf_cartao, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

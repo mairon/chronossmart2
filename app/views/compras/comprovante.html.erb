@@ -1,0 +1,269 @@
+   <table align="left"  valign="top">
+
+      <tr>
+         <td>
+            <table>
+               <tr>
+                  <td width="400">
+                    <h3>
+                      <%= session[:empresa_nome] %>
+                    </h3>
+                  </td>
+
+                  <td align="right" width="400">
+                     <b>
+                        <% if @compra.tipo_compra == 1 %>
+                           <h3><%= t('VOUCHER').upcase %> DE GASTO   N. <%= @compra.id.to_s.rjust(6,'0') %></h3>
+                        <% else %>
+                           <h3><%= t('VOUCHER').upcase %> DE COMPRA   N. <%= @compra.id.to_s.rjust(6,'0') %></h3>
+                        <% end %>
+                     </b>
+                  </td>
+
+            </table>
+         </td>
+      </tr>
+
+
+   </tr>
+   <tr>
+      <td colspan="2" aling="center">
+            ___________________________________________________________________________________________________________________________________________________________
+      </td>
+   </tr>
+
+
+
+   <tr>
+      <td>
+         <table>
+            <tr>
+               <td align="right">
+                     Fecha :
+               </td>
+
+               <td align="left">
+                     <%= @compra.data.strftime("%d/%m/%Y") %>
+               </td>
+
+            </tr>
+
+            <tr>
+               <td align="right">
+                     Proveedor :
+               </td>
+
+               <td align="left">
+                     <%= @compra.persona_nome %>
+               </td>
+
+            </tr>
+
+            <tr>
+               <td align="right">
+                     N. Factura :
+               </td>
+
+               <td align="left">
+                     <%= @compra.documento_numero_01 %>-<%= @compra.documento_numero_02 %>-<%= @compra.documento_numero %>
+               </td>
+            </tr>
+
+            <%if @compra.moeda == 0
+               moeda   = "DOLAR"
+               importe = @total_dolar
+            elsif @compra.moeda == 1
+               moeda = "GUARANI"
+               importe = @total_guarani
+            else
+               moeda = "REAIS"
+               importe = @total_real
+            end%>
+
+            <%if @compra.tipo == 0
+               tipo = 'CONTADO'
+            else
+               tipo = 'CREDITO'
+            end%>
+
+
+            <tr>
+              <td align="right">
+                Compra :
+              </td>
+              <td>
+                <%= tipo %>
+              </td>
+            </tr>
+
+            <tr>
+              <td align="right">
+                Moneda:
+              </td>
+              <td>
+                <%= moeda %>
+              </td>
+            </tr>
+
+            <tr>
+              <td align="right">
+                Concepto:
+              </td>
+              <td>
+                <%= @compra.descricao %>
+              </td>
+
+            </tr>
+
+         </table>
+      </td>
+   </tr>
+
+   <tr>
+      <td colspan="4" aling="center">
+            ___________________________________________________________________________________________________________________________________________________________
+      </td>
+   </tr>
+  <% if @compra.tipo_compra == 1 %>
+   <tr>
+      <td  colspan="4">
+        Rubro: <%= @compra.rubro_descricao %>
+      </td>
+   </tr>
+   <% else %>
+   <tr>
+      <td colspan="4" align="center">
+         <b>
+            <h3>
+            ITENS DEL <%= t('VOUCHER').upcase %>
+            </h3>
+         </b>
+      </td>
+   </tr>
+
+   <tr>
+      <td colspan="4" aling="center">
+            ___________________________________________________________________________________________________________________________________________________________
+      </td>
+   </tr>
+
+   <tr>
+      <td>
+         <table>
+            <tr class="head">
+               <td width="100">Ref.</td>
+               <td width="350">Producto</td>
+               <td width="150">Grupo</td>
+               <td width="150">Modelo</td>
+               <td width="60" align="right">Cantidade</td>
+               <td width="70" align="right">Unit.</td>
+               <td width="70" align="right">Total</td>
+            </tr>
+            <% qtd  = 0 %>
+            <% cust = 0 %>
+            <% unit = 0 %>
+            <% tot  = 0 %>
+            <% iva  = 0 %>
+
+            <% @produtos.each do |prod| %>
+               <tr class="<%= cycle("cor1", "cor2")%>">
+                  <td width="100"><%= prod.produto.fabricante_cod %></td>
+                  <td width="350"><%= prod.produto_nome %></td>
+                  <td width="150"><%= prod.produto.grupo.descricao unless prod.produto.grupo.blank? %></td>
+                  <td width="150"><%= prod.produto.sub_grupo.descricao unless prod.produto.sub_grupo.blank? %></td>
+                  <td width="60" align="center"><%= prod.quantidade.to_i %></td>
+                  <% if @compra.moeda.to_i == 0  %>
+                     <td width="70" align="right"><%= format_decimal( prod.unitario_dolar) %></td>
+                     <td width="70"align="right"><%= format_decimal( prod.total_dolar) %></td>
+                     <% qtd  = qtd  +  prod.quantidade%>
+                     <% cust = cust + prod.custo_dolar %>
+                     <% unit = unit + prod.unitario_dolar %>
+                     <% tot  = tot  + prod.total_dolar%>
+                     <% iva  = iva  + prod.iva_dolar%>
+                  <% elsif @compra.moeda.to_i == 1 %>
+                     <td width="70" align="right"><%= format_int( prod.unitario_guarani) %></td>
+                     <td width="70" align="right"><%= format_int( prod.total_guarani) %></td>
+                     <% qtd  = qtd  +  prod.quantidade %>
+                     <% cust = cust + prod.custo_guarani %>
+                     <% unit = unit + prod.unitario_guarani %>
+                     <% tot  = tot  + prod.total_guarani %>
+                     <% iva  = iva  + prod.iva_guarani %>
+
+                  <% else %>
+                     <td width="70" align="right"><%= format_decimal( prod.unitario_real ) %></td>
+                     <td width="70" align="right"><%= format_decimal( prod.total_real ) %></td>
+                     <% qtd  = qtd  +  prod.quantidade %>
+                     <% cust = cust + prod.custo_real %>
+                     <% unit = unit + prod.unitario_real %>
+                     <% tot  = tot  + prod.total_real %>
+                     <% iva  = iva  + prod.iva_real %>
+                  <% end %>
+               </tr>
+            <% end %>
+            <tr>
+               <td height="30"></td>
+            </tr>
+
+            <tr class="head">
+               <td colspan="4"></td>
+               <td width="60" align="center"><%= format_decimal( qtd) %></td>
+               <% if @compra.moeda.to_i == 1  %>
+                   
+                  <td width="70" align="right"></td>
+                  <td width="70" align="right"><%= format_int( tot) %></td>
+               <% else %> 
+                  <td width="70" align="right"></td>
+                  <td width="70" align="right"><%= format_decimal( tot) %></td>
+               <% end %>
+            </tr>
+         </table>
+      </td>
+   </tr>
+   <% end %>
+   <tr>
+      <td colspan="5">
+         <p class="border">
+            <b>Condiciones de Pago</b>
+         </p>
+      </td>
+   </tr>
+   <tr>
+      <td>
+         <table border='1'>
+            <tr class="head">
+            <td width="50"><%= t('SHARE') %></td>
+            <td width="150"><%= t('DOC') %></td>
+            <td width="100" align="right"><%= t('VALUE') %></td>
+            <td width="100" align="center"> Vencimiento</td>
+
+
+            </tr>
+            <% @condicoes.each do |c| %>
+            <tr class="<%= cycle("cor1", "cor2") %>" >
+               <td width="50"><%= c.cota %></td>
+               <td width="150"><%= c.documento_numero_01 %>-<%= c.documento_numero_02 %>-<%= c.documento_numero %></td>
+               <% if @compra.moeda == 0 %>
+                  <td width="100" align="right">   <%= h number_to_currency(c.valor_dolar)  %></td>
+               <% elsif @compra.moeda == 1 %>
+                  <td width="100" align="right">   <%= h number_to_currency(c.valor_guarani)  %></td>
+               <% else %>
+                  <td width="100" align="right">   <%= h number_to_currency(c.valor_real)  %></td>
+               <% end %>
+               <td width="100" align="center">  <%= h c.vencimento.strftime("%d/%m/%Y") %></td>
+            </tr>
+            <% end %>
+         </table>
+      </td>
+   </tr>
+</table>
+</body>
+
+
+
+
+
+<style type="text/css">
+   table {
+      border-collapse: collapse;
+   }
+</style>

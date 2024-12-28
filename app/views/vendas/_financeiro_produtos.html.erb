@@ -1,0 +1,23 @@
+<div class="panel">
+  <table class="head_grid">
+    <tr>
+      <td width="300">Productos</td>
+      <td width="70" align="right">Ctd</td>
+      <td width="70" align="right">Unit</td>
+      <td width="70" align="right">Total</td>
+    </tr>
+  </table>
+  <div class="rolagem" style="height: 215px;">
+    <table>
+    <% @venda.vendas_produtos.each do |vp| %>
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td width="300"><%= vp.produto_nome %></td>
+      <td width="70" align="right"><%= vp.quantidade %></td>
+      <td width="70" align="right"><%= format_int(vp.unitario_guarani) %></td>
+      <td width="70" align="right"><%= format_int(vp.total_guarani) %></td>
+      <td><%= link_to '', vendas_produto_path(vp, origen: 'VendasFinanca'), :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+    </tr>
+    <% end %>
+    </table>
+  </div>
+</div>

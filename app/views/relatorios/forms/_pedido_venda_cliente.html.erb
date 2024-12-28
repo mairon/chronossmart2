@@ -1,0 +1,51 @@
+<% t_pedido = 0 %>
+<% t_fatura = 0 %>
+<% t_valor  = 0 %>
+<% t_fac    = 0 %>
+<table>
+	<% @pedidos_vendas.each do |pv| %>
+		<tr class= "<%= cycle( "cor1", "cor2" )%>">
+			<td width="50"><%= pv.persona_id.to_s.rjust(6,'0') %></td>
+			<td width="400"><%= pv.nome %> | <%= pv.nome_fatura %></td>
+			<td width="80" align="right"><%= pv.tot_pedido.to_i %></td>
+			<td width="80" align="right"><%= pv.tot_faturado.to_i %></td>
+			<td width="80" align="right"><%= pv.tot_pedido.to_i - pv.tot_faturado.to_i %></td>
+			<% if params[:moeda] == '0' %>
+				<td width="80" align="right"><%= number_to_currency(pv.valor_pedido_us.to_f, :format=>' %n ', :separeitor => "," ) %></td>
+				<td width="80" align="right"><%= number_to_currency(pv.valor_faturado_us.to_f, :format=>' %n ', :separeitor => "," ) %></td>
+				<td width="80" align="right"><%= number_to_currency(pv.valor_pedido_us.to_f - pv.valor_faturado_us.to_f, :format=>' %n ', :separeitor => "," ) %></td>
+				<% t_valor  += pv.valor_pedido_us.to_f %>
+				<% t_fac    += pv.valor_faturado_us.to_f %>
+			<% elsif params[:moeda] == '1' %>
+				<td width="80" align="right"><%= number_to_currency(pv.valor_pedido_gs.to_f, :format=>' %n ', :precision => 0 ) %></td>
+				<td width="80" align="right"><%= number_to_currency(pv.valor_faturado_gs.to_f, :format=>' %n ', :precision => 0 ) %></td>
+				<td width="80" align="right"><%= number_to_currency(pv.valor_pedido_gs.to_f - pv.valor_faturado_gs.to_f, :format=>' %n ', :precision => 0 ) %></td>
+				<% t_valor  += pv.valor_pedido_gs.to_f %>
+				<% t_fac    += pv.valor_faturado_gs.to_f %>
+			<% else %>
+				<td width="80" align="right"><%= number_to_currency(pv.valor_pedido_rs.to_f, :format=>' %n ', :separeitor => "," ) %></td>
+				<td width="80" align="right"><%= number_to_currency(pv.valor_faturado_rs.to_f, :format=>' %n ', :separeitor => "," ) %></td>
+				<td width="80" align="right"><%= number_to_currency(pv.valor_pedido_rs.to_f - pv.valor_faturado_rs.to_f, :format=>' %n ', :separeitor => "," ) %></td>
+				<% t_valor  += pv.valor_pedido_rs.to_f %>
+				<% t_fac    += pv.valor_faturado_rs.to_f %>
+			<% end %>
+		</tr>
+		<% t_pedido += pv.tot_pedido.to_i %>
+		<% t_fatura += pv.tot_faturado.to_i %>
+	<% end %>
+
+	<tr class="head" height="40">
+		<td colspan="2"></td>
+		<td width="80" align="right"><%= t_pedido.to_i %></td>
+		<td width="80" align="right"><%= t_fatura.to_i %></td>
+		<td width="80" align="right"><%= t_pedido.to_i - t_fatura.to_i %></td>
+		<% if params[:moeda] == '1' %>
+			<td width="80" align="right"><%= number_to_currency(t_valor.to_f, :format=>' %n ', :precision => 0 ) %></td>
+			<td width="80" align="right"><%= number_to_currency(t_fac.to_f, :format=>' %n ', :precision => 0 ) %></td>
+		<% else %>
+			<td width="80" align="right"><%= number_to_currency(t_valor.to_f, :format=>' %n ', :separeitor => "," ) %></td>
+			<td width="80" align="right"><%= number_to_currency(t_fac.to_f, :format=>' %n ', :separeitor => "," ) %></td>
+			<td width="80" align="right"><%= number_to_currency(t_valor.to_f - t_fac.to_f, :format=>' %n ', :separeitor => "," ) %></td>
+		<% end %>
+	</tr>
+</table>

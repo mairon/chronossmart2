@@ -1,0 +1,41 @@
+<%= form_for(@persona_api) do |f| %>
+  <% if @persona_api.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@persona_api.errors.count, "error") %> prohibited this persona_api from being saved:</h2>
+
+      <ul>
+      <% @persona_api.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> persona_apis - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', persona_apis_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

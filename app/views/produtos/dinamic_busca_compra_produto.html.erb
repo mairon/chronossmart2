@@ -1,0 +1,36 @@
+
+  <table class="head_grid">
+    <tr>
+      <td width="58"></td>
+      <td width="150">Clase/Marca</td>
+      <td width="150">Grupo</td>
+      <td width="120">Referencia</td>
+      <td width="550">Descripción</td>
+    </tr>
+  </table>
+
+  <div class="rolagem" id="div">
+    <table>
+      <% count = 0 %>
+      <% @produtos.each do |p| %>
+        <tr class = "<%= cycle( "cor1", "cor2" )%>"
+          onMouseOver="javascript:this.style.backgroundColor='#e6ebf2'"
+          onMouseOut="javascript:this.style.backgroundColor=''"
+             onclick="Fecha( '<%= p.nome %>',
+                                      '<%= p.produto_id %>',
+                                      '<%= 1 %>')" >
+
+        <td class="<%= count %>"><input type="text" id="<%= count %>" value="<%= count %>" size="1" style="border: none;"
+                  onkeypress="Fecha( '<%= p.nome %>',
+                                      '<%= p.produto_id %>',
+                                      '<%= 1 %>')"  data-plus-as-tab="false" ></td>
+          <td class="<%= count %>" width="150"> <%= p.clase_nome %> </td>
+          <td class="<%= count %>" width="150"> <%= p.grupo_nome %> </td>
+          <td class="<%= count %>" width="120"> <%= p.fabricante_cod %> </td>
+          <td class="<%= count %>" width="550"> <%= p.nome %> </td>
+        </tr>
+        <% count += 1 %>
+      <% end %>
+      <input type="hidden" id="foco" value="-1">
+    </table>
+  </div>

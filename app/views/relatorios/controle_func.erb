@@ -1,0 +1,63 @@
+<body onload="ImputFocus('inicio')">
+   <h1 align="right" id="header">.</h1>
+   <ul class="tabs">
+      <li><a href="#tab1">Relatorio Fluxo de Empleados</a></li>
+   </ul>
+
+   <div class="tab_container">
+      <div id="tab1" class="tab_content">
+         <%= form_tag resultado_controle_func_relatorios_path, :method => "get" do%>
+            <table>
+
+               <tr height="35">
+                  <td align="right"> De:</td>
+                  <td>
+                     <input name="inicio" id="inicio"  size="10"  onkeyup="Formatadata(this,event)" />
+                     Hasta
+                     <input name="final"  id="final"   size="10" onkeyup="Formatadata(this,event)"/>
+                  </td>
+               </tr>
+
+               <tr>
+                  <td align="right">Persona :</td>
+                  <td>
+                     <%=   select("busca", "persona", Persona.all(:select => 'id,nome', :order => 'nome',:conditions => 'tipo_funcionario = 1').collect {|p| [ p.nome, p.id ] }, { :include_blank => true })   %>
+                  </td>
+               </tr>
+
+               <tr>
+                  <td align="right">Obra Ref.:</td>
+                  <td>
+                     <%=   select("busca", "obra", Produto.all(:select => 'fabricante_cod',:order => 'fabricante_cod').collect {|p| [ p.fabricante_cod, p.fabricante_cod ] }, { :include_blank => true })   %>
+                  </td>
+               </tr>
+
+
+              <tr height="35">
+                  <td></td>
+                  <td>
+                     <input  id      ="button"
+                             type    ="submit"
+                             value   ="            Informe           "
+                             onclick = "Tipo('0')"/>
+
+                     <input type     = "submit"
+                            value    = "            Excel            "
+                            onclick  = "Tipo('1')"/>
+                  </td>
+               </tr>
+
+               <input type  = "hidden"
+                      name  = "tipo"
+                      id    = "tipo"
+                      size  = "5"
+                      value = "0"/>
+
+            </table>
+         <% end %>
+   </div>
+ </div>
+
+</body>
+
+

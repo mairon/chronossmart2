@@ -1,0 +1,2 @@
+module AjustePrecoDetalhesHelper
+end

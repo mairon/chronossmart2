@@ -1,0 +1,8 @@
+
+<h1 align="right" id="header">Vendas</h1>
+Producto - Edicion
+<%  if $empres == 'E01' %>
+<%= render :partial => 'form_E01' %>
+<% else %>
+<%= render :partial => 'form_E02' %>
+<% end %>

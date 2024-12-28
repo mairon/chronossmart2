@@ -1,0 +1,48 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <header class="panel-heading" style="font-family: 'prox'; font-size: 18px; padding-bottom: 10px;">
+        Transf. Deposito Productos #<%= @transferencia_deposito.id.to_s.rjust(6,'0') %> - <%= @transferencia_deposito.data.strftime("%d/%m/%y") %>
+        <div class="pull-right">
+          <%= link_to t('BACK'), edit_transferencia_deposito_path(@transferencia_deposito), :class => "btn btn-blue" %> 
+          <a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"><%= t('VOUCHER') %></a>
+          <%= link_to 'Finalizar', transferencia_depositos_path(), :class => "btn btn-blue" %>           
+        </div>  
+      </header>
+
+       <div class="panel-content">
+          <% dp_origem = Deposito.find_by_id(@transferencia_deposito.deposito_origem_id, select: 'id,nome')%>
+          <% dp_destino = Deposito.find_by_id(@transferencia_deposito.deposito_destino_id, select: 'id,nome')%>
+          Origen: <%= dp_origem.nome %> > Destino: <%= dp_destino.nome %>
+       </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content">
+        <%= render :partial=>"transferencia_deposito_detalhes/index", :locals=>{:producao => @transferencia_deposito,:transferencia_deposito_detalhes => @transferencia_deposito.transferencia_deposito_detalhes} %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content">
+        <%= render :partial=>"transferencia_deposito_detalhes/new_produto" , :locals=>{:producao => @transferencia_deposito, :transferencia_deposito_detalhe => TransferenciaDepositoDetalhe.new} %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+	function Comprovante(){
+		window.open('/transferencia_depositos/' + <%= @transferencia_deposito.id %> + '/comprovante', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	}
+</script>
+

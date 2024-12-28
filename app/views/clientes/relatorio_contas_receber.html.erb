@@ -1,0 +1,27 @@
+<% if params[:detalhe] == "0"%>
+  <%= render :partial => "/clientes/forms/resumido_por_cliente"  %>
+<% elsif params[:detalhe] == "3"%>
+	<% if params[:moeda].to_s  == "1" %>
+   	<%= render :partial => "/clientes/forms/resumido_por_fatura_gs"  %>
+	<% elsif params[:moeda].to_s  == "0" %>
+		<%= render :partial => "/clientes/forms/resumido_por_fatura_us"  %>   		
+	<% else %>
+		<%= render :partial => "/clientes/forms/resumido_por_fatura_rs"  %>   		
+	<% end %>
+<% elsif params[:detalhe] == "8" %>
+ 	<%= render :partial => "/clientes/forms/detalhado_produtos"  %>
+<% elsif params[:detalhe] == "9" %>
+ 	<%= render :partial => "/clientes/forms/extracto_para_cliente_rs" %> 	
+<% elsif params[:detalhe] == "10" %>
+ 	<%= render :partial => "/clientes/forms/detalhado_cotas_tutor_aluno" %> 	
+
+<% else %>
+	<% if params[:moeda].to_s  == "1" %>
+		<%= render :partial => "/clientes/forms/detalhado_gs"  %>   			
+	<% elsif params[:moeda].to_s  == "0" %>
+		<%= render :partial => "/clientes/forms/detalhado_us"  %>
+	<% else %>
+		<%= render :partial => "/clientes/forms/detalhado_rs"  %>
+	<% end %>
+
+<% end %>

@@ -1,0 +1,93 @@
+<table>
+	<% quebra       = ""%>
+	<% totentrada   = 0 %>
+	<% totsaida     = 0 %>
+	<% subentrada   = 0 %>
+	<% subsaida     = 0 %>
+	<% subsaldo     = 0 %>
+	<% ant          = @financas_anterior.to_f %>
+	<% anterior     = 0 %>
+
+	<% for fin in @financas %>
+	
+    <% if params[:moeda] == "0" %>
+      <% entrada        = fin.entrada_dolar %>
+      <% saida          = fin.saida_dolar %>
+      <% valor_sum      = 'entrada_dolar - saida_dolar'%>
+      <% consulta_maior = 'entrada_dolar + saida_dolar' %>
+
+    <% elsif params[:moeda] == "1" %>
+      <% entrada        = fin.entrada_guarani %>
+      <% saida          = fin.saida_guarani %>
+      <% valor_sum      = 'entrada_guarani - saida_guarani'%>
+      <% consulta_maior = 'entrada_guarani + saida_guarani' %>
+    <% else %>
+      <% entrada        = fin.entrada_real %>
+      <% saida          = fin.saida_real %>
+      <% valor_sum      = 'entrada_real - saida_real' %>
+      <% consulta_maior = 'entrada_real + saida_real' %>
+    <% end %>
+	      
+	  <% if quebra != fin.data.strftime("%d/%m/%y")  %>
+	    <% if quebra != "" %>
+				<tr height="15">
+					<td></td>	         
+				</tr>
+			<% end %>
+			<tr>
+				<td class="head"  align="center"><%= quebra = fin.data.strftime("%d/%m/%y") %></td>	
+			  <% condante = "data < '#{quebra}' AND ESTADO = 0 AND MOEDA = #{params[:moeda]} AND #{consulta_maior} != 0 AND conta_id = #{params[:busca]["conta"]}" %>
+	      <% anterior = Financa.sum(valor_sum,:conditions => condante)%>
+
+				<td  class="head" align="right" colspan="5">Anterior =></td>
+				<% if params[:moeda].to_s == '1' %>
+					<td  class="head" align="right"><%= format_int(anterior)%></td>
+				<% else %>
+					<td  class="head" align="right"><%= format_decimal(anterior)%></td>
+				<% end %>
+			</tr>
+		<% end %>
+	
+	<% ant += (entrada.to_f - saida.to_f) %>
+	<tr class="<%= cycle("cor1", "cor2")%>">
+		<td width="80" align="center"> <%= fin.data.strftime("%d/%m/%y")%> </td>
+		<td width="250">
+			<%= fin.persona_nome ? truncate(fin.persona_nome.to_s, :length => 26) : "Operación Financiera" %>
+		</td>
+
+	  <td width="720" align="left">
+	  	<%= fin.concepto %>
+		</td>		  	
+		<td width="100"><%= fin.documento_numero %></td>
+   	<% if params[:moeda].to_s == '1'%>
+  	  <td width="80" align="right"> <%= format_int( entrada ) %> </td>
+	    <td width="80" align="right"> <%= format_int( saida ) %> </td>
+		  <td width="80" align="right"> <%= format_int( ant ) %> </td>
+		<% else %>  
+  	  <td width="80" align="right"> <%= format_decimal( entrada ) %> </td>
+	    <td width="80" align="right"> <%= format_decimal( saida ) %> </td>
+		 	<td width="80" align="right"> <%= format_decimal( ant ) %> </td>
+		<% end %>  		
+	</tr>
+
+	<% totentrada   += entrada.to_f %>
+	<% totsaida     += saida.to_f %>
+	<% subentrada   += entrada.to_f%>
+	<% subsaida     += saida.to_f %>
+	<% end %>
+
+	<% if quebra != '' %>	
+	  <% condante = "data < '#{quebra}' AND ESTADO = 0 AND MOEDA = #{params[:moeda]} AND #{consulta_maior} != 0 AND conta_id = #{params[:busca]["conta"]}" %>
+  	<% anterior = Financa.sum(valor_sum,:conditions => condante) %>
+  <% else %>
+  	<% anterior = @financas_anterior %>
+  <% end %>
+
+	<tr height="15">
+		<td></td>
+	</tr>
+
+	<% subsaida    = 0 %>
+	<% subentrada  = 0 %>
+	<% subsaldo    = 0 %>
+</table>

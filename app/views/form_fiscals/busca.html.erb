@@ -1,0 +1,132 @@
+<table class="head_grid" >
+  <tr>
+    <td width="50">UN</td>
+    <td width="50">TM</td>
+    <td width="80">Status</td>
+    <td width="80">Tipo Doc.</td>
+    <td width="80">Fecha</td>
+    <td width="80">Venc.</td>
+    <td width="100">Doc</td>
+    <td width="70">Timbrado</td>
+    <td width="50">Tipo</td>
+    <td width="100">Ruc</td>
+    <td width="300">Nombre</td>
+    <td width="20">Cod proc</td>
+    <td width="20">Sigla proc</td>
+    <% if params[:tipo_emissao] == '1' %>
+    <td width="80">Situacion</td>
+      <td width="80">Estado SET</td>
+    <% end%>
+
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @form_fiscals.each do |form_fiscal| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="50"><%= form_fiscal.unidade_id %></td>
+        <td width="50"><%= form_fiscal.terminal_id %></td>
+        <% if form_fiscal.status == 0 %>
+          <td width="80" style="background: green; color: #fff">
+            <b>Pendente</b>
+          </td>
+        <% elsif form_fiscal.status == 1 %>
+          <td width="80" style="background: yellow">
+            <b>Activo</b>
+          </td>
+        <% elsif form_fiscal.status == 2 %>
+          <td width="80" style="background: red;color: #fff">
+            <b>Anulado</b>
+          </td>
+        <% end %>
+        
+        <td width="80">
+          <% if form_fiscal.tipo_doc == 1 %>
+            Factura
+          <% elsif form_fiscal.tipo_doc == 2 %>
+            Nota de débito
+          <% elsif form_fiscal.tipo_doc == 3 %>
+            Nota de crédito
+          <% elsif form_fiscal.tipo_doc == 4 %>
+            Despacho
+          <% elsif form_fiscal.tipo_doc == 5 %>
+            Auto Factura
+          <% elsif form_fiscal.tipo_doc == 7 %>
+            Pasaje Aérea
+          <% elsif form_fiscal.tipo_doc == 8 %>
+            Factura del Exterior
+          <% elsif form_fiscal.tipo_doc == 9 %>
+            Planilla de Sueldos
+          <% elsif form_fiscal.tipo_doc == 10 %>
+            Comprobante de Ingresos
+          <% elsif form_fiscal.tipo_doc == 11 %>
+            Retención Absorbida
+          <% elsif form_fiscal.tipo_doc == 13 %>
+            Pasaje Aérea Electronica
+          <% elsif form_fiscal.tipo_doc == 14 %>
+            Nota de Retención
+          <% end %>
+          </td>
+        <td width="80"><%= form_fiscal.data.strftime("%d/%m/%y") %></td>
+        <td width="80"><%= form_fiscal.vencimento.strftime("%d/%m/%y") %></td>
+        <td width="100"><%= form_fiscal.doc_01 %>.<%= form_fiscal.doc_02 %>.<%= form_fiscal.doc %></td>
+        <td width="70"><%= form_fiscal.timbrado %></td>
+        <td width="50"><%= form_fiscal.tipo %></td>
+        <td width="100"><%= form_fiscal.ruc %></td>
+        <td width="300"><small><%= form_fiscal.persona_nome %></small></td>
+        <td width="20"><%= form_fiscal.cod_proc %></td>
+        <td width="20"><%= form_fiscal.sigla_proc %></td>        
+
+        <% if params[:tipo_emissao] == '1' %>
+
+          <%
+            data = {cdcList: [{cdc: "#{form_fiscal.cdc}"}]};
+
+             url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/de/estado")
+
+                        http = Net::HTTP.new(url.host, url.port)
+                        http.use_ssl = true
+                        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+                        request = Net::HTTP::Post.new(url)
+                        request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+                        request["content-type"] = 'application/json'
+                        request.body = data.to_json
+                        response = http.request(request)
+                        puts get_resp = JSON.parse(response.body)
+
+            
+
+          %> 
+        
+        <td>
+          <% if get_resp["deList"][0]["situacion"].to_s == '0' %>
+            Generado DE
+          <% elsif get_resp["deList"][0]["situacion"].to_s == '1' %>
+            Enviado en un Lote
+          <% elsif get_resp["deList"][0]["situacion"].to_s == '2' %>
+            Aprobado
+          <% elsif get_resp["deList"][0]["situacion"].to_s == '3' %>
+            Aprobado con observacion
+          <% elsif get_resp["deList"][0]["situacion"].to_s == '4' %>
+            <span style="color: red">Rechazado</span>
+          <% elsif get_resp["deList"][0]["situacion"].to_s == '98' %>
+            Inexistente
+          <% elsif get_resp["deList"][0]["situacion"].to_s == '99' %>
+            Cancelado
+          <% end %>
+        </td>
+        <td class="bold" width="80"><%= get_resp["deList"][0]["respuesta_mensaje"] %></td>
+        <td>
+          <% if get_resp["deList"][0]["situacion"].to_s == '4' %>
+            <%= link_to 'Re-Enviar', reenviar_form_fiscals_path(id: form_fiscal), target: '_blank' %>
+          <% end %>
+        </td>
+
+        <% end %>
+        <td><%= link_to 'Editar', edit_form_fiscal_path(form_fiscal) %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>

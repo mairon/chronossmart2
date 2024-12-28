@@ -1,0 +1,2 @@
+module VendaRomaneiosHelper
+end

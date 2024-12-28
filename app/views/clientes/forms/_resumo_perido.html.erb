@@ -1,0 +1,86 @@
+<div class="col-md-3">
+  <div class="panel">
+    <header class="panel-heading title-list" align="center">
+      <%= Date::MONTHNAMES[Time.now.strftime("%m").to_i].to_s %> / <%= Time.now.strftime("%Y") %>
+    </header>
+
+    <header class="panel-heading title-list" align="center" style="line-height: 54px !important;">
+      HOY
+    </header>
+
+    <div class="panel-content">
+    <div class="row">
+      <div class="col-md-4 us" align="center">U$ <%= format_decimal(@hoje_us) %></div>
+      <div class="col-md-4 gs" align="center">Gs <%= format_int(@hoje_gs) %></div>
+      <div class="col-md-4 rs" align="center">R$ <%= format_decimal(@hoje_rs) %></div>
+    </div>
+    </div>
+  </div>
+</div>
+
+<div class="col-md-3">
+  <div class="panel">
+    <header class="panel-heading title-list us" align="center">
+      Dolares
+    </header>
+
+    <div class="panel-content list-result">
+      <li>Previsto: <span class=" pull-right">U$ <%= format_decimal( tot_us =  (@saldo_us.to_f) + (@recebido_us * -1).to_f ) %></span></li>
+      <li>Realizado: ( <b><%= format_decimal(((@recebido_us * -1).to_f / tot_us.to_f) * 100) %>%</b> ) <span class="pull-right">
+        U$ <%= format_decimal( @recebido_us * -1 ) %>
+
+        </span></li>
+      <li class="result">
+        Falta: ( <b><%= format_decimal(((@saldo_us).to_f / tot_us.to_f) * 100) %>%</b> )<span class=" pull-right">
+        U$ <%= format_decimal(@saldo_us) %>
+
+      </span>
+      </li>
+    </div>
+  </div>
+</div>
+
+<div class="col-md-3">
+  <div class="panel">
+    <header class="panel-heading title-list gs" align="center">
+      Guaranies
+    </header>
+
+    <div class="panel-content list-result">
+      <li>Previsto: <span class="pull-right">Gs. <%= format_int( tot_gs = (@recebido_gs * -1).to_f + @saldo_gs.to_f ) %></span></li>
+      <li>
+        Realizado: ( <b><%= format_decimal(((@recebido_gs * -1).to_f / tot_gs.to_f) * 100) %>%</b> )<span class=" pull-right">
+          Gs. <%= format_int(@recebido_gs * -1) %>
+          </span>
+
+      </li>
+      <li class="result">
+        Falta: ( <b><%= format_decimal((@saldo_gs.to_f / tot_gs.to_f) * 100) %>%</b> ) <span class=" pull-right">
+        Gs. <%= format_int(@saldo_gs) %>
+        </span>
+
+      </li>
+    </div>
+  </div>
+</div>
+
+<div class="col-md-3">
+  <div class="panel">
+    <header class="panel-heading title-list rs" align="center">
+      Reales
+    </header>
+
+    <div class="panel-content list-result">
+      <li>Previsto: <span class=" pull-right">R$ <%= format_decimal( tot_rs =  (@saldo_rs.to_f) + (@recebido_rs * -1).to_f ) %></span></li>
+      <li>Realizado: ( <b><%= format_decimal(((@recebido_rs * -1).to_f / tot_rs.to_f) * 100) %>%</b> ) <span class="pull-right">
+        U$ <%= format_decimal( @recebido_rs * -1 ) %>
+
+        </span></li>
+      <li class="result">
+        Falta: ( <b><%= format_decimal(((@saldo_rs).to_f / tot_rs.to_f) * 100) %>%</b> )<span class=" pull-right">
+        U$ <%= format_decimal(@saldo_rs) %>
+      </span>
+      </li>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,59 @@
+<%= form_for(@transf_cartao_dt) do |f| %>
+  <% if @transf_cartao_dt.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@transf_cartao_dt.errors.count, "error") %> prohibited this transf_cartao_dt from being saved:</h2>
+
+      <ul>
+      <% @transf_cartao_dt.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> transf_cartao_dts - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">nr_comprovante :</td>                    
+                      <td><%= f.text_field :nr_comprovante %></td>
+                                      
+                      <td align="right">valor_gs :</td>                    
+                      <td><%= f.text_field :valor_gs %></td>
+                                      
+                      <td align="right">valor_us :</td>                    
+                      <td><%= f.text_field :valor_us %></td>
+                                      
+                      <td align="right">valor_rs :</td>                    
+                      <td><%= f.text_field :valor_rs %></td>
+                                      
+                      <td align="right">cartao_bandeira_id :</td>                    
+                      <td><%= f.number_field :cartao_bandeira_id %></td>
+                                      
+                      <td align="right">transf_cartao_id :</td>                    
+                      <td><%= f.number_field :transf_cartao_id %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), transf_cartao_dts_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

@@ -1,0 +1,76 @@
+<%= form_for(@retencao) do |f| %>
+  <% if @retencao.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@retencao.errors.count, "error") %> prohibited this retencao from being saved:</h2>
+
+      <ul>
+      <% @retencao.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> Retención - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+
+                  <tr>
+                    <td align="right"><%= t('DATE') %>:</td>
+                    <td><%= f.date_select :data %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Cotización:</td>
+                    <% if params[:action] == 'new' %>
+                    <td><%= f.text_field :cotacao,
+                                         :size     => 10,
+                                         :precision => 0, :dir   => "rtl",
+                                         :value    => @retencao.cotacao.to_i,
+                                          :onfocus  => " $.ajax({url: '/buscas/cotz_us_venda',
+                                                type: 'POST',
+                                                data: 'data=' + $('#retencao_data_3i').val()+'/'+
+                                                $('#retencao_data_2i').val()+'/'+
+                                                $('#retencao_data_1i').val(),
+                                                success: function(data){
+                                                  $('#retencao_cotacao').val(data);} })" , :autofocus => true %></td>
+                    <% else %>
+                    <td><%= f.text_field :cotacao, size: 10, autofocus: true, :precision => 0, :dir   => "rtl" %></td>
+                    <% end %>
+
+                  </tr>
+
+
+                  <tr>
+                    <td align="right">Nombre :</td>
+                    <td colspan="3">
+
+                      <%= f.collection_select :persona_id, Persona.all( :select => 'id,nome', :conditions => ["tipo_fornecedor = 1"], :order  => '2' ),
+                                                            :id,:nome,
+                                                            {:prompt => 'Seleccione el Proveedor'},{:class => "selc_medium"} %>
+                    </td>
+                  </tr>
+
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="buttons">
+        <%= f.submit :value => " Seguir", :disable_with => "Aguarde...", :class => "button add" %>
+        <%= link_to t('BACK'), retencaos_path, :class => "button back" %>
+      </div>
+
+    </div>
+<% end %>

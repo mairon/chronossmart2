@@ -1,0 +1,43 @@
+<%
+  ferias = Persona.where("estado = 0 and date_part('month', data_entrada) = '#{Time.now.strftime("%m")}'").order('data_entrada')
+%>
+
+<div class="panel">
+  <header class="panel-heading">
+  Empleados con Vacacciones Concedida del Mes
+</header>
+   <table class="head_grid">
+      <tr>
+        <td width="150">Unidad</td>
+        <td width="300">Empleado</td>
+        <td width="80" align="center"><%= t("DATE")%></td>
+        <td width="80" align="center">Antiguidad</td>
+        <td width="120" align="center">Dias Concedidos</td>
+      </tr>
+   </table>
+   <div class="rolagem" id="div">
+      <table>
+         <% total = 0 %>
+         <% ferias.each do |cl| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="150" align="left"><%= cl.unidade.unidade_nome %></td>
+              <td width="300" align="left"><%= link_to cl.nome, show_funcionario_persona_path(cl.id) %></td>
+              <td width="80" align="center"><%= cl.data_entrada.strftime("%d/%m") %></td>
+              <td width="80" align="center"><%= ((Time.now.to_date - cl.data_entrada.to_date ) / 365).to_i %> Año</td>
+              <td width="120" align="center">
+                <% anos = (( ("#{Time.now.strftime("%Y")}-#{cl.data_entrada.strftime("%m")}-#{cl.data_entrada.strftime("%d")}").to_date - cl.data_entrada.to_date).to_i  / 365) %>
+                <% if anos <= 5 %>
+                  <%= anos_causado = 12 %>
+                <% elsif anos > 5  and anos <= 10 %>
+                  <%= anos_causado = 18 %>
+                <% elsif anos > 10 %>
+                  <%= anos_causado = 30 %>
+                <% end %>
+              </td> 
+            </tr>
+            <% total += 1 %>
+         <% end %>
+      </table>
+   </div>
+   Total : <%= total %>
+   </div>

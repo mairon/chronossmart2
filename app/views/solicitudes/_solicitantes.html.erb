@@ -1,0 +1,45 @@
+<h1 id="header">Solicitud</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_solicitude_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="80">Cod</td>
+    <td width="100">Fecha Soli.</td>
+    <td width="100">Quando</td>
+    <td width="250">Motivo</td>
+    <td width="120">Status</td>
+    <td width="180">Status obs</td>
+    <td width="50">Anexo</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @solicitudes.each do |solicitude| %>
+      <tr>
+        <td width="80"><%= solicitude.id.to_s.rjust(6,'0') %></td>
+        <td width="100"><%= solicitude.created_at.strftime("%d/%m/%y - %H:%M") %></td>
+        <td width="100"><%= solicitude.data.strftime("%d/%m/%y") unless solicitude.data.blank? %> - <%= solicitude.time.strftime("%H:%M")  unless solicitude.data.blank? %></td>
+        <td width="250"><%= solicitude.motivo.nome %></td>
+        <td width="120">
+          <span style="background-color: #91DC5A;" class="panel-tag"><%= solicitude.status %></span>
+        </td>
+        <td width="180"><%= solicitude.status_obs %></td>
+        <td><%= link_to '', solicitude, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+        <td width="50">
+          <%= link_to(solicitude.anexo.url, target: '_blank') do %>
+          <% if solicitude.anexo_content_type == 'application/pdf' %>
+              <%= image_tag 'ficheiro-pdf.png', class: 'img-thumbnail' %>
+            <% else %>
+              <%= image_tag solicitude.anexo, class: 'img-thumbnail' %>
+            <% end %>
+          <% end %>
+        </td>
+        <td width="180"><%= link_to 'Add Anexo', add_anexo_solicitude_path(solicitude) %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

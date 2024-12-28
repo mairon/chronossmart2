@@ -1,0 +1,103 @@
+<div class="group">
+<%= form_for(ordem_serv_prod) do |f| %>
+  <% if ordem_serv_prod.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(ordem_serv_prod.errors.count, "error") %> prohibited this ordem_serv_prod from being saved:</h2>
+
+      <ul>
+      <% ordem_serv_prod.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= f.hidden_field :ordem_serv_id %>
+  <%= f.hidden_field :status, value: true %>
+  <div class="row">
+    <div class="col-md-6">
+      <label><%= t('DATE') %></label>
+      <%= f.date_select :data %>
+    </div>
+    <div class="col-md-6">
+      <label>Deposito</label>
+      <%= f.collection_select :deposito_id, Deposito.all( :select => ' id,nome', :order  => '2' ), :id, :nome %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Barra</label>
+      <%= text_field_tag :cod_busca, nil, style: 'width: 100%', class: 'first', placeholder: 'Barra', autocapitalize: "off", autocomplete:"off", autocorrect:"off" %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Producto</label>
+      <%= f.collection_select :produto_id, Produto.all( :select => ' id,nome', :order  => '2' ), :id, :nome,{prompt: 'Selecione lo producto'}, {required: true, class: 'ret_produto_id panel-field'} %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <label>Cantidad</label>
+      <%= f.number_field :quantidade, required: true %>
+    </div>
+    <div class="col-md-6">
+      <% if @ordem_serv.moeda.to_i == 0 %>
+        <%= field_us_label 'Monto U$ :',f,:valor_us, required: true %>
+      <% elsif @ordem_serv.moeda.to_i == 1 %>
+        <%= field_gs_label 'Monto G$ :',f,:valor_gs, required: true %>
+      <% elsif @ordem_serv.moeda.to_i == 2 %>
+        <%= field_us_label 'Monto R$ :',f,:valor_rs, required: true %>
+      <% end %>
+    </div>    
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <br>      
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    </div>
+  </div>
+
+<% end %>
+</div>
+
+<script>
+
+$("#cod_busca").change(function(){
+  $.ajax({url: "/buscas/get_produto",
+      type: 'GET',
+      beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+      data: 'tipo_busca=BARRA&cod=' + $('#cod_busca').val(),
+      success: function(grade){
+      //tabela de preco
+     $(".ret_produto_id").val(grade);
+    }
+  });
+});
+
+
+  $(".ret_produto_id").change(function(){
+      $.ajax({url: "/buscas/busca_venda_produto",
+        type: 'GET',
+        beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+        data: 'tipo_busca=ID&cod=' + $('.ret_produto_id').val() +
+          "&unidade=" + <%= current_unidade.id %> +
+          "&data=" + '<%= @ordem_serv.data.strftime("%d/%m/%Y") %>' +
+          "&deposito=" + $("#ordem_serv_prod_deposito_id").val() +
+          "&barra_balanca=0" +
+          "&persona_id=" + <%= @ordem_serv.persona_id %> +
+          "&tabela_preco=" + <%= @ordem_serv.persona.tabela_preco_id %>,
+        success: function(grade){
+        //tabela de preco
+        if (<%= @ordem_serv.moeda %> == '0'){
+          $('#ordem_serv_prod_valor_us').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
+        }if (<%= @ordem_serv.moeda %> == '1'){
+          $('#ordem_serv_prod_valor_gs').val(number_format( grade["produto"].preco_1_gs, 0, ',', '.'));
+        }if (<%= @ordem_serv.moeda %> == '2'){
+          $('#ordem_serv_prod_valor_rs').val(number_format( grade["produto"].preco_1_rs, 2, ',', '.'));
+        }
+      }
+    });
+
+
+  });
+</script>

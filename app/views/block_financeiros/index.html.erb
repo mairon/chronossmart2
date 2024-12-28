@@ -1,0 +1,38 @@
+<h1 id="header">Bloquear Financiero</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_block_financeiro_path, :class => "button add" %>
+</div>
+<div class="group">
+   <table class="head_grid">
+      <tr>
+         <td width="110" align="center"><%= t('CODE') %></td>
+         <td width="250" >Periodo</td>
+         <td width="250" >Status</td>
+         <td width="250" >Responsable</td>
+         <td width="52"></td>
+      </tr>
+   </table>
+   <div class="rolagem" id="div">
+      <table>
+         <% @block_financeiros.each do |bf| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="110" align="center"><%= bf.id.to_s.rjust(6,'0') %></td>
+              <td width="250"><strong><%= bf.periodo.strftime("%m/%Y") %></strong></td>
+              <td width="250">
+                <% if bf.status == true %>
+                  <span style="background-color: #D80027;" class="panel-tag">Bloqueado</span> 
+                <% else %>
+                  <span style="background-color: #91DC5A;" class="panel-tag">Aberto</span> 
+                <% end %>
+              </td>
+              <td width="250" ><%= bf.usuario.usuario_nome unless bf.usuario_id.nil? %></td>
+              <td><%= link_to '', edit_rodado_path(bf), class: 'icon-pencil' %></td>
+              <td><%= link_to '', bf, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>
+            </tr>
+         <% end %>
+      </table>
+   </div>
+</div>
+<div class="head_grid">
+  <%= will_paginate @block_financeiros %>
+</div>

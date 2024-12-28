@@ -1,0 +1,433 @@
+
+<%= form_for(@venda) do |vdc| %>
+  <%= vdc.hidden_field :tabela_preco_id %>
+  <input type='hidden' name='_method' value='put'>
+    <%= hidden_field_tag :tela, params[:action] %>
+    <% if @venda_config.multi_moeda == true %>
+    <div class="row">
+      <div class="col-md-12">
+        <%= vdc.radio_button :moeda, 0, class: 'edit_moeda' %> Dolar
+        <%= vdc.radio_button :moeda, 1, class: 'edit_moeda' %> Guaranies
+        <%= vdc.radio_button :moeda, 2, class: 'edit_moeda' %> Real
+      </div>
+    </div>
+    <% end %>
+
+    <div class="row">
+      <% if @venda_config.data == true %>
+        <div class="col-md-7">
+          <label><%= t('DATE') %></label>
+          <%= vdc.date_select :data %>
+        </div>
+      <% end %>
+
+      <% unless Cartao.last.nil? %>
+        <div class="col-md-7">
+          <label>Comanda</label>
+          <%= vdc.text_field :cartao_nome, placeholder: 'Digite Comanda', autocomplete: "off", required: true %> 
+           <%= image_tag("check.png", align: "absmiddle", border: 0, id: "check-comanda", width: 15, height: 15, style: "position: absolute; right: 85px; top: 56%; display: none;" ) %>
+           <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner-comanda", width: 15, height: 15, style: "position: absolute; right: 85px; top: 56%; display: none;") %>
+           <%= image_tag("close.png", align: "absmiddle", border: 0, id: "close-comanda", width: 15, height: 15, style: "position: absolute; right: 85px; top: 56%; display: none;" ) %>
+          <%= vdc.hidden_field :cartao_id %>
+        </div>
+      <% end %>
+
+      <% unless Setor.last.nil? %>
+        <div class="col-md-3">
+          <label>Sector</label>
+          <%= vdc.collection_select :setor_id, Setor.select('id,nome').order('2'), :id, :nome, { prompt: '' } %>
+        </div>
+      <% end %>      
+      <% unless CentroCusto.last.nil? %>
+        <div class="col-md-3">
+          <label>Centro Costo</label>
+          <%= vdc.collection_select :centro_custo_id, CentroCusto.select('id,nome').order('2'), :id, :nome, { prompt: '' } %>
+        </div>
+      <% end %> 
+
+    </div>
+  <div class="row">
+
+    <div class="col-md-7">
+      <label>
+        <Cliente></Cliente>
+        <a href="#" target="popup" style="font-size: 12px;" onclick="window.open('/personas/new?layout=resumido','popup','width=600,height=600'); return false;"> Add
+        </a> |
+        <a href="#" title="Histórico Cliente" onclick="HistoricoCliente()" style="font-size: 12px;">Histórico</a> | <a href="#" class="type_point" set="SAIDA"  onclick="authenticateUser()"> Buscar FaceID</a> 
+      </label>
+      <% unless @venda.vendas_produtos.present? %>
+        <%= vdc.text_field :persona_nome, placeholder: 'Busca Cliente', style: 'width: 100%', onclick: "this.select();" %>
+      <% else %>
+        <%= vdc.text_field :persona_nome, placeholder: 'Busca Cliente', style: 'width: 100%', readonly: 'readonly', onclick: "this.select();"  %>
+      <% end %>
+
+
+      <%= image_tag("check.png", align: "absmiddle", border: 0, id: "check", width: 15, height: 15, style: "position: absolute; right: 20px; top: 56%;" ) %>
+      <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 15, height: 15, style: "position: absolute; right: 20px; top: 56%; display: none;") %>
+    </div>
+    <%= vdc.hidden_field :persona_id %>
+    <div class="col-md-5">
+      <label>Vendedor</label>
+      <%= vdc.collection_select :vendedor_id, Persona.where(tipo_vendedor: 1).select('id,nome').order('2'), :id, :nome, { prompt: 'Selecione o Cliente' }, {class: 'panel-field'} %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <label></label>
+      <%= vdc.text_area :obs, class: 'panel-field', rows: 1, placeholder: 'Obs' %>
+    </div>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+  function HistoricoCliente(){
+        var deposito = document.getElementById('vendas_produto_deposito_id').value
+        var dt       = document.getElementById('vendas_produto_data').value
+      window.open('/personas/' + $("#venda_persona_id").val() + '/historico_vendas' , '', ' SCROLLBARS=YES, TOP=0, LEFT=50, WIDTH=2500, HEIGHT=600');
+  };
+
+
+    $("#venda_cartao_nome").change(function(){
+        $("#spinner-comanda").show("fast");
+        $.ajax({url: "/buscas/busca_cartao",
+          type: 'GET',
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))
+          },
+
+          data: 'unidade_id=<%= current_unidade.id %>&cod=' + $('#venda_cartao_nome').val(),
+
+          success: function(find_cartao, textStatus, xhr){
+            if (find_cartao["cartao"] == null) {
+              alert('Tarjeta no Disponible! busque otra numeración');
+              $('#spinner-comanda').hide("slow");
+              $("#check-comanda").hide("fast");
+              $("#close-comanda").show("fast");
+
+              $('#venda_cartao_id').val('');  
+              $('#venda_cartao_nome').val('');
+              $('#venda_cartao_nome').focus();
+            }else{
+              $('#venda_cartao_id').val(find_cartao["cartao"].id);
+              $.ajax({
+                type: 'PUT',
+                url:  '/vendas/'+ <%= @venda.id %>,
+                data: $('.edit_venda').serialize(),
+                dataType: "JSON",
+                success: function(data,textStatus,jqXHR) {
+                  if (jqXHR.status == "204") {
+                    $('#spinner-comanda').hide("slow");
+                    $("#close-comanda").hide("fast");
+                    $("#check-comanda").show("fast");
+
+                  };
+                }
+            });              
+            }
+            
+          }
+        });
+    });
+
+
+  $("#venda_setor_id, #venda_vendedor_id, #venda_obs, #venda_finalidade, #venda_nome_ref, #venda_tabela_preco_id, #venda_centro_custo_id").change(function(){
+      $("#spinner").css({"position": "absolute", "top": "55%", "right": "20px"}).show("fast");
+      $.ajax({
+        type: 'PUT',
+        url:  '/vendas/'+ <%= @venda.id %>,
+        data: $('.edit_venda').serialize(),
+        dataType: "JSON",
+        success: function(data,textStatus,jqXHR) {
+          if (jqXHR.status == "204") {
+            $('#spinner').hide("slow");
+            $("#check").css({"position": "absolute", "top": "55%", "right": "20px"}).show("fast");
+          };
+        }
+    });
+  })
+
+  $('.edit_moeda').bind('blur change click', function() {
+    $("form:first").submit();
+  });
+
+  $("#venda_persona_nome").blur(function(){
+      $.ajax({
+        type: 'PUT',
+        url:  '/vendas/'+ <%= @venda.id %>,
+        data: $('.edit_venda').serialize(),
+        dataType: "JSON",
+        success: function(data,textStatus,jqXHR) {
+          if (jqXHR.status == "204") {
+            $('#spinner').hide("slow");
+
+            if ($("#tela").val() == 'vendas_financa'){
+              $('#edit_venda_<%= @venda.id %>').submit();
+            };
+
+            $("#check").css({"position": "absolute", "top": "55%", "right": "20px"}).show("fast");
+          };
+        }
+    });
+  })
+
+  $(document).ready(function(){
+    $.ajax({
+      type: 'GET',
+      url:  '/vendas/verifica_financas',
+      data: {
+        "venda_id": <%= @venda.id %>
+      },
+      success: function(data) {
+        if (data == 1) {
+          $('.edit_venda input,  .edit_venda select, .edit_venda textarea').attr('readonly', 'readonly');
+
+        }
+      }
+    });
+  });
+  
+    $(function() {
+      $( "#venda_persona_nome" ).autocomplete({
+          source: function( request, response ) {
+          $.ajax({
+            url: "/personas/busca?per=CLIENTE",
+            dataType: "json",
+            data: {
+              tipo: 'DESCRIPCION',
+              busca: request.term
+            },
+            beforeSend: function(){
+              $("#spinner").css({"position": "absolute", "top": "55%", "right": "20px"}).show("fast");
+              $("#check").css({"position": "absolute", "top": "55%", "right": "20px"}).hide("fast");
+            },
+
+            success: function( data ) {
+              response( data );
+            },
+          });
+        },
+        minLength: 2,
+        change: function( event, ui ) {
+          $("#venda_persona_id").val("");
+          $('#venda_persona_id').val(ui.item.id);
+          $('#venda_tabela_preco_id').val(ui.item.tabela_preco_id);
+          $('#tabela_preco_id').val(ui.item.tabela_preco_id);
+          tabela_preco_id
+
+          $.ajax({
+              type: 'PUT',
+              url:  '/vendas/'+ <%= @venda.id %>,
+              data: $('.edit_venda').serialize(),
+              dataType: "JSON",
+              success: function(data,textStatus,jqXHR) {
+                if (jqXHR.status == "204") {
+                  $('#spinner').hide("slow");
+                  $("#check").css({"position": "absolute", "top": "55%", "right": "20px"}).show("fast");
+                };
+              }
+          });
+
+        }
+      });
+      $( "#venda_persona_nome" ).change(function(){
+        if ($( "#venda_persona_id" ).val() == ''){
+          alert('Cliente nao Cadastrado!')
+        }
+      });
+    });
+</script>
+<% if @venda_config.altera_vendedor_obrig == true %>
+<script>
+    if ($( "#venda_vendedor_id" ).val() == ''){
+
+      $(document).ready(function(){
+        $("#ModalVendedor").modal('show');
+
+        $('#ModalVendedor').on('shown.bs.modal', function() {
+          $('#cod_vendedor').focus();
+        })
+
+        $("#cod_vendedor").change(function(){
+          if (true) {}
+            $.ajax({
+              type: 'GET',
+              url:  '/buscas/get_vendedor',
+              data: {cod_vendedor: $("#cod_vendedor").val()},
+              dataType: "JSON",
+              success: function(data,textStatus,jqXHR) {
+                if (data["persona"] == 'null'){
+                  alert('Vendedor no Encontrado')
+                  $('#cod_vendedor').focus();
+                  $('#cod_vendedor').val('');
+                } else {
+                  $("#venda_vendedor_id").val(data["persona"].id);
+                  $('#ModalVendedor').modal('hide');
+                  $('#venda_cartao_nome').focus();
+
+                    $.ajax({
+                        type: 'PUT',
+                        url:  '/vendas/'+ <%= @venda.id %>,
+                        data: $('.edit_venda').serialize(),
+                        dataType: "JSON",
+                        success: function(data,textStatus,jqXHR) {
+                          if (jqXHR.status == "204") {
+                            $('#spinner').hide("slow");
+                            $("#check").css({"position": "absolute", "top": "55%", "right": "20px"}).show("fast");
+                          };
+                        }
+                    });
+
+                }
+
+              }
+          });
+        })
+
+      });
+
+    };
+</script>
+<% end %>
+
+
+<div class="modal fade" id="ModalVendedor" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary">
+        <h1 style="font-size: 16px; font-weight: bold; color: #fff">
+        Selecione lo Vendedor
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </h1>
+        
+      </div>
+      <div class="modal-body" style="padding: 5px 20px 20px 20px">
+
+        <%= text_field_tag :cod_vendedor, nil, class: 'panel-field', placeholder: 'Código Vendedor' %>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  
+  <script src="https://cdn.faceio.net/fio.js"></script>
+  <script type="text/javascript">
+          // Initialize the library first with your application Public ID.
+          // Grab your public ID from the Application Manager on the FACEIO console at: https://console.faceio.net/
+          const faceio = new faceIO("fioa72db"); // Replace with your application Public ID
+
+          function authenticateUser() {
+            // Start the facial authentication process (Identify a previously enrolled user)
+            faceio.authenticate({
+              "locale": "auto" // Default user locale
+            }).then(userData => {
+              console.log("Success, user recognized")
+              // Grab the facial ID linked to this particular user which will be same
+              // for each of his successful future authentication. FACEIO recommend
+              // that your rely on this ID if you plan to uniquely identify
+              // all enrolled users on your backend for example.
+              console.log("Linked facial Id: " + userData.facialId)
+              // Grab the arbitrary data you have already linked (if any) to this particular user
+              // during his enrollment via the payload parameter the enroll() method takes.
+              console.log("Associated Payload: " + JSON.stringify(userData.payload["id"]))
+              // {"whoami": 123456, "email": "john.doe@example.com"} set via enroll()
+              
+              var currentdate = new Date(); 
+              var datetime = currentdate.getFullYear() + "-" + (currentdate.getMonth()+1)  + "-" + currentdate.getDate() + "  " + currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
+
+              $(".tag-log").show()
+              $("#venda_persona_id").val(userData.payload["id"]);
+              $("#venda_persona_nome").val(userData.payload["nome"]);
+            
+              //
+              // faceio.restartSession() let you authenticate another user again (without reloading the entire HTML page)
+              //
+            }).catch(errCode => {
+              // handle authentication failure. Visit:
+              // https://faceio.net/integration-guide#error-codes
+              // for the list of all possible error codes
+              handleError(errCode);
+              
+              // If you want to restart the session again without refreshing the current TAB. Just call:
+              faceio.restartSession();
+              // restartSession() let you authenticate the same user again (in case of failure) 
+              // without refreshing the entire page.
+              // restartSession() is available starting from the PRO plan and up, so think of upgrading your app
+              // for user usability.
+            });
+          }
+          function handleError(errCode) {
+            // Log all possible error codes during user interaction..
+            // Refer to: https://faceio.net/integration-guide#error-codes
+            // for a detailed overview when these errors are triggered.
+            switch (errCode) {
+              case fioErrCode.PERMISSION_REFUSED:
+                console.log("Access to the Camera stream was denied by the end user");
+                break;
+              case fioErrCode.NO_FACES_DETECTED:
+                console.log("No faces were detected during the enroll or authentication process");
+                break;
+              case fioErrCode.UNRECOGNIZED_FACE:
+                console.log("Unrecognized face on this application's Facial Index");
+                break;
+              case fioErrCode.MANY_FACES:
+                console.log("Two or more faces were detected during the scan process");
+                break;
+              case fioErrCode.FACE_DUPLICATION:
+                console.log("User enrolled previously (facial features already recorded). Cannot enroll again!");
+                break;
+              case fioErrCode.MINORS_NOT_ALLOWED:
+                console.log("Minors are not allowed to enroll on this application!");
+              break;
+              case fioErrCode.PAD_ATTACK:
+                console.log("Presentation (Spoof) Attack (PAD) detected during the scan process");
+                break;
+              case fioErrCode.FACE_MISMATCH:
+                console.log("Calculated Facial Vectors of the user being enrolled do not matches");
+                break;
+              case fioErrCode.WRONG_PIN_CODE:
+                console.log("Wrong PIN code supplied by the user being authenticated");
+                break;
+              case fioErrCode.PROCESSING_ERR:
+                console.log("Server side error");
+                break;
+              case fioErrCode.UNAUTHORIZED:
+                console.log("Your application is not allowed to perform the requested operation (eg. Invalid ID, Blocked, Paused, etc.). Refer to the FACEIO Console for additional information");
+                break;
+              case fioErrCode.TERMS_NOT_ACCEPTED:
+                console.log("Terms & Conditions set out by FACEIO/host application rejected by the end user");
+                break;
+              case fioErrCode.UI_NOT_READY:
+                console.log("The FACEIO Widget could not be (or is being) injected onto the client DOM");
+                break;
+              case fioErrCode.SESSION_EXPIRED:
+                console.log("Client session expired. The first promise was already fulfilled but the host application failed to act accordingly");
+                break;
+              case fioErrCode.TIMEOUT:
+                console.log("Ongoing operation timed out (eg, Camera access permission, ToS accept delay, Face not yet detected, Server Reply, etc.)");
+                break;
+              case fioErrCode.TOO_MANY_REQUESTS:
+                console.log("Widget instantiation requests exceeded for freemium applications. Does not apply for upgraded applications");
+                break;
+              case fioErrCode.EMPTY_ORIGIN:
+                console.log("Origin or Referer HTTP request header is empty or missing");
+                break;
+              case fioErrCode.FORBIDDDEN_ORIGIN:
+                console.log("Domain origin is forbidden from instantiating fio.js");
+                break;
+              case fioErrCode.FORBIDDDEN_COUNTRY:
+                console.log("Country ISO-3166-1 Code is forbidden from instantiating fio.js");
+                break;
+              case fioErrCode.SESSION_IN_PROGRESS:
+                console.log("Another authentication or enrollment session is in progress");
+                break;
+              case fioErrCode.NETWORK_IO:
+              default:
+                console.log("Error while establishing network connection with the target FACEIO processing node");
+                break;
+            }
+          }
+        </script>  

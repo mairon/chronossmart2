@@ -1,0 +1,181 @@
+<h1 align="right" id="header">Productos Grades</h1>
+<body onload="CampoBuscaTipo()">
+   <div class="group">
+      <h2>
+        <table>
+         <%= form_tag busca_grades_produtos_path, :method => "get" do %>
+          <tr>
+            <td align="right">Clase :</td>
+            <td>
+              <%=   select("filtro", "clase", Clase.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },
+                                                                                          { :include_blank => true },{:style => "width:250px"})   %>
+            </td>
+            <td align="right">Grupo :</td>
+            <td>
+              <%=   select("filtro", "grupo", Grupo.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },
+                                                                                          { :include_blank => true },{:style => "width:250px"})   %>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="right">Marca :</td>
+            <td>
+              <%=   select("filtro", "sub_grupo", SubGrupo.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },
+                                                                                          { :include_blank => true },{:style => "width:250px"})   %>
+            </td>
+            <td align="right">Colección :</td>
+            <td>
+              <%=   select("filtro", "colecao", Colecao.all(:select => 'id,nome').collect {|p| [ p.nome, p.id ] },
+                                                                                          { :include_blank => true },{:style => "width:250px"})   %>
+            </td>
+          </tr>
+          <tr>
+            <td align="right">Filtro:</td>
+            <td>
+            <select name="tipo" id="tipo" style="width:250px;">
+               <option>REFERENCIA</option>
+               <option>DESCRIPCION</option>
+               <option>CODIGO</option>
+            </select>
+
+            </td>
+            <td></td>
+            <td><input id="busca" name="busca" type="text" onkeydown = "f(this)" onkeypress ="return bloqEnter(event)" size="43"  />
+             <input  id      ="button"
+                      type    ="submit"
+                      class="button_info"
+                      value   ="Informe"
+                      onclick = "Tipo('0')"/>
+            <%= image_tag("load.gif",
+                          :align => "absmiddle",
+                          :border => 0,
+                          :id => "spinner",
+                          :width => 21,
+                          :height => 21,
+                          :style =>"display: none;" ) %></td>
+          </tr>
+
+
+         <% end %>
+        </table>
+      </h2>
+      <div id="pagina">
+      </div>
+
+
+
+      <script language="javascript">
+
+         function pesquisa(valor){
+            clase     = document.getElementById('filtro_clase').value
+            grupo     = document.getElementById('filtro_grupo').value
+            sub_grupo = document.getElementById('filtro_sub_grupo').value
+            colecao   = document.getElementById('filtro_colecao').value
+            tipo      = document.getElementById('tipo').value
+            busca     = document.getElementById('busca').value
+            //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+            url="/produtos/busca_grades?clase="+clase+"&grupo="+grupo+"&sub_grupo="+sub_grupo+"&colecao="+colecao+"&tipo="+tipo+"&busca="+busca+"&commit=buscar";
+
+            ajax(url);
+
+         }
+
+
+         function ajax(url)
+
+         {
+
+                  $('#spinner').show();
+
+
+            //alert(nick);
+
+            //alert(dest);
+
+            //alert(msg);
+
+
+
+            req = null;
+
+            // Procura por um objeto nativo (Mozilla/Safari)
+
+            if (window.XMLHttpRequest) {
+
+               req = new XMLHttpRequest();
+
+               req.onreadystatechange = processReqChange;
+
+               req.open("GET",url,true);
+
+               req.send(null);
+
+               // Procura por uma versão ActiveX (IE)
+
+            } else if (window.ActiveXObject) {
+
+               req = new ActiveXObject("Microsoft.XMLHTTP");
+
+               if (req) {
+
+
+
+                  req.onreadystatechange = processReqChange;
+
+                  req.open("GET",url,true);
+
+
+
+                  req.send();
+
+               }
+
+            }
+
+         }
+
+
+
+         function processReqChange()
+
+         {
+
+
+
+            // apenas quando o estado for "completado"
+
+            if (req.readyState == 4) {
+
+
+
+               // apenas se o servidor retornar "OK"
+
+
+
+               if (req.status ==200) {
+
+
+
+                  // procura pela div id="pagina" e insere o conteudo
+
+                  // retornado nela, como texto HTML
+
+
+                  onSuccess:$('#spinner').hide();
+                  document.getElementById('pagina').innerHTML = req.responseText;
+
+
+
+               } else {
+
+                  alert("Houve um problema ao obter os dados:n" + req.statusText);
+
+               }
+
+            }
+
+         }
+      </script>
+   </div>
+</body>

@@ -1,0 +1,49 @@
+<%= form_for(@marca) do |f| %>
+  <% if @marca.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@marca.errors.count, "error") %> prohibited this marca from being saved:</h2>
+
+      <ul>
+      <% @marca.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> Marcas - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+           <tr>
+                      <td align="right">Nome :</td>
+                      <td><%= f.text_field :nome %></td>
+
+                      <td align="right">Registro :</td>
+                      <td><%= f.text_field :registro %></td>
+
+                      <td align="right">Endereco :</td>
+                      <td><%= f.text_field :endereco %></td>
+          </tr>
+          <tr>
+                      <td align="right">Telefone :</td>
+                      <td><%= f.text_field :telefone %></td>
+
+                      <td align="right">Email :</td>
+                      <td><%= f.text_field :email %></td>
+                                      </tr>
+
+          </tr>
+        </table>
+      </div>
+
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), marcas_path, :class => "button back" %>
+      </div>
+
+    </div>
+<% end %>

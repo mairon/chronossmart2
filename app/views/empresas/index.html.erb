@@ -1,0 +1,29 @@
+<h1 id="header">Config. Empresas</h1>
+<div class="panel">
+  <div class="panel-body">
+    <table>
+      <tr class="header">
+        <td>Nome</td>
+        <td>Locale</td>
+        <td>Segmento</td>
+      </tr>
+      <% @empresas.each do |empresa| %>
+        <tr>
+          <td width="200"><%= empresa.nome %></td>
+          <td width="200"><%= empresa.locale %></td>
+          <td width="200">
+            <% if empresa.segmento.to_i == 0 %>
+              Comercial
+            <% elsif empresa.segmento.to_i == 1 %>
+              Educação
+            <% elsif empresa.segmento.to_i == 2 %>
+              Comercio Automotor
+            <% end %>
+
+          </td>
+          <td><%= link_to '', edit_empresa_path(empresa), class: 'icon-pencil' %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

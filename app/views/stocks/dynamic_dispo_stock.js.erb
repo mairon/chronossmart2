@@ -1,0 +1,5 @@
+$('#busca_colecao').empty();
+$('#busca_colecao').append('<option value="">Selecione la Colección</option>');
+<% for ne in @marcas %>
+  $('#busca_colecao').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+<% end %>

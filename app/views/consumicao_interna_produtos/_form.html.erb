@@ -1,0 +1,110 @@
+
+<%= form_for [@consumicao_interna,@consumicao_interna_produto] do |f| %>
+    <% if @consumicao_interna_produto.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@consumicao_interna_produto.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @consumicao_interna_produto.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+     <%= f.hidden_field :produto_id  %>
+     <%= f.hidden_field :cotacao,:value =>   @consumicao_interna.cotacao.to_i %>
+     <%= f.hidden_field :clase_id  %>
+     <%= f.hidden_field :moeda,:value => @consumicao_interna.moeda  %>
+     <%= f.hidden_field :data,:value => @consumicao_interna.data  %>
+     <%= f.hidden_field :grupo_id %>
+     <%= f.hidden_field :cor_id %>
+     <%= f.hidden_field :tamanho_id %>
+     <%= f.hidden_field :produtos_grade_id %>
+     <%= f.hidden_field :taxa  %>
+     <%= f.hidden_field :sub_grupo_id  %>
+     <%= f.hidden_field :fabricante_cod  %>
+      <div class="group">
+         <table>
+         	
+         	<tr>
+               <td align="right">Deposito :</td>
+               <td><%= f.collection_select(  :deposito_id, Deposito.all(:order => '2'),:id,:nome,{},{:onkeyup => "EnterTab(event,'venda_produto_produto_busca_')"} )%></td>
+         		
+               <td align="right">Producto :</td>
+               <td colspan="8">
+
+                   <%= text_field_tag( 'codigo',
+                                                      nil,
+                                                      :id     => "codigo",
+                                                      :onblur => {:remote => true,
+                                                                  :update => "codigo",
+                                                                  :url    => { :action     => :get_codigo_barra_produto },
+                                                                               :with       => "'codigo='+this.value"},
+                                                                               :size       => 8,
+                                                                               :onkeyup    => "f(this),EnterTab(event,'vendas_produto_quantidade')",
+                                                                               :onkeypress => "return bloqEnter(event)") %>
+                  <%= f.text_field  :produto_nome,
+                                    :size     => 50 %>
+                  </td>
+                  
+                  <td align="right">Cantidad :</td>
+                  <td><%= f.text_field :quantidade,
+                                       :size       => 8,
+                                       :value      => 1,
+                                       :onkeyup    => "EnterTab(event,'vendas_produto_total_desconto')",
+                                       :onkeypress => "return bloqEnter(event)",
+                                       :onblur => " ConsumicaoInternaUnitGs(),
+                                                                     ConsumicaoInternaUnitUs(),
+                                                                     ConsumicaoInternaTotalDolar(),
+                                                                     ConsumicaoInternaTotalGs(),
+                                                                     ConsumicaoInternaIvaGs(),
+                                                                     ConsumicaoInternaIvaDolar() " %></td>
+
+        <td align="right">Saldo : <font color="red"><SPAN id="red"></SPAN> </font>
+                                  <font color="green"><SPAN id="green"></SPAN> </font>
+        </td>
+      </tr>            
+            
+  <% if @consumicao_interna.moeda == 0  %>
+            <%= field_us 'Unit. U$ :',f,:unitario_dolar,:onblur => " ConsumicaoInternaUnitGs(),
+                                                                     ConsumicaoInternaUnitUs(),
+                                                                     ConsumicaoInternaTotalDolar(),
+                                                                     ConsumicaoInternaTotalGs(),
+                                                                     ConsumicaoInternaIvaGs(),
+                                                                     ConsumicaoInternaIvaDolar() " %>
+            <%= field_us 'Total U$ :',f,:total_dolar %>
+
+
+            <%= f.hidden_field :unitario_guarani %>
+            <%= f.hidden_field :total_guarani%>
+            <%= f.hidden_field :iva_dolar%>
+            <%= f.hidden_field :iva_guarani%>
+            
+            <td><%= f.submit t('SAVE') %></td>
+
+
+      <% else %>
+
+
+            <%= field_gs 'Unit. Gs.:',f,:unitario_guarani,:onblur => " ConsumicaoInternaUnitGs(),
+                                                                     ConsumicaoInternaUnitUs(),
+                                                                     ConsumicaoInternaTotalDolar(),
+                                                                     ConsumicaoInternaTotalGs(),
+                                                                     ConsumicaoInternaIvaGs(),
+                                                                     ConsumicaoInternaIvaDolar() " %>
+
+
+            <%= field_gs 'Total. Gs.:',f,:total_guarani %>                
+
+            <%= f.hidden_field :unitario_dolar %>
+            <%= f.hidden_field :iva_dolar%>
+            <%= f.hidden_field :iva_guarani%>
+            <td><%= f.submit t('SAVE') %></td>
+
+      <% end %>
+            
+         </table>
+  <% end %>
+

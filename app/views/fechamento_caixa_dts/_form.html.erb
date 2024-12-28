@@ -1,0 +1,87 @@
+<h1 id="header">Lanzamiento - [Edición]</h1>
+<div class="group">
+<%= form_for(@fechamento_caixa_dt) do |f| %>
+  <% if @fechamento_caixa_dt.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@fechamento_caixa_dt.errors.count, "error") %> prohibited this fechamento_caixa_dt from being saved:</h2>
+
+      <ul>
+      <% @fechamento_caixa_dt.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+      <table>
+      <tr>
+        <td>
+          <label>Forma de Pago</label>
+          <b><%= @fechamento_caixa_dt.forma_pago.id %>-<%= @fechamento_caixa_dt.forma_pago.nome %></b>
+        </td>
+        <td>
+          <label>Moneda</label>
+          <% if @fechamento_caixa_dt.moeda == 0 %>
+            U$
+          <% elsif @fechamento_caixa_dt.moeda == 1 %>
+            G$
+          <% elsif @fechamento_caixa_dt.moeda == 2 %>
+            R$
+          <% elsif @fechamento_caixa_dt.moeda == 3 %>
+            P$
+          <% end %>
+        </td>
+       
+      </tr>
+      <% if @fechamento_caixa_dt.forma_pago_id != 2 and @fechamento_caixa_dt.forma_pago_id != 12 and @fechamento_caixa_dt.forma_pago_id != 7 %>
+
+        <tr>
+          <td>
+            <% c_origem = Conta.find_by_id(@fechamento_caixa_dt.conta_origem_id) %>
+            <label>Origen</label>
+            <%= f.hidden_field :conta_origem_id, size: 3 %>
+            <b><%= c_origem.id %>-<%= c_origem.nome %></b>
+          </td>
+          <% if @fechamento_caixa_dt.forma_pago_id == 15 %>
+            <td>
+              <% c_destino = Conta.find_by_forma_pago_id(1, conditions:  "unidade_id = #{@fechamento_caixa.unidade_id} and moeda = #{@fechamento_caixa_dt.moeda }") %>
+              <%= f.text_field :conta_destino_id, size: 3, value: c_destino.id %>
+              <b><%= c_destino.id %>-<%= c_destino.nome %></b>
+            </td>
+
+          <% else %>
+            <td>
+              <label>Destino</label>
+              <% fc = FechamentoCaixa.find(@fechamento_caixa_dt.fechamento_caixa_id)%>
+              <% c_destino = Conta.where(tesouraria: true, moeda: @fechamento_caixa_dt.moeda, unidade_id: fc.unidade_id).last %>
+              <%= f.hidden_field :conta_destino_id, size: 3, value: c_destino.id %>
+              <b><%= c_destino.id %>-<%= c_destino.nome %></b>
+            </td>
+            <% end %>
+        </tr>
+      <% end %>
+
+      <tr>
+        <td>
+          <label>Monto Registrado</label>
+          <% if @fechamento_caixa_dt.moeda.to_i == 1 %>
+            <%= text_field_tag '', format_int(@fechamento_caixa_dt.valor_sis.to_f), :dir   => "rtl", :size => 15, readonly: true %>
+          <% else %>
+            <%= text_field_tag '', format_decimal(@fechamento_caixa_dt.valor_sis.to_f), :dir   => "rtl", :size => 15, readonly: true %>
+          <% end %>
+        </td>
+        <% if @fechamento_caixa_dt.moeda.to_i == 1 %>
+          <%= field_gs_label 'Monto', f ,:valor, autofocus: true %>
+        <% else %>
+          <%= field_us_label 'Monto', f ,:valor, autofocus: true %>
+        <% end %>
+      </tr>
+
+
+      </table>
+    <div class="footer-buttons">
+      <%= f.submit "Grabar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to 'Volver', fechamento_caixa_path(@fechamento_caixa_dt.fechamento_caixa_id), :class => "btn btn-back" %>
+    </div>
+    <% end %>
+  </div>
+</div>

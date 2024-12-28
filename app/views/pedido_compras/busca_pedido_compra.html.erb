@@ -1,0 +1,39 @@
+<div class="group">
+	<table class="head_grid">
+		<tr>
+			<td width="50" align="center">Cod.</td>
+			<td width="60" align="center"><%= t('DATE') %></td>
+			<td width="100" align="center">Tipo</td>
+			<td width="350">Proveedor</td>
+			<td width="70" align="right">Cantidad</td>
+		</tr>
+	</table>
+
+	<div class="rolagem" dir="div">
+		<table>
+			<% @pc.each do |pc| %>
+			<% tot_produtos = pc.pedido_compra_produtos.sum('quantidade') %>
+			<% if tot_produtos.to_f == 0 %>
+			<% color = '#fa3e40' %>
+			<% end %>
+
+			<tr class= "<%= cycle( "cor1", "cor2" )%>">
+				<td bgcolor="<%= color %>" width="50" align="center"> <%= pc.id.to_s.rjust(6,'0') %> </td>
+				<td bgcolor="<%= color %>" width="60" align="center"> <%= pc.data.strftime("%d/%m/%y") %></td>
+				<td bgcolor="<%= color %>" width="100" align="center">
+					<% if pc.tipo_pedido == 0 %>
+					 PRESUPUESTO
+					<% else %>
+					 PEDIDO
+					<% end %>
+				</td>
+				<td bgcolor="<%= color %>" width="350" align="left">  <%= pc.persona_nome %> </td>
+				<td bgcolor="<%= color %>" width="70" align="right">  <%= pc.pedido_compra_produtos.sum('quantidade') %> </td>
+				<td bgcolor="<%= color %>"><%= link_to 'Editar', edit_pedido_compra_path(pc) %></td>
+				<td bgcolor="<%= color %>"><%= link_to t('DELETE'), pc, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+				<td bgcolor="<%= color %>"><%= link_to 'Comprovante', "pedido_compras/#{pc.id}/print_pedido" %></td>
+				</tr>
+			<% end %>
+		</table>
+	</div>
+</div>

@@ -1,0 +1,43 @@
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="55"></td>
+      <td width="80" align="center">Laz.</td>
+      <td width="95" align="center">Comanda</td>
+      <td width="60" align="center"><%= t('DATE') %></td>
+      <td width="250">Vendedor</td>
+      <td width="250">Cliente</td>
+      <td width="150">Obs</td>
+      <td width="50" align="right">Ctd.</td>
+      <td width="35" align="center"></td>
+      <td width="80" align="right">Monto</td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+    <table>
+    <% count = 0 %>
+    <% @vendas_pendentes.each do |v| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>" onclick="OpenCobraca(<%= v.id %>)" class="<%= count %>">
+        <td width="35" class="<%= count %>"><input type="text" id="<%= count %>" class="<%= count %>" value="<%= count %>" size="1" style="border: none;"
+          onkeypress="OpenCobraca(<%= v.id %>)" data-plus-as-tab="false"></td>
+        <td class="<%= count %>" width="80" align="center"><b><%= v.id.to_s.rjust(8,'0') %></b></td>
+        <td class="<%= count %>" width="80" align="center"><b><%= v.cartao_nome %></b></td>
+        <td class="<%= count %>" width="60" align="center"><%= v.data.strftime("%d/%m/%y")%></td>
+        <td class="<%= count %>" width="250" align="left"><%= v.vendedor %></td>
+        <td class="<%= count %>" width="250" align="left"><%= truncate( v.cliente, :length => 35 ) %></td>
+        <td width="150" align="left"><small><%= v.obs %></small></td>
+        <td class="<%= count %>" width="50" align="right"><%= v.qtd.to_f %></td>
+        <% if v.moeda.to_i == 0 %>
+        <td class="<%= count %>" width="35" align="center">U$</td>
+          <td  class="<%= count %>"width="80" align="right"><%= format_decimal( v.tot_us ) %></td>
+        <% else %>
+          <td class="<%= count %>" width="35" align="center"><span class="gs">Gs</span></td>
+          <td class="<%= count %>" width="80" align="right"><b><%= format_int( v.tot_gs ) %></b></td>
+        <% end %>
+  		</tr>
+      <% count += 1 %>
+    <% end %>
+    <input type="hidden" id="foco" value="-1">
+  </table>
+  </div>
+</div>

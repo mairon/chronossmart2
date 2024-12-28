@@ -1,0 +1,55 @@
+<%= form_tag update_individual_adelanto_cotas_path :method => :put do %>
+<table class="head_grid">
+  <tr>
+    <td width="60"><%= t('SHARE') %></td>
+    <td width="100" align="right"><%= t('VALUE') %></td>
+    <td width="280" align="center"><%= t('EXPIRATION') %></td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div" style="height: 250px">
+  <table>
+    <% tot = 0 %>
+    <% adelanto_cotas.each do |ac| %>
+      <%= fields_for "adelanto_cotas[]", ac do |f| %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td width="60"><%= ac.cota %></td>
+        <% if ac.moeda == 0 %>
+          <%= field_us '',f,:valor_us %>
+          <% tot += ac.valor_us %>
+        <% elsif ac.moeda == 2 %>
+          <%= field_us '',f,:valor_rs %>
+          <% tot += ac.valor_rs %>
+        <% else %>
+          <%= field_us '',f,:valor_gs %>
+          <% tot += ac.valor_gs %>
+        <% end %>
+        <td width="280" align="center"><%= f.date_select :vencimento %></td>
+        <td>
+          <% doc_prov = Proveedore.where(tabela: 'ADELANTO_COTAS', tabela_id: ac.id, liquidacao: 1 ).count(:id) %>
+          <% doc_clie =  Cliente.where(tabela: 'ADELANTO_COTAS', tabela_id: ac.id, liquidacao: 1 ).count(:id) %>
+          <% if doc_prov.to_i + doc_clie.to_i == 1 %>
+            <span class="gs">Doc ya aplicado</span>
+          <% else %>
+            <%= link_to '', ac, method: :delete, data: { confirm: 'Esta Seguro?' }, class: 'icon-trash' %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+    <% end %>
+    <%= hidden_field_tag :id, @adelanto.id %>
+  </table>
+</div>
+<table class="head_grid">
+  <tr>
+    <td width="200"  align="right"><b><%= number_to_currency( tot, :format=>' %n ', :separeitor => ',') %></b></td>
+  </tr>
+  <tr>
+    <td></td>
+  </tr>
+  <tr>
+    <td colspa="3"><%= submit_tag "Atulizar Cuotas" , :class => "btn btn-blue", :disable_with => "Aguarde..." %></td>
+  </tr>
+
+</table>
+<% end %>

@@ -1,0 +1,264 @@
+<% if params[:busca]["persona"].to_i == 5 or params[:busca]["persona"].to_i == 29 %>
+  <% dt = "F.DATA" %>
+<% else %>
+  <% dt = "F.DATA_CONCILIACAO" %>
+<% end %>
+
+
+<%
+sql = "SELECT
+             SUM(F.ENTRADA_REAL) AS ENTRADA_REAL
+        FROM FINANCAS F
+        INNER JOIN CONTAS C
+        ON C.ID = F.CONTA_ID
+        WHERE F.PERSONA_ID = #{params[:busca]["persona"]}
+        AND #{dt} < '#{params[:inicio].split("/").reverse.join("-")}'
+        AND F.TABELA = 'INGRESSOS'
+        AND F.ENTRADA_REAL > 0"
+
+  anterior_ingressos = Financa.find_by_sql(sql)
+
+%>
+
+
+
+<%
+sql = "SELECT
+             SUM(F.SAIDA_REAL) AS SAIDA_REAL
+        FROM FINANCAS F
+        INNER JOIN CONTAS C
+        ON C.ID = F.CONTA_ID
+        WHERE F.PERSONA_ID = #{params[:busca]["persona"]}
+        AND F.DATA < '#{params[:inicio].split("/").reverse.join("-")}'
+        AND F.SIGLA_PROC IN ('PGR   ', 'EG    ', 'IGMC   ') "
+
+  anterior_saidas = Financa.find_by_sql(sql)
+
+%>
+
+<%
+
+sql_m = " SELECT
+             SUM(F.VALOR_REAL) AS SAIDA_REAL
+        FROM INGRESSOS F
+        INNER JOIN CONTAS C
+        ON C.ID = F.CONTA_ID
+        WHERE F.PERSONA_ID = #{params[:busca]["persona"]}
+        AND F.OPERACAO = 1 AND F.DATA < '#{params[:inicio].split("/").reverse.join("-")}'
+"
+  anterior_modal_saidas = Financa.find_by_sql(sql_m)
+%>
+
+
+<% saldo_anterior = ( anterior_ingressos[0].entrada_real.to_f - (anterior_saidas[0].saida_real.to_f + anterior_modal_saidas[0].saida_real.to_f) ) %>
+
+
+
+<%
+sql = "SELECT F.DATA,
+             F.ID,
+             C.NOME AS CONTA_NOME,
+             F.ENTRADA_REAL,
+             F.CONCEPTO,
+             F.DATA,
+             F.DATA_CONCILIACAO,
+             F.TABELA_ID
+        FROM FINANCAS F
+        INNER JOIN CONTAS C
+        ON C.ID = F.CONTA_ID
+        WHERE F.PERSONA_ID = #{params[:busca]["persona"]}
+        AND #{dt} BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}'
+        AND F.TABELA = 'INGRESSOS'
+        AND F.ENTRADA_REAL > 0
+
+UNION ALL
+
+SELECT F.DATA,
+             F.ID,
+             C.NOME AS CONTA_NOME,
+             F.VALOR_REAL AS ENTRADA_REAL,
+             F.CONCEPTO,
+             F.DATA,
+             F.DATA AS DATA_CONCILIACAO,
+             F.ID AS TABELA_ID
+        FROM TRANSFERENCIA_CONTAS F
+        INNER JOIN CONTAS C
+        ON C.ID = F.DESTINO_ID
+        WHERE C.PERSONA_ID = #{params[:busca]["persona"]}
+        AND F.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}'
+        ORDER BY 1,2
+
+        "
+
+  ingressos = Financa.find_by_sql(sql)
+
+%>
+
+
+
+<%
+sql = "SELECT F.DATA,
+             F.ID,
+             C.NOME AS CONTA_NOME,
+             F.SAIDA_REAL,
+             F.CONCEPTO,
+             F.DATA_CONCILIACAO,
+             F.TITULO
+        FROM FINANCAS F
+        INNER JOIN CONTAS C
+        ON C.ID = F.CONTA_ID
+        WHERE F.PERSONA_ID = #{params[:busca]["persona"]}
+        AND F.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}'
+        AND F.SIGLA_PROC IN ('PGR   ', 'EG    ', 'IGMC   ')
+
+
+      UNION ALL
+
+      SELECT F.DATA,
+                   F.ID,
+                   C.NOME AS CONTA_NOME,
+                   F.VALOR_REAL AS SAIDA_REAL,
+                   F.CONCEPTO,
+                   F.DATA AS DATA_CONCILIACAO,
+                   '' AS TITULO
+              FROM TRANSFERENCIA_CONTAS F
+              INNER JOIN CONTAS C
+              ON C.ID = F.INGRESO_ID
+              WHERE C.PERSONA_ID = #{params[:busca]["persona"]}
+              AND F.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}'
+
+      UNION ALL
+
+      SELECT F.DATA,
+             F.ID,
+             C.NOME AS CONTA_NOME,
+             F.VALOR_REAL AS SAIDA_REAL,
+             F.CONCEPTO,
+             F.DATA_CONCILIACAO,
+             '' AS TITULO
+        FROM INGRESSOS F
+        INNER JOIN CONTAS C
+        ON C.ID = F.CONTA_ID
+        WHERE F.PERSONA_ID = #{params[:busca]["persona"]}
+        AND F.OPERACAO = 1 AND F.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}'
+
+        ORDER BY 1,2"
+
+  saidas = Financa.find_by_sql(sql)
+
+%>
+
+
+<style type="text/css">
+  table {
+    border-collapse: collapse;
+    font-size: 9px
+  }
+  .titulo {
+    font-size: 22px
+  }
+  td, tr {
+    border: 1px solid black;
+  }
+</style>
+
+
+
+<table>
+
+  <% tot_ingresso = 0 %>
+  <% ingressos.each do |i| %>
+    <% tot_ingresso += i.entrada_real.to_f %>
+  <% end %>
+
+  <% tot_saida = 0 %>
+  <% saidas.each do |i| %>
+    <% tot_saida += i.saida_real.to_f %>
+  <% end %>
+
+  <%
+    per = Persona.find_by_id(params[:busca]["persona"])
+  %>
+
+  <tr>
+    <td colspan="4">
+
+      <table>
+        <tr>
+          <td width="53"><%= per.nome %></td>
+          <td width="115">ENTRADAS</td>
+          <td width="70" align="right"><b> <%= format_decimal( tot_ingresso ) %></b></td>
+          <td width="265"></td>
+          <td width="60" align="center"><b> SALDO </b></td>
+          <td width="60" align="right"><%= format_decimal(saldo_anterior.to_f +  (tot_ingresso.to_f - tot_saida.to_f )) %></td>
+          <td width="218"></td>
+          <td width="103">SAÍDAS</td>
+          <td width="60" align="right"><b> <%= format_decimal( tot_saida ) %></b></td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td valign="top">
+      <table>
+        <tr>
+          <td width="center" height="30">Data Confir. Cliente</td>
+          <td>Banco Empresa</td>
+          <td align="right">Valor</td>
+          <td>Descrição</td>
+          <td align="center">Data Entrada Banco</td>
+        </tr>
+
+        <% ingressos.each do |i| %>
+          <tr class = "<%= cycle("cor1", "cor2") %>">
+            <% if params[:busca]["persona"].to_i == 5 or params[:busca]["persona"].to_i == 29 %>
+              <td width="40" align="center"><%= i.data.strftime("%d/%m/%y") %></td>
+            <% else %>
+              <td width="40" align="center"><%= i.data_conciliacao.strftime("%d/%m/%y") %></td>
+            <% end %>
+            <td width="100"><%= i.conta_nome %></td>
+            <td width="60" align="right"><%= format_decimal(i.entrada_real) %></td>
+            <td width="170"><%= i.tabela_id.to_s.rjust(6,'0')%>-<%= i.concepto %></td>
+            <td width="40" align="center"><%= i.data.strftime("%d/%m/%y") unless i.data.nil? %></td>
+          </tr>
+        <% end %>
+        <tr class="head">
+          <td></td>
+          <td></td>
+          <td align="right"><%= format_decimal(tot_ingresso) %></td>
+        </tr>
+      </table>
+    </td>
+    <td width="60" valign="top" style="padding-top: 20px; font-size: 8px;"> Valor anterior</td>
+    <td width="60" valign="top" style="padding-top: 20px; font-size: 8px;" align="right"><b><%= format_decimal(saldo_anterior) %></b></td>
+    <td valign="top">
+
+      <table>
+          <tr>
+            <td height="40">Data Pagamento</td>
+            <td>Descrição</td>
+            <td>Banco Empresa</td>
+            <td align="right">Valor</td>
+          </tr>
+
+          <% saidas.each do |i| %>
+
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="40" align="center"><%= i.data.strftime("%d/%m/%y") %></td>
+              <td width="150"><%= i.titulo %>-<%= i.concepto %></td>
+              <td width="100"><%= i.conta_nome %></td>
+              <td width="60" align="right"><%= format_decimal(i.saida_real) %></td>
+            </tr>
+          <% end %>
+          <tr class="head">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td align="right"><%= format_decimal(tot_saida) %></td>
+          </tr>
+      </table>
+    </td>
+  </tr>
+</table>

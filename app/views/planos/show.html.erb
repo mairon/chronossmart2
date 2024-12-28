@@ -1,0 +1,26 @@
+<ul class="tabs">
+    <li><a href="#tab1">Plan de Pago - [<%= t('EDITION') %>] Condición: <b><%= @plano.condicao %><b></a></li>
+  </ul>
+
+  <div class="tab_container">
+    <div id="tab1" class="tab_content">
+      <table>
+        <tr>
+         	<td>
+	        	<div class="group">
+	          	<%= render partial: "/plano_regras/index_regras", locals: {plano_regras: @plano.plano_regras} %>
+	          </div>
+	          <div class="group">
+	          	<%= render partial: "/plano_regras/new_regra", locals: {plano_regra: PlanoRegra.new(plano_id: @plano.id)} %>
+	          </div>
+					</td>
+         	</tr>
+         </table>
+      </div> 	
+    </div> 	
+    <div class="buttons">
+			<%= link_to 'Editar', edit_plano_path(@plano), :class => "button back" %>
+			<%= link_to 'Finalizar', planos_path, :class => "button next" %>
+    </div>
+  </div>
+

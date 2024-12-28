@@ -1,0 +1,357 @@
+﻿<% if @nota_credito.tipo == 0
+	 	tipo = "CONTADO"
+	 else
+	 	tipo = "CREDITO"
+	 end
+ %>
+
+
+<% if @nota_credito.moeda == 0
+	 	d = "DOLAR"
+	 else
+	 	d = "GUARANIES"
+	 end
+ %>
+<table>
+ <small style="float:right; margin-right: 30px"><%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc %>/<%= @ft.cod_proc %></small></table>
+<div class="border-principal" style="width:395px; ">
+	<table>
+		<tr>
+			<td width="60" align="right"><%= t('DATE') %>.:</td>
+			<td width="150"><%=l @ft.data.to_date.to_date %> - <%= Time.now.strftime('%H:%M') %></td>
+
+			<td colspan="3">Condición de Venta: <%= tipo %></td>
+		</tr>
+
+		<tr>
+			<td align="right">RUC/CI.:</td>
+			<td><b><%= @ft.ruc %></b></td>
+			<td align="right">Teléfono: </td>
+			<td><%= @ft.persona.telefone %></td>
+		</tr>
+		<tr>
+			<td align="right">Razon Social:</td>
+			<td width="571" colspan="4"><b><%= @ft.persona_id.to_s.rjust(6,'0') %>-<%= @ft.persona_nome %></b></td>
+		</tr>
+		<tr>
+
+			<td align="right">Dirección:</td>
+			<td colspan="4"><%= @nota_credito.persona.direcao unless @nota_credito.persona.cidade_id.blank? %> - <%= @nota_credito.persona.cidade.nome unless @nota_credito.persona.cidade_id.blank? %> </td>
+		</tr>
+	</table>
+</div>
+<br>
+<div class="border-principal" style="width:395px; height: 465px">
+	<table>
+		<tr>
+			<td valign="top">
+
+				<% if @nota_credito.operacao.to_i == 1 %>
+
+					<% count        = 1 %>
+					<% tottaxa0_gs  = 0 %>
+					<% tottaxa0_us  = 0 %>
+					<% tottaxa10_gs = 0 %>
+					<% tottaxa10_us = 0 %>
+					<% tottaxa05_gs = 0 %>
+					<% tottaxa05_us = 0 %>
+					<% tot_ps = 0 %>
+					<% teste = 0 %>
+					<% valor_antecipo = 0 %>
+
+					<table border="0"  cellspacing="0" cellpadding="0" value="top">
+						<tr class="head">
+							<td><%= t('CODE') %></td>
+							<td align="center">Ctd.</td>
+							<td>Descripción de la mercadoria y/o servico</td>
+							<td align="right">Unitario</td>
+							<td align="right">Total</td>
+							<td align="right">IVA</td>
+						</tr>
+						<tr>								
+						  <td width="30">			    
+						  </td>
+						  <td width="25"  align="center">
+						    1
+						  </td>
+			
+						  <td width="220">
+								<%= @nota_credito.concepto %>
+	    			  </td>
+	    			  		<td></td>
+							<td width="50" align="right">
+							<%= format_int(@ft.tot_gs) %>
+							</td>
+							<td width="60" align="right">10%</td>
+							<% tottaxa10_gs  = tottaxa10_gs + @ft.tot_gs %>
+	    			</tr>	
+					</table>
+				<% else %>
+
+				<table border="0"  cellspacing="0" cellpadding="0" value="top">
+					<tr class="head">
+						<td><%= t('CODE') %></td>
+						<td align="center">Ctd.</td>
+						<td>Descripción de la mercadoria y/o servico</td>
+						<td align="right">Unitario</td>
+						<td align="right">Total</td>
+						<td align="right">IVA</td>
+					</tr>
+
+					<tr>
+						<td colspan="8"><hr/></td>
+					</tr>
+					<% count        = 1 %>
+					<% tottaxa0_gs  = 0 %>
+					<% tottaxa0_us  = 0 %>
+					<% tottaxa10_gs = 0 %>
+					<% tottaxa10_us = 0 %>
+					<% tottaxa05_gs = 0 %>
+					<% tottaxa05_us = 0 %>
+					<% tot_ps = 0 %>
+					<% teste = 0 %>
+					<% valor_antecipo = 0 %>
+
+					<% @nota_credito_produtos.each do |prod| %>
+						<% tot_ps += (prod.produto.peso.to_f * prod.quantidade.to_f) %>
+						<tr>
+						  <td width="30">
+						    <%= prod.produto_id.to_s.rjust(6,'0') %>
+						  </td>
+						  <td width="25"  align="center">
+						    <%= prod.quantidade.to_i %>
+						  </td>
+
+						  <td width="220">
+							<%= truncate(prod.produto_nome, length: 50, omission: ' ') %>.
+				      </td>
+							<td width="50"  align="right">
+					      <% if @nota_credito.persona.isento == true %>
+									<% if @nota_credito.moeda.to_i == 0 %>
+										<%= format_decimal(prod.unitario_dolar) %>
+									<% else %>
+										<%= format_int(prod.unitario_guarani / 1.1 ) %>
+									<% end %>
+								<% else %>
+									<% if @nota_credito.moeda.to_i == 0 %>
+										<%= format_decimal(prod.unitario_dolar) %>
+									<% else %>
+										<%= format_int(prod.unitario_guarani) %>
+									<% end %>
+								<% end %>
+							</td>
+
+				      <% if @nota_credito.persona.isento == true %>
+								<td width="80" align="right">
+									<% if @nota_credito.moeda.to_i == 0 %>
+										<%= format_decimal(prod.quantidade.to_f * prod.unitario_dolar) %>
+									<% else %>
+										<%= format_int( prod.quantidade.to_f * (prod.unitario_guarani.to_f / 1.1 ) ) %>
+									<% end %>
+								</td>
+								<% tottaxa0_gs  = (tottaxa0_gs + (prod.total_guarani.to_f / 1.1 )) %>
+								<% tottaxa0_us  = tottaxa0_us + prod.total_dolar %>
+							<% else %>
+								<td width="80" align="right">
+									<% if @nota_credito.moeda.to_i == 0 %>
+										<%= format_decimal(prod.quantidade.to_f * prod.unitario_dolar) %>
+									<% else %>
+										<%= format_int( prod.quantidade.to_f * (prod.unitario_guarani.to_f) ) %>
+									<% end %>
+								</td>
+
+								<% if prod.taxa.to_i == 0 %>
+									<% tottaxa0_gs  = tottaxa0_gs + prod.total_guarani %>
+									<% tottaxa0_us  = tottaxa0_us + prod.total_dolar %>
+									<td width="25" align="right">0%</td>
+								<% end %>
+								<% if prod.taxa.to_i == 5 %>
+									<% tottaxa05_gs  = tottaxa05_gs + prod.total_guarani %>
+									<% tottaxa05_us  = tottaxa05_us + prod.total_dolar %>
+									<td width="25" align="right">5%</td>
+								<% end %>
+								<% if prod.taxa.to_i == 10 %>
+									<% tottaxa10_gs  = tottaxa10_gs + prod.total_guarani %>
+									<% tottaxa10_us  = tottaxa10_us + prod.total_dolar %>
+									<td width="25" align="right">10%</td>
+								<% end %>
+				      <% end %>
+						</tr>
+					<% end %>
+					
+				</table>
+			<% end %>
+
+			</td>
+		</tr>
+	</table>
+
+</div>
+<br>
+
+<!-- resultado !-->
+<div class="border-principal" style="width:395px;">
+	<table  border="0"  cellspacing="0" cellpadding="0" value="top">
+		<tr>
+			<td> 
+				<% docs = NotaCreditosDetalhe.where(nota_credito_id: @nota_credito.id).select('distinct(documento_numero), documento_numero_01,documento_numero_02') %>
+				REF. FACTS.: <% docs.each do |d| %>
+					<%= d.documento_numero_01 %>-<%= d.documento_numero_02 %>-<%= d.documento_numero %>,
+				<% end %>
+			</td>
+		</tr>
+		<tr>
+			
+			<td id="totales" align="right" width="250">Sub-Total:</td>
+			<td id="totales" align="right" width="74">
+			<% if @nota_credito.present? %>
+					<%= format_int((tottaxa10_gs.to_i + tottaxa05_gs.to_i + tottaxa0_gs.to_i) - valor_antecipo.to_i) %>
+			<% else %>
+				<% if @nota_credito.moeda.to_i == 0 %>
+					<%= format_int(tottaxa10_us.to_i + tottaxa05_us.to_i + tottaxa0_us.to_i) %>
+				<% else %>
+					<%= format_int(tottaxa10_gs.to_i + tottaxa05_gs.to_i + tottaxa0_gs.to_i) %>
+				<% end %>
+			<% end %>
+			</td>
+		</tr>
+		<tr>
+			
+			<td id="totales" align="right" width="250">Sub-Total Exentas:</td>
+			<td id="totales" align="right" width="74">
+				<% if @nota_credito.moeda.to_i == 0 %>
+					<%= format_decimal(tottaxa0_us) %>
+				<% else %>
+					<%= format_int(tottaxa0_gs) %>
+				<% end %>
+			</td>
+		</tr>
+		<tr>
+			
+
+			<td id="totales" align="right">Sub-Total gravadas 05%:</td>
+			<td id="totales" align="right" width="74">
+		  	<% if @nota_credito.moeda.to_i == 0 %>
+		  		<%= format_decimal(tottaxa05_us) %>
+		  	<% else %>
+		  		<%= format_int(tottaxa05_gs) %>
+		  	<% end %>
+			</td>
+		</tr>
+		<tr>
+			
+
+			<td id="totales" align="right">Sub-Total gravadas 10%:</td>
+			<td id="totales" align="right" width="74">
+			<% if @nota_credito.present? %>
+	  		<%= format_int(((tottaxa10_gs )) - valor_antecipo.to_i) %>
+		  <% else %>
+		  	<% if @nota_credito.moeda.to_i == 0 %>
+		  		<%= format_decimal(tottaxa10_us) %>
+		  	<% else %>
+		  		<%= format_int((tottaxa10_gs )) %>
+		  	<% end %>
+		  <% end %>
+			</td>
+		</tr>
+		<tr>
+			
+			<td id="totales" align="right">Total a Pagar:</td>
+			<td id="totales" align="right" width="74">
+				<%  tot_pagar = 0 %>
+
+				<b>
+					<% if @nota_credito.present? %>
+					<%= format_int((tottaxa10_gs.to_i + tottaxa05_gs.to_i + tottaxa0_gs.to_i) - valor_antecipo.to_i) %>
+					<%  tot_pagar = (tottaxa10_gs.to_i + tottaxa05_gs.to_i + tottaxa0_gs.to_i) - valor_antecipo.to_i %>
+			<% else %>
+				<% if @nota_credito.moeda.to_i == 0 %>
+					<%= format_int(tottaxa10_us.to_i + tottaxa05_us.to_i + tottaxa0_us.to_i) %>
+				<% else %>
+					<%= format_int(tottaxa10_gs.to_i + tottaxa05_gs.to_i + tottaxa0_gs.to_i) %>
+					<%  tot_pagar = tottaxa10_gs.to_i + tottaxa05_gs.to_i + tottaxa0_gs.to_i %>
+				<% end %>
+			<% end %>
+			  	</b>
+			</td>
+		</tr>
+			<tr>
+				<td colspan="3">
+				 <ELEMENT></ELEMENT>En Letras:
+			  	<% if @nota_credito.moeda.to_i == 0 %>
+						U$ <% real,cents= ("%.2f" % tot_pagar.to_f).to_s.split(/\./).map{ |m| m.to_i}
+					      valor_cents=Extenso.por_extenso(cents%100)
+					      valor_cents+= case cents.to_i%100
+					      when 0 then ""
+					      when 1 then " "
+					      when 2..99 then " "
+					      end %>
+						<%= I18n.with_locale(:es) { @produto_sum_dolar.to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS' %>
+			  	<% else %>
+			  	<%= I18n.with_locale(:es) { (format_int(tot_pagar.to_f)).gsub('.','').to_i.to_words.upcase } %> GUARANIES
+			  		
+			  	<% end %>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="7">
+					<table>
+						<tr>
+							<td width="230">
+								Liquidación del IVA: (05%)
+								<% if @ft.moeda == 0 %>
+									<%= number_to_currency((tottaxa05_us.to_f) / 21, :format=>' %n ', :precision => 0)%>
+								<% else %>
+									<%= number_to_currency((tottaxa05_gs.to_f) / 21, :format=>' %n ', :precision => 0)%>
+								<% end %>
+							</td>
+							<td width="230">
+								(10%)
+								
+									<% if @ft.moeda == 0 %>
+										<%= format_decimal(@produto_sum_iva10_us.to_f)%>
+									<% else %>
+							  		<%= format_int( (tottaxa10_gs.to_f) / 11 ) %>
+									<% end %>
+								
+							</td>
+							<td width="200">
+								Total del IVA:
+								<% if @nota_credito.present? %>
+						  		<%= format_int((tottaxa05_gs.to_f + (tottaxa10_gs.to_f  ) - valor_antecipo.to_f) / 11.to_f) %>
+								<% else %>
+									<% if @ft.moeda == 0 %>
+										<%= number_to_currency( ((tottaxa05_us.to_f) / 21) + ((tottaxa10_gs.to_f) / 11), :format=>' %n ', :precision => 0)%>
+									<% else %>
+							  		<%= format_int(tottaxa05_gs.to_f + (tottaxa10_gs.to_f  - (tottaxa10_gs.to_i )) / 11.to_f) %>
+									<% end %>
+								<% end %>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br>
+<table>
+			<tr>
+				<td>_____________________________</td>
+				<td>_____________________________</td>
+				<td>_____________________________</td>
+			</tr>
+			<tr>
+				<td align="center">Firma</td>
+				<td align="center">Aclaración</td>
+				<td align="center">CI</td>
+			</tr>
+		</table>
+	<% @ft.update_attributes(gv_10_gs: ((tottaxa10_gs.to_f) - valor_antecipo.to_f ),
+														gv_05_gs: tottaxa05_gs.to_f,
+														ex_gs: tottaxa0_gs.to_f )  %>
+
+	<% @ft.update_attributes(tot_gs: (( ( tottaxa0_gs.to_f + tottaxa10_gs.to_f + tottaxa05_gs.to_f )) - valor_antecipo.to_f)
+ )  %>
+
+	<% @ft.update_attributes(ip_10_gs: (((tottaxa10_gs.to_f) - valor_antecipo.to_f)  / 11),
+														ip_05_gs: (tottaxa05_gs.to_f / 21) ) %>

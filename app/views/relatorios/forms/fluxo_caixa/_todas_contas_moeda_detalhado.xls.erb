@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <ss:Styles>
+    <ss:Style ss:ID="1">
+      <ss:Font ss:Bold="1"/>
+      <ss:Alignment ss:Horizontal="Center"/>
+      <ss:Interior ss:Pattern="Gray25"/>
+    </ss:Style>
+    <ss:Style ss:ID="2">
+      <ss:Alignment ss:Horizontal="Center"/>
+    </ss:Style>
+  </ss:Styles>
+  <Worksheet ss:Name="Sheet1">
+    <Table>
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String"><B>Fluxo de Caixa</B></Data></Cell>
+        </B></Data></Cell>
+        <Cell><Data ss:Type="String"><B></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B></B></Data></Cell>
+      </Row>
+
+
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String"><B>Favorecido</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Descrição</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Doc.</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Entrada</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Saida</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Saldo</B></Data></Cell>
+      </Row>
+
+
+
+
+
+
+
+<% sql_saldo_cx = "SELECT C.NOME AS CONTA_NOME,
+										      SUM(F.ENTRADA_REAL - F.SAIDA_REAL) AS SALDO_RS
+										FROM FINANCAS F
+
+										INNER JOIN CONTAS C
+										ON C.ID = F.CONTA_ID
+										WHERE C.TIPO = 0 AND C.MOEDA = #{params[:moeda]} AND DATA < '#{params[:inicio].split("/").reverse.join("-")}'
+										GROUP BY 1"  
+
+saldo_cx = Financa.find_by_sql(sql_saldo_cx)
+%>
+
+
+<% sql_saldo_bc = "SELECT C.NOME AS CONTA_NOME,
+										      SUM(F.ENTRADA_REAL - F.SAIDA_REAL) AS SALDO_RS
+										FROM FINANCAS F
+
+										INNER JOIN CONTAS C
+										ON C.ID = F.CONTA_ID
+										WHERE C.TIPO = 1 AND F.CONCILIACAO = TRUE AND C.MOEDA = #{params[:moeda]} AND F.DATA < '#{params[:inicio].split("/").reverse.join("-")}'
+										GROUP BY 1" 
+	saldo_bc = Financa.find_by_sql(sql_saldo_bc)
+%>
+
+
+<% sql_mov_fc = "SELECT C.VENCIMENTO,
+						       C.PERSONA_NOME,
+							   C.DESCRICAO,
+							   C.DOCUMENTO_NUMERO_01,
+							   C.DOCUMENTO_NUMERO_02,
+							   C.DOCUMENTO_NUMERO,	   
+							   C.COTA,
+							   C.DIVIDA_REAL AS ENTRADA_REAL,
+							   0 AS SAIDA_REAL
+						FROM CLIENTES C 
+						WHERE C.LIQUIDACAO = 0 
+						AND C.MOEDA = #{params[:moeda]}
+						AND C.VENCIMENTO BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
+
+						UNION ALL 
+
+						SELECT C.VENCIMENTO,
+						       C.PERSONA_NOME,
+							   C.DESCRICAO,
+							   C.DOCUMENTO_NUMERO_01,
+							   C.DOCUMENTO_NUMERO_02,
+							   C.DOCUMENTO_NUMERO,	   
+							   C.COTA,
+							   0 AS ENTRADA_REAL,
+							   C.DIVIDA_REAL AS SAIDA_REAL
+						FROM PROVEEDORES C 
+						WHERE C.LIQUIDACAO = 0 
+						AND C.MOEDA = #{params[:moeda]}
+						AND C.VENCIMENTO BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
+
+						ORDER BY 1"  
+
+mov_fc = Financa.find_by_sql(sql_mov_fc)
+%>
+
+		<% saldo_ant = 0 %>
+		<% saldo_cx.each do |sc| %>
+			<Row>
+				<Cell><Data ss:Type="String"><%= sc.conta_nome %></Data></Cell>
+				<Cell><Data ss:Type="Number"><%= format_decimal(sc.saldo_rs) %></Data></Cell>
+				<% saldo_ant += sc.saldo_rs.to_f %>
+			</Row>
+		<% end %>
+
+		<% saldo_bc.each do |sb| %>
+			<Row>
+				<Cell><Data ss:Type="String"><%= sb.conta_nome %></Data></Cell>
+				<Cell><Data ss:Type="Number"><%= format_decimal(sb.saldo_rs) %></Data></Cell>
+				<% saldo_ant += sb.saldo_rs.to_f %>
+			</Row>
+		<% end %>
+		<Row>
+			<Cell><Data ss:Type="String">Saldo Conciliado (<%= Financa.where(conciliacao: true).last.updated_at.strftime("%d/%m/%y - %H:%M") %>)</Data></Cell>
+			<Cell><Data ss:Type="Number"><%= format_decimal(saldo_ant) %></Data></Cell>
+		</Row>
+
+	<% quebra = '' %>
+	<% sub_c = 0 %>
+	<% sub_d = 0 %>
+
+	<% tot_c = 0 %>
+	<% tot_d = 0 %>
+	<% saldo_rec = 0 %>
+
+	<% mov_fc.each do |mf| %>
+
+   	<% if quebra != mf.vencimento %>
+      <% if quebra != "" %>
+         <Row>
+         		<Cell><Data ss:Type="String">Saldo do dia</Data></Cell>
+         		<Cell><Data ss:Type="String"></Data></Cell>
+         		<Cell><Data ss:Type="String"></Data></Cell>
+						<Cell><Data ss:Type="Number"><%= format_decimal(sub_c) %></Data></Cell>
+						<Cell><Data ss:Type="Number"><%= format_decimal(sub_d) %></Data></Cell>
+						<Cell><Data ss:Type="Number"><%= format_decimal( saldo_rec) %></Data></Cell>
+
+						<% sub_c = 0 %>
+						<% sub_d = 0 %>
+         </Row>
+      	<% end %>
+				<Row>
+					<Cell><Data ss:Type="String"><% quebra = mf.vencimento %> <%= Date::DAYNAMES[mf.vencimento.wday].to_s %> - <%= mf.vencimento.to_date.strftime("%d/%m/%y") %></Data></Cell>
+				</Row>
+
+      <% end %>
+
+				<Row>
+					<Cell><Data ss:Type="String"><%= mf.persona_nome %></Data></Cell>
+					<Cell><Data ss:Type="String"><%= mf.descricao %></Data></Cell>
+					<Cell><Data ss:Type="String"><%= mf.documento_numero %> - <%= mf.cota %></Data></Cell>
+					<Cell><Data ss:Type="Number"><%= format_decimal(mf.entrada_real) %></Data></Cell>
+					<Cell><Data ss:Type="Number"><%= format_decimal(mf.saida_real) %></Data></Cell>
+					<Cell><Data ss:Type="Number"><%= format_decimal( saldo_rec = (mf.entrada_real.to_f + saldo_ant.to_f) - mf.saida_real.to_f) %></Data></Cell>
+
+					<% sub_c += mf.entrada_real.to_f %>
+					<% sub_d += mf.saida_real.to_f %>
+				</Row>
+			<% end %>
+       <Row>
+       		<Cell><Data ss:Type="String">Saldo do dia</Data></Cell>
+       		<Cell><Data ss:Type="String"></Data></Cell>
+       		<Cell><Data ss:Type="String"></Data></Cell>
+					<Cell><Data ss:Type="Number"><%= format_decimal(sub_c) %></Data></Cell>
+					<Cell><Data ss:Type="Number"><%= format_decimal(sub_d) %></Data></Cell>
+					<Cell><Data ss:Type="Number"><%= format_decimal(saldo_rec) %></Data></Cell>
+
+					<% sub_c = 0 %>
+					<% sub_d = 0 %>
+       </Row>
+    </Table>
+  </Worksheet>
+</Workbook>

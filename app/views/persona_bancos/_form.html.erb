@@ -1,0 +1,34 @@
+<%= form_for(persona_banco) do |f| %>
+<div class="row panel-modal-body">
+  <%= f.hidden_field :persona_id %>
+  <div class="row">
+    <div class="col-md-4">
+      <label>Banco</label>
+      <%= f.collection_select :banco_id, Persona.all( :select => ' id, nome',
+      :conditions => ["tipo_banco = 1"], :order  => '2' ), :id, :nome, {:prompt => "Selecione lo Banco"} %>
+    </div>
+    <div class="col-md-4">
+      <label>Cuenta</label>
+      <%= f.text_field :conta, class: 'panel-field' %>
+    </div>
+    <div class="col-md-4">
+      <%= field_us_label 'Ahorro avista',f,:ahorro_avista %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4">
+      <%= field_us_label 'CDA',f,:cda %>
+    </div>
+
+    <div class="col-md-4">
+      <label>Oficial Conta</label>
+      <%= f.text_field :oficial_conta, class: 'panel-field' %>
+    </div>
+    <div class="col-md-4">
+      <label>.</label>
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    </div>
+  </div>
+</div>
+<% end %>

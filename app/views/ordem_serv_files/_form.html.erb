@@ -1,0 +1,23 @@
+<div class="group">
+<%= form_for(ordem_serv_file, :html => { :multipart => true }) do |f| %>
+  <%= f.hidden_field :ordem_serv_id %>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Descriptión</label>
+      <%= f.text_field :nome %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Img</label>
+      <%= f.file_field :picture, align: 'center' %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <br>
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    </div>
+  </div>
+  <% end %>
+</div>

@@ -1,0 +1,101 @@
+  <div class="group">
+    <%= form_tag dinamic_busca_venda_produto_produtos_path, :method => "get" do %>
+    <select name="tipo" id="tipo">
+      <option>REFERENCIA</option>
+      <option>DESCRIPCION</option>
+      <option>BARRA</option>
+    </select>
+      <input id         ="busca"
+             name       ="busca"
+             type       ="text"
+             size       ="40"
+             value="<%= params[:busca]%>"
+             autofocus/>
+
+      <input type   ="button"
+             id     ="button"
+             class="button_info"
+             onclick="pesquisa(document.getElementById('busca').value)"
+             value  ="Buscar"/>
+
+    <% end %>
+    <hr/>
+</div>
+
+
+
+    <%= hidden_field_tag :unidade, params[:unidade] %>
+    <%= hidden_field_tag :conferencia_id, @conferencia.id %>
+
+<script language="javascript">
+   function pesquisa(valor){
+      tipo = document.getElementById('tipo').value
+      var tabela_preco = document.getElementById('tabela_preco').value
+      var unidade  = document.getElementById('unidade').value
+      var colecao  = document.getElementById('colecao').value
+      var tabela_preco = document.getElementById('tabela_preco').value
+      var presupuesto = document.getElementById('conferencia_id').value
+
+      //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+      location.href="/conferencias/"+presupuesto+"/resultado_grade?cliente="+tabela_preco+"&tipo="+tipo+"&colecao="+colecao+"&busca="+valor+"&unidade="+unidade+"";
+
+   }
+</script>
+<table class="head_grid">
+  <tr>
+    <td width="85" align="right"><b>Cantidad</b></td>
+    <td width="50" align="center">Stock</td>
+    <td width="50">Tamanho</td>
+    <td width="345">Color</td>
+    <td width="120">Ref.</td>
+    <td width="445">Producto</td>
+
+  </tr>
+</table>
+
+<div class="rolagem" id="div">
+<%= form_tag "/conferencias/#{params[:id]}/add_produtos", method: 'post' do %>
+  <table>
+    <% count  = 0 %>
+    <% qtd    = 0 %>
+    <% @produtos.each do |p| %>
+      <% presu_count =ConferenciaProduto.count(:conditions => ["produtos_grade_id = #{p.produtos_grade_id} and conferencia_id = ?",@conferencia.id]) %>
+      <% if presu_count.to_i > 0 %>
+        <% find_presu = ConferenciaProduto.count(:conditions => ["produtos_grade_id = #{p.produtos_grade_id} and conferencia_id = ?",@conferencia.id]) %>
+        <% qtd = find_presu %>
+      <% else %>
+        <% qtd = 0 %>
+      <% end %>
+      <%= hidden_field_tag "fields[#{count}][conferencia_id]", @conferencia.id %>
+      <%= hidden_field_tag "fields[#{count}][produto_id]", p.produto_id %>
+      <%= hidden_field_tag "fields[#{count}][produtos_grade_id]", p.produtos_grade_id %>
+      <%= hidden_field_tag "fields[#{count}][fabricante_cod]", p.fabricante_cod %>
+      <%= hidden_field_tag "fields[#{count}][cor_id]", p.cor_id %>
+      <%= hidden_field_tag "fields[#{count}][tamanho_id]", p.tamanho_id %>
+      <%= hidden_field_tag "fields[#{count}][cor_nome]", p.cor_nome %>
+      <%= hidden_field_tag "fields[#{count}][tamanho_nome]", p.tamanho_nome %>
+      <%= hidden_field_tag "fields[#{count}][produto_nome]", p.nome %>
+
+      <tr class = "<%= cycle( "cor1", "cor2" )%>"
+          onMouseOver="javascript:this.style.backgroundColor='#949494'"
+          onMouseOut="javascript:this.style.backgroundColor=''">
+          <td> <%= text_field_tag "fields[#{count}][quantidade]","#{qtd.to_i}", size: 10, dir: "rtl"%> </td>
+          <td width="50" align="center"><b> <%= p.stock %></b> </td>
+        <td width="50" align="center"><b> <%= p.tamanho_nome %></b> </td>
+        <td width="350">
+          <div style="background-color: #<%= p.cod_cor %>; width: 10px;height: 10px;border: 2px solid black;float:left;margin: 3px;"></div>
+          <%= p.cor_nome %>
+       </td>
+        <td width="120"> <%= p.fabricante_cod %> </td>
+        <td width="450"> <%= p.nome %> </td>
+      </tr>
+      <% count += 1 %>
+    <% end %>
+  </table>
+</div>
+<%= submit_tag "Agregar ao Pedido",:disable_with => "Aguarde...", :class => "button" %>
+<%= link_to t('BACK'), conferencia_path(@conferencia.id), :class => "button back" %>
+<% end %>
+<input type="hidden" id="foco" value="-1">
+

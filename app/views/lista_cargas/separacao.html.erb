@@ -1,0 +1,127 @@
+<body onload="window.print()">
+
+  <style type="text/css">
+    body {
+      margin: 0px;
+      font-family: arial;
+      font-size:8px;
+    }
+
+    td{
+      font-family: arial;
+      font-size:9px;
+      letter-spacing:2px
+    } 
+
+  </style>
+
+
+<table>
+    <tr>
+      <td colspan='3' align="center">
+      +
+        <% 62.times do |t| %>
+          -
+        <% end %>      
+      +
+      </td>
+    </tr>
+    <tr>
+      <td style="padding-left:7px;letter-spacing:1px">| 
+      <%= current_unidade.nome_sys %>
+        <%= @lista_carga.data_emisao.strftime("%d")%> de <%= l @lista_carga.data_emisao, :format => :mes %>  de <%= @lista_carga.data_emisao.strftime("%Y")%> | Horas: <%= @lista_carga.created_at.strftime("%H:%M")%>
+
+
+      </td>
+      <td align="right" style="padding-right:7px;letter-spacing:1px">       
+        Separación
+        Nº: <%= @lista_carga.id.to_s.rjust(6,'0') %>
+        |
+      </td>
+    </tr>
+    <tr>
+       <td colspan="8">
+         <table>
+            <tr>
+              <td colspan='8' align="center">
+              +
+                <% 62.times do |t| %>
+                  -
+                <% end %>      
+              +
+              </td>
+            </tr>
+
+            <tr>
+              <td width="440" style="padding-left:4px;letter-spacing:1px;">| Cliente: <%= @pedido.persona.nome %> - Pedido:  <%= @pedido.id.to_s.rjust(6,'0') %></td>
+            </tr>
+          <tr>
+            <td colspan='7' align="center">
+            +
+              <% 62.times do |t| %>
+                -
+              <% end %>
+            +
+            </td>
+            <tr>
+              <td width="440" style="padding-left:4px;letter-spacing:1px;">| Iten</td>
+              <td width="70" style="letter-spacing:1px" align="right">Cantidad |</td>
+            </tr>
+          <tr>
+            <td colspan='7' align="center">
+            +
+              <% 62.times do |t| %>
+                -
+              <% end %>
+            +
+            </td>
+          </tr>
+
+            <% qtd    = 0 %>
+            <% tot_us = 0 %>
+            <% tot_gs = 0 %>
+            <% tot_rs = 0 %>
+            <% @lista_carga_produtos.each do |pc|%>
+            <tr>
+              <td width="440" style="padding-left:4px;letter-spacing:1px;">| <%= pc.produto.nome %></td>              
+              <td width="70" style="letter-spacing:1px" align="right"><%= pc.quantidade.to_f %> |</td>
+            </tr>
+            <% qtd += pc.quantidade.to_f %>
+           <% end %>
+          <tr>
+            <td colspan='8' align="center" >
+            +
+              <% 62.times do |t| %>
+                -
+              <% end %>
+            +
+            </td>
+          </tr>
+
+          <tr>
+          	<td> |</td>
+            <td style="padding-left:4px;"  align="right">&nbsp&nbsp&nbsp&nbsp<%= qtd %> |</td>
+          </tr>
+          <tr>
+            <td colspan='8' align="center" >
+            +
+              <% 62.times do |t| %>
+                -
+              <% end %>
+            +
+            </td>
+          </tr>
+
+         </table>
+       </td>
+    </tr>
+</table>
+
+
+<script>
+  document.onkeydown=function(e){
+    if(e.which == 27)
+      self.close();
+  }
+</script>
+

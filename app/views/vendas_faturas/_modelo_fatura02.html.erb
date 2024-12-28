@@ -1,0 +1,225 @@
+
+<!--COMBUSTIVEL-FRONTEIRAS!-->
+<body  onload="print()">
+	<% if @venda.tipo == 0
+	    	tipo_venda = "CONTADO"
+		  else
+		    tipo_venda = "CREDITO"
+		  end
+	%>
+
+			<table align="left"  valign="top"  border="0" >
+
+				<tr>
+					<td colspan="5" height="24" width="1300" align="right" valign="bottom" >
+					
+					</td>
+				</tr>				
+				<tr>
+					<td style="font-family:Arial; font-size:8px; border-collapse: collapse;margin:0;padding:0;" align="left" colspan="5">
+					<% 30.times do |t| %>
+						&nbsp
+					<% end %>
+
+					<%= @venda.data.strftime("%d") %>
+					<% 20.times do |t| %>
+						&nbsp
+					<% end %>
+					<span style="letter-spacing:1px;">
+						<%= l @venda.data, :format => :mes %>
+					</span>
+					<% 55.times do |t| %>
+						&nbsp
+					<% end %>
+					<%= @venda.data.strftime("%Y") %>
+					<% 2.times do |t| %>
+						&nbsp
+					<% end %>
+					<%= Time.now.strftime('%H:%M') %>
+
+<span style="font-family:Arial;font-size:7px;">
+						<%= @vendas_fatura.documento_numero_01 %>-<%= @vendas_fatura.documento_numero_02%>-<%= @vendas_fatura.documento_numero %>/<%= @venda.id %> 
+						</span>
+				</td>
+				</tr>
+				<tr>
+					<td width="50"  style="margin:0;padding:0;"></td>
+					<td style="font-family:Arial; font-size:8px; border-collapse: collapse;margin:0;padding:0; margin-top: -2px; position: absolute;letter-spacing:1px;"  colspan="2" align="left">
+					<% 8.times do |t| %>
+						&nbsp
+					<% end %>
+						<%= @vendas_fatura.nome_fatura %>
+					</td>
+
+					<td style="font-family:Arial,Lucida Console;font-size:8px;border-collapse: collapse;margin:0;padding:0; margin-left: 460px; margin-top: -3px; position: absolute;letter-spacing:1px;" align="left" width="100">
+						<%= @vendas_fatura.ruc_fatura %>
+					</td>
+				</tr>				
+				<tr>
+					<td></td>
+					
+					<td style="letter-spacing:1px;font-family:Arial; font-size:8px; border-collapse: collapse;margin-top: 3px; position: absolute;" width="560"  align="left" >
+						<% 8.times do |t| %>
+							&nbsp
+						<% end %>
+							<%= @vendas_fatura.venda.persona.direcao %>
+						</div>
+						
+					</td>
+				</tr>
+				<tr>
+					<td  width="50"></td>
+					<td colspan="2" align="left" >
+					<% 5.times do |t| %>
+						&nbsp
+					<% end %>
+					</td>
+
+					<td style="letter-spacing:1px;font-family:Arial; font-size:8px;margin:0;padding:0;margin-left: -70px; margin-top: 5px; position: absolute;" align="left" >
+						<%= tipo_venda %>
+					</td>
+				</tr>
+
+				<tr height="105" valign="top" >
+					<td colspan="5">
+						<table  style="letter-spacing:1px;font-family:Arial; font-size:8px;margin:0;padding:0;margin-top:5px" border="0" cellspacing="0" cellpadding="0">
+							<% count        = 1 %>
+							<% tottaxa0_gs  = 0 %>
+							<% tottaxa0_us  = 0 %>
+							<% tottaxa10_gs = 0 %>
+							<% tottaxa10_us = 0 %>
+							<% tottaxa05_gs = 0 %>
+							<% tottaxa05_us = 0 %>
+							<% @venda_produto.each do |produto| %>
+							<tr> 								
+								<td width="120" align="right"><%= produto.produto_id %></td>
+								<td width="90"  align="right" style="letter-spacing:1px;">		
+									<%= produto.quantidade.to_f %>
+								</td>
+								<td width="550" align="left">
+								<% 9.times do |t| %>&nbsp<% end %>
+								<%= produto.produto_nome %></td>
+
+								<% if @venda.moeda == 0 %>
+									<td width="140"  align="right"><%= format_decimal(produto.unitario_dolar) %></td>
+								<% else %>
+									<td width="140"  align="right" style="letter-spacing:1px"><%= format_int(produto.unitario_guarani) %></td>
+								<% end %>
+
+								<% if produto.taxa.to_i == 0 %>
+
+									<% if @venda.moeda == 0 %>
+										<td width="140" align="right"><%= format_decimal(produto.quantidade.to_f * produto.unitario_dolar) %></td>
+									<% else %>
+										<td width="140" align="right" style="letter-spacing:1px"><%= format_int(produto.quantidade.to_f * produto.unitario_guarani) %></td>
+									<% end %>
+
+									<td width="140" align="right">0</td>
+									<td width="140" align="right">0</td>
+									<% tottaxa0_gs  = tottaxa0_gs + produto.total_guarani %>
+									<% tottaxa0_us  = tottaxa0_us + produto.total_dolar %>
+
+								<% elsif produto.taxa.to_i == 5 %>
+
+								<td width="140" align="right">0</td>
+
+								<% if @venda.moeda == 0 %>
+									<td width="140" align="right"><%= format_decimal(produto.total_dolar) %></td>
+								<% else %>
+									<td width="140" align="right" style="letter-spacing:1px"><%= format_int(produto.total_guarani) %></td>
+								<% end %>
+								
+								<td width="140" align="right">0</td>
+
+								<% tottaxa05_gs  = tottaxa05_gs + produto.total_guarani %>
+								<% tottaxa05_us  = tottaxa05_us + produto.total_dolar %>
+
+								<% elsif produto.taxa.to_i == 10 %>
+									<td width="140" align="right">0</td>
+									<td width="140" align="right">0</td>
+
+									<% if @venda.moeda == 0 %>
+										<td width="140" align="right"><%= format_decimal(produto.total_dolar) %></td>
+									<% else %>
+										<td width="140" align="right" style="letter-spacing:1px"><%= format_int(produto.total_guarani) %></td>
+									<% end %>
+
+								<% tottaxa10_gs  = tottaxa10_gs + produto.total_guarani %>
+								<% tottaxa10_us  = tottaxa10_us + produto.total_dolar %>
+
+								<% end %>
+							</tr>
+							<% count += 8 %>
+							<% end %>
+							</table>
+							</td>
+						</tr>					
+
+<!--RESULTADOS !-->
+
+				<tr style="margin:0;padding:0;margin-left:-2px; margin-top: -4px; position: absolute;">
+					<td style="font-family:Arial;font-size: 8px" colspan="5" align="right"  width="1255">					
+						<table style="font-size:7px;">
+						<% if @venda.moeda == 0 %>
+							<tr>
+								<td style="font-family:Arial;font-size: 8px" width="810"></td>
+								<td style="font-family:Arial;font-size: 8px" colspan="4"></td>
+                  <td style="font-family:Arial;font-size: 8px;letter-spacing:1px" width="140" align="right"><%= format_decimal(tottaxa0_us) %></td>
+                  <td style="font-family:Arial;font-size: 8px;letter-spacing:1px" width="140" align="right"><%= format_decimal(tottaxa05_us) %></td>
+                  <td style="font-family:Arial;font-size: 8px;letter-spacing:1px" width="140" align="right"><%= format_decimal(tottaxa10_us) %></td>
+				        </tr>
+				      <% else %>
+							<tr>
+								<td style="font-family:Arial;font-size: 8px;letter-spacing:1px" width="950"></td>
+            		<td style="font-family:Arial;font-size: 8px;letter-spacing:1px" width="140" align="right"><%= format_int(tottaxa0_gs) %></td>
+                <td style="font-family:Arial;font-size: 8px;letter-spacing:1px" width="140" align="right"><%= format_int(tottaxa05_gs) %></td>
+                <td style="font-family:Arial;font-size: 8px;letter-spacing:1px" width="140" align="right"><%= format_int(tottaxa10_gs) %></td>
+				      </tr>
+				     	<% end %>							
+						</table>
+					</td>
+				</tr>
+
+				<tr style="letter-spacing:1px;margin:0;padding:0;margin-left:-2px; margin-top: 7px; position: absolute;">
+					<td style="font-family:Arial;font-size: 8px" align="left" colspan="5">
+					<% 40.times do |t| %>
+						&nbsp
+					<% end %>
+
+					<%= number_to_currency(@produto_sum_iva05_gs.to_f, :format=>' %n ', :precision => 0)%>
+					<% 35.times do |t| %>
+						&nbsp
+					<% end %>
+					<%= number_to_currency(@produto_sum_iva10_gs.to_f, :format=>' %n ', :precision => 0)%>
+					<% 40.times do |t| %>
+						&nbsp
+					<% end %>
+					<%= number_to_currency(@produto_sum_iva05_gs.to_f + @produto_sum_iva10_gs.to_f, :format=>' %n ', :precision => 0)%>
+				</tr>
+				<tr style="letter-spacing:1px;margin:0;padding:0;margin-left:-2px; margin-top: 16px; position: absolute;">
+					<td style="font-family:Arial;font-size: 6px" colspan="5" align="left"  width="1300">					
+						<% 20.times do |t| %>
+							&nbsp
+						<% end %>
+						<%= I18n.with_locale(:es) { @produto_sum_guarani.to_i.to_words.upcase }%>
+					</td>
+					<td style="font-family:Arial;font-size: 7px;letter-spacing:1px;" width="200" valign="top" align="right"><b> TOTAL Gs<%= number_to_currency(@produto_sum_guarani.to_f, :format=>' %n ', :precision => 0)%></b></td>
+				</tr>
+				<tr style="letter-spacing:1px;margin:0;padding:0;margin-left:-2px; margin-top: 46px; position: absolute;">
+					<td style="font-family:Arial;font-size: 7px" colspan="5" align="left"  width="1300">					
+						<% 33.times do |t| %>
+							&nbsp
+						<% end %>
+						CHAPA: <%= @venda.chapa %> <%= @venda.rodado.placa unless @venda.rodado.blank? %> 
+						<% 33.times do |t| %>
+							&nbsp
+						<% end %>
+						KM: <%= @venda.km %>
+					</td>
+					<td style="letter-spacing:1px;font-family:Arial;font-size: 7px" width="200" valign="top" align="right"></td>
+				</tr>
+
+
+			</table>
+</body>
+

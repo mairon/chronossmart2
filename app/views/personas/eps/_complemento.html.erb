@@ -1,0 +1,76 @@
+<div class="panel">
+	<div class="panel-body">
+		<div class="row">
+			<div class="col-md-10">
+				<h3>Datos para CRM</h3>
+				<label>Cumpleaño</label>
+				<b><%= @persona.data_nascimento.to_date.strftime("%d/%m/%Y") unless @persona.data_nascimento.blank? %></b>
+			</div>
+			<div class="col-md-2">
+  			<a class="modalButton-frma panel-icon-right" data-toggle="modal" data-width="500" data-height="781" data-target="#myiframe">
+  				<%= image_tag("icon-edit.png", width: '13') %>
+  			</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel"><%= t('DATE') %> Cumpleaño</h4>
+      </div>
+      <div class="modal-body">
+				<%= form_for(@persona) do |f| %>
+					<div class="row panel-modal-body">
+						<div class="col-md-12">
+	            <label>Ciudad</label>
+	            <%= f.date_select :data_nascimento, :start_year => 1960, class: 'panel-field' %>
+						</div>
+
+	         <div class="col-md-12">
+	         		<br>
+	            <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+	         </div>
+
+					</div>
+
+      	<% end %>
+      </div>      
+    </div>
+  </div>
+</div>
+
+<script>
+  
+( function($) {
+  
+function iframeModalOpen(){
+
+    $('.acao').on('click', function(e) {
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+      
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+      
+      // stampiamo i nostri dati nell'iframe
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#myiframe').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+    });
+  }
+  
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+  
+  } ) ( jQuery );
+
+</script>

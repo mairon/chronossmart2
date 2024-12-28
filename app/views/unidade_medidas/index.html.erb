@@ -1,0 +1,29 @@
+<h1 id="header">Unidad Medidas</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_unidade_medida_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="50">Laz.</td>
+    <td width="300">Descripcíon</td>
+    <td width="100">Sigla</td>
+    <td width="100"><%= t('UNIT') %></td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @unidade_medidas.each do |unidade_medida| %>
+      <tr class = "<%= cycle("cor1", "cor2")%>">
+        <td width="50"><%= unidade_medida.id.to_s.rjust(6,'0') %></td>
+        <td width="300"><%= unidade_medida.nome %></td>
+        <td width="100"><%= unidade_medida.sigla %></td>
+        <td width="100" align="right"><%= unidade_medida.unidade %></td>
+        <td><%= link_to 'Editar', edit_unidade_medida_path(unidade_medida) %></td>
+        <td><%= link_to t('DELETE'), unidade_medida, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

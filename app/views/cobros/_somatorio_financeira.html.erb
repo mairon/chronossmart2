@@ -1,0 +1,137 @@
+<div class="panel">
+  <div  class="panel-body">
+    <% if @cobro.moeda.to_i == 0 %>  
+      <table>
+        <tr>
+          <td align="right"><%= t('SUM') %> de Titulos (+):</td>
+          <td align="right" width="70"><%= format_decimal( @tot_cobro_us.to_f ) %></td>
+        </tr>
+        <tr>
+          <td align="right"><%= t('DISCOUNT') %> (-):</td>
+          <td align="right"><%= format_decimal( @tot_des_us.to_f ) %></td>
+        </tr>
+        <tr>
+          <td align="right"><%= t('INTEREST') %> (+):</td>
+          <td align="right"><%= format_decimal( @tot_int_us.to_f ) %></td>
+        </tr>
+        <tr>
+          <td align="right"><%= t('ADVANCE') %> Aplicados (-):</td>
+          <td align="right"><%= format_decimal( @tot_ade_us.to_f ) %></td>
+        </tr>
+        <tr>
+          <td align="right"><b>Total Cobrar:</b></td>
+          <td align="right"><strong><%= format_decimal( @fecha_result_us.to_f ) %></strong></td>
+        </tr>
+      </table>
+      <% elsif @cobro.moeda == 1 %>
+        <table>
+          <tr>
+            <td align="right"><%= t('SUM') %> de Titulos (+):</td>
+            <td align="right" width="70"><%= format_int( @tot_cobro_gs.to_f ) %></td>
+          </tr>
+          <tr>
+            <td align="right"><%= t('DISCOUNT') %> (-):</td>
+            <td align="right"><%= format_int( @tot_des_gs.to_f ) %></td>
+          </tr>
+          <tr>
+            <td align="right"><%= t('INTERES') %> (+):</td>
+            <td align="right"><%= format_int( @tot_int_gs.to_f ) %></td>
+          </tr>
+          <tr>
+            <td align="right"><strong>Total Cobrar:</strong></td>
+            <td align="right"><strong><%= format_int( @fecha_result_gs.to_f ) %></strong></td>
+          </tr>
+        </table>
+
+      <% else %>
+
+        <table>
+          <tr>
+            <td align="right"><%= t('SUM') %> de Titulos (+):</td>
+            <td align="right" width="70"><%= format_decimal( @tot_cobro_rs.to_f ) %></td>
+          </tr>
+          <tr>
+            <td align="right"><%= t('DISCOUNT') %> (-):</td>
+            <td align="right"><%= format_decimal( @tot_desc_rs.to_f ) %></td>
+          </tr>
+          <tr>
+            <td align="right"><%= t('INTERES') %> (+):</td>
+            <td align="right"><%= format_decimal( @tot_int_rs.to_f ) %></td>
+          </tr>
+          <tr>
+            <td align="right"><%= t('ADVANCE') %> Aplicados (-):</td>
+            <td align="right"><%= format_decimal( @tot_ade_rs.to_f ) %></td>
+          </tr>
+          <tr>
+            <td align="right"><b>Total Cobrar:</b></td>
+            <td align="right"><strong><%= format_decimal( @fecha_result_rs.to_f ) %></strong></td>
+          </tr>
+        </table>
+      <% end %>
+    </div>
+  </div>
+  <div class="panel">
+    <div  class="panel-body">
+        <legend>Factura</legend>
+        <table class="head_grid">
+          <tr>
+            <td width="100"><%= t('DOC') %></td>
+            <td width="70" align="right"><%= t('VALUE') %></td>
+          </tr>
+        </table>
+
+        <div class="rolagem" dir="div" style="height: 100px">
+          <table>
+            <% @fts.each do |cobros_nc| %>
+            <% if cobros_nc.status == 2 %>
+              <% color = '#fa3e40' %>
+            <% end %>
+
+              <tr class = "<%= cycle("cor1", "cor2") %>">
+                <td  width="100"  bgcolor="<%=color%>"><%= cobros_nc.doc_01 %>.<%= cobros_nc.doc_02 %>.<%= cobros_nc.doc %></td>
+                <td  width="70"  align="right"  bgcolor="<%=color%>"><%= format_int(cobros_nc.tot_gs) %></td>
+                <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(cobros_nc) %></td>
+                <td><%= link_to 'Impri.', "#",  :onclick => "ComprovanteFC(#{cobros_nc.id})" %></td>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+        <%= render partial: "form_fiscals/attr_forms/cobro_update_fc" %>           
+    </div>
+  </div>
+
+  <div class="panel">
+    <div  class="panel-body">
+        <legend>Recibo de Dinero</legend>
+        <table class="head_grid" style="font-size: 10px">
+          <tr>
+            <td width="80"><%= t('DOC') %></td>
+            <td width="50" align="right"><%= t('VALUE') %></td>
+          </tr>
+        </table>
+
+        <div class="rolagem" dir="div" style="height: 100px; font-size: 10px">
+          <table>
+            <% @rds.each do |cobros_nc| %>
+            <% if cobros_nc.status == 2 %>
+              <% color = 'background-color: #fa3e40; color: #fff' %>
+            <% end %>
+
+              <tr class = "<%= cycle("cor1", "cor2") %>">
+                <td  width="100"  style="<%=color%>"><%= cobros_nc.doc_01 %>.<%= cobros_nc.doc_02 %>.<%= cobros_nc.doc %></td>
+                <td  width="70"  align="right"  style="<%=color%>"><%= format_int(cobros_nc.tot_gs) %></td>
+                <% if cobros_nc.status == 1 %>
+                  <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(cobros_nc, status: '2'), style: 'text-decoration: underline' %></td>          
+
+                  <td>
+                    <%= link_to 'Impri.', "#",  :onclick => "ComprovanteRecibo()", style: 'text-decoration: underline' %>
+                  </td>
+                <% end %>
+                <td  style="<%=color %>"><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(cobros_nc, status: '0'), style: "#{color}; text-decoration: underline" %></td>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+        <%= render partial: "form_fiscals/attr_forms/cobro_update_rd" %>           
+    </div>
+  </div>

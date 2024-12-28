@@ -1,0 +1,257 @@
+<%= form_tag gerar_raterio_compras_produtos_path :method => :put do %>
+<h1 align="right" id="header">Prorateo</h1>
+<ul class="tabs">
+   <li><a href="#tab1">Prorateo </a></li>
+</ul>
+<div class="tab_container">
+   <br/>
+   <table class="head_grid">
+      <tr>
+        <td width="30"></td>
+        <td width="350">Producto</td>
+        <td width="50" align="center">Cantidad</td>
+        <td width="80" align="center">Costo Mecaderia </td>
+        <td width="80" align="center">Total Mecaderia </td>
+        <td width="80" align="right"> % </td>
+        <td width="80" align="right">Seguro</td>
+        <td width="80" align="right">Aduana (<%= format_decimal(@compra.aduana_dolar) %>)</td>
+        <td width="80" align="right">TX ENvio (<%= format_decimal(@compra.frete_dolar) %>)</td>
+        <td width="80" align="right">Despacho (<%= format_decimal(@compra.despacho_dolar) %>)</td>
+        <td width="80" align="right">Comisión (<%= format_decimal(@compra.outros_dolar) %>)</td>
+        <td width="80" align="center">Costo Rateado </td>
+        <td width="80" align="center">Total Rateado</td>
+      </tr>
+   </table>
+
+   <div class="rolagem" dir="div">
+
+      <table>
+         <% indice         = 1  %>
+         <% quant          = 0  %>
+         <% custous        = 0  %>
+         <% totivad        = 0  %>
+         <% totprodus      = 0  %>
+         <% tot_aduana_us  = 0  %>
+         <% totfretedus    = 0  %>
+         <% totdespachodus = 0  %>
+         <% tot_seguro_us  = 0  %>
+         <% totivaus       = 0  %>
+         <% totoutrosdus   = 0  %>
+         <% totprodgs      = 0  %>
+         <% totivags       = 0  %>
+         <% totdescontodgs = 0  %>
+         <% totfretedgs    = 0  %>
+         <% totdespachodgs = 0  %>
+         <% totoutrosdgs   = 0  %>
+         <% tot_porcen     = 0  %>
+
+
+          <% @compras_produto.each do |compras_produto| %>
+            <%= fields_for "compras_produtos[]", compras_produto do |f| %>
+            <%= hidden_field_tag :id, @compra.id %>
+
+
+            <%
+            sum            = ComprasProduto.sum('custo_dolar * quantidade', :conditions => ['compra_id = ?',compras_produto.compra_id])
+            if @compra.tipo_rateio.to_i == 0
+              porcentagem    = ( ( (compras_produto.custo_dolar.to_f * compras_produto.quantidade.to_f) * 100 ) / sum.to_f )
+              compras_produto.update_attribute :porcentagem, porcentagem.to_f
+            else
+              porcentagem = compras_produto.porcentagem.to_f
+            end
+
+            aduana_dolar    = ( ( ( @compra.aduana_dolar.to_f * porcentagem ) / 100 )/ compras_produto.quantidade.to_f )
+            compras_produto.update_attribute :aduana_dolar, aduana_dolar.to_f
+
+            frete_dolar       = ( ( ( @compra.frete_dolar.to_f * porcentagem ) / 100 ) / compras_produto.quantidade.to_f )
+            compras_produto.update_attribute :frete_dolar, frete_dolar.to_f
+
+            outros_dolar      = ( ( ( @compra.outros_dolar.to_f * porcentagem ) / 100 ) / compras_produto.quantidade.to_f )
+            compras_produto.update_attribute :outros_dolar, outros_dolar.to_f
+
+            seguro_dolar      = ( ( ( @compra.seguro_dolar.to_f * porcentagem ) / 100 ) / compras_produto.quantidade.to_f )
+            compras_produto.update_attribute :seguro_dolar, seguro_dolar.to_f
+
+            despacho_dolar    = ( ( ( @compra.despacho_dolar  * porcentagem ) / 100 ) / compras_produto.quantidade )
+            compras_produto.update_attribute :despacho_dolar, despacho_dolar.to_f
+
+            iva_despacho_dolar = ( ( ( @compra.iva_despacho_dolar.to_f * porcentagem ) / 100 ) / compras_produto.quantidade )
+            compras_produto.update_attribute :iva_despacho_dolar, iva_despacho_dolar.to_f
+
+            iva_dolar         = ( ( ( @compra.iva_total_dolar * porcentagem ) / 100 ) / compras_produto.quantidade )
+            compras_produto.update_attribute :iva_dolar, ( iva_dolar + iva_despacho_dolar )
+
+            unit_dolar = ( ( compras_produto.custo_dolar.to_f + seguro_dolar.to_f + frete_dolar.to_f + despacho_dolar.to_f + outros_dolar.to_f ) + aduana_dolar.to_f   )
+
+            compras_produto.update_attribute :unitario_dolar, unit_dolar.to_f
+
+            compras_produto.update_attribute :total_dolar, unit_dolar * compras_produto.quantidade
+
+            #GUARANI------------------------------------------------------------------------------------------------
+
+            desconto_guarani    = ( ( ( @compra.desconto_guarani * porcentagem ) / 100 ) / compras_produto.quantidade )
+            compras_produto.update_attribute :desconto_guarani, desconto_guarani.to_f
+            frete_guarani       = ( ( ( @compra.frete_guarani * porcentagem ) / 100 ) / compras_produto.quantidade )
+            compras_produto.update_attribute :frete_guarani, frete_guarani.to_f
+            outros_guarani      = ( ( ( @compra.outros_guarani * porcentagem ) / 100 ) / compras_produto.quantidade )
+            compras_produto.update_attribute :outros_guarani, outros_guarani.to_f
+            seguro_guarani      = ( ( ( @compra.seguro_guarani * porcentagem ) / 100 ) / compras_produto.quantidade )
+            compras_produto.update_attribute :seguro_guarani, seguro_guarani.to_f
+
+            if @compra.tipo_compra == 2
+               despacho_guarani    = ( ( ( @compra.despacho_guarani * porcentagem ) / 100 ) / compras_produto.quantidade )
+               compras_produto.update_attribute :despacho_guarani, despacho_guarani.to_f
+
+               iva_despacho_guarani = ( ( ( @compra.iva_despacho_guarani.to_f * porcentagem ) / 100 ) / compras_produto.quantidade )
+               compras_produto.update_attribute :iva_despacho_guarani, iva_despacho_guarani.to_f
+
+               iva_guarani         = ( ( ( ( @compra.iva_total_guarani ) * porcentagem ) / 100 ) / compras_produto.quantidade )
+               compras_produto.update_attribute :iva_guarani, ( iva_guarani + iva_despacho_guarani )
+               
+               custo_contabil_guarani = ( ( compras_produto.custo_guarani + ( frete_guarani + despacho_guarani.to_f + outros_guarani.to_f + seguro_guarani.to_f ) ) - ( iva_guarani.to_f + desconto_guarani.to_f ) )
+               compras_produto.update_attribute :custo_contabil_guarani, custo_contabil_guarani.to_f
+
+               unit_guarani = ( ( compras_produto.custo_guarani + ( frete_guarani + despacho_guarani.to_f + outros_guarani.to_f + seguro_guarani.to_f ) ) - ( desconto_guarani.to_f ) )
+               compras_produto.update_attribute :unitario_guarani, unit_guarani.to_f
+
+               compras_produto.update_attribute :total_guarani, unit_guarani.to_f * compras_produto.quantidade
+
+            else
+
+               unit_guarani = ( ( compras_produto.custo_guarani.to_f + ( frete_guarani.to_f + despacho_guarani.to_f + outros_guarani.to_f + seguro_guarani.to_f ) )- ( desconto_guarani.to_f ) )
+               compras_produto.update_attribute :unitario_guarani, unit_guarani.to_f
+
+               compras_produto.update_attribute :total_guarani, unit_guarani.to_f * compras_produto.quantidade
+
+               taxa = ( ( ( compras_produto.iva_taxa.to_f / 100 ) + 1.00 ) * 10 )
+
+               iva_guarani = ( unit_guarani.to_f / taxa )
+               compras_produto.update_attribute :iva_guarani, ( iva_guarani )
+
+               custo_contabil_guarani = ( ( compras_produto.custo_guarani.to_f + ( frete_guarani.to_f + despacho_guarani.to_f + outros_guarani.to_f + seguro_guarani.to_f ) )- ( desconto_guarani.to_f ) )
+               compras_produto.update_attribute :custo_contabil_guarani, (custo_contabil_guarani.to_f - iva_guarani.to_f)
+
+            end
+
+         %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="30" align="center">  <%= indice %></td>
+              <td width="350" align="left">   <%= compras_produto.produto_nome %></td>
+              <td width="50" align="center">  <%= compras_produto.quantidade %></td>
+              <% if @compra.moeda == 0 %>
+                <td width="80" align="right">   <%= format_decimal( compras_produto.custo_dolar )  %></td>
+                <td width="80" align="right">   <%= format_decimal( compras_produto.custo_dolar.to_f * compras_produto.quantidade )  %></td>
+                <% if @compra.tipo_rateio.to_i == 0 %>
+                  <td width="80" align="right">   <%= format_decimal( compras_produto.porcentagem.to_f )  %></td>
+                <% else %>
+                <td width="80" align="right">   <%= f.text_field :porcentagem, size: 10, :dir   => "rtl"   %></td>
+                <% end %>
+                
+                <td width="80" align="right">   <%= format_decimal( compras_produto.seguro_dolar )  %></td>
+                <td width="80" align="right">   <%= format_decimal( compras_produto.aduana_dolar )  %></td>
+                <td width="80" align="right">   <%= format_decimal( compras_produto.frete_dolar)  %></td>
+                <td width="80" align="right">   <%= format_decimal( compras_produto.despacho_dolar )  %></td>
+                <td width="80" align="right">   <%= format_decimal( compras_produto.outros_dolar )  %></td> 
+                <td width="80" align="right">   <%= format_decimal( compras_produto.unitario_dolar )  %></td>
+                <td width="80" align="right">   <%= format_decimal( compras_produto.total_dolar )  %></td>
+
+              <% else %>
+                <td width="80" align="right">   <%=h format_int( compras_produto.unitario_guarani)  %></td>
+                <td width="80" align="right">   <%=h format_int( compras_produto.unitario_guarani * compras_produto.quantidade)  %></td>
+                <td width="80" align="right">   <%=h format_int( compras_produto.custo_contabil_guarani)  %></td>
+                <td width="80" align="right">   <%=h format_int( compras_produto.iva_guarani  * compras_produto.quantidade )  %></td>
+                <td width="80" align="right">   <%=h format_int( compras_produto.desconto_guarani )  %></td>
+                <td width="80" align="right">   <%=h format_int( compras_produto.frete_guarani )  %></td>
+                <td width="80" align="right">   <%=h format_int( compras_produto.outros_guarani )  %></td>
+                <td width="80" align="right">   <%=h format( "%.4f",porcentagem.to_f )  %></td>
+
+              <% end %>
+            </tr>
+
+            <% indice       = indice + 1 %>
+            <% quant          += compras_produto.quantidade.to_f %>
+            <% tot_porcen     += compras_produto.porcentagem.to_f %>
+            <% custous        += compras_produto.custo_dolar.to_f * compras_produto.quantidade.to_f %>
+            <% totprodus      += compras_produto.total_dolar.to_f %>
+            <% tot_seguro_us  += compras_produto.quantidade.to_f * compras_produto.seguro_dolar.to_f  %>
+            <% tot_aduana_us +=  compras_produto.quantidade.to_f * compras_produto.aduana_dolar.to_f %>
+            <% totfretedus    += compras_produto.quantidade.to_f * compras_produto.frete_dolar.to_f %>
+            <% totdespachodus += compras_produto.quantidade.to_f * compras_produto.despacho_dolar.to_f %>
+            <% totoutrosdus   += compras_produto.quantidade.to_f * compras_produto.outros_dolar.to_f %>
+            <% totivaus       += compras_produto.quantidade.to_f * ( compras_produto.iva_dolar.to_f) %>
+
+            <% totprodgs      += compras_produto.unitario_guarani.to_f * compras_produto.quantidade.to_f %>
+            <% totdescontodgs += compras_produto.desconto_guarani.to_f * compras_produto.quantidade.to_f %>
+            <% totfretedgs    += compras_produto.frete_guarani.to_f * compras_produto.quantidade.to_f%>
+            <% totdespachodgs += compras_produto.despacho_guarani.to_f * compras_produto.quantidade.to_f %>
+            <% totoutrosdgs   += compras_produto.outros_guarani.to_f * compras_produto.quantidade.to_f %>
+            <% totivags       += compras_produto.iva_guarani.to_f * compras_produto.quantidade.to_f %>
+
+            <% if @compra.tipo_compra == 2 %>
+               <% iva_custo_dolar = compras_produto.iva_despacho_dolar %>
+               <% iva_custo_guarani = compras_produto.iva_despacho_guarani %>
+               <% documento = 'COMPRAS IMPORTACION' %>
+            <% else %>
+               <% iva_custo_dolar = ( compras_produto.iva_dolar.to_f / compras_produto.quantidade.to_f ) %>
+               <% iva_custo_guarani = ( compras_produto.iva_guarani.to_f / compras_produto.quantidade.to_f ) %>
+               <% documento = 'COMPRAS' %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </table>
+    </div>
+   <table class="head_grid">
+      <% if @compra.moeda == 0 %>
+        <tr class="head">
+          <td width="380"></td>
+          <td width="50" align="center"><b><%= format_decimal( quant )%></b></td>
+          <td width="80" align="right"> <%= format_decimal( custous ) %></td>
+          <td width="80" align="right"></td>
+          <td width="80" align="right"></td>
+          <td width="80" align="right">  <%= format_decimal( tot_porcen ) %></td>
+          <td width="80" align="right">  <%= format_decimal( tot_seguro_us ) %></td>
+          <td width="80" align="right">  <%= format_decimal( tot_aduana_us ) %></td>
+          <td width="80" align="right">  <%= format_decimal( totfretedus ) %></td>
+          <td width="80" align="right">  <%= format_decimal( totdespachodus ) %></td>
+          <td width="80" align="right">  <%= format_decimal( totoutrosdus ) %></td>
+          <td width="80" align="right"><b><%= format_decimal( totprodus) %></b></td>
+        </tr>
+      <% else %>
+        <tr class="head">
+          <td width="740" align="right"> <%= number_to_currency( totprodgs,       :format =>' %n ', :precision => 0 )  %></td>
+          <td width="80" align="right"></td>
+          <td width="80" align="right"> <%= number_to_currency( totivags,        :format =>' %n ', :precision => 0 )  %></td>
+          <td width="80" align="right">  <%= number_to_currency( totdescontodgs,  :format =>' %n ', :precision => 0 )  %></td>
+          <td width="80" align="right">  <%= number_to_currency( totfretedgs,     :format =>' %n ', :precision => 0 )  %></td>
+          <td width="80" align="right">  <%= number_to_currency( totoutrosdgs,    :format =>' %n ', :precision => 0 )  %></td>
+        </tr>
+      <% end %>
+    </table>
+
+     <div class="buttons">
+        <a href="/compras/<%=params[:id]%>/total_documento" class="button back"><%= t('BACK') %></a> 
+        <a href="/compras/<%=params[:id]%>/compras_financa" class="button next">Serguir</a> 
+        <%= submit_tag "Actulizar Porcentagen" , :class => "button delete", :disable_with => "Aguarde..." %>
+    </div>
+  </div>
+
+
+<% end %>
+
+<% @compras_produto.each do |compras_produto| %>
+
+<%
+  params[:data]        = @compra.data
+  params[:deposito_id] = compras_produto.deposito_id
+  params[:produto_id]  = compras_produto.produto_id
+  params[:tabela] = 'COMPRAS_PRODUTOS'
+  params[:tabela_id] = compras_produto.id
+  Recalculo.gera_recalculo_entrada(params)
+
+
+%>
+<% end %>
+<style type="text/css">
+   table { font-size: 10px}
+
+</style>

@@ -1,0 +1,69 @@
+<%= form_for(fact_indep_produto) do |f| %>
+  <% if fact_indep_produto.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(fact_indep_produto.errors.count, "error") %> prohibited this fact_indep_produto from being saved:</h2>
+
+      <ul>
+      <% fact_indep_produto.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+
+  <%= f.hidden_field :fact_indep_id %>
+  <table>
+    <tr>
+        <td colspan="8">
+          <label>Producto</label>
+          <%= f.text_field :produto_nome, size: 68, autofocus: true %>
+          <%= f.hidden_field :produto_id %>
+        </td>
+    </tr>
+    </tr>
+        <td>
+          <label>Cantidad</label>
+          <%= f.text_field :quantidade, :size => 10,:dir   => "rtl", value: '', required: true %>
+        </td>
+
+        <%= field_gs_label 'Unit G$', f, :unit_gs %>
+
+        <td style="padding-top: 20px;" align="right">
+        <%= f.submit :value => t('SAVE'), :class => "btn btn-green", :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %></td>
+      </tr>
+  </table>
+<% end %>
+
+<script type="text/javascript">
+
+$(function() {
+  $( "#fact_indep_produto_produto_nome" ).autocomplete({
+      source: function( request, response ) {
+      $.ajax({
+        url: "/buscas/search_all_produtos",
+        dataType: "json",
+        data: {
+          tipo: 'DESCRIPCION',
+          busca: request.term
+        },
+        success: function( data ) {
+          response( data );
+        },
+      });
+    },
+    minLength: 2,
+    select: function( event, ui ) {
+      $("#fact_indep_produto_produto_id").val("");
+      $('#fact_indep_produto_produto_id').val(ui.item.id);
+      return false;
+
+    }
+  });
+
+});
+</script>
+
+
+
+

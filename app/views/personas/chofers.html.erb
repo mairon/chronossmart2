@@ -1,0 +1,101 @@
+   <div>
+      <ul class="tabs">
+        <li><a href="#tab1">Contatos</a></li>
+        <li><a href="/personas/<%= @persona.id%>/local_entregas">Locais Entrega(Obras)</a></li>
+      </ul>
+
+      <div class="tab_container">
+
+            <div id="tab1" class="tab_content">
+              <table>
+                <tr>
+                    <td>
+                      <div>
+                        <table>
+                          <tr>
+                            <td>
+                              <div class="group">
+                                <%= render :partial=>"/persona_contatos/index", :locals=>{:persona_contatos => @persona.persona_contatos} %>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="group">
+                              <%= render :partial=>"/persona_contatos/new_contato", :locals=>{:persona_contato=>PersonaContato.new(:persona_id=>@persona.id)} %>
+                              </div>
+                            </td>
+                          </tr>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+              </table>
+            </div>
+
+            <div id="tab2" class="tab_content">
+              <table>
+                <tr>
+                    <td>
+                      <div>
+                        <table>
+                          <tr>
+                            <td>
+                              <div class="group">
+                                <%= render :partial=>"/persona_locais_entregas/index", :locals=>{:persona_locais_entregas => @persona.persona_locais_entregas} %>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="group">
+                              <%= render :partial=>"/persona_locais_entregas/new_local", :locals=>{:persona_locais_entrega=>PersonaLocaisEntrega.new(:persona_id=>@persona.id)} %>
+                              </div>
+                            </td>
+                          </tr>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+              </table>
+            </div>
+
+         <div id="tab3" class="tab_content">
+         	<table>
+         		<tr>
+         			<td>Transportadora : </td>
+         			<td><%= @persona.nome %> </td>
+         		</tr>
+         	</table>
+            <table>
+              <tr>
+                  <td>
+                    <div>
+                      <table>
+                        <tr>
+                          <td>
+                            <fieldset>
+                            <legend>Choferes</legend>
+                              <%= render :partial=>"/persona_chofers/index", :locals=>{:persona_chofers => @persona.persona_chofers} %>
+                            </fieldset>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>                            
+                            <%= render :partial=>"/persona_chofers/new_chofer", :locals=>{:persona_chofer=>PersonaChofer.new(:persona_id=>@persona.id)} %>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+            </table>
+          </div>
+        </div>
+   </div>
+   <div class="buttons">
+     <%= link_to 'Editar', edit_persona_path(@persona), :class => "button back" %> 
+     <%= link_to 'Finalizar', personas_path, :class => "button delete" %>
+   </div>
+
+

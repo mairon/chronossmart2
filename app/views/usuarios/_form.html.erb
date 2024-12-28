@@ -1,0 +1,74 @@
+<h1 id="header">Usuário - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+
+  <%= form_for(@usuario) do |f| %>
+
+    <% if @usuario.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@usuario.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @usuario.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div class="row">
+    <div class="col-md-12">
+      <label><%= t('NAME') %></label>
+      <%= f.text_field :usuario_nome, class: 'panel-field' %>
+      
+    </div>
+    <div class="col-md-12">
+      <label>Contra-Senha</label>
+      <%= f.password_field :usuario_senha, class: 'panel-field' %>      
+    </div>
+    <div class="col-md-12">
+      <label>Locale</label>
+      <%= f.text_area :locale, class: 'form-control', rows: 1, cols: 1 %>
+    </div>
+
+    <div class="col-md-12">
+      <label>Terminal</label>
+      <%= f.collection_select :terminal_id, Terminal.all(:select => 'id,nome',:order => '1,2',:conditions => ["unidade_id = #{current_unidade.id}"]),:id,:nome,{:prompt => 'Seleccione el Terminal'}, {class: 'panel-field'} %>
+    </div>
+
+
+    <div class="col-md-12">
+      <label><%= t('CENTER_OF_COSTOS') %></label>
+      <%= f.collection_select :centro_custo_id,
+                               CentroCusto.select('id,nome').where("unidade_id = #{current_unidade.id}"),:id, :nome,{:prompt => 'Selecione Centro de Costo'} %>  
+    </div>  
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Unidades con Aceso</label>
+        <%= f.collection_select :unidade_ids, Unidade.all, :id, :unidade_nome, {}, {:multiple => true, class: "pre-selected-options"} %>
+    </div>
+    <div class="col-md-12">
+      <%= f.check_box :dash_finac, style:"float: left; padding:10px !important; margin: 10px 0px;" %> <label for="cobro_adelanto" style="float: left; margin-left:5px; ">Dashbord Financiero</label>
+    </div>
+    <div class="col-md-12">
+      <%= f.radio_button :tipo, 0 %> Administrado
+      <%= f.radio_button :tipo, 1 %> Financeiro
+      <%= f.radio_button :tipo, 2 %> Usuario      
+    </div>
+    <div class="col-md-12">
+      <label>Senha Autoriz. Venda</label>
+      <%= f.password_field :senha_autoriza_venda, class: 'panel-field' %>
+    </div>
+
+    <div class="col-md-12">
+        <label>Empleado Vinculado</label>
+        <%= f.collection_select :persona_id, Persona.where("tipo_funcionario = 1").select('id,nome').order('nome'), :id, :nome, {prompt: 'Selecione'} %>
+    </div>
+  </div>
+  <div class="footer-buttons">
+    <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    <%= link_to t('BACK'), usuarios_path, :class => "btn btn-back" %>
+  </div>      
+  <% end %>
+</div>

@@ -1,0 +1,47 @@
+<%= form_for(@venda_compra) do |f| %>
+  <% if @venda_compra.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@venda_compra.errors.count, "error") %> prohibited this venda_compra from being saved:</h2>
+
+      <ul>
+      <% @venda_compra.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> venda_compras - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">venda_id :</td>                    
+                      <td><%= f.number_field :venda_id %></td>
+                                      
+                      <td align="right">compra_id :</td>                    
+                      <td><%= f.number_field :compra_id %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', venda_compras_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

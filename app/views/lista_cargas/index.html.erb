@@ -1,0 +1,29 @@
+<h1 id="header">Lista de Cargas</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_lista_carga_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="80">Cod.</td>
+    <td width="300">Rodado</td>
+    <td width="50">Status</td>
+    <td width="200">Concepto</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @lista_cargas.each do |lista_carga| %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td width="80"><%= lista_carga.id.to_s.rjust(6,'0') %></td>
+        <td width="300"><%= lista_carga.rodado.placa %></td>
+        <td width="50"><%= lista_carga.status %></td>
+        <td width="200"><%= lista_carga.obs %></td>
+        <td><%= link_to 'Editar', edit_lista_carga_path(lista_carga) %></td>
+        <td><%= link_to t('DELETE'), lista_carga, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

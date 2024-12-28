@@ -1,0 +1,163 @@
+<h1 align="right" id="header">.</h1>
+Libro Mayor
+<div class="group">
+  <h2>
+    <%= form_tag resultado_livro_mayor_produtos_contabilidades_path, :method => "get" do%>
+      <table>
+
+        <tr valign="top" height="35">
+          <td align="right"> De:</td>
+          <td>
+            <fieldset>
+              <table>
+                <tr>
+                  <td><input name       = "inicio"
+                             id         = "inicio"
+                             size       = "10"
+                             onkeypress = "return bloqEnter(event)"
+                             onkeyup    = "Formatadata(this,event),EnterTab(event,'final')" />
+                      Hasta
+                      <input name       = "final"
+                             id         = "final"
+                             size       = "10"
+                             onkeypress = "return bloqEnter(event)"
+                             onkeyup    = "Formatadata(this,event),EnterTab(event,'codigo')" /></td>
+                </tr>
+              </table>
+            </fieldset>
+          </td>
+        </tr>
+
+        <tr>
+          <td align="right"><%= t('COIN') %> :</td>
+          <td>
+            <fieldset>
+              <input id         = "moeda"
+                     name       = "moeda"
+                     type       = "radio"
+                     value      = "0"
+                     checked
+                     onkeypress = "return bloqEnter(event)"
+                     onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Dolar
+
+              <input id    ="moeda"
+                     name  ="moeda"
+                     type  ="radio"
+                     value ="1"
+                     onkeypress = "return bloqEnter(event)"
+                     onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Guaranies
+
+            </fieldset>
+          </td>
+        </tr>
+
+        <tr height="35">
+          <td align="right">Cod.Contabil :</td>
+          <td >
+           <input type="text" id="codigo_inicio" name="codigo_inicio" />
+           Hasta 
+           <input type="text" id="codigo_final" name="codigo_final" />
+          </td>
+         
+
+        </tr>
+
+        <tr height="35">
+          <td align="right">Contabilidade :</td>
+          <td>
+              <%=   select("busca", "descricao_inicio", PlanoDeConta.all(:select => 'id,codigo,descricao',:order => 'descricao').collect {|p| [ p.descricao, p.codigo ] },
+                                                                                                                                  { :include_blank => true },
+                                                                                                                                  { :onblur => "MayorBuscaCodContabilInicio()"})   %>
+                                                                                                                                  Hasta
+              <%=   select("busca", "descricao_final", PlanoDeConta.all(:select => 'id,codigo,descricao',:order => 'descricao').collect {|p| [ p.descricao, p.codigo ] },
+                                                                                                                                  { :include_blank => true },
+                                                                                                                                  { :onblur => "MayorBuscaCodContabilFinal()"})   %>
+          </td>
+
+        </tr>
+
+          <tr>
+            <td align="right">Clase :</td>
+            <td>
+              <%= text_field_tag( 'campo_clase',
+                                   nil,
+                                   :id       => "campo_clase",
+                                   :onchange => {:remote => true,
+                                                 :update     => "campo_clase",
+                                                                 :url        => { :action => :get_clase, :id => 1},
+                                                                 :with       => "'campo_clase='+this.value"},
+                                                                 :size       => 5,
+                                                                 :onkeypress => "return bloqEnter(event)",
+                                                                 :onkeyup    => "EnterTab(event,'busca_clase')"
+                                                              ) %>
+
+              <%=   select("busca", "clase", Clase.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },                 
+                                                                                          { :include_blank => true },
+                                                                                          { :onkeypress    => "return bloqEnter(event)",
+                                                                                            :onkeyup       => "EnterTab(event,'campo_grupo')" })   %></td>
+          </tr>
+
+          <tr>
+            <td align="right">Grupo :</td>
+
+            <td>
+              <%= text_field_tag( 'campo_grupo',
+                                   nil,
+                                   :id       => "campo_grupo",
+                                   :onchange => {:remote => true,
+                                                 :update => "campo_grupo",
+                                                                 :url        => { :action => :get_grupo, :id => 1},
+                                                                 :with       => "'campo_grupo='+this.value"},
+                                                                 :onkeypress => "return bloqEnter(event)",
+                                                                 :onkeyup    => "EnterTab(event,'busca_grupo')",
+                                                                 :size       => 5
+                              ) %>
+
+              <%=   select("busca", "grupo", Grupo.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] }, 
+                                                                                          { :include_blank => true },
+                                                                                          { :onkeypress    => "return bloqEnter(event)",
+                                                                                            :onkeyup       => "EnterTab(event,'campo_produto')" })   %></td>
+          </tr>
+
+
+          <tr>
+            <td align="right">Producto :</td>
+
+            <td>
+              <%= text_field_tag( 'campo_produto',
+                                   nil,
+                                  :id       => "campo_produto",
+                                  :onchange => {:remote => true,
+                                                :update => "campo_produto",
+                                                                :url        => { :action => :get_produto, :id => 1},
+                                                                :with       => "'campo_produto='+this.value"},
+                                                                :size       => 5,
+                                                                :onkeypress => "return bloqEnter(event)",
+                                                                :onkeyup    => "EnterTab(event,'busca_produto')"
+
+                                ) %>
+
+
+              <%=   select("busca", "produto", Produto.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] }, 
+                                                                                                          { :include_blank => true },
+                                                                                                          { :onkeypress    => "return bloqEnter(event)",
+                                                                                                            :onkeyup       => "EnterTab(event,'busca_deposito')" })   %></td>
+          </tr>
+
+
+        <tr height="35">
+          <td></td>
+          <td>
+            <input type="submit" value="        Informe        " onclick="Tipo('0')"/>
+            <input type="submit" value="          Excel          " onclick="Tipo('1')"/>
+          </td>
+
+        </tr>
+
+        <input type="hidden" name="tipo" id="tipo"  size="5" value="0"/>
+      </table>
+    <% end %>
+  </h2>
+</div>
+
+

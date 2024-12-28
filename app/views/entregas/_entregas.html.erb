@@ -1,0 +1,41 @@
+<% tot_qtd  = 0 %>
+<% tot_peso = 0 %>
+<div class="group">
+<h2>Entregas Selecionadas</h2>
+	<table class="head_grid">
+		<td width="30"></td>
+			<td width="55" align="center"><%= t('SALE') %></td>
+			<td width="80" ><%= t('DOC') %></td>
+			<td width="350" >Cliente</td>
+			<td width="350" >Direción</td>
+			<td width="70" align="right">Cant.</td>
+			<td width="70" align="right">Peso</td>
+			<td width="50"></td>
+		</tr>
+	</table>
+	<div class="rolagem" id="div" style="height: 150px">
+		<table>
+			<% @entregas_selecionadas.each do |ep| %>	
+				<tr class="<%= cycle("cor1", "cor2")%>">
+				<td width="30"></td>
+					<td width="55" align="center"><%= ep.venda_id.to_s.rjust(6, '0')%></td>
+					<td width="80"><%= ep.documento_numero %></td>
+					<td width="350"><%= ep.persona_nome %></td>
+					<td width="350"><%= ep.direcao %></td>
+					<td width="70" align="right"><%= ep.qtd %></td>
+					<td width="70" align="right"><%= ep.tot_peso %></td>
+					<td><%= link_to t('DELETE'), ep, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+				</tr>
+				<% tot_qtd  += ep.qtd.to_f %>
+				<% tot_peso += ep.tot_peso.to_f %>
+			<% end %>
+		</table>
+	</div>
+	<table class="head_grid">
+		<tr>
+			<td width="860"></td>
+			<td width="70" align="right"><%= tot_qtd %></td>
+			<td width="70" align="right"><%= tot_peso %></td>
+		</tr>
+	</table>
+</div>

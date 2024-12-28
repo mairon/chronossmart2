@@ -1,0 +1,36 @@
+<h1 id="header">Usuários</h1>
+<div class="acessos">
+
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td width="50">Id</td>
+            <td width="100">Pseudo</td>
+            <td width="140">Primer Nombre</td>
+            <td width="100">Segundo Nombre</td>
+            <td width="120">Email</td>
+            <td width="90">Cargo</td>
+            <td width="100">Persona</td>
+            <td width="50">Status</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @users.each do |user| %>
+      <tr>
+                  <td width="50"><%= user.id %></td>
+                  <td width="100"><%= user.pseudo %></td>
+                  <td width="140"><%= user.firstname %></td>
+                  <td width="100"><%= user.lastname %></td>
+                  <td width="120"><%= user.email %></td>
+                  <td width="110"><%= user.role %></td>
+                  <td width="100"><%= user.persona.nome unless user.persona.nil? %></td>
+                  <td><%= link_to 'Editar', edit_user_path(user) %></td>
+                  <td><%= link_to 'Borrar', user, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

@@ -1,0 +1,32 @@
+<%= form_for(persona_ativo) do |f| %>
+<div class="row panel-modal-body">
+  <%= f.hidden_field :persona_id %>
+  <div class="row">
+    <div class="col-md-4">
+      <label><%= t('COIN') %></label>
+      <br>
+      <% if current_unidade.moeda.to_i == 0 %>
+        <%= f.radio_button :moeda, 1 %> <%= t('GUARANIS') %>
+        <%= f.radio_button :moeda, 0,  :Checked => "True" %> Dolar
+        <%= f.radio_button :moeda, 2 %> Real
+      <% elsif current_unidade.moeda.to_i == 1 %>
+        <%= f.radio_button :moeda, 1,  :Checked => "True" %> <%= t('GUARANIS') %>
+        <%= f.radio_button :moeda, 0 %> Dolar
+        <%= f.radio_button :moeda, 2 %> Real
+
+      <% elsif current_unidade.moeda.to_i == 2 %>
+        <%= f.radio_button :moeda, 1 %> <%= t('GUARANIS') %>
+        <%= f.radio_button :moeda, 0 %> Dolar
+        <%= f.radio_button :moeda, 2,  :Checked => "True" %> Real
+      <% end %>
+    </div>
+    <div class="col-md-4">
+      <%= field_us_label 'Monto',f,:valor %>
+    </div>
+    <div class="col-md-4">
+      <label>.</label>
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    </div>
+  </div>
+</div>
+<% end %>

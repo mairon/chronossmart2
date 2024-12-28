@@ -1,0 +1,44 @@
+<table class="head_grid">
+   <tr>
+      <td width="45"><%= t('CODE') %></td>
+      <td width="250">Sub-Grupo</td>
+      <td width="150">Ref.</td>
+      <td width="400">Producto</td>
+      <td width="80" align="right">Cantidad</td>
+      <td width="80" align="right">Precio</td>
+      <td width="80" align="right">Precio Mini.</td>
+   </tr>
+</table>
+<div class="rolagem" id="div" style="height: 500px;">
+   <table>
+      <% @produtos.each do |p| %>
+         <tr class = "<%= cycle( "cor1", "cor2" )%>">
+            <td width="45"> <%= p.produto_id.to_s.rjust(6,'0') %></td>
+            <td width="250"> <%= p.sub_grupo_nome %> </td>
+            <td width="150"> <%= p.fabricante_cod %> </td>
+            <td width="400"> <%= p.nome %> </td>
+            <% if p.stock.to_i <= 0 %>
+               <td width="80"  align="right"><font color="red"> <%= format( "%.0f",p.stock.to_f ) %></font> </td>
+            <%else%>
+               <td width="80"  align="right"><font color="green"> <%= format( "%.0f",p.stock.to_f ) %></font> </td>
+            <%end%>
+            <% if current_unidade.moeda == 0 %>
+              <td width="80" align="right"><%= format_decimal( p.tabela_1_us.to_f ) %></td>
+              <td width="80" align="right"><%= format_decimal( p.tabela_2_us.to_f ) %></td>
+            <% else %>
+              <td width="80" align="right"><%= format_int( p.tabela_1_gs.to_f ) %></td>
+              <td width="80" align="right"><%= format_int( p.tabela_2_gs.to_f ) %></td>
+            <% end %>
+            <td><a href="#" title="" onclick="Imagem('<%= p.produto_id %>')" >Imagem</a></td>
+            <td><a href="#" title="" onclick="Historico('<%= p.produto_id %>')" >Histórico</a></td>
+
+         </tr>
+      <% end %>
+   </table>
+</div>
+
+
+
+
+
+

@@ -1,0 +1,48 @@
+<p>
+  <b><%= t('DATE') %>:</b>
+  <%=h @reclassif_stock.data %>
+</p>
+
+<p>
+  <b>Produto:</b>
+  <%=h @reclassif_stock.produto_id %>
+</p>
+
+<p>
+  <b>Produto <%= t('NAME') %>:</b>
+  <%=h @reclassif_stock.produto_nome %>
+</p>
+
+<p>
+  <b>Quantidade:</b>
+  <%=h @reclassif_stock.quantidade %>
+</p>
+
+<p>
+  <b>Custo dolar:</b>
+  <%=h @reclassif_stock.custo_dolar %>
+</p>
+
+<p>
+  <b>Custo guarani:</b>
+  <%=h @reclassif_stock.custo_guarani %>
+</p>
+
+<p>
+  <b>Custo real:</b>
+  <%=h @reclassif_stock.custo_real %>
+</p>
+
+<p>
+  <b>Cotacao:</b>
+  <%=h @reclassif_stock.cotacao %>
+</p>
+
+<p>
+  <b>Cotacao real:</b>
+  <%=h @reclassif_stock.cotacao_real %>
+</p>
+
+
+<%= link_to 'Edit', edit_reclassif_stock_path(@reclassif_stock) %> |
+<%= link_to 'Back', reclassif_stocks_path %>

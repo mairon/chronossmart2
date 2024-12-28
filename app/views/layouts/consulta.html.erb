@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <title>Chronos Smart</title>
+    <%= stylesheet_link_tag 'application', 'themes/base/jquery.ui.all', :media => 'all' %>
+    <%= javascript_include_tag 'application','vendas' %>
+    <%= csrf_meta_tag %>
+
+
+  </head>
+  <body data-plus-as-tab="true">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/menus" class="navbar-brand"><%= image_tag "logo.png", class: 'brand-l' %></a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
+           <ul class="nav navbar-nav navbar-right">
+            <li><a href="/vendas" onClick="pdv(0)" class="btn" style="margin-top:1px;">Salir</a></li>
+            <li class="divider-vertical"></li>
+            <li><a href="#"><i class="icon-white icon-th"></i> <%= current_unidade.unidade_nome %></a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                <i class="icon-white icon-user"></i> <%= current_user.usuario_nome %> <span class="caret"></span>
+              </a>
+
+              <ul class="dropdown-menu">
+                <% if session[:logged] %>
+                  <li><%= link_to "logout", new_login_path, :action => :delete %></li>
+                <% end %>
+              </ul>
+            </li>
+           </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /container -->
+    </nav>
+
+    <% if flash[:notice] or flash[:observacao] %>
+      <div class="Mensagem" id="observacao">
+        <%= flash[:observacao] %>
+        <%= flash[:notice] %>
+      </div>
+    <% end %>
+    <div class="Mensagem_error" id="observacao">
+      <%= flash[:error] %>
+    </div>
+
+    <div id="back">
+      <div class="container box-panel">
+        <div class="to-print" align="center">
+          <%= image_tag "logo-login.png", width: '100' %>
+          <br>
+          <%= current_unidade.unidade_nome %>
+        </div>
+
+        <%= yield :layout %>
+        <% session[:modal] = "false" %>
+      </div>
+    </div>
+      <script>
+        document.onkeydown=function(e)
+        {
+          if(e.which == 27)
+            self.close();
+        }
+      </script>
+
+<script>
+    document.onkeydown=function(e)
+    {
+      if(e.which == 27)
+        self.close();
+
+      if(e.keyCode == 40){
+            valor = parseInt($("#foco").val()) + 1;
+            $("#foco").val(valor)
+             campo     = '#'+ valor
+             c_campo   = '.'+ valor
+             ant_campo = '.'+ (valor - 1)
+            $(campo).focus()
+
+            if ((valor - 1)%2 == 0){
+              $(ant_campo).css('backgroundColor','#fff');
+            }else{
+              $(ant_campo).css('backgroundColor','#f9f9f9');
+            };
+
+            $(c_campo).css('backgroundColor','#e6ebf2');
+           return false;
+         }
+
+         if(e.keyCode == 38){
+            valor = parseInt($("#foco").val()) - 1;
+            $("#foco").val(valor)
+             campo     = '#'+ valor
+             c_campo   = '.'+ valor
+             ant_campo = '.'+ (valor + 1)
+            $(campo).focus()
+            if ((valor + 1)%2 == 0){
+              $(ant_campo).css('backgroundColor','#fff');
+            }else{
+              $(ant_campo).css('backgroundColor','#fff');
+            };
+
+            $(c_campo).css('backgroundColor','#e6ebf2');
+           return false;
+         }
+    }
+  </script>
+  <style>
+    body {
+      overflow-x: hidden;
+    }
+  </style>
+
+
+    <div class="footer">
+      Copyright © 2011 - <%= Time.now.strftime("%Y") %> - Chronos - Powered by <a href="http://chronos.com.py">Chronos</a>
+    </div>
+
+  </body>
+</html>
+

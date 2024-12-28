@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <ss:Styles>
+    <ss:Style ss:ID="1">
+      <ss:Font ss:Bold="1"/>
+      <ss:Alignment ss:Horizontal="Center"/>
+      <ss:Interior ss:Pattern="Gray25"/>
+    </ss:Style>
+    <ss:Style ss:ID="2">
+      <ss:Alignment ss:Horizontal="Center"/>
+    </ss:Style>
+  </ss:Styles>
+  <Worksheet ss:Name="Sheet1">
+    <Table>
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String"><B>Prov. <%= @compra.persona_nome %></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Doc. <%= @compra.documento_numero_01 %>-<%= @compra.documento_numero_02 %>-<%= @compra.documento_numero %></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B></B></Data></Cell>
+      </Row>
+
+
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String"><B>Ref.</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Producto</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Color</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Tamanho</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Cantidad</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Custo Ref.</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Unitario</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Total</B></Data></Cell>
+      </Row>
+      <% qtd  = 0 %>
+      <% cust = 0 %>
+      <% unit = 0 %>
+      <% tot  = 0 %>
+        <% @produtos.each do |a| %>
+          <Row>
+            <Cell><Data ss:Type="String"><%= a.fabricante_cod %></Data></Cell>
+            <Cell><Data ss:Type="String"><%= a.produto_nome %></Data></Cell>
+            <Cell><Data ss:Type="String"><%= a.cor_nome %></Data></Cell>
+            <Cell><Data ss:Type="String"><%= a.tamanho_nome %></Data></Cell>
+            <Cell><Data ss:Type="Number"><%= a.quantidade.to_f %></Data></Cell>
+            <% qtd  += 0 %>
+            <% if @compra.moeda == 0 %>
+              <Cell><Data ss:Type="Number"><%= a.custo_dolar.to_f %></Data></Cell>
+              <Cell><Data ss:Type="Number"><%= a.unitario_dolar.to_f %></Data></Cell>
+              <Cell><Data ss:Type="Number"><%= a.total_dolar.to_f %></Data></Cell>
+              <% cust += a.custo_dolar.to_f %>
+              <% unit += a.unitario_dolar.to_f %>
+              <% tot  += a.total_dolar.to_f %>
+            <% elsif @compra.moeda == 1 %>
+              <Cell><Data ss:Type="Number"><%= a.custo_guarani.to_f %></Data></Cell>
+              <Cell><Data ss:Type="Number"><%= a.unitario_guarani.to_f %></Data></Cell>
+              <Cell><Data ss:Type="Number"><%= a.total_guarani.to_f %></Data></Cell>
+              <% cust += a.custo_guarani.to_f %>
+              <% unit += a.unitario_guarani.to_f %>
+              <% tot  += a.total_guarani.to_f %>
+            <% else %>
+              <Cell><Data ss:Type="Number"><%= a.custo_real.to_f %></Data></Cell>
+              <Cell><Data ss:Type="Number"><%= a.unitario_real.to_f%></Data></Cell>
+              <Cell><Data ss:Type="Number"><%= a.total_real.to_f %></Data></Cell>
+              <% cust += a.custo_real.to_f %>
+              <% unit += a.unitario_real.to_f %>
+              <% tot  += a.total_real.to_f %>
+            <% end %>
+          </Row>
+        <% end %>
+        <Row ss:StyleID="1">
+          <Cell><Data ss:Type="String"><B></B></Data></Cell>
+          <Cell><Data ss:Type="String"><B></B></Data></Cell>
+          <Cell><Data ss:Type="String"><B></B></Data></Cell>
+          <Cell><Data ss:Type="String"><B></B></Data></Cell>
+          <Cell><Data ss:Type="Number"><B><%= qtd.to_f %></B></Data></Cell>
+          <Cell><Data ss:Type="Number"><B><%= cust.to_f %></B></Data></Cell>
+          <Cell><Data ss:Type="Number"><B><%= unit.to_f %></B></Data></Cell>
+          <Cell><Data ss:Type="Number"><B><%= tot.to_f %></B></Data></Cell>
+        </Row>
+
+    </Table>
+  </Worksheet>
+</Workbook>

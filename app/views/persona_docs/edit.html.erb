@@ -1,0 +1,49 @@
+<h1 id="header"><%= t('DOC') %>s - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+
+  <%= form_for(@persona_doc) do |f| %>
+  <div class="row panel-modal-body">
+
+    <div class="col-md-12">
+      <%= f.check_box :status %> Pendiente
+    </div>
+
+    <div class="col-md-12">
+      <label><%= t('DOC') %></label>
+      <%= f.collection_select :documento_id, Documento.all( :select => 'id,nome',
+            :order  => '2' ),:id,:nome,{:prompt => 'Selecione '} %>
+
+
+      <%= link_to(@persona_doc.doc_attach.url, target: '_blank') do %>
+      <% if @persona_doc.  == 'application/pdf' %>
+          <%= image_tag 'ficheiro-pdf.png', class: 'img-thumbnail', style: "height: 100px" %>
+        <% else %>
+          <%= image_tag @persona_doc.doc_attach, class: 'img-thumbnail', style: "height: 100px" %>
+        <% end %>
+      <% end %>
+      formato: <%= @persona_doc.doc_attach_content_type %>
+    </div>
+    <div class="col-md-6">
+      <label>Arquivo</label>
+      <%= f.file_field :doc_attach %>
+    </div>
+
+    <div class="col-md-12">
+      <label>Obs.</label>
+      <%= f.text_area :obs, class: "panel-field", rows: 5 %>
+    </div>
+
+
+    <div class="col-md-12">
+      <br>
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+    </div>
+
+
+  </div>
+  <% end %>
+</div>
+
+<script type="text/javascript">
+  $('#persona_doc_documento_id').selectize();
+</script>

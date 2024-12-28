@@ -1,0 +1,46 @@
+<ul class="tabs">
+      <li><a href="#tab1"> <%= t('STATE') %>: <%= @estado.nome %> - <%= t('COUNTRY') %>: <%= @estado.paise.nome unless @estado.paise.nil? %></a></li>
+</ul>
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+                <table>
+					<table class="head_grid">
+					  <tr>
+					    <td width="450"><%= t('REGION') %></td>
+					  </tr>
+					</table>
+
+					<div class="rolagem" dir="div">
+					  <table>
+					  	<% cd = 0 %>
+					    <% @estado.regiaos.each do |c| %>
+					      <tr class = "<%= cycle("cor1", "cor2")%>" >
+					        <td width="450"><%= c.nome %></td>
+					      </tr>
+					      <% cd += 1 %>
+					    <% end %>
+					  </table>
+					</div>
+					<table class="head_grid">
+					  <tr>
+					    <td width="350"><%= t('REGIONS') %> <%= t('TOTAL') %>:</td>
+					    <td width="80" align="right"><b><%= cd %></b></td>
+					  </tr>
+					</table>
+
+              	</table>
+
+	          </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="buttons">
+      	<%= link_to 'Editar', edit_estado_path(@estado), :class => "button back" %>
+        <%= link_to 'Sair', estados_path, :class => "button next" %>        
+      </div>
+    </div>

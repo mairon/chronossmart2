@@ -1,0 +1,84 @@
+<h1 align="right" id="header">.</h1>
+   <ul class="tabs">
+      <li><a href="#tab1">Gastos - [<%= t('EDITION') %>]</a></li>
+   </ul>
+   <div class="tab_container">
+   <br/>
+   <table>
+      <tr>
+
+         <td valign="top">
+            <div class="group">
+               <table>
+                  <input type="hidden" id="tipo" value="<%=@compra.tipo%>"/>
+                  <tr>
+                     <td align="right"><%= t('DATE') %> :</td>
+                     <td> <%=@compra.data.strftime("%d/%m/%Y")%> </td>
+                  </tr>
+                  <tr>
+                     <td align="right">Cotacion :</td>
+                     <td><%=number_to_currency( @compra.cotacao.to_f,       :format =>' %n ',:precision => 0 )%> </td>
+                  </tr>
+                  <tr>
+                     <td align="right">Compra :</td>
+                     <td>
+                        <%if @compra.tipo == 0 %>
+                           CONTADO
+                        <%else%>
+                           CREDITO</td>
+                     <%end%>
+                  </tr>
+                  <tr>
+                     <td align="right">N. Factura :</td>
+                     <td><%=@compra.documento_numero_01%> -
+                         <%=@compra.documento_numero_02%> -
+                         <%=@compra.documento_numero%>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td align="right">Proveedor :</td>
+                     <td><%=@compra.persona_nome%></td>
+                  </tr>
+               </table>
+            </div>
+         </td>
+      </tr>
+
+   </table>
+
+
+<input type="hidden" name="cotacao"id="cotacao"/>
+<table>
+  <tr>
+    <td>
+      <div class="group">
+        <table>
+          <tr>
+            <td>
+                <%= render :partial=>"index_gasto", :locals=>{:compras_gastos => @compra.compras_gastos} %>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </td>
+  </tr>
+</table>
+<div class="buttons">
+  <a href="/compras/<%=params[:id]%>/edit_gasto" class="button back" ><%= t('BACK') %></a>
+  <a href="/compras/<%=params[:id]%>/compras_financa" class="button next"> Serguir</a>
+  <a href="/compras/<%=params[:id]%>/novo_gasto" class="button add" >Nuevo</a>
+</div>
+</div>
+
+<%= hidden_field_tag :id, @compra.id %>
+<script>
+
+
+  document.onkeydown=function(e)
+  {
+    if(e.which == 115)
+      location.href="/compras/novo_gasto/"+ document.getElementById('id').value;
+
+  }
+
+</script>

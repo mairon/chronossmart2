@@ -1,0 +1,45 @@
+<h1 id="header">Transferencia Tarjeta</h1>
+
+<ul class="tabs">
+  <li><a href="#tab1">Tarjetas</a></li>
+</ul>
+<div class="tab_container">
+  <div class="group">
+    Fecha de la Transferencia: <b> <%= @transf_cartao.data.strftime("%d/%m/%y") %></b>
+
+    <%= @transf_cartao.conta_origem_id %>
+  </div>
+  <br/>  
+  <table>
+    <%= form_tag "/transf_cartaos/#{@transf_cartao.id}/baixa_cartao" do %>
+      <tr>
+        <td>
+          <div class="group">
+            <%= render 'cartao' %>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="group">
+            <%= submit_tag " Bajas Tarjetas ",:disable_with => "Aguarde...", :class => "button"  %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+    <tr>
+      <td>        
+        <div class="group">
+          <%= render partial: "/transf_cartao_dts/index_cartao", locals: {transf_cartao_dts: @transf_cartao.transf_cartao_dts} %>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <div class="buttons">
+    <%= link_to t('BACK'), edit_transf_cartao_path(@transf_cartao), :class => "button back" %>
+    <%= link_to 'Finalizar', transf_cartaos_path , :class => "button delete" %>
+  </div>
+</div>
+
+
+

@@ -1,0 +1,7 @@
+<% if params[:tipo_listado] == '1' %>
+  <%= render 'relatorios/forms/rh/ferias_detalhado' %>
+<% elsif params[:tipo_listado] == '2' %>
+  <%= render 'relatorios/forms/rh/ferias_resumo' %>
+<% elsif params[:tipo_listado] == '3' %>
+  <%= render 'relatorios/forms/rh/ferias_fiscal' %>
+<% end %>

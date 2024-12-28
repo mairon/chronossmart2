@@ -1,0 +1,2 @@
+module VendasFaturasHelper
+end

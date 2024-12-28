@@ -1,0 +1,126 @@
+ <div class="row">
+    <div class="col-md-12">
+      <div class="panel">
+        <h1 id="header">
+          Plan de Venta <%= @plano_venda.id.to_s.rjust(6,'0') %>
+          <div class="pull-right">
+            <%= link_to image_tag("icon-edit.png", width: '13'), edit_plano_venda_path(@plano_venda), class: 'btn btn-default' %>
+            <%= link_to 'Salir', plano_vendas_path, :class => "btn btn-blue" %>
+            <%= link_to 'Gerara Plande Venta', comprovante_plano_venda_path(@plano_venda), :class => "btn btn-green", target:'_blank?' %>
+          </div>
+        </h1>
+        <div class="panel-content">
+          <div class="row">
+            <div class="col-md-4">
+              <label>Cliente</label>
+              <%= @plano_venda.persona_nome %>
+            </div>      
+            <div class="col-md-4">
+              <label>Condición</label>
+              <%= @plano_venda.tabela_preco.nome %>
+            </div> 
+            <div class="col-md-4">
+              <label>Precio</label>
+              <b>
+              <% if @plano_venda.moeda.to_i == 0 %>
+                <%= format_decimal(@plano_venda.valor_us) %>
+              <% elsif @plano_venda.moeda.to_i == 1 %>
+                <%= format_int(@plano_venda.valor_gs) %>
+              <% elsif @plano_venda.moeda.to_i == 2 %>
+                
+              <% end %>
+              </b>
+            </div>                  
+          </div>
+          
+
+          <div class="row">
+            <div class="col-md-4">
+              <label>Producto</label>
+              <%= @plano_venda.produto.nome %>
+            </div> 
+
+            <div class="col-md-4">
+              <label>Moneda</label>
+              <% if @plano_venda.moeda.to_i == 0 %>
+                U$.
+              <% elsif @plano_venda.moeda.to_i == 1 %>
+                Gs.
+              <% elsif @plano_venda.moeda.to_i == 2 %>
+                R$.
+              <% end %>
+            </div>
+            <div class="col-md-4">
+              <label>Obs.</label>
+              <%= @plano_venda.obs %>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="panel">
+        <h1 id="header">Plan Propuesto 
+          <div class="pull-right"><a class="modalButton-frma btn btn-blue" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-cond">+</a></div>
+        </h1>
+        <div class="panel-content">
+          <%= render "conds" %>
+          <%= render "conds_list" %>
+        </div>
+      </div> 
+    </div>
+    <div class="col-md-6">
+      
+      <div class="panel">
+        <h1 id="header">Escrituración</h1>
+        <div class="panel-content">
+          <% unless @plano_venda.persona_escrivania_id.nil? %>
+            <% ps = Persona.find(@plano_venda.persona_escrivania_id) %>
+            Proveedor: <%= ps.nome %> - 
+            <% end %>
+            Monto:
+          
+          <% if @plano_venda.valor_gs_escritura.to_f > 0 %>
+            Gs.<%= format_int(@plano_venda.valor_gs_escritura) %>
+          <% end %>
+
+          <% if @plano_venda.valor_us_escritura.to_f > 0 %>
+            U$.<%= format_decimal(@plano_venda.valor_us_escritura) %>
+          <% end %>
+
+
+        </div>
+      </div>  
+
+      <div class="panel">
+        <h1 id="header">Seguro</h1>
+        <div class="panel-content">
+          <% unless @plano_venda.persona_seguro_id.nil? %>
+            <% ps = Persona.find(@plano_venda.persona_seguro_id) %>
+            Proveedor: <%= ps.nome %> - 
+            <% end %>
+            Monto: 
+            
+            <% if @plano_venda.valor_gs_seguro.to_f > 0 %>
+              <%= format_int(@plano_venda.valor_gs_seguro) %>
+            <% end %>
+
+            <% if @plano_venda.valor_us_seguro.to_f > 0 %>
+              <%= format_decimal(@plano_venda.valor_us_seguro) %>
+            <% end %>
+
+          
+        </div>
+      </div>  
+
+      <%= render "docs" %>
+
+      <%= render "autorizacao" %>
+
+    </div>
+  </div>

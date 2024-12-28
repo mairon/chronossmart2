@@ -1,0 +1,97 @@
+<table class="head_grid">
+   <tr>
+      <td width="200"><%= t('FORM_OF_PAYMENT') %></td>
+      <td width="150"><%= t('ACCOUNT') %></td>
+      <td width="55" align="center"><%= t('COIN') %></td>
+      <td width="80" align="right"><%= t('VALUE') %></td>
+      <td width="100"><%= t('CHECKS') %></td>
+      <td width="80" align="center">Dif.</td>
+      <td width="80" align="right">Valor <%= t('SOURCE_S') %></td>
+      <td width="55"></td>
+   </tr>
+</table>
+<div class="rolagem" dir="div" style="height: 120px">
+   <table>
+      <% tot_us = 0 %>
+      <% tot_gs = 0 %>
+      <% tot_rs = 0 %>
+      <% tot = 0 %>
+      <% compras_financas.each do |cf| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="200"><%= cf.forma_pago.nome unless cf.forma_pago_id.blank? %></td>
+          <td width="150"><%= cf.conta.nome unless cf.conta_id.blank? %></td>
+          <% if cf.moeda.to_i == 0 %>
+            <td width="55" align="center"><span style="color:green">U$</span></td>
+            <% if cf.cred_deb.to_i == 1 %>
+               <% sinal = "-" %>
+               <% color = '#e33d43' %>
+               <% tot += cf.valor_dolar.to_f %>
+            <% else %>
+               <% sinal = "+" %>
+               <% color = '#56b349' %>
+               <% tot += cf.valor_dolar.to_f %>
+            <% end %>
+            <td width="80" align="right" ><b style="color: <%= color %>"><%= format_decimal( cf.valor_dolar ) %></b></td>
+
+
+          <% elsif cf.moeda.to_i == 1 %>
+            <td width="55" align="center"><span style="color:red">Gs</span></td>
+
+            <% if cf.cred_deb.to_i == 1 %>
+               <% sinal = "-" %>
+               <% color = '#e33d43' %>
+               <% tot += cf.valor_guarani.to_f %>
+            <% else %>
+               <% sinal = "+" %>
+               <% color = '#56b349' %>
+               <% tot += cf.valor_guarani.to_f %>
+            <% end %>
+            <td width="80" align="right" ><b style="color: <%= color %>"><%= format_int( cf.valor_guarani ) %></b></td>
+            <% elsif cf.moeda.to_i == 2 %>
+            <td width="55" align="center"><span style="color:blue">R$</span></td>
+            <% if cf.cred_deb.to_i == 1 %>
+               <% sinal = "-" %>
+               <% color = '#e33d43' %>
+               <% tot += cf.valor_real.to_f %>
+            <% else %>
+               <% sinal = "+" %>
+               <% color = '#56b349' %>
+               <% tot += cf.valor_real.to_f %>
+            <% end %>
+
+            <td width="80" align="right" style="color: <%= color %>"><b><%= format_decimal( cf.valor_real ) %></b></td>
+          <% end %>
+          <td align="center" ><b style="color: <%= color %>"><%= sinal %></b></td>
+          <td width="100" ><%= cf.cheque %></td>
+          <td width="80" align="center"><% cf.diferido.to_date.strftime("%d/%m/%y") unless cf.diferido.nil? %></td>
+          <% if @compra.moeda.to_i == 0 %>
+            <td width="80" align="right"><%= format_decimal(cf.valor_dolar) %></td>
+            <% tot_us += cf.valor_dolar.to_f %>
+          <% elsif @compra.moeda.to_i == 1 %>
+            <td width="80" align="right"><%= format_int(cf.valor_guarani) %></td>
+            <% tot_gs += cf.valor_guarani.to_f %>
+          <% elsif @compra.moeda.to_i == 2 %>
+            <td width="80" align="right"><%= format_decimal(cf.valor_real) %></td>
+            <% tot_rs += cf.valor_real.to_f %>
+          <% end %>
+          <td><%= link_to '', cf, method: :delete, class: 'icon-trash', title: t('DELETE'), data: { confirm: 'Esta Seguro?' }  %></td>
+        </tr>
+      <% end %>
+   </table>
+</div>
+<table class="head_grid">
+   <tr>
+      <td width="200"></td>
+      <td width="45" align="center"></td>
+      <td width="80" align="right"></td>
+      <td width="80" align="center"></td>
+      <% if @compra.moeda.to_i == 0 %>
+        <td width="80" align="right"><%= format_decimal(tot) %></td>
+      <% elsif @compra.moeda.to_i == 1 %>
+        <td width="80" align="right"><%= format_int(tot) %></td>
+      <% elsif @compra.moeda.to_i == 2 %>
+        <td width="80" align="right"><%= format_decimal(tot) %></td>
+      <% end %>
+      <td width="55"></td>
+   </tr>
+</table>

@@ -1,0 +1,94 @@
+<% form_tag resultado_busca_diferido_transferencia_contas_path, :name => "form1" do  %>
+   <div class="group">
+      <table>
+         <tr>
+            <td width="50" align="center">Cod.</td>
+            <td width="80" align="center"><%= t('DATE') %></td>
+            <td width="80" align="center">Dif.</td>
+            <td width="200" align="center">Titular</td>
+            <td width="200" align="center">Banco</td>
+            <td width="250" align="center"><%= t('ACCOUNT') %></td>
+            <td width="100" align="center">N. <%= t('CHECKS') %></td>
+            <td width="100" align="center">Valor n</td>
+         </tr>
+      </table>
+      <div class="rolagem" id="div">
+         <table>
+            <% sumus = 0 %>
+            <% sumgs = 0 %>
+            <% @diferido.each do |diferido| %>
+               <tr class = "<%= cycle("cor1", "cor2")%>">                  
+                  <%= hidden_field_tag "id", params[:id]   %>
+                  <td width="50" align="center"><%= diferido.id %></td>
+                  <td width="80" align="center"><%= diferido.original.strftime("%d/%m/%Y") %></td>
+                  <td width="80" align="center"><%= diferido.data.strftime("%d/%m/%Y") %></td>
+                  <td width="200" align="left"><%= diferido.titular %></td>
+                  <td width="200" align="left"><%= diferido.banco %></td>
+                  <td width="250" align="left"><%= diferido.conta_nome %></td>
+                  <td width="100" align="center"><%= diferido.cheque %></td>
+                  <% if @transferencia_conta.ingreso_moeda == 0 %>
+                     <% if @transferencia_conta.deposito == 3 %>
+
+                     <td width="100" align="right"><%= number_to_currency(diferido.saida_dolar, :format=>' %n ', :separator => ",") %></td>
+                     <td width="100" align="right"><%= number_to_currency(diferido.saida_dolar.to_f * @transferencia_conta.cotacao.to_f, :format=>' %n ', :precision => 0) %></td>
+
+                     <% diferido.entrada_guarani %>
+                     <% sumus = sumus +  diferido.saida_dolar %>
+                     <% sumgs = sumgs +  diferido.saida_guarani %>
+
+                     <% else %>
+
+                     <td width="100" align="right"><%= number_to_currency(diferido.entrada_dolar, :format=>' %n ', :separator => ",") %></td>
+                     <td width="100" align="right"><%= number_to_currency(diferido.entrada_dolar.to_f * @transferencia_conta.cotacao.to_f, :format=>' %n ', :precision => 0) %></td>
+
+                     <% diferido.entrada_guarani %>
+                     <% sumus = sumus +  diferido.entrada_dolar %>
+                     <% sumgs = sumgs +  diferido.entrada_guarani %>
+
+                     <% end  %>
+                  <% else %>
+                     <% if @transferencia_conta.deposito == 3 %>
+                        <td width="100" align="right"><%= number_to_currency(diferido.saida_guarani, :format=>' %n ', :precision => 0) %></td>
+                        <td width="100" align="right"><%= number_to_currency(diferido.saida_guarani / @transferencia_conta.cotacao.to_f, :format=>' %n ', :separator => ",") %></td>
+                        <% diferido.entrada_dolar %>
+                        <% sumgs = sumgs +  diferido.saida_guarani %>
+                        <% sumus = sumus +  diferido.saida_dolar %>
+                        <% else %>
+
+                        <td width="100" align="right"><%= number_to_currency(diferido.entrada_guarani, :format=>' %n ', :precision => 0) %></td>
+                        <td width="100" align="right"><%= number_to_currency(diferido.entrada_guarani / @transferencia_conta.cotacao.to_f, :format=>' %n ', :separator => ",") %></td>
+                        <% diferido.entrada_dolar %>
+                        <% sumgs = sumgs +  diferido.entrada_guarani %>
+                        <% sumus = sumus +  diferido.entrada_dolar %>
+
+                        <% end %>
+                  <% end %>
+               </tr>
+            <% end %>
+
+         </table>
+      </div>
+      <%= link_to t('BACK'), "/transferencia_contas/#{params[:id]}",  :class => 'button back' %> 
+   </div>   
+<% end %>
+
+
+<script>
+   function fecha(){
+      window.opener.document.getElementById('transferencia_conta_valor_cheque_guarani').value     = document.getElementById('total_gs').value;
+      window.opener.document.getElementById('transferencia_conta_valor_cheque_dolar').value       = document.getElementById('total_us').value;
+      self.close();
+
+   }
+   function SomaTotal(valor_gs,valor_us)              //
+   {
+      if(document.getElementById("diferido").checked == false ){
+         document.getElementById("total_gs").value = parseFloat(document.getElementById("total_gs").value) -  parseFloat(valor_gs)
+         document.getElementById("total_us").value = parseFloat(document.getElementById("total_us").value) -  parseFloat(valor_us)
+      }
+      else{
+         document.getElementById("total_gs").value = parseFloat(document.getElementById("total_gs").value) + parseFloat(valor_gs)
+         document.getElementById("total_us").value = parseFloat(document.getElementById("total_us").value) + parseFloat(valor_us)
+      }
+   }
+</script>

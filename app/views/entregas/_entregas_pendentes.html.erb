@@ -1,0 +1,36 @@
+<%= form_tag :action => 'add_entregas',:id => @entrega.id do %>
+	<div class="group">
+	<h2>Entregas Pendentes</h2>
+		<table class="head_grid">
+		<tr>
+		<td width="30"></td>
+			<td width="55" align="center"><%= t('SALE') %></td>
+			<td width="80" ><%= t('DOC') %></td>
+			<td width="350" >Cliente</td>
+			<td width="350" >Direción</td>
+			<td width="70" align="right">Cant.</td>
+			<td width="70" align="right">Peso</td>
+		</tr>
+		</table>
+		<div class="rolagem" id="div" style="height: 150px">
+			<table>
+				<% @entregas_pendentes.each do |ep| %>	
+					<tr class="<%= cycle("cor1", "cor2")%>">
+						<td width="30"><%= check_box_tag "lanz_ids[]", ep.id %></td>
+						<td width="55" align="center"><%= ep.id.to_s.rjust(6, '0')%></td>
+						<td width="80"><%= ep.documento_numero %></td>
+						<td width="350"><%= ep.persona_nome %></td>
+						<td width="350"><%= ep.direcao %></td>
+						<td width="70" align="right"><%= ep.qtd %></td>
+						<td width="70" align="right"><%= ep.tot_peso %></td>
+					</tr>
+				<% end %>
+			</table>
+		</div>
+		<div class="group">
+			<h2>
+				<%= submit_tag "Selecionar", :disable_with => "Aguarde...", class: 'button' %>
+			</h2>
+		</div>
+	</div>
+<% end %>

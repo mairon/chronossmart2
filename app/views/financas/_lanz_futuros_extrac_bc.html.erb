@@ -1,0 +1,74 @@
+<table>
+	<tr height="40">
+		<td colspan="7" align="center" valign="bottom">----------------------------------------------------------Lanzamientos Fucturos----------------------------------------------------------</td>
+	</tr>
+	<tr class="head">
+		<td align="center"><%= t('DATE') %></td>
+		<td align="left">Concepto</td>
+		<td align="center">Nr. <%= t('CHECKS') %></td>
+		<td align="right">Credito</td>
+		<td align="right">Debito</td>
+		<td align="right">Saldo</td>
+
+	</tr>
+	<tr>
+		<td colspan="7" align="center">----------------------------------------------------------------------------------------------------------------------------------------</td>
+	</tr>
+
+	<% totentrada   = 0 %>
+	<% totsaida     = 0 %>	
+	<% @lanz_futuros.each do |lf| %>
+
+		<% if params[:moeda] == "0" %>
+	      <% entrada = lf.entrada_dolar %>
+	      <% saida  = lf.saida_dolar %>
+	      <% valor_sum = 'entrada_dolar - saida_dolar'%>
+	      <% consulta_maior = 'entrada_dolar + saida_dolar' %>
+	    <% elsif params[:moeda] == "1" %>
+	      <% entrada = lf.entrada_guarani %>
+	      <% saida  = lf.saida_guarani %>
+	      <% valor_sum = 'entrada_guarani - saida_guarani'%>
+	      <% consulta_maior = 'entrada_guarani + saida_guarani' %>	     
+        <% else %>
+	      <% entrada = lf.entrada_real %>
+	      <% saida  = lf.saida_real %>
+	      <% valor_sum = 'entrada_real - saida_real'%>
+	      <% consulta_maior = 'entrada_real + saida_real' %>
+
+	    <% end %>
+
+		<tr>
+			<td width="80" align="center"> <%= h lf.data.strftime("%d/%m/%Y")%> </td>
+			<% if lf.tabela == "VENDAS_lfANCAS"%>
+			   <td width="640" align="left"> <%= h lf.concepto%> - <%= h lf.persona_nome %> </td>
+			<% else %>
+			   <td width="640" align="left"> <%= h lf.concepto%> </td>
+			<% end %>
+			<td width="50" align="center"> <%= h lf.ob_ref %>  </td>
+			<td width="100" align="center"> <%= h lf.cheque %>  </td>
+	   	    <% if params[:moeda].to_s == '1'%>
+	  		  <td width="80" align="right"> <%= h number_to_currency(entrada, :format=>' %n ', :precision => 0) %> </td>
+		  	  <td width="80" align="right"> <%= h number_to_currency(saida, :format=>' %n ', :precision => 0) %> </td>		  	  
+			<% else %>  
+	  		  <td width="80" align="right"> <%= h number_to_currency(entrada, :format=>' %n ', :separeitor => ',') %> </td>
+		  	  <td width="80" align="right"> <%= h number_to_currency(saida, :format=>' %n ', :separeitor => ',') %> </td>			
+			<% end %>  
+			<td width="80" align="right"></td>
+			<% totentrada   += entrada.to_f %>
+			<% totsaida     += saida.to_f %>
+			
+		</tr>
+	<% end %>
+	<tr class="head">
+		<td colspan="4"></td>
+      	<% if params[:moeda].to_s == '1' %>	      
+			<td width="80" align="right" ><%= number_to_currency(totentrada, :format=>' %n ', :precision => 0 ) %></td>
+			<td width="80" align="right"><%= number_to_currency(totsaida, :format=>' %n ', :precision => 0 ) %></td>
+			<td width="80" align="right"><%= number_to_currency((totentrada.to_f - totsaida.to_f), :format=>' %n ', :precision => 0) %></td>
+        <% else %>
+			<td width="80" align="right" ><%= number_to_currency(totentrada, :format=>' %n ', :separeitor => ',') %></td>
+			<td width="80" align="right"><%= number_to_currency(totsaida, :format=>' %n ', :separeitor => ',') %></td>
+			<td width="80" align="right"><%= number_to_currency((totentrada.to_f - totsaida.to_f), :format=>' %n ', :separeitor => ',') %></td>
+  	    <% end %>
+	</tr>	
+</table>

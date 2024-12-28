@@ -1,0 +1,27 @@
+<h1 id="header">Pantalla de Preparo</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_painel_preparo_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td>Codigo</td>
+    <td>Descripción</td>
+    <td>Grupo ids</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @painel_preparos.each do |painel_preparo| %>
+      <tr>
+        <td><%= link_to painel_preparo.id.to_s.rjust(6,'0'), painel_preparo_path(painel_preparo)  %></td>
+        <td><%= painel_preparo.nome %></td>
+        <td><%= painel_preparo.grupo_ids %></td>
+        <td><%= link_to '', edit_painel_preparo_path(painel_preparo), class: 'icon-pencil' %></td>
+        <td><%= link_to '', painel_preparo, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

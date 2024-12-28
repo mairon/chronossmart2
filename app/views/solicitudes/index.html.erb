@@ -1,0 +1,5 @@
+<% if current_user.tipo.to_i == 2 %>
+  <%= render 'solicitantes' %>
+<% else %>
+  <%= render 'autorizacao' %>
+<% end %>

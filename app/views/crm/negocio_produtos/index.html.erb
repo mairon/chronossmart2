@@ -1,0 +1,35 @@
+<h1 id="header">negocio_produtos</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_negocio_produto_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Negocio</t>
+            <td>Produto</t>
+            <td>Moeda</t>
+            <td>Unit us</t>
+            <td>Unit gs</t>
+            <td>Tot gs</t>
+            <td>Tot us</t>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @negocio_produtos.each do |negocio_produto| %>
+      <tr>
+                  <td><%= negocio_produto.negocio_id %></td>
+                  <td><%= negocio_produto.produto_id %></td>
+                  <td><%= negocio_produto.moeda %></td>
+                  <td><%= negocio_produto.unit_us %></td>
+                  <td><%= negocio_produto.unit_gs %></td>
+                  <td><%= negocio_produto.tot_gs %></td>
+                  <td><%= negocio_produto.tot_us %></td>
+                <td><%= link_to 'Editar', edit_negocio_produto_path(negocio_produto) %></td>
+        <td><%= link_to 'Borrar', negocio_produto, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

@@ -1,0 +1,99 @@
+
+<div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="myModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel">Efetivación de Gasto <span class="cota"></span> | <span class="prov"></h4>
+      </div>
+      <div class="modal-body" align="center">
+        <input type="hidden" name="" id="seq">
+
+        <a class="modalButton-frma btn btn-default" data-toggle="modal" data-width="500" data-height="781" data-target="#myiframe" data-dismiss="modal" aria-label="Close">No Fiscal</a>
+
+        <a href="#" title="" class="btn btn-default">Fiscal</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel">Efetivación de Gasto <span class="cota"></span> | <span class="prov"></h4>
+      </div>
+      <div class="modal-body" align="center">
+        <div class="embed-responsive embed-responsive-16by9" style="height: 460px">
+          <iframe class="embed-responsive-item" id="iframeModal" frameborder="0 " border="0"></iframe>
+      	</div>
+			</div>			
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(".acao").click(function() {
+    id_prov = $(this).attr('id');
+    cota = $(this).attr('cota');
+    prov = $(this).attr('prov');
+
+    $('#myModal').modal('show');
+    	$(".cota").text( cota );
+    	$(".prov").text( prov );
+      $('#seq').val(id_prov);
+
+   });
+
+	$('#myModal').on('shown.bs.modal', function(e) {
+	    $('#seq').val(id_prov);
+	});
+</script>
+
+
+<script>
+  
+( function($) {
+  
+function iframeModalOpen(){
+
+    // impostiamo gli attributi da aggiungere all'iframe es: data-src andrà ad impostare l'url dell'iframe
+    $('.modalButton-frma').on('click', function(e) {
+      var id     = $("#seq").val();
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+      
+      // stampiamo i nostri dati nell'iframe
+      $("#myiframe iframe").attr({
+        'src': '/compras/' + id + '/edit_gasto?prov_gasto=true&fiscal=false',
+        'height': height,
+        'width': width,
+        'allowfullscreen':''
+      });
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#myiframe').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+    });
+  }
+  
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+  
+  } ) ( jQuery );
+
+</script>
+
+<script>
+	$('#iframeModal .close', parent.document).trigger('click');
+</script>

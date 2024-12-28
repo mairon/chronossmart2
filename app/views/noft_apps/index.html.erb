@@ -1,0 +1,21 @@
+<h1 id="header">noft_apps</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_noft_app_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @noft_apps.each do |noft_app| %>
+      <tr>
+                <td><%= link_to 'Editar', edit_noft_app_path(noft_app) %></td>
+        <td><%= link_to 'Borrar', noft_app, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

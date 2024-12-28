@@ -1,0 +1,296 @@
+<div class="row" style="margin:0px">
+	<div class="col-md-12">
+		<div class="panel">
+		  <div class="panel-body">
+				<div class="row">
+				  <div class="col-md-2">
+		   			<%= image_tag @persona.picture, class: 'img-thumbnail' %>
+		   		</div>
+		     	<div class="col-md-9">
+		     		<label><i class="icon-user"></i><%= @persona.id.to_s.rjust(6,'0')%>-<%= @persona.nome %> | CI/RUC <%= @persona.ruc %>  | </label>
+		     		 <label>Segmiento <%= @persona.seguimento.nome unless @persona.seguimento_id.nil? %></label> <br>
+		     		<label><i class="icon-envelope"></i> <%= @persona.email %></label>
+		     		<label><%= image_tag 'phone.png', height: 14, style: 'margin-top: 2px;margin-right: 5px;' %> <%= @persona.telefone %> <%= @persona.telefone2 %></label> <br>
+		     		<label><i class="icon-tag"></i>
+		     			<% if @persona.tipo_cliente.to_i == 1 %>
+		     				<span style="background-color: #91DC5A;" class="panel-tag">Cliente</span>
+		     			<% end %>
+		     			<% if @persona.tipo_fornecedor.to_i == 1 %>
+		     				<span style="background-color: #933EC5;" class="panel-tag">Proveedor</span>
+	     				<% end %>
+	     				<% if @persona.tipo_banco.to_i == 1 %>
+		     				<span style="background-color: #006DF0;" class="panel-tag">Banco</span>
+	     				<% end %>
+	     				<% if @persona.tipo_funcionario.to_i == 1 %>
+	     					<span style="background-color: #D80027;" class="panel-tag">Empleado</span>
+		     			<% end %>
+	     				<% if @persona.tipo_vendedor.to_i == 1 %>
+		     				<span style="background-color: #FFDA44;" class="panel-tag">Vendedor</span>
+		     			<% end %>
+		     			<% if @persona.tipo_indicador.to_i == 1 %>
+		     				<span style="background-color: #00CAD9;" class="panel-tag">Indicador</span>
+		     			<% end %>
+		     		</label> <br>
+		     		<label>Obs.: <small style="margin-top: 3px;margin-left: 5px"><%= @persona.observacao %></small></label>
+		     		<label><input type="text" name="email" placeholder="exemplo@gmail.com"><a href="javascript:void(0)" class="btn btn-green" id="btn_enviar">Enviar por e-mail</a></label>
+		     	</div>
+		   	</div>
+		  </div>
+	  </div>
+  </div>
+</div>
+
+<div class="row">
+
+		<div class="row">
+		  <div class="col-md-12">
+
+		  </div>
+		</div>
+
+		<% if @persona.tipo_funcionario.to_i == 1 %>
+			<div class="row">
+			  <div class="col-md-12">
+
+			  </div>
+			</div>
+		<% end %>
+
+  </div>
+  <div class="col-sm-12">
+		<div class="row">
+		  <div class="col-md-12">
+		  	<div class="panel">
+			  	<div class="panel-body">
+			  		<h3>Receber</h3>
+			  		<p align="center">
+							<table>
+								<tr>
+									<td>
+										<div class="group">
+											<table class="head_grid">
+								  				<tr>
+								  					<td width="80" align="center"><%= t('DATE') %></td>
+								  					<td width="80" align="center"><%= t('SOURCE_S') %></td>
+								    				<td width="150">Factura</td>
+								    				<td width="150">Vendedor</td>
+								    				<td width="70" align="right">Deuda</td>
+								    				<td width="70" align="right">Pago</td>
+								    				<td width="70" align="right">Saldo</td>
+								    				<td width="80" align="center">Venc.</td>
+								    				<td width="25" align="center">Dias</td>
+								  				</tr>
+											</table>
+
+										<div class="rolagem" id="div" style="height: 150px">
+											<table>
+												<% tot = 0 %>
+												<% vencido = 0 %>
+												<% @cliente.each do |c| %>
+						            	<% if c.venda_id == 0 && current_user.tipo != 0 %>
+
+													<% else %>
+
+														<tr class="<%= cycle("cor1", "cor2")%>">
+															<td width="80" align="center"><%= c.data.strftime("%d/%m/%y") %></td>
+															<td width="80" align="center"><%= c.cod_proc.to_s.rjust(6,'0') %>•<%= c.sigla_proc %></td>
+															<td width="150"><%= c.doc %></td>
+															<td width="150"><%= c.vendedor_nome %></td>
+															<% if c.moeda.to_i == 0 %>
+																 <% if c.vencimento.to_date < Time.now.to_date %>
+								               		<% vencido += (c.divida_dolar.to_f ) %>
+								                  <% vec = "style=\" background-color: #fa3e40; padding: 2px; color:#fff; border-radius: 4px \" " %>
+									              <% end %>
+															<td width="70" align="right"><%= format_decimal(c.divida_dolar) %></td>
+															<td width="70" align="right"><%= format_decimal(c.anterior_us) %></td>
+															<td width="70" align="right"><%= format_decimal(c.divida_dolar.to_f - c.anterior_us.to_f) %></td>
+															<% tot += (c.divida_dolar.to_f) %>
+															<% elsif c.moeda.to_i == 1 %>
+														 	<% if c.vencimento.to_date < Time.now.to_date %>
+							               		<% vencido += (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+							                  <% vec = "style=\" background-color: #fa3e40; padding: 2px; color:#fff; border-radius: 4px \" " %>
+							              	<% end %>
+															<td width="70" align="right"><%= format_int(c.divida_guarani) %></td>
+															<td width="70" align="right"><%= format_int(c.anterior_gs) %></td>
+															<td width="70" align="right"><%= format_int(c.divida_guarani.to_f - c.anterior_gs.to_f) %></td>
+															<% tot += (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+															<% elsif c.moeda.to_i == 2 %>
+														 	<% if c.vencimento.to_date < Time.now.to_date %>
+							               		<% vencido += (c.divida_real.to_f) %>
+							                  <% vec = "style=\" background-color: #fa3e40; padding: 2px; color:#fff; border-radius: 4px \" " %>
+							              	<% end %>
+															<td width="70" align="right"><%= format_decimal(c.divida_real) %></td>
+															<td width="70" align="right"><%= format_decimal(c.anterior_gs) %></td>
+															<td width="70" align="right"><%= format_decimal(c.divida_real.to_f) %></td>
+															<% tot += (c.divida_real.to_f) %>
+
+															<% end %>
+															<td width="80" align="center"><span <%= raw vec %> ><%= c.vencimento.strftime("%d/%m/%y") %></span></td>
+															<td width="25" align="center"><%= Time.now.to_date - c.vencimento.to_date  %></td>
+														</tr>
+
+													<% end %>
+												<% end %>
+											</table>
+										</div>
+
+
+											<table class="head_grid">
+												<tr class="head">
+													<td width="180"></td>
+													<td align="right">Vencido: <font color="red"><b><%= format_decimal(vencido)%></b></font></td>
+													<td width="20" align="right"></td>
+													<td align="right">À Vencer: <font color="green"><b><%= format_decimal(tot - vencido)%></b></font></td>
+													<td width="20" align="right"></td>
+													<td align="right">Total: <font color="blue"><b><%= format_decimal(tot)%></b></font></td>
+												</tr>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</table>
+			  		</p>
+			  	</div>
+		  	</div>
+		  </div>
+		</div>
+
+		<div class="row">
+		  <div class="col-md-12">
+		  	<div class="panel">
+			  	<div class="panel-body">
+							<%= link_to 'Historico de Ventas', "#", :onClick=>"Vendas()", class: 'button' %>
+							<%= link_to 'Historico de Cobros', "#", :onClick=>"Cobros()", class: 'button' %>
+							<%= link_to t('VOUCHER'), "#", :onClick=>"Comprovante()", class: 'button' %>
+							<%= link_to 'Enviar e-mail', '', class: "btn btn-primary", onclick: "EnviarEmail(#{@persona.id})", id: 'send_email' %>
+
+			  	</div>
+		  	</div>
+		  </div>
+		</div>
+  </div>
+</div>
+
+<style>
+	i {
+		margin-top: 2px;
+		margin-right: 5px;
+	}
+
+	.panel-tag {
+	  border-radius: 4px;
+	  color: #fff;
+	  padding: 1px 8px 1px 8px;
+	}
+</style>
+
+<%= hidden_field_tag :id, @persona.id %>
+
+<script type="text/javascript">
+
+	$(document).ready(function(){
+		$("#btn_enviar").click(function(){
+      $.ajax({
+      	url: '/vendas/enviar_email_dividas',
+        type: 'POST',
+        beforeSend: function(xhr) {
+        	xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))
+        }, data: {
+        	"persona_id": $("#id").val(),
+        	"persona_id": $("#id").val()
+        }, success: function(data){
+        	$('#adelanto_cotacao_real').val(data);
+        }
+      });
+		});
+	});
+
+
+	function Compras(){
+    window.open('/personas/' + document.getElementById('id').value + '/compras', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+
+	$(window).keydown(function(event) {
+	  if(event.ctrlKey && event.keyCode == 70) {
+	    window.open('/personas/' + document.getElementById('id').value+'/compras', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	    event.preventDefault();
+	  }
+	});
+
+
+	function Vendas(){
+    window.open('/personas/' + document.getElementById('id').value+'/vendas', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+
+	$(window).keydown(function(event) {
+	  if(event.ctrlKey && event.keyCode == 70) {
+	    window.open('/personas/' + document.getElementById('id').value+'/vendas', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	    event.preventDefault();
+	  }
+	});
+
+
+	function DetalheVenda(venda){
+    window.open('/personas/' + <%= @persona.id %> +'/detalhe_venda?venda=' + venda , 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+
+	$(window).keydown(function(event) {
+	  if(event.ctrlKey && event.keyCode == 70) {
+	    window.open('/personas/' + <%= @persona.id %> +'/detalhe_venda?venda=' + venda , 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	    event.preventDefault();
+	  }
+	});
+
+
+	function DetalheCompra(compra){
+    window.open('/personas/' + <%= @persona.id %> +'/detalhe_compra?compra=' + compra , 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+
+	$(window).keydown(function(event) {
+	  if(event.ctrlKey && event.keyCode == 70) {
+	    window.open('/personas/' + <%= @persona.id %> +'/detalhe_compra?compra=' + compra , 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	    event.preventDefault();
+	  }
+	});
+
+
+	function Comprovante(compra){
+    window.open('/personas/' + <%= @persona.id %> +'/comprovante_dividas?compra=' + compra , 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+
+	function Cobros(compra){
+    window.open('/personas/' + <%= @persona.id %> +'/cobros?compra=' + compra , 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+
+	$(window).keydown(function(event) {
+	  if(event.ctrlKey && event.keyCode == 70) {
+	    window.open('/personas/' + <%= @persona.id %> +'/cobros?compra=' + compra , 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	    event.preventDefault();
+	  }
+	});
+
+
+	function Pagos(compra){
+    window.open('/personas/' + <%= @persona.id %> +'/pagos?compra=' + compra , 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+
+	$(window).keydown(function(event) {
+	  if(event.ctrlKey && event.keyCode == 70) {
+	    window.open('/personas/' + <%= @persona.id %> +'/pagos?compra=' + compra , 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	    event.preventDefault();
+	  }
+	});
+
+
+	function EnviarEmail(id){
+		window.open("/clientes/"+ id +"/enviar_email", '', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=800, HEIGHT=300');
+	}
+
+</script>

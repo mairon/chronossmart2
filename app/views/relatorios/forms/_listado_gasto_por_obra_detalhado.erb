@@ -1,0 +1,103 @@
+<% quebra   = "" %>
+<% subtotal = 0 %>
+<% total    = 0 %>
+<% totgt    = 0 %>
+
+<div class="group">
+   <table>
+      <% @gastos.each do |gt| %>
+      <% if quebra != gt.ob_ref  %>
+
+         <% if quebra != "" %>
+         
+            <tr class="head">
+            <% if params[:moeda] == '0'%>
+         	   <td colspan="8"></td>
+               <td width="80" align="right">    <%= number_to_currency( subtotal, :format =>' %n ', :separeitor => ',' ) %> </td>
+            <% else %>
+         	   <td colspan="8"></td>
+               <td width="80" align="right">    <%= number_to_currency( subtotal, :format =>' %n ', :precision => 0 ) %> </td>            
+            <% end %>
+            </tr>
+
+            <tr>
+               <td></td>
+            </tr>
+
+            <% subtotal  = 0 %>
+
+         <% end %>
+		<tr>
+	     <td colspan="1"></td>
+         <td colspan="6" class="head"><%=h quebra = gt.ob_ref %> - <% pd = Produto.last(:conditions => ["fabricante_cod = ?",quebra]) unless quebra.blank? %> <%= pd.nome  unless pd.nome.blank? %></td>			
+		</tr>
+
+		<tr>
+         <td colspan="9" class="head" align="certer">----------------------------------------------------------------------Etapas------------------------------------------------------------------------</td>			
+		</tr>
+
+		
+		<% etapas = Produto.all(:select =>"fabricante_cod,nome,preco_venda_guarani,preco_venda_dolar", :conditions => ["barra = ?",quebra])%>
+		<% etapas.each do |et| %>
+			<tr>
+	     		<td colspan="1"></td>
+	            <td colspan="7" class="head"><%= et.fabricante_cod %> - <%= et.nome %></td>
+	            <% if params[:moeda] == '0'%>
+    	           <td width="80" align="right">    <%= number_to_currency( et.preco_venda_dolar, :format =>' %n ', :separeitor => ',' ) %> </td>
+        	    <% else %>
+            	   <td width="80" align="right">    <%= number_to_currency( et.preco_venda_guarani, :format =>' %n ', :precision => 0 ) %> </td>            
+            	<% end %>
+			</tr>
+		<% end %>
+		<tr>
+         <td colspan="9" class="head" align="certer">----------------------------------------------------------------------Custos------------------------------------------------------------------------</td>			
+		</tr>
+
+      <% end %>
+
+
+                       
+         <tr class = "<%= cycle("cor1", "cor2") %>">
+            <td width="30"  align="center">   <%= gt.id %></td>
+            <td width="15"  align="left">   <%= gt.ob_ref %></td>
+            <td width="70"  align="center">   <%= gt.data.strftime("%d/%m/%Y") %></td>
+            <td width="130" align="left">     <%= truncate( gt.persona_nome, :length => 25 ) %></td>
+            <td width="150" align="left">     <%= truncate( gt.rubro_descricao, :length => 30 ) %></td>
+            <td width="70" align="center">   <%= gt.documento_numero_01 %>-<%= gt.documento_numero_02 %>-<%= truncate( gt.documento_numero, :length => 8 ) %></td>
+            <td width="80" align="center">    <%= truncate( gt.rodado_nome, :length => 15 ) %></td>                        
+            <td width="80" align="left">
+            	<% cf = ComprasFinanca.last(:conditions => ["compra_id = ?",gt.id])%>
+            	<%= truncate( cf.conta_nome, :length => 20 ) %>
+            </td>            
+            <% if params[:moeda] == '0'%>            
+               <td width="80" align="right">    <%= number_to_currency( gt.total_dolar, :format =>' %n ', :separeitor => ',' ) %> </td>
+               <% totgt    +=  gt.total_dolar %>
+               <% subtotal +=  gt.total_dolar %>
+
+            <% else %>
+               <td width="80" align="right">    <%= number_to_currency( gt.total_guarani, :format =>' %n ', :precision => 0 ) %> </td>
+               <% totgt +=  gt.total_guarani %>            
+               <% subtotal +=  gt.total_guarani %>
+            <% end %> 
+         </tr>
+      <% end %>
+      
+      <tr class="head">
+	      <td colspan="8"></td>
+            <% if params[:moeda] == '0'%>
+               <td width="80" align="right">    <%= number_to_currency( subtotal, :format =>' %n ', :separeitor => ',' ) %> </td>
+            <% else %>
+               <td width="80" align="right">    <%= number_to_currency( subtotal, :format =>' %n ', :precision => 0 ) %> </td>            
+            <% end %>
+      </tr>
+            
+         <tr class="head" height="30">
+            <td colspan="8"></td>
+            <% if params[:moeda] == '0'%>
+               <td width="80" align="right">    <%= number_to_currency( totgt, :format =>' %n ', :separeitor => ',' ) %> </td>
+            <% else %>
+               <td width="80" align="right">    <%= number_to_currency( totgt, :format =>' %n ', :precision => 0 ) %> </td>            
+            <% end %>
+         </tr>
+   </table>
+</div>

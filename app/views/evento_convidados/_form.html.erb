@@ -1,0 +1,65 @@
+<%= form_for(@evento_convidado) do |f| %>
+  <% if @evento_convidado.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@evento_convidado.errors.count, "error") %> prohibited this evento_convidado from being saved:</h2>
+
+      <ul>
+      <% @evento_convidado.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <h1 id="header">
+        Evento <%= @evento_convidado.evento.nome %>
+        <small><%= @evento_convidado.evento.obs %></small>
+        <div class="pull-right">
+          <%= @evento_convidado.evento.id.to_s.rjust(6,'0') %>
+        </div>
+      </h1>
+      <div class="panel-content">
+        <div class="row">
+          <div class="col-md-12">
+            <label>Nombre</label>
+            <%= f.text_field :nome %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <label>Doc.</label>
+            <%= f.text_field :doc %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <label>Telefone</label>
+            <%= f.text_field :telefone %>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <label>Confirmado</label>
+            <%= f.check_box :confirmado %>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <label>Present</label>
+            <%= f.check_box :presente %>
+          </div>
+        </div>                
+      </div>
+    </div>
+    <div style="padding: 10px" align="center">
+      <%= f.submit "Salvar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), evento_path(@evento_convidado.evento_id), :class => "btn btn-back" %>
+    </div>      
+  </div>
+</div>
+
+<% end %>

@@ -1,0 +1,101 @@
+<% if params[:fact_mes] == '12' %>
+  <% mes = 11 %>
+<% else %>
+  <% mes = 5 %>
+<% end %>
+
+<%
+sql = "SELECT ANO, MES, SUM(TOT_GS) AS TOT_GS, SUM(QTD) AS QTD FROM (
+        SELECT date_part('year', V.DATA) AS ANO,
+              date_part('month', V.DATA) AS MES,
+              SUM(VP.TOTAL_GUARANI - VP.DESCONTO_GUARANI) AS TOT_GS,
+              SUM(VP.QUANTIDADE) AS QTD
+        FROM VENDAS_PRODUTOS VP
+        INNER JOIN VENDAS V
+        ON V.ID = VP.VENDA_ID
+        WHERE V.UNIDADE_ID = #{current_unidade.id}
+        AND V.DATA >= date_trunc('month',current_date) - INTERVAL '#{mes}' MONTH
+        AND (SELECT COUNT(VF) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID ) > 0
+
+        GROUP BY 1,2
+
+        UNION ALL
+
+        SELECT date_part('year', V.DATA) AS ANO,
+                 date_part('month', V.DATA) AS MES,
+                (SUM(VP.TOTAL_GUARANI) * -1) AS TOT_GS,
+                (SUM(VP.QUANTIDADE) * -1) AS QTD
+            FROM
+              NOTA_CREDITOS_DETALHES VP
+              INNER JOIN NOTA_CREDITOS V
+              ON V.ID = VP.NOTA_CREDITO_ID
+            WHERE V.OPERACAO = 0
+          AND V.DATA >= date_trunc('month',current_date) - INTERVAL '#{mes}' MONTH
+            AND V.UNIDADE_ID = #{current_unidade.id}
+
+            GROUP BY 1,2
+
+        ) AS X GROUP BY 1,2
+    ORDER BY 1 DESC ,2 DESC"
+
+
+faturamento_mes = Venda.find_by_sql(sql)
+%>
+
+
+<script type="text/javascript">
+  google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(drawVisualization);
+
+  function drawVisualization() {
+    // Some raw data (not necessarily accurate)
+    var data = google.visualization.arrayToDataTable([
+      ['Año/Mes', 'Facturación'],
+      <% faturamento_mes.reverse_each do |fm| %>
+      ['<%= fm.mes.to_s.rjust(2,'0') %>/<%= fm.ano[2..3] %> | <%= fm.qtd.to_i %> | <%= format_int(fm.tot_gs) %>',  <%= fm.tot_gs.to_i %>],
+      <% end %>
+    ]);
+
+
+    var options = {
+      chartArea: {width: '83%'},
+      bar: {groupWidth: "90%"},
+      hAxis: {title: 'Meses'},
+      seriesType: 'bars',
+      legend: { position: 'none' },
+      series: {5: {type: 'line'}}
+    };
+
+    var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+    chart.draw(data, options);
+  }
+</script>
+
+
+<h1 id="header">
+  Facturación últimos
+  <div class="btn-group btn-group-sm" role="group" aria-label="...">
+    <% if params[:fact_mes] == '12' %>
+      <button type="button" class="btn btn-default" id="fac_mes_6">6 meses</button>
+      <button type="button" class="btn btn-primary" id="fac_mes_12">12 meses</button>
+    <% else %>
+      <button type="button" class="btn btn-primary" id="fac_mes_6">6 meses</button>
+      <button type="button" class="btn btn-default" id="fac_mes_12">12 meses</button>
+    <% end %>
+  </div>
+</h1>
+<div>
+  <div id="chart_div" style="height: 300px;" align="center"></div>
+</div>
+
+<script>
+
+  $('#fac_mes_6').click(function (){
+    window.location.href = "/dashboard/faturamento?fact_mes=6";
+  });
+
+  $('#fac_mes_12').click(function (){
+    window.location.href = "/dashboard/faturamento?fact_mes=12";
+  });
+
+</script>

@@ -1,0 +1,40 @@
+<h1 id="header"><%= t('DATE') %> <%= @pago.data.strftime("%d/%m/%y")%> |
+                Prov. <%= @pago.persona_nome %> |
+                Moneda :
+                <% if @pago.moeda == 0 %>
+                  <font color="green"> Dolar</font>
+                <% elsif @pago.moeda == 1 %>
+                  <font color="red"> Guaranies </font>
+                <% else %>
+                  <font color="blue"> Real</font>
+                <% end %>
+                | Cotizacion U$.: 
+                <%= number_to_currency( @pago.cotacao, :format =>' %n ', :precision => 02 ) %> 
+                R$.: <%= number_to_currency( @pago.cotacao_real, :format =>' %n ', :precision => 2 ) %>
+</h1>
+  <table>
+    <tr>
+      <% if @pago.moeda == 0 %>
+        <td width="100" align="right">Valor: <%= number_to_currency( @pago_us, :format =>' %n ', :separator => "," ) %></td>
+        <td width="100" align="right">Desc.: <%= number_to_currency( @desconto_us, :format =>' %n ', :separator => "," ) %>(-)</td>
+        <td width="100" align="right">Int.   <%= number_to_currency( @interes_us, :format =>' %n ', :separator => "," ) %>(+)</td>      
+        <td width="100" align="right">Total: <b><%= number_to_currency( ( ( @pago_us.to_f + @interes_us.to_f ) - @desconto_us.to_f ), :format =>' %n ', :separator => ",")%></b></td>      
+      <% elsif @pago.moeda == 1 %>
+        <td width="100" align="right">Valor: <%= number_to_currency( @pago_gs, :format =>' %n ', :precision => 0 ) %></td>
+        <td width="100" align="right">Desc.: <%= number_to_currency( @desconto_gs, :format =>' %n ', :precision => 0 ) %>(-)</td>
+        <td width="100" align="right">Int.:  <%= number_to_currency( @interes_gs, :format =>' %n ', :precision => 0 ) %>(+)</td>      
+        <td width="100" align="right">Total: <b><%= number_to_currency( ( ( @pago_gs.to_f + @interes_gs.to_f ) - @desconto_gs.to_f ), :format =>' %n ', :precision => 0 ) %></b></td>
+      <% else %>
+        <td width="100" align="right">Valor: <%= number_to_currency( @pago_rs, :format =>' %n ', :separator => "," ) %></td>
+        <td width="100" align="right">Desc.: <%= number_to_currency( @desconto_rs, :format =>' %n ', :separator => "," ) %>(-)</td>
+        <td width="100" align="right">Int.:  <%= number_to_currency( @interes_rs, :format =>' %n ', :separator => "," ) %>(+)</td>      
+        <td width="100" align="right">Total: <b><%= number_to_currency( ( ( @pago_rs.to_f + @interes_rs.to_f ) - @desconto_rs.to_f ), :format =>' %n ', :separator => ",")%> </b> </td>      
+      <% end %>
+    </tr>
+  </table>
+
+<%= render :partial=>"index_financa", :locals=>{:pagos_financas => @pago.pagos_financas} %>
+<br/>
+
+<%= render :partial=>"form_financa", :locals=>{:pagos_financa=>PagosFinanca.new(:pago_id=>@pago.id)} %>
+

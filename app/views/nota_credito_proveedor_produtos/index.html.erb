@@ -1,0 +1,18 @@
+<h1>Listing nota_credito_proveedor_produtos</h1>
+
+<table>
+  <tr>
+  </tr>
+
+<% @nota_credito_proveedor_produtos.each do |nota_credito_proveedor_produto| %>
+  <tr>
+    <td><%= link_to 'Show', nota_credito_proveedor_produto %></td>
+    <td><%= link_to 'Edit', edit_nota_credito_proveedor_produto_path(nota_credito_proveedor_produto) %></td>
+    <td><%= link_to 'Destroy', nota_credito_proveedor_produto, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New nota_credito_proveedor_produto', new_nota_credito_proveedor_produto_path %>

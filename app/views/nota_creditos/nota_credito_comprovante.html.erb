@@ -1,0 +1,15 @@
+<h1 id="header">Nota de Credito - Comprovante</h1>
+<div class="group">
+   <a href="javascript:void(0)" class="button print" onClick="Comprovante()"><%= t('VOUCHER') %></a>
+   <a href="/nota_creditos"class="button next"> Finalizar </a>
+</div>
+<%= hidden_field_tag :id, @nota_credito.id %>
+<script>
+function Comprovante(){
+    window.open('/nota_creditos/'+document.getElementById('id').value+'/comprovante', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }  
+
+</script>
+
+
+

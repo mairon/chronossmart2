@@ -1,0 +1,43 @@
+<style type="text/css">
+  td{
+    cursor: pointer;
+  }
+</style>
+
+ <div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="100" align="center">Fecha</td>
+      <td width="60">Origen</td>
+      <td width="50">Origen</td>
+      <td width="200">Vendedor</td>
+      <td width="150">Marca</td>
+      <td width="320">Producto</td>
+      <td width="55" align="right">Salida</td>
+      <td width="55" align="right">Unit.</td>
+      <td width="73" align="right">Tot.</td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+    <table>
+      <% @historico_compras.each do |hc| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>" onclick="addVenda('<%= hc.produto_nome %>')">
+          <td width="100" align="center"><%= hc.data.to_date.strftime("%d/%m/%y") %></td>
+          <td width="60"><%= hc.cod_processo.to_s.rjust(6,'0') %></td>
+          <td width="50"><%= hc.sigla_proc %></td>
+          <td width="200"><%= hc.vendedor_nome %></td>
+          <td width="150"><%= hc.clase_nome %></td>
+          <td width="320"><%= hc.produto_id.to_s.rjust(6,'0')%>-<%= hc.produto_nome %></td>
+          <td width="55" align="right"><%= hc.saida.to_f %></td>
+          <td width="55" align="right"><%= format_int(hc.unitario_guarani) %></td>
+          <td width="70" align="right"><%= format_int((hc.entrada.to_f + hc.saida.to_f) *  hc.unitario_guarani.to_f) %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+  <div class="acessos">
+  </div>
+</div>
+
+
+

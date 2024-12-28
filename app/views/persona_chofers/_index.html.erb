@@ -1,0 +1,27 @@
+
+<table class="head_grid">
+  <tr>
+    <td width="50">Cod.</td>
+    <td width="100">Chapa</td>
+    <td width="250">Chofer</td>
+    <td width="200">Marca</td>
+    <td width="70" align="right">Capacidad</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% persona_chofers.each do |persona_chofer| %>
+    <% chof = Persona.find_by_id(persona_chofer.chofer_id) %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td width="50"><%= persona_chofer.chofer_id.to_s.rjust(6, '0') %></td>
+        <td width="100"><%= chof.placa %></td>
+        <td width="250"><%= chof.nome %></td>
+        <td width="200"><%= chof.marca %></td>
+        <td width="70" align="right"><%= format_int(chof.capacidade.to_f) %></td>
+        <td><%= link_to t('DELETE'), persona_chofer, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

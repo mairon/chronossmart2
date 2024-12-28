@@ -1,0 +1,70 @@
+<table>
+	<% valor = 0 %>
+	<% pago  = 0 %>
+	<% @adelantos.each do |ad| %>
+		<tr class="<%= cycle("cor1", "cor2")%>">
+			<td width="30" align="center"><%= ad.id.to_s.rjust(6,'0') %></td>
+			<td width="40" align="center"><%= ad.data.strftime("%d/%m/%y") %></td>
+			<td width="40" align="center"><%= ad.vencimento.strftime("%d/%m/%y") %></td>
+			<td width="200" align="left"><%= truncate(ad.nome, length: 25) %></td>
+			<td width="10" align="left"><%= ad.cota %></td>
+			<td width="150" align="left"><%= ad.doc %></td>
+			<% if params[:tipo_adelanto] == '0' %>
+				<% if ad.moeda.to_i == 0 %>
+		      <td width="70" align="right"><%= number_to_currency(ad.pago_us.to_f, :format=>' %n ', :separeitor => ",") %></td>
+		      <td width="70" align="right"><%= number_to_currency(ad.div_us.to_f, :format=>' %n ', :separeitor => ",") %></td>
+		      <td width="70" align="right"><%= number_to_currency( ad.pago_us.to_f - ad.div_us.to_f, :format=>' %n ', :separeitor => ",") %></td>
+					<% valor += ad.pago_us.to_f %>
+					<% pago  += ad.div_us.to_f %>
+
+				<% elsif ad.moeda.to_i == 1 %>
+		      <td width="70" align="right"><%= number_to_currency(ad.pago_gs.to_f, :format=>' %n ', :precision => 0) %></td>
+		      <td width="70" align="right"><%= number_to_currency(ad.div_gs.to_f, :format=>' %n ', :precision => 0) %></td>
+		      <td width="70" align="right"><%= number_to_currency( ad.pago_gs.to_f - ad.div_gs.to_f, :format=>' %n ', :precision => 0) %></td>
+					<% valor += ad.pago_gs.to_f %>
+					<% pago  += ad.div_gs.to_f %>
+				<% else %>
+		      <td width="70" align="right"><%= number_to_currency(ad.pago_rs.to_f, :format=>' %n ', :separeitor => ",") %></td>
+		      <td width="70" align="right"><%= number_to_currency(ad.div_rs.to_f, :format=>' %n ', :separeitor => ",") %></td>
+		      <td width="70" align="right"><%= number_to_currency( ad.pago_rs.to_f - ad.div_rs.to_f, :format=>' %n ', :separeitor => ",") %></td>
+					<% valor += ad.pago_rs.to_f %>
+					<% pago  += ad.div_rs.to_f %>
+				<% end %>
+			<% else %>
+				<% if ad.moeda.to_i == 0 %>
+		      <td width="70" align="right"><%= number_to_currency(ad.div_us.to_f, :format=>' %n ', :separeitor => ",") %></td>
+		      <td width="70" align="right"><%= number_to_currency(ad.pago_us.to_f, :format=>' %n ', :separeitor => ",") %></td>
+		      <td width="70" align="right"><%= number_to_currency(ad.div_us.to_f - ad.pago_us.to_f, :format=>' %n ', :separeitor => ",") %></td>
+					<% valor += ad.div_us.to_f %>
+					<% pago  += ad.pago_us.to_f %>
+
+				<% elsif ad.moeda.to_i == 1 %>
+		      <td width="70" align="right"><%= number_to_currency(ad.div_gs.to_f, :format=>' %n ', :precision => 0) %></td>
+		      <td width="70" align="right"><%= number_to_currency(ad.pago_gs.to_f, :format=>' %n ', :precision => 0) %></td>
+		      <td width="70" align="right"><%= number_to_currency(ad.div_gs.to_f - ad.pago_gs.to_f, :format=>' %n ', :precision => 0) %></td>
+					<% valor += ad.div_gs.to_f %>
+					<% pago  += ad.pago_gs.to_f %>
+				<% else %>
+		      <td width="70" align="right"><%= number_to_currency(ad.div_rs.to_f, :format=>' %n ', :separeitor => ",") %></td>
+		      <td width="70" align="right"><%= number_to_currency(ad.pago_rs.to_f, :format=>' %n ', :separeitor => ",") %></td>
+		      <td width="70" align="right"><%= number_to_currency(ad.div_rs.to_f - ad.pago_rs.to_f, :format=>' %n ', :separeitor => ",") %></td>
+					<% valor += ad.div_rs.to_f %>
+					<% pago  += ad.pago_rs.to_f %>
+				<% end %>
+			<% end %>
+		</tr>
+	<% end %>
+	<tr class="head" height="30">
+		<td colspan="6"></td>
+		<% if params[:moeda].to_s == '1' %>
+	    <td width="70" align="right"><%= number_to_currency(valor.to_f, :format=>' %n ', :precision => 0) %></td>
+	    <td width="70" align="right"><%= number_to_currency(pago.to_f, :format=>' %n ', :precision => 0) %></td>
+	    <td width="70" align="right"><%= number_to_currency(valor.to_f - pago.to_f, :format=>' %n ', :precision => 0) %></td>
+		<% else %>
+	    <td width="70" align="right"><%= number_to_currency(valor.to_f, :format=>' %n ', :separeitor => ",") %></td>
+	    <td width="70" align="right"><%= number_to_currency(pago.to_f, :format=>' %n ', :separeitor => ",") %></td>
+	    <td width="70" align="right"><%= number_to_currency(valor.to_f - pago.to_f, :format=>' %n ', :separeitor => ",") %></td>
+		<% end %>
+	</tr>
+
+</table>

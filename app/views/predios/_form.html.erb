@@ -1,0 +1,35 @@
+<h1 id="header">Predio - [Edición]</h1>
+ <div class="group">
+
+<%= form_for(@predio) do |f| %>
+  <% if @predio.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@predio.errors.count, "error") %> prohibited this predio from being saved:</h2>
+
+      <ul>
+      <% @predio.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+      <table>
+        <tr>
+          <td>
+            <label>Nome</label>
+            <%= f.text_field :nome, autofocus: true,required: true %>
+          </td>
+        </tr>
+        <tr>
+          <td><%= f.check_box :status %> Status</td>
+        </tr>
+      </table>
+      <div class="footer-buttons">
+        <%= f.submit "Grabar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+        <%= link_to 'Volver', predios_path, :class => "btn btn-back" %>
+      </div>
+    <% end %>
+</div>
+
+

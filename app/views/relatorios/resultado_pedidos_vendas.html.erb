@@ -1,0 +1,5 @@
+<% if params[:detalhe].to_s == '2' %>
+	<%= render :partial => 'relatorios/forms/pedido_venda_cliente' %>
+<% else %>
+	<%= render :partial => 'relatorios/forms/pedido_venda_resumido_det' %>
+<% end %>

@@ -1,0 +1,83 @@
+<%= form_for(@ajuste_preco) do |f| %>
+	<% if @ajuste_preco.errors.any? %>
+		<div id="error_explanation">
+			<h2><%= pluralize(@ajuste_preco.errors.count, "error") %> prohibited this ajuste_preco from being saved:</h2>
+
+			<ul>
+			<% @ajuste_preco.errors.full_messages.each do |msg| %>
+				<li><%= msg %></li>
+			<% end %>
+			</ul>
+		</div>
+	<% end %>
+
+<ul class="tabs">
+			<li><a href="#tab1"> Ajuste de Precio - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+	<div id="tab1" class="tab_content">
+		<table>
+			</tr>
+				<td align="right"><%= t('DATE') %>:</td>
+				<td><%= f.date_select :data %> </td>
+			</tr>
+
+			<tr>
+				<td align="right">Marca:</td>
+				<td>
+					<%= f.collection_select :sub_grupo_id, SubGrupo.all(:select => 'id,descricao',:order => '2'),:id,:descricao,{:include_blank => true}, {:style => "width:350px"}%>
+				</td>
+			</tr>
+
+			<tr>
+				<td align="right">Grupo:</td>
+				<td>
+					<%= f.collection_select :grupo_id, Grupo.all(:select => 'id,descricao',:order => '2'),:id,:descricao,{:include_blank => true}, {:style => "width:350px"} %>
+
+					<%= image_tag("load.gif",
+						:align => "absmiddle",
+						:border => 0,
+						:id => "spinner",
+						:width => 21,
+						:height => 21,
+						:style =>"display: none;" ) %>
+				</td>
+				<tr>
+					<td align="right">Tipo de Aplicacion:</td>
+					<td>
+							<%= f.radio_button :tipo, 0 %> Descontar
+							<%= f.radio_button :tipo, 1 %> Adcionar
+					</td>
+				</tr>
+			</tr>
+				<td align="right">Consumidor Final:</td>
+				<td><%= f.text_field :porcen_1, :dir   => "rtl", :size => 15 %> % </td>
+			</tr>
+			</tr>
+				<td align="right">Cliente Especial:</td>
+				<td><%= f.text_field :porcen_2, :dir   => "rtl", :size => 15 %> % </td>
+			</tr>
+			</tr>
+				<td align="right">Colaboradores:</td>
+				<td><%= f.text_field :porcen_3, :dir   => "rtl", :size => 15 %> % </td>
+			</tr>
+			</tr>
+				<td align="right">Tabla 4:</td>
+				<td><%= f.text_field :porcen_4, :dir   => "rtl", :size => 15 %> % </td>
+			</tr>
+
+			<tr>
+				<td align="right">obs :</td>
+				<td><%= f.text_area :obs, :cols => 55, :rows => 5 %></td>
+			</tr>
+		</table>
+		</div>
+
+		<div class="buttons">
+			<%= f.submit :value => t('SAVE'), :class => "button" %>
+			<%= link_to t('BACK'), ajuste_precos_path, :class => "button back" %>
+		</div>
+
+	</div>
+<% end %>

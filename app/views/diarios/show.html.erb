@@ -1,0 +1,64 @@
+<h1 align="right" id="header">Acientos Contables</h1>
+Acientos Contables
+
+<div class="group">
+  <table>
+    <tr>
+      <td><%= t('DATE') %>:</td>
+      <td><%= @diario.data.strftime("%d/%m/%Y") %></td>
+
+      <td>Lanz.:</td>
+      <td><%= @diario.tabela_id %></td>
+
+
+      <td>Cotizacion:</td>
+      <td><%= @diario.cotacao %></td>
+
+    </tr>
+
+    <tr>
+      <td>Documento:</td>
+      <td><%= @diario.documento_nome %></td>
+    </tr>
+
+  </table>
+
+
+  <table>
+    <tr>
+      <td>
+
+  <fieldset>
+    
+    <legend>Debitos</legend>
+
+    <p><a href="/diarios/novo_debe/<%=@diario.id%>" id="novo">Nuevo</a></p>
+    <%= render :partial=>"index_debe", :locals=>{:diario_debes => @diario.diario_debes} %>
+
+  </fieldset>
+
+      </td>
+    </tr>
+  </table>
+
+  <table>
+    <tr>
+      <td>
+
+
+  <fieldset>
+    <legend>Creditos</legend>
+
+    <p><a href="/diarios/novo_haber/<%=@diario.id%>" id="novo">Nuevo</a></p>
+    <%= render :partial=>"index_haber", :locals=>{:diario_habers => @diario.diario_habers} %>
+
+  </fieldset>
+      </td>
+    </tr>
+  </table>
+
+
+</div>
+<%= link_to '<< Volver ', edit_diario_path(@diario) %> |
+<a href="#" onclick="DiarioSeguirComprovante(<%=@diario.id%>)">Seguir >></a>
+

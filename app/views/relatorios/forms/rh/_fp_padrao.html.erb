@@ -1,0 +1,297 @@
+<style type="text/css">
+  .page-break { display:block; clear:both; page-break-after:always; }
+  .header{
+    border-collapse: collapse;
+    font-size: 9px;
+  }
+  .header{
+    font-weight: bold;
+    background-color: #999;
+  }
+  .header_top{
+    padding:  0px 0px 0px 0px;
+    margin-left: 0px;
+    font-family: Verdana;
+    text-transform: uppercase;
+  }
+</style>
+
+
+<table>
+
+  <% tot_gs_sueldo = 0 %>
+  <% tot_gs_comis  = 0 %>
+  <% tot_gs_extr   = 0 %>
+  <% tot_gs_bonif  = 0 %>
+  <% tot_gs_pg_adel   = 0 %>
+  <% tot_gs_adel   = 0 %>
+  <% tot_gs_prest  = 0 %>
+  <% tot_gs_ips    = 0 %>
+  <% tot_gs_otr_d  = 0 %>
+  <% tot_gs_otr_c  = 0 %>
+  <% tot_gs_pago   = 0 %>
+  <% tot_gs_vac    = 0 %>
+  <% tot_gs_agui   = 0 %>
+  <% tot_gs        = 0 %>
+  <% tot_sub_cred_gs = 0 %>
+  <% tot_sub_deb_gs  = 0 %>
+
+  <% tot_us_sueldo = 0 %>
+  <% tot_us_comis  = 0 %>
+  <% tot_us_extr   = 0 %>
+  <% tot_us_bonif  = 0 %>
+  <% tot_us_adel   = 0 %>
+  <% tot_us_prest  = 0 %>
+  <% tot_us_otr_d  = 0 %>
+  <% tot_us_otr_c  = 0 %>
+  <% tot_us_pago  = 0 %>
+  <% tot_us_vac    = 0 %>
+  <% tot_us_agui   = 0 %>
+  <% tot_us        = 0 %>
+
+  <% tot_rs_sueldo = 0 %>
+  <% tot_rs_comis  = 0 %>
+  <% tot_rs_extr   = 0 %>
+  <% tot_rs_bonif  = 0 %>
+  <% tot_rs_adel   = 0 %>
+  <% tot_rs_prest  = 0 %>
+  <% tot_rs_otr_d  = 0 %>
+  <% tot_rs_otr_c  = 0 %>
+  <% tot_rs_pago  = 0 %>
+  <% tot_rs_vac    = 0 %>
+  <% tot_rs_agui   = 0 %>
+
+  <% tot_rs        = 0 %>
+
+<% if params[:moeda_gs] == '1' %>
+  <tr>
+    <td><%= t('COIN') %>: G$</td>
+  </tr>
+  <tr>
+    <td class="header"> Empleado</td>
+    <td class="header" align="right"> Sueldo(+)</td>
+    <td class="header" align="right"> Comisión(+)</td>
+    <td class="header" align="right"> Extra(+)</td>
+    <td class="header" align="right"> Bonif.(+)</td>
+    <td class="header" align="right"> Pg. Antec.(+)</td>
+    <td class="header" align="right"> Vacaciones(+)</td>
+    <td class="header" align="right"> Aguinaldo(+)</td>
+    <td class="header" align="right"> Otros(+)</td>
+    <td class="header" align="right"> Sub-total(+)</td>
+
+    <td class="header" align="right"> IPS(-)</td>
+    <td class="header" align="right"> Deducción Ante.(-)</td>
+    <td class="header" align="right"> Prest.(-)</td>
+    <td class="header" align="right"> Otros(-)</td>
+    <td class="header" align="right"> Sub-total(-)</td>
+    <td class="header" align="right"> Saldo Dev.</td>
+    <td class="header" align="right"> Pago</td>
+    <td class="header" align="right"> Saldo</td>
+  </tr>
+  <% @sueldo.each do |sd| %>
+    <% pago_gs = SueldoPago.sum(:valor_gs, :conditions => ["PERSONA_ID = #{sd.id} and MOEDA = 1 and sueldo_id = #{sd.id}"])%>
+
+    <tr class = "<%= cycle( "cor1", "cor2" )%>">
+      <td width="200" ><%= truncate(sd.nome, length: 40) %></td>
+      <td width="60" align="right"><%= format_int(sd.gs_sueldo.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.gs_comis.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.gs_extr.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.gs_bonif.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.gs_pg_adel.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.gs_vaca.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.gs_agui.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.gs_otros_cred.to_f) %></td>
+
+      <td width="60" align="right"><b><%= format_int(sd.gs_sueldo.to_f + sd.gs_comis.to_f + sd.gs_extr.to_f  + sd.gs_bonif.to_f + sd.gs_vaca.to_f + sd.gs_agui.to_f + sd.gs_otros_cred.to_f + sd.gs_pg_adel.to_f) %></b></td>
+
+      <td width="60" align="right"><%= format_int(sd.gs_ips.to_f + (sd.gs_pg_adel.to_f * 0.09)) %></td>
+      <td width="60" align="right"><%= format_int(sd.gs_adel.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.gs_prest.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.gs_otros_deb.to_f) %></td>
+      <td width="60" align="right"><b><%= format_int(sd.gs_ips.to_f + sd.gs_adel.to_f + sd.gs_prest.to_f + sd.gs_otros_deb.to_f) %></b></td>
+
+      <td width="60" align="right"><b><%= format_int(l_tot_gs = ((sd.gs_sueldo.to_f + sd.gs_comis.to_f + sd.gs_extr.to_f  + sd.gs_bonif.to_f + sd.gs_vaca.to_f + sd.gs_agui.to_f + sd.gs_otros_cred.to_f) - (sd.gs_adel.to_f + sd.gs_otros_deb.to_f + sd.gs_prest.to_f + sd.gs_ips.to_f + (sd.gs_pg_adel.to_f * 0.09) ))) %></b></td>
+      <td width="60" align="right"><%= number_to_currency( pago_gs,  :format=>' %n ', :precision => 0 ) %></td>
+      <td width="60" align="right"><%= number_to_currency( l_tot_gs.to_f - pago_gs.to_f,  :format=>' %n ', :precision => 0 ) %></td>
+
+      <% tot_gs_sueldo += sd.gs_sueldo.to_f %>
+      <% tot_gs_comis  += sd.gs_comis.to_f %>
+      <% tot_gs_extr   += sd.gs_extr.to_f %>
+      <% tot_gs_bonif  += sd.gs_bonif.to_f %>
+      <% tot_gs_adel   += sd.gs_adel.to_f %>
+      <% tot_gs_pg_adel   += sd.gs_pg_adel.to_f %>
+      <% tot_gs_prest  += sd.gs_prest.to_f %>
+      <% tot_gs_vac    += sd.gs_vaca.to_f %>
+      <% tot_gs_agui   += sd.gs_agui.to_f %>
+      <% tot_gs_otr_d  += sd.gs_otros_cred.to_f %>
+      <% tot_gs_otr_c  += sd.gs_otros_deb.to_f %>
+      <% tot_gs_ips    += sd.gs_ips.to_f %>
+      <% tot_gs_pago   += pago_gs.to_f %>
+      <% tot_gs        += l_tot_gs.to_f %>
+      <% tot_sub_cred_gs += (sd.gs_sueldo.to_f + sd.gs_comis.to_f + sd.gs_extr.to_f  + sd.gs_bonif.to_f + sd.gs_vaca.to_f + sd.gs_agui.to_f + sd.gs_otros_cred.to_f + sd.gs_pg_adel.to_f) %>
+      <% tot_sub_deb_gs  += (sd.gs_ips.to_f + sd.gs_adel.to_f + sd.gs_prest.to_f + sd.gs_otros_deb.to_f + (sd.gs_pg_adel.to_f * 0.09)) %>
+
+    </tr>
+  <% end %>
+
+  <tr class="head">
+    <td class="header">TOTAL:</td>
+    <td class="header" align="right"><%= format_int(tot_gs_sueldo.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_gs_comis.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_gs_extr.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_gs_bonif.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_gs_pg_adel.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_gs_vac.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_gs_agui.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_gs_otr_c.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_sub_cred_gs.to_f) %></td>
+
+    <td class="header" align="right"><%= format_int(tot_gs_ips.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_gs_adel.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_gs_prest.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_gs_otr_d.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_sub_deb_gs.to_f) %></td>
+    <td class="header" align="right"><b><%= format_int(tot_gs.to_f) %></b></td>
+    <td class="header" align="right"><%= format_int(tot_gs_pago.to_f) %></td>
+    <td class="header" align="right"><b><%= format_int(tot_gs.to_f) %></b></td>
+  </tr>
+
+  <tr><td></td></tr>
+  <tr><td></td></tr>
+  <tr><td></td></tr>
+<% end %>
+
+<% if params[:moeda_us] == '1' %>
+  <tr>
+    <td><%= t('COIN') %>: U$</td>
+  </tr>
+  <tr>
+    <td class="header"> Empleado</td>
+    <td class="header" align="right"> Sueldo(+)</td>
+    <td class="header" align="right"> Comisión(+)</td>
+    <td class="header" align="right"> Extra(+)</td>
+    <td class="header" align="right"> Bonif.(+)</td>
+    <td class="header" align="right"> Adel.(-)</td>
+    <td class="header" align="right"> Prest.(-)</td>
+    <td class="header" align="right"> Otros(+)</td>
+    <td class="header" align="right"> Otros(-)</td>
+    <td class="header" align="right"> Saldo Dev.</td>
+    <td class="header" align="right"> Pago</td>
+    <td class="header" align="right"> Saldo</td>
+  </tr>
+  <% @sueldo.each do |sd| %>
+    <% pago_us = SueldoPago.sum(:valor_us, :conditions => ["PERSONA_ID = #{sd.id} and MOEDA = 0 and sueldo_id = #{sd.id}"])%>
+
+    <tr class = "<%= cycle( "cor1", "cor2" )%>">
+      <td width="200" ><%= truncate(sd.nome, length: 40) %></td>
+      <td width="60" align="right"><%= format_int(sd.us_sueldo.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.us_comis.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.us_extr.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.us_bonif.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.us_adel.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.us_prest.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.us_otros_cred.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.us_otros_deb.to_f) %></td>
+      <td width="60" align="right"><b><%= format_int(l_tot_us = ((sd.us_sueldo.to_f + sd.us_comis.to_f + sd.us_extr.to_f + sd.us_bonif.to_f + sd.us_otros_cred.to_f) - (sd.us_adel.to_f + sd.us_otros_deb.to_f + sd.us_prest.to_f))) %></b></td>
+      <td width="60" align="right"><%= number_to_currency( pago_us,  :format=>' %n ', :precision => 0 ) %></td>
+      <td width="60" align="right"><%= number_to_currency( l_tot_us.to_f - pago_us.to_f,  :format=>' %n ', :precision => 0 ) %></td>
+
+      <% tot_us_sueldo += sd.us_sueldo.to_f %>
+      <% tot_us_comis  += sd.us_comis.to_f %>
+      <% tot_us_extr   += sd.us_extr.to_f %>
+      <% tot_us_bonif  += sd.us_bonif.to_f %>
+      <% tot_us_adel   += sd.us_adel.to_f %>
+      <% tot_us_prest  += sd.us_prest.to_f %>
+      <% tot_us_otr_d  += sd.us_otros_cred.to_f %>
+      <% tot_us_otr_c  += sd.us_otros_deb.to_f %>
+      <% tot_us_pago   += pago_us.to_f %>
+      <% tot_us        += l_tot_us.to_f %>
+    </tr>
+  <% end %>
+
+  <tr class="head">
+    <td class="header">TOTAL:</td>
+    <td class="header" align="right"><%= format_int(tot_us_sueldo.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_us_comis.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_us_extr.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_us_bonif.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_us_adel.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_us_prest.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_us_otr_c.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_us_otr_d.to_f) %></td>
+    <td class="header" align="right"><b><%= format_int(tot_us.to_f) %></b></td>
+    <td class="header" align="right"><%= format_int(tot_us_pago.to_f) %></td>
+    <td class="header" align="right"><b><%= format_int(tot_us.to_f) %></b></td>
+  </tr>
+
+  <tr><td></td></tr>
+  <tr><td></td></tr>
+  <tr><td></td></tr>
+<% end %>
+
+<% if params[:moeda_rs] == '1' %>
+  <tr>
+    <td><%= t('COIN') %>: R$</td>
+  </tr>
+  <tr>
+    <td class="header"> Empleado</td>
+    <td class="header" align="right"> Sueldo(+)</td>
+    <td class="header" align="right"> Comisión(+)</td>
+    <td class="header" align="right"> Extra(+)</td>
+    <td class="header" align="right"> Bonif.(+)</td>
+    <td class="header" align="right"> Adel.(-)</td>
+    <td class="header" align="right"> Prest.(-)</td>
+    <td class="header" align="right"> Otros(+)</td>
+    <td class="header" align="right"> Otros(-)</td>
+    <td class="header" align="right"> Saldo Dev.</td>
+    <td class="header" align="right"> Pago</td>
+    <td class="header" align="right"> Saldo</td>
+  </tr>
+  <% @sueldo.each do |sd| %>
+    <% pago_rs = SueldoPago.sum(:valor_us, :conditions => ["PERSONA_ID = #{sd.id} and MOEDA = 2 and sueldo_id = #{sd.id}"])%>
+
+    <tr class = "<%= cycle( "cor1", "cor2" )%>">
+      <td width="200" ><%= truncate(sd.nome, length: 40) %></td>
+      <td width="60" align="right"><%= format_int(sd.rs_sueldo.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.rs_comis.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.rs_extr.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.rs_bonif.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.rs_adel.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.rs_prest.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.rs_otros_cred.to_f) %></td>
+      <td width="60" align="right"><%= format_int(sd.rs_otros_deb.to_f) %></td>
+      <td width="60" align="right"><b><%= format_int(l_tot_rs = ((sd.rs_sueldo.to_f + sd.rs_comis.to_f + sd.rs_extr.to_f + sd.rs_bonif.to_f + sd.rs_otros_cred.to_f) - (sd.rs_adel.to_f + sd.rs_otros_deb.to_f + sd.rs_prest.to_f))) %></b></td>
+      <td width="60" align="right"><%= number_to_currency( pago_rs,  :format=>' %n ', :precision => 0 ) %></td>
+      <td width="60" align="right"><%= number_to_currency( l_tot_rs.to_f - pago_rs.to_f,  :format=>' %n ', :precision => 0 ) %></td>
+
+      <% tot_rs_sueldo += sd.rs_sueldo.to_f %>
+      <% tot_rs_comis  += sd.rs_comis.to_f %>
+      <% tot_rs_extr   += sd.rs_extr.to_f %>
+      <% tot_rs_bonif  += sd.rs_bonif.to_f %>
+      <% tot_rs_adel   += sd.rs_adel.to_f %>
+      <% tot_rs_prest  += sd.rs_prest.to_f %>
+      <% tot_rs_otr_d  += sd.rs_otros_cred.to_f %>
+      <% tot_rs_otr_c  += sd.rs_otros_deb.to_f %>
+      <% tot_rs_pago   += pago_rs.to_f %>
+      <% tot_rs        += l_tot_rs.to_f %>
+    </tr>
+  <% end %>
+
+  <tr class="head">
+    <td class="header">TOTAL:</td>
+    <td class="header" align="right"><%= format_int(tot_rs_sueldo.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_rs_comis.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_rs_extr.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_rs_bonif.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_rs_adel.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_rs_prest.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_rs_otr_c.to_f) %></td>
+    <td class="header" align="right"><%= format_int(tot_rs_otr_d.to_f) %></td>
+    <td class="header" align="right"><b><%= format_int(tot_rs.to_f) %></b></td>
+    <td class="header" align="right"><%= format_int(tot_rs_pago.to_f) %></td>
+    <td class="header" align="right"><b><%= format_int(tot_rs.to_f) %></b></td>
+  </tr>
+
+</table>
+
+<% end %>

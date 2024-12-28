@@ -1,0 +1,39 @@
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="80" align="center"><%= t('CODE') %></td>
+      <td width="70" align="center"><%= t('DATE') %></td>
+      <td width="250">Cliente</td>
+      <td width="100" align="center">Operación</td>
+      <td width="120" align="center">Doc. N.</td>
+    </tr>
+   </table>
+   <div class="rolagem" dir="div">
+      <table>
+         <% @nota_creditos.each do |nc| %>
+         
+         	<% if nc.operacao == 0 %>
+         		<% op = 'Devoluciones'%>
+         	<% else %>
+         		<% op = 'Descuentos'%>
+         	<% end %>
+               <tr class = "<%= cycle("cor1", "cor2") %>">
+                  <td width="80" align="center"><%= h nc.id.to_s.rjust(6,'0') %></td>
+                  <td width="70" align="center"><%= h nc.data.strftime("%d/%m/%y") %></td>
+                  <td width="250"><%= h truncate( nc.persona_nome, :length => 25 ) %></td>
+                  <td width="100" align="center"><%= h op %></td>
+                  <td width="120" align="center"><%= h nc.documento_numero_02 %>-<%= h nc.documento_numero_02 %>-<%= h nc.documento_numero %></td>
+                  <td><%= link_to 'Editar', edit_nota_credito_path(nc) %></td>
+                  <td><%= link_to t('DELETE'), nc, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+               </tr>
+         <% end %>
+      </table>
+   </div>
+</div>
+
+<%= will_paginate @nota_creditos, :update => 'pagina', :options => {:prev_label => '<< Anterior',:next_label => 'Próximo >>'}%>
+
+
+
+
+

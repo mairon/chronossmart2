@@ -1,0 +1,52 @@
+<table class="head_grid">
+  <tr>
+    <td width="20"></td>
+    <td width="120" align="center">Ref.</td>
+    <td width="120">Marca</td>
+    <td width="450">Producto</td>
+    <td width="70" align="center">Peso</td>
+    <td width="70" align="center">Mult. <%= t('PURCHASE') %></td>
+    <td width="70" align="right">Ultima <%= t('PURCHASE') %></td>
+  </tr>
+</table>
+
+<div class="rolagem" id="div">
+  <table>
+    <% count = 0 %>
+    <% @produtos.each do |p| %>
+      <tr class = "<%= cycle( "cor1", "cor2" )%>"
+          onMouseOver="javascript:this.style.backgroundColor='#949494'"
+          onMouseOut="javascript:this.style.backgroundColor=''"
+           onclick="Fecha(  '<%= p.nome %>',
+                                    '<%= p.produto_id %>',
+                                    '<%= p.multiplo_compra.to_i %>',
+                                    '<%= p.fabricante_cod %>',
+                                    '<%= p.clase_id %>',
+                                    '<%= format_decimal(p.ultima_compra_us.to_f) %>',
+                                    '<%= format_int(p.ultima_compra_gs.to_f) %>'
+                                    )" data-plus-as-tab="false">
+
+        <td width="20"  class="<%= count %>"><input type="text"  id="<%= count %>" value="" size="1"
+                onkeypress="Fecha(  '<%= p.nome %>',
+                                    '<%= p.produto_id %>',
+                                    '<%= p.multiplo_compra.to_i %>',
+                                    '<%= p.fabricante_cod %>',
+                                    '<%= p.clase_id %>',
+                                    '<%= format_decimal(p.ultima_compra_us.to_f) %>',
+                                    '<%= format_int(p.ultima_compra_gs.to_f) %>'
+                                    )" data-plus-as-tab="false" ></td>
+        <td width="120" class="<%= count %>"> <%= p.fabricante_cod %> </td>
+        <td width="120" class="<%= count %>"> <%= p.marca %></td>
+        <td width="450" class="<%= count %>"> <%= p.nome %></td>
+        <td width="70" align="center" class="<%= count %>"> <%= p.peso_bruto %></td>
+        <td width="70" align="center" class="<%= count %>"> <%= p.multiplo_compra %></td>
+        <% if params[:moeda] == '0' %>
+          <td width="70" align="right" class="<%= count %>"> <%= format_decimal(p.ultima_compra_us) %></td>
+          <% else %>
+          <td width="70" align="right" class="<%= count %>"> <%= format_int(p.ultima_compra_gs) %></td>
+        <% end %>
+      <% count += 1 %>
+    <% end %>
+    <input type="hidden" id="foco" value="-1">
+  </table>
+</div>

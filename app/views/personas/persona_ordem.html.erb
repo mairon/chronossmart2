@@ -1,0 +1,130 @@
+<body onload="CampoBusca()">
+<h1 align="right" id="header">Personas</h1>
+<br/>
+  <div class="group">
+    <h2>
+      <%form_tag busca_persona_ordem_personas_path, :method => "get" do %>
+        Buscar :  <input id="busca" name="busca" type="text" onKeyUp="f(this),pesquisa(this.value)" onkeydown = "f(this)"/>
+
+      <% end %>
+
+    </h2>
+
+    <div id="pagina">
+    </div>
+
+
+    <script language="javascript">
+      function Fecha(nome)        //
+      {        
+        window.opener.document.getElementById('ordem_servico_persona_busca_').value       = nome;
+        window.opener.document.getElementById('ordem_servico_persona_busca_').focus();
+        self.close();
+      }
+
+      function pesquisa(valor)    //
+
+      {
+
+        //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+        url="/personas/busca_persona_ordem?busca="+valor+"&commit=Buscar";
+
+        ajax(url);
+
+      }
+
+      function ajax(url)          //
+
+      {
+
+
+
+        //alert(nick);
+
+        //alert(dest);
+
+        //alert(msg);
+
+
+
+        req = null;
+
+        // Procura por um objeto nativo (Mozilla/Safari)
+
+        if (window.XMLHttpRequest) {
+
+          req = new XMLHttpRequest();
+
+          req.onreadystatechange = processReqChange;
+
+          req.open("GET",url,true);
+
+          req.send(null);
+
+          // Procura por uma versão ActiveX (IE)
+
+        } else if (window.ActiveXObject) {
+
+          req = new ActiveXObject("Microsoft.XMLHTTP");
+
+          if (req) {
+
+
+
+            req.onreadystatechange = processReqChange;
+
+            req.open("GET",url,true);
+
+
+
+            req.send();
+
+          }
+
+        }
+
+      }
+
+      function processReqChange() //
+
+      {
+
+
+
+        // apenas quando o estado for "completado"
+
+        if (req.readyState == 4) {
+
+
+
+          // apenas se o servidor retornar "OK"
+
+
+
+          if (req.status ==200) {
+
+
+
+            // procura pela div id="pagina" e insere o conteudo
+
+            // retornado nela, como texto HTML
+
+
+
+            document.getElementById('pagina').innerHTML = req.responseText;
+
+
+
+          } else {
+
+            alert("Houve um problema ao obter os dados:n" + req.statusText);
+
+          }
+
+        }
+
+      }
+    </script>
+  </div>
+</body>

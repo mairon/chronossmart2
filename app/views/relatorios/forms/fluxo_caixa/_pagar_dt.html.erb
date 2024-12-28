@@ -1,0 +1,138 @@
+
+<div class="group">
+	<h2 style="padding: 10px"><strong>PAGAR</strong> - 
+    <%= t('COIN') %> Base
+    <% if params[:moeda].to_i == 0 %>
+     <span class="us">U$</span>
+    <% elsif params[:moeda].to_i == 1 %>
+      <span class="gs">Gs.</span>
+    <% elsif params[:moeda].to_i == 2 %>
+      <span class="rs">R$</span>
+    <% end %>
+     - Ctz. U$<%= params[:cotacao] %> | Gs.<%= params[:cotacao_real] %> | R$.<%= params[:cotacao_rs_us] %>
+  </h2>		
+</div>	
+<table class="head_grid">
+  <tr>
+    <td width="100"><%= t('DOC') %></td>
+    <td width="200">Proveedor</td>
+    <td width="200">Cuenta Prev. Pago</td>
+    <td width="80" align="center"><%= t('SHARE') %></td>
+    <td width="80" align="center"><%= t('COIN') %></td>
+    <% if params[:formato] == '2' %>
+      <td width="100" align="right">Original</td>
+      <td width="100" align="right">Convert. 
+      <% if params[:moeda].to_i == 0 %>
+       <span class="us">U$</span>
+      <% elsif params[:moeda].to_i == 1 %>
+        <span class="gs">Gs.</span>
+      <% elsif params[:moeda].to_i == 2 %>
+        <span class="rs">R$</span>
+      <% end %>
+
+      </td>
+    <% else %>
+      <td width="100" align="right">Entrada</td>
+    <% end %>
+  </tr>
+</table>
+<div class="rolagem" dir="div">
+<table> 
+  <% div = 0 %>
+  <% @saidas.each do |w| %>
+    <tr>
+      <td width="100"><%= w.documento_numero %></td>
+      <td width="200"><%= w.persona_nome %></td>
+      <td width="200"><%= w.conta.nome unless w.conta_id.blank? %></td>
+      <td width="80" align="center"><%= w.cota %></td>
+      <td width="80" align="center">
+        <% if w.moeda.to_i == 0 %>
+         <span class="us">U$</span>
+        <% elsif w.moeda.to_i == 1 %>
+          <span class="gs">Gs.</span>
+        <% elsif w.moeda.to_i == 2 %>
+          <span class="rs">R$</span>
+        <% end %>
+      </td>
+      <% if params[:formato] == '2' %>
+
+        <% if params[:moeda] == '0' %>
+
+          <% if w.moeda.to_i == 0 %>
+            <td width="100" align="right"><%= format_decimal(w.divida_dolar) %></td>
+            <td width="100" align="right"><%= format_decimal(w.divida_dolar) %></td>
+            <% div += w.divida_dolar %>
+          <% elsif w.moeda.to_i == 1 %>
+            <td width="100" align="right"><%= format_int(w.divida_guarani.to_f) %></td>
+            <td width="100" align="right"><%= format_decimal(w.divida_guarani.to_f / params[:cotacao].to_f) %></td>
+            <% div += (w.divida_guarani.to_f / params[:cotacao].to_f) %>
+          <% elsif w.moeda.to_i == 2 %>
+            <td width="100" align="right"><%= format_decimal(w.divida_real.to_f) %></td>
+            <td width="100" align="right"><%= format_decimal(w.divida_real.to_f / params[:cotacao_rs_us].gsub(',','.').to_f) %></td>
+            <% div += (w.divida_real.to_f / params[:cotacao_rs_us].gsub(',','.').to_f) %>
+          <% end %>
+
+        <% elsif params[:moeda] == '1' %>
+
+          <% if w.moeda.to_i == 0 %>
+            <td width="100" align="right"><%= format_decimal(w.divida_dolar) %></td>
+            <td width="100" align="right"><%= format_int(w.divida_dolar.to_f * params[:cotacao].to_f) %></td>
+            <% div += (w.divida_dolar.to_f * params[:cotacao].to_f) %>
+          <% elsif w.moeda.to_i == 1 %>
+            <td width="100" align="right"><%= format_int(w.divida_guarani.to_f) %></td>
+            <td width="100" align="right"><%= format_int(w.divida_guarani) %></td>
+            <% div += (w.divida_guarani) %>
+          <% elsif w.moeda.to_i == 2 %>
+            <td width="100" align="right"><%= format_decimal(w.divida_real) %></td>
+            <td width="100" align="right"><%= format_int(w.divida_real.to_f * params[:cotacao_real].to_f) %></td>
+            <% div += (w.divida_real.to_f * params[:cotacao_real].to_f) %>
+          <% end %>
+
+        <% elsif params[:moeda] == '2' %>
+
+          <% if w.moeda.to_i == 0 %>
+            <td width="100" align="right"><%= format_decimal(w.divida_dolar) %></td>
+            <td width="100" align="right"><%= format_decimal(w.divida_dolar.to_f * params[:cotacao_rs_us].gsub(',','.').to_f) %></td>
+            <% div += (w.divida_dolar.to_f * params[:cotacao_rs_us].gsub(',','.').to_f) %>
+          <% elsif w.moeda.to_i == 1 %>
+            <td width="100" align="right"><%= format_decimal(w.divida_guarani.to_f) %></td>
+            <td width="100" align="right"><%= format_decimal(w.divida_guarani.to_f / params[:cotacao_real].to_f) %></td>
+            <% div += (w.divida_guarani.to_f / params[:cotacao_real].to_f) %>
+          <% elsif w.moeda.to_i == 2 %>
+            <td width="100" align="right"><%= format_decimal(w.divida_real) %></td>
+            <td width="100" align="right"><%= format_decimal(w.divida_real) %></td>
+            <% div += (w.divida_real) %>
+          <% end %>
+
+        <% end %>
+
+
+      <% else %>
+        <% if params[:moeda] == '0' %>
+          <td width="100" align="right"><%= format_decimal(w.divida_dolar) %></td>
+          <% div += w.divida_dolar %>
+        <% elsif params[:moeda] == '1' %>
+          <td width="100" align="right"><%= format_int(w.divida_guarani) %></td>
+          <% div += w.divida_guarani %>
+        <% elsif params[:moeda] == '2' %>
+          <td width="100" align="right"><%= format_decimal(w.divida_real) %></td>
+          <% div += w.divida_real %>
+        <% end %>
+
+      <% end %>
+    </tr>
+  <% end %>
+</table>  
+</div>
+<table class="head_grid">
+  <tr>
+    <td width="100"></td>
+    <td width="580"></td>
+    <td width="80" align="center"></td>
+    <% if params[:moeda] == '1' %>
+      <td width="100" align="right"><%= format_int(div)%></td>
+    <% else %>
+      <td width="100" align="right"><%= format_decimal(div)%></td>
+    <% end %>
+  </tr>
+</table>

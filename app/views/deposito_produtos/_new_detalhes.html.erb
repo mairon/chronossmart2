@@ -1,0 +1,43 @@
+<%= form_for(deposito_produtos) do |f| %>
+  <% if deposito_produtos.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(deposito_produtos.errors.count, "error") %> prohibited this deposito_produto from being saved:</h2>
+
+      <ul>
+      <% deposito_produtos.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+
+  <div class="tab_container">
+      
+        <table>
+          <tr>
+            <td width="1000">
+              <FIELDSET>
+                <table>
+                  <tr>
+                       <%= f.hidden_field :deposito_id %>  
+                                      
+                      <td align="right">Producto :</td>                    
+                      <td><%= f.collection_select :produto_id, Produto.all(:select => 'id,nome', conditions: "grupo_id = 1",:order => '2'),:id,:nome %></td>
+                                      </tr>                 
+                </table> 
+              </FIELDSET>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), edit_deposito_path, :class => "button back" %> 
+        <%= link_to 'Salir', depositos_path, :class => "button" %>       
+      </div>
+
+    </div>
+
+<% end %>

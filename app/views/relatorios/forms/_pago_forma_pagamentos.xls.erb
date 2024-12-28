@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <ss:Styles>
+    <ss:Style ss:ID="1">
+      <ss:Font ss:Bold="1"/>
+      <ss:Alignment ss:Horizontal="Center"/>
+      <ss:Interior ss:Pattern="Gray25"/>
+    </ss:Style>
+    <ss:Style ss:ID="2">
+      <ss:Alignment ss:Horizontal="Center"/>
+    </ss:Style>
+  </ss:Styles>
+  <Worksheet ss:Name="Sheet1">
+
+    <Table>
+			<Row>
+				<Cell><Data ss:Type="String">Reg.</Data></Cell>
+				<Cell><Data ss:Type="String"><%= t('DATE') %>PG</Data></Cell>
+        <Cell><Data ss:Type="String"><%= t('PROVIDER')%> </Data></Cell>
+				<Cell><Data ss:Type="String"><%= t('CLASSIFICATION') %></Data></Cell>
+        <Cell><Data ss:Type="String">Obs.</Data></Cell>
+				<Cell><Data ss:Type="String"><%= t('QUOTA') %></Data></Cell>
+				<Cell><Data ss:Type="String">Valor</Data></Cell>
+				<Cell><Data ss:Type="String"><%= t('ACCOUNT') %></Data></Cell>
+			</Row>
+
+			<% pago_us = 0 %>
+			<% pago_gs = 0 %>
+			<% pago_rs = 0 %>
+
+			<% sub_pago_us = 0 %>
+			<% sub_pago_gs = 0 %>
+			<% sub_pago_rs = 0 %>
+			<% @cobros.each do |pago| %>
+				<Row>
+					<Cell><Data ss:Type="String"><%= pago.pago_id.to_s.rjust(5,'0') %></Data></Cell>
+					<Cell><Data ss:Type="String"><%= pago.data.strftime("%d/%m/%Y") %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= pago.persona_nome %></Data></Cell>
+					<Cell><Data ss:Type="String">
+			      <% pd = PagosDetalhe.where(pago_id: pago.pago_id) %>
+			      <% pd.each do |pd| %>
+			        <%= pd.rubro.descricao unless pd.rubro.nil? %>
+			      <% end %>
+					</Data></Cell>
+          <Cell><Data ss:Type="String"><%= pago.descricao %></Data></Cell>
+          <Cell><Data ss:Type="String">
+            <% pd.each do |pd| %>
+              <%= pd.cota %>/<%= pd.tot_cotas %>
+            <% end %>
+          </Data></Cell>
+					<% if params[:moeda].to_s == '0'%>
+						<Cell><Data ss:Type="Number"><%= (pago.pago_dolar.to_f) %></Data></Cell>
+			      <% pago_us  += pago.pago_dolar.to_f %>
+			      <% sub_pago_us += pago.pago_dolar.to_f %>
+					<% elsif params[:moeda].to_s == '1' %>
+						<Cell><Data ss:Type="Number"><%= (pago.pago_guarani.to_f) %></Data></Cell>
+			      <% pago_gs  += pago.pago_guarani.to_f %>
+			      <% sub_pago_gs += pago.pago_guarani.to_f %>
+					<% else %>
+						<Cell><Data ss:Type="Number"><%= (pago.pago_real.to_f) %></Data></Cell>
+			      <% pago_rs  += pago.pago_real.to_f %>
+			      <% sub_pago_rs += pago.pago_real.to_f %>
+					<% end %>
+					<Cell><Data ss:Type="String"><%= pago.conta_nome %></Data></Cell>
+				</Row>
+			<% end %>
+    </Table>
+  </Worksheet>
+</Workbook>

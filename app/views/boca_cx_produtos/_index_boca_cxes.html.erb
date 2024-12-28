@@ -1,0 +1,21 @@
+
+
+<table class="head_grid">
+	<tr>
+		<td width="400">Producto</td>
+		<td width="200">Comisión</td>
+	</tr>
+</table>
+
+<div class="rolagem" dir="div">
+	<table>
+		<% boca_cx_produtos.each do |boca_cx_produto| %>
+			<tr>
+				<td width="400"><%= boca_cx_produto.produto.nome %></td>
+				<td width="200"><%= number_to_currency( boca_cx_produto.comissao.to_f , :format =>'%n', :separator => "," ) %></td>
+				<td><%= link_to '', boca_cx_produto, boca_cx_id: boca_cx_produto.boca_cx_id, method: :delete, class: 'icon-trash', title: t('DELETE'), data: { confirm: 'Esta Seguro?' }  %></td>
+			</tr>
+		<% end %>
+	</table>
+</div>
+

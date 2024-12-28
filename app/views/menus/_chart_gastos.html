@@ -1,0 +1,54 @@
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+
+        var data = google.visualization.arrayToDataTable([
+          ['Rubros', 'Montos'],
+        <% @rubros.each do |r| %>
+          <% v = 0 %>
+          <% if current_unidade.moeda == 0 %>
+            <% v = r.valor_us %>
+          <% elsif current_unidade.moeda == 1 %>
+            <% v = r.valor_gs %>
+          <% elsif current_unidade.moeda == 2 %>
+            <% v = r.valor_rs %>
+          <% end %>        
+          ['<%= r.rubro_nome %>',     <%= v.to_f %>],
+        <% end %>
+        ]);
+
+        var options = {
+          'pieHole': 0.1,
+          'chartArea': {'width': '100%', 'height': '80%'},
+          'fontSize': 11
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+        chart.draw(data, options);
+
+      }
+    </script>
+
+<div class="panel">
+  <h1 id="header">
+    <%= t('EXPENSES') %>s <%= t('OF') %> <%= t('MONTH') %> por GS
+
+    <div class="pull-right">
+    <% if current_unidade.moeda == 0 %>
+      <span class="us">U$ <%= format_decimal(@rubros_sum_us.to_f) %></span>
+    <% elsif current_unidade.moeda == 1 %>
+      <span class="gs">G$ <%= format_int(@rubros_sum_gs.to_f) %></span>
+    <% elsif current_unidade.moeda == 2 %>
+      <span class="rs">R$ <%= format_decimal(@rubros_sum_rs.to_f) %></span>
+    <% end %>
+    </div>
+  </h1>  
+  <div class="group">
+    <div id="donutchart" ></div>
+  </div>
+  <br>
+</div>

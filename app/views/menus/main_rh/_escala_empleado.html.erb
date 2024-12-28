@@ -1,0 +1,43 @@
+<%
+      escala = PersonaEscala.joins(:persona).where("personas.estado = 0 and date_part('month', persona_escalas.data) = '#{Time.now.strftime("%m")}' and date_part('Year', persona_escalas.data) = '#{Time.now.strftime("%Y")}'").order('persona_escalas.data')
+%>
+
+
+<%= link_to 'Solicitudes', solicitudes_path, target: '_blank', class: 'btn btn-green' %>
+<br>
+<br>
+<div class="panel">
+  <header class="panel-heading">
+  Escala Empleado <%= Time.now.strftime("%B") %>
+</header>
+   <table class="head_grid">
+      <tr>
+        <td width="20"></td>
+         <td width="80" align="center"><%= t("DATE")%></td>
+         <td width="480">Empleado</td>
+         <td width="100">Unidad</td>
+      </tr>
+   </table>
+   <div class="rolagem" id="div">
+      <table>
+         <% total = 0 %>
+         <% escala.includes(:persona).each do |cl| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+             <td width="20">
+               <% if cl.data.strftime("%d") == Time.now.strftime("%d") and cl.data.strftime("%m") == Time.now.strftime("%m") %>
+                 <i class="icon-certificate"></i>
+               <% end %>
+             </td>
+               <td width="50" align="left"><%= cl.data.strftime("%d/%m") %></td>
+               <td width="480" align="left"><small><%= cl.persona.nome %></small></td>
+               <td width="150"><%= cl.persona.unidade.unidade_nome %></td>
+            </tr>
+            <% total += 1 %>
+         <% end %>
+      </table>
+   </div>
+   Total : <%= total %>
+   </div>
+
+
+

@@ -1,0 +1,105 @@
+<% busca_produto = Produto.find_by_id(produto,depo) %>
+  <% sql = "SELECT ID,DATA,STOCK,PROMEDIO_DOLAR,PROMEDIO_GUARANI,TOTAL_DOLAR,TOTAL_GUARANI FROM STOCKS WHERE PRODUTOS_GRADE_ID = #{produto}
+            AND DATA < '1990-02-01' AND DEPOSITO_ID = #{depo} ORDER BY DATA DESC, ID DESC, STATUS DESC LIMIT 1" %>
+
+  <% anterior = Stock.find_by_sql(sql) %>
+
+  <% saldo_stock       = 0 %>
+  <% valor_stock_gs    = 0 %>
+  <% valor_stock_us    = 0 %>
+
+  <% promedio_stock_gs = 0 %>
+  <% promedio_stock_us = 0 %>
+
+  <% total_stock_gs = 0 %>
+  <% total_stock_us = 0 %>
+
+  <% anterior.each do |ant_rec| %>
+
+    <% saldo_stock       = ant_rec.stock %>
+
+    <% promedio_stock_gs = ant_rec.promedio_guarani %>
+    <% promedio_stock_us = ant_rec.promedio_dolar %>
+
+    <% total_stock_gs = ant_rec.total_guarani %>
+    <% total_stock_us = ant_rec.total_dolar %>
+
+  <% end %>
+
+
+  <% novo = Stock.all( :select     => 'id,produto_id,deposito_id,entrada,status,saida,unitario_guarani,unitario_dolar,tabela,promedio_guarani,data',
+                            :conditions => ["DEPOSITO_ID = #{depo} AND produtos_grade_id = ? AND DATA >= '1990-02-01'",produto],
+                            :order      => 'produto_id,produtos_grade_id,data,id,status' ) %>
+
+
+  <% ultima_data = '' %>
+  <% novo.each do |prod_rec| %>
+
+    <% saldo_stock    += ( prod_rec.entrada - prod_rec.saida ) %>
+
+    <!-- #ZERA CUSTO-->
+    <% if saldo_stock.to_f == 0 %>
+
+      <% promedio_stock_gs = 0 %>
+      <% promedio_stock_us = 0 %>
+
+      <% valor_stock_gs    = 0 %>
+      <% valor_stock_us    = 0 %>
+
+      <% total_stock_gs = 0 %>
+      <% total_stock_us = 0 %>
+
+    <% end %>
+
+    <!-- #RECALCULO CUSTO ENTRADA-->
+    <% if ( prod_rec.entrada.to_f > 0 and saldo_stock.to_f != 0   and prod_rec.status.to_i == 0) %>
+
+      <% valor_stock_gs = ( prod_rec.entrada.to_f * prod_rec.unitario_guarani.to_f )  %>
+      <% valor_stock_us = ( prod_rec.entrada.to_f * prod_rec.unitario_dolar.to_f )  %>
+
+      <% total_stock_gs += valor_stock_gs.to_f  %>
+      <% total_stock_us += valor_stock_us.to_f  %>
+
+      <% promedio_stock_gs = ( total_stock_gs.to_f / saldo_stock.to_f )  %>
+      <% promedio_stock_us = ( total_stock_us.to_f / saldo_stock.to_f )  %>
+
+    <% end %>
+
+   <!-- #RECALCULO CUSTO SAIDA-->
+    <% if ( prod_rec.saida.to_f > 0 and saldo_stock.to_f != 0 and prod_rec.status.to_i == 1 ) %>
+
+      <% valor_stock_gs = ( prod_rec.saida.to_f * promedio_stock_gs.to_f )  %>
+      <% valor_stock_us = ( prod_rec.saida.to_f * promedio_stock_us.to_f )  %>
+
+      <% total_stock_gs -= valor_stock_gs.to_f  %>
+      <% total_stock_us -= valor_stock_us.to_f  %>
+    <% end %>
+
+
+    <% if ( prod_rec.entrada.to_f > 0 and prod_rec.status.to_i == 3) %>
+
+    <% last_custo = Stock.first( :select => "produto_id,promedio_dolar,promedio_guarani",
+                :conditions => ["DEPOSITO_ID = #{depo} AND produtos_grade_id = #{produto} AND DATA <= '#{prod_rec.data}' AND status = 0 and tabela = 'COMPRAS_PRODUTOS'"],
+                :order => 'produto_id,data desc,status,id') %>
+
+      <% valor_stock_gs = ( prod_rec.entrada.to_f * last_custo.promedio_guarani.to_f )  unless last_custo.nil? %>
+      <% valor_stock_us = ( prod_rec.entrada.to_f * last_custo.promedio_dolar.to_f ) unless last_custo.nil? %>
+
+      <% total_stock_gs += valor_stock_gs.to_f %>
+      <% total_stock_us += valor_stock_us.to_f %>
+
+      <% promedio_stock_gs = ( last_custo.promedio_guarani.to_f ) %>
+      <% promedio_stock_us = ( last_custo.promedio_dolar.to_f ) %>
+
+
+     <% end %>
+
+  <!-- #atulizacoes-->
+  <%
+     prod_rec.update_attributes(stock: saldo_stock.to_f, promedio_guarani: promedio_stock_gs.to_f, promedio_dolar: promedio_stock_us.to_f, saldo_guarani: total_stock_gs.to_f, saldo_dolar: total_stock_us.to_f)
+
+     busca_produto_custo = ProdutosCusto.find_by_produtos_grade_id(produto, :conditions => ["deposito_id = #{depo}"])
+     busca_produto_custo.update_attributes(stock: saldo_stock.to_f, custo_medio_us: promedio_stock_us.to_f, custo_medio_gs: promedio_stock_gs.to_f, saldo_us: total_stock_us.to_f, saldo_gs: total_stock_gs.to_f )
+
+   %>
+  <% end %>

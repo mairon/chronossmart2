@@ -1,0 +1,50 @@
+<%= form_for(@grupos_prazo) do |f| %>
+  <% if @grupos_prazo.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@grupos_prazo.errors.count, "error") %> prohibited this grupos_prazo from being saved:</h2>
+
+      <ul>
+      <% @grupos_prazo.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> grupos_prazos - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">persona_id :</td>                    
+                      <td><%= f.number_field :persona_id %></td>
+                                      
+                      <td align="right">grupo_id :</td>                    
+                      <td><%= f.number_field :grupo_id %></td>
+                                      
+                      <td align="right">prazo_id :</td>                    
+                      <td><%= f.number_field :prazo_id %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), grupos_prazos_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

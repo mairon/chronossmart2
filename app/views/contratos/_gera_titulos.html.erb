@@ -1,0 +1,89 @@
+<div class="modal fade" id="modal-item" tabindex="-1" role="dialog" aria-labelledby="modal-item" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="width: 400px;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 5px 20px 20px 20px">
+        <%= form_tag gera_titulos_contratos_path, :method => "get" do %>
+          <div class="row">
+            <div class="col-md-12">
+              <label>Dependente</label>
+              <%= select("busca", "persona", Persona.all( :select     => ' id,nome', :conditions => ["vend_responsavel_id = #{@contrato.persona_id}"], :order      => '2').collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...'}, {required: true }) %>            
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <label>Producto</label>
+              <%= select("busca", "produto", Produto.order("nome,id").collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...'}, {required: true }) %>            
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <label>Centro Costo</label>
+              <%= select("busca", "cc", CentroCusto.where("unidade_id = #{current_unidade.id}").select('id,nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...'}, {required: true }) %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <label>Tabla Precio</label>
+              <%= select("busca", "tabela_preco", TabelaPreco.where("status = true").select('id,nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...'}, {required: true }) %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <label>Ctd Cotas</label>
+              <%= text_field_tag :cota,'', class: 'panel-field', required: true %>
+            </div>
+
+            <div class="col-md-4">
+              <label>Vencimiento</label>
+              <%= text_field_tag :vencimento, Time.now.strftime("%d/%m/%Y"), class: 'panel-field date', required: true %>
+            </div>
+
+            <div class="col-md-4">
+              <label>Monto</label>
+              <%= text_field_tag :valor_gs, '', class: 'panel-field money_gs', required: true %>
+            </div>
+          </div>
+
+          <div class="footer-buttons">
+            <input type="submit" class="btn btn-green" value="Grabar" />
+          </div>
+
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  $('#modal-item').on('shown.bs.modal', function () {
+    $('#busca_persona').focus();
+  });  
+
+
+  $("#busca_tabela_preco").on('change', function(){
+    $.ajax({
+      url: '/buscas/get_produtos_precos',
+      type: 'GET',
+      beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+      data: {
+        produto_id : $("#busca_produto").val(),
+        tabela_preco_id : $("#busca_tabela_preco").val()
+      },
+      success: function(data){
+       $("#valor_gs").val(number_format(data["produto"].preco_1_gs, 0, ',', '.'));
+      }
+    });
+  });
+
+  $('#busca_persona, #busca_produto, #busca_cc, #busca_tabela_preco').selectize();
+</script>

@@ -1,0 +1,251 @@
+<h1 id="header">Antecipo de Cliente - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+  <style type="text/css" media="screen">
+    .input-select{width: 100%;margin-bottom: 5px;}
+  </style>
+
+<%= form_for(@adelanto) do |f| %>
+   <% if @adelanto.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@adelanto.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @adelanto.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= f.hidden_field :tipo_adelanto, value: 1 %>
+  <%= f.hidden_field :tipo, value: 1 %>
+  <%= f.hidden_field :status, value: 0 %> 
+ <table width="750">
+    <tr>
+      <td>
+        <label><%= t('DATE') %></label>
+        <%= f.date_select :data %>
+      </td>
+
+      <td> 
+        <label>Cotz. GsxU$</label>
+        <%= f.text_field  :cotacao, size: 10, precision: 0, autofocus: true %>
+      </td>
+      <td>
+        <label> GsxR$</label>
+        <%= f.text_field :cotacao_real, size: 10, precision: 0 %>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="4">
+        <label>Cliente</label>
+        <%= f.collection_select :persona_id, Persona.where(tipo_cliente: 1).select('id,nome').order('2'), :id,
+            :nome,{prompt: 'Seleccione el Cliente'}, {required: true } %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+      <label><%= t('CENTER_OF_COSTOS') %></label>
+      <%= f.collection_select :centro_custo_id,
+                 CentroCusto.all( :select => 'id,nome',
+                            :order  => '2' ),:id,
+                            :nome,{:prompt => 'Seleccione lo Centro de Costo'}, {required: true} %>
+      </td>
+      
+
+    </tr>
+
+    <tr>
+      <td>
+        <label><%= t('DOC') %></label>
+        <%= f.collection_select :documento_id, Documento.where("nome Ilike '%ANTECIPO RECEBIDO DE CLIENTE%' ").select('id,nome').order('nome'), :id, :nome %>
+      </td>
+
+      <td>
+        <label>Nº</label>
+        <% if params[:action] == 'new' %>
+          <%= f.text_field :documento_numero, size: 15, value: (Adelanto.where(tipo_adelanto: 1).maximum(:id).to_i + 1).to_s.rjust(6,'0') %>
+        <% else %>
+          <%= f.text_field :documento_numero, size: 15%>
+        <% end %>
+      </td>
+    </tr>
+    <tr>
+      <tr>
+        <td colspan="4">
+          <label><%= t('ACCOUNT') %></label>
+          <%= f.collection_select :conta_id, Conta.where(unidade_id: current_unidade.id).select('id,nome').order('2'), :id, :nome,{prompt: 'Seleccione la Cuenta'}, {required: true, class: 'input-select' } %>
+          <%= f.hidden_field :moeda %>
+        </td>
+      </tr>
+
+      <tr hidden class="valores-gs">
+        <%= field_gs_label 'Monto Gs',f,:valor_guarani,
+         :onblur   => "GsToUsRs('adelanto_cotacao','adelanto_cotacao_real','adelanto_valor_guarani','adelanto_valor_dolar','adelanto_valor_real')", required: true  %>
+      </tr>
+      <tr hidden class="valores-us">
+         <%= field_us_label 'U$',f,:valor_dolar,
+               :onblur   => "UsToGsRs('adelanto_cotacao','adelanto_cotacao_real','adelanto_valor_dolar','adelanto_valor_guarani','adelanto_valor_real')", required: true  %>
+      </tr>
+      <tr hidden class="valores-rs">
+         <%= field_us_label 'R$',f,:valor_real,
+         :onblur   => "RsToUsGs('adelanto_cotacao','adelanto_cotacao_real','adelanto_valor_guarani','adelanto_valor_dolar','adelanto_valor_real')", required: true  %>        
+      </tr>
+
+
+      <tr>
+        <td style="padding: 10px"><%= f.check_box :cheque_status %> Cheque?</td>
+      </tr>
+      <tr hidden class="cheque">
+        <td colspan="4">
+          <label>Banco</label>
+          <%= f.collection_select :banco_id, Persona.where(tipo_banco: 1).select('id,nome').order('2'), :id, :nome, {prompt: "Selecione lo Banco"} %>
+        </td>
+      </tr>
+      <tr hidden class="cheque">
+        <td style="padding-bottom: 20px">
+          <label><%= t('CHECKS') %></label>
+          <%= f.text_field :cheque, size: 15 %>
+        </td>
+        <td style="padding-bottom: 20px">
+          <label>Diferido</label>
+          <%= f.date_select :diferido %>
+        </td>
+      </tr>
+
+      <tr>
+         <td colspan="5"><%= f.text_area :concepto, cols: 98, rows: 5, placeholder: 'Concepto:', required: true %></td>
+      </tr>
+
+        <tr>
+          <td colspan="5">
+            <label>Terminal</label>
+            <%= f.collection_select :terminal_id, Terminal.select('id,nome').order('nome'), :id, :nome %>
+          </td>
+        </tr>
+
+    </table>
+
+    <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+      <% if params[:action] == 'new' %>
+        <%= link_to t('BACK'), adelantos_path(tipo_adelanto: params[:tipo_adelanto]), :class => "btn btn-back" %>
+      <% else %>
+      <%= link_to t('BACK'), adelantos_path(tipo_adelanto: @adelanto.tipo_adelanto), :class => "btn btn-back" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<% if params[:action] != 'new' %>
+  <script>
+  $(document).ready(function() {
+
+    d = $('#adelanto_moeda').val();
+    if (d == '1') {
+      $(".valores-gs").show();
+      $(".valores-rs").hide();
+      $(".valores-us").hide();
+
+    } else if (d == '0') {
+      $(".valores-us").show();
+      $(".valores-rs").hide();
+      $(".valores-gs").hide();
+    } else if (d == '2') {
+      $(".valores-rs").show();
+      $(".valores-us").hide();
+      $(".valores-gs").hide();
+    }  
+  });
+
+  </script>
+<% end %>
+
+<script type="text/javascript">
+
+  $("#adelanto_conta_id").change(function() {
+    $.ajax({url: "/buscas/get_moeda_conta",
+      type: 'GET',
+      beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+      data: "conta=" + escape($("#adelanto_conta_id").val()),
+      error: function(XMLHttpRequest, textStatus, errorThrown) {
+        alert('Moneda no Encontrada!');
+      },
+      success: function(data){
+        $('#adelanto_moeda').val(data);
+        d = $('#adelanto_moeda').val();
+        if (d == '1') {
+          $(".valores-gs").show();
+          $(".valores-rs").hide();
+          $(".valores-us").hide();
+
+        } else if (d == '0') {
+          $(".valores-us").show();
+          $(".valores-rs").hide();
+          $(".valores-gs").hide();
+        } else if (d == '2') {
+          $(".valores-rs").show();
+          $(".valores-us").hide();
+          $(".valores-gs").hide();
+        }  
+      }
+    });
+
+       
+  });
+
+
+  $(document).ready(function () {
+    if ($('#adelanto_cheque_status').checked) {
+      $(".cheque").css('display','block');
+    } else {
+      $(".cheque").css('display','none');
+    }
+
+  $('#adelanto_cheque_status').click(function() {
+    if (this.checked) {
+      $(".cheque").css('display','block');
+    } else {
+      $(".cheque").css('display','none');
+    }
+  });
+  });
+</script>
+
+<% if params[:action] == 'new' %>
+  <script type="text/javascript">
+    //busca cotacao dolar
+    $("#adelanto_cotacao").focus(function(){
+      $.ajax({url: '/buscas/cotz_us_compra',
+              type: 'POST',
+              beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+              data: 'data=' + $('#adelanto_data_1i').val()+'-'+
+                              $('#adelanto_data_2i').val()+'-'+
+                              $('#adelanto_data_3i').val(),
+              success: function(data){
+              $('#adelanto_cotacao').val(number_format(data,0, ',', '.') );} })
+    });
+
+    //busca cotacao real
+    $("#adelanto_cotacao_real").focus(function(){
+      $.ajax({url: '/buscas/cotz_rs_compra',
+              type: 'POST',
+              beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+              data: 'data=' + $('#adelanto_data_1i').val()+'-'+
+                              $('#adelanto_data_2i').val()+'-'+
+                              $('#adelanto_data_3i').val(),
+              success: function(data){
+              $('#adelanto_cotacao_real').val(number_format(data,0, ',', '.')  );} })
+    });
+  </script>
+<% end %>
+
+<script>
+  $('#adelanto_persona_id').selectize();
+  $('#adelanto_documento_id').selectize();
+  $('#adelanto_banco_id').selectize();
+  $('#adelanto_terminal_id').selectize();
+</script>

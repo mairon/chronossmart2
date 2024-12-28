@@ -1,0 +1,32 @@
+<div class="group">
+   <table>
+      <tr>
+         <td width="50" align="center">Lanz.</td>
+         <td width="80" align="center"><%= t('DATE') %></td>
+         <td width="80" align="center">Cod. Prod.</td>
+         <td width="200" align="center">Procucto</td>                  
+         <td width="100" align="center">Costo U$.</td>
+         <td width="100" align="center">Costo U$.</td>
+      </tr>
+   </table>  
+   <div class="rolagem" id="div">
+      <table>
+      
+         <% @reclassif_stocks.each do |rs| %>
+            <tr class="<%= cycle("cor1", "cor2")%>">
+               <td width="50" align="center"><%= rs.id.to_s.rjust(6,'0') %></td>
+               <td width="80" align="center"><%= rs.data.strftime("%d/%m/%Y") %></td>
+               <td width="50" align="center"><%= rs.clase_id.to_s.rjust(2,'0') %>.<%= rs.grupo_id.to_s.rjust(4,'0') %>.<%= rs.produto_id.to_s.rjust(6,'0') %></td>
+               <td width="200" align="left"><%= rs.produto_nome %></td>               
+               <td width="100" align="center"><%= number_to_currency( rs.custo_dolar,     :format =>' %n ', :separeitor => "," )%></td>
+               <td width="100" align="center"><%= number_to_currency( rs.custo_guarani,   :format =>' %n ', :precision => 0 )%></td>
+               <td width="100" align="center"><%= number_to_currency( rs.custo_real,      :format =>' %n ', :separeitor => "," )%></td>               
+               <td><%= link_to 'Editar', edit_reclassif_stock_path(rs) %></td>
+               <td><%= link_to t('DELETE'), rs, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+            </tr>
+         <% end %>
+      </table>
+
+   </div>
+</div>
+

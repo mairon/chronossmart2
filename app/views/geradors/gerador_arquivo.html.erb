@@ -1,0 +1,30 @@
+   <div class="group">
+      <h2>
+         <%= form_tag "/geradors/result_gerador", :method => "get" do %>
+            <table>
+
+               <tr height="35">
+                  <td align="right"> Arquivo</td>
+                  <td>
+                     <%= text_field_tag :arq %>
+                  </td>
+               </tr>
+
+               <tr height="35">
+                  <td></td>
+                  <td>
+                     <input  id      ="button"
+                             type    ="submit"
+                             value   ="Informe"
+                             class   = "button_info"
+                             onclick = "Tipo('0')"/>
+
+                  </td>
+               </tr>
+            </table>
+         <% end %>
+      </h2>
+   </div>
+</body>
+
+

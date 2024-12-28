@@ -1,0 +1,27 @@
+<h1 id="header"><%= plural_table_name %></h1>
+<div class="acessos">
+  <%%= link_to 'Nuevo', new_<%= singular_table_name %>_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <% attributes.each do |attribute| -%>
+        <td><%= attribute.human_name %></t>
+    <% end -%>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <%% @<%= plural_table_name %>.each do |<%= singular_table_name %>| %>
+      <tr>
+        <% attributes.each do |attribute| -%>
+          <td><%%= <%= singular_table_name %>.<%= attribute.name %> %></td>
+        <% end -%>
+        <td><%%= link_to 'Editar', edit_<%= singular_table_name %>_path(<%= singular_table_name %>) %></td>
+        <td><%%= link_to 'Borrar', <%= singular_table_name %>, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <%% end %>
+  </table>
+</div>
+

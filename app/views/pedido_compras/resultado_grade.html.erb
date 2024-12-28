@@ -1,0 +1,151 @@
+  <div class="group">
+    <%= form_tag dinamic_busca_venda_produto_produtos_path, :method => "get" do %>
+    <select name="tipo" id="tipo">
+      <option>REFERENCIA</option>
+      <option>DESCRIPCION</option>
+      <option>BARRA</option>
+    </select>
+      <input id         ="busca"
+             name       ="busca"
+             type       ="text"
+             size       ="40"
+             value="<%= params[:busca]%>"
+             autofocus/>
+
+      <input type   ="button"
+             id     ="button"
+             class="button_info"
+             onclick="pesquisa(document.getElementById('busca').value)"
+             value  ="Buscar"/>
+
+    <% end %>
+    <hr/>
+</div>
+
+
+
+    <%= hidden_field_tag :moeda, @pedido_compra.moeda %>
+    <%= hidden_field_tag :unidade, params[:unidade] %>
+    <%= hidden_field_tag :colecao, @pedido_compra.colecao_id %>
+    <%= hidden_field_tag :pedido_compra_id, @pedido_compra.id %>
+
+<script language="javascript">
+   function pesquisa(valor){
+      tipo = document.getElementById('tipo').value
+      var tabela_preco = document.getElementById('tabela_preco').value
+      var unidade  = document.getElementById('unidade').value
+      var colecao  = document.getElementById('colecao').value
+      var tabela_preco = document.getElementById('tabela_preco').value
+      var presupuesto = document.getElementById('presupuesto_id').value
+
+      //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+      location.href="/presupuestos/"+presupuesto+"/resultado_grade?cliente="+tabela_preco+"&tipo="+tipo+"&colecao="+colecao+"&busca="+valor+"&unidade="+unidade+"";
+
+   }
+</script>
+<table class="head_grid">
+  <tr>
+    <td width="135" align="right"><b>Cantidad</b></td>
+    <td width="120">Ref.</td>
+    <td width="445">Producto</td>
+    <td width="70" align="right"><b>Precio</b></td>
+
+  </tr>
+</table>
+
+<div class="rolagem" id="div">
+<%= form_tag "/pedido_compras/#{params[:id]}/add_produtos", method: 'post' do %>
+  <table>
+    <% count  = 0 %>
+    <% qtd    = 0 %>
+    <% @produtos.each do |p| %>
+      <% presu_count = PedidoCompraProduto.count(:conditions => ["produto_id = #{p.produto_id} and pedido_compra_id = ?",@pedido_compra.id]) %>
+      <% if presu_count.to_i > 0 %>
+        <% find_presu = PedidoCompraProduto.find_by_produto_id(p.produto_id, :conditions => ["pedido_compra_id = ?",@pedido_compra.id]) %>
+        <% qtd = find_presu.quantidade %>
+      <% else %>
+        <% qtd = 0 %>
+      <% end %>
+      <%= hidden_field_tag "fields[#{count}][pedido_compra_id]", @pedido_compra.id %>
+      <%= hidden_field_tag "fields[#{count}][produto_id]", p.produto_id %>
+      <%= hidden_field_tag "fields[#{count}][fabricante_cod]", p.fabricante_cod %>
+      <%= hidden_field_tag "fields[#{count}][clase_id]", p.clase_id %>
+      <%= hidden_field_tag "fields[#{count}][grupo_id]", p.grupo_id %>
+      <%= hidden_field_tag "fields[#{count}][sub_grupo_id]", p.sub_grupo_id %>
+      <%= hidden_field_tag "fields[#{count}][cotacao]", @pedido_compra.cotacao.to_i %>
+      <%= hidden_field_tag "fields[#{count}][data]", @pedido_compra.data %>
+      <%= hidden_field_tag "fields[#{count}][persona_id]", @pedido_compra.persona_id %>
+      <%= hidden_field_tag "fields[#{count}][persona_nome]", @pedido_compra.persona_nome %>
+      <%= hidden_field_tag "fields[#{count}][moeda]", @pedido_compra.moeda %>
+      <%= hidden_field_tag "fields[#{count}][produto_nome]", p.nome %>
+      <% preco_us = 0  %>
+      <% preco_gs = 0  %>
+      <% preco_rs = 0  %>
+
+      <% if @pedido_compra.moeda == 0 %>
+        <%= hidden_field_tag "fields[#{count}][unitario_dolar]", number_to_currency(preco_us, :format=>' %n ', :separator => ","), size: 15, dir: "rtl" %>
+      <% elsif @pedido_compra.moeda == 1 %>
+        <%= hidden_field_tag "fields[#{count}][unitario_guarani]", number_to_currency(preco_gs, :format=>' %n ', :precision => 0), size: 15, dir: "rtl" %>
+      <% else %>
+        <%= hidden_field_tag "fields[#{count}][unitario_real]", number_to_currency(preco_rs, :format=>' %n ', :separator => ","), size: 15, dir: "rtl" %>
+      <% end %>
+
+
+      <% if @pedido_compra.moeda == 0 %>
+        <%= hidden_field_tag "fields[#{count}][total_dolar]","#{number_to_currency(preco_us.to_f * qtd.to_f, :format=>' %n ', :separator => ",")}", size: 15, dir: "rtl" %>
+      <% elsif @pedido_compra.moeda == 1 %>
+        <%= hidden_field_tag "fields[#{count}][total_guarani]","#{number_to_currency(preco_gs.to_f * qtd.to_f, :format=>' %n ', :precision => 0)}", size: 15, dir: "rtl" %>
+      <% else %>
+        <%= hidden_field_tag "fields[#{count}][total_real]","#{number_to_currency(preco_rs.to_f * qtd.to_f, :format=>' %n ', :separator => ",")}", size: 15, dir: "rtl" %>
+      <% end %>
+
+      <tr class = "<%= cycle( "cor1", "cor2" )%>"
+          onMouseOver="javascript:this.style.backgroundColor='#949494'"
+          onMouseOut="javascript:this.style.backgroundColor=''">
+
+        <% if @pedido_compra.moeda.to_s == '0' %>
+          <td> <%= number_field_tag "fields[#{count}][quantidade]","#{qtd.to_i}", size: 10, dir: "rtl", :onblur => "CalcQtdDescimal('fields_#{count}_unitario_dolar','fields_#{count}_quantidade','fields_#{count}_total_dolar')" %> </td>
+        <% elsif @pedido_compra.moeda.to_s == '1' %>
+          <td> <%= number_field_tag "fields[#{count}][quantidade]","#{qtd.to_i}", size: 10, dir: "rtl", :onblur => "CalcQtdDescimal('fields_#{count}_unitario_guarani','fields_#{count}_quantidade','fields_#{count}_total_guarani')" %> </td>
+        <% else %>
+          <td> <%= number_field_tag "fields[#{count}][quantidade]","#{qtd.to_i}", size: 10, dir: "rtl", :onblur => "CalcQtdDescimal('fields_#{count}_unitario_real','fields_#{count}_quantidade','fields_#{count}_total_real')" %> </td>
+        <% end %>
+        <td width="120"> <%= p.fabricante_cod %> </td>
+        <td width="450"> <%= p.nome %> </td>
+
+        <% if @pedido_compra.moeda.to_s == '0' %>
+          <td width="71" align="right"> <%= number_to_currency(preco_us, :format=>' %n ', :separator => ",")  %></td>
+        <% elsif @pedido_compra.moeda.to_s == '1' %>
+          <td width="71" align="right"> <%= number_to_currency(preco_gs, :format=>' %n ', :precisio => 0)  %></td>
+        <% else %>
+          <td width="71" align="right"> <%= number_to_currency(preco_rs, :format=>' %n ', :separator => ",")  %></td>
+        <% end %>
+
+      </tr>
+      <% count += 1 %>
+    <% end %>
+  </table>
+</div>
+<%= submit_tag "Agregar ao Pedido",:disable_with => "Aguarde...", :class => "button" %>
+<%= link_to t('BACK'),pedido_compra_path(@pedido_compra.id), :class => "button back" %>
+<% end %>
+<input type="hidden" id="foco" value="-1">
+
+<script>
+function CalcQtdDescimal(unit,qtd,tot)                                      //
+{
+    var total = eval( parseFloat( document.getElementById(unit).value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById(qtd).value.replace(/\./g, "").replace(",", ".") ) )  ;
+    document.getElementById(tot).value = ( number_format(total,2, ',', '.') );
+}
+
+function CalcQtd(unit,qtd,tot)                                      //
+{
+    var total = eval( parseFloat( document.getElementById(unit).value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById(qtd).value.replace(/\./g, "").replace(",", ".") ) )  ;
+    document.getElementById(tot).value = ( number_format(total,0, ',', '.') );
+}
+
+
+
+
+</script>

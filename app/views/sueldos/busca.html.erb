@@ -1,0 +1,45 @@
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="100" align="center"><%= t('CODE') %></td>
+      <td width="100" align="center">Tipo</td>
+      <td width="150" align="center">Periodo</td>
+      <td width="550">Empleado</td>
+    </tr>
+  </table>
+
+
+  <div class="rolagem" id="div">
+    <table>
+
+      <% @sueldos.each do |sueldo| %>
+      <% pago = sueldo.pago %>
+        <% if pago.to_i == 0 %>
+          <% color = '#ffa0a2' %>
+        <% end %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td bgcolor="<%= color%>" width="100" align="center"><%= sueldo.id.to_s.rjust(6,'0') %></td>
+          <td bgcolor="<%= color%>" width="100" align="center">
+            <% if sueldo.tipo_liquidacao == 0 %>
+              SUELDO
+            <% elsif sueldo.tipo_liquidacao == 1 %>
+              VACACIONES
+            <% elsif sueldo.tipo_liquidacao == 2 %>
+              AGUINALDO
+            <% end %>
+          </td>
+          <td bgcolor="<%= color%>" width="150" align="center"><%= l sueldo.data_inicio, :format => :mes  %>/<%= sueldo.data_inicio.strftime("%Y")  %></td>
+          <td  bgcolor="<%= color%>"width="550" align="left"><%= sueldo.persona_nome %></td>
+          <td bgcolor="<%= color%>"><%= link_to 'Editar', edit_sueldo_path(sueldo) %></td>
+          <% if pago.to_i == 0 %>
+            <td bgcolor="<%= color %>"><%= link_to 'Pagar', financas_sueldo_path(sueldo) %></td>
+            <td bgcolor="<%= color %>"><%= link_to t('DELETE'), sueldo, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+          <% else %>
+          <% end %>
+          <td bgcolor="<%= color %>"><%= link_to 'Detalhe', sueldo_path(sueldo) %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+

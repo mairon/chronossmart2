@@ -1,0 +1,5 @@
+$('#busca_terminal').empty();
+$('#busca_terminal').append('<option value="">Selecione a Região</option>');
+<% for ne in @terminals %>
+  $('#busca_terminal').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+<% end %>

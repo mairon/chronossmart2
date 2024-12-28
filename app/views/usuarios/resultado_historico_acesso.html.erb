@@ -1,0 +1,34 @@
+<div class="group">
+   <table class="head_grid">
+      <tr>
+         <td width="120" align="center">Quando</td>
+         <td width="100" align="center">Cod Proceso</td>
+         <td width="100">Proceso</td>
+         <td width="250">Resumen</td>
+         <td width="80">Actividad</td>
+         <td width="450">Alteración</td>
+      </tr>
+   </table>  
+   <div class="rolagem" id="div">
+      <table>
+         <% @auditorias.each do |a| %>
+            <tr class="<%= cycle("cor1", "cor2")%>">
+               <td width="120" align="center"><%= a.created_at.strftime("%d/%m/%y - %H:%M") %></td>
+               <td width="100" align="center"><%= a.cod_processo %></td>
+               <td width="100" ><%= a.owner_type %></td>
+               <td width="250" ><%= a.comment %></td>
+               <td width="80" >
+                <b>
+                  <% if a.action == 'destroy' %>
+                    BORRADO
+                  <% else %>
+                    <%= a.action %>
+                  <% end %>
+                </b>
+               </td>
+               <td width="450" ><%= a.audited_changes %></td>
+            </tr>
+         <% end %>
+      </table>
+   </div>
+</div>

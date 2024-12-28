@@ -1,0 +1,231 @@
+<h1 id="header"><%= t('LISTING') %> de <%= t('ACCOUNT') %>s a Pagar</h1>
+  <div class="group">
+    <%= form_tag relatorio_contas_pagar_proveedores_path, :method => "get" do %>
+<% sql = "SELECT PC.ID,
+                         (PG.DESCRICAO || ' > ' || PC.DESCRICAO) AS DESCRICAO
+                  FROM PLANO_DE_CONTAS PC
+                  LEFT JOIN PLANO_DE_CONTAS PG
+                  ON SUBSTRING(PG.CODIGO, 1, 8) = SUBSTRING(PC.CODIGO, 1, 8)
+                  WHERE LENGTH(PC.CODIGO) >=12 AND LENGTH(PG.CODIGO) =8
+                  ORDER BY 2"
+          plano = PlanoDeConta.find_by_sql(sql)
+        %>          
+    <div class="row">
+      <div class="col-md-12">
+        <label>Periodo</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <%= select_tag 'tipo_data', options_for_select([[t('EXPIRATION'),'vencimento'],[t('EMISSION'),'emicao']]), autofocus: true, class: 'panel-field' %>
+      </div>
+      <div class="col-md-4">
+          <div class="input-group">
+            <%= text_field_tag :inicio, nil, onkeyup: "Formatadata(this,event)", required: true %>
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default" >
+                <i class="icon-calendar" aria-hidden="true"></i>
+              </button>
+            </span>
+          </div>
+      </div>
+
+      <div class="col-md-4">
+          <div class="input-group">
+            <%= text_field_tag :final, nil, onkeyup: "Formatadata(this,event)", required: true %>
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default" >
+                <i class="icon-calendar" aria-hidden="true"></i>
+              </button>
+            </span>
+          </div>
+      </div>
+      <div class="col-md-1"></div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <label><%= t('PROVIDER') %></label>
+        <%= text_field_tag :persona_nome, nil, class: 'panel-field' %>
+        <%= hidden_field_tag :persona_id , nil  %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <label><%= t('CENTER_OF_COSTOS') %></label>
+          <%= select("busca", "cc", CentroCusto.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...'}) %>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-md-12">
+        <label><%= t('CLASSIFICATION') %></label>
+          <%= select("busca", "clasif", plano.collect {|p| [ p.descricao, p.id ] }, { :prompt => 'Todos...' })   %>
+      </div>
+    </div>
+
+   <div class="row">
+      <div class="col-md-3">
+        <label>Doc.</label>
+        <%= text_field_tag :doc,'', class: 'panel-field' %>
+      </div>
+
+      <div class="col-md-3">
+        <label><%= t('QUOTA') %></label>
+        <%= text_field_tag :cota,'', class: 'panel-field' %>
+      </div>
+
+      <div class="col-md-3">
+        <label>Valor Divida Min. </label>
+        <%= telephone_field_tag :valor_min,'', class: 'panel-field', size: 15, class: "money_us", dir: "rtl", step: ".01" %>
+      </div>
+      <div class="col-md-3">
+        <label>Max. </label>
+        <%= telephone_field_tag :valor_max,'', class: 'panel-field', size: 15, class: "money_us", dir: "rtl", step: ".01" %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <fieldset>
+          <legend>Filtros</legend>
+          <input id="filtro" name="filtro" type="radio" value="0"  checked/> <%= t('EM') %> <%= t('OPEN') %>
+          <input id="filtro" name="filtro" type="radio" value="1"/> Canceladas
+          <input id="filtro" name="filtro" type="radio" value="2"/> Todos
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset>
+          <legend>Tipo</legend>
+          <input type="radio" id= "detalhe" name="detalhe" value="2" />
+          Sintetico
+          <input type="radio" id= "detalhe" name="detalhe" value="0" />
+          Analitico
+          <input type="radio" id= "detalhe" name="detalhe" value="3" checked />
+          Analítico Por <%= t("QUOTA") %>
+         </fieldset>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <label>Descr.</label>
+        <%= text_field_tag :desc, nil, class: 'panel-field' %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <%= check_box_tag :lancamento,'1', checked: true %> Todos em uma <%= t('COIN') %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <fieldset>
+          <legend><%= t('COIN') %></legend>
+          <input type="radio" id="moeda" name="moeda" value="0" <%= 'checked' if current_unidade.moeda.to_i == 0 %> /> <%= t('DOLLARS') %>
+          <input type="radio" id="moeda" name="moeda" value ="1" <%= 'checked' if current_unidade.moeda.to_i == 1 %> /> <%= t('GUARANIS') %>
+          <input type="radio" id="moeda" name="moeda" value="2" <%= 'checked' if current_unidade.moeda.to_i == 2 %> /> <%= t('REAIS') %>
+          <input type="radio" id="moeda" name="moeda" value="4" <%= 'checked' if current_unidade.moeda.to_i == 4 %> /> Euro
+        </fieldset>
+      </div>
+    </div>
+
+      
+
+    <div class="row">
+      <div class="col-md-12">
+        <br>
+        <input  id="button" class="acao btn btn-green" value="Informe"  style="cursor:pointer;" id="myModalLabel" data-toggle="modal" data-width="500" data-height="781" data-target="#myiframe" data-dismiss="modal" />
+        <input  id="button" type="submit" class="btn btn-blue" value="Excel" onclick = "Tipo('1')"/>
+        
+        <input type="hidden" name="tipo" id="tipo" size="5" value="0"/>
+      </div>
+    </div>
+   </div>
+ <% end %>
+
+
+<script>
+  $('#busca_cc, #busca_clasif').selectize();
+      $(function() {
+      $( "#persona_nome" ).autocomplete({
+          source: function( request, response ) {
+          $.ajax({
+            url: "/personas/busca?per=PROVEEDOR",
+            dataType: "json",
+            data: {
+              tipo: 'DESCRIPCION',
+              busca: request.term
+            },
+            success: function( data ) {
+              response( data );
+            },
+          });
+        },
+        minLength: 2,
+        change: function( event, ui ) {
+          $("#persona_id").val("");
+          $('#persona_id').val(ui.item.id);
+          return false;
+        }
+      });
+      $( "#cobro_persona_nome" ).change(function(){
+        if ($( "#persona_id" ).val() == ''){
+        }
+      });
+    });
+</script>
+
+
+
+<script>
+  
+( function($) {
+
+function iframeModalOpen(){
+
+    $('.acao').on('click', function(e) {
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+
+      // stampiamo i nostri dati nell'iframe
+      $("#myiframe iframe").attr({
+        'src': '/proveedores/relatorio_contas_pagar?' + $('form').serialize(),
+        'height': height,
+        'width': width,
+        'allowfullscreen':''
+      });
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#myiframe').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+    });
+  }
+
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+
+  } ) ( jQuery );
+
+</script>
+
+<div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 1100px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('LISTING') %> de <%= t('ACCOUNT') %> a Pagar</h4>
+      </div>
+      <div class="modal-body" align="center">
+        <div class="embed-responsive embed-responsive-16by9" style="height: 460px">
+          <iframe class="embed-responsive-item" id="iframeModal" frameborder="0 " border="0"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

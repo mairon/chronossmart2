@@ -1,0 +1,249 @@
+<div class="panel">
+  <div class="panel-content conteudo">
+    <table class="grid-fc">
+      <tr>
+        <td class="bold" align="center">
+          <% if params[:pagos] == 'on' %>
+            <% if params[:moeda_fc] == '0' %>
+              <% if @saldo_us.to_f > 0 %>
+                <span class="rs bold"><%= format_decimal( @saldo_us + (@saldo_gs.to_f / @ctz.dolar_compra.to_f) + (@saldo_rs.to_f / @ctz.real_compra.to_f) ) %></span>
+              <% else %>
+                <span class="gs bold"><%= format_decimal( @saldo_us + (@saldo_gs.to_f / @ctz.dolar_compra.to_f) + (@saldo_rs.to_f / @ctz.real_compra.to_f) ) %></span>
+              <% end %>
+            <% elsif params[:moeda_fc] == '1' %>
+              <% if @saldo_gs.to_f > 0 %>
+                <span class="rs bold"><%= format_int( @saldo_gs + (@saldo_us.to_f * @ctz.dolar_compra.to_f) + (@saldo_rs.to_f * @ctz.real_compra.to_f) ) %></span>
+              <% else %>
+                <span class="gs bold"><%= format_int( @saldo_gs + (@saldo_us.to_f * @ctz.dolar_compra.to_f) + (@saldo_rs.to_f * @ctz.real_compra.to_f) ) %></span>
+              <% end %>
+            <% elsif params[:moeda_fc] == '2' %>
+              <% if @saldo_rs.to_f > 0 %>
+                <span class="rs bold"><%= format_decimal( @saldo_rs + (@saldo_us.to_f * @ctz.rs_us_compra.to_f) + (@saldo_gs.to_f / @ctz.real_compra.to_f) ) %></span>
+              <% else %>
+                <span class="gs bold"><%= format_decimal( @saldo_rs + (@saldo_us.to_f * @ctz.rs_us_compra.to_f) + (@saldo_gs.to_f / @ctz.real_compra.to_f) ) %></span>
+              <% end %>
+            <% end %>
+
+          <% else %>
+            <% if params[:moeda_fc] == '0' %>
+              <% if @saldo_us.to_f > 0 %>
+                <span class="rs bold"><%= format_decimal( @saldo_us )%></span>
+              <% else %>
+                <span class="gs bold"><%= format_decimal( @saldo_us )%></span>
+              <% end %>
+            <% elsif params[:moeda_fc] == '1' %>
+              <% if @saldo_gs.to_f > 0 %>
+                <span class="rs bold"><%= format_int( @saldo_gs )%></span>
+              <% else %>
+                <span class="gs bold"><%= format_int( @saldo_gs )%></span>
+              <% end %>
+            <% elsif params[:moeda_fc] == '2' %>
+              <% if @saldo_rs.to_f > 0 %>
+                <span class="rs bold"><%= format_decimal( @saldo_rs )%></span>
+              <% else %>
+                <span class="gs bold"><%= format_decimal( @saldo_rs )%></span>
+              <% end %>
+            <% end %>
+          <% end %>
+
+        </td>
+        <% @fluxo_caixa_cl.each do |d| %>
+          <td align="center"><span class="bold-black"><%= d.data.strftime("%d/%m") %> <br> <%= Date::ABBR_DAYNAMES[d.data.wday].to_s %></span></td>
+        <% end %>
+      </tr>
+      <tr>
+        <td><span class="rs bold">Recebir</span></td>
+
+        <% @fluxo_caixa_cl.each do |d| %>
+
+          <% if params[:pagos] == 'on' %>
+            <% if params[:moeda_fc] == '0' %>
+              <td align="center">
+                <span class="rs">
+                  <%= link_to  '#fc-detalhe-rc', "data-toggle" => "modal", "data-target" => "#fc-detalhe-rc", "data-moeda" => "#{ params[:moeda_fc]}", "data-tipo" => "receber", "data-vencimento" => "#{d.data}" do %>
+                      <%= format_decimal(d.divida_us.to_f + (d.divida_gs.to_f / @ctz.dolar_compra.to_f) + (d.divida_rs.to_f / @ctz.real_compra.to_f)) %>
+                    <% end %>
+                  </span>
+                </td>
+            <% elsif params[:moeda_fc] == '1' %>
+              <td align="center">
+                <span class="rs">
+                  <%= link_to  '#fc-detalhe-rc', "data-toggle" => "modal", "data-target" => "#fc-detalhe-rc", "data-moeda" => "#{ params[:moeda_fc]}", "data-tipo" => "receber", "data-vencimento" => "#{d.data}" do %>
+
+                    <%= format_int(d.divida_gs.to_f + (d.divida_us.to_f * @ctz.dolar_compra.to_f) + (d.divida_rs.to_f * @ctz.real_compra.to_f) ) %>
+                  <% end %>
+                </span>
+              </td>
+            <% elsif params[:moeda_fc] == '2' %>
+              <td align="center">
+                <span class="rs">
+                  <%= link_to  '#fc-detalhe-rc', "data-toggle" => "modal", "data-target" => "#fc-detalhe-rc", "data-moeda" => "#{ params[:moeda_fc]}", "data-tipo" => "receber", "data-vencimento" => "#{d.data}" do %>
+                    <%= format_decimal(d.divida_rs.to_f + (d.divida_us.to_f * @ctz.rs_us_compra.to_f) + (d.divida_gs.to_f / @ctz.real_compra.to_f)) %>
+                  <% end %>
+                </span>
+              </td>
+            <% end %>
+
+          <% else %>
+            <% if params[:moeda_fc] == '0' %>
+              <td align="center">
+                <span class="rs">
+                  <%= link_to  '#fc-detalhe-rc', "data-toggle" => "modal", "data-target" => "#fc-detalhe-rc", "data-moeda" => "#{ params[:moeda_fc]}", "data-tipo" => "receber", "data-vencimento" => "#{d.data}" do %>
+                    <%= format_decimal(d.divida_us) %>
+                  <% end %>
+                </span>
+              </td>
+            <% elsif params[:moeda_fc] == '1' %>
+              <td align="center">
+                <span class="rs">
+                  <%= link_to  '#fc-detalhe-rc', "data-toggle" => "modal", "data-target" => "#fc-detalhe-rc", "data-moeda" => "#{ params[:moeda_fc]}", "data-tipo" => "receber", "data-vencimento" => "#{d.data}" do %>
+                    <%= format_int(d.divida_gs) %>
+                  <% end %>
+                </span>
+              </td>
+            <% elsif params[:moeda_fc] == '2' %>
+              <td align="center">
+                <span class="rs">
+                  <%= link_to  '#fc-detalhe-rc', "data-toggle" => "modal", "data-target" => "#fc-detalhe-rc", "data-moeda" => "#{ params[:moeda_fc]}", "data-tipo" => "receber", "data-vencimento" => "#{d.data}" do %>
+                    <%= format_decimal(d.divida_rs) %>
+                  <% end %>
+                </span>
+              </td>
+            <% end %>
+          <% end %>
+        <% end %>
+      </tr>
+
+      <tr>
+        <td><span class="gs bold">Pagar</span></td>
+        <% pg = 0 %>
+        <% @fluxo_caixa_prov.each do |d| %>
+          <% if params[:pagos] == 'on' %>
+            <% if params[:moeda_fc] == '0' %>
+              <td align="center">
+                <span class="gs">
+                  <%= link_to  '#fc-detalhe', "data-toggle" => "modal", "data-target" => "#fc-detalhe", "data-moeda" => "#{ params[:moeda_fc]}", "data-tipo" => "pagar", "data-vencimento" => "#{d.data}" do %>
+
+                    <%= format_decimal(d.divida_us.to_f + (d.divida_gs.to_f / @ctz.dolar_compra.to_f) + (d.divida_rs.to_f / @ctz.real_compra.to_f)) %>
+                  <% end %>
+                </span>
+              </td>
+            <% elsif params[:moeda_fc] == '1' %>
+              <td align="center">
+                <span class="gs">
+                  <%= link_to  '#fc-detalhe-pg', "data-toggle" => "modal", "data-target" => "#fc-detalhe-pg", "data-moeda" => "#{ params[:moeda_fc]}", "data-tipo" => "pagar", "data-vencimento" => "#{d.data}" do %>
+
+                    <%= format_int(d.divida_gs.to_f + (d.divida_us.to_f * @ctz.dolar_compra.to_f) + (d.divida_rs.to_f * @ctz.real_compra.to_f) ) %>
+                  <% end %>
+                  </span>
+                </td>
+            <% elsif params[:moeda_fc] == '2' %>
+              <td align="center">
+                <span class="gs">
+                  <%= link_to  '#fc-detalhe-pg', "data-toggle" => "modal", "data-target" => "#fc-detalhe-pg", "data-moeda" => "#{ params[:moeda_fc]}", "data-tipo" => "pagar", "data-vencimento" => "#{d.data}" do %>
+                      <%= format_decimal(d.divida_rs.to_f + (d.divida_us.to_f * @ctz.rs_us_compra.to_f) + (d.divida_gs.to_f / @ctz.real_compra.to_f)) %>
+                    <% end %>
+                  </span>
+                </td>
+            <% end %>
+          <% else %>
+            <% if params[:moeda_fc] == '0' %>
+              <td align="center">
+                <span class="gs">
+                  <%= link_to  '#fc-detalhe-pg', "data-toggle" => "modal", "data-target" => "#fc-detalhe-pg", "data-moeda" => "#{ params[:moeda_fc]}", "data-tipo" => "pagar", "data-vencimento" => "#{d.data}" do %>
+                    <%= format_decimal(d.divida_us) %>
+                  <% end %>
+                </span>
+              </td>
+            <% elsif params[:moeda_fc] == '1' %>
+              <td align="center">
+                <span class="gs">
+                  <%= link_to  '#fc-detalhe-pg', "data-toggle" => "modal", "data-target" => "#fc-detalhe-pg", "data-moeda" => "#{ params[:moeda_fc]}", "data-tipo" => "pagar", "data-vencimento" => "#{d.data}" do %>
+                    <%= format_int(d.divida_gs) %>
+                  <% end %>
+                </span>
+              </td>
+            <% elsif params[:moeda_fc] == '2' %>
+              <td align="center">
+                <span class="gs">
+                  <%= link_to  '#fc-detalhe-pg', "data-toggle" => "modal", "data-target" => "#fc-detalhe-pg", "data-moeda" => "#{ params[:moeda_fc]}", "data-tipo" => "pagar", "data-vencimento" => "#{d.data}" do %>
+                    <%= format_decimal(d.divida_rs) %>
+                  <% end %>
+                </span>
+              </td>
+            <% end %>
+          <% end %>
+        <% end %>
+      </tr>
+
+      <% saldo_us = @saldo_us.to_f %>
+      <% saldo_gs = @saldo_gs.to_f %>
+      <% saldo_rs = @saldo_rs.to_f %>
+
+      <tr>
+        <td class="bold-black">Saldo </td>
+        <% @fluxo_caixa_saldo.each do |d| %>
+          <% if params[:pagos] == 'on' %>
+            <% if params[:moeda_fc] == '0' %>
+
+              <% saldo_us += (d.divida_us.to_f + (d.divida_gs.to_f / @ctz.dolar_compra.to_f) + (d.divida_rs.to_f / @ctz.real_compra.to_f)) %>
+              <td align="center"><span class="bold rs"><%= format_decimal(saldo_us) %></span></td>
+
+            <% elsif params[:moeda_fc] == '1' %>
+              <% saldo_gs += (d.divida_gs.to_f + (d.divida_us.to_f * @ctz.dolar_compra.to_f) + (d.divida_rs.to_f * @ctz.real_compra.to_f)) %>
+              <td align="center"><span class="bold rs"><%= format_int(saldo_gs ) %></span></td>
+            <% elsif params[:moeda_fc] == '2' %>
+              <% saldo_rs += (d.divida_rs.to_f + (d.divida_us.to_f * @ctz.rs_us_compra.to_f) + (d.divida_gs.to_f / @ctz.real_compra.to_f)) %>
+              <td align="center"><span class="bold rs"><%= format_decimal(saldo_rs) %></span></td>
+            <% end %>
+          <% else %>
+            <% if params[:moeda_fc] == '0' %>
+              <% saldo_us += d.divida_us.to_f %>
+              <td align="center"><span class="bold rs"><%= format_decimal(saldo_us) %></span></td>
+            <% elsif params[:moeda_fc] == '1' %>
+              <% saldo_gs += d.divida_gs.to_f %>
+              <td align="center"><span class=" bold rs"><%= format_int(saldo_gs) %></span></td>
+            <% elsif params[:moeda_fc] == '2' %>
+              <% saldo_rs += d.divida_rs.to_f %>
+              <td align="center"><span class=" bold rs"><%= format_decimal(saldo_rs) %></span></td>
+            <% end %>
+          <% end %>
+        <% end %>
+      </tr>
+    </table>
+  </div>
+</div>
+
+
+<style>
+  .grid-fc td{
+    width: 200px;
+    padding: 10px;
+    border: 1px solid #cfd8e6;
+  }
+  .grid-fc{
+
+    border-radius: 5px;
+  }
+
+
+.conteudo {
+    display: flex;
+    flex-direction: row;
+    /* justify-content: center; */
+    align-items: center;
+    width: 100%;
+    overflow-x: auto;
+}
+
+.card {
+    min-width: 250px;
+    margin: 10px;
+    height: 200px;
+    text-align: center;
+}
+</style>
+
+
+
+

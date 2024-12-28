@@ -1,0 +1,21 @@
+
+<div class="grid">
+   <%= render :partial=>"producao_produtos/index", :locals=>{:producao => @producao,:producao_produtos => @producao.producao_produtos} %>
+</div>
+
+<div class="modal fade" id="add_prod" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 350px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel">Producto</h4>
+      </div>
+      <div class="modal-body">
+        <%= render :partial=>"producao_produtos/new_produto" , :locals=>{:producao => @producao, :producao_produto => ProducaoProduto.new}%>
+      </div>
+    </div>
+  </div>
+</div>
+

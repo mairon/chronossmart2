@@ -1,0 +1,5 @@
+Paperclip.run("identify", "-format %m :file", :file => "/path/to/imageâ)
+Paperclip.run("identify", "-format %m :file", :file => "/path/to/imageâ")
+Paperclip.run("identify", "-format %m /path/to/image")
+eit
+exit

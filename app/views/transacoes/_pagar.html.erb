@@ -1,0 +1,34 @@
+<% sql = "SELECT C.PERSONA_ID,
+								 C.MOEDA,
+								 MAX(NOME) AS PERSONA_NOME,
+								 SUM(C.DIVIDA_REAL - C.PAGO_REAL) AS SALDO_RS,
+								 SUM(C.DIVIDA_DOLAR - C.PAGO_DOLAR) AS SALDO_US,
+								 SUM(C.DIVIDA_GUARANI - C.PAGO_GUARANI) AS SALDO_GS
+								 FROM PROVEEDORES C
+								 INNER JOIN PERSONAS P
+								 ON P.ID = C.PERSONA_ID
+								 GROUP BY 1,2
+								 HAVING 
+								 (SUM(C.DIVIDA_REAL - C.PAGO_REAL) + SUM(C.DIVIDA_DOLAR - C.PAGO_DOLAR) + SUM(C.DIVIDA_GUARANI - C.PAGO_GUARANI)) > 0
+								 ORDER BY 3
+								 "
+								 saldo_pagar = Cliente.find_by_sql(sql) %>
+
+<table class="list">
+	<% saldo_pagar.each do |sr| %>
+	<tr class = "<%= cycle("cor1", "cor2") %>">
+		<td width="150"><%= sr.persona_nome %></td>
+		<% if sr.moeda == 0 %>
+			<td>U$</td>
+			<td width="60" align="right"><%= format_decimal(sr.saldo_us ) %></td>
+		<% elsif sr.moeda == 1 %>
+			<td>Gs.</td>
+			<td width="60" align="right"><%= format_int(sr.saldo_gs ) %></td>
+		<% elsif sr.moeda == 2 %>
+			<td>R$</td>
+			<td width="60" align="right"><%= format_decimal(sr.saldo_rs ) %></td>
+		<% end %>
+		<td></td>
+	</tr>
+	<% end %>
+</table>

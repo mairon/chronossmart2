@@ -1,0 +1,81 @@
+<div class="c-entity-detail-info__header">
+  <div class="c-entity-detail-custom-fields-section__header__action">
+    <div class="c-button-mds-icon c-button-mds-icon--surface-raised c-button-mds-icon--size-default c-button-mds-icon--shape-round c-button-mds-icon__round">
+      <button class="c-button-mds-icon__button" type="button" data-toggle="modal" data-target="#form_produto_new" data-dismiss="modal" aria-labe="Close">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#6d758d"><path d="M446.67-446.67H200v-66.66h246.67V-760h66.66v246.67H760v66.66H513.33V-200h-66.66v-246.67Z"/></svg>
+      </button>
+    </div>
+  </div>  
+
+  <div class="c-entity-detail-info__header__wrap">
+    <div class="c-avatar c-avatar--square c-entity-detail-info__header__avatar c-entity-detail-info__header__avatar--deal">
+      <span class="c-icon material-icons c-avatar__icon">
+       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#6d758d"><path d="M180-80q-24.75 0-42.37-17.63Q120-115.25 120-140v-483q-17-6-28.5-21.39T80-680v-140q0-24.75 17.63-42.38Q115.25-880 140-880h680q24.75 0 42.38 17.62Q880-844.75 880-820v140q0 20.22-11.5 35.61T840-623v483q0 24.75-17.62 42.37Q804.75-80 780-80H180Zm0-540v480h600v-480H180Zm-40-60h680v-140H140v140Zm220 260h240v-60H360v60Zm120 40Z"/></svg>
+      </span>
+    </div>
+  </div>
+ <br>
+  <div class="c-entity-detail-info__header__text-block">
+    <div class="c-entity-detail-info__header__title">Productos</div>
+  </div>
+
+
+
+</div>
+
+<hr class="c-entity-detail-info__divider">
+
+<div class="c-entity-detail-info__detail">
+   <ul class="c-entity-detail-info__detail__list">
+      <li class="c-entity-detail-info__detail__item">
+         <div class="c-detail-field-info">
+            <table class="list">
+              <tr class="head_grid">
+                <td>Qtd</td>
+                <td>Producto</td>
+                <td align="right">Unit.</td>
+                <td align="right">Tot.</td>
+              </tr>
+              <% @negocio.negocio_produtos.each do |np| %>
+                <tr class="<%= cycle("cor1", "cor2")%>">
+                  <td colspan="4" width="400">
+                    <%= link_to np.produto.nome, edit_crm_negocio_produto_path(np) unless np.produto.nil? %>
+                  </td>
+                </tr>
+
+                <tr class="<%= cycle("cor1", "cor2")%> head_grid">
+                  <td><%= np.quantidade.to_i %></td>
+                  <td></td>
+                  <% if @negocio.moeda.to_i == 0 %>
+                    <td align="right"><%= format_decimal(np.unit_us) %></td>
+                    <td align="right"><%= format_decimal(np.tot_us) %></td>
+                  <% else %>
+                    <td align="right"><%= format_int(np.unit_gs) %></td>
+                    <td align="right"><%= format_int(np.tot_gs) %></td>
+                  <% end %>
+                  <td><%= link_to '', [:crm, np], :confirm => 'Estas Seguro?', :method => :delete , class: 'icon-trash' %></td>
+                </tr>
+              <% end %>
+            </table>
+         </div>
+      </li>
+    
+   </ul>
+</div>
+
+
+<div class="modal fade" id="form_produto_new" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 600px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('NEW') %> Producto</h4>
+      </div>
+      <div class="modal-body">
+        <%= render 'crm/negocio_produtos/form' %>
+      </div>
+    </div>
+  </div>
+</div>

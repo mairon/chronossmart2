@@ -1,0 +1,74 @@
+<%= form_for(@cobros_recibo) do |f| %>
+  <% if @cobros_recibo.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@cobros_recibo.errors.count, "error") %> prohibited this <%= t('CHARGE') %>s_recibo from being saved:</h2>
+
+      <ul>
+      <% @cobros_recibo.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> <%= t('CHARGE') %>s_recibos - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right"><%= t('CHARGE') %>_id :</td>                    
+                      <td><%= f.number_field :cobro_id %></td>
+                                      
+                      <td align="right"><%= t('DATE') %> :</td>                    
+                      <td><%= f.date_select :data %></td>
+                                      
+                      <td align="right">documento_numero_01 :</td>                    
+                      <td><%= f.text_field :documento_numero_01 %></td>
+                                      
+                      <td align="right">documento_numero_02 :</td>                    
+                      <td><%= f.text_field :documento_numero_02 %></td>
+                                      
+                      <td align="right">documento_numero :</td>                    
+                      <td><%= f.text_field :documento_numero %></td>
+                                      
+                      <td align="right">valor_us :</td>                    
+                      <td><%= f.text_field :valor_us %></td>
+                                      
+                      <td align="right">valor_gs :</td>                    
+                      <td><%= f.text_field :valor_gs %></td>
+                                      
+                      <td align="right">moeda :</td>                    
+                      <td><%= f.number_field :moeda %></td>
+                                      
+                      <td align="right">persona_id :</td>                    
+                      <td><%= f.number_field :persona_id %></td>
+                                      
+                      <td align="right">persona_nome :</td>                    
+                      <td><%= f.text_field :persona_nome %></td>
+                                      
+                      <td align="right">tipo :</td>                    
+                      <td><%= f.number_field :tipo %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), cobros_recibos_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

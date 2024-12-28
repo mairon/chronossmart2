@@ -1,0 +1,47 @@
+<div class="panel">
+  <div class="row">
+    <div class="col-md-3"> 
+      <div class="row" style="padding: 10px 8px">
+        <% if @venda.moeda.to_i == 1 %>
+          <div class="col-md-12"><span class="us"style="font-family: 'prox-bold'; font-size: 14px;">U$ <%= format_decimal(@produto_sum_us)%></span></div>
+          <div class="col-md-12"><span class="rs"style="font-family: 'prox-bold'; font-size: 14px;">R$ <%= format_decimal(@produto_sum_rs)%></span></div>
+        <% elsif @venda.moeda.to_i == 0 %>
+          <div class="col-md-12"><span class="gs"style="font-family: 'prox-bold'; font-size: 14px;">Gs. <%= format_int(@produto_sum_gs)%></span></div>
+          <div class="col-md-12"><span class="rs"style="font-family: 'prox-bold'; font-size: 14px;">R$ <%= format_decimal(@produto_sum_rs)%></span></div>
+        <% end %>
+
+
+      </div>
+    </div>
+    <div class="col-md-9">
+      <% if @venda.moeda.to_i == 0 %>
+        <font class="style3 us" style="font-family: 'prox-bold'; font-size: 43px;">
+          <span id="sub_total_dolar">Total</span>
+        </font>
+
+        <font class="style3 us" color="green" style="font-family: 'prox-bold'; font-size: 43px;">
+          <span id="sub_total_guarani"><%= format_int(@produto_sum_us) %>U$</span>
+        </font>
+
+      <% elsif @venda.moeda.to_i == 1 %>
+        <font class="style3 gs" style="font-family: 'prox-bold'; font-size: 43px;">
+          <span id="sub_total_guarani">Total</span>
+        </font>
+
+        <font class="style3 gs" color="red" style="font-family: 'prox-bold'; font-size: 43px;">
+          <span id="sub_total_guarani"><%= format_int(@produto_sum_gs) %>Gs.</span>
+        </font>
+      <% elsif @venda.moeda.to_i == 2 %>
+        <font class="style3 rs" style="font-family: 'prox-bold'; font-size: 43px;">
+          <span id="sub_total_real">Total</span>
+        </font>
+
+        <font class="style3 rs" color="red" style="font-family: 'prox-bold'; font-size: 43px;">
+          <span id="sub_total_guarani"><%= format_int(@produto_sum_rs) %>R$</span>
+        </font>
+
+      <% end %>
+      
+    </div>
+  </div>
+</div>

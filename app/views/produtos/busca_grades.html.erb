@@ -1,0 +1,44 @@
+<script language="javascript">
+  function GeraEti(v){
+      clase     = document.getElementById('filtro_clase').value
+      grupo     = document.getElementById('filtro_grupo').value
+      sub_grupo = document.getElementById('filtro_sub_grupo').value
+      colecao   = document.getElementById('filtro_colecao').value
+      tipo      = document.getElementById('tipo').value
+      busca     = document.getElementById('busca').value
+      //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+      location.href="";
+
+  }
+</script>
+
+<table>
+  <tr>
+    <td width="150" align="center">Cod.</td>
+
+    <td width="150" align="center">Cod. Fabri.</td>
+    <td width="700" align="center">Producto</td>
+
+  </tr>
+</table>
+
+<div class="rolagem" id="div">
+    <table>
+      <% ids = '' %>
+      <% for produto in @produtos %>
+        <tr class = "<%= cycle("cor1", "cor2")%>">
+          <% #cp.update_attribute :updated_at, '2014-04-22 11:15:25.2791' %>
+          <td width="150" align="center" ><%= produto.clase_id.to_s.rjust(2, '0')<< '.' << produto.grupo_id.to_s.rjust(4, '0') << '.' <<  produto.produtos_grade_id.to_s.rjust(8, '0' )%> 
+          <td width="150" align="center"> <%=h produto.fabricante_cod %> </td>
+          <td width="700" align="left">   <%=h produto.nome %> </td>
+          <td width="200" align="left">   <%=h produto.cor_nome %> </td>
+          <td width="40" align="left">   <%=h produto.tamanho_nome %> </td>
+        </tr>
+      <% end %>
+      <% ids = @produtos.map  { |t| t.produtos_grade_id }.join(',') %>
+    </table>
+</div>
+
+<%= will_paginate @produtos, :options => {:prev_label => '<< Anterior',:next_label => 'Próximo >>'}%>
+<a href="/produtos/etiquetas?modelo=1&clase=<%= params[:clase] %>&grupo=<%= params[:grupo] %>&sub_grupo=<%= params[:sub_grupo] %>&colecao=<%= params[:colecao] %>&tipo=<%= params[:tipo] %>&ids=<%= ids %>" , class="button print">Gerar Etiquetas</a>
+

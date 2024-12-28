@@ -1,0 +1,42 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <header class="panel-heading" style="font-family: 'prox'; font-size: 18px; padding-bottom: 10px;">
+       Uso y Consumo #<%= @consumicao_interna.id.to_s.rjust(6,'0') %> - <%= @consumicao_interna.data.strftime("%d/%m/%y") %>
+        <div class="pull-right">
+				  <%= link_to t('BACK'), edit_consumicao_interna_path(@consumicao_interna), :class => "btn btn-blue" %>
+				  <%= link_to 'Finalizar', consumicao_internas_path, :class => "btn btn-blue" %>
+				  <%= link_to 'Generar (PDF)', comprovante_consumicao_interna_path(@consumicao_interna),:class =>'btn btn-blue' %>
+        </div>  
+      </header>
+
+       <div class="panel-content">
+          Persona: <%= @consumicao_interna.persona.nome %> | 
+          Rodado: <%= @consumicao_interna.rodado.placa unless @consumicao_interna.rodado.blank?  %> |
+          Centro de Costo: <%= @consumicao_interna.centro_custo.nome unless @consumicao_interna.centro_custo.blank?  %>
+       </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content">
+        <%= render :partial=>"consumicao_interna_produtos/index", :locals=>{:consumicao_interna => @consumicao_interna,:consumicao_interna_produtos => @consumicao_interna.consumicao_interna_produtos} %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content">
+        <%= render :partial=>"consumicao_interna_produtos/new_produto" , :locals=>{:consumicao_interna => @consumicao_interna, :consumicao_interna_produto => ConsumicaoInternaProduto.new}%>
+      </div>
+    </div>
+  </div>
+</div>

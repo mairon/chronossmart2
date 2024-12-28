@@ -1,0 +1,63 @@
+<p>
+  <b>Transferencia deposito:</b>
+  <%=h @transferencia_deposito_detalhe.transferencia_deposito_id %>
+</p>
+
+<p>
+  <b>Deposito origem:</b>
+  <%=h @transferencia_deposito_detalhe.deposito_origem_id %>
+</p>
+
+<p>
+  <b>Deposito origem <%= t('NAME') %>:</b>
+  <%=h @transferencia_deposito_detalhe.deposito_origem_nome %>
+</p>
+
+<p>
+  <b>Deposito destino:</b>
+  <%=h @transferencia_deposito_detalhe.deposito_destino_id %>
+</p>
+
+<p>
+  <b>Deposito destino <%= t('NAME') %>:</b>
+  <%=h @transferencia_deposito_detalhe.deposito_destino_nome %>
+</p>
+
+<p>
+  <b>Produto:</b>
+  <%=h @transferencia_deposito_detalhe.produto_id %>
+</p>
+
+<p>
+  <b>Produto <%= t('NAME') %>:</b>
+  <%=h @transferencia_deposito_detalhe.produto_nome %>
+</p>
+
+<p>
+  <b>Quantidade:</b>
+  <%=h @transferencia_deposito_detalhe.quantidade %>
+</p>
+
+<p>
+  <b>Custo dolar:</b>
+  <%=h @transferencia_deposito_detalhe.custo_dolar %>
+</p>
+
+<p>
+  <b>Custo guarani:</b>
+  <%=h @transferencia_deposito_detalhe.custo_guarani %>
+</p>
+
+<p>
+  <b>Preco guarani:</b>
+  <%=h @transferencia_deposito_detalhe.preco_guarani %>
+</p>
+
+<p>
+  <b>Preco dolar:</b>
+  <%=h @transferencia_deposito_detalhe.preco_dolar %>
+</p>
+
+
+<%= link_to 'Edit', edit_transferencia_deposito_detalhe_path(@transferencia_deposito_detalhe) %> |
+<%= link_to 'Back', transferencia_deposito_detalhes_path %>

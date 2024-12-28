@@ -1,0 +1,30 @@
+<%= form_for [:crm, Nota.new], html: { class: "c-entity-timeline-form c-entity-timeline-form--note"} do |f| %>
+	<%= f.hidden_field :negocio_id, value: @negocio.id %>
+    <section class="c-entity-timeline-form__body">
+       <div class="c-entity-timeline-form__containers">
+          <div class="c-entity-timeline-form__body__form">	
+          	<%= f.text_area :descricao, class: "c-entity-timeline-form__body__note", placeholder: "Escreva aqui lo concepto de la actividad", rows: "5", required: true %>
+          </div>
+       </div>
+    </section>
+    
+    <div class="c-entity-timeline-form__footer">
+       <div class="c-entity-timeline-form__containers">
+          	<div class="pull-left">
+
+
+            <% if @usuario_pipe.permissao.to_i == 0 %>     		
+          		<%= f.select(:usuario_id, PipelineUsuario.where(pipeline_id: @negocio.etapa.pipeline_id).map{|s| [s.usuario.usuario_nome, s.usuario_id]}, {selected: current_user.id}, {class: "c-entity-timeline-form__body__note"}) %>
+              <% else %>
+                <%= f.select(:usuario_id, PipelineUsuario.where(pipeline_id: @negocio.etapa.pipeline_id, usuario_id: @usuario_pipe.usuario_id ).map{|s| [s.usuario.usuario_nome, s.usuario_id]}, {selected: current_user.id}, {class: "c-entity-timeline-form__body__note"}) %>
+              <% end %>
+          	</div>
+          <div class="c-entity-timeline-form__footer__actions">
+
+             <div class="c-button-mds c-button-mds--raised c-button-mds--deal c-entity-timeline-form__footer__action c-entity-timeline-form__footer__action--send">
+             	<%= f.submit t('SAVE'), class: "btn btn-blue", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+             </div>
+          </div>
+       </div>
+    </div>
+ <% end %>

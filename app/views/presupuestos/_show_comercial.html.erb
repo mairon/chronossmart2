@@ -1,0 +1,44 @@
+<div class="panel">
+  <h1 id="header">
+    Pedido Venta Productos - [<%= t('EDITION') %>]
+    <div class="pull-right">
+      <%= link_to t('BACK'), edit_presupuesto_path(@presupuesto),:class =>'btn btn-default' %>
+      <%= link_to 'Generar (PDF)', print_presupuesto_presupuesto_path(@presupuesto, tipo: '0'),:class =>'btn btn-blue  btn-print' %>
+      <%= link_to '(PDF) - INTERNO', print_presupuesto_presupuesto_path(@presupuesto, tipo: '1'),:class =>'btn btn-blue btn-print' %> 
+      <%= link_to 'Finalizar', presupuestos_path,:class =>'btn' %>
+      
+    </div>
+  </h1>
+ <div class="acessos" style="padding-left: 30px">
+  Cliente: <%= @presupuesto.persona_nome %>
+  | Condición de Pago: <%= @presupuesto.plano.condicao unless @presupuesto.plano_id.blank? %>
+  | Tabla de Precio: <%= @presupuesto.tabela_preco.nome unless @presupuesto.tabela_preco_id.blank? %>
+  </div>  
+</div>
+
+<div class="panel">
+  <div class="group">
+  <%= render :partial=>"presupuesto_produtos/index_comercial", :locals=>{:presupuesto => @presupuesto,:presupuesto_produtos => @presupuesto.presupuesto_produtos} %>
+  </div>
+</div>
+<div class="panel">
+  <div class="group">
+  <%= render :partial=>"presupuesto_produtos/new_produto_comercial" , :locals=>{:presupuesto => @presupuesto, :presupuesto_produto => PresupuestoProduto.new} %>  
+  </div>
+</div>
+
+<script type="text/javascript">
+
+  document.onkeydown=function(e){
+    //LISTA DE PRODUTOS
+    var moeda   = document.getElementById('presupuesto_produto_moeda').value
+    if(e.which == 113)
+      window.open('/produtos/busca_presupuesto_produto?tabela_preco='+<%= @presupuesto.tabela_preco_id %>+'&unidade='+<%= @presupuesto.unidade_id %>+'&persona_id='+<%= @presupuesto.persona_id %>+'&moeda='+moeda+'', 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=2500, HEIGHT=700');
+
+  }
+
+  function BuscaTintometria(m,p){
+    window.open("/vendas/busca_tintometria?marca="+ m + "&persona_id=" + p , '', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=2500, HEIGHT=600');
+  };
+
+</script>

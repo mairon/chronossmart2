@@ -1,0 +1,65 @@
+<h1 id="header">Cuota <%= @cliente.cota.to_s.rjust(2,'0') %></h1>
+ <div class="group">
+
+<%= form_for(@cliente) do |f| %>
+  <% if @cliente.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@cliente.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @cliente.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+        <table>
+        <%= hidden_field_tag :proc, 'contrato' %>
+            <tr>
+              <td> 
+                <label>Proveedor</label>
+                <label>
+                  <b>
+                    <%= @cliente.persona_id %>
+                  </b>
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td> 
+                <label><%= t('DOC') %></label>
+                <label>
+                  <b>
+                    <%= @cliente.documento_numero %>
+                  </b>
+                </label>
+              </td>
+            </tr>
+
+            <tr>              
+              <td>
+                <label><%= t('EXPIRATION') %></label>
+                <%= f.date_select :vencimento %>
+              </td>
+            </tr>
+            <tr>
+              <% if @cliente.moeda == 0 %>
+                
+                <%= field_us_label 'Divida U$',f,:divida_dolar, autofocus: true %>								
+              <% elsif @cliente.moeda == 1 %>
+              	
+              	<%= field_gs_label 'Divida Gs',f,:divida_guarani, autofocus: true %>
+              <% else %>
+              	
+              	<%= field_us_label 'Divida R$',f,:divida_real, autofocus: true %>
+              <% end %>               
+            </tr>
+        </table>
+        <div class="footer-buttons">
+          <%= f.submit "Actualizar", :class => "btn btn-green", :disable_with => "Aguarde...", "data-plus-as-tab" => "false"   %>
+          <%= link_to t('BACK'), contrato_path(@cliente.cod_proc), :class => "btn btn-back" %>
+        </div>
+      <% end %>
+    </div>

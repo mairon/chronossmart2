@@ -1,0 +1,34 @@
+<table>
+  <% total = 0 %>
+  <%  @stocks.each do |stm| %>
+     <tr class = "<%= cycle("cor1", "cor2") %>">
+         <td align="left" width="90"><%= stm.clase_id.to_s.rjust(2,'0') %>.<%= stm.grupo_id.to_s.rjust(4,'0') %>.<%= stm.id.to_s.rjust(6,'0')%></td>
+         <td align="left" width="90"><%= stm.fabricante_cod %>
+
+         <td width="430"><%= stm.nome %></td>
+         <td width="60" align="right"><%= stm.unitario_dolar %></td>
+         <td width="60" align="right"><%= stm.stock %></td>
+         <td width="60" align="right"><%= stm.stock_minimo %></td>
+         <td width="60" align="right"><%= stm.stock_maximo.to_f - stm.stock.to_f %></td>
+         <td width="60" align="right"><%= stm.stock_maximo %></td>
+     </tr>
+     
+     <% total +=  1 %>
+  <% end %>
+  <tr class="head">
+    <td colspan="7">Total Productos : <%= total %>
+    </td> 
+  </tr>
+</table>
+
+
+<style type="text/css">
+  table {
+    border-collapse: collapse;
+    font-size: 9px
+  }
+  td, tr {
+    border: 1px solid black;
+  }
+  
+</style>

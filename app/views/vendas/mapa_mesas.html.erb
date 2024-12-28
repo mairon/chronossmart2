@@ -1,0 +1,107 @@
+
+<style type="text/css">
+.list_mesas_on{
+  color: #000 !important;
+  border: 2px solid #fff;
+  height: 100px;
+  width: 200px;
+  float: left;
+  background-color: #dcefa2;
+  font-size: 12px;
+  text-align: center;
+  padding: 5px;
+}
+
+.list_mesas_off{
+  color: #000 !important;
+  border:2px solid #fff;
+  height: 100px;
+  width: 200px;
+  float: left;
+  background-color: #ff9b9b;
+  font-size: 12px;
+  text-align: center;
+  padding: 5px;
+}
+
+.title-card{
+  font-size: 16px;
+
+}
+
+.op-false{
+  background-color: #ffc107 !important;
+  
+}
+td{
+  color: #000;
+}
+</style>
+
+
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <header class="panel-heading" style="font-family: 'prox'; font-size: 18px; padding-bottom: 10px;">
+      	<a href="/vendas/new?tipo_venda=0" class="button add">Venta Directa</a>
+      </header>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-5">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <div class="panel-content">
+            <h1>Vendas Apertas</h1>
+            <%= render 'mapa_mesa_vendas_em_curso' %>
+          </div>
+        </div>        
+      </div>
+
+      <div class="col-md-12">
+        <div class="panel">
+          <div class="panel-content">
+            <h1>Cocina</h1>
+            <%= render 'mapa_mesa_produto_preparo' %>
+          </div>
+        </div>        
+      </div>
+    </div>
+
+  </div>
+
+	<div class="col-md-7">
+  	<div class="panel">
+    	<div class="panel-content" style="display:table">
+        <header class="panel-heading" style="display:table-row;">
+          <div class="pull-left" style="padding-top: 15px">
+            <h1>Mapa de Mesas</h1>
+          </div>
+            <div class="pull-right">
+              <%= search_field_tag :filtro_cartao, nil, placeholder: 'Buscar tarjeta', autofocus: true, onkeyup: "pesquisa(this.value),f(this)", onkeydown: "f(this)"  %>
+              <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;") %>
+            </div>
+        </header>
+
+        <div id="pagina"></div>
+        <script language="javascript">
+          function pesquisa(valor){
+            url="/vendas/lista_mapa_mesas?cartao_nome=" + $('#filtro_cartao').val();
+            ajax(url);
+          }
+
+          $(document).ready(function() {
+            url="/vendas/lista_mapa_mesas";
+            ajax(url);
+          });
+        </script>
+        <%= javascript_include_tag 'busca_ajax' %>
+     	</div>
+   	</div>
+  </div>
+
+</div>

@@ -1,0 +1,133 @@
+<table>
+  <% quebra       = ""%>
+  <% totentrada   = 0 %>
+  <% totsaida     = 0 %>
+  <% subentrada   = 0 %>
+  <% subsaida     = 0 %>
+  <% subsaldo     = 0 %>
+  <% ant          = @financas_anterior.to_f %>
+  <% anterior     = 0 %>
+<% unless @financas.present? %>
+  <td align="center" class="head" width="800">
+    Saldo:
+    <% if params[:moeda] == '1' %>
+      <%= format_int(@financas_anterior.to_f) %>
+    <% else %>
+      <%= format_decimal(@financas_anterior.to_f) %>
+    <% end %>
+  </td>
+<% else %>
+
+    <% for fin in @financas %>
+
+      <% if params[:moeda] == "0" %>
+        <% entrada        = fin.entrada_dolar %>
+        <% saida          = fin.saida_dolar %>
+        <% valor_sum      = 'coalesce(entrada_dolar,0) - coalesce(saida_dolar,0)' %>
+        <% consulta_maior = 'coalesce(entrada_dolar,0) + coalesce(saida_dolar,0)' %>
+
+      <% elsif params[:moeda] == "1" %>
+        <% entrada        = fin.entrada_guarani %>
+        <% saida          = fin.saida_guarani %>
+        <% valor_sum      = 'coalesce(entrada_guarani,0) - coalesce(saida_guarani,0)' %>
+        <% consulta_maior = 'coalesce(entrada_guarani,0) + coalesce(saida_guarani,0)' %>
+      <% else %>
+        <% entrada        = fin.entrada_real %>
+        <% saida          = fin.saida_real %>
+        <% valor_sum      = 'coalesce(entrada_real,0) - coalesce(saida_real,0)' %>
+        <% consulta_maior = 'coalesce(entrada_real,0) + coalesce(saida_real,0)' %>
+      <% end %>
+
+      <% if quebra != fin.data.strftime("%Y-%m-%d")  %>
+        <% if quebra != "" %>
+          <tr height="15">
+            <td></td>
+          </tr>
+        <% end %>
+        <tr>
+        <%
+        if params[:conciliacao] == 'true'
+            tipo_data = "DATA_CONCILIACAO"
+            solo_conciliados = "AND CONCILIACAO = true"
+        else
+            tipo_data = "DATA"
+        end
+
+        %>
+          <td class="head"  align="center"><%= fin.data.strftime("%d/%m/%y") %><% quebra = fin.data.strftime("%Y-%m-%d") %></td>
+          <% condante = "#{tipo_data} < '#{quebra}' AND MOEDA = #{params[:moeda]} AND #{consulta_maior} != 0 AND conta_id = #{params[:busca]["conta"]} #{solo_conciliados}"  %>
+          <% anterior = Financa.sum(valor_sum,:conditions => condante)%>
+
+          <td  class="head" align="right" colspan="5">Anterior =></td>
+          <% if params[:moeda].to_s == '1' %>
+            <td  class="head" align="right"><%= format_int(anterior)%></td>
+          <% else %>
+            <td  class="head" align="right"><%= format_decimal(anterior)%></td>
+          <% end %>
+        </tr>
+      <% end %>
+
+      <% ant += (entrada.to_f - saida.to_f) %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td width="80" align="center"> <%= fin.data.strftime("%d/%m/%y")%> </td>
+        <td width="250">
+          <%= fin.persona_nome ? truncate(fin.persona_nome.to_s, :length => 26) : "Operación Financiera" %>
+        </td>
+
+      <% if fin.tabela == "VENDAS_FINANCAS" %>
+        <td width="640" align="left">
+          <%= fin.concepto %> Nr.: <%= fin.documento_numero %>
+          <%= '- Banco :' + fin.banco.to_s + '- Titular :' + fin.titular.to_s if fin.cheque_status.to_i != 0 %>
+        </td>
+      <% else %>
+        <td width="690" align="left">
+          <%= fin.concepto %> - <%= fin.documento_numero %>
+          <% if fin.compra_id != nil %>
+            <% cp = Compra.find_by_id(fin.compra_id, :select => "id,rubro_descricao")%>
+            <%= ' - Rb.:' << cp.rubro_descricao.to_s %>
+          <% end %>
+          <%= '- Banco :' + fin.banco.to_s + '- Titular :' + fin.titular.to_s if fin.cheque_status.to_i != 0 %>
+      <% end %>
+
+      <% if fin.diferido > fin.data %>
+        <td width="100" align="center"> <%= fin.cheque %> D </td>
+      <% else %>
+        <td width="100" align="center"> <%= fin.cheque %> </td>
+      <% end %>
+      <% if params[:moeda].to_s == '1'%>
+        <td width="80" align="right"> <%= format_int( entrada ) %> </td>
+        <td width="80" align="right"> <%= format_int( saida ) %> </td>
+        <td width="80" align="right"> <%= format_int( ant ) %> </td>
+      <% else %>
+        <td width="80" align="right"> <%= format_decimal( entrada ) %> </td>
+        <td width="80" align="right"> <%= format_decimal( saida ) %> </td>
+        <td width="80" align="right"> <%= format_decimal( ant ) %> </td>
+      <% end %>
+    </tr>
+
+    <% totentrada   += entrada.to_f %>
+    <% totsaida     += saida.to_f %>
+    <% subentrada   += entrada.to_f%>
+    <% subsaida     += saida.to_f %>
+    <% end %>
+
+    <% if quebra != '' %>
+      <% condante = "#{tipo_data} < '#{quebra}' AND MOEDA = #{params[:moeda]} AND #{consulta_maior} != 0 AND conta_id = #{params[:busca]["conta"]} #{solo_conciliados}" %>
+      <% anterior = Financa.sum(valor_sum,:conditions => condante) %>
+    <% else %>
+      <% anterior = @financas_anterior %>
+    <% end %>
+
+    <tr height="15">
+      <td></td>
+    </tr>
+
+    <% subsaida    = 0 %>
+    <% subentrada  = 0 %>
+    <% subsaldo    = 0 %>
+  </table>
+
+  <% if params[:filtro] == '1' and params[:futuros] == 'true' %>
+    <%= render 'lanz_futuros_extrac_bc'%>
+  <% end %>
+<% end %>

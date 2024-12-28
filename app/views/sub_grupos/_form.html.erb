@@ -1,0 +1,42 @@
+<%= form_for(@sub_grupo) do |f| %>
+  <% if @sub_grupo.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@sub_grupo.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @sub_grupo.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+   <ul class="tabs">
+      <li><a href="#tab1">Sub-Grupo - [<%= t('EDITION') %>]</a></li>
+   </ul>
+   <div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td>
+              <label>Descripción:</label>
+              <%= f.text_field :descricao, size: 60, autofocus: true, required: true %>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Cod. Implantacion:</label>
+              <%= f.text_field :cod_impl, size: 5 %>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="buttons">
+        <%= f.submit t('SAVE'), :class => "btn btn-green", :disable_with => "Aguarde...", "data-plus-as-tab" => "false"   %>
+        <%= link_to t('BACK'), sub_grupos_path, :class => "btn btn-back" %>
+      </div>
+    </div>
+
+<% end %>

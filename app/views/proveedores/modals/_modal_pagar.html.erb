@@ -1,0 +1,389 @@
+<div class="modal fade" id="modal-pagar" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary">
+        <h1 style="font-size: 16px; font-weight: bold; padding: 0px !important; color: #fff">Pagar Titulo #<span id="data-id"></span> -
+          <span id="data_doc_01"></span>-<span id="data_doc_02"></span>-<span id="data_doc"></span>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        </h1>
+
+      </div>
+      <div class="modal-body" style="padding: 5px 20px 20px 20px">
+        <%= form_for(Proveedore.new) do |fr| %>
+        <%= hidden_field_tag :origin, 'painel-pagar' %>
+        <%= fr.hidden_field :liquidacao, value: 0 %>
+        <%= fr.hidden_field :sigla_proc, value: 'CLR' %>
+        <%= fr.hidden_field :finan, value: true %>
+        <%= fr.hidden_field :usuario_created, value: current_user.id %>
+        <%= fr.hidden_field :cota %>
+        <%= fr.hidden_field :vencimento %>
+        <%= fr.hidden_field :documento_numero, class: 'cl_doc' %>
+        <%= fr.hidden_field :documento_numero_01, class: 'cl_doc_01' %>
+        <%= fr.hidden_field :documento_numero_02, class: 'cl_doc_02' %>
+        <%= fr.hidden_field :descricao %>
+        <%= fr.hidden_field :plano_de_conta_id %>
+        <%= fr.hidden_field :centro_custo_id %>
+        <%= fr.hidden_field :tot_cotas %>
+        <%= fr.hidden_field :persona_id %>
+        <%= fr.hidden_field :titulo %>
+        <%= fr.hidden_field :saldo_gs %>
+        <%= fr.hidden_field :saldo_rs %>
+        <%= fr.hidden_field :saldo_us %>        
+
+        <div class="row">
+          <div class="col-md-12">
+            <br>
+            <span id="data-descricao"></span>
+            <hr>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <label>Doc.</label>
+            <%= fr.text_field :documento_numero_01, class: 'cl_doc_01', size: 5 %>
+            <%= fr.text_field :documento_numero_02, class: 'cl_doc_02', size: 5 %>
+            <%= fr.text_field :documento_numero, class: 'cl_doc', size: 15 %>
+          </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+              <label>Forma de Pago</label>
+              <%= fr.collection_select :forma_pago_id, FormaPago.all(:conditions => "pago = true", :select     =>' id,nome', :order      => '1'), :id,:nome,{prompt: 'Selecione'},{onchange: "fp(this.options[this.selectedIndex].value)", autofocus: true, required: true, class: 'panel-field'} %>
+            <input type="hidden" name="forma_pg" id="forma_pg" value="1"/>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+              <label>Fecha</label>
+                <%= fr.text_field :data, value: Time.now.strftime("%d/%m/%Y"), size: 12, class: "input-addon date", onkeyup: "Formatadata(this,event)", autocomplete: 'off', required: true %>
+                <div class="input-group-addon-f">
+                  <span class="icon-calendar"></span>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+              <label>Cuenta</label>
+              <%= fr.collection_select :conta_id,
+                     Conta.where("unidade_id = #{current_unidade.id}").select('id,nome').order(2), :id, :nome, {:prompt => 'Selecione la Cuenta'}, {required: true, class: 'panel-field'} %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <label>Moneda</label>
+              <%= fr.select :moeda, options_for_select([['Dolar', 0], ['Guaranies', 1], ['Reales', 2]]), {}, {class: 'panel-field, rece-moeda'} %>
+              <%= hidden_field_tag :moeda_lanz %>
+            </div>
+            <div class="col-md-4" align="right">
+              <div hidden class="ctz">
+                <label>Ctz.</label>
+                <div class="ctz_gs_us" hidden><%= text_field_tag :ctz_gs_us, format_int(@ctz.dolar_compra), size: 8, dir: "rtl" %></div>
+                <div class="ctz_gs_rs" hidden><%= text_field_tag :ctz_gs_rs, format_int(@ctz.real_compra), size: 8, dir: "rtl" %></div>
+
+                <div class="ctz_rs_gs" hidden><%= text_field_tag :ctz_rs_gs, format_int(@ctz.real_compra), size: 8, dir: "rtl" %></div>
+                <div class="ctz_rs_us" hidden><%= text_field_tag :ctz_rs_us, format_int(@ctz.rs_us_compra), size: 8, dir: "rtl" %></div>
+
+                <div class="ctz_us_gs" hidden><%= text_field_tag :ctz_us_gs, format_peso(@ctz.dolar_venda), size: 8, dir: "rtl" %></div>
+                <div class="ctz_us_rs" hidden><%= text_field_tag :ctz_us_rs, format_peso(@ctz.rs_us_venda), size: 8, dir: "rtl" %></div>
+              </div>
+            </div>
+            <div class="col-md-4" align="right">
+              <div class="rece-divida-us">
+                <%= field_us_label 'Monto U$', fr, :divida_dolar, size: 11 %>
+              </div>
+              <div class="rece-divida-gs" hidden>
+                <%= field_gs_label 'Monto Gs.', fr, :divida_guarani, size: 11 %>
+              </div>
+              <div class="rece-divida-rs" hidden>
+                <%= field_us_label 'Monto R$', fr, :divida_real, size: 11 %>
+              </div>
+            </div>
+          </div>
+          <div class="cheque" style="display:none;">
+
+            <h1 align="center">Datos Cheque</h1>
+            <div class="row">
+              <div class="col-md-6">
+                <label>Numero</label>
+                <%= fr.text_field :cheque, style: 'width: 100%' %>
+              </div>
+              <div class="col-md-6">
+                <label>Banco</label>
+                <%= fr.collection_select :banco_id, Persona.all( :select => ' id, nome',
+                :conditions => ["tipo_banco = 1"], :order  => '2' ), :id, :nome, {:prompt => "Selecione lo Banco"},{ class: 'panel-field'} %>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                  <span style="display:none" class="campo_data_dif">
+                  <label><%= t('DEFERRED') %></label>
+                  <%= fr.date_select( :diferido, {},{:onkeyup     => "EnterTab(event,'vendas_financa_transportadora_id')"} )%>
+                  </span>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 footer-buttons" >
+              <%= fr.submit "Grabar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+$('.rece-moeda').change(function(){
+  //seta moeda para pagamento
+  if ($('.rece-moeda').val() == '0') {
+    $(".rece-divida-us").show();
+    $(".rece-divida-gs").hide();
+    $(".rece-divida-rs").hide();
+
+    if ($("#proveedore_moeda").val() != $("#moeda_lanz").val()) {
+      $(".ctz").show();
+      if ($('#moeda_lanz').val() == '1' ) {
+
+
+        var cambio_gs_us = eval( parseFloat( $("#proveedore_divida_guarani").val().replace(/\./g, "") ) / parseFloat( $("#ctz_us_gs").val().replace(/\./g, "").replace(",", ".") ) ) ;
+        $("#proveedore_divida_dolar").val( number_format( cambio_gs_us,2, ',', '.') )
+        $("#proveedore_saldo_us").val( number_format( cambio_gs_us,2, ',', '.') )
+
+
+
+        $('#ctz_us_gs').change(function(){
+          var cambio_gs_us = eval( parseFloat( $("#proveedore_divida_guarani").val().replace(/\./g, "") ) / parseFloat( $("#ctz_us_gs").val().replace(/\./g, "").replace(",", ".") ) ) ;
+          $("#proveedore_divida_dolar").val( number_format( cambio_gs_us,2, ',', '.') )
+          $("#proveedore_saldo_us").val( number_format( cambio_gs_us,2, ',', '.') )
+        });
+
+
+        $('#proveedore_divida_dolar').change(function(){
+          var cambio_gs_us = eval( parseFloat( $("#proveedore_divida_dolar").val().replace(/\./g, "") ) * parseFloat( $("#ctz_us_gs").val().replace(/\./g, "").replace(",", ".") ) ) ;
+          $("#proveedore_divida_real").val( number_format( cambio_gs_us,2, ',', '.') )
+        });
+
+
+
+        $(".ctz_us_gs").show();
+
+        $('.ctz_gs_us').hide();
+        $('.ctz_gs_rs').hide();
+        $('.ctz_rs_gs').hide();
+        $('.ctz_rs_us').hide();
+        $('.ctz_us_rs').hide();
+
+      } else if ($('#moeda_lanz').val() == '2'){
+
+        var cambio_gs_us = eval( parseFloat( $("#proveedore_divida_real").val().replace(/\./g, "") ) / parseFloat( $("#ctz_us_rs").val().replace(/\./g, "").replace(",", ".") ) ) ;
+        $("#proveedore_divida_dolar").val( number_format( cambio_gs_us,2, ',', '.') )
+        $("#proveedore_saldo_us").val( number_format( cambio_gs_us,2, ',', '.') )
+
+
+
+        $('#ctz_us_rs').change(function(){
+          var cambio_gs_us = eval( parseFloat( $("#proveedore_divida_real").val().replace(/\./g, "") ) / parseFloat( $("#ctz_us_rs").val().replace(/\./g, "").replace(",", ".") ) ) ;
+          $("#proveedore_divida_dolar").val( number_format( cambio_gs_us,2, ',', '.') )
+          $("#proveedore_saldo_us").val( number_format( cambio_gs_us,2, ',', '.') )
+        });
+
+
+        $('#proveedore_divida_dolar').change(function(){
+          var cambio_gs_us = eval( parseFloat( $("#proveedore_divida_dolar").val().replace(/\./g, "") ) * parseFloat( $("#ctz_us_rs").val().replace(/\./g, "").replace(",", ".") ) ) ;
+          $("#proveedore_divida_real").val( number_format( cambio_gs_us,2, ',', '.') )
+        });
+
+
+        $(".ctz_us_rs").show();
+
+        $('.ctz_gs_us').hide();
+        $('.ctz_gs_rs').hide();
+        $('.ctz_rs_gs').hide();
+        $('.ctz_rs_us').hide();
+        $('.ctz_us_gs').hide();
+
+      }
+    } else{
+      $(".ctz").hide();
+    };
+
+  } else if ($('.rece-moeda').val() == '1') {
+    $(".rece-divida-us").hide();
+    $(".rece-divida-gs").show();
+    $(".rece-divida-rs").hide();
+
+    if ($("#proveedore_moeda").val() != $("#moeda_lanz").val()) {
+      $(".ctz").show();
+      if ($('#moeda_lanz').val() == '0' ) {
+
+        $(".ctz_gs_us").show();
+
+        $('.ctz_gs_rs').hide();
+        $('.ctz_rs_gs').hide();
+        $('.ctz_rs_us').hide();
+        $('.ctz_us_gs').hide();
+        $('.ctz_us_rs').hide();
+
+      } else if ($('#moeda_lanz').val() == '2'){
+        $(".ctz_gs_rs").show();
+
+        $('.ctz_gs_us').hide();
+        $('.ctz_rs_gs').hide();
+        $('.ctz_rs_us').hide();
+        $('.ctz_us_gs').hide();
+        $('.ctz_us_rs').hide();
+
+      }
+    } else{
+      $(".ctz").hide();
+    };
+
+
+  } else if ($('.rece-moeda').val() == '2') {
+    $(".rece-divida-us").hide();
+    $(".rece-divida-gs").hide();
+    $(".rece-divida-rs").show();
+
+    if ($("#proveedore_moeda").val() != $("#moeda_lanz").val()) {
+      $(".ctz").show();
+      if ($('#moeda_lanz').val() == '0' ) {
+        $(".ctz_rs_us").show();
+
+        $('.ctz_gs_us').hide();
+        $('.ctz_gs_rs').hide();
+        $('.ctz_rs_gs').hide();
+        $('.ctz_us_gs').hide();
+        $('.ctz_us_rs').hide();
+
+      } else if ($('#moeda_lanz').val() == '1'){
+        $(".ctz_rs_gs").show();
+
+        $('.ctz_gs_us').hide();
+        $('.ctz_gs_rs').hide();
+        $('.ctz_rs_us').hide();
+        $('.ctz_us_gs').hide();
+        $('.ctz_us_rs').hide();
+
+      }
+    } else{
+      $(".ctz").hide();
+    };
+
+
+  };
+})
+
+</script>
+
+<script type="text/javascript">
+
+  $('#modal-pagar').on('shown.bs.modal', function(event) {
+     $("#data-id").text($(event.relatedTarget).data('id'));
+     $("#data-descricao").text($(event.relatedTarget).data('descricao'));
+     $("#proveedore_conta_id").val($(event.relatedTarget).data('conta-id'));
+     $("#proveedore_moeda").val($(event.relatedTarget).data('moeda'));
+     $("#moeda_lanz").val($(event.relatedTarget).data('moeda'));
+     $("#proveedore_divida_dolar").val($(event.relatedTarget).data('saldo-us'));
+     $("#proveedore_divida_guarani").val($(event.relatedTarget).data('saldo-gs'));
+     $("#proveedore_divida_real").val($(event.relatedTarget).data('saldo-rs'));
+
+     $("#proveedore_saldo_us").val($(event.relatedTarget).data('saldo-us'));
+     $("#proveedore_saldo_gs").val($(event.relatedTarget).data('saldo-gs'));
+     $("#proveedore_saldo_rs").val($(event.relatedTarget).data('saldo-rs'));
+
+     $("#proveedore_cota").val($(event.relatedTarget).data('cota'));
+
+     $(".cl_doc").val($(event.relatedTarget).data('documento-numero'));
+     $(".cl_doc_01").val($(event.relatedTarget).data('documento-numero-01'));
+     $(".cl_doc_02").val($(event.relatedTarget).data('documento-numero-02'));
+
+     $("#data_doc").text($(event.relatedTarget).data('documento-numero'));
+     $("#data_doc_01").text($(event.relatedTarget).data('documento-numero-01'));
+     $("#data_doc_02").text($(event.relatedTarget).data('documento-numero-02'));
+
+     $("#proveedore_plano_de_conta_id").val($(event.relatedTarget).data('plano-de-conta-id'));
+     $("#proveedore_centro_custo_id").val($(event.relatedTarget).data('centro-custo-id'));
+     $("#proveedore_vencimento").val($(event.relatedTarget).data('vencimento'));
+     $("#proveedore_tot_cotas").val($(event.relatedTarget).data('tot-cotas'));
+     $("#proveedore_descricao").val($(event.relatedTarget).data('descricao'));
+     $("#proveedore_persona_id").val($(event.relatedTarget).data('persona-id'));
+     $("#proveedore_titulo").val($(event.relatedTarget).data('titulo'));
+
+
+      if ($(event.relatedTarget).data('moeda') == '0') {
+        $(".rece-divida-us").show();
+        $(".rece-divida-gs").hide();
+        $(".rece-divida-rs").hide();
+      } else if ($(event.relatedTarget).data('moeda') == '1') {
+        $(".rece-divida-us").hide();
+        $(".rece-divida-gs").show();
+        $(".rece-divida-rs").hide();
+      } else if ($(event.relatedTarget).data('moeda') == '2') {
+        $(".rece-divida-us").hide();
+        $(".rece-divida-gs").hide();
+        $(".rece-divida-rs").show();
+      };
+
+  })
+
+
+function fp(v) {
+  $("#forma_pg").val(v);
+  if( v == '5' ){
+    $(".cheque").css('display','block');
+    $(".titulo_data_dif").css('display','none');
+    $(".campo_data_dif").css('display','none');
+    $(".cheque_terc").css('display','none');
+
+  } else if( v == '6'){
+    $(".cheque").css('display','block');
+    $(".titulo_data_dif").css('display','block');
+    $(".campo_data_dif").css('display','block');
+    $(".cheque_terc").css('display','none');
+
+  } else if( v == '1'){
+    $(".cheque").css('display','none');
+    $(".titulo_data_dif").css('display','none');
+    $(".campo_data_dif").css('display','none');
+    $(".cheque_terc").css('display','none');
+  } else if( v == '3'){
+    $(".cheque").css('display','none');
+    $(".titulo_data_dif").css('display','none');
+    $(".campo_data_dif").css('display','none');
+    $(".cheque_terc").css('display','none');
+  } else if( v == '8'){
+    $(".cheque").css('display','none');
+    $(".titulo_data_dif").css('display','none');
+    $(".campo_data_dif").css('display','none');
+    $(".cheque_terc").css('display','none');
+
+
+  } else if( v == '9'){
+    $(".cheque").css('display','block');
+    $(".titulo_data_dif").css('display','block');
+    $(".campo_data_dif").css('display','block');
+    $(".cheque_terc").css('display','none');
+  } else if( v == '11'){
+    $(".cheque").css('display','block');
+    $(".titulo_data_dif").css('display','block');
+    $(".cheque_terc").css('display','block');
+    $(".campo_data_dif").css('display','block');
+
+
+  } else{
+    $("#cheque_status").val('0');
+    $(".title_venc").css('display','none');
+    $(".content_venc").css('display','none');
+    $(".cheque_terc").css('display','none');
+  }
+}
+
+
+</script>

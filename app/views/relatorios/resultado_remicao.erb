@@ -1,0 +1,61 @@
+
+<div class="group">
+   <table>
+      <% subqtd   = 0 %>
+      <% subcusto = 0 %>
+      <% subvalor = 0 %>
+      <% totqtd   = 0 %>
+      <% totcusto = 0 %>
+      <% totvalor = 0 %>
+      <% @remicao.each do |remicao|%>
+         <tr class="head">
+            <td width="80" align="center"><%=remicao.id%></td>
+            <td width="80" align="center"><%=remicao.data.strftime("%d/%m/%Y")%></td>
+            <td width="200" align="left" colspan="5">Origen :<%=remicao.origem_unidade_nome%> - Destino : <%=remicao.destino_unidade_nome%></td>
+         </tr>
+         <% @remicao_produto     = NotaRemicaoProduto.all(:conditions => ["nota_remicao_id = ? ",remicao.id]) %>
+         <% @remicao_produto.each do |remicao_produto|%>
+            <tr>
+               <td></td>
+               <td width="80" align="center"> <%= remicao_produto.produto_cod%></td>
+               <td width="300" align="left">  <%= remicao_produto.produto_nome%></td>
+               <td width="80" align="center"> <%= remicao_produto.quantidade.to_f%></td>
+               <td width="80" align="right">  <%= remicao_produto.custo_guarani.to_f%></td>
+               <td width="80" align="right">  <%= remicusto =  remicao_produto.quantidade.to_f * remicao_produto.custo_guarani.to_f%></td>
+               <td width="80" align="right">  <%= remicao_produto.valor_guarani.to_f%></td>
+               <td width="80" align="right">  <%= remivalor = remicao_produto.quantidade.to_f * remicao_produto.valor_guarani.to_f%></td>
+
+               <%  subqtd   = subqtd + remicao_produto.quantidade.to_f %>
+               <%  subcusto = subcusto + remicusto.to_f %>
+               <%  subvalor = subvalor + remivalor.to_f %>
+
+               <%  totqtd   = totqtd + remicao_produto.quantidade.to_f %>
+               <%  totcusto = totcusto + remicusto.to_f %>
+               <%  totvalor = totvalor + remivalor.to_f %>
+
+            </tr>
+         <% end %>
+         <tr class="head">
+            <td colspan="3"></td>
+            <td align="center"><%= subqtd %></td>
+            <td></td>
+            <td align="right"><%= subcusto %></td>
+            <td></td>
+            <td align="right"><%= subvalor %></td>
+            <% subqtd      = 0 %>
+            <% subcusto = 0 %>
+            <% subvalor = 0 %>
+         </tr>
+      <% end %>
+      <tr class="head">
+         <td colspan="3"></td>
+         <td align="center"><%= totqtd %></td>
+         <td></td>
+         <td align="right"><%= totcusto %></td>
+         <td></td>
+         <td align="right"><%= totvalor %></td>
+      </tr>
+
+   </table>
+</div>
+

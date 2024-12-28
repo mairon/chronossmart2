@@ -1,0 +1,26 @@
+<fieldset>
+  <legend>Detalhes do veiculo</legend>
+  <table>
+    <tr>
+      <td align="right">Chapa :</td>
+      <td colspan="3"><%= f.text_field :placa %></td>
+    </tr>
+    <tr>                
+      <td align="right">Marca :</td>
+      <td><%= f.text_field :marca, :size => 50 %></td>
+     </tr>
+     <tr>                      
+      <td align="right">Modelo :</td>
+
+      <td><%= f.text_field :modelo, :size => 50 %></td>
+      </tr>
+
+      <tr>
+        <td align="right">Tara :</td>
+        <td><%= f.text_field :tara, :size => 15 %>
+        Capacidad :<%= f.text_field :capacidade, :size => 15 %>
+
+        </td>
+    </tr>
+  </table>
+</fieldset>

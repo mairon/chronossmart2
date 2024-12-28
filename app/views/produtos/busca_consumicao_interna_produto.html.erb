@@ -1,0 +1,186 @@
+<body onload="pesquisa('<%= params[:busca]%>'), CampoTipo()">
+  <div class="groupvenda">
+    <%= form_tag dinamic_busca_venda_produto_produtos_path, :method => "get" do%>
+
+   Deposito :       <input id         ="deposito_id"
+             name       ="deposito_id"
+             type       ="text"
+             size       ="3"
+             value="<%= params[:deposito_id]%>"
+             onkeypress ="return bloqEnter(event)"
+             onKeyUp    ="EnterTab(event,'tipo')"
+             onkeydown  ="f(this)" />
+
+
+    <select name="tipo" id="tipo">
+      <option>REFERENCIA</option>
+      <option>DESCRIPCION</option>
+      <option>BARRA</option>
+    </select>
+
+      <input id         ="busca"
+             name       ="busca"
+             type       ="text"
+             value="<%= params[:busca]%>"
+             size       ="40"
+             onkeydown  ="f(this)" />
+
+      <input type   ="button"
+             id     ="button"
+             onclick="pesquisa(document.getElementById('busca').value)"
+             value  ="Buscar..."/>
+
+      <%= image_tag("load.gif",
+              :align => "absmiddle",
+              :border => 0,
+              :id => "spinner",
+              :width => 21,
+              :height => 21,
+              :style =>"display: none;" ) %>
+    <% end %>
+    <hr/>
+    <div id="pagina">
+    </div>
+  </div>
+
+    <%= hidden_field_tag :cliente, params[:cliente] %>
+    <%= hidden_field_tag :moeda, params[:moeda] %>
+    <%= hidden_field_tag :unidade, params[:unidade] %>
+    <%= hidden_field_tag :data, params[:data] %>
+    <script language="javascript">
+
+    var moeda = document.getElementById('moeda').value
+    var tabela_preco = 1
+    function Fecha(produto_nome,produto_id,fabricante_cod,cor_id,tamanho_id,cor_nome,tamanho_nome,produtos_grade_id,stock,preco_us,preco_gs,preco_rs){
+      window.opener.document.getElementById('consumicao_interna_produto_produto_nome').value      = produto_nome;
+      window.opener.document.getElementById('consumicao_interna_produto_produto_id').value        = produto_id;
+      window.opener.document.getElementById('consumicao_interna_produto_fabricante_cod').value    = fabricante_cod;
+      window.opener.document.getElementById('consumicao_interna_produto_cor_id').value            = cor_id;
+      window.opener.document.getElementById('consumicao_interna_produto_tamanho_id').value        = tamanho_id;
+      window.opener.document.getElementById('consumicao_interna_produto_cor_nome').value          = cor_nome;
+      window.opener.document.getElementById('consumicao_interna_produto_tamanho_nome').value      = tamanho_nome;
+      window.opener.document.getElementById('consumicao_interna_produto_produtos_grade_id').value = produtos_grade_id;
+      window.opener.document.getElementById('consumicao_interna_produto_saldo').value             = stock;
+      if (moeda == '0'){
+        window.opener.document.getElementById('consumicao_interna_produto_unitario_dolar').value  = preco_us;
+      }else if (moeda == '1'){
+        window.opener.document.getElementById('consumicao_interna_produto_unitario_guarani').value  = preco_gs;
+      }
+      window.opener.document.getElementById("consumicao_interna_produto_quantidade").focus()
+      self.close();
+    }
+
+      function pesquisa(valor){
+
+        var tipo     = document.getElementById('tipo').value
+        var cliente  = document.getElementById('cliente').value
+        var deposito = document.getElementById('deposito_id').value
+        var moeda    = document.getElementById('moeda').value
+        var unidade  = document.getElementById('unidade').value
+        var dt       = document.getElementById('data').value
+        //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+        url="/produtos/dinamic_busca_consumicao_interna_produto?deposito_id="+deposito+"&cliente="+cliente+"&data="+dt+"&moeda="+moeda+"&tipo="+tipo+"&unidade="+unidade+"&busca="+valor;
+
+        ajax(url);
+
+      }
+
+
+      function ajax(url)
+
+      {
+
+
+        $('#spinner').show();
+        //alert(nick);
+
+        //alert(dest);
+
+        //alert(msg);
+
+
+
+        req = null;
+
+        // Procura por um objeto nativo (Mozilla/Safari)
+
+        if (window.XMLHttpRequest) {
+
+          req = new XMLHttpRequest();
+
+          req.onreadystatechange = processReqChange;
+
+          req.open("GET",url,true);
+
+          req.send(null);
+
+          // Procura por uma versão ActiveX (IE)
+
+        } else if (window.ActiveXObject) {
+
+          req = new ActiveXObject("Microsoft.XMLHTTP");
+
+          if (req) {
+
+
+
+            req.onreadystatechange = processReqChange;
+
+            req.open("GET",url,true);
+
+
+
+            req.send();
+
+          }
+
+        }
+
+      }
+
+
+
+      function processReqChange()
+
+      {
+
+
+
+        // apenas quando o estado for "completado"
+
+        if (req.readyState == 4) {
+
+
+
+          // apenas se o servidor retornar "OK"
+
+
+
+          if (req.status ==200) {
+
+
+
+            // procura pela div id="pagina" e insere o conteudo
+
+            // retornado nela, como texto HTML
+
+
+            onSuccess:$('#spinner').hide();
+            document.getElementById('pagina').innerHTML = req.responseText;
+          
+
+
+          } else {
+
+            alert("Houve um problema ao obter os dados:n" + req.statusText);
+
+          }
+
+        }
+
+      }
+    </script>
+  
+</body>
+

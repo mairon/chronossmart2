@@ -1,0 +1,20 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Produto:</b>
+  <%= @produto_barra.produto_id %>
+</p>
+
+<p>
+  <b>Produto <%= t('NAME') %>:</b>
+  <%= @produto_barra.produto_nome %>
+</p>
+
+<p>
+  <b>Barra:</b>
+  <%= @produto_barra.barra %>
+</p>
+
+
+<%= link_to 'Edit', edit_produto_barra_path(@produto_barra) %> |
+<%= link_to 'Back', produto_barras_path %>

@@ -1,0 +1,58 @@
+<h1 id="header"><%= t('QUOTE') %></h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_moeda_path,:class => 'button add' %>
+</div>
+
+<div class="group">
+
+<table class="head_grid">
+    <tr>
+      <td width="110" align="center"><%= t('CODE') %></td>
+      <td width="60" align="center"><%= t('DATE') %></td>
+      <td width="70" align="right">G$xUS$ <%= t('PURCHASE') %></td>
+      <td width="70" align="right">G$xUS$ <%= t('SALE') %></td>
+      <td width="70" align="right">G$xRS$ <%= t('PURCHASE') %></td>
+      <td width="70" align="right">G$xRS$ <%= t('SALE') %></td>
+      <td width="70" align="right">US$xRS$ <%= t('PURCHASE') %></td>
+      <td width="70" align="right">US$xRS$ <%= t('SALE') %></td>
+      <td width="70" align="right">G$xP$ <%= t('PURCHASE') %></td>
+      <td width="70" align="right">G$xP$ <%= t('SALE') %></td>
+      <td width="70" align="right">U$xP$ <%= t('PURCHASE') %></td>
+      <td width="70" align="right">U$xP$ <%= t('SALE') %></td>
+      <td width="70" align="right"><%= t('QUOTE') %> Oficial <%= t('PURCHASE') %></td>
+      <td width="70" align="right"><%= t('QUOTE') %> Oficial <%= t('SALE') %></td>
+      <td width="55"></td>
+
+    </tr>
+
+  </table>
+  <div class="rolagem" id="div">
+      <table>
+
+      <% @moedas.each do |moeda| %>
+        <tr class = "<%= cycle("cor1", "cor2")%>" >
+          <td width="110" align="center"> <%= moeda.id.to_s.rjust(6,'0') %></td>
+          <td width="60" align="center"> <%= moeda.data.strftime("%d/%m/%y") %></td>
+          <td width="70" align="right"> <%= format_decimal(moeda.dolar_compra) %></td>
+          <td width="70" align="right"> <%= format_decimal(moeda.dolar_venda) %></td>
+          <td width="70" align="right"> <%= format_decimal(moeda.real_compra) %></td>
+          <td width="70" align="right"> <%= format_decimal(moeda.real_venda) %></td>
+          <td width="70" align="right"> <%= format_decimal(moeda.rs_us_compra) %></td>
+          <td width="70" align="right"> <%= format_decimal(moeda.rs_us_venda) %></td>
+          <td width="70" align="right"> <%= format_decimal(moeda.ps_gs_compra) %></td>
+          <td width="70" align="right"> <%= format_decimal(moeda.ps_gs_venda) %></td>
+          <td width="70" align="right"> <%= format_decimal(moeda.ps_us_compra) %></td>
+          <td width="70" align="right"> <%= format_decimal(moeda.ps_us_venda) %></td>
+          <td width="70" align="right"> <%= format_decimal(moeda.cotacao_oficial_compra) %></td>
+          <td width="70" align="right"> <%= format_decimal(moeda.cotacao_oficial_venda) %></td>
+
+          <td align="right"><%= link_to '', edit_moeda_path(moeda), class: 'icon-pencil' %></td>
+          <td align="right"><%= link_to '', moeda, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+        </tr>
+      <% end %>
+    </table>
+	</div>
+</div>
+<div class="head_grid">
+  <%= will_paginate @moedas %>
+</div>

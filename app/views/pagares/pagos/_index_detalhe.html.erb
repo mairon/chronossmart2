@@ -1,0 +1,117 @@
+<div class="group">
+   <table class="head_grid">
+      <tr>
+         <td width="80" align="center"><%= t('DATE') %></td>
+         <td width="150" align="center"><%= t('DOC') %></td>
+         <td width="50" align="center">Sector</td>
+         <td width="150" align="center">N. <%= t('DOC') %></td>
+         <td width="80" align="center"><%= t('SHARE') %></td>
+         <td width="80" align="center">Venc.</td>
+         <td width="100" align="center">Desc. </td>
+         <td width="100" align="center"><%= t('INTERES') %> </td>
+         <td width="100" align="center">Pago </td>
+         <td width="100" align="center">Total </td>
+
+      </tr>
+   </table>
+   <div class="rolagem_cobro" dir="div">
+
+      <table>
+         <% total = 0 %>
+         <% desc  = 0 %>
+         <% inte  = 0 %>
+         <% for pagos_detalhe in pagos_detalhes %>
+
+            <tr class = "<%= cycle( "cor1", "cor2" )%>">
+
+               <td width="80"  align="center"><%= pagos_detalhe.data.strftime("%d/%m/%Y")%></td>
+               <% if pagos_detalhe.documento_nome == "FACTURA CREDITO" %>
+                  <td width="150" align="left">FCR</td>
+               <% else %>
+                  <td width="150" align="left"><%= pagos_detalhe.documento_nome %></td>
+               <% end %>
+               <td width="50" align="left"><%= pagos_detalhe.clase_produto %></td>
+               <td width="150" align="center"><%= pagos_detalhe.documento_numero_01%>-<%= pagos_detalhe.documento_numero_02%>-<%= pagos_detalhe.documento_numero%></td>
+               <td width="80"  align="center"><%= pagos_detalhe.cota%></td>
+               <td width="80"  align="center"><%= pagos_detalhe.vencimento.strftime("%d/%m/%Y")%></td>
+
+               <% if @pago.moeda == 0 %>
+                  <td width="100" align="right"><%= number_to_currency( pagos_detalhe.desconto_dolar, :format =>' %n ', :separator => ",") %></td>
+                  <td width="100" align="right"><%= number_to_currency( pagos_detalhe.interes_dolar, :format =>' %n ', :separator => ",") %></td>
+                  <td width="100" align="right"><%= number_to_currency( pagos_detalhe.pago_dolar, :format =>' %n ', :separator => ",") %></td>
+                  <td width="100" align="right"><%= number_to_currency( pagos_detalhe.desconto_dolar.to_f + pagos_detalhe.interes_dolar.to_f+pagos_detalhe.pago_dolar.to_f, :format =>' %n ', :separator => ",") %></td>
+
+                  <% desc  = desc  + pagos_detalhe.desconto_dolar.to_f %>
+                  <% inte  = inte  + pagos_detalhe.interes_dolar.to_f %>
+                  <% total = total + pagos_detalhe.pago_dolar.to_f %>
+
+               <% elsif @pago.moeda == 1 %>
+
+                  <td width="100" align="right"><%= number_to_currency( pagos_detalhe.desconto_guarani, :format =>' %n ', :precision => 0)%></td>
+                  <td width="100" align="right"><%= number_to_currency( pagos_detalhe.interes_guarani, :format =>' %n ', :precision => 0)%></td>
+                  <td width="100" align="right"><%= number_to_currency( pagos_detalhe.pago_guarani, :format =>' %n ', :precision => 0)%></td>
+                  <td width="100" align="right"><%= number_to_currency( pagos_detalhe.desconto_guarani.to_f + pagos_detalhe.interes_guarani.to_f + pagos_detalhe.pago_guarani.to_f, :format =>' %n ', :precision => 0)%></td>
+
+                  <% desc  = desc  + pagos_detalhe.desconto_guarani.to_f %>
+                  <% inte  = inte  + pagos_detalhe.interes_guarani.to_f %>
+                  <% total = total + pagos_detalhe.pago_guarani.to_f %>
+
+               <% else %>
+
+                  <td width="100" align="right"><%= number_to_currency( pagos_detalhe.desconto_real, :format =>' %n ', :separator => ",") %></td>
+                  <td width="100" align="right"><%= number_to_currency( pagos_detalhe.interes_real, :format =>' %n ', :separator => ",") %></td>
+                  <td width="100" align="right"><%= number_to_currency( pagos_detalhe.pago_real, :format =>' %n ', :separator => ",") %></td>
+                  <td width="100" align="right"><%= number_to_currency( pagos_detalhe.desconto_real.to_f + pagos_detalhe.interes_real.to_f + pagos_detalhe.pago_real.to_f, :format =>' %n ', :separator => ",") %></td>
+
+                  <% desc  = desc  + pagos_detalhe.desconto_real.to_f %>
+                  <% inte  = inte  + pagos_detalhe.interes_real.to_f %>
+                  <% total = total + pagos_detalhe.pago_real.to_f %>
+
+               <% end %>
+               <td><%= link_to 'Editar', edit_pagos_detalhe_path(pagos_detalhe) %></td>
+               <td><%= link_to t('DELETE'), pagos_detalhe, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+
+
+            </tr>
+         <% end %>
+      </table>
+   </div>
+
+   <% if @pago.moeda == 0 %>
+      <% if  @pago.adelanto == 1 %>
+      <% sum_adelanto = AdelantoCota.sum('valor_us', :conditions => ["adelanto_id = #{@pago.adelanto_id}"]) %>
+      <% end %>
+    <% elsif @pago.moeda == 1 %>
+      <% if  @pago.adelanto == 1 %>
+      <% sum_adelanto = AdelantoCota.sum('valor_gs', :conditions => ["adelanto_id = #{@pago.adelanto_id}"]) %>
+      <% end %>
+    <% else %>
+      <% if  @pago.adelanto == 1 %>
+      <% sum_adelanto = AdelantoCota.sum('valor_rs', :conditions => ["adelanto_id = #{@pago.adelanto_id}"]) %>
+      <% end %>
+    <% end %>
+   <table class="head_grid">
+      <tr>
+         <td width="600"></td>
+         <% if @pago.moeda == 1 %>
+            <td width="100" align="right"> <%= number_to_currency( desc , :format =>' %n ', :precision => 0 ) %> </td>
+            <td width="100" align="right"> <%= number_to_currency( inte, :format =>' %n ', :precision => 0 ) %> </td>
+            <td width="100" align="right"> <%= number_to_currency( total, :format =>' %n ', :precision => 0 ) %> </td>
+            <td width="100" align="right"> <%= number_to_currency( ( total + inte - desc ), :format =>' %n ', :precision => 0 ) %> </td>
+         <% else %>
+            <td width="100" align="right"> <%= number_to_currency( desc , :format =>' %n ', :separator => "," ) %> </td>
+            <td width="100" align="right"> <%= number_to_currency( inte, :format =>' %n ', :separator => "," ) %> </td>
+            <td width="100" align="right"> <%= number_to_currency( total, :format =>' %n ', :separator => "," ) %> </td>
+            <td width="100" align="right"> <%= number_to_currency( ( total + inte - desc ), :format =>' %n ', :separator => "," ) %> </td>
+
+         <% end %>
+      </tr>
+      <tr>
+         
+         <td width="600" align="right"><%= t('ADVANCE') %></td>
+         <td width="100" align="right"> <%= number_to_currency( sum_adelanto, :format =>' %n ', :separator => "," ) %> </td>
+      </tr>
+   </table>
+</div>
+
+

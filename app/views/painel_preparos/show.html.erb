@@ -1,0 +1,211 @@
+<%= render "set_print" %>
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <h1 id="header">
+        <div class="pull-left">
+        Pantalla de Preparo <%= @painel_preparo.nome %>
+          
+        </div>
+
+       
+        <div class="pull-right">
+          <span class="us">  </span> 
+        </div>
+      </h1>
+    </div>
+  </div>
+</div>
+<div class="row bord-stpes">  
+  <div class=" bord-steps">
+    <div class="panel">
+      <!-- Default panel contents -->
+      <div class="pipe-steps-title">
+        <div class="contact-action">
+          <header class="panel-title">
+            Pendiente
+            <div class="pull-right">
+              
+            </div>            
+          </header>
+          <smal> 
+        </div>
+      </div>
+        <script language="javascript">
+          $(document).ready(function() {
+            url="/painel_preparos/preparo_pendentes?painel_preparo_id=<%= @painel_preparo.id %>";
+            ajax(url);
+          });
+
+          setInterval(function() {
+            url="/painel_preparos/preparo_pendentes?painel_preparo_id=<%= @painel_preparo.id %>";
+            ajax(url);
+          }, 10000); //10 seconds          
+        </script>
+        <%= javascript_include_tag 'busca_ajax' %>
+      <div class="connectedSortable" id="sortable1" data-box-id="1">
+        <div id="pagina"></div>
+      </div>
+    </div>  
+  </div>
+
+  <div class=" bord-steps">
+    <div class="panel">
+      <!-- Default panel contents -->
+      <div class="pipe-steps-title">
+        <div class="contact-action">
+          <header class="panel-title">
+            En Produción
+            <div class="pull-right">
+              
+            </div>            
+          </header>
+          <smal> 
+        </div>
+      </div>
+
+      <div class="connectedSortable" id="sortable1" data-box-id="1">
+        <% @produtos_s1.each do |n| %>
+          <div class="card-stepp" id="1">
+            <div class="card-title" style="padding-top: 15px">
+              #<%= n.id.to_s.rjust(6,'0') %> - Comanda <%= n.cartao_nome %>
+              <div class="card-time"><%= n.created_at.to_datetime.strftime("%d/%m/%y - %H:%M") %></div>
+            </div>
+            
+
+            <div class="card-cliente">
+               <ul>
+                <% venda_produto_ids = [] %>
+                <% VendasProduto.joins(:produto).where("produtos.sub_grupo_id in (#{@painel_preparo.grupo_ids}) and produtos.preparacao = true and vendas_produtos.venda_id = #{n.id} AND vendas_produtos.status_preparo = 1").each do |vp| %>
+                <li>
+                  <% venda_produto_ids += [vp.id] %>
+                  <%= vp.quantidade.to_i %> - <%= vp.produto_nome %>
+                  <ul>
+                    <% vp.produto_composicaos.each do |pc| %>
+                      <li><%= pc.componente_nome %></li>
+                    <% end %>
+                    <li><%= vp.obs.to_s %></li>
+                  </ul>                  
+                </li>
+
+                <% end %>
+              </ul>
+              <div align="center">
+                <%= link_to "FINALIZAR", status_preparo_painel_preparos_path(venda_id: n.id, status_preparo: 2, painel_preparo_id: @painel_preparo.id,  venda_produto_ids: venda_produto_ids ), class: 'btn btn-green' %>
+                <a href="javascript:void(0)" class="button print" onClick="TicketCozinha(<%= n.id %>, <%= @painel_preparo.id %>, <%= venda_produto_ids %>)">Imprimir</a>
+              </div>
+            </div>
+          </div> 
+        <% end %>
+      </div>
+    </div>  
+  </div>
+
+  <div class=" bord-steps">
+    <div class="panel">
+      <!-- Default panel contents -->
+      <div class="pipe-steps-title">
+        <div class="contact-action">
+          <header class="panel-title">
+            Finalizado
+            <div class="pull-right">
+              
+            </div>            
+          </header>
+          <smal> 
+        </div>
+      </div>
+
+      <div class="connectedSortable" id="sortable1" data-box-id="1">
+        <% @produtos_f1.each do |n| %>
+          <div class="card-stepp" id="1">
+            <div class="card-title" style="padding-top: 15px">
+              #<%= n.id.to_s.rjust(6,'0') %> - Comanda <%= n.cartao_nome %>
+            </div>
+            <hr>
+            <div class="card-title">              
+              Inicio: <%= n.created_at.to_datetime.strftime("%d/%m/%y - %H:%M") %><br>
+              Finalizado: <%= n.updated_at.to_datetime.strftime("%d/%m/%y - %H:%M") %><br>
+              Tiempo Total: <%= (( n.updated_at - n.created_at) / 60.0 ).round %>
+
+            </div>
+            <hr>
+
+            
+
+            <div class="card-cliente">
+               <ul>
+                <% venda_produto_ids = [] %>
+                <% VendasProduto.joins(:produto).where("produtos.sub_grupo_id in (#{@painel_preparo.grupo_ids}) and produtos.preparacao = true and vendas_produtos.venda_id = #{n.id} AND vendas_produtos.status_preparo = 2").each do |vp| %>
+                <li>
+                  <% venda_produto_ids += [vp.id] %>
+                  <%= vp.quantidade.to_i %> - <%= vp.produto_nome %>
+                  <ul>
+                    <% vp.produto_composicaos.each do |pc| %>
+                      <li><%= pc.componente_nome %></li>
+                    <% end %>
+                    <li><%= vp.obs.to_s %></li>
+                  </ul>                  
+                </li>
+
+                <% end %>
+              </ul>
+              <div align="center">
+                <%= link_to "RETROCEDER", status_preparo_painel_preparos_path(venda_id: n.id, status_preparo: 1, painel_preparo_id: @painel_preparo.id,  venda_produto_ids: venda_produto_ids ), class: 'btn btn-blue' %>
+              </div>
+            </div>
+          </div> 
+        <% end %>
+        <div class="head_grid">
+          <%= will_paginate @produtos_f1, "data-remote" => "true" %>
+        </div>
+
+
+      </div>
+    </div>  
+  </div>
+
+</div>
+
+
+<style>
+  .card-time{
+    float: right;
+  }
+  .card-stepp {
+    flex-direction: row;
+    padding: 6px 8px;
+    cursor: pointer;
+    margin: 10px 8px;
+    min-height: 85px !important;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 10%), 0 2px 10px 0 rgb(0 0 0 / 4%);
+    border: 1px solid #ddd;
+    background-color: #f7f9fc;
+  } 
+
+  .card-stepp li{
+    font-size: 18px;
+    padding: 10px;
+  }   
+
+  .btn-green{
+    margin: 20px 0px 15px 0px;
+    width: 250px;
+    
+  }  
+
+  .preparo{
+    background-color: #ffc107;
+  }
+
+
+</style>
+
+
+<script>
+  function TicketCozinha(id, painel_preparo_id, vendas_produto_ids ){
+    var mywindow =  window.open('/vendas/'+ id +'/ticket_cozinha?painel_preparo='+painel_preparo_id+ '&vendas_produto_ids=['+ vendas_produto_ids + ']' , '', ' SCROLLBARS=YES, TOP=150, LEFT=100, WIDTH=400, HEIGHT=500');
+    mywindow.print();
+  }
+</script>

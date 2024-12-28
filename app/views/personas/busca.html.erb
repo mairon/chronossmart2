@@ -1,0 +1,33 @@
+  <table class="head_grid">
+    <tr>
+      <td width="80"align="center"><%= t('CODE') %></td>
+      <td width="350">Fantasia</td>
+      <td width="350">Razão Social</td>
+      <td width="150">Telefone</td>
+      <td width="150"><%= t('DOC_PER') %></td>
+      <td width="50">Fecha Nasc.</td>
+      <td width="80" align="center">Estado</td>
+    </tr>
+    </table>
+
+    <div class="rolagem" id="div">
+      <table>
+        <% @personas.each do |p| %>        
+          <tr class = "<%= cycle("cor1", "cor2")%>" onclick="location.href='/personas/<%= p.id %>'">
+            <td width="80" align="center"> <%= p.id.to_s.rjust(6,'0') %></td>
+            <td width="350" align="left">  <%= p.nome %></td>
+            <td width="350" align="left">  <%= p.nome_fatura %></td>
+            <td width="150"> <%= link_to  p.telefone, "https://api.whatsapp.com/send?phone=595#{p.telefone}", target: '_blank' %> | <%= p.telefone2 %></td>
+            <td width="150"><%= p.ruc %></td>
+            <td width="50"><%= p.data_nascimento.strftime("%d/%m/%Y") unless p.data_nascimento.blank? %></td>
+            <td width="80"align="center">
+              <% if p.estado.to_i == 0 %>
+                <span class="btn-success"><%= t('ACTIVE_S') %></span>
+              <% else %>
+                <span class="btn-danger">Bloqueado</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </table>     
+    </div>

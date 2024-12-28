@@ -1,0 +1,789 @@
+<body  onload="print()">
+<style type="text/css">
+	body {
+		font-family:Lucida Console, Courier ;
+		font-size:12px;
+		letter-spacing:1px;
+	}	
+	td {
+		font-family:Lucida Console, Courier ;
+		font-size:12px;
+		letter-spacing:1px;
+	}	
+</style>
+
+<% tip = 0%>
+<% if tip == 1
+    	tipo_venda_cred = " CREDITO"
+	  else
+	    tipo_venda_cont = " CONTADO"
+	  end
+%>
+
+
+<% if @venda.moeda == 0
+	 	d = "DOLAR"
+	 else
+	 	d = "GUARANIES"
+	 end
+ %>
+<% per = Persona.find_by_id(@ft.persona_id)%>
+
+<div style="position: absolute;top:<%= @config_impr.n_fatura_x %>px;left:<%= @config_impr.n_fatura_y %>px;">
+	<%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc %>/<%= @ft.cod_proc %>
+</div>
+
+<div style="position: absolute;top:<%= @config_impr.dia_x %>px;left:<%= @config_impr.dia_y %>px;">
+	<%= @ft.data.strftime("%d") %> 
+</div>
+
+<div style="position: absolute;top:<%= @config_impr.mes_x %>px;left:<%= @config_impr.mes_y %>px;">
+	de <%= l @ft.data, :format => :mes %> de
+</div>
+
+<div style="position: absolute;top:<%= @config_impr.ano_x %>px;left:<%= @config_impr.ano_y %>px;">
+	<%= @ft.data.strftime("%Y") %>
+</div>
+
+<div style="position: absolute;top:<%= @config_impr.cont_x %>px;left:<%= @config_impr.cont_y %>px;">
+	<%= tipo_venda_cont %>
+</div>
+
+<div style="position: absolute;top:<%= @config_impr.cred_x %>px;left:<%= @config_impr.cred_y %>px;">
+	<%= tipo_venda_cred %>
+</div>
+
+<div style="position: absolute;top:<%= @config_impr.venc_x %>px;left:<%= @config_impr.venc_y %>px;">
+</div>
+
+
+<div style="position: absolute;top:<%= @config_impr.cliente_x %>px;left:<%= @config_impr.cliente_y %>px;">
+	<%= per.nome_fatura %>
+</div>
+
+<div style="position: absolute;top:<%= @config_impr.os_x %>px;left:<%= @config_impr.os_y %>px;">
+	
+</div>
+
+<div style="position: absolute;top:<%= @config_impr.obs_x %>px;left:<%= @config_impr.obs_y %>px;">
+	
+</div>
+
+<div style="position: absolute;top:<%= @config_impr.ruc_x %>px;left:<%= @config_impr.ruc_y %>px;">
+	 <%= per.ruc %>
+</div>
+
+<div style="position: absolute;top:<%= @config_impr.direcao_x %>px;left:<%= @config_impr.direcao_y %>px;">
+	<%= per.direcao %>
+</div>
+
+<div style="position: absolute;top:<%= @config_impr.telefone_x %>px;left:<%= @config_impr.telefone_y %>px;">
+	<%= per.telefone %>
+</div>
+
+<!--BOX DOS PRODUTOS !-->
+<div style="position: absolute;top:<%= @config_impr.box_produto_x %>px;left:<%= @config_impr.box_produto_y %>px;">
+
+	<table border="0"  cellspacing="0" cellpadding="0">
+
+		<% count        = 1 %>
+		<% tottaxa0_gs  = 0 %>
+		<% tottaxa0_us  = 0 %>
+		<% tottaxa10_gs = 0 %>
+		<% tottaxa10_us = 0 %>
+		<% tottaxa05_gs = 0 %>
+		<% tottaxa05_us = 0 %>
+		<% totalgs = 0 %>
+<% vd = @venda.cobros_detalhes.where("venda_id is not null").count(:id) %>
+
+<% if vd.to_i > 0 %>
+	<% list_ids = @venda.cobros_detalhes.where("venda_id is not null").map  { |t| t.venda_id }.join(', ') %>
+<% else %>
+	<% list_ids = 0 %>
+<% end %>
+
+
+
+
+
+<% cl = @venda.cobros_detalhes.where("venda_id is null").count(:id) %>
+
+<% if cl.to_i > 0 %>
+	<% list_cl_ids = @venda.cobros_detalhes.where("venda_id is null").map { |t| "#{t.documento_numero}#{t.cota}" }.join("','") %>
+<% else %>
+	<% list_cl_ids = 0 %>
+<% end %>
+
+
+<% sql = "
+						
+						SELECT 
+						     VVP.DESCRICAO,
+								 COUNT(VP.DOCUMENTO_NUMERO) AS QUANTIDADE,
+								 MAX(VP.MOEDA) AS MOEDA,
+								 ((SUM(VP.COBRO_GUARANI)/ COUNT(VP.DOCUMENTO_NUMERO))  ) AS UNITARIO_GUARANI,
+								 (SUM(VP.COBRO_GUARANI)) AS TOTAL_GUARANI,
+								 SUM(VP.COBRO_DOLAR) AS UNITARIO_DOLAR,
+								 SUM(VP.COBRO_DOLAR) AS TOTAL_DOLAR,
+								 MAX(VP.SALDO_PERC) AS SP,
+
+								 MAX(VVP.TAXA) AS TAXA 
+								 FROM COBROS_DETALHES VP
+								 INNER JOIN CLIENTES VVP
+								 ON VVP.divida_guarani > 0 and VVP.documento_numero = VP.documento_numero and VVP.cota = VP.cota AND VP.VENDA_ID IS NULL
+
+								 WHERE VP.COBRO_ID = #{@venda.id} AND VP.VENDA_ID IS NULL
+								 GROUP BY 1
+
+						  
+"
+
+
+			@venda_produto = VendasProduto.find_by_sql(sql)					 
+%>
+
+<% sql = "
+						SELECT 
+								 VVP.PRODUTO_NOME,
+								 SUM(VVP.QUANTIDADE) AS QUANTIDADE,
+								 MAX(VP.MOEDA) AS MOEDA,
+								 (SUM(VVP.TOTAL_GUARANI - VVP.DESCONTO_GUARANI) / SUM(VVP.QUANTIDADE) * MAX(VP.SALDO_PERC / 100) / (SELECT COUNT(VF.ID) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID= MAX(VP.VENDA_ID) ))  AS UNITARIO_GUARANI,
+								 (SUM(VVP.TOTAL_GUARANI - VVP.DESCONTO_GUARANI) * MAX(VP.SALDO_PERC / 100) / (SELECT COUNT(VF.ID) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = MAX(VP.VENDA_ID) )) AS TOTAL_GUARANI,
+								 SUM(VP.COBRO_DOLAR) AS UNITARIO_DOLAR,
+								 SUM(VP.COBRO_DOLAR) AS TOTAL_DOLAR,
+
+								 MAX(P.TAXA) AS TAXA
+								 FROM COBROS_DETALHES VP
+								 
+								 INNER JOIN VENDAS_PRODUTOS VVP
+								 ON VVP.VENDA_ID = VP.VENDA_ID
+
+								 INNER JOIN PRODUTOS P
+								 ON P.ID = VVP.PRODUTO_ID
+
+								 WHERE COBRO_ID = #{@venda.id} AND VP.VENDA_ID IS NOT NULL
+								 GROUP BY 1
+
+						  
+"
+
+
+			@venda_produto_dt = VendasProduto.find_by_sql(sql)					 
+%>
+
+
+		<% @venda_produto_dt.each do |prod| %>
+
+		<tr>
+		  <td width="70"  align="left">
+		    <%= prod.quantidade.to_i %>
+		  </td>
+		  <td width="290" align="left">
+		  	<%= prod.produto_nome %>
+      </td>
+      <td width="20"  align="right">
+      </td>
+      <% totalgs += prod.total_guarani.to_f %>
+
+			<td width="75"  align="right">
+				<% if @venda.moeda.to_i == 0 %>
+					<%= format_decimal(prod.unitario_dolar) %>
+				<% else %>
+					<%= format_int(prod.unitario_guarani) %>
+				<% end %>
+			</td>
+
+			<% if prod.taxa.to_i == 0 %>
+				<td width="90" align="right">
+					<% if @venda.moeda.to_i == 0 %>
+						<%= format_decimal(prod.quantidade.to_f * prod.unitario_dolar) %>
+					<% else %>
+						<%= format_int(prod.quantidade.to_f * prod.unitario_guarani) %>
+					<% end %>
+				</td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right">0</td>
+				<% tottaxa0_gs  = tottaxa0_gs + prod.total_guarani %>
+				<% tottaxa0_us  = tottaxa0_us + prod.total_dolar %>
+			<% end %>
+
+			<% if prod.taxa.to_i == 5 %>
+				<td width="100" align="right">0</td>
+				<td width="70" align="right">	
+					<% if @venda.moeda.to_i == 0 %>
+						<%= format_decimal( prod.quantidade.to_f * prod.unitario_dolar) %>
+					<% else %>
+						<%= format_int( prod.quantidade.to_f * prod.unitario_guarani) %>
+					<% end %>
+				</td>
+				<td width="70" align="right">0</td>
+				<% tottaxa05_gs  = tottaxa05_gs + prod.total_guarani %>
+				<% tottaxa05_us  = tottaxa05_us + prod.total_dolar %>
+			<% end %>
+
+						
+			<% if prod.taxa.to_i == 10 %>
+				<td width="90" align="center">0</td>
+				<td width="90" align="center">0</td>
+				<td width="90" align="center">
+					<% if @venda.moeda.to_i == 0 %>
+						<%= format_decimal( prod.quantidade.to_f * prod.unitario_dolar) %>
+					<% else %>
+						<%= format_int( prod.quantidade.to_f * prod.unitario_guarani) %>
+					<% end %>
+				</td>
+				<% tottaxa10_gs  = tottaxa10_gs + prod.total_guarani.to_f %>
+				<% tottaxa10_us  = tottaxa10_us + prod.total_dolar.to_f %>
+			<% end %>
+		</tr>
+		<% end %>
+
+		<% @venda_produto.each do |prod| %>
+
+		<tr>
+		  <td width="70"  align="left">
+		    <%= prod.quantidade.to_i %>
+		  </td>
+		  <td width="290" align="left">
+		  	<%= prod.descricao %>
+      </td>
+      <td width="20"  align="right">
+      </td>
+      <% totalgs += prod.total_guarani.to_f %>
+
+			<td width="75"  align="right">
+				<% if @venda.moeda.to_i == 0 %>
+					<%= format_decimal(prod.unitario_dolar) %>
+				<% else %>
+					<%= format_int(prod.unitario_guarani) %>
+				<% end %>
+			</td>
+			<% if prod.descricao.upcase["PATINAJE"] %>
+				<td width="90" align="right">
+					<% if @venda.moeda.to_i == 0 %>
+						<%= format_decimal(prod.quantidade.to_f * prod.unitario_dolar) %>
+					<% else %>
+						<%= format_int(prod.quantidade.to_f * prod.unitario_guarani) %>
+					<% end %>
+				</td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right">0</td>
+				<% tottaxa0_gs  = tottaxa0_gs + prod.total_guarani %>
+				<% tottaxa0_us  = tottaxa0_us + prod.total_dolar %>			
+	  	<% else %>
+			<% if prod.taxa.to_i == 0 %>
+				<td width="90" align="right">
+					<% if @venda.moeda.to_i == 0 %>
+						<%= format_decimal(prod.quantidade.to_f * prod.unitario_dolar) %>
+					<% else %>
+						<%= format_int(prod.quantidade.to_f * prod.unitario_guarani) %>
+					<% end %>
+				</td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right">0</td>
+				<% tottaxa0_gs  = tottaxa0_gs + prod.total_guarani %>
+				<% tottaxa0_us  = tottaxa0_us + prod.total_dolar %>
+			<% end %>
+
+			<% if prod.taxa.to_i == 5 %>
+				<td width="100" align="right">0</td>
+				<td width="70" align="right">	
+					<% if @venda.moeda.to_i == 0 %>
+						<%= format_decimal( prod.quantidade.to_f * prod.unitario_dolar) %>
+					<% else %>
+						<%= format_int( prod.quantidade.to_f * prod.unitario_guarani) %>
+					<% end %>
+				</td>
+				<td width="70" align="right">0</td>
+				<% tottaxa05_gs  = tottaxa05_gs + prod.total_guarani %>
+				<% tottaxa05_us  = tottaxa05_us + prod.total_dolar %>
+			<% end %>
+
+						
+			<% if prod.taxa.to_i == 10 %>
+				<td width="90" align="center">0</td>
+				<td width="90" align="center">0</td>
+				<td width="90" align="center">
+					<% if @venda.moeda.to_i == 0 %>
+						<%= format_decimal( prod.quantidade.to_f * prod.unitario_dolar) %>
+					<% else %>
+						<%= format_int( prod.quantidade.to_f * prod.unitario_guarani) %>
+					<% end %>
+				</td>
+				<% tottaxa10_gs  = tottaxa10_gs + prod.total_guarani.to_f %>
+				<% tottaxa10_us  = tottaxa10_us + prod.total_dolar.to_f %>
+			<% end %>
+	  	<% end %>
+
+		</tr>
+		<% end %>
+  </table>
+</div>
+
+<!--RESULTADOS !-->
+  <div style="position: absolute;top:<%= @config_impr.sub_tot_ext_x %>px;left:<%= @config_impr.sub_tot_ext_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(tottaxa0_us) %>
+  	<% else %>
+  		<%= format_int(tottaxa0_gs) %>
+  	<% end %>
+  </div>
+  <div style="position: absolute;top:<%= @config_impr.sub_tot_05_x %>px;left:<%= @config_impr.sub_tot_05_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(tottaxa05_us) %>
+  	<% else %>
+  		<%= format_int(tottaxa05_gs) %>
+  	<% end %>
+  </div>
+  <div style="position: absolute;top:<%= @config_impr.sub_tot_10_x %>px;left:<%= @config_impr.sub_tot_10_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(tottaxa10_us) %>
+  	<% else %>
+  		<%= format_int(tottaxa10_gs) %>
+  	<% end %>
+	</div>
+	<div style="position: absolute;top:<%= @config_impr.en_letras_x %>px;left:<%= @config_impr.en_letras_y %>px; width: 500;">
+  	<% if @venda.moeda.to_i == 0 %>
+			U$ <% real,cents= ("%.2f" % @produto_sum_dolar.to_f).to_s.split(/\./).map{ |m| m.to_i}
+		      valor_cents=Extenso.por_extenso(cents%100)
+		      valor_cents+= case cents.to_i%100
+		      when 0 then ""
+		      when 1 then " "
+		      when 2..99 then " "
+		      end %>
+			 <%= I18n.with_locale(:es) { @produto_sum_dolar.to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS' %>
+  	<% else %>
+  		  Gs.<%= I18n.with_locale(:es) { totalgs.to_i.to_words.upcase } %>
+  	<% end %>
+  	</div>
+	<div style="position: absolute;top:<%= @config_impr.tot_x %>px;left:<%= @config_impr.tot_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<b>U$.:<%= format_decimal(@produto_sum_dolar.to_f) %></b>
+  	<% else %>
+  		<b>G$.:<%= format_int(totalgs.to_f) %></b>
+  	<% end %>
+	</div>
+	<div style="position: absolute;top:<%= @config_impr.iva_05_x %>px;left:<%= @config_impr.iva_05_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(@produto_sum_iva05_us.to_f) %>
+  	<% else %>
+  		<%= format_int(tottaxa05_gs.to_f) %>
+  	<% end %>		
+	</div>
+	<div style="position: absolute;top:<%= @config_impr.iva_10_x %>px;left:<%= @config_impr.iva_10_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(@produto_sum_iva10_us.to_f) %>
+  	<% else %>
+  		<%= format_int(tottaxa10_gs.to_f / 11) %>
+  	<% end %>		
+	</div>
+	<div style="position: absolute;top:<%= @config_impr.tot_iva_x %>px;left:<%= @config_impr.tot_iva_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(@produto_sum_iva05_us.to_f + @produto_sum_iva10_us.to_f) %>
+  	<% else %>
+  		<%= format_int(tottaxa05_gs.to_f + (tottaxa10_gs.to_f / 11) ) %>
+  	<% end %>		
+	</div>
+
+
+
+
+
+<% if @config_impr.modelo.to_i == 2 %>
+ <% space_01 = @config_impr.space_01.to_i %>
+	<div style="position: absolute;top:<%= space_01 + @config_impr.n_fatura_x %>px;left:<%= @config_impr.n_fatura_y %>px;">
+	<%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc %>/<%= @ft.cod_proc %>
+	</div>
+
+	<div style="position: absolute;top:<%= space_01 + @config_impr.dia_x %>px;left:<%= @config_impr.dia_y %>px;">
+		<%= @ft.data.strftime("%d") %>
+	</div>
+
+	<div style="position: absolute;top:<%= space_01 + @config_impr.mes_x %>px;left:<%= @config_impr.mes_y %>px;">
+		de <%= l @ft.data, :format => :mes %> de
+	</div>
+
+	<div style="position: absolute;top:<%= space_01 + @config_impr.ano_x %>px;left:<%= @config_impr.ano_y %>px;">
+		<%= @ft.data.strftime("%Y") %>
+	</div>
+
+	<div style="position: absolute;top:<%= space_01 + @config_impr.cont_x %>px;left:<%= @config_impr.cont_y %>px;">
+		<%= tipo_venda_cont %>
+	</div>
+
+	<div style="position: absolute;top:<%= space_01 + @config_impr.cred_x %>px;left:<%= @config_impr.cred_y %>px;">
+		<%= tipo_venda_cred %>
+	</div>
+
+	<div style="position: absolute;top:<%=  space_01.to_i + @config_impr.venc_x.to_i %>px;left:<%= @config_impr.venc_y.to_i %>px;">
+		<%= @venda.vendas_financas.last.vencimento.strftime("%d/%m/%Y") if @ft.tipo == 1 %>
+	</div>
+
+
+	<div style="position: absolute;top:<%= space_01 + @config_impr.cliente_x %>px;left:<%= @config_impr.cliente_y %>px;">
+		<%= @ft.persona_nome %>
+	</div>
+
+<div style="position: absolute;top:<%= space_01 + @config_impr.os_x %>px;left:<%= @config_impr.os_y %>px;">
+	<%= @venda.vendas_ordem_servs.map  { |t| t.ordem_serv.rt }.join(', ') %>
+</div>
+
+<div style="position: absolute;top:<%= space_01 + @config_impr.obs_x %>px;left:<%= @config_impr.obs_y %>px;">
+	<%= @venda.obs %>
+</div>
+
+
+	<div style="position: absolute;top:<%= space_01 + @config_impr.ruc_x %>px;left:<%= @config_impr.ruc_y %>px;">
+		<%= @ft.ruc %>
+	</div>
+
+	<div style="position: absolute;top:<%= space_01 + @config_impr.direcao_x %>px;left:<%= @config_impr.direcao_y %>px;">
+		<%= @venda.direcao %>
+	</div>
+
+	<div style="position: absolute;top:<%= space_01 + @config_impr.telefone_x %>px;left:<%= @config_impr.telefone_y %>px;">
+		Tel: <%= per.telefone %>
+	</div>
+
+	<!--BOX DOS PRODUTOS !-->
+<div style="position: absolute;top:<%= @config_impr.box_produto_x %>px;left:<%= @config_impr.box_produto_y %>px;">
+
+	<table border="0"  cellspacing="0" cellpadding="0">
+
+		<% count        = 1 %>
+		<% tottaxa0_gs  = 0 %>
+		<% tottaxa0_us  = 0 %>
+		<% tottaxa10_gs = 0 %>
+		<% tottaxa10_us = 0 %>
+		<% tottaxa05_gs = 0 %>
+		<% tottaxa05_us = 0 %>
+		<% @venda_produto.each do |prod| %>
+
+		<tr>
+			<td width="40"  align="left">
+		    <%= prod.id.to_i %>
+		  </td>								
+		  <td width="40"  align="left">
+		    <%= prod.quantidade.to_f %>
+		  </td>
+		  <td width="290" align="left">
+				<%= prod.produto_nome %> 
+      </td>
+      <td width="20"  align="right">
+      </td>
+
+			<td width="75"  align="right">
+				<% if @venda.moeda.to_i == 0 %>
+					<%= format_decimal(prod.unitario_dolar) %>
+				<% else %>
+					<%= format_int(prod.unitario_guarani) %>
+				<% end %>
+			</td>
+
+			<% if prod.taxa.to_i == 0 %>
+				<td width="90" align="right">
+					<% if @venda.moeda.to_i == 0 %>
+						<%= format_decimal(prod.quantidade.to_f * prod.unitario_dolar) %>
+					<% else %>
+						<%= format_int(prod.quantidade.to_f * prod.unitario_guarani) %>
+					<% end %>
+				</td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right">0</td>
+				<% tottaxa0_gs  = tottaxa0_gs + prod.total_guarani %>
+				<% tottaxa0_us  = tottaxa0_us + prod.total_dolar %>
+			<% end %>
+
+			<% if prod.taxa.to_i == 5 %>
+				<td width="100" align="right">0</td>
+				<td width="70" align="right">	
+					<% if @venda.moeda.to_i == 0 %>
+						<%= format_decimal( prod.quantidade.to_f * prod.unitario_dolar) %>
+					<% else %>
+						<%= format_int( prod.quantidade.to_f * prod.unitario_guarani) %>
+					<% end %>
+				</td>
+				<td width="70" align="right">0</td>
+				<% tottaxa05_gs  = tottaxa05_gs + prod.total_guarani %>
+				<% tottaxa05_us  = tottaxa05_us + prod.total_dolar %>
+			<% end %>
+
+						
+			<% if prod.taxa.to_i == 10 %>
+				<td width="100" align="center">0</td>
+				<td width="120" align="center">0</td>
+				<td width="70" align="right">
+					<% if @venda.moeda.to_i == 0 %>
+						<%= format_decimal( prod.quantidade.to_f * prod.unitario_dolar) %>
+					<% else %>
+						<%= format_int( prod.quantidade.to_f * prod.unitario_guarani) %>
+					<% end %>
+				</td>
+				<% tottaxa10_gs  = tottaxa10_gs + prod.total_guarani %>
+				<% tottaxa10_us  = tottaxa10_us + prod.total_dolar %>
+			<% end %>
+		</tr>
+		<% end %>
+  </table>
+</div>
+
+<!--RESULTADOS !-->
+  <div style="position: absolute;top:<%= space_01 + @config_impr.sub_tot_ext_x %>px;left:<%= @config_impr.sub_tot_ext_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(tottaxa0_us) %>
+  	<% else %>
+  		<%= format_int(tottaxa0_gs) %>
+  	<% end %>
+  </div>
+  <div style="position: absolute;top:<%= space_01 + @config_impr.sub_tot_05_x %>px;left:<%= @config_impr.sub_tot_05_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(tottaxa05_us) %>
+  	<% else %>
+  		<%= format_int(tottaxa05_gs) %>
+  	<% end %>
+  </div>
+  <div style="position: absolute;top:<%= space_01 + @config_impr.sub_tot_10_x %>px;left:<%= @config_impr.sub_tot_10_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(tottaxa10_us) %>
+  	<% else %>
+  		<%= format_int(tottaxa10_gs) %>
+  	<% end %>
+	</div>
+	<div style="position: absolute;top:<%= space_01 + @config_impr.en_letras_x %>px;left:<%= @config_impr.en_letras_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+			U$ <% real,cents= ("%.2f" % @produto_sum_dolar.to_f).to_s.split(/\./).map{ |m| m.to_i}
+		      valor_cents=Extenso.por_extenso(cents%100)
+		      valor_cents+= case cents.to_i%100
+		      when 0 then ""
+		      when 1 then " "
+		      when 2..99 then " "
+		      end %>
+			<%= I18n.with_locale(:es) { @produto_sum_dolar.to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS' %>
+  	<% else %>
+  		Gs.<%= I18n.with_locale(:es) { totalgs.to_i.to_words.upcase } %>
+  	<% end %>
+  	</div>
+	<div style="position: absolute;top:<%= space_01 + @config_impr.tot_x %>px;left:<%= @config_impr.tot_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<b>U$.:<%= format_decimal(@produto_sum_dolar.to_f) %></b>
+  	<% else %>
+  		<b>G$.:<%= format_int(totalgs.to_f) %></b>
+  	<% end %>
+	</div>
+	<div style="position: absolute;top:<%= space_01 + @config_impr.iva_05_x %>px;left:<%= @config_impr.iva_05_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(@produto_sum_iva05_us.to_f) %>
+  	<% else %>
+  		<%= format_int(@produto_sum_iva05_gs.to_f) %>
+  	<% end %>		
+	</div>
+	<div style="position: absolute;top:<%= space_01 + @config_impr.iva_10_x %>px;left:<%= @config_impr.iva_10_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(@produto_sum_iva10_us.to_f) %>
+  	<% else %>
+  		<%= format_int(@produto_sum_iva10_gs.to_f) %>
+  	<% end %>		
+	</div>
+	<div style="position: absolute;top:<%= space_01 + @config_impr.tot_iva_x %>px;left:<%= @config_impr.tot_iva_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(@produto_sum_iva05_us.to_f + @produto_sum_iva10_us.to_f) %>
+  	<% else %>
+  		<%= format_int(@produto_sum_iva05_gs.to_f + @produto_sum_iva10_gs.to_f) %>
+  	<% end %>		
+	</div>
+
+
+
+
+ <% space_02 = @config_impr.space_02.to_i %>
+	<div style="position: absolute;top:<%= space_02 + @config_impr.n_fatura_x %>px;left:<%= @config_impr.n_fatura_y %>px;">
+	<%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc %>/<%= @ft.cod_proc %>
+	</div>
+
+	<div style="position: absolute;top:<%= space_02 + @config_impr.dia_x %>px;left:<%= @config_impr.dia_y %>px;">
+		<%= @ft.data.strftime("%d") %>
+	</div>
+
+	<div style="position: absolute;top:<%= space_02 + @config_impr.mes_x %>px;left:<%= @config_impr.mes_y %>px;">
+		de <%= l @ft.data, :format => :mes %> de
+	</div>
+
+	<div style="position: absolute;top:<%= space_02 + @config_impr.ano_x %>px;left:<%= @config_impr.ano_y %>px;">
+		<%= @ft.data.strftime("%Y") %>
+	</div>
+
+	<div style="position: absolute;top:<%= space_02 + @config_impr.cont_x %>px;left:<%= @config_impr.cont_y %>px;">
+		<%= tipo_venda_cont %>
+	</div>
+
+	<div style="position: absolute;top:<%= space_02 + @config_impr.cred_x %>px;left:<%= @config_impr.cred_y %>px;">
+		<%= tipo_venda_cred %>
+	</div>
+
+	<div style="position: absolute;top:<%=  space_02.to_i + @config_impr.venc_x.to_i %>px;left:<%= @config_impr.venc_y.to_i %>px;">
+		<%= @venda.vendas_financas.last.vencimento.strftime("%d/%m/%Y") if @ft.tipo == 1 %>
+	</div>
+
+
+	<div style="position: absolute;top:<%= space_02 + @config_impr.cliente_x %>px;left:<%= @config_impr.cliente_y %>px;">
+		<%= @ft.persona_nome %>
+	</div>
+
+	<div style="position: absolute;top:<%= space_02 + @config_impr.os_x %>px;left:<%= @config_impr.os_y %>px;">
+		<%= @venda.vendas_ordem_servs.map  { |t| t.ordem_serv.rt }.join(', ') %>
+	</div>
+
+	<div style="position: absolute;top:<%= space_02 + @config_impr.obs_x %>px;left:<%= @config_impr.obs_y %>px;">
+		<%= @venda.obs %>
+	</div>
+
+
+	<div style="position: absolute;top:<%= space_02 + @config_impr.ruc_x %>px;left:<%= @config_impr.ruc_y %>px;">
+		<%= @ft.ruc %>
+	</div>
+
+	<div style="position: absolute;top:<%= space_02 + @config_impr.direcao_x %>px;left:<%= @config_impr.direcao_y %>px;">
+		<%= @venda.direcao %>
+	</div>
+
+	<div style="position: absolute;top:<%= space_02 + @config_impr.telefone_x %>px;left:<%= @config_impr.telefone_y %>px;">
+		Tel: <%= per.telefone %>
+	</div>
+
+	<!--BOX DOS PRODUTOS !-->
+	<div style="position: absolute;top:<%= space_02 + @config_impr.box_produto_x %>px;left:<%= @config_impr.box_produto_y %>px;">
+
+		<table border="0"  cellspacing="0" cellpadding="0">
+
+		<% count        = 1 %>
+		<% tottaxa0_gs  = 0 %>
+		<% tottaxa0_us  = 0 %>
+		<% tottaxa10_gs = 0 %>
+		<% tottaxa10_us = 0 %>
+		<% tottaxa05_gs = 0 %>
+		<% tottaxa05_us = 0 %>
+		<% @venda_produto.each do |produto| %>								
+
+							<% produto.quantidade.to_i %>
+							<% produto.produto.fabricante_cod %>
+
+						
+							<% produto.produto_nome %>
+							<% format_int(produto.unitario_guarani) %>
+
+							<% format_int(produto.total_guarani.to_f) %>
+							 
+							<% tottaxa10_gs  = tottaxa10_gs.to_f + produto.total_guarani.to_f %>
+							<% tottaxa10_us  = tottaxa10_us.to_f + produto.total_dolar.to_f %>
+						
+					
+				
+				
+			<% end %>
+
+		<tr>								
+		  <td width="75"  align="center">
+		    0001
+		  </td>
+		  <td width="55"  align="left">
+		    01
+		  </td>
+		  <td width="255" align="left">
+				TRATAMIENTO ODONTOLOGICO
+      </td>
+
+			<td width="55"  align="right">
+				<% if @venda.moeda.to_i == 0 %>
+					<%= format_decimal(tottaxa10_us) %>
+				<% else %>
+					<%= format_int(tottaxa10_gs) %>
+				<% end %>
+			</td>
+
+			
+
+						
+			
+				<td width="80" align="right">0</td>
+				<td width="70" align="right">0</td>
+				<td width="150" align="right">
+					<% if @venda.moeda.to_i == 0 %>
+
+						<%= format_decimal(tottaxa10_us) %>
+					<% else %>
+						<%= format_int(tottaxa10_gs) %>
+					<% end %>
+				</td>
+				
+			
+		</tr>
+		
+  </table>
+</div>
+
+<!--RESULTADOS !-->
+  <div style="position: absolute;top:<%= space_02 + @config_impr.sub_tot_ext_x %>px;left:<%= @config_impr.sub_tot_ext_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(tottaxa0_us) %>
+  	<% else %>
+  		<%= format_int(tottaxa0_gs) %>
+  	<% end %>
+  </div>
+  <div style="position: absolute;top:<%= space_02 + @config_impr.sub_tot_05_x %>px;left:<%= @config_impr.sub_tot_05_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(tottaxa05_us) %>
+  	<% else %>
+  		<%= format_int(tottaxa05_gs) %>
+  	<% end %>
+  </div>
+  <div style="position: absolute;top:<%= space_02 + @config_impr.sub_tot_10_x %>px;left:<%= @config_impr.sub_tot_10_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(tottaxa10_us) %>
+  	<% else %>
+  		<%= format_int(tottaxa10_gs) %>
+  	<% end %>
+	</div>
+	<div style="position: absolute;top:<%= space_02 + @config_impr.en_letras_x %>px;left:<%= @config_impr.en_letras_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+			U$ <% real,cents= ("%.2f" % @produto_sum_dolar.to_f).to_s.split(/\./).map{ |m| m.to_i}
+		      valor_cents=Extenso.por_extenso(cents%100)
+		      valor_cents+= case cents.to_i%100
+		      when 0 then ""
+		      when 1 then " "
+		      when 2..99 then " "
+		      end %>
+			<%= I18n.with_locale(:es) { @produto_sum_dolar.to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS' %>
+  	<% else %>
+  		Gs.<%= I18n.with_locale(:es) { @produto_sum_guarani.to_i.to_words.upcase } %>
+  	<% end %>
+  	</div>
+	<div style="position: absolute;top:<%= space_02 + @config_impr.tot_x %>px;left:<%= @config_impr.tot_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<b>U$.:<%= format_decimal(@produto_sum_dolar.to_f) %></b>
+  	<% else %>
+  		<b>G$.:<%= format_int(@produto_sum_guarani.to_f) %></b>
+  	<% end %>
+	</div>
+	<div style="position: absolute;top:<%= space_02 + @config_impr.iva_05_x %>px;left:<%= @config_impr.iva_05_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(@produto_sum_iva05_us.to_f) %>
+  	<% else %>
+  		<%= format_int(@produto_sum_iva05_gs.to_f) %>
+  	<% end %>		
+	</div>
+	<div style="position: absolute;top:<%= space_02 + @config_impr.iva_10_x %>px;left:<%= @config_impr.iva_10_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(@produto_sum_iva10_us.to_f) %>
+  	<% else %>
+  		<%= format_int(@produto_sum_iva10_gs.to_f) %>
+  	<% end %>		
+	</div>
+	<div style="position: absolute;top:<%= space_02 + @config_impr.tot_iva_x %>px;left:<%= @config_impr.tot_iva_y %>px;">
+  	<% if @venda.moeda.to_i == 0 %>
+  		<%= format_decimal(@produto_sum_iva05_us.to_f + @produto_sum_iva10_us.to_f) %>
+  	<% else %>
+  		<%= format_int(@produto_sum_iva05_gs.to_f + @produto_sum_iva10_gs.to_f) %>
+  	<% end %>		
+	</div>
+<% end %>
+</body>

@@ -1,0 +1,32 @@
+
+<table class="head_grid">
+	<tr>
+		<td width="60" align="center"><%= t('CODE') %></td>
+		<td width="60">Ref.</td>
+		<td width="300">Producto</td>
+		<td width="300">Marca</td>
+		<td width="70" align="right">Precio G$</td>
+	</tr>
+</table>
+
+<div class="rolagem" id="div">
+	<table>
+		<% @produtos.each do |p| %>
+			<tr class = "<%= cycle( "cor1", "cor2" )%>"
+						onMouseOver="javascript:this.style.backgroundColor='#949494'"
+						onMouseOut="javascript:this.style.backgroundColor=''"
+						onclick="Fecha( '<%= p.nome %>',
+										'<%= p.produto_id %>',
+										'<%= format_int(p.preco_1_gs.to_f)  %>' )">
+
+
+				<td width="60" align="center"> <%= p.produto_id.to_s.rjust(6,'0') %> </td>
+				<td width="60"> <%= p.fabricante_cod %> </td>
+				<td width="300"> <%= p.nome %> </td>
+				<td width="300"> <%= p.marca_nome %> </td>
+				<td width="71" align="right"><b> <%= format_int(p.preco_1_gs.to_f) %></b></td>
+			</tr>
+		<% end %>
+		<input type="hidden" id="foco" value="-1">
+	</table>
+</div>

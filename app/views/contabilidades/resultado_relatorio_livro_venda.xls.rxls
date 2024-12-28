@@ -1,0 +1,56 @@
+sheet = workbook.create_worksheet
+sheet.name = "Relatorio de Stock"
+
+format  = Spreadsheet::Format.new( :color => "white", :weight => "bold", :pattern_fg_color => "gray", :pattern => 1, :align => :center)
+bold    = Spreadsheet::Format.new :weight => :bold, :align => :right
+left    = Spreadsheet::Format.new :align => :left
+center  = Spreadsheet::Format.new :align => :center
+sheet.row(00).default_format = format
+
+sheet[00,00]  = 'Fecha'
+sheet[00,01]  = 'codigo'
+sheet[00,02]  = 'Status'
+sheet[00,03]  = 'Producto'
+sheet[00,04]  = 'Entrada'
+sheet[00,05]  = 'Saida'
+sheet[00,06]  = 'Saldo'
+
+
+
+
+indice            = 1
+
+@stocks.each do |lancamento|
+        entradas = Stock.sum( :entrada,:conditions => ['produto_id = ?',lancamento.produto_id] )
+        saidas   = Stock.sum( :saida  ,:conditions => ['produto_id = ?',lancamento.produto_id] )
+        stock    = entradas - saidas
+
+            row       = sheet.row(indice)
+            row.push  lancamento.data.strftime("%d/%m/%Y")
+            row.push  lancamento.codigo
+            row.push  lancamento.status
+            row.push  lancamento.produto_nome
+            row.push  format( "%.3f",lancamento.entrada.to_f )
+            row.push  format( "%.3f",lancamento.saida.to_f )
+            row.push  format( "%.3f",stock.to_f )
+
+            indice = indice + 1
+
+            sheet.row(indice + -1).set_format(0,  center)
+            sheet.row(indice + -1).set_format(1,  center)
+            sheet.row(indice + -1).set_format(2,  center)
+            sheet.row(indice + -1).set_format(3,  left)
+            sheet.row(indice + -1).set_format(4,  bold)
+            sheet.row(indice + -1).set_format(5,  bold)
+            sheet.row(indice + -1).set_format(6,  bold)
+            sheet.row(indice + -1).set_format(7,  center)
+            sheet.row(indice + -1).set_format(8,  left)
+            sheet.row(indice + -1).set_format(9,  bold)
+            sheet.row(indice + -1).set_format(10, bold)
+            sheet.row(indice + -1).set_format(11, bold)
+            sheet.row(indice + -1).set_format(12, bold)
+            sheet.row(indice + -1).set_format(13, center)
+            sheet.row(indice + -1).set_format(14, bold)
+
+end
+

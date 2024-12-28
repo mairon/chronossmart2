@@ -1,0 +1,97 @@
+<h1 id="header">Extracto Caja</h1>
+   <div class="group">
+      <%= form_tag relatorio_financas_financas_path, :method => "get" do%>
+      <%= hidden_field_tag :tipo_data, 0 %>
+        <table>
+          <tr>
+            <td colspan="4"> 
+              <label>Periodo</label>
+              <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+              <div class="input-group-addon-f">
+                <span class="icon-calendar"></span>
+              </div>
+              <div class="date-separ"><%= t('TO') %></div>
+              <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+              <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+              </div>                  
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label><%= t('ACCOUNT') %></label>
+
+                <% if current_unidade.conta_multi_unidades == true %>
+                  <%= select("busca", "conta", Conta.all( :select => 'id,nome',:conditions => ["status = true and tipo = 0 "],:order => 'nome').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione la Cuenta'}, {required: true}) %>
+                <% else %>
+                  <%= select("busca", "conta", Conta.all( :select => 'id,nome',:conditions => ["status = true and tipo = 0 and unidade_id = #{current_unidade.id}"],:order => 'nome').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione la Cuenta'}, {required: true}) %>
+                <% end %>
+              </td>
+           </tr>
+          <tr>
+            <td colspan="4" class="footer-buttons">
+              <input  id="button" class="acao btn btn-green" value="Informe"  style="cursor:pointer;" id="myModalLabel" data-toggle="modal" data-width="500" data-height="781" data-target="#myiframe" data-dismiss="modal" />
+              <input  id="button" type="submit" class="btn btn-blue" value="Excel" onclick = "Tipo('1')"/>
+          </tr>
+          <input type="hidden" name="tipo" id="tipo" size="5" value="0"/>
+          <input type="hidden" name="filtro" id="filtro" value="0"/>
+          
+
+        </table>
+     <% end %>
+</div>
+
+
+<div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 1100px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel">Extracto Caja</h4>
+      </div>
+      <div class="modal-body" align="center">
+        <div class="embed-responsive embed-responsive-16by9" style="height: 460px">
+          <iframe class="embed-responsive-item" id="iframeModal" frameborder="0 " border="0"></iframe>
+        </div>
+      </div>      
+    </div>
+  </div>
+</div>
+
+<script>
+  $('#busca_conta').selectize();
+( function($) {
+  
+function iframeModalOpen(){
+
+    $('.acao').on('click', function(e) {
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+      
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+      
+      // stampiamo i nostri dati nell'iframe
+      $("#myiframe iframe").attr({
+        'src': '/financas/relatorio_financas?' + $('form').serialize(),
+        'height': height,
+        'width': width,
+        'allowfullscreen':''
+      });
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#myiframe').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+    });
+  }
+  
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+  
+  } ) ( jQuery );
+
+</script>

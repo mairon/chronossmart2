@@ -1,0 +1,39 @@
+<div class="panel-content">
+	<h1><%= t('PRODUCT') %>/Serviços</h1>
+  <div>
+    <table class="head_grid">
+     	<tr>
+        <td width="250"><%= t('PRODUCT') %>/Serviços</td>
+        <td width="100" align="right">Qtd.</td>
+        <td width="55"></td>
+        <td width="100" align="right"><%= t('VALUE') %></td>
+        <td width="100" align="right">Total</td>
+     	</tr>
+  	</table>
+    <div class="rolagem" dir="div" style="height: 220px">
+       <table>
+          <% @contra_servis.each do |cs| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="250"><%= cs.produto.nome %></td>
+              <td width="100" align="right"><%= cs.quantidade %></td>
+              <% if @contrato.moeda.to_i == 0 %>
+                <td width="55" align="center"><span class="us">U$</span></td>
+                <td width="100" align="right"><b><span class="us"><%= format_decimal(cs.unitario_us) %></span></b></td>
+                <td width="100" align="right"><b><span class="us"><%= format_decimal(cs.total_us) %></span></b></td>
+              <% elsif @contrato.moeda.to_i == 1 %>
+                <td width="55" align="center"><span class="gs">Gs</span></td>
+                <td width="100" align="right"><b><span class="gs"><%= format_int(cs.unitario_gs) %></span></b></td>
+                <td width="100" align="right"><b><span class="gs"><%= format_int(cs.total_gs) %></span></b></td>
+
+              <% elsif @contrato.moeda.to_i == 2 %>
+                <td width="55" align="center"><span class="rs">R$</span></td>
+                <td width="100" align="right"><b><span class="rs"><%= format_decimal(cs.unitario_rs) %></span></b></td>
+								<td width="100" align="right"><b><span class="rs"><%= format_decimal(cs.total_rs) %></span></b></td>                            
+              <% end %>
+
+            </tr>
+          <% end %>
+       </table>
+    </div>
+	</div>
+</div>

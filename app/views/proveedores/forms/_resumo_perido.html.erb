@@ -1,0 +1,91 @@
+<div class="panel">
+  <header class="panel-heading title-list" align="center">
+    <%= Date::MONTHNAMES[Time.now.strftime("%m").to_i].to_s %> / <%= Time.now.strftime("%Y") %> 
+  </header>
+  <header class="panel-heading title-list" align="center">
+    HOJE
+  </header>
+
+  <div class="panel-content">
+  <div class="row">
+    <div class="col-md-4 us" align="center">U$ <%= format_decimal(@hoje_us.to_f) %></div>
+    <div class="col-md-4 gs" align="center">Gs <%= format_int(@hoje_gs.to_f) %></div>
+    <div class="col-md-4 rs" align="center">R$ <%= format_decimal(@hoje_rs.to_f) %></div>
+  </div>
+
+
+  </div>
+</div>
+
+<div class="panel">
+  <header class="panel-heading title-list us" align="center">
+    <%= t('DOLLARS') %>
+  </header>
+
+  <div class="panel-content list-result">
+    <li>Realizado: <span class="us pull-right">U$ <%= format_decimal(@pago_us.to_f) %></span></li>
+    <li>Falta:<span class=" pull-right">U$ <%= format_decimal(@saldo_us.to_f) %></span></li>
+    <li class="result">
+      Previsto: <span class=" pull-right">U$ <%= format_decimal(@saldo_us.to_f) %></span>
+    </li>
+  </div>
+</div>
+
+<div class="panel">
+  <header class="panel-heading title-list gs" align="center">
+    <%= t('GUARANIS') %>
+  </header>
+
+  <div class="panel-content list-result">
+    <li>Realizado: <span class="gs pull-right">Gs. <%= format_int(@pago_gs.to_f) %></span></li>
+    <li>Falta:<span class=" pull-right">Gs. <%= format_int(@saldo_gs.to_f) %></span></li>
+    <li class="result">
+      Previsto: <span class=" pull-right">Gs. <%= format_int(@saldo_gs.to_f) %></span>
+    </li>
+  </div>       
+</div>
+
+<div class="panel">
+  <header class="panel-heading title-list rs" align="center">
+    <%= t('REAIS') %>
+  </header>
+
+  <div class="panel-content list-result">
+    <li>Realizado: <span class="rs pull-right">R$ 0,00</span></li>
+    <li>Falta:<span class=" pull-right">R$ <%= format_decimal(@saldo_rs.to_f) %></span></li>
+    <li class="result">
+      Previsto: <span class=" pull-right">R$ <%= format_decimal(@saldo_rs.to_f) %></span>
+    </li>
+  </div>       
+</div>
+
+
+<div class="panel">
+  <header class="panel-heading title-list rs" align="center">
+    Cheques Diferidos Emitidos
+  </header>
+  <% @cheques_diferidos.each do |cd| %>
+    <% if cd.moeda.to_i == 0 %>
+      <div class="panel-content list-result">
+        <li class="result">
+          <%= cd.persona_nome %> - <%= truncate(cd.concepto, length: 20) %>  <br>
+          <%= cd.diferido.strftime("%d/%m/%y")%>•<%= cd.cheque %> <span class=" pull-right us">U$ <%= format_decimal(cd.saida_dolar.to_f) %></span>
+        </li>
+      </div>
+    <% elsif cd.moeda.to_i == 1 %>
+      <div class="panel-content list-result">
+        <li class="result">
+          <%= cd.persona_nome %> - <%= truncate(cd.concepto, length: 20) %>   <br>
+          <%= cd.diferido.strftime("%d/%m/%y")%>•<%= cd.cheque %> <span class=" pull-right gs">Gs. <%= format_int(cd.saida_guarani.to_f) %></span>
+        </li>
+      </div>
+    <% elsif cd.moeda.to_i == 2 %>
+      <div class="panel-content list-result">
+        <li class="result">
+          <%= cd.persona_nome %> - <%= truncate(cd.concepto, length: 20) %>  <br>
+          <%= cd.diferido.strftime("%d/%m/%y")%>•<%= cd.cheque %> <span class=" pull-right rs">R$ <%= format_decimal(cd.saida_real.to_f) %></span>
+        </li>
+      </div>
+    <% end %>
+  <% end %>
+</div>

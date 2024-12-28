@@ -1,0 +1,2 @@
+module AdelantoCotaHelper
+end

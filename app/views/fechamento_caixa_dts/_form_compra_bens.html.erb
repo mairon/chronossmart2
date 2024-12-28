@@ -1,0 +1,317 @@
+<!--modelo INTEGRACAO COM MOEDA REAL E03!-->
+
+<body>
+	<%= form_for(@compra) do |f| %>
+		<% if @compra.errors.any? %>
+			<div id="error_explanation">
+				<h2><%= pluralize(@compra.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+				<ul>
+					<% @compra.errors.full_messages.each do |msg| %>
+					<li>
+						<%= msg %>
+					</li>
+					<% end %>
+				</ul>
+			</div>
+		<% end %>
+	<ul class="tabs">
+		<li><a href="#tab1">Gasto NO Fiscal - [<%= t('EDITION') %>]</a></li>
+	</ul>
+	<% if params[:action] == 'new_bens' %>
+		<%= f.hidden_field :tipo_compra, value: 3 %>
+		<%= f.hidden_field :fiscal, value: '0' %>
+		<%= hidden_field_tag :moeda, '1' %>
+		<%= f.hidden_field :documento_numero_01, value: '000' %>
+		<%= f.hidden_field :documento_numero_02, value: '000' %>
+		<%= f.hidden_field :documento_timbrado, value: '00000000' %>
+	<% else %>
+		<%= hidden_field_tag :moeda, @compra.moeda %>
+	<% end %>
+
+	<div class="tab_container">
+		<div id="tab1" class="tab_content">
+			<table>
+				<tr>
+					<td>
+						<fieldset>
+							<table>
+								<tr>
+									<td><%= t('DATE') %>:</td>
+									<td colspan="3"> <%= f.date_select :data %></td>
+									<td>
+									Moneda:
+							    <%= f.radio_button  :moeda, 1, Checked: "True", onfocus: "MoedaCompra('1')" %> Gs.
+							    <%= f.radio_button :moeda, 0, onfocus: "MoedaCompra('0')"%> Dolar
+							    <%= f.radio_button :moeda, 2, onfocus: "MoedaCompra('2')"%> Real
+									</td>
+								</tr>
+							</table>
+						</fieldset>
+					</td>
+					<td>
+						<fieldset>
+							<table>
+								<tr>
+									<td height="43">
+										Tipo:
+								    <%= f.radio_button :tipo, 0, Checked: "True" %> Contado
+								    <%= f.radio_button :tipo, 1 %> Credito
+									</td>
+								</tr>
+							</table>
+						</fieldset>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<fieldset>
+							<table>
+								<tr>
+                  <td align="right">Competência:</td>
+                  <td> <%= f.date_select :competencia, :discard_day => true %></td>
+
+			            <td align="right">Cotización: U$xGs:</td>
+			            <td><%= f.text_field :cotacao, size: 10, class: "money_gs", dir: "rtl", :required => true %></td>
+
+			            <td align="right">R$xGs:</td>
+			            <td><%= f.text_field :cotacao_real, size: 10, dir: "rtl", class: "money_gs", :required => true %></td>
+
+			            <td align="right">R$xU$:</td>
+			            <td> <%= f.text_field :cotacao_rs_us, size: 10, dir: "rtl", class: "money_us", :required => true %></td>
+
+								</tr>
+							</table>
+						</fieldset>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3"
+						<fieldset>
+							<table>
+								<tr>
+									<td align="right">Proveedor:</td>
+									<td colspan="3">
+
+										<%= f.text_field :persona_nome, size: 81, required: true, class: 'autocomplete' %>
+										 <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+							      <%= f.hidden_field :persona_id %></td>
+									</td>
+								</tr>
+								<tr>
+									<td></td>
+									<td colspan="10">
+									<fieldset>
+										<legend>Classificacíon de Bien</legend>
+											<%= f.radio_button :classif_bens, 0 %> Rodados
+											<%= f.radio_button :classif_bens, 1 %> Máqu. y equipos
+											<%= f.radio_button :classif_bens, 2 %> Inmuebles
+											<%= f.radio_button :classif_bens, 3 %> Muebles
+											<%= f.radio_button :classif_bens, 4 %> Herram. y Utensílios
+											<%= f.radio_button :classif_bens, 5 %> Terrenos
+										</fieldset>
+									</td>
+								</tr>
+								<tr>
+									<td align="right">Numero:</td>
+									<td>
+									<%= f.text_field :documento_numero, size: 25, maxlength: 25, required: true, placeholder: '0000001' %>
+									</td>
+								</tr>
+							</table>
+						</fieldset>
+					</td>
+				</tr>
+			</table>
+		  <fieldset>
+				<table class="valores-gs">
+					<tr>
+						<%= field_gs 'Total Descuento Gs.:',f,:desconto_guarani %>
+					</tr>
+					<tr>
+						<%= field_gs 'Total Gs.:',f,:total_guarani %>
+					</tr>
+				</table>
+
+				<table hidden class="valores-us">
+					<tr>
+						<%= field_us 'Total Descuento U$:',f,:desconto_dolar %>
+					</tr>
+					<tr>
+						<%= field_us 'Total U$:',f,:total_dolar %>
+					</tr>
+				</table>
+
+				<table hidden class="valores-rs">
+					<tr>
+						<%= field_us 'Total Descuento R$:',f,:desconto_real %>
+					</tr>
+					<tr>
+						<%= field_us 'Total R$:',f,:total_real %>
+					</tr>
+				</table>
+		</fieldset>
+	</td>
+</tr>
+<tr>
+	<td align="right" valign="top"></td>
+	<td>
+		<%= f.text_area :descricao, :cols => 105, :rows => 4, placeholder: 'Concepto:'%>
+	 </td>
+</tr>
+
+	</table>
+</div>
+
+		<div class="buttons">
+			<%= f.submit "Seguir", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"   %>
+			<%= link_to t('BACK'), index_bens_compras_url, class: "btn btn-back" %>
+		</div>
+	</div>
+<% end %>
+
+
+<% if params[:action] == 'new_bens' %>
+
+	<script>
+	  //cotacao
+		$(document).ready(function() {
+			$('#compra_data_3i').focus();
+	    $.ajax({url: '/buscas/cotz_us_compra',
+	            type: 'POST',
+	            beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+	            data: 'data=' + $('#compra_data_3i').val()+'/'+
+	                            $('#compra_data_2i').val()+'/'+
+	                            $('#compra_data_1i').val(),
+	            success: function(data){
+	            $('#compra_cotacao').val(number_format(data, 0, ',', '.'));} });
+
+	    $.ajax({url: '/buscas/cotz_rs_compra',
+	            type: 'POST',
+	            beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+	            data: 'data=' + $('#compra_data_3i').val()+'/'+
+	                            $('#compra_data_2i').val()+'/'+
+	                            $('#compra_data_1i').val(),
+	            success: function(data){
+	            $('#compra_cotacao_real').val(number_format(data, 0, ',', '.'));} });
+
+	    $.ajax({url: '/buscas/cotz_rs_us_compra',
+	            type: 'POST',
+	            beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+	            data: 'data=' + $('#compra_data_3i').val()+'/'+
+	                            $('#compra_data_2i').val()+'/'+
+	                            $('#compra_data_1i').val(),
+	            success: function(data){
+	            $('#compra_cotacao_rs_us').val(number_format(data, 2, ',', '.'));} });
+		});
+	</script>
+
+<% else %>
+
+	<script>
+		$(document).ready(function() {
+			$('#compra_data_3i').focus();
+			d = $('#moeda').val();
+			if (d == '1') {
+		    $(".valores-gs").show();
+		    $(".valores-rs").hide();
+		    $(".valores-us").hide();
+
+	   	} else if (d == '0') {
+
+		    $(".valores-us").show();
+		    $(".valores-rs").hide();
+		    $(".valores-gs").hide();
+	   	} else if (d == '2') {
+		    $(".valores-rs").show();
+		    $(".valores-us").hide();
+		    $(".valores-gs").hide();
+	   	}
+		});
+	</script>
+<% end %>
+
+<script type="text/javascript">
+  //moeda
+	function MoedaCompra(d){
+		moeda = $('#moeda').val(d);
+    if (d == '1') {
+	    $(".valores-gs").show();
+	    $(".valores-rs").hide();
+	    $(".valores-us").hide();
+
+   	} else if (d == '0') {
+
+	    $(".valores-us").show();
+	    $(".valores-rs").hide();
+	    $(".valores-gs").hide();
+   	} else if (d == '2') {
+	    $(".valores-rs").show();
+	    $(".valores-us").hide();
+	    $(".valores-gs").hide();
+   	}
+	}
+
+  //calc valores
+  $( "#compra_exentas_guarani, #compra_gravadas_05_guarani, #compra_gravadas_10_guarani" ).blur(function() {
+  	var exentas_gs = $('#compra_exentas_guarani').val();
+  	var grav_05_gs = $('#compra_gravadas_05_guarani').val();
+  	var grav_10_gs = $('#compra_gravadas_10_guarani').val();
+  	var tot_gs = (parseFloat(exentas_gs.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_05_gs.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_10_gs.replace(/\./g, "").replace(",", ".")) );
+  	$('#compra_total_guarani').val(number_format(tot_gs, 0, ',', '.'));
+  });
+
+  $( "#compra_exentas_dolar, #compra_gravadas_05_dolar, #compra_gravadas_10_dolar" ).blur(function() {
+  	var exentas_us = $('#compra_exentas_dolar').val();
+  	var grav_05_us = $('#compra_gravadas_05_dolar').val();
+  	var grav_10_us = $('#compra_gravadas_10_dolar').val();
+  	var tot_us = (parseFloat(exentas_us.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_05_us.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_10_us.replace(/\./g, "").replace(",", ".")) );
+  	$('#compra_total_dolar').val(number_format(tot_us, 2, ',', '.'));
+  });
+
+  $( "#compra_exentas_real, #compra_gravadas_05_real, #compra_gravadas_10_real" ).blur(function() {
+  	var exentas_rs = $('#compra_exentas_real').val();
+  	var grav_05_rs = $('#compra_gravadas_05_real').val();
+  	var grav_10_rs = $('#compra_gravadas_10_real').val();
+  	var tot_rs = (parseFloat(exentas_rs.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_05_rs.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_10_rs.replace(/\./g, "").replace(",", ".")) );
+  	$('#compra_total_real').val(number_format(tot_rs, 2, ',', '.'));
+  });
+
+</script>
+
+<script type="text/javascript">
+	$(function() {
+		$( "#compra_persona_nome" ).autocomplete({
+				source: function( request, response ) {
+					$("#sppiner").addClass("sppiner_show");
+				$.ajax({
+					url: "/personas/busca?per=PROVEEDOR",
+					dataType: "json",
+
+					data: {
+						tipo: 'DESCRIPCION',
+						busca: request.term
+					},
+					beforeSend: function(){
+					$("#spinner").addClass("sppiner_show");
+					},
+
+					success: function( data ) {
+						$("#sppiner").removeClass("sppiner_show");
+						response( data );
+					},
+				});
+			},
+			minLength: 2,
+			change: function( event, ui ) {
+				$("#compra_persona_id").val("");
+				$('#compra_persona_id').val(ui.item.id);
+				return false;
+			}
+		});
+		$( "#compra_persona_nome" ).change(function(){
+			if ($( "#compra_persona_id" ).val() == ''){
+			}
+		});
+	});
+
+</script>

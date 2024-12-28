@@ -1,0 +1,48 @@
+<ul class="tabs">
+	<li><a href="#tab1">Pedido de Compras Finanças</a></li>
+</ul>
+<div class="tab_container">
+	<table>
+		<tr>
+			<td>
+				<div class="group" style="padding:10px">
+					Proveedor: <b> <%= @pedido_compra.persona_nome %> - Documento: <%= @pedido_compra.documento_numero %></b>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+	      <div class="group">
+	        <%= render partial: "/pedido_compra_financas/index", locals: {pedido_compra_financas: @pedido_compra.pedido_compra_financas} %>
+	      </div>
+	      <div class="group" style="padding: 5px">
+	      <% if @pedido_compra.moeda == 0 %>
+		      <% if @saldo_us.to_f != 0 %>
+				<%= render partial: "/pedido_compra_financas/new_financa", locals: {pedido_compra_financa: PedidoCompraFinanca.new(pedido_compra_id: @pedido_compra.id)} %>
+				<% else %>
+				<h1 style="color:green" align="center">Operacíon Concluida, click en Finalizar para Salir!</h1>
+		      <% end %>
+	      <% elsif @pedido_compra.moeda == 1 %>
+		      <% if @saldo_gs != 0 %>
+				<%= render partial: "/pedido_compra_financas/new_financa", locals: {pedido_compra_financa: PedidoCompraFinanca.new(pedido_compra_id: @pedido_compra.id)} %>
+				<% else %>
+				<h1 style="color:green" align="center">Operacíon Concluida, click en Finalizar para Salir!</h1>
+		      <% end %>
+	      <% elsif @pedido_compra.moeda == 2 %>
+		      <% if @saldo_rs != 0 %>
+				<%= render partial: "/pedido_compra_financas/new_financa", locals: {pedido_compra_financa: PedidoCompraFinanca.new(pedido_compra_id: @pedido_compra.id)} %>
+				<% else %>
+				<h1 style="color:green" align="center">Operacíon Concluida, click en Finalizar para Salir!</h1>
+		      <% end %>
+
+	      <% end %>
+	      </div>
+			<div class="buttons">
+			    <%= link_to t('BACK'), pedido_compra_path(@pedido_compra.id), :class => "button back"%>
+			    <%= link_to 'Genera Informe', "/pedido_compras/#{@pedido_compra.id}/print_pedido", :class => "button print" %>
+			    <%= link_to 'Finalizar', pedido_compras_path, :class => "button delete"%>
+			</div>
+	    </td>
+	  </tr>
+	</table>
+</div>

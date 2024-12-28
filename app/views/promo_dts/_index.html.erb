@@ -1,0 +1,26 @@
+<table class="head_grid">
+  <tr>
+    <td width="150">Referencia</td>
+    <td width="350" >Producto</td>
+    <td width="70" align="right">Precio Orig</td>
+    <td width="70" align="right">% Desc.</td>
+    <td width="70" align="right">Precio Desc</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% promo_dts.includes(:produto).each do |promo_dt| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="150"><%= promo_dt.produto.fabricante_cod unless promo_dt.produto.nil? %></td>
+        <td width="350"><%= promo_dt.produto_id.to_s.rjust(6,'0') %>-<%= promo_dt.produto.nome unless promo_dt.produto.nil? %></td>
+        <td width="70" align="right"><%= format_int(promo_dt.preco_original_gs) %></td>
+        <td width="70" align="right"><%= format_decimal(promo_dt.desc_porce) %>%</td>
+        <td width="70" align="right"><%= format_int(promo_dt.preco_venda_gs) %></td>
+        <td><%= link_to 'Editar', edit_promo_dt_path(promo_dt) %></td>
+        <td><%= link_to 'Borrar', promo_dt, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

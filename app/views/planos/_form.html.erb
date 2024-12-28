@@ -1,0 +1,41 @@
+<%= form_for(@plano) do |f| %>
+
+  <% if @plano.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@plano.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @plano.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  
+  <ul class="tabs">
+    <li><a href="#tab1">Plan de Pago - [<%= t('EDITION') %>]</a></li>
+  </ul>
+
+  <div class="tab_container">
+    <div id="tab1" class="tab_content">
+      <table>
+        <tr>
+         	<td align="right">Condición:</td>
+         		<td colspan="3"><%= f.text_field :condicao, size: 50, required: true, autofocus: true %></td>
+         	</tr>
+          <tr>
+            <td></td>
+            <td><%= f.check_box :pdv %> Ativar no PDV</td>
+          </tr>
+         </table>
+      </div> 	
+    </div> 	
+    <div class="buttons">
+      <%= f.submit t('SAVE'), :class => "button add", :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %>
+      <%= link_to t('BACK'), planos_path, :class => "button back" %>
+    </div>
+  </div>
+<% end %>
+

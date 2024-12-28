@@ -1,0 +1,61 @@
+
+  <div class="group">
+    <table class="head_grid">
+      <tr>
+        <td width="250"><%= t('ACCOUNT') %></td>
+        <td width="100" align="center"><%= t('DATE') %></td>
+        <td width="450">Concepto</td>
+        <td width="100" align="right"><%= t('VALUE') %></td>
+
+      </tr>
+    </table>
+    <div class="rolagem" dir="div" style="height: 150px">
+      <table>
+        <% cre = 0 %>
+        <% sueldo_pagos.each do |sp| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="250"><%= sp.conta.nome unless sp.conta_id.blank? %></td>
+              <td width="100" align="center"><%= sp.data.strftime("%d/%m/%Y") %></td>
+              <td width="450" align="left"><%= sp.obs %></td>
+              <% if sp.moeda == 2 %>
+                <td width="100" align="right"><%= number_to_currency(sp.valor_rs, :format=>' %n ', :separeitor => ',')   %></td>
+                <% cre += sp.valor_rs %>
+
+              <% elsif sp.moeda == 1 %>
+                <td width="100" align="right"><%= number_to_currency(sp.valor_gs, :format=>' %n ', :precision => 0)   %></td>
+
+                <% cre += sp.valor_gs %>
+
+              <% else %>
+                <td width="100" align="right"><%= number_to_currency(sp.valor_us, :format=>' %n ', :separeitor => ',')   %></td>
+                <% cre += sp.valor_us %>
+
+              <% end %>
+                <td><%= link_to '',  "#", class: 'icon-file', onclick: "PrintCheque(#{sp.sueldo_id}, #{sp.id})" %></td>
+                <td><%= link_to 'Editar', edit_sueldo_pago_path(sp) %></td>
+                <td><%= link_to t('DELETE'), sp, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+              </tr>
+            <% end %>
+        </table>
+      </div>
+
+    <table class="head_grid">
+      <tr>
+        <td width="650"></td>
+        <% if @sueldo.moeda == 1 %>
+          <td width="100" align="right"><%=h number_to_currency(cre, :format=>' %n ', :precision => 0) %></td>
+        <% else %>
+          <td width="100" align="right"><%=h number_to_currency(cre, :format=>' %n ', :separeitor => ',') %></td>
+        <% end %>
+      </tr>
+
+    </table>
+    </div>
+</fieldset>
+
+<script>
+   function PrintCheque(id, pf){
+    window.open('/sueldos/'+ id + '/print_cheque/?pf=' + pf, 'Pagina', ' SCROLLBARS=YES, TOP=50, LEFT=200, WIDTH=900, HEIGHT=300');
+  }
+ 
+</script>

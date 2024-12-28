@@ -1,0 +1,32 @@
+<style>
+#tarjeta
+{
+    font:normal 12px tahoma, arial, helvetica, sans-serif;
+    font-size:12px;
+    border: 3px solid;
+    font-weight:bold;
+    height: 450px;
+    width: 350px;
+    -moz-border-radius:15px;
+    -webkit-border-radius:15px;
+
+}
+
+</style>
+
+
+<div id="tarjeta">
+  <p align="center"><%= image_tag "/images/logo.JPG", :size => '300x100' %></p>
+  <br/>	
+  <p align="center"><h2 align="center"><%= @persona.nome %></h2></p>
+  <br/>
+  <br/>
+  <br/>
+  <br/>
+  <p align="center"><%= Barby::Code39.new(@persona.id.to_s.rjust(9,'0')).to_svg.html_safe %></p>
+  <p align="center"><%= @persona.id.to_s.rjust(9,'0') %></p>	
+</div>
+
+  
+
+

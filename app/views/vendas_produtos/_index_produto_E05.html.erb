@@ -1,0 +1,24 @@
+<table>
+	<tr  class="<%= cycle("cor1", "cor2") %>">
+		<td width="100" align="center"> <%= index_produto.fabricante_cod %> </td>
+		<td width="50" align="left"> <%= index_produto.produto_nome %> </td>
+		<td width="80" align="center"> <%= format("%.3f",index_produto.quantidade.to_f) %> </td>
+		<td width="30" align="center"> <%= format("%.3f",index_produto.nro_amostra.to_f) %> </td>
+		<td width="30" align="center"> <%= format("%.3f",index_produto.amostra_macro_comple.to_f) %> </td>
+		<td width="30" align="center"> <%= format("%.3f",index_produto.amostra_macro.to_f) %> </td>
+		<td width="30" align="center"> <%= format("%.3f",index_produto.amostra_completa.to_f) %> </td>
+		<td width="30" align="center"> <%= format("%.3f",index_produto.amostra_extratificante.to_f) %> </td>
+		<% if index_produto.moeda == 0 %>
+		<td width="80" align="right"><%= number_to_currency(index_produto.unitario_dolar, :format=>' %n ', :separeitor =>  "," ) %> </td>
+		<td width="80" align="right"><%= number_to_currency(index_produto.total_dolar, :format=>' %n ', :separeitor =>  "," ) %> </td>
+		<td width="80" align="right"><%= number_to_currency( index_produto.quantidade * index_produto.iva_dolar , :format=>' %n ', :separeitor =>  "," ) %> </td>
+		<% else %>
+		<td width="80" align="right"><%= number_to_currency(index_produto.unitario_guarani, :format=>' %n ', :precision => 0) %> </td>
+		<td width="80" align="right"><%= number_to_currency(index_produto.total_guarani, :format=>' %n ', :precision => 0) %> </td>
+		<td width="80" align="right"><%= number_to_currency(index_produto.quantidade * index_produto.iva_guarani , :format=>' %n ', :precision => 0 ) %> </td>
+		<% end %>
+		<td width="80" align="right"><%= index_produto.total_desconto %> </td>
+		<td><%= link_to 'Editar', edit_vendas_produto_path(index_produto) %></td>
+		<td><%= link_to t('DELETE'), index_produto, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+	</tr>
+</table>

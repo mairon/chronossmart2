@@ -1,0 +1,322 @@
+<h1 id="header"><%= t('LISTING') %> de <%= t('PAYMENTS') %></h1>
+<div class="group">
+  <%= form_tag resultado_pagos_relatorios_path, :method => "get" do%>
+    <table>
+      <tr>
+        <td colspan="4"> 
+          <label>Periodo</label>
+          <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+          <div class="input-group-addon-f">
+            <span class="icon-calendar"></span>
+          </div>
+          <div class="date-separ"><%= t('TO') %></div>
+          <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+          <div class="input-group-addon-f">
+          <span class="icon-calendar"></span>
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td colspan="4">
+          <label><%= t('PROVIDER') %></label>
+          <%=   select("busca", "persona", Persona.all(:select => 'id,nome',:conditions => ["tipo_fornecedor = 1"]).collect {|p| [ p.nome, p.id ] }, { :prompt => 'Todos...' })%></td>
+
+          </td>
+        </tr>
+
+        <tr>
+          <td colspan="4">
+            <label><%= t('CENTER_OF_COSTOS') %></label>
+            <%= select("busca", "cc", CentroCusto.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...'}) %>
+
+          </td>
+        </tr>
+
+
+        <tr>
+          <td colspan="4">
+            <label>Grupo de <%= t('COST') %></label>
+            <%= select("compras_custo", "rubro_grupo_id",
+                       PlanoDeConta.all( :select => 'id,descricao',
+                                  :conditions => ["length(codigo) = 8"],
+                                  :order  => '2' ).collect {|p| [ p.descricao, p.id ]}, {prompt: 'Todos...'}) %>
+                <%= image_tag("load.gif",
+                                :align => "absmiddle",
+                                :border => 0,
+                                :id => "spinner",
+                                :width => 21,
+                                :height => 21,
+                                :style =>"display: none;" ) %>
+          </td>
+        </tr>
+
+        <tr>
+          <td colspan="4">
+            <label><%= t('CLASSIFICATION') %></label>
+              <%= select("compras_custo", "rubro_id",  Rubro.all( :select => 'id,descricao',
+                                  :order  => '2').collect {|p| [ p.descricao, p.id ] }, { prompt: 'Todos...'}) %>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label>Doc.</label>
+            <%= text_field_tag :doc,'', class: 'panel-field', size: 10 %>
+          </td>
+          <td>
+            <label><%= t('QUOTA') %></label>
+            <%= text_field_tag :cota,'', class: 'panel-field', size: 5 %>            
+          </td>
+          <td>
+            <label>Valor min.</label>
+            <%= telephone_field_tag :valor_min,'', class: 'panel-field', size: 15, class: "money_us", dir: "rtl", step: ".01" %>
+          </td>
+          <td>
+            <label>Valor Max.</label>
+            <%= telephone_field_tag :valor_max,'', class: 'panel-field', size: 15, class: "money_us", dir: "rtl", step: ".01" %>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">
+            <br>
+            <%= check_box_tag :lancamento, '1' %> Todos Lançamentos
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <br>
+            <a href="#" data-value="0" title="Moneda" class="Moeda us <%= 'checked' if current_unidade.moeda.to_i == 0 %>" ><%= t('DOLLARS') %></a>
+          </td>
+          <td align="center">
+            <br>
+            <a href="#" data-value="1" title="Moneda" class="Moeda gs <%= 'checked' if current_unidade.moeda.to_i == 1 %>" ><%= t('GUARANIS') %></a>
+          </td>
+          <td align="center">
+            <br>
+            <a href="#" data-value="2" title="Moneda" class="Moeda rs <%= 'checked' if current_unidade.moeda.to_i == 2 %>" ><%= t('REAIS') %></a>
+          </td>
+          <%= hidden_field_tag :moeda, current_unidade.moeda %>
+        </tr>
+        <tr>
+          <td>
+            <br>
+            <a href="#" data-value="0" title="Formato" class="Detalhe " >Sintético</a>
+          </td>
+
+          <td align="center">
+            <br>
+            <a href="#" data-value="1" title="Formato" class="Detalhe" >Analítico</a>
+          </td>
+
+          <td>
+            <br>
+            <a href="#" data-value="2" title="Formato" class="Detalhe checked" >Forma de Pagamento </a>
+          </td>
+
+            <%= hidden_field_tag :detalhe, 2 %>
+        </tr>
+
+        <tr>
+          <td>
+            <br>
+            <a href="#" data-value="0" title="Ordem" class="od checked" >Ordenado por <%= t('DATE') %></a>
+          </td>
+
+          <td align="center">
+            <br>
+            <a href="#" data-value="1" title="Ordem" class="od" >Ordenado por <%= t('PROVIDER') %></a>
+          </td>
+
+          <td>
+            <br>
+            <a href="#" data-value="2" title="Ordem" class="od" >Ordenado por Forma PG</a>
+          </td>
+
+            <%= hidden_field_tag :od, 0 %>
+        </tr>
+
+        <tr>
+          <td colspan="4">
+            <br>
+            <%= check_box_tag :agp, '1' %> Agrupar pela ordem
+          </td>
+        </tr>
+
+        <tr>
+          <td colspan="4" class="footer-buttons">
+            <input  id="button" class="acao btn btn-green" value="Informe"  style="cursor:pointer;" id="myModalLabel" data-toggle="modal" data-width="500" data-height="781" data-target="#myiframe" data-dismiss="modal" />
+            <a href="#" class="xls btn btn-blue">Excel</a>
+        </tr>
+        <input type="hidden" name="tipo" id="tipo" size="5" value="0"/>
+      </table>
+    <% end %>
+  </div>
+
+
+<div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 1100px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel"><%= t('LISTING') %> de <%= t('PAYMENTS') %></h4>
+      </div>
+      <div class="modal-body" align="center">
+        <div class="embed-responsive embed-responsive-16by9" style="height: 460px">
+          <iframe class="embed-responsive-item" id="iframeModal" frameborder="0 " border="0"></iframe>
+        </div>
+      </div>      
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+
+  $('.xls').click(function() {
+    window.location.href = '/relatorios/resultado_pagos.xls?' + $('form').serialize();
+  });
+
+  function Tipo(d){
+    document.getElementById('tipo').value = d
+  }
+  $('#busca_cc').selectize();
+  $('#busca_persona').selectize();
+
+$(document).ready(function() {
+  var xhr;
+  var select_state, $select_state;
+  var select_city, $select_city;
+
+
+$select_state = $('#compras_custo_rubro_grupo_id').selectize({
+    persist: false,
+    onChange: function(value) {
+      if (!value.length) return;
+      select_city.clearOptions();
+      select_city.load(function(callback) {
+        xhr && xhr.abort();
+        xhr = $.ajax({
+          type: "GET",
+           url: "/compras/dynamic_rubro_grupo/"+value,
+          data: value,
+          dataType: 'json',
+          beforeSend: function(){
+            $('#spinner2').show();
+          },
+          success: function(results){
+            $('#spinner2').hide();
+            callback(results);
+            console.log(results);
+          },
+          error: function() {
+            callback();
+          }
+
+        });
+     });
+  }, 
+    sortField: {
+        field: 'text',
+        direction: 'asc'
+    },    
+    dropdownParent: 'body'
+});
+
+$select_city = $('#compras_custo_rubro_id').selectize({
+    persist: false,
+    valueField: 'id',
+    labelField: 'descricao',
+    searchField: ['descricao'],
+    preload: true,
+    dropdownParent: 'body'
+});
+
+
+select_city  = $select_city[0].selectize;
+select_state = $select_state[0].selectize;
+});
+
+
+</script>
+
+
+<script>
+  
+
+
+  $(document).ready(function() {
+
+    $(".Status").click(function() {
+      $("#status").val($(this).attr('data-value'));
+      $(".Status").css("border-bottom", "none");
+      $(".Status").css("color", "#918f8f");
+      $(this).css("border-bottom", "2px solid #B94A48");
+      $(this).css("text-align", "center");
+      $(this).css("color", "#B94A48");
+    });
+
+    $(".Detalhe").click(function() {
+      $("#detalhe").val($(this).attr('data-value'));
+      $(".Detalhe").css("border-bottom", "none");
+      $(".Detalhe").css("color", "#918f8f");
+      $(this).css("border-bottom", "2px solid #B94A48");
+      $(this).css("text-align", "center");
+      $(this).css("color", "#B94A48");
+    });
+
+    $(".od").click(function() {
+      $("#od").val($(this).attr('data-value'));
+      $(".od").css("border-bottom", "none");
+      $(".od").css("color", "#918f8f");
+      $(this).css("border-bottom", "2px solid #B94A48");
+      $(this).css("text-align", "center");
+      $(this).css("color", "#B94A48");
+    });
+
+
+    $(".Moeda").click(function() {
+      $("#moeda").val($(this).attr('data-value'));
+      $(".Moeda").css("border-bottom", "none");
+      $(".Moeda").css("color", "#918f8f");
+      $(this).css("border-bottom", "2px solid #B94A48");
+      $(this).css("text-align", "center");
+      $(this).css("color", "#B94A48");
+    });
+  });
+
+( function($) {
+  
+function iframeModalOpen(){
+
+    $('.acao').on('click', function(e) {
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+      
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+      
+      // stampiamo i nostri dati nell'iframe
+      $("#myiframe iframe").attr({
+        'src': '/relatorios/resultado_pagos?' + $('form').serialize(),
+        'height': height,
+        'width': width,
+        'allowfullscreen':''
+      });
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#myiframe').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+    });
+  }
+  
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+  
+  } ) ( jQuery );
+
+</script>

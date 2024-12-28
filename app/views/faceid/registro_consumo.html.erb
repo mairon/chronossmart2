@@ -1,0 +1,181 @@
+  <br>
+  <% Produto.where(grupo_id: 4 ).each do |p| %>
+    <%= link_to p.nome,  "/faceid/registro_consumo?produto_id=#{p.id}", class: 'btn btn-blue', :disabled => p.id.to_i == params[:produto_id].to_i %>
+  <% end %>
+  
+  <style>
+    .btn[disabled]{
+      color: #000 !important;
+    }
+  </style>
+  <br>  
+  <br>  
+  <br>  
+  <% unless params[:produto_id].blank? %>
+    <a href="#" class="type_point btn btn-green" set="REGISTROCONSUMO"  onclick="authenticateUser()"> REGISTRAR CONSUMO</a> 
+  <% else %>
+    <h1 align="center" style="font-size: 21px">SELECCIONAR CONSUMO</h1>
+  <% end %>
+  <%= form_for(CheckPoint.new) do |f| %>
+  <%= f.hidden_field :produto_id, value: params[:produto_id] %>
+    <%= f.hidden_field :persona_id, class: 'panel-field' %><br>
+    <%= f.hidden_field :check_point_type, class: 'panel-field', value: 'REGISTROCONSUMO' %><br>
+    <%= f.hidden_field :datetime, class: 'panel-field' %><br>
+    <h1 class="tag-log" hidden>Hola <span id="persona_nome"></span> <br> <span id="consumo"></span></h1>
+
+    <%= f.submit '', class: "btn bt-ponto", disable_with: "Registrando...", "data-plus-as-tab" => "false" %>
+  <% end %>
+  <div id="faceio-modal"></div>
+  <script src="https://cdn.faceio.net/fio.js"></script>
+<script type="text/javascript">
+          // Initialize the library first with your application Public ID.
+          // Grab your public ID from the Application Manager on the FACEIO console at: https://console.faceio.net/
+          const faceio = new faceIO("fioa72db"); // Replace with your application Public ID
+
+          function authenticateUser() {
+            // Start the facial authentication process (Identify a previously enrolled user)
+            faceio.authenticate({
+              "locale": "auto" // Default user locale
+            }).then(userData => {
+              console.log("Success, user recognized")
+              // Grab the facial ID linked to this particular user which will be same
+              // for each of his successful future authentication. FACEIO recommend
+              // that your rely on this ID if you plan to uniquely identify
+              // all enrolled users on your backend for example.
+              console.log("Linked facial Id: " + userData.facialId)
+              
+              var currentdate = new Date(); 
+              var datetime = currentdate.getFullYear() + "-" + (currentdate.getMonth()+1)  + "-" + currentdate.getDate() + "  " + currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
+                $(".tag-log").show()
+                $.ajax({
+                  type: 'GET',
+                  url:  '/check_points/busca_ticket',
+                  data: {
+                    "faceid": userData.facialId, "produto_id": '<%= params[:produto_id] %>'
+                  },
+                  success: function(data) {
+                    $("#persona_nome").text(data["busca"]["nome"]);
+                    $("#check_point_persona_id").val(data["busca"]["id"]);
+                    if (data["ticket"] == 0) {
+                      $("#consumo").text('Nenhum Combo Encontrado, Consumo a Credito Registrado!');                        
+                    }else{
+                      $("#consumo").text('Combo Encontrado com Sucesso!');
+                    }                     
+                  }
+                });
+            
+                $("#check_point_datetime").val(datetime);
+                $("#datetime").text(datetime);
+                setTimeout(function(){
+                  console.log("3")
+                   $('#new_check_point').submit();
+                },5000)
+              
+              //
+              // faceio.restartSession() let you authenticate another user again (without reloading the entire HTML page)
+              //
+            }).catch(errCode => {
+              // handle authentication failure. Visit:
+              // https://faceio.net/integration-guide#error-codes
+              // for the list of all possible error codes
+              handleError(errCode);
+              
+              // If you want to restart the session again without refreshing the current TAB. Just call:
+              faceio.restartSession();
+              // restartSession() let you authenticate the same user again (in case of failure) 
+              // without refreshing the entire page.
+              // restartSession() is available starting from the PRO plan and up, so think of upgrading your app
+              // for user usability.
+            });
+          }
+          function handleError(errCode) {
+            // Log all possible error codes during user interaction..
+            // Refer to: https://faceio.net/integration-guide#error-codes
+            // for a detailed overview when these errors are triggered.
+            switch (errCode) {
+              case fioErrCode.PERMISSION_REFUSED:
+                console.log("Access to the Camera stream was denied by the end user");
+                break;
+              case fioErrCode.NO_FACES_DETECTED:
+                console.log("No faces were detected during the enroll or authentication process");
+                break;
+              case fioErrCode.UNRECOGNIZED_FACE:
+                console.log("Unrecognized face on this application's Facial Index");
+                break;
+              case fioErrCode.MANY_FACES:
+                console.log("Two or more faces were detected during the scan process");
+                break;
+              case fioErrCode.FACE_DUPLICATION:
+                console.log("User enrolled previously (facial features already recorded). Cannot enroll again!");
+                break;
+              case fioErrCode.MINORS_NOT_ALLOWED:
+                console.log("Minors are not allowed to enroll on this application!");
+              break;
+              case fioErrCode.PAD_ATTACK:
+                console.log("Presentation (Spoof) Attack (PAD) detected during the scan process");
+                break;
+              case fioErrCode.FACE_MISMATCH:
+                console.log("Calculated Facial Vectors of the user being enrolled do not matches");
+                break;
+              case fioErrCode.WRONG_PIN_CODE:
+                console.log("Wrong PIN code supplied by the user being authenticated");
+                break;
+              case fioErrCode.PROCESSING_ERR:
+                console.log("Server side error");
+                break;
+              case fioErrCode.UNAUTHORIZED:
+                console.log("Your application is not allowed to perform the requested operation (eg. Invalid ID, Blocked, Paused, etc.). Refer to the FACEIO Console for additional information");
+                break;
+              case fioErrCode.TERMS_NOT_ACCEPTED:
+                console.log("Terms & Conditions set out by FACEIO/host application rejected by the end user");
+                break;
+              case fioErrCode.UI_NOT_READY:
+                console.log("The FACEIO Widget could not be (or is being) injected onto the client DOM");
+                break;
+              case fioErrCode.SESSION_EXPIRED:
+                console.log("Client session expired. The first promise was already fulfilled but the host application failed to act accordingly");
+                break;
+              case fioErrCode.TIMEOUT:
+                console.log("Ongoing operation timed out (eg, Camera access permission, ToS accept delay, Face not yet detected, Server Reply, etc.)");
+                break;
+              case fioErrCode.TOO_MANY_REQUESTS:
+                console.log("Widget instantiation requests exceeded for freemium applications. Does not apply for upgraded applications");
+                break;
+              case fioErrCode.EMPTY_ORIGIN:
+                console.log("Origin or Referer HTTP request header is empty or missing");
+                break;
+              case fioErrCode.FORBIDDDEN_ORIGIN:
+                console.log("Domain origin is forbidden from instantiating fio.js");
+                break;
+              case fioErrCode.FORBIDDDEN_COUNTRY:
+                console.log("Country ISO-3166-1 Code is forbidden from instantiating fio.js");
+                break;
+              case fioErrCode.SESSION_IN_PROGRESS:
+                console.log("Another authentication or enrollment session is in progress");
+                break;
+              case fioErrCode.NETWORK_IO:
+              default:
+                console.log("Error while establishing network connection with the target FACEIO processing node");
+                break;
+            }
+          }
+        </script>   
+  <style>
+    .tag-log{
+      font-size: 23px;
+      font-family: 'prox-bold';
+      margin: 15px;
+    }
+    .type_point{
+      font-family: 'prox-bold';
+      font-size: 23px;  
+      padding: 30px 80px;
+      border-radius: 90px !important;
+      margin:10px;
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 20%), 0 2px 10px 0 rgb(0 0 0 / 10%);      
+    }
+    .bt-ponto{
+      border: none;
+      background-color: #fff;
+    }
+  </style>

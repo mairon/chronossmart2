@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <ss:Styles>
+    <ss:Style ss:ID="1">
+      <ss:Font ss:Bold="1"/>
+      <ss:Alignment ss:Horizontal="Center"/>
+      <ss:Interior ss:Pattern="Gray25"/>
+    </ss:Style>
+    <ss:Style ss:ID="2">
+      <ss:Alignment ss:Horizontal="Center"/>
+    </ss:Style>
+  </ss:Styles>
+  <Worksheet ss:Name="Sheet1">
+    <Table>
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String"><B>Laz.</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B><%= t('DOC') %></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B><%= t('DATE') %></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Prazo</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Vend.</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Cliente</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Marca</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Coleccion</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Cantidad</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Total</B></Data></Cell>
+      </Row>
+        <% tot_ctd = 0 %>
+        <% tot_vl  = 0 %>
+        <% p_ea    = 0 %>
+        <% p_f     = 0 %>
+        <% p_c     = 0 %>
+        <% p_a     = 0 %>
+        <% qtd     = 0 %>
+
+        <% p_qtd   = 0 %>
+        <% p_s     = 0 %>
+
+        <% @pedidos_vendas.each do |pv| %>
+          <Row>
+            <Cell><Data ss:Type="String"><%= pv.id.to_s.rjust(6,'0') %></Data></Cell>
+            <Cell><Data ss:Type="String"><%= pv.documento_numero.to_s.rjust(6,'0') %></Data></Cell>
+            <Cell><Data ss:Type="String"><%= pv.data.strftime("%d/%m/%y") %></Data></Cell>
+            <Cell><Data ss:Type="String"><%= pv.prazo_entrega.strftime("%d/%m/%y") %></Data></Cell>
+            <Cell><Data ss:Type="String"><%= pv.vendedor_id %></Data></Cell>
+            <Cell><Data ss:Type="String"><%= truncate(pv.persona.nome, :length => 42 ) %></Data></Cell>
+            <Cell><Data ss:Type="String"><%= truncate(pv.sub_grupo.descricao, :length => 30 )  unless pv.sub_grupo_id.nil? %></Data></Cell>
+            <Cell><Data ss:Type="String"><%= truncate(pv.colecao.nome, :length => 40 ) unless pv.colecao_id.nil? %></Data></Cell>
+            <Cell><Data ss:Type="Number"><%= pv.qtd.to_f %></Data></Cell>
+            <% qtd += pv.qtd.to_f %>
+
+            <!-- total moedas -->
+            <% if params[:moeda].to_s == '0' %>
+              <Cell><Data ss:Type="Number"><%= pv.tot_us.to_f %></Data></Cell>
+              <% tot_vl  += pv.tot_us.to_f %>
+            <% elsif params[:moeda].to_s == '1'%>
+              <Cell><Data ss:Type="Number"><%= pv.tot_gs.to_f %></Data></Cell>
+              <% tot_vl  += pv.tot_gs.to_f %>
+            <% else %>
+              <Cell><Data ss:Type="Number"><%= pv.tot_rs.to_f %></Data></Cell>
+              <% tot_vl  += pv.tot_rs.to_f %>
+            <% end %>
+          </Row>
+          <!-- detalhe produtos pedido -->
+          <% if params[:detalhe].to_s == '1' %>
+            <% sql = "SELECT PP.PRODUTOS_GRADE_ID,
+                             PP.FABRICANTE_COD,
+                             PP.PRODUTO_NOME,
+                             PP.COR_NOME,
+                             PP.TAMANHO_NOME,
+                             PP.UNITARIO_DOLAR,
+                             PP.TOTAL_DOLAR,
+                             PP.QUANTIDADE,
+                             PP.UNITARIO_GUARANI,
+                             PP.TOTAL_GUARANI,
+                             PP.UNITARIO_REAL,
+                             PP.TOTAL_REAL,
+                             coalesce((SELECT SUM(S.ENTRADA - S.SAIDA) FROM STOCKS S WHERE S.DEPOSITO_ID = 1 AND S.PRODUTOS_GRADE_ID = PP.PRODUTOS_GRADE_ID),0) AS STOCK
+                      FROM PRESUPUESTO_PRODUTOS PP
+                      WHERE PP.PRESUPUESTO_ID = #{pv.id}" %>
+            <% pedido_vendas_produtos = PresupuestoProduto.find_by_sql(sql) %>
+
+
+            <Row ss:StyleID="1">
+              <Cell><Data ss:Type="String"><B>Grade</B></Data></Cell>
+              <Cell><Data ss:Type="String"><B>Ref.</B></Data></Cell>
+              <Cell><Data ss:Type="String"><B>Producto</B></Data></Cell>
+              <Cell><Data ss:Type="String"><B>Color</B></Data></Cell>
+              <Cell><Data ss:Type="String"><B>Tamanho</B></Data></Cell>
+              <Cell><Data ss:Type="String"><B>Unit.</B></Data></Cell>
+              <Cell><Data ss:Type="String"><B>Cantidad</B></Data></Cell>
+              <Cell><Data ss:Type="String"><B>Stock</B></Data></Cell>
+              <Cell><Data ss:Type="String"><B>Total</B></Data></Cell>
+            </Row>
+          <% pedido_vendas_produtos.each do |pvp| %>
+            <Row>
+              <Cell><Data ss:Type="String"><%= pvp.produtos_grade_id.to_s.rjust(6,'0')%></Data></Cell>
+              <Cell><Data ss:Type="String"><%= pvp.fabricante_cod %></Data></Cell>
+              <Cell><Data ss:Type="String"><%= pvp.produto_nome %></Data></Cell>
+              <Cell><Data ss:Type="String"><%= pvp.cor_nome %></Data></Cell>
+              <Cell><Data ss:Type="String"><%= pvp.tamanho_nome %></Data></Cell>
+              <!-- total moedas -->
+              <% if params[:moeda].to_s == '0' %>
+                <Cell><Data ss:Type="Number"><%= pvp.unitario_dolar.to_f %></Data></Cell>
+                <Cell><Data ss:Type="Number"><%= pvp.quantidade.to_i %></Data></Cell>
+                <Cell><Data ss:Type="Number"><%= pvp.stock.to_i %></Data></Cell>
+                <Cell><Data ss:Type="Number"><%= pvp.total_dolar.to_f %></Data></Cell>
+              <% elsif params[:moeda].to_s == '1' %>
+                <Cell><Data ss:Type="Number"><%= pvp.unitario_guarani.to_f %></Data></Cell>
+                <Cell><Data ss:Type="Number"><%= pvp.quantidade.to_i %></Data></Cell>
+                <Cell><Data ss:Type="Number"><%= pvp.stock.to_i %></Data></Cell>
+                <Cell><Data ss:Type="Number"><%= pvp.total_guarani.to_f %></Data></Cell>
+              <% else %>
+                <Cell><Data ss:Type="Number"><%= pvp.unitario_real.to_f %></Data></Cell>
+                <Cell><Data ss:Type="Number"><%= pvp.quantidade.to_i %></Data></Cell>
+                <Cell><Data ss:Type="Number"><%= pvp.stock.to_i %></Data></Cell>
+                <Cell><Data ss:Type="Number"><%= pvp.total_real.to_f %></Data></Cell>
+              <% end %>
+            </Row>
+
+            <% p_qtd   += pvp.quantidade.to_i %>
+            <% p_s     += pvp.stock.to_i %>
+          <% end %>
+          <Row>
+            <Cell></Cell>
+            <Cell></Cell>
+            <Cell></Cell>
+            <Cell></Cell>
+            <Cell></Cell>
+            <Cell></Cell>
+            <Cell><Data ss:Type="Number"><%= p_qtd %></Data></Cell>
+            <Cell><Data ss:Type="Number"><%= p_s %></Data></Cell>
+          </Row>
+          <% p_qtd   = 0 %>
+          <% p_s     = 0 %>
+      <% end %>
+    <% end %>
+    <!-- total -->
+    <Row>
+      <Cell></Cell>
+      <Cell></Cell>
+      <Cell></Cell>
+      <Cell></Cell>
+      <Cell></Cell>
+      <Cell></Cell>
+      <Cell></Cell>
+      <Cell>Total ==></Cell>
+      <Cell><Data ss:Type="Number"><%= qtd %></Data></Cell>
+      <% if params[:moeda].to_s == '1' %>
+        <Cell><Data ss:Type="Number"><%= tot_vl.to_f %></Data></Cell>
+      <% else %>
+        <Cell><Data ss:Type="Number"><%= tot_vl.to_f %></Data></Cell>
+      <% end %>
+    </Row>
+    </Table>
+  </Worksheet>
+</Workbook>

@@ -1,0 +1,39 @@
+<div class="panel">
+  <header class="panel-heading link-prod" >
+    <div class="row" style="font-size: 14px;">
+      <div class="col-md-3">Sub-Total</div>
+      <div class="col-md-3 gs" align="right"><small>Gs.</small> <%= format_int(@produto_sum_gs)%></div>
+      <div class="col-md-3 us" align="right"><small>U$</small> <%= format_decimal(@produto_sum_us)%></div>
+      <div class="col-md-3 rs" align="right"><small>R$</small> <%= format_decimal(@produto_sum_rs)%></div>
+    </div>
+
+  </header>
+  <div class="panel-content">
+    <table class="head_grid">
+       <tr>
+          <td width="50" align="center">Cota</td>
+          <td width="200">Forma de Pago</td>
+          <td width="45" align="center"></td>
+          <td width="70" align="right"><%= t('VALUE') %></td>
+          <td width="70" align="center">Venci.</td>
+       </tr>
+    </table>
+
+    <div class="rolagem lista-produtos" dir="div" style="height:230px">
+      <div id="vendas_financas">
+        <table>
+          <%= render @venda.vendas_financas %>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer class="panel-footer link-prod">
+    <div class="row" style="font-size: 15px;">
+      <div class="col-md-3">Total Pagar</div>
+      <div class="col-md-3 gs saldo-gs" align="right"><small>Gs.</small> <%= format_int(@saldo_gs)%></div>
+      <div class="col-md-3 us saldo-us" align="right"><small>U$</small> <%= format_decimal(@saldo_us)%></div>
+      <div class="col-md-3 rs saldo-rs" align="right"><small>R$</small> <%= format_decimal(@saldo_rs)%></div>
+    </div>
+  </footer>
+</div>

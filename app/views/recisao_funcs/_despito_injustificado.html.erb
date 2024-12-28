@@ -1,0 +1,136 @@
+<div class="row">
+  <div class="col-md-8">
+    <div class="panel">
+      <header class="panel-heading">
+        Liquidación de Haberes
+      </header>
+    <% if @recisao_func.antiguedad_meses.to_i == 0 %>
+    <% aguinaldo_mes = 1 %>
+    <% else %>
+    <% aguinaldo_mes = (@recisao_func.data_saida.to_date.strftime('%m').to_i)   %>
+    <% end %>
+
+    <table>
+      <tr>
+        <td width="250">Salario <b><%= @recisao_func.dias_trabalhados %></b> trabajados</td>
+        <td width="200" align="right"><b><%= format_int( sl = @recisao_func.dias_trabalhados.to_i * (@recisao_func.salario_mensal.to_f / 30)) %></b></td>
+      </tr>
+
+      <% dias_preaviso = 0 %>
+      <% if @recisao_func.antiguedad_ano.to_i <= 1 %>
+        <% dias_preaviso = 30 %>
+      <% elsif @recisao_func.antiguedad_ano.to_i > 1 and @recisao_func.antiguedad_ano.to_i <= 5 %>
+        <% dias_preaviso = 45 %>
+      <% elsif @recisao_func.antiguedad_ano.to_i > 5 and @recisao_func.antiguedad_ano.to_i <= 10 %>
+        <% dias_preaviso = 60 %>
+      <% elsif @recisao_func.antiguedad_ano.to_i > 10 %>
+        <% dias_preaviso = 90 %>
+      <% end %>
+    <% tot_sueld_6_meses = SueldosDetalhe.where("tipo in ('SUELDO', 'VACACIONES') and persona_id = #{@recisao_func.persona_id} AND data BETWEEN  '#{@recisao_func.data_saida - 6.months}' and '#{@recisao_func.data_saida}'") %>
+
+    <% media_sueld_6_meses = ( (tot_sueld_6_meses.sum("credito_gs") + sl.to_f) / (tot_sueld_6_meses.size.to_i + 1) ) %>    
+
+      <tr>
+        <td>Pre-aviso <b> <%= dias_preaviso %> días </b></td>
+        <td width="300" align="right"><b><%= format_int(pre = ( media_sueld_6_meses.to_f / 30) * dias_preaviso.to_i) %></b></td>
+      </tr>
+
+
+        <% dias_indenizao = 0 %>
+        <% if  @recisao_func.antiguedad_ano.to_f >= 10 %>
+          <% dias_indenizao = 30 %>
+        <% else %>
+          <% dias_indenizao = 15 %>
+        <% end %>
+
+
+      <% if @recisao_func.antiguedad_ano.to_i == 0 %>
+        <% aguinaldo_ano = 1 %>
+      <% else %>
+        <% aguinaldo_ano = @recisao_func.antiguedad_ano.to_i %>
+      <% end %>
+      <tr>
+        <td>Indenización <b> <%= dias_indenizao %> días x <%=aguinaldo_ano %> años</b></td>
+        <td width="300" align="right"><b><%= format_int( indenizacao = ( media_sueld_6_meses.to_f / 30) * (dias_indenizao.to_f * aguinaldo_ano.to_f )) %></b></td>
+      </tr>
+
+
+      <% agui_prop =  SueldosDetalhe.where("persona_id = #{@recisao_func.persona_id} and tipo in ('SUELDO', 'VACACIONES' )").sum(:credito_gs) %>
+      <% ad =  Adelanto.where("documento_id = 19 and persona_id = #{@recisao_func.persona_id}").sum(:valor_guarani) %>
+
+      <% tot_sueld_ano = SueldosDetalhe.where("tipo in ('SUELDO', 'VACACIONES') and persona_id = #{@recisao_func.persona_id} AND data BETWEEN  '#{@recisao_func.data_saida.to_date.strftime('%Y')}-01-01' and '#{@recisao_func.data_saida.to_date.strftime('%Y').to_i}-#{@recisao_func.data_saida.to_date.strftime('%m')}-20'").sum("credito_gs") %>
+      <tr>
+        <td>Aguinaldo proporcional</td>
+        <td width="300" align="right"><b><%= format_int(agui = (tot_sueld_ano.to_f + sl.to_f) / 12 ) %></b></td>
+      </tr>
+
+      <tr>
+        <td>Vacaciones Causadas</td>
+        <td width="300" align="right">--</td>
+      </tr>
+
+      <tr>
+        <td>Vacaciones Propocionales</td>
+        <td width="300" align="right"><b><%= format_int( vac_pro = (@recisao_func.salario_mensal.to_f / 30) * @recisao_func.vacaciones_prop.to_i) %></b></td>
+      </tr>
+
+      <tr>
+        <td>SUB-TOTAL</td>
+        <td width="300" align="right"><b><%= format_int(sl.to_f + agui.to_f + vac_pro.to_f + pre.to_f + indenizacao.to_f) %></b></td>
+      </tr>
+
+
+      <tr>
+        <td>(-) Descuento IPS</td>
+        <td width="300" align="right"><b><%= format_int( ips = (sl.to_f + vac_pro.to_f + pre.to_f + indenizacao.to_f) * 0.09 ) %></b></td>
+      </tr>
+
+      <tr>
+        <td><b>TOTAL A PAGAR</b></td>
+        <td width="300" align="right"><b><%= format_int( @saldo = (sl.to_f + agui.to_f + vac_pro.to_f + pre.to_f + indenizacao.to_f) - ips.to_f ) %></b></td>
+      </tr>
+    </table>
+  </div>
+
+  </div>
+  <% if params[:action] == 'show' %>
+  <div class="col-md-4">
+    <div class="panel">
+      <header class="panel-heading">
+        Sueldo Últimos 6 meses
+      </header>
+    <div class="panel-content" align="center">
+    <table>
+      <% tot = 0 %>
+    <% SueldosDetalhe.where("tipo in ('SUELDO', 'VACACIONES') and persona_id = #{@recisao_func.persona_id} AND data BETWEEN  '#{@recisao_func.data_saida - 6.months}' and '#{@recisao_func.data_saida}'").order('data').each do |s| %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td width="80"><%= s.data.strftime("%d/%m/%y") %></td>
+        <td width="50"><%= s.tipo %></td>
+        <td width="100" align="right"><%= format_int(s.credito_gs) %></td>
+      </tr>
+      <% tot += s.credito_gs.to_f %>
+    <% end %>
+    <tr>
+      <td></td>
+    </tr>
+    <tr class="head">
+      <td>Total</td>
+      <td></td>
+      <td align="right"><%= format_int(tot) %></td>
+    </tr>
+    <tr class="head">
+      <td>Média 6 meses</td>
+      <td></td>
+      <td align="right"><%= format_int(tot.to_f / 6) %></td>
+    </tr>
+    <tr class="head">
+      <td>Valor dia</td>
+      <td></td>
+      <td align="right"><%= format_int( (tot.to_f / 6) / 30 ) %></td>
+    </tr>
+    </table>
+    </div>
+  </div>
+  </div>
+  <% end %>
+</div>

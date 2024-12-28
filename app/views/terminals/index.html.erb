@@ -1,0 +1,28 @@
+<h1 id="header">Terminales de <%= t('SALE') %></h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_terminal_path, :class => "button add" %>
+</div>
+
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="110" align="center"><%= t('CODE') %></td>
+      <td width="400">Nombre</td>
+      <td width="200">Secuencia Factura</td>
+    </tr>
+  </table>
+
+  <div class="rolagem" dir="div">
+    <table>
+      <% @terminals.each do |terminal| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="110" align="center"><%= terminal.id.to_s.rjust(6,'0') %></td>
+          <td width="400"><%= terminal.nome %></td>
+          <td width="200"><%= terminal.documento_numero_01 %>-<%= terminal.documento_numero_02 %></td>
+          <td><%= link_to '', edit_terminal_path(terminal), class: 'icon-pencil' %></td>
+          <td><%= link_to '', terminal, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

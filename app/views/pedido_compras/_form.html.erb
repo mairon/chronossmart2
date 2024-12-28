@@ -1,0 +1,129 @@
+<body onload="ImputFocus('pedido_compra_data_3i')">
+	<%= form_for(@pedido_compra) do |f| %>
+		<% if @pedido_compra.errors.any? %>
+			<div id="error_explanation">
+				<h2><%= pluralize(@pedido_compra.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+				<ul>
+					<% @pedido_compra.errors.full_messages.each do |msg| %>
+						<li>
+							<%= msg %>
+						</li>
+					<% end %>
+				</ul>
+			</div>
+		<% end %>
+
+		<ul class="tabs">
+			 <li><a href="#tab1">Pedido Compras - [<%= t('EDITION') %>]</a></li>
+		</ul>
+
+		<div class="tab_container">
+			 <div id="tab1" class="tab_content">
+				 <table>
+					 <tr>
+						 <td>
+							 <fieldset>
+								<table>
+									<tr>
+										<td align="right"><%= t('DATE') %>:</td>
+										<td> <%= f.date_select :data %></td>
+									</tr>
+									<tr>
+										<td><%= t('COIN') %>:</td>
+										<td colspan="4">
+											 <fieldset>
+													<%= f.radio_button :moeda, 0, :Checked => "True",:onblur => "MoedaCompra('0')"%> U$
+													<%= f.radio_button :moeda, 1, :onblur  => "MoedaCompra('1')" %> G$.
+													<%= f.radio_button :moeda, 2, :onblur  => "MoedaCompra('1')" %> R$.
+											 </fieldset>
+										</td>
+								 	</tr>
+									<tr>
+										<td>Tipo:</td>
+										<td colspan="4">
+											 <fieldset>
+													<%= f.radio_button :tipo_pedido, 1, :Checked => "True" %> Pedido
+													<%= f.radio_button :tipo_pedido, 0 %> Presupuesto
+											 </fieldset>
+										</td>
+									</tr>
+									<tr>
+										<td align="right">Nrº Documento:</td>
+										<td><%= f.text_field :documento_numero, size: 15 %></td>
+									</tr>
+								</table>
+							 </fieldset>
+						 </td>
+					 </tr>
+					 <tr>
+						 <td colspan="2">
+							 <fieldset>
+								 <table>
+									 <tr>
+										 <td align="right">Requerente:</td>
+										 <td colspan="3">
+										 <%= f.collection_select :requerente_id, Persona.all( :select => 'id,nome',
+																 :conditions => ["tipo_funcionario = 1"],
+																 :order  => '2' ),:id, :nome, {prompt: "Seleccione el Requerente"}, {class: 'selc_medium'} %>
+										 </td>
+									 </tr>
+									 <tr>
+										 <td align="right">Transportadora:</td>
+										 <td colspan="3">
+										 <%= f.collection_select :transportadora_id, Persona.all( :select => 'id,nome',
+																 :conditions => ["tipo_trans = 1"],
+																 :order  => '2' ),:id, :nome, {prompt: "Seleccione la Transportadora"}, {class: 'selc_medium'} %>
+										 </td>
+									 </tr>
+									 <tr>
+										 <td align="right">Proveedor:</td>
+										 <td colspan="3">
+											<%= f.text_field :persona_nome, size: 72 %>
+											<%= f.hidden_field :persona_id %>
+											<a href="#" title="novo Cliente" class="button" onclick="Novo()">+</a>
+										 </td>
+									 </tr>
+								 </table>
+							 </fieldset>
+						 </td>
+					 </tr>
+					 <tr>
+						<td align="left" valign="top" colspan="2"><%= f.text_area :descricao, cols: 95, rows: 5, placeholder: 'Concepto:' %></td>
+					 </tr>
+				 </table>
+			 </div>
+			 <div class="buttons">
+				<%= f.submit 'Seguir',:disable_with => "Aguarde...", :class => "button", "data-plus-as-tab" => "false" %>
+				<%= link_to t('BACK'), pedido_compras_path, :class => "button back" %>
+			 </div>
+		</div>
+	</body>
+<% end %>
+
+<script type="text/javascript">
+	$(function() {
+		$( "#pedido_compra_persona_nome" ).autocomplete({
+			source: function( request, response ) {
+				$.ajax({
+					url: "/personas/busca",
+					dataType: "json",
+					data: {
+						tipo: 'DESCRIPCION',
+						per:  'PROVEEDOR',
+						busca: request.term
+					},
+					success: function( data ) {
+						response( data );
+					},
+				});
+			},
+			minLength: 2,
+			change: function( event, ui ) {
+				$("#pedido_compra_persona_id").val("");
+				$('#pedido_compra_persona_id').val(ui.item.id);
+				return false;
+			}
+		});
+	});
+</script>

@@ -1,0 +1,159 @@
+  <div class="group">
+      <%= form_tag busca_persona_venda_personas_path, :method => "get" do %>
+        <div class="input-group" style="margin-top: 15px">
+          <span class="input-group-btn">
+            <button type="button" class="btn btn-default" >
+              <i class="icon-search" aria-hidden="true"></i>
+            </button>
+          </span>
+          <input id="busca" name="busca" type="search" value="<%= params[:busca]%>" placeholder="Busce por RUC/CI, NOMBRE ou NOMBRE FANTASIA/TELEFONE" onKeyUp="pesquisa(document.getElementById('busca').value)" size="60" autocapitalize="off" autocomplete="off" autocorrect="off" autofocus />
+          <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinner", :width => 21, :height => 21, :style =>"display: none;" ) %>
+        </div>
+      <% end %>
+  </div>
+  <br>
+  <div class="group">
+    <div id="pagina">
+    </div>
+  </div>
+
+  <% if params[:tela] == 'PDV' %>
+
+
+    <script language="javascript">
+      function Fecha(id,nome){
+        window.opener.document.getElementById('venda_persona_nome').value        = nome;
+        window.opener.document.getElementById('venda_persona_id').value          = id;
+        window.opener.document.getElementById("venda_persona_nome").focus();
+        self.close();
+      }
+    </script>
+  <% else %>
+    <script language="javascript">
+      function Fecha(id,nome,ruc){
+
+        window.opener.document.getElementById('venda_persona_nome').value        = nome;
+        window.opener.document.getElementById('venda_persona_id').value          = id;
+
+        window.opener.document.getElementById('persona_nome').value    = nome;
+        window.opener.document.getElementById('persona_id').value      = id;
+
+        window.opener.document.getElementById('ruc').value             = ruc;
+
+        window.opener.document.getElementById("venda_persona_nome").focus();
+
+        self.close();
+      }
+    </script>
+  <% end %>
+
+    <script language="javascript">
+      function pesquisa(valor)
+
+      {
+
+        //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+        url="/personas/busca_persona_venda?busca="+valor+"&commit=Buscar";
+
+        ajax(url);
+
+      }
+
+
+      function ajax(url)
+
+      {
+
+        $('#spinner').show();
+
+        //alert(nick);
+
+        //alert(dest);
+
+        //alert(msg);
+
+
+
+        req = null;
+
+        // Procura por um objeto nativo (Mozilla/Safari)
+
+        if (window.XMLHttpRequest) {
+
+          req = new XMLHttpRequest();
+
+          req.onreadystatechange = processReqChange;
+
+          req.open("GET",url,true);
+
+          req.send(null);
+
+          // Procura por uma versão ActiveX (IE)
+
+        } else if (window.ActiveXObject) {
+
+          req = new ActiveXObject("Microsoft.XMLHTTP");
+
+          if (req) {
+
+
+
+            req.onreadystatechange = processReqChange;
+
+            req.open("GET",url,true);
+
+
+
+            req.send();
+
+          }
+
+        }
+
+      }
+
+
+
+      function processReqChange()
+
+      {
+
+
+
+        // apenas quando o estado for "completado"
+
+        if (req.readyState == 4) {
+
+
+
+          // apenas se o servidor retornar "OK"
+
+
+
+          if (req.status ==200) {
+
+
+
+            // procura pela div id="pagina" e insere o conteudo
+
+            // retornado nela, como texto HTML
+
+
+            onSuccess:$('#spinner').hide();
+            document.getElementById('pagina').innerHTML = req.responseText;
+
+
+
+          } else {
+
+            alert("Houve um problema ao obter os dados:n" + req.statusText);
+
+          }
+
+        }
+
+      }
+    </script>
+  </div>
+</body>

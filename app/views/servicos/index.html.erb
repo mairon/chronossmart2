@@ -1,0 +1,35 @@
+<h1 id="header">Serviços</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_servico_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td width="120"><%= t('NAME') %></td>
+            <td width="120">Descricao</td>
+            <td width="100">Tipo</td>
+            <td width="60"><%= t('VALUE') %></td>
+            <td width="80"><%= t('DATE') %> inicio</td>
+            <td width="80"><%= t('DATE') %> final</td>
+            <td width="100">Obs</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @servicos.each do |servico| %>
+      <tr>
+                  <td width="120"><%= servico.nome %></td>
+                  <td width="120"><%= servico.descricao %></td>
+                  <td width="100"><%= servico.tipo %></td>
+                  <td width="60"><%= servico.valor %></td>
+                  <td width="80"><%= servico.data_inicio %></td>
+                  <td width="80"><%= servico.data_final %></td>
+                  <td width="100"><%= servico.obs %></td>
+                <td><%= link_to 'Editar', edit_servico_path(servico) %></td>
+        <td><%= link_to t('DELETE'), servico, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

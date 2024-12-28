@@ -1,0 +1,109 @@
+
+<style type="text/css">
+	/* The whole thing */
+	.custom-menu {
+		display: none;
+		z-index: 1000;
+		position: absolute;
+		overflow: hidden;
+		border: 1px solid #CCC;
+		white-space: nowrap;
+		font-family: sans-serif;
+		background: #FFF;
+		color: #333;
+		border-radius: 5px;
+		padding: 0;
+	}
+
+	/* Each of the items in the list */
+	.custom-menu li {
+		padding: 8px 12px;
+		cursor: pointer;
+		list-style-type: none;
+		transition: all .3s ease;
+	}
+
+	.custom-menu li:hover {
+		background-color: #DEF;
+	}
+</style>
+
+<div id="wrapper" style="position: fixed;">
+	<!--<div class="overlay"></div>-->
+		<!-- Sidebar -->
+	<nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation" style="margin-top: 45px;">
+		<ul class="nav sidebar-nav">
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" style="font-size: 13px;">Favoritos
+					<span class="caret"></span>
+				</a>
+				<ul class="dropdown-menu" role="menu" id="favoritos">
+					<li class="dropdown">
+						<input type="hidden" id="usuario_id" value="<% current_user.id %>">
+						<a id="add_favorites"  style="font-size:13px"> Adicionar aos Favoritos
+							<span class="glyphicon glyphicon-star" style="color:yellow"></span>
+						</a>
+					</li>
+					<% menu = UsuarioPerfil.where("usuario_id = #{current_user.id } and favorito = 1").order('menus.nome').includes(:menu).select('menu_id, codigo') %>
+					<% menu.each do |m| %>
+					<li   id="<%= m.menu_id %>">
+						<a class="dropdown-toggle" href="<%= m.menu.url %>">
+							 <%= m.menu.nome %>
+						</a>
+					</li>
+					<% end %>
+				</ul>
+			</li>
+			<li>
+				<a href="#" data-toggle="dropdown"  style="font-size: 13px;">Dashboard <span class="caret"></span></a>
+			</li>
+		</ul>
+	</nav>
+	<!-- /#sidebar-wrapper -->
+
+	<!-- Page Content -->
+	<div id="page-content-wrapper">
+		<button type="button" class="hamburger is-closed" data-toggle="offcanvas">
+			<span class="hamb-top"></span>
+			<span class="hamb-middle"></span>
+			<span class="hamb-bottom"></span>
+		</button>
+	</div>
+
+</div>
+
+
+<script type="text/javascript">
+	$(function(){
+		$("#add_favorites").click(function(e){
+			$.ajax({
+				url: "/usuario_perfils/add_favorite",
+				type: "GET",
+				dataType: "json",
+				data: {
+					path_name: window.location.pathname
+				},
+				success: function(data){
+					$("<li id='" + data["menu_favorito"].menu_id + "'><a class='dropdown-toggle' href='" + data["menu_favorito"].url + "'>" + data["menu_favorito"].nome + " </a> </li>").appendTo('#favoritos').show('slow');
+					$(".dropdown").attr("class","dropdown open");
+				}
+			});
+		});
+
+		$(".remove_favorite").click(function(){
+			alert
+			$.ajax({
+				url: "/usuario_perfils/remove_favorite",
+				type: "GET",
+				data: {
+					menu_id: $(this).attr('id')
+				},
+				success: function(){
+					$(this).attr('id').toggle('in');
+				}
+			});
+		});
+	});
+
+
+</script>

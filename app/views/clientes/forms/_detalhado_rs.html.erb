@@ -1,0 +1,80 @@
+   <table>
+      <% quebra       = "" %>
+      <% subdivida    = 0 %>
+      <% subcobro     = 0 %>
+      <% subsaldo     = 0 %>
+      <% totdivida    = 0 %>
+      <% totdivida    = 0 %>
+      <% subint       = 0 %>
+      <% totdividaint = 0 %>
+      <% totint       = 0 %>
+      <% subdividaint = 0 %>
+      <% totcobro     = 0 %>
+      <% count        = 0 %>
+      <% @clientes.each do |cliente| %>
+         <% if quebra != cliente.persona_nome  %>
+
+            <% if quebra != "" %>
+               <%subsaldo = subdivida.to_f - subcobro.to_f %>
+               <tr class="head">
+                  <td colspan="6"></td>
+              		<td align="right"><%= format_decimal(subdivida) %></td>
+              		<td align="right"><%= format_decimal(subcobro) %></td>
+              		<td align="right"><%= format_decimal(subdivida.to_f - subcobro.to_f) %></td>
+             			<% subdivida    = 0 %>
+      		        <% subcobro     = 0 %>
+               </tr>              
+            <% end %>
+            <tr>
+              <td colspan="1"></td>
+              <td class="head" colspan="10"><%= cliente.persona_id %> - <%= quebra = cliente.persona_nome %>  - Ruc/CI <%= cliente.ruc %> - Tel.: <%= cliente.telefone %>  </td>
+            </tr>
+
+         <% end %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="50" align="center"><%= cliente.data.strftime("%d/%m/%y")%> </td>
+              <td width="100" align="left"><small><%= cliente.centro_custo_nome %></small></td>
+              <td width="250" align="left"><small><%= cliente.descricao %></small></td>
+              <td width="80"><%=h cliente.documento_numero%> </td>
+              <td width="15" align="center"><%= cliente.cota %>/<%= cliente.tot_cotas %> </td>
+              <td width="50" align="center"><%= cliente.vencimento.strftime("%d/%m/%y") %> </td>
+          	  <td width="70" align="right"><%= format_decimal(cliente.divida_real )%> </td>
+	            <% subdivida    += cliente.divida_real.to_f %>
+              <td width="70" align="right"><%= format_decimal(cliente.cobro_real)%> </td>
+              <td width="70" align="right"></td>
+         </tr>
+         
+         <%  subcobro     += cliente.cobro_real.to_f %>
+         <%  totdivida    += cliente.divida_real.to_f %>
+         <%  totcobro     += cliente.cobro_real.to_f %>
+         <%  count        += 1 %>
+
+      <% end %>
+
+      <% subsaldo = subdivida.to_f - subcobro.to_f %>
+
+      <tr class="head" >
+        <td colspan="6"></td>
+    		<td align="right"><%= format_decimal(subdivida) %></td>
+    		<td align="right"><%= format_decimal(subcobro) %></td>
+    		<td align="right"><%= format_decimal((subdivida.to_f + subcobro.to_f)) %></td>
+   			<% subdivida    = 0 %>
+        <% subcobro     = 0 %>
+      </tr>
+      
+      <tr class="head"   height="50" >
+        <td colspan="5">Anteriro : <%= format_decimal( @saldo_anterior) %></td>      
+        <td>Total:</td>
+     		<td align="right"><%= format_decimal(totdivida) %></td>
+    		<td align="right"><%= format_decimal(totcobro) %></td>
+     		<td align="right"><%= format_decimal((totdivida.to_f - totcobro.to_f) + @saldo_anterior.to_f) %></td> 
+      </tr>
+   </table>
+
+
+
+
+
+
+
+

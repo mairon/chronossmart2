@@ -1,0 +1,56 @@
+<div class="group">  
+  <table class="head_grid">
+    <tr>
+      <td width="250">Deposito</td>
+      <td width="400">Producto</td>
+      <td width="60" align="right">Ctd.</td>
+      <td width="70" align="right">Unit.</td>
+      <td width="70" align="right">Tot.</td>
+    </tr>
+  </table>
+  <% qtd = 0 %>
+  <% tot = 0 %>
+  <div class="rolagem" dir="div" style="height: 150px">
+    <table>
+       <% nota_credito_proveedor_produtos.each do |nc| %>
+          <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="250"><%= nc.deposito_nome %></td>
+              <td width="400"><%= nc.produto_nome %></td>
+              <td width="60" align="right"><%= format_int(nc.quantidade ) %></td>
+              <% qtd += nc.quantidade.to_f %>
+              <% if @nota_credito_proveedor.moeda.to_i == 0 %>
+                <td width="70" align="right">   <%= format_decimal(nc.unitario_dolar) %></td>
+                <td width="70" align="right">   <%= format_decimal(nc.total_dolar) %></td>
+                <% tot += nc.total_dolar.to_f %>
+              <% elsif @nota_credito_proveedor.moeda.to_i == 1 %>
+                <td width="70" align="right">   <%= format_int(nc.unitario_guarani) %></td>
+                <td width="70" align="right">   <%= format_int(nc.total_guarani) %></td>
+                <% tot += nc.total_guarani.to_f %>
+              <% else %>
+                <td width="70" align="right">   <%= format_decimal(nc.unitario_real) %></td>
+                <td width="70" align="right">   <%= format_decimal(nc.total_real) %></td>               
+                <% tot += nc.unitario_real.to_f %>
+              <% end %>
+              <td><%= link_to '', nc, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+          </tr>
+       <% end %>
+    </table>
+  </div>
+  <table class="head_grid">
+    <% if @nota_credito_proveedor.moeda.to_i == 1 %>
+    <tr>
+      <td width="640"></td>
+      <td width="70" align="right"><b><%= format_int(qtd) %></b></td>
+      <td width="70" align="center"></td>
+      <td width="70" align="right"><b><%= format_int(tot) %></b></td>
+    </tr>
+    <% else %>
+    <tr>
+      <td width="640"></td>
+      <td width="70" align="right"><b><%= format_int(qtd) %></b></td>
+      <td width="70" align="center"></td>
+      <td width="70" align="right"><b><%= format_decimal(tot) %></b></td>
+    </tr>
+    <% end %>
+  </table>
+</div>

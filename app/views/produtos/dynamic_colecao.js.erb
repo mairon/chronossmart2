@@ -1,0 +1,11 @@
+$('#produto_fabricante_id').empty();
+
+<% for ne in @sub_grupos %>
+  $('#produto_fabricante_id').append($("<option></option>").attr("value",<%= ne.persona_id %>).text('<%= ne.persona.nome %>').change());
+<% end %>
+
+$('#produto_colecao_id').empty();
+
+<% for ne in @personas %>
+  $('#produto_colecao_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+<% end %>

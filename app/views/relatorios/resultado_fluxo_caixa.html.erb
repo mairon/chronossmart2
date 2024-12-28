@@ -1,0 +1,5 @@
+<% if params[:visao] == '0' %>
+  <%= render 'relatorios/forms/fluxo_caixa_proj_diario' %>
+<% else %>
+  <%= render 'relatorios/forms/fluxo_caixa_proj_mensal' %>
+<% end %>

@@ -1,0 +1,224 @@
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <h1 id="header">
+        <div class="pull-left">
+          <% tot_etapas = Negocio.where("etapa_id in (?)", @pipeline.etapas.map(&:id) ) %>
+          <%= select("busca", "pipeline", Pipeline.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...', selected: @pipeline.id }, {style: "border:none"}) %>
+          
+        </div>
+
+        <script type="text/javascript">
+          $(document).ready(function() {
+            $('#busca_pipeline').change(function() {
+              window.location.replace("/crm/pipelines/" + $("#busca_pipeline").val() );
+            });
+          });
+        </script>
+
+        <div class="pull-right">
+          <span class="us"> U$ <%= format_decimal(NegocioProduto.joins(:negocio).where("negocios.etapa_id in (?) and negocios.moeda = 0", @pipeline.etapas.map(&:id)).sum("negocio_produtos.tot_us")) %> </span> |
+          <span class="gs"> Gs. <%= format_int(NegocioProduto.joins(:negocio).where("negocios.etapa_id in (?) and negocios.moeda = 1", @pipeline.etapas.map(&:id)).sum("negocio_produtos.tot_gs")) %> </span> |
+          <%= tot_etapas.count(:id) %> Negocios</small>
+
+          <%= link_to " Oportunidad", '#', class: 'btn add', 'data-toggle' => "modal", 'data-target' => "#form_modal", 'data-dismiss' => "modal", 'aria-labe' => "Close" %>
+
+
+          <% if @usuario_pipe.permissao.to_i == 0 %>
+            <a href="/crm/pipelines/<%= @pipeline.id %>/configs" class="btn btn-blue">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="margin-top: 2px" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings "><g><circle cx="14" cy="14" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></g></svg>
+            </a>
+          <% end %>
+        </div>
+      </h1>
+    </div>
+  </div>
+</div>
+
+<% if @usuario_pipe.permissao.to_i == 2 %>
+  <% card_view_user = "and usuario_id = #{@usuario_pipe.usuario_id}" %>
+<% else %>
+  <% card_view_user = "" %>
+<% end %>
+
+<div class="row bord-stpes">  
+  <% @steps.each do |s| %>
+    <div class=" bord-steps">
+      <div class="panel">
+        <!-- Default panel contents -->
+        <div class="pipe-steps-title">
+          <div class="contact-action">
+            <header class="panel-title">
+              <%= s.nome %>
+              <div class="pull-right">
+                <% negocio_counts = Negocio.where("etapa_id = #{s.id} and status = 0 #{card_view_user}") %>
+              </div>            
+            </header>
+            <smal> 
+              <span class="us"> U$ <%= format_decimal(NegocioProduto.joins(:negocio).where("negocios.status = 0 and negocios.etapa_id = #{s.id} and negocios.moeda = 0").sum("negocio_produtos.tot_us")) %> </span> |
+              <span class="gs"> Gs. <%= format_int(NegocioProduto.joins(:negocio).where("negocios.status = 0 and negocios.etapa_id = #{s.id} and negocios.moeda = 1").sum("negocio_produtos.tot_gs")) %> </span> |
+               <%= negocio_counts.count(:id) %> Negocios</small>
+          </div>
+        </div>
+        
+        <div class="pipe-steps connectedSortable" id="sortable<%= s.id %>" data-box-id="<%= s.id %>">
+          
+          <% Negocio.where("etapa_id = #{s.id} and status = 0 #{card_view_user}").each do |n| %>
+
+          <%= link_to crm_negocio_path(n), id: n.id do %>
+            <div class="card-step " id="<%= n.id %>">
+              <div class="card-title"><%= n.titulo %></div>
+              <div class="card-cliente"><%= n.persona.nome %></div>
+              <div class="avatar-vend" data-toggle="tooltip" data-placement="top" title="<%= n.usuario.usuario_nome %>"><%= n.usuario.usuario_nome[0..1] %></div>
+              <div class="negocio_tarefa">
+                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#5076ff"><path d="M576.23-240Q536-240 508-267.77q-28-27.78-28-68Q480-376 507.77-404q27.78-28 68-28Q616-432 644-404.23q28 27.78 28 68Q672-296 644.23-268q-27.78 28-68 28ZM216-96q-29.7 0-50.85-21.5Q144-139 144-168v-528q0-29 21.15-50.5T216-768h72v-96h72v96h240v-96h72v96h72q29.7 0 50.85 21.5Q816-725 816-696v528q0 29-21.15 50.5T744-96H216Zm0-72h528v-360H216v360Zm0-432h528v-96H216v96Zm0 0v-96 96Z"/></svg>
+                <div class="negocio_tarefa_count"><%= n.tarefas.count(:id)%></div>
+              </div>
+
+              <% if n.moeda.to_i == 0 %>
+                <div class="amount us"> U$. <%= format_decimal(n.negocio_produtos.sum(:tot_us)) %></div>
+              <% else %>
+                <div class="amount gs">Gs. <%= format_int(n.negocio_produtos.sum(:tot_gs)) %></div>
+              <% end %>              
+              
+            </div> 
+            <% end %>
+          <% end %>
+        </div>
+      </div>  
+    </div>
+  <% end %>
+
+
+  <div class=" bord-steps">
+    <div class="panel">
+      <!-- Default panel contents -->
+      <div class="pipe-steps-title">
+        <div class="contact-action">
+          <header class="panel-title">
+            <span class="us">Aprovado</span>
+            <div class="pull-right">
+              <% negocio_counts = Negocio.where("status = 1 #{card_view_user}") %>
+            </div>            
+          </header>
+          <smal> 
+            <span class="us"> U$ <%= format_decimal(NegocioProduto.joins(:negocio).where("negocios.status = 1 and negocios.moeda = 0").sum("negocio_produtos.tot_us")) %> </span> |
+            <span class="gs"> Gs. <%= format_int(NegocioProduto.joins(:negocio).where("negocios.status = 1 and negocios.moeda = 1").sum("negocio_produtos.tot_gs")) %> </span> |
+             <%= negocio_counts.count(:id) %> Negocios</small>
+        </div>
+      </div>
+
+      <div class="pipe-steps connectedSortable">
+        <% Negocio.where("status = 1 #{card_view_user}").each do |n| %>
+        <%= link_to crm_negocio_path(n), id: n.id do %>
+          <div class="card-step " id="<%= n.id %>">
+            <div class="card-title"><%= n.titulo %></div>
+            <div class="card-cliente"><%= n.persona.nome %></div>
+            <div class="avatar-vend">MB</div>
+            <div class="negocio_tarefa">
+              <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#5076ff"><path d="M576.23-240Q536-240 508-267.77q-28-27.78-28-68Q480-376 507.77-404q27.78-28 68-28Q616-432 644-404.23q28 27.78 28 68Q672-296 644.23-268q-27.78 28-68 28ZM216-96q-29.7 0-50.85-21.5Q144-139 144-168v-528q0-29 21.15-50.5T216-768h72v-96h72v96h240v-96h72v96h72q29.7 0 50.85 21.5Q816-725 816-696v528q0 29-21.15 50.5T744-96H216Zm0-72h528v-360H216v360Zm0-432h528v-96H216v96Zm0 0v-96 96Z"/></svg>
+              <div class="negocio_tarefa_count"><%= n.tarefas.count(:id)%></div>
+            </div>
+
+            <% if n.moeda.to_i == 0 %>
+              <div class="amount us"> U$. <%= format_decimal(n.negocio_produtos.sum(:tot_us)) %></div>
+            <% else %>
+              <div class="amount gs">Gs. <%= format_int(n.negocio_produtos.sum(:tot_gs)) %></div>
+            <% end %>              
+            
+          </div> 
+          <% end %>
+        <% end %>
+      </div>
+    </div>  
+  </div>
+
+
+  <div class=" bord-steps">
+    <div class="panel">
+      <!-- Default panel contents -->
+      <div class="pipe-steps-title">
+        <div class="contact-action">
+          <header class="panel-title">
+            <span class="gs">Rechazado</span>
+            <div class="pull-right">
+              <% negocio_counts = Negocio.where("status = 2 #{card_view_user}") %>
+            </div>            
+          </header>
+          <smal> 
+            <span class="us"> U$ <%= format_decimal(NegocioProduto.joins(:negocio).where("negocios.status = 2 and negocios.moeda = 0").sum("negocio_produtos.tot_us")) %> </span> |
+            <span class="gs"> Gs. <%= format_int(NegocioProduto.joins(:negocio).where("negocios.status = 2 and negocios.moeda = 1").sum("negocio_produtos.tot_gs")) %> </span> |
+             <%= negocio_counts.count(:id) %> Negocios</small>
+        </div>
+      </div>
+
+      <div class="pipe-steps connectedSortable">
+        <% Negocio.where("status = 2 #{card_view_user}").each do |n| %>
+        <%= link_to crm_negocio_path(n), id: n.id do %>
+          <div class="card-step " id="<%= n.id %>">
+            <div class="card-title"><%= n.titulo %></div>
+            <div class="card-cliente"><%= n.persona.nome %></div>
+            <div class="avatar-vend">MB</div>
+            <div class="negocio_tarefa">
+              <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#5076ff"><path d="M576.23-240Q536-240 508-267.77q-28-27.78-28-68Q480-376 507.77-404q27.78-28 68-28Q616-432 644-404.23q28 27.78 28 68Q672-296 644.23-268q-27.78 28-68 28ZM216-96q-29.7 0-50.85-21.5Q144-139 144-168v-528q0-29 21.15-50.5T216-768h72v-96h72v96h240v-96h72v96h72q29.7 0 50.85 21.5Q816-725 816-696v528q0 29-21.15 50.5T744-96H216Zm0-72h528v-360H216v360Zm0-432h528v-96H216v96Zm0 0v-96 96Z"/></svg>
+              <div class="negocio_tarefa_count"><%= n.tarefas.count(:id)%></div>
+            </div>
+
+            <% if n.moeda.to_i == 0 %>
+              <div class="amount us"> U$. <%= format_decimal(n.negocio_produtos.sum(:tot_us)) %></div>
+            <% else %>
+              <div class="amount gs">Gs. <%= format_int(n.negocio_produtos.sum(:tot_gs)) %></div>
+            <% end %>              
+            
+          </div> 
+          <% end %>
+        <% end %>
+      </div>
+    </div>  
+  </div>
+</div>
+
+
+
+<script>
+  $(function() {
+    $('<%= @steps.map  { |t| '#sortable' + t.id.to_s }.join(', ') %>').sortable({
+      connectWith: ".connectedSortable",
+      start: function() {
+          origin_step_id = $(this).attr("data-box-id")
+        },    
+      receive: function(event, ui) {
+        var it = ui.item.attr('id')
+        $.ajax({
+          type: "POST",
+          url: "/crm/negocios/draggable",
+          data: {
+            "deal_id": it,
+            "origin_step_id": origin_step_id,
+            "step_id": $(this).attr("data-box-id")
+          }, success: function(){
+            //colocar contagem de deals nos pipes #count-deals + id
+          }
+        });
+      }
+    }).disableSelection();
+  });
+</script>
+
+
+<div class="modal fade" id="form_modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 400px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('NEW') %> <span class="cota"></span></h4>
+      </div>
+      <div class="modal-body">
+        <%= render 'crm/negocios/form' %>
+      </div>
+    </div>
+  </div>
+</div>

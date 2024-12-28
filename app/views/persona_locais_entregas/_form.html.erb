@@ -1,0 +1,84 @@
+<%= form_for(@persona_locais_entrega) do |f| %>
+  <% if @persona_locais_entrega.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@persona_locais_entrega.errors.count, "error") %> prohibited this @persona_locais_entrega from being saved:</h2>
+
+      <ul>
+      <% @persona_locais_entrega.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= f.hidden_field :persona_id %>
+
+   <div>
+      <ul class="tabs">
+        <li><a href="#tab2">Locais Entrega(Obras)</a></li>
+      </ul>
+
+      <div class="tab_container">
+            <div id="tab1" class="tab_content">
+              <table>
+                <tr>
+                  <td align="right"><%= t('DATE') %> :</td>
+                  <td><%= f.date_select :data %></td>
+                  <td align="right"><%= t('NAME') %>:</td>
+                  <td><%= f.text_field :nome, :size => 60 %></td>
+                </tr>                  
+                <tr>
+                  <td align="right">CEP:</td>
+                  <td><%= f.text_field :cep, :size => 20 %></td>
+                  <td align="right" >N.:</td>
+                  <td><%= f.text_field :nr, :size => 5 %></td>
+
+                </tr>              
+                <tr>
+                  <td align="right">Pais:</td>
+                  <td><%= f.collection_select :paise_id, Paise.all(:select => 'id,nome',
+                                                                     :order => '2'),:id,
+                                                                     :nome, {prompt: 'Selecione o pais'} %>
+                  </td>
+                  <td align="right">Depart.:</td>
+                  <td><%= f.collection_select :estado_id, Estado.all(:select => 'id,nome', :order => '2'),:id, :nome, {prompt: 'Selecione o Estado'} %></td>
+                </tr>
+                <tr>
+                  <td align="right">Cidade:</td>
+                  <td><%= f.collection_select :cidade_id, Cidade.all(:select => 'id,nome',
+                                                                     :order => '2'), :id, :nome, {prompt: 'Selecione a cidade'} %></td>
+
+
+                  <td align="right">Região:</td>
+                  <td><%= f.collection_select :regiao_id, Regiao.all(:select => 'id,nome',
+                                                                     :order => '2'), :id, :nome, {prompt: 'Selecione a regiao'} %></td>
+
+                </tr>
+                <tr>  
+                  <td align="right">Endereço:</td>
+                  <td  colspan="8"><%= f.text_field :direcao, :size => 65 %></td>
+                </tr>
+
+                <tr>
+                  <td align="right" valign="top">Complemento :</td>
+                  <td colspan="8"><%= f.text_area :obs, :cols => 65, :rows => 3 %></td>
+                </tr>
+                <tr>
+                  <td align="right">Concluir Obra:</td>
+                  <td><%= f.check_box :status %></td>
+
+                  <td align="right"><%= t('DATE') %> Conclusão :</td>
+                  <td><%= f.date_select :data_conclusao %></td>
+                </tr>                  
+
+              </table>
+          </div>
+         <div class="buttons">
+         <%= f.submit :value => t('SAVE'), :class => "button" %>
+           <%= link_to 'Voltar', local_entregas_persona_path(@persona_locais_entrega.persona_id), :class => "button back" %> 
+           
+         </div>
+
+        </div>
+
+   </div>
+            <% end %>

@@ -1,0 +1,202 @@
+<!-- MODELO LISTADO DE COMICAO LUXUS!-->
+<table>
+	<% tot = 0 %>
+	<% sub_tot_pedido_qtd   = 0 %>
+	<% sub_tot_pedido_valor = 0 %>
+	<% sub_tot_fat_qtd      = 0 %>
+	<% sub_tot_fat_valor    = 0 %>
+	<% sub_tot_cobro        = 0 %>
+	<% sub_tot_comi         = 0 %>
+	<% tot_vsp_v            = 0 %>
+	<% tot_vsp_c            = 0 %>
+	<% tot_vsp_g            = 0 %>
+
+	<% @empl.each do |ep| %>
+	<tr class="head">
+		<td width="40" align="center"><%= ep.id.to_s.rjust(6,'0') %></td>		
+		<td width="200"><%= ep.nome %></td>
+		<td width="200"><%= ep.departamento %></td>
+		<td width="50" align="right"><%= ep.comissao.to_f %>%</td>
+	</tr>
+	<% if current_unidade.id == 1 %>
+	<% if ep.origem_comissao.to_i == 0 %>
+	<tr>
+		<td colspan="8">
+			<table>
+					<% sql ="SELECT 
+											      C.DATA,
+											      (SELECT P.VENDEDOR_ID FROM VENDAS_PRODUTOS VP INNER JOIN PRESUPUESTOS P ON P.ID = VP.PRESUPUESTO_ID WHERE VP.VENDA_ID = CD.VENDA_ID LIMIT 1) AS VENDEDOR,
+											      CD.COBRO_DOLAR,
+											      C.PERSONA_ID,
+											      C.PERSONA_NOME,
+											      CD.COTA,
+											      CD.VENDA_ID,
+											      C.ID,
+											      V.PEDIDO,
+											      V.DOCUMENTO_NUMERO
+											FROM COBROS_DETALHES CD
+											INNER JOIN COBROS C
+											ON C.ID = CD.COBRO_ID
+											LEFT JOIN VENDAS V
+											ON V.ID = CD.VENDA_ID
+											WHERE V.PEDIDO = 1 AND C.UNIDADE_ID = 1 AND C.DATA  BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND	'#{params[:final].split("/").reverse.join("-")}'
+											AND CD.VENDA_ID > 0
+											AND (SELECT P.VENDEDOR_ID FROM VENDAS_PRODUTOS VP INNER JOIN PRESUPUESTOS P ON P.ID = VP.PRESUPUESTO_ID WHERE VP.VENDA_ID = CD.VENDA_ID LIMIT 1)  = #{ep.id}
+											ORDER BY 2,1
+											"%>
+					<% detalhe = CobrosDetalhe.find_by_sql(sql) %>
+					<% detalhe.each do |d| %>
+		        <tr class = "<%= cycle("cor1", "cor2") %>">
+		        	<td width="30" align="center"><%= d.venda_id.to_s.rjust(4,'0') %></td>
+		        	<td width="45" align="center"><%= d.data.to_date.strftime("%d/%m/%y") %></td>
+		        	<td width="600">CRED.COBRADO DOC: <%= d.documento_numero %> <%= d.persona_nome %> </td>
+			        <td width="60" align="right"><%= format_decimal( d.cobro_dolar.to_i ) %></td>
+			        <td width="70" align="right"><%= format_decimal( (d.cobro_dolar.to_i.to_f * (ep.comissao.to_f ) / 100) ) %></td>
+		        </tr>
+						<% sub_tot_cobro        += d.cobro_dolar.to_i.to_f %>
+						<% sub_tot_comi         += ((d.cobro_dolar.to_i.to_f * ep.comissao.to_f) / 100) %>
+
+	        <% end %>
+					<tr class="head">
+						<td colspan="3"></td>
+						<td width="70" align="right"><%= format_decimal( sub_tot_cobro.to_f) %></td>
+						<td width="70" align="right"><%= format_decimal( sub_tot_comi.to_f) %></td>
+					</tr>
+					<% sub_tot_cobro        = 0 %>
+					<% sub_tot_comi         = 0 %>
+
+			</table>
+		</td>
+	</tr>
+	<% else %>
+
+	<tr>
+		<td colspan="8">
+			<table>
+	<% 	sqlvsp = "SELECT 
+								       V.ID,
+								       V.TIPO AS TIPO,
+								       V.DOCUMENTO_NUMERO AS DOC,
+								       CB.DATA AS DATA_COBRO,
+								       V.DATA,
+								       V.VENDEDOR_ID,
+								       V.PERSONA_NOME,
+								       (SELECT SUM(VP.TOTAL_DOLAR) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID) AS TOTAL_FACT_US,
+								       CB.COBRO_DOLAR AS TOT_US ,
+								       CB.COBRO_GUARANI AS TOT_GS
+								FROM COBROS_DETALHES CB
+								INNER JOIN VENDAS V
+								ON V.ID = CB.VENDA_ID
+								AND V.VENDEDOR_ID = #{ep.id}
+								AND CB.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND	'#{params[:final].split("/").reverse.join("-")}'
+								ORDER BY 5,3" %>
+		<% detalhe_vsp = CobrosDetalhe.find_by_sql(sqlvsp) %>
+		<% detalhe_vsp.each do |d| %>
+	    <tr class = "<%= cycle("cor1", "cor2") %>">
+	    	<td width="40" align="center"><%= d.id.to_s.rjust(6,'0') %></td>
+	    	<td width="50" align="center"><%= d.data_cobro.to_date.strftime("%d/%m/%y") %></td>
+	    	<td width="240"><%= d.persona_nome %> FACT: <%= d.doc %> - <%= format_decimal(d.total_fact_us) %></td>
+	    	<% if d.tipo.to_i == 0 %>
+	    		<td width="100">CONTADO </td>
+	    		<td width="70" align="right">0</td>
+	    		<td width="70" align="right">0</td>
+	    		<td width="70" align="right">0</td>
+	    		<td width="70" align="right"><%= format_decimal( d.tot_us.to_f) %></td>
+	    		<td width="70" align="right">0</td>
+	    		<td width="70" align="right">0</td>
+	    		<td width="70" align="right">0</td>
+	    		<td width="70" align="right"><%= format_decimal( (d.tot_us.to_f * (ep.comissao.to_f ) / 100) ) %></td>
+					<% tot_vsp_v += d.tot_us.to_f %>
+	    	<% else %>
+	    		<td width="100">CRED.COBRADO </td>
+	    		<td width="70" align="right">0</td>
+	    		<td width="70" align="right">0</td>
+	    		<td width="70" align="right">0</td>
+	    		<td width="70" align="right">0</td>
+	    		<td width="70" align="right">0</td>
+	    		<td width="70" align="right">0</td>
+	    		<td width="70" align="right"><%= format_decimal( d.tot_us.to_f) %></td>
+	    		<td width="70" align="right"><%= format_decimal( (d.tot_us.to_f * (ep.comissao.to_f ) / 100) ) %></td>
+					<% tot_vsp_c += d.tot_us.to_f %>
+	    	<% end %>	    	
+	    	<% tot_vsp_g += (d.tot_us.to_f * (ep.comissao.to_f ) / 100) %>
+	    </tr>
+		<% end %>
+			<tr class="head">
+				<td colspan="4">Total ==></td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right"><%= format_decimal( tot_vsp_v.to_f) %></td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right"><%= format_decimal( tot_vsp_c.to_f) %></td>
+				<td width="70" align="right"><%= format_decimal( tot_vsp_g.to_f) %></td>
+			</tr>
+
+			</table>
+		</td>
+	</tr>
+
+	
+	<% end %>
+
+	<!-- comissao de vendas sem pedido -->
+	<% else %>
+	<tr>
+		<td colspan="8">
+			<table>
+	<% 	sqlvsp = "SELECT 
+								       V.ID,
+								       V.TIPO AS TIPO,
+								       CB.DATA AS DATA_COBRO,
+								       V.DATA,
+								       V.VENDEDOR_ID,
+								       V.PERSONA_NOME,
+								       CB.COBRO_DOLAR,
+								       CB.COBRO_GUARANI AS TOT_GS
+								FROM COBROS_DETALHES CB
+								INNER JOIN VENDAS V
+								ON V.ID = CB.VENDA_ID
+								AND V.VENDEDOR_ID = #{ep.id}
+								AND CB.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND	'#{params[:final].split("/").reverse.join("-")}'
+								ORDER BY 5,3" %>
+		<% detalhe_vsp = CobrosDetalhe.find_by_sql(sqlvsp) %>
+		<% detalhe_vsp.each do |d| %>
+	    <tr class = "<%= cycle("cor1", "cor2") %>">
+	    	<td width="40" align="center"><%= d.id.to_s.rjust(6,'0') %></td>
+	    	<td width="50" align="center"><%= d.data_cobro.to_date.strftime("%d/%m/%y") %></td>
+	    	<td width="240"><%= d.persona_nome %></td>
+	    	<% if d.tipo.to_i == 0 %>
+	    		<td width="100">CONTADO </td>
+	    		<td width="70" align="right"><%= format_int( d.tot_gs.to_f) %></td>
+	    		<td width="70" align="right">0</td>
+	    		<td width="70" align="right"><%= format_int( (d.tot_gs.to_f * (ep.comissao.to_f ) / 100) ) %></td>
+					<% tot_vsp_v += d.tot_gs.to_f %>
+	    	<% else %>
+	    		<td width="100">CREDITO COBRADO </td>
+	    		<td width="70" align="right">0</td>
+	    		<td width="70" align="right"><%= format_int( d.tot_gs.to_f) %></td>
+	    		<td width="70" align="right"><%= format_int( (d.tot_gs.to_f * (ep.comissao.to_f ) / 100) ) %></td>
+					<% tot_vsp_c += d.tot_gs.to_f %>
+	    	<% end %>	    	
+	    	<% tot_vsp_g += (d.tot_gs.to_f * (ep.comissao.to_f ) / 100) %>
+	    </tr>
+		<% end %>
+			<tr class="head">
+				<td colspan="4">Total ==></td>
+				<td width="70" align="right"><%= format_int( tot_vsp_v.to_f) %></td>
+				<td width="70" align="right"><%= format_int( tot_vsp_c.to_f) %></td>
+				<td width="70" align="right"><%= format_int( tot_vsp_g.to_f) %></td>
+			</tr>
+
+			</table>
+		</td>
+	</tr>
+
+	<% end %>
+	<tr>
+		<td height="30"></td>
+	</tr>
+	<% end %>
+</table>

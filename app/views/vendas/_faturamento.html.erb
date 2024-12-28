@@ -1,0 +1,325 @@
+<% if current_unidade.id == 1 %>
+
+<script type="text/javascript" src="/qz/js/qz-tray.js"></script>
+<script type="text/javascript" src="/qz/js/dependencies/rsvp-3.1.0.min.js"></script>
+<script src="https://cdn.rawgit.com/kjur/jsrsasign/c057d3447b194fa0a3fdcea110579454898e093d/jsrsasign-all-min.js"></script>
+<script type="text/javascript" src="/qz/js/dependencies/sha-256.min.js"></script>
+
+<!-- Pollyfills -->
+<script type="text/javascript" src="/qz/js/sample/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/qz/js/sample/bootstrap.min.js"></script>
+
+
+<script type="text/javascript" src="/qz/js/sample/promise-polyfill-8.1.3.min.js"></script>
+<script type="text/javascript" src="/qz/js/sample/whatwg-fetch-3.0.0.min.js"></script>
+<script type="text/javascript" src="/qz/js/sample/padstart-pollyfill.js"></script>
+<script type="text/javascript" src="/qz/js/sample/array-from-pollyfill.js"></script>
+<script src="/qz/assets/signing/sign-message.js"></script>
+
+<script>
+	qz.websocket.connect();
+
+	qz.security.setCertificatePromise(function(resolve, reject) {
+	   fetch("/qz/assets/signing/digital-certificate.txt", {cache: 'no-store', headers: {'Content-Type': 'text/plain'}})
+	      .then(function(data) { data.ok ? resolve(data.text()) : reject(data.text()); });
+	});    
+ 
+
+    /// Connection ///
+    function launchQZ() {
+        if (!qz.websocket.isActive()) {
+            window.location.assign("qz:launch");
+            //Retry 5 times, pausing 1 second between each attempt
+            startConnection({ retries: 5, delay: 1 });
+        }
+    }
+
+    function startConnection(config) {
+        var host = $('#connectionHost').val().trim();
+        var usingSecure = $("#connectionUsingSecure").prop('checked');
+
+        // Connect to a print-server instance, if specified
+        if (host != "" && host != 'localhost') {
+            if (config) {
+                config.host = host;
+                config.usingSecure = usingSecure;
+            } else {
+                config = { host: host, usingSecure: usingSecure };
+            }
+        }
+
+        if (!qz.websocket.isActive()) {
+            updateState('Waiting', 'default');
+
+            qz.websocket.connect(config).then(function() {
+                updateState('Active', 'success');
+                findVersion();
+            }).catch(handleConnectionError);
+        } else {
+            displayMessage('An active connection with QZ already exists.', 'alert-warning');
+        }
+    }
+
+    function endConnection() {
+        if (qz.websocket.isActive()) {
+            qz.websocket.disconnect().then(function() {
+                updateState('Inactive', 'default');
+            }).catch(handleConnectionError);
+        } else {
+            displayMessage('No active connection with QZ exists.', 'alert-warning');
+        }
+    }
+
+
+    function listNetworkDevices() {
+        var listItems = function(obj) {
+            var html = '';
+            var labels = { mac: 'MAC', ip: 'IP', up: 'Up', ip4: 'IPv4', ip6: 'IPv6', primary: 'Primary' };
+
+            Object.keys(labels).forEach(function(key) {
+                if (!obj.hasOwnProperty(key)) { return; }
+                if (key !== 'ip' && obj[key] == obj['ip']) { return; }
+
+                var value = obj[key];
+                if (key === 'mac') { value = obj[key].match(/.{1,2}/g).join(':'); }
+                if (typeof obj[key] === 'object') { value = value.join(', '); }
+
+                html += '<li><strong>' + labels[key] + ':</strong> <code>' + value + '</code></li>';
+            });
+
+            return html;
+        };
+
+        qz.networking.devices().then(function(data) {
+            var list = '';
+
+            for(var i = 0; i < data.length; i++) {
+                var info = data[i];
+
+                if (i == 0) {
+                    list += "<li>" +
+                        "   <strong>Hostname:</strong> <code>" + info.hostname + "</code>" +
+                        "</li>" +
+                        "<li>" +
+                        "   <strong>Username:</strong> <code>" + info.username + "</code>" +
+                        "</li>";
+                }
+                list += "<li>" +
+                    "   <strong>Interface:</strong> <code>" + (info.name || "UNKNOWN") + (info.id ? "</code> (<code>" + info.id + "</code>)" : "</code>") +
+                    "   <ul>" + listItems(info) + "</ul>" +
+                    "</li>";
+            }
+
+            pinMessage("<strong>Network details:</strong><ul>" + list + "</ul>");
+        }).catch(displayError);
+    }	
+</script>
+<% unless @fts.last.nil? %>
+	<% @ft = FormFiscal.find_by_id(@fts.last.id)  %>
+	<script>	
+		function print1(id){
+		  qz.printers.find('EPSON LX-350 ESC/P').then((found) => {
+		     var config = qz.configs.create('EPSON LX-350 ESC/P');
+
+	var printData = [
+
+	        '\x1B' + '\x40', // init
+	        '\x1B' + '\x4D' + '\x31', // normal text
+	        '\x1B' + '\x61' + '\x30', // left align
+
+	        '\x0A \x0A \x0A \x0A \x0A',
+
+	        '<%= ''.to_s.ljust(65, ' ') %><%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc %>/<%= @ft.cod_proc %>' + '\x0A',
+	        '<%= ''.to_s.ljust(15, ' ') %><%= @ft.data.strftime("%d").to_s.ljust(2, ' ') %> de <%= l @ft.data, :format => :mes %> de <%= @ft.data.strftime("%Y").to_s.ljust(2, ' ') %>',
+
+	        '<% if @venda.tipo.to_i == 0 %>',
+	          '<%= 'X'.to_s.rjust(26, ' ') %>',
+	        '<% else %>',
+	          '<%= 'X'.to_s.rjust(32, ' ') %>',
+	        '<% end %>' + '\x0A',
+
+	        '<%= ''.to_s.ljust(5, ' ') %><%= @ft.ruc %> \x0A',
+	        '<%= ''.to_s.ljust(18, ' ') %><%= @ft.persona_nome %> <%= ' '.to_s.rjust(30, ' ') %> tel<%= @ft.persona.telefone %> \x0A',
+	        '<%= ''.to_s.ljust(10, ' ') %><%= @ft.persona.direcao %> - <%= @ft.persona.cidade.nome unless @ft.persona.cidade_id.blank? %> \x0A',
+
+	        '<% qtd    = 0 %>',
+	        '<% tot_us = 0 %>',
+	        '<% tot_gs = 0 %>',
+	        '<% tot_rs = 0 %>',
+	        '<% tot_ex = 0 %>',
+	        '<% tot_05 = 0 %>',
+	        '<% tot_10 = 0 %>',
+
+	        '\x0A \x0A',
+
+	        '<% produtos_count = VendasProduto.find_by_sql('select count(id) from vendas_produtos where venda_id = ' + @venda.id.to_s ).first %>',
+
+	        '<% @venda.vendas_produtos.each do |vp|%>',
+	          '<%= ''.to_s.ljust(2,' ') %> <%= (vp.produto_id.to_i).to_s.ljust(10, ' ') %>',
+	          '<%= (vp.quantidade.to_i).to_s.ljust(5, ' ') %>',
+	          '<%= vp.produto_nome.to_s.ljust(40, ' ').first(30) %>',
+	            '<%= format_int(vp.unitario_guarani.to_f).to_s.rjust(13, ' ') %>',
+	            '<% if vp.produto.taxa.to_i == 0 %>',
+	              '<%= format_int(vp.total_guarani.to_f).to_s.rjust(4, ' ') %>',
+	              '<%= '0'.to_s.rjust(10, ' ') %>',
+	              '<%= '0'.to_s.rjust(18, ' ') %>',
+	              '<% tot_ex += vp.total_guarani.to_f %>',
+
+	            '<% elsif vp.produto.taxa.to_i == 5 %>',
+
+	              '<%= '0'.to_s.rjust(4, ' ') %>',
+	              '<%= format_int(vp.total_guarani.to_f).to_s.rjust(10, ' ') %>',
+	              '<%= '0'.to_s.rjust(18, ' ') %>',
+	              '<% tot_05 += vp.total_guarani.to_f %>',
+
+	            '<% elsif vp.produto.taxa.to_i == 10 %>',
+	              '<%= '0'.to_s.rjust(4, ' ') %>',
+	              '<%= '0'.to_s.rjust(10, ' ') %>',
+	              '<%= format_int(vp.total_guarani.to_f).to_s.rjust(18, ' ') %>',
+	              '<% tot_10 += vp.total_guarani.to_f %>',
+	            '<% end %>',
+
+	          '\x0A',
+	          '<% qtd += vp.quantidade.to_i %>',
+	          '<% tot_gs += vp.total_guarani.to_f %>',
+	        '<% end %>',
+
+	        '<% min_prod = 7 %>',
+
+	        '<% altura = min_prod - produtos_count.count.to_i %>',
+
+	        '<% altura.times.each do |vp| %>',
+	          '\x0A',
+	        '<% end %>',
+	        '\x0A \x0A',
+
+	        '<%= format_int(tot_ex).to_s.to_s.rjust(65, ' ') %>',
+	        '<%= format_int(tot_05).to_s.to_s.rjust(12, ' ') %>',
+	        '<%= format_int(tot_10).to_s.to_s.rjust(16, ' ') %>',
+
+	        '\x0A',
+	        '\x0A',
+
+	        '<%= '   '.to_s.rjust(20, ' ') %>',
+	        '<%= I18n.with_locale(:es) { @produto_sum_guarani.to_i.to_words.upcase.to_s[0..30].ljust(57, ' ')  } %>',
+	        '<%= format_int(tot_gs).rjust(15, ' ') %>',
+
+	        '<%= I18n.with_locale(:es) { @produto_sum_guarani.to_i.to_words.upcase.to_s[31..60]  } %> \x0A',
+
+	        '<%= format_int(tot_05.to_f / 21 ).to_s.rjust(22, ' ').ljust(25, ' ') %>',
+	        '<%= format_int(tot_10.to_f / 11 ).to_s.rjust(22, ' ').ljust(35, ' ') %>',
+	        '<%= format_int( (tot_05.to_f / 21) + (tot_10.to_f / 11) ).to_s.rjust(12, ' ').ljust(5, ' ') %>',
+	        '\x0A ',
+
+	        ];
+
+					
+		      return qz.print(config, printData);
+		  }).catch((e) => {
+		      alert(e);
+		  })
+		};
+		</script>
+		<% end %>
+	<% end %>
+
+
+  <div class="panel">
+    <div class="panel-content">
+      <h1>Factura  <a href="#" data-toggle="modal" data-target="#modal-faturamento" class="btn btn-green" style="padding: 5px 10px; float: right; "> +</a></h1>
+
+<table class="head_grid">
+  <tr>
+    <td width="100">Lanz.</td>
+    <td width="100">Factura</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div" style="height: 80px">
+  <table>  
+    <% @fts.each do |ft| %>
+    <% if ft.status == 2 %>
+      <% color = '#fa3e40' %>
+    <% end %>
+
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td  width="100"  bgcolor="<%=color%>"><%= ft.id %></td>
+        <td  width="100"  bgcolor="<%=color%>"><%= ft.doc_01 %>.<%= ft.doc_02 %>.<%= ft.doc %></td>
+        <% if ft.status == 1 %>
+          <td>
+          	<% if current_user.tipo.to_i == 0 %>
+          		<%= link_to 'Anular', form_anula_nc_form_fiscal_path(ft, status: '2') %>
+          	<% end %>
+        	</td>
+          <td>
+          	<% if current_unidade.id == 1 %>
+          		<%= link_to 'Re-imprimir', "#",  :onclick => "MultiplaFaturaVenda(#{ft.id})" %>
+          	<% else %>
+          		<%= link_to 'Re-imprimir', "#",  :onclick => "print1(#{ft.id})" %>
+          	<% end %>
+
+          	
+          </td>
+        <% end %>
+        <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0') %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+  <div class="modal fade" id="modal-faturamento" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="close-button">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <h1 class="modal-title-f" id="myModalLabelf">Datos de la Factura</h1>
+        </div>
+        <div class="modal-body">
+
+
+					<% unless @fts.present? %>
+						<%= render partial: "form_fiscals/attr_forms/venda_update_ft" %>
+					<% else %>
+						<% if @fts.first.status.to_i != 1 %>
+							<%= render partial: "form_fiscals/attr_forms/venda_update_ft" %>
+						<% end %>
+
+						<!-- controle de impressao !-->
+						<% if @fts.first.status.to_i == 1 and @fts.first.impressao.to_i == 0 and @fts.first.autorizacao == true %>
+							<script type="text/javascript">
+								function MultiplaFaturaVenda(){
+									window.open('/form_fiscals/' + <%= @fts.first.id %> +'/impressao_ft', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+
+								    $.ajax({
+								    		type: "POST",
+								        url: '/form_fiscals/'+ <%= @fts.first.id %> +'/update_impressao',
+								        data: 'id=' + <%= @fts.first.id %>,
+								        dataType: 'script'
+								    })
+
+								}
+								window.onload = MultiplaFaturaVenda;
+							</script>
+						<% else %>
+							<script type="text/javascript">
+								function MultiplaFaturaVenda(id){
+									window.open('/form_fiscals/' + id +'/impressao_ft', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+								    $.ajax({
+								    		type: "POST",
+								        url: '/form_fiscals/'+ id +'/update_impressao',
+								        data: 'id=' + id,
+								        dataType: 'script'
+								    })
+								}
+							</script>
+						<% end %>
+					<% end %>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+	</div>
+</div>

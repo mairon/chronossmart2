@@ -1,0 +1,19 @@
+<ul>
+  <% @mesas.each do |m| %>
+    <% if m.status_op.to_i == 1 %>
+        <li class="list_mesas_off" align="center">
+          <p class="title-card"><%= m.nome %></p>
+          <p>Itens:</p>
+          <p><%= link_to image_tag("add.png"), venda_path(m.venda_id) unless m.venda_id.nil? %></p>
+        </li>
+    <% else %>
+      <li class="list_mesas_on">
+        <p  class="title-card">
+          <a href="/vendas/new?cartao_nome=<%= m.nome %>&cartao_id=<%= m.id %>&tipo_venda=0&status_op=1&nome_ref=SALAO">
+           <%= m.nome %>
+          </a>
+        </p>
+      </li>
+    <% end %>
+  <% end %>
+</ul>

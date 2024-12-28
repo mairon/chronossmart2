@@ -1,0 +1,111 @@
+<%= form_for(@lista_carga) do |f| %>
+  <% if @lista_carga.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@lista_carga.errors.count, "error") %> prohibited this lista_carga from being saved:</h2>
+
+      <ul>
+      <% @lista_carga.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> Lista de Cargas - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+                <table>
+                  <tr>
+                    <td align="right"><%= t('DATE') %> Emissión:</td>
+                    <td colspan="4"><%= f.date_select :data_emisao %></td>
+                  </tr>
+                  <tr>                                      
+                    <td align="right">Veiculo:</td>                    
+                    <td colspan="4"><%= f.collection_select :rodado_id, ListaCarga.veiculos_disponiveis,:id, :placa, {prompt: "Selecione lo Veiculo", required: true }, {class: 'selc_medium'} %></td>
+                  </tr>
+                  <tr>                                      
+                    <td align="right">Chofer:</td>                    
+                    <td colspan="4"><%= f.collection_select :motorista_id, ListaCarga.chofer_disponiveis,:id, :nome, {prompt: "Selecione lo Chofer", required: true }, {class: 'selc_medium'} %></td>
+                  </tr>
+                  <tr>
+                    <td align="right">Ajudantes:</td>
+                      <td colspan="3">
+                          <%= f.collection_select :persona_ids, Persona.select('id,nome').where('tipo_funcionario = 1'), :id, :nome, {}, {:multiple => true, class: "pre-selected-options"} %>
+                      </td>
+                  </tr>
+
+                  <tr>
+                    <td align="right"><%= t('DATE') %> Salida:</td>
+                    <td><%= f.date_select :data_saida %></td>
+                    <td align="right">Retorno:</td>
+                    <td><%= f.date_select :data_retorno %></td>
+                  </tr>
+                  <tr>
+                    <td align="right">Horário Previsto Salida:</td>
+                    <td><%= f.time_select :prev_saida %></td>
+                    <td align="right">Retorno:</td>
+                    <td><%= f.time_select :prev_chegada, include_blank: true %></td>
+                  </tr>
+
+                  <% if params[:action] == 'edit' %>
+                    <tr>
+                      <td align="right">Horário:</td>
+                      <td><%= f.time_select :horas_saida, include_blank: true %></td>
+                      <td align="right">Retorno:</td>
+                      <td><%= f.time_select :horas_retorno, include_blank: true %></td>
+                    </tr>
+                  <% end %>
+
+                  <tr>
+                    <td align="right">KM Salida:</td>
+                    <td><%= f.text_field :km_saida %></td>
+                    <td align="right">Retorno:</td>
+                    <td><%= f.text_field :km_retorno %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right"></td>
+                    <td colspan="4"><%= f.text_area :obs, rows:5, cols: 61, placeholder: 'Concepto:' %></td>
+                  </tr>
+                  <% if params[:action] == 'edit' %>
+                    <tr>
+                      <td align="right"></td>
+                      <td colspan="4"><%= f.check_box :status %> Finalizado?</td>
+                    </tr>
+                  <% end %>
+                </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit "Seguir", disable_with: "Aguarde...", "data-plus-as-tab" => "false", class: "button add" %> 
+        <%= link_to t('BACK'), lista_cargas_path, :class => "button back" %>        
+      </div>
+    </div>
+<% end %>
+
+<script type="text/javascript">
+  
+  $(document).ready(function () {
+
+    jQuery.validator.setDefaults({
+      success: "valid"
+    });
+
+    $('form').validate({
+      rules: {
+      "lista_carga[rodado_id]": {required: true},
+      "lista_carga[cidade_id]": {required: true}
+      }
+    });
+  });
+
+</script>

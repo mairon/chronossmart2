@@ -1,0 +1,650 @@
+<h1 align="right" id="header">Cierre de Caja</h1>
+
+<ul class="tabs">
+	<li>
+		<a href="#tab1">Cierre de Caja - [<%= t('EDITION') %>]</a>
+	</li>
+</ul>
+
+<div class="tab_container">
+	<div class="group">
+		Cierre de Caja N.: <%= @fechamento_caixa.id %> |
+		Fecha : <%= @fechamento_caixa.data.strftime("%d/%m/%Y") %>  as <%= @fechamento_caixa.created_at.strftime("%H:%M")%>|
+		Usuario : <%= @fechamento_caixa.usuario_nome %> |
+		Caja : <%= @fechamento_caixa.conta_nome %>
+	</div>
+	<!--SELECTS!-->
+	<div class="group">
+		<table>
+			<tr>
+				<td>
+					<fieldset>
+					<legend>Movimentacion en lo Sistema</legend>
+					<table>
+						<tr>
+							<td width="100" align="right">En Efetivo :</td>
+							<td width="120" align="right"><%= number_to_currency( efetivo_us = ( Financa.sum(" entrada_dolar - saida_dolar",:conditions => ["moeda = 0 AND data <= '#{@fechamento_caixa.data}' AND ESTADO = 0 AND CONTA_ID = #{@fechamento_caixa.conta_id} AND CHEQUE_STATUS <> 1"])), :format=>' %n ', :separator => "," ) %></td>
+                            <%  dif_eft_us = (efetivo_us.to_f - @fechamento_caixa.entrada_efetivo_dolar.to_f) %>					     
+							<% if dif_eft_us <= 5.00 and dif_eft_us >= -5.00 %>					   
+                              <td><font color="green"><span class="save"></span></font></td>
+                            <% else %>  
+                              <td><font color="red"><span class="delete"></span></font></td>
+                            <% end %>  
+
+                            <td>Gs.:</td>
+
+							<td width="120" align="right"><%= number_to_currency( efetivo_gs = ( Financa.sum(" entrada_guarani - saida_guarani",:conditions => ["moeda = 1 AND data <= '#{@fechamento_caixa.data}' AND ESTADO = 0 AND CONTA_ID = #{@fechamento_caixa.conta_id} AND CHEQUE_STATUS <> 1"])), :format=>' %n ', :precision => 0 ) %></td>
+							<%  dif_eft_gs = (efetivo_gs.to_f - @fechamento_caixa.entrada_efetivo_guarani.to_f) %>					     
+							<% if dif_eft_gs <= 10000.00 and dif_eft_gs >= -10000.00 %>
+                              <td><font color="green"><span class="save"></span></font></td>
+                            <% else %>  
+                              <td><font color="red"><span class="delete"></span></font></td>
+                            <% end %>  
+
+						</tr>
+
+						<tr>
+							<td width="100" align="right">Viatico :</td>
+							<td width="120" align="right"><%= number_to_currency( viatico_us = ( Financa.sum(" entrada_dolar ", :conditions => ["moeda = 0 AND data <= '#{@fechamento_caixa.data}' AND ESTADO = 0 AND CONTA_ID = #{@fechamento_caixa.conta_viatico_id} AND CHEQUE_STATUS = 0"])), :format=>' %n ', :separator => "," ) %></td>
+                            <%  dif_vt_us = (viatico_us.to_f - @fechamento_caixa.saida_efetivo_dolar.to_f) %>					     
+							<% if dif_vt_us <= 5.00 and dif_vt_us >= -5.00 %>					   
+                              <td><font color="green"><span class="save"></span></font></td>
+                            <% else %>  
+                              <td><font color="red"><span class="delete"></span></font></td>
+                            <% end %>  
+
+                            <td>Gs.:</td>
+
+							<td width="120" align="right"><%= number_to_currency( viatico_gs = ( Financa.sum(" entrada_guarani", :conditions => ["moeda = 1 AND data <= '#{@fechamento_caixa.data}' AND ESTADO = 0 AND CONTA_ID = #{@fechamento_caixa.conta_viatico_id} AND CHEQUE_STATUS = 0"])), :format=>' %n ', :precision => 0 ) %></td>
+							<%=  dif_vt_gs = ( viatico_gs.to_f - @fechamento_caixa.saida_efetivo_guarani.to_f) %>					     
+							<% if dif_vt_gs <= 10000.00 and dif_vt_gs >= -10000.00 %>
+                              <td><font color="green"><span class="save"></span></font></td>
+                            <% else %>  
+                              <td><font color="red"><span class="delete"></span></font></td>
+                            <% end %>  
+
+						</tr>
+
+
+						<tr>
+							<td width="100" align="right">Cheque Dia U$ :</td>
+							<td width="100" align="right">
+							  (<%= number_to_currency( sis_qtd_entr_dia = ( Financa.count(:cheque, :distinct => 'CHEQUE', :conditions => ["moeda = 0 AND DATA <= '#{@fechamento_caixa.data}' AND ENTRADA_DOLAR > 0 AND DIFERIDO <= '#{@fechamento_caixa.data}' AND ESTADO = 0 AND ENTRADA_DOLAR + SAIDA_DOLAR != 0 AND CONTA_ID = #{@fechamento_caixa.conta_id} AND CHEQUE_STATUS = 1"])), :format=>' %n ', :precision => 0 ) %>)
+							  <%= number_to_currency( sis_entr_dia_us = ( Financa.sum("entrada_dolar",:conditions => ["moeda = 0 AND DATA <= '#{@fechamento_caixa.data}' AND DIFERIDO <= '#{@fechamento_caixa.data}' AND ESTADO = 0 AND ENTRADA_DOLAR + SAIDA_DOLAR != 0 AND CONTA_ID = #{@fechamento_caixa.conta_id}  AND CHEQUE_STATUS = 1"])), :format=>' %n ', :separator => "," ) %>
+							</td>
+							<% if sis_entr_dia_us ==  @fechamento_caixa.entrada_cheq_dia_dolar.to_f %>
+                              <td><font color="green"><span class="save"></span></font></td>
+                            <% else %>  
+                              <td><font color="red"><span class="delete"></span></font></td>
+                            <% end %>  
+
+                            <td>Gs.:</td>
+
+							<td width="100" align="right">
+							  (<%= number_to_currency( sis_qtd_entr_dia = ( Financa.count(:cheque, :distinct => 'CHEQUE', :conditions => ["moeda = 1 AND DATA <= '#{@fechamento_caixa.data}' AND ENTRADA_DOLAR > 0 AND DIFERIDO <= '#{@fechamento_caixa.data}' AND ESTADO = 0 AND ENTRADA_DOLAR + SAIDA_DOLAR != 0 AND CONTA_ID = #{@fechamento_caixa.conta_id} AND CHEQUE_STATUS = 1"])), :format=>' %n ', :precision => 0 ) %>)
+							  <%= number_to_currency( sis_entr_dia_gs = ( Financa.sum("entrada_guarani",:conditions => ["moeda = 1 AND DATA <= '#{@fechamento_caixa.data}' AND DIFERIDO <= '#{@fechamento_caixa.data}' AND ESTADO = 0 AND ENTRADA_DOLAR + SAIDA_DOLAR != 0 AND CONTA_ID = #{@fechamento_caixa.conta_id}  AND CHEQUE_STATUS = 1"])), :format=>' %n ', :precision => 0 ) %>
+							</td>
+
+							<% if sis_entr_dia_gs ==  @fechamento_caixa.entrada_cheq_dia_guarani.to_f %>
+                              <td><font color="green"><span class="save"></span></font></td>
+                            <% else %>  
+                              <td><font color="red"><span class="delete"></span></font></td>
+                            <% end %>  
+
+						</tr>
+
+						<tr>
+							<td width="100" align="right">Cheque Dif U$ :</td>
+
+							<td width="100" align="right">
+							  (<%= number_to_currency(Financa.count(:cheque, :distinct => 'CHEQUE', :conditions => ["moeda = 0 AND DATA <= '#{@fechamento_caixa.data}' AND ENTRADA_DOLAR > 0 AND DIFERIDO > '#{@fechamento_caixa.data}' AND ESTADO = 0 AND ENTRADA_DOLAR + SAIDA_DOLAR != 0 AND CONTA_ID = #{@fechamento_caixa.conta_id} AND CHEQUE_STATUS = 1"]), :format=>' %n ', :precision => 0 ) %>)
+							  <%= number_to_currency( sis_entr_dif_us = ( Financa.sum("entrada_dolar",:conditions => ["moeda = 0 AND DATA <= '#{@fechamento_caixa.data}' AND DIFERIDO > '#{@fechamento_caixa.data}' AND ESTADO = 0 AND ENTRADA_DOLAR + SAIDA_DOLAR != 0 AND CONTA_ID = #{@fechamento_caixa.conta_id} AND CHEQUE_STATUS = 1"])), :format=>' %n ', :separator => "," ) %>
+							</td>
+							<% if sis_entr_dif_us ==  @fechamento_caixa.entrada_cheq_dif_dolar.to_f %>
+                              <td><font color="green"><span class="save"></span></font></td>
+                            <% else %>  
+                              <td><font color="red"><span class="delete"></span></font></td>
+                            <% end %>  
+
+                            <td>Gs.:</td>
+							<td width="100" align="right">
+							  (<%= number_to_currency(Financa.count(:cheque, :distinct => 'CHEQUE', :conditions => ["moeda = 1 AND DATA <= '#{@fechamento_caixa.data}' AND ENTRADA_DOLAR > 0 AND DIFERIDO > '#{@fechamento_caixa.data}' AND ESTADO = 0 AND ENTRADA_DOLAR + SAIDA_DOLAR != 0 AND CONTA_ID = #{@fechamento_caixa.conta_id} AND CHEQUE_STATUS = 1"]), :format=>' %n ', :precision => 0 ) %>)
+							  <%= number_to_currency( sis_entr_dif_gs = ( Financa.sum("entrada_guarani",:conditions => ["moeda = 1 AND DATA <= '#{@fechamento_caixa.data}' AND DIFERIDO > '#{@fechamento_caixa.data}' AND ESTADO = 0 AND ENTRADA_DOLAR + SAIDA_DOLAR != 0 AND CONTA_ID = #{@fechamento_caixa.conta_id} AND CHEQUE_STATUS = 1"])), :format=>' %n ', :precision => 0 ) %>
+							</td>
+							<% if sis_entr_dif_gs ==  @fechamento_caixa.entrada_cheq_dif_guarani.to_f %>
+                              <td><font color="green"><span class="save"></span></font></td>
+                            <% else %>  
+                              <td><font color="red"><span class="delete"></span></font></td>
+                            <% end %>  
+
+						</tr>
+					</table>
+
+				</fieldset>
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					<fieldset>
+					<legend>En Caja</legend>
+					<table>
+						<tr>
+							<td width="100" align="right">En Efetivo U$.:</td>
+							<td width="120" align="right"><%= number_to_currency( cierre_efetivo_us = ( @fechamento_caixa.entrada_efetivo_dolar ), :format=>' %n ', :separator => "," ) %></td>
+
+							<% if dif_eft_us <= 5.00 and dif_eft_us >= -5.00 %>
+							  <td><font color="green"><span class="save"></span></font></td>
+                            <% else %>  
+                              <td><font color="red"><span class="delete"></span></font></td>
+                            <% end %>  
+                              
+                            <td>Gs.:</td>
+							<td width="100" align="right"><%= number_to_currency( cierre_efetivo_gs = ( @fechamento_caixa.entrada_efetivo_guarani ), :format=>' %n ', :precision => 0 ) %></td>
+
+							<% if dif_eft_gs <= 10000.00 and dif_eft_gs >= -10000.00 %>
+                              <td><font color="green"><span class="save"></span></font></td>
+                            <% else %>  
+                              <td><font color="red"><span class="delete"></span></font></td>
+                            <% end %>  
+
+						</tr>
+
+						<tr>
+							<td width="100" align="right">Viatico U$.:</td>
+							<td width="120" align="right"><%= number_to_currency( cierre_viatico_us = ( @fechamento_caixa.saida_efetivo_dolar ), :format=>' %n ', :separator => "," ) %></td>
+
+							<% if dif_vt_us <= 5.00 and dif_vt_us >= -5.00 %>
+							  <td><font color="green"><span class="save"></span></font></td>
+                            <% else %>  
+                              <td><font color="red"><span class="delete"></span></font></td>
+                            <% end %>  
+                              
+                            <td>Gs.:</td>
+							<td width="100" align="right"><%= number_to_currency( cierre_efetivo_gs = ( @fechamento_caixa.saida_efetivo_guarani ), :format=>' %n ', :precision => 0 ) %></td>
+
+							<% if dif_vt_gs <= 10000.00 and dif_vt_gs >= -10000.00 %>
+                              <td><font color="green"><span class="save"></span></font></td>
+                            <% else %>  
+                              <td><font color="red"><span class="delete"></span></font></td>
+                            <% end %>  
+
+						</tr>
+
+
+						
+						<tr>
+							<td width="100" align="right">Cheque Dia U$ :</td>
+
+							<td width="100" align="right">
+
+							  (<%= number_to_currency( qtd_said_dif = ( @fechamento_caixa.qtd_entrada_cheq_dia_dolar.to_f ), :format=>' %n ', :precision => 0 ) %>)
+							
+							  <%= number_to_currency( cierre_cheq_dia = ( @fechamento_caixa.entrada_cheq_dia_dolar.to_f ), :format=>' %n ', :separator => "," ) %>
+							</td>
+
+							<% if sis_entr_dia_us ==  @fechamento_caixa.entrada_cheq_dia_dolar.to_f %>
+                              <td><font color="green"><span class="save"></span></font></td>
+                            <% else %>  
+                              <td><font color="red"><span class="delete"></span></font></td>
+                            <% end %>  
+
+
+                            <td>Gs.:</td>
+
+							<td width="120" align="right">
+							  (<%= number_to_currency( qtd_said_dia = ( @fechamento_caixa.qtd_entrada_cheq_dia_guarani.to_f ), :format=>' %n ', :precision => 0) %>)
+							  
+							  <%= number_to_currency( cierre_cheq_dia = ( @fechamento_caixa.entrada_cheq_dia_guarani.to_f ), :format=>' %n ', :precision => 0 ) %>
+							</td>
+							<% if sis_entr_dia_gs ==  @fechamento_caixa.entrada_cheq_dia_guarani.to_f %>
+                              <td><font color="green"><span class="save"></span></font></td>
+                            <% else %>  
+                              <td><font color="red"><span class="delete"></span></font></td>
+                            <% end %>  
+
+						</tr>
+
+						<tr>
+							<td width="100" align="right">Cheque Dif U$ :</td>
+							<td width="100" align="right">
+							  (<%= number_to_currency( qtd_said_dif = ( @fechamento_caixa.qtd_entrada_cheq_dif_dolar.to_f ), :format=>' %n ', :precision => 0 ) %>)
+							
+							  <%= number_to_currency( cierre_cheq_dif = ( @fechamento_caixa.entrada_cheq_dif_dolar.to_f ), :format=>' %n ', :separator => "," ) %>
+							</td>
+
+							<% if sis_entr_dif_us ==  @fechamento_caixa.entrada_cheq_dif_dolar.to_f %>
+                              <td><font color="green"><span class="save"></span></font></td>
+                            <% else %>  
+                              <td><font color="red"><span class="delete"></span></font></td>
+                            <% end %>  
+
+                            <td>Gs.:</td>
+
+							<td width="100" align="right">
+							  (<%= number_to_currency( qtd_said_dif = ( @fechamento_caixa.qtd_entrada_cheq_dif_guarani.to_f ), :format=>' %n ', :precision => 0 ) %>)
+
+							  <%= number_to_currency( cierre_cheq_dif = ( @fechamento_caixa.entrada_cheq_dif_guarani.to_f ), :format=>' %n ', :precision => 0 ) %>
+							</td>
+
+							<% if sis_entr_dif_gs ==  @fechamento_caixa.entrada_cheq_dif_guarani.to_f %>
+                              <td><font color="green"><span class="save"></span></font></td>
+                            <% else %>  
+                              <td><font color="red"><span class="delete"></span></font></td>
+                            <% end %>  
+
+						</tr>
+					</table>
+
+				</fieldset>
+				</td>
+			</tr>
+			<tr>
+			 <td>
+			 <table>
+				<tr>
+    		    <% number_to_currency( caja_us =  ( @fechamento_caixa.entrada_efetivo_dolar.to_f  + @fechamento_caixa.saida_efetivo_dolar.to_f  + @fechamento_caixa.entrada_cheq_dia_dolar.to_f + @fechamento_caixa.entrada_cheq_dif_dolar.to_f ), :format=>' %n ', :separator => ',' ) %>  
+    		    <% number_to_currency( caja_gs =  ( @fechamento_caixa.entrada_efetivo_guarani.to_f + @fechamento_caixa.saida_efetivo_guarani.to_f  + @fechamento_caixa.entrada_cheq_dia_guarani.to_f + @fechamento_caixa.entrada_cheq_dif_guarani.to_f ), :format=>' %n ', :separator => ',' ) %>  
+
+				<!--SOMATORIAS!-->
+				  <td width="100" align="right">Saldo Sis U$.:</td>
+			      <td width="120" align="right">
+					  <%= number_to_currency( sis_us =  ( efetivo_us.to_f  + viatico_us.to_f  + sis_entr_dia_us.to_f + sis_entr_dif_us.to_f ), :format=>' %n ', :separator => "," ) %>  
+   		 	      </td>
+   		 	      
+    			  <% dif_result_us = (sis_us - caja_us) %>
+    			  <% if dif_result_us <= 5.00 and dif_result_us >= -5.00 %>
+                     <td><font color="green"><span class="save"></span></font></td>
+                  <% else %>  
+                     <td><font color="red"><span class="delete"></span></font></td>
+                  <% end %>  
+
+                 <td>Gs.:</td>
+			      <td width="120" align="right">
+					  <%= number_to_currency( sis_gs =  ( efetivo_gs.to_f + viatico_gs.to_f + sis_entr_dia_gs.to_f + sis_entr_dif_gs.to_f ), :format=>' %n ', :precision => 0 ) %>  
+   		 	      </td>
+
+    			  <% dif_result_gs = (sis_gs - caja_gs) %>
+    			  <% if dif_result_gs <= 10000.00 and dif_result_gs >= -10000.00 %>
+                     <td><font color="green"><span class="save"></span></font></td>
+                  <% else %>  
+                     <td><font color="red"><span class="delete"></span></font></td>
+                  <% end %>  
+
+				</tr>
+
+				<tr>
+				  <td align="right">Saldo Caja U$:</td>
+			      <td align="right">
+					  <%= number_to_currency( caja_us , :format=>' %n ', :separator => ',' ) %>  
+   		 	      </td>
+    			  <% if dif_result_us <= 5.00 and dif_result_us >= -5.00 %>
+                     <td><font color="green"><span class="save"></span></font></td>
+                  <% else %>  
+                     <td><font color="red"><span class="delete"></span></font></td>
+                  <% end %>  
+
+                 <td>Gs.:</td>
+
+			      <td align="right">
+					  <%= number_to_currency( caja_gs , :format=>' %n ', :precision => 0 ) %>  
+   		 	      </td>
+
+    			  <% if dif_result_gs <= 10000.00 and dif_result_gs >= -10000.00 %>
+                     <td><font color="green"><span class="save"></span></font></td>
+                  <% else %>  
+                     <td><font color="red"><span class="delete"></span></font></td>
+                  <% end %>  
+
+				</tr>
+				<tr>
+				  <td align="right">Dif U$.:</td>
+			      <td align="right">
+        			     <%= number_to_currency( caja_us - sis_us , :format=>' %n ', :separator => ',' ) %>  
+   		 	      </td>
+    			  <% if dif_result_us <= 5.00 and dif_result_us >= -5.00 %>
+                     <td><font color="green"><span class="save"></span></font></td>
+                  <% else %>  
+                     <td><font color="red"><span class="delete"></span></font></td>
+                  <% end %>  
+
+                 <td>Gs.:</td>
+			      <td align="right">
+        			     <%= number_to_currency( caja_gs - sis_gs, :format=>' %n ', :precision=> 0 ) %>  
+   		 	      </td>
+    			  <% if dif_result_gs <= 10000.00 and dif_result_gs >= -10000.00 %>
+                     <td><font color="green"><span class="save"></span></font></td>
+                  <% else %>  
+                     <td><font color="red"><span class="delete"></span></font></td>
+                  <% end %>  
+
+				</tr>
+
+			 </table>
+			 </td>
+			</tr>
+			
+			<tr>
+		      <td colspan="7"> 
+				<br />
+				<hr/> 
+				<br />
+		      </td>
+			</tr>
+			
+			<!-- VIATICO!-->
+			<tr>
+               <td>
+               
+     		      <table>
+     		      	<tr>
+     		      		<td valign="top">
+		     		      <fieldset>
+		     		        <legend>Viatico Dolar</legend>
+		                  	<table>
+		                  			<tr>
+		                  				<td width="50" align="center" >Nr.</td>
+		                  				<td width="80" align="center" ><%= t('DATE') %></td>
+		                  				<td width="250" align="left" >Concepto</td>
+		                  				<td width="100" align="right" >Valor U$.</td>
+		                  			</tr>
+								<% cheque_dia_us  = Financa.all(:conditions => ["MOEDA = 0 AND DATA <= '#{@fechamento_caixa.data}' AND ESTADO = 0 AND ENTRADA_DOLAR + SAIDA_DOLAR != 0 AND CONTA_ID = #{@fechamento_caixa.conta_viatico_id} AND CHEQUE_STATUS = 0 AND ENTRADA_DOLAR > 0" ] )%>
+		                  		<% cheque_dia_us.each do |cd|%>
+		                  			<tr class = "<%= cycle("cor1", "cor2") %>">
+		                  				<td width="50" align="center" ><%= cd.cod_processo %></td>
+		                  				<td width="80" align="center" ><%= cd.data.strftime("%d/%m/%Y") %></td>
+		                  				<td width="350" align="left" ><%= cd.concepto %></td>
+		                  				<td width="100" align="right" ><%= number_to_currency( cd.entrada_dolar.to_f, :format=>' %n ', :separator => "," ) %></td>
+		                  			</tr>
+		                  		<% end %>
+		                  	</table>
+		                  </fieldset>
+     		      		</td>
+
+     		      		<td valign="top">
+		     		      <fieldset>
+		     		        <legend>Viatico Guaranies</legend>
+		                  	<table>
+		                  			<tr>
+		                  				<td width="50" align="center" >Nr.</td>
+		                  				<td width="80" align="center" ><%= t('DATE') %></td>
+		                  				<td width="250" align="left" >Concepto</td>
+		                  				<td width="100" align="right" >Valor Gs.</td>
+		                  			</tr>
+								<% cheque_dia_gs  = Financa.all(:conditions => ["MOEDA = 1 AND DATA <= '#{@fechamento_caixa.data}' AND ESTADO = 0 AND ENTRADA_DOLAR + SAIDA_DOLAR != 0 AND CONTA_ID = #{@fechamento_caixa.conta_viatico_id}  AND CHEQUE_STATUS = 0  AND ENTRADA_GUARANI > 0" ] )%>
+		                  		<% cheque_dia_gs.each do |cd|%>
+		                  			<tr class = "<%= cycle("cor1", "cor2") %>">
+		                  				<td width="50" align="center" ><%= cd.cod_processo %></td>
+		                  				<td width="80" align="center" ><%= cd.data.strftime("%d/%m/%Y") %></td>
+		                  				<td width="350" align="left" ><%= cd.concepto %></td>
+		                  				<td width="100" align="right" ><%= number_to_currency( cd.entrada_guarani.to_f, :format=>' %n ', :precision => 0 ) %></td>
+		                  			</tr>
+		                  		<% end %>
+		                  	</table>
+		                  </fieldset>
+     		      		</td>
+     		      	</tr>
+     		      </table>               
+               </td>
+			</tr>
+
+
+			<tr>
+		      <td colspan="7"> 
+				<br />
+				<hr/> 
+				<br />
+		      </td>
+			</tr>
+			
+            <!-- CHEQUES!-->
+			<tr>
+          	<td>     
+     		      <table>
+     		      	<tr>
+     		      		<td>
+		     		      <fieldset>
+		     		        <legend>Cheque dia Dolar</legend>
+		                  	<table>
+		                  			<tr>
+		                  				<td width="180" align="center" >Nr.</td>
+		                  				<td width="200" align="left" >Titular</td>
+		                  				<td width="100" align="left" >Banco</td>
+		                  				<td width="100" align="right" >Valor U$.</td>
+		                  			</tr>
+								<% cheque_dia_us  = Financa.all(:conditions => ["MOEDA = 0 AND DIFERIDO <= '#{@fechamento_caixa.data}' AND ESTADO = 0 AND ENTRADA_DOLAR + SAIDA_DOLAR != 0 AND CONTA_ID = #{@fechamento_caixa.conta_id}  AND CHEQUE_STATUS = 1"])%>
+		                  		<% cheque_dia_us.each do |cd|%>
+		                  			<tr class = "<%= cycle("cor1", "cor2") %>">
+		                  				<td width="180" align="center" ><%= cd.cheque %></td>
+		                  				<td width="200" align="left" ><%= cd.titular %></td>
+		                  				<td width="100" align="left" ><%= cd.banco %></td>
+		                  				<td width="100" align="right" ><%= number_to_currency( cd.entrada_dolar.to_f, :format=>' %n ', :separator => "," ) %></td>
+		                  			</tr>
+		                  		<% end %>
+		                  	</table>
+		                  </fieldset>
+     		      		</td>
+
+     		      		<td valign="top">
+		     		      <fieldset>
+		     		        <legend>Cheque dia Guaranies</legend>
+		                  	<table>
+		                  			<tr>
+		                  				<td width="180" align="center" >Nr.</td>
+		                  				<td width="200" align="left" >Titular</td>
+		                  				<td width="100" align="left" >Banco</td>
+		                  				<td width="100" align="right" >Valor Gs.</td>
+		                  			</tr>
+								<% cheque_dia_gs  = Financa.all(:conditions => ["MOEDA = 1 AND DIFERIDO <= '#{@fechamento_caixa.data}' AND ESTADO = 0 AND ENTRADA_DOLAR + SAIDA_DOLAR != 0 AND CONTA_ID = #{@fechamento_caixa.conta_id}  AND CHEQUE_STATUS = 1"])%>
+		                  		<% cheque_dia_gs.each do |cd|%>
+	                  			    <tr class = "<%= cycle("cor1", "cor2") %>">
+		                  				<td width="180" align="center" ><%= cd.cheque %></td>
+		                  				<td width="200" align="left" ><%= cd.titular %></td>
+		                  				<td width="100" align="left" ><%= cd.banco %></td>
+		                  				<td width="100" align="right" ><%= number_to_currency( cd.entrada_guarani.to_f, :format=>' %n ', :separator => "," ) %></td>
+		                  			</tr>
+		                  		<% end
+		                  		 %>
+		                  	</table>
+		                  </fieldset>
+     		      		</td>
+     		      	</tr>
+     		      </table>               
+               </td>
+			</tr>
+			
+            <tr>
+				<!-- DETALHES CHEQUES -->
+     		    <td rowspan="4" valign="top">
+     		      <table>
+     		      	<tr>
+     		      		<td>
+		     		      <fieldset>
+		     		        <legend>Cheque Dif. Dolar</legend>
+		                  	<table>
+		                  			<tr>
+		                  				<td width="80" align="center" >Diferido</td>
+		                  				<td width="100" align="center" >Nr.</td>
+		                  				<td width="200" align="left" >Titular</td>
+		                  				<td width="100" align="left" >Banco</td>
+		                  				<td width="100" align="right" >Valor U$.</td>
+		                  			</tr>
+								<% cheque_dif_us  = Financa.all(:conditions => ["MOEDA = 0 AND DIFERIDO > '#{@fechamento_caixa.data}' AND ESTADO = 0 AND ENTRADA_DOLAR + SAIDA_DOLAR != 0 AND CONTA_ID = #{@fechamento_caixa.conta_id}  AND CHEQUE_STATUS = 1"])%>
+		                  		<% cheque_dif_us.each do |cd|%>
+		                  			<tr class = "<%= cycle("cor1", "cor2") %>">
+		                  				<td width="80" align="center" ><%= cd.diferido.strftime("%d/%m/%Y") %></td>
+		                  				<td width="100" align="center" ><%= cd.cheque %></td>
+		                  				<td width="200" align="left" ><%= cd.titular %></td>
+		                  				<td width="100" align="left" ><%= cd.banco %></td>
+		                  				<td width="100" align="right" ><%= number_to_currency( cd.entrada_dolar.to_f, :format=>' %n ', :separator => "," ) %></td>
+		                  			</tr>
+		                  		<% end %>
+		                  	</table>
+		                  </fieldset>
+     		      		</td>
+
+     		      		<td valign="top">
+		     		      <fieldset>
+		     		        <legend>Cheque Dif. Guaranies</legend>
+		                  	<table>
+		                  			<tr>
+		                  				<td width="80" align="center" >Diferido</td>
+		                  				<td width="100" align="center" >Nr.</td>
+		                  				<td width="200" align="left" >Titular</td>
+		                  				<td width="100" align="left" >Banco</td>
+		                  				<td width="100" align="right" >Valor Gs.</td>
+		                  			</tr>
+								<% cheque_dif_gs  = Financa.all(:conditions => ["MOEDA = 1 AND DIFERIDO > '#{@fechamento_caixa.data}' AND ESTADO = 0 AND ENTRADA_DOLAR + SAIDA_DOLAR != 0 AND CONTA_ID = #{@fechamento_caixa.conta_id}  AND CHEQUE_STATUS = 1"])%>
+		                  		<% cheque_dif_gs.each do |cd|%>
+	                  			    <tr class = "<%= cycle("cor1", "cor2") %>">
+		                  				<td width="80" align="center" ><%= cd.diferido.strftime("%d/%m/%Y") %></td>
+		                  				<td width="100" align="center" ><%= cd.cheque %></td>
+		                  				<td width="200" align="left" ><%= cd.titular %></td>
+		                  				<td width="100" align="left" ><%= cd.banco %></td>
+		                  				<td width="100" align="right" ><%= number_to_currency( cd.entrada_guarani.to_f, :format=>' %n ', :separator => "," ) %></td>
+		                  			</tr>
+		                  		<% end %>
+		                  	</table>
+		                  </fieldset>
+     		      		</td>
+     		      	</tr>
+     		      	
+    		        <tr>
+			          <td>
+				        Obs.: <%= @fechamento_caixa.obs%>
+		              </td>
+			        </tr>
+     		      </table>
+			    </td>
+            </tr>
+		</table>
+		<br />
+		<hr />
+		<br />
+		<table id="list" >
+			<tr>
+				<td valign="top">
+				<fieldset>
+				<legend>Movimentacion U$.</legend>
+		     <!-- GASTOS !-->
+            <% movi_ant_us = Financa.sum('entrada_dolar - saida_dolar', :conditions => ["ESTADO = 0 AND conta_id = ? AND data < ? AND moeda = 0",@fechamento_caixa.conta_id, @fechamento_caixa.data] ) %>
+
+            <% movi_us = Financa.all(:select => 'concepto,entrada_dolar,saida_dolar', :conditions => ["ESTADO = 0 AND conta_id = ? AND data = ? AND moeda = 0",@fechamento_caixa.conta_id, @fechamento_caixa.data] ) %>
+            	<table id="list">
+		          <tr>
+		            <td width="500" align="left" >Descripcion</td>
+		            <td width="100" align="right" >Entrada</td>
+		            <td width="100" align="right" >Salida</td>
+		          </tr>
+		          <tr>
+		            <td colspan="3" ><hr /></td>
+		          </tr>
+		          <% entr_us = 0 %>
+		          <% said_us = 0 %>
+            	  <% movi_us.each do |mv| %> 
+                  <tr class = "<%= cycle("cor1", "cor2") %>">
+            	    <td width="500" align="left"><%= mv.concepto %></td>
+            	    <td width="100" align="right"><%= number_to_currency(  mv.entrada_dolar, :format=>' %n ', :separator => "," ) %></td>
+            	    <td width="100" align="right"><%= number_to_currency(  mv.saida_dolar, :format=>' %n ', :separator => "," ) %></td>
+            	  </tr>
+		          <% entr_us += mv.entrada_dolar %>
+		          <% said_us += mv.saida_dolar %>
+
+            	  <% end %>
+		          <tr>
+		            <td colspan="3" ><hr /></td>
+		          </tr>
+            	  
+		          <tr>
+		            <td width="500"  colspan="1" align="left" >Total ==> </td>
+            		<td width="100" align="right"><%= number_to_currency( entr_us.to_f, :format=>' %n ', :separator => "," ) %></td>
+            		<td width="100" align="right"><%= number_to_currency( said_us.to_f, :format=>' %n ', :separator => "," ) %></td>
+		          </tr>
+		          
+		          <tr>
+		            <td width="500"  colspan="1" align="left" >Ant.: <%= number_to_currency( movi_ant_us.to_f, :format=>' %n ', :separator => "," ) %></td>
+            		<td width="100" align="right"><%= number_to_currency( entr_us.to_f, :format=>' %n ', :separator => "," ) %></td>
+            		<td width="100" align="right"><%= number_to_currency( said_us.to_f, :format=>' %n ', :separator => "," ) %></td>
+            		<td width="100" align="right"><%= number_to_currency(  (movi_ant_us.to_f + entr_us.to_f) - said_us.to_f, :format=>' %n ', :separator => "," ) %></td>
+		          </tr>
+
+            	</table>
+				
+				</fieldset>
+				</td>
+				
+				<td valign="top">
+				<fieldset>
+				<legend>Movimentacion Gs.</legend>
+		     <!-- GASTOS !-->
+            <% entr_gs = 0 %>
+            <% said_gs = 0 %>
+            <% movi_ant_gs = Financa.sum('entrada_guarani - saida_guarani', :conditions => ["ESTADO = 0 AND conta_id = ? AND data < ? AND moeda = 1", @fechamento_caixa.conta_id, @fechamento_caixa.data] ) %>
+            <% movi_gs = Financa.all(:select => 'concepto,entrada_guarani,saida_guarani', :conditions => ["ESTADO = 0 AND conta_id = ? AND data = ? AND moeda = 1", @fechamento_caixa.conta_id, @fechamento_caixa.data] ) %>
+            	<table id="list" >
+		          <tr>
+		            <td width="500" align="left" >Descripcion</td>
+		            <td width="100" align="right" >Entrada</td>
+		            <td width="100" align="right" >Salida</td>
+		          </tr>
+		          <tr>
+		            <td colspan="3" ><hr /></td>
+		          </tr>
+		          <% entr_us = 0 %>
+		          <% said_us = 0 %>
+            	  <% movi_gs.each do |mv| %> 
+                  <tr class = "<%= cycle("cor1", "cor2") %>">
+            	    <td width="500" align="left"><%= mv.concepto %></td>
+            	    <td width="100" align="right"><%= number_to_currency(  mv.entrada_guarani, :format=>' %n ', :precision => 0 ) %></td>
+            	    <td width="100" align="right"><%= number_to_currency(  mv.saida_guarani, :format=>' %n ', :precision => 0 ) %></td>
+            	  </tr>
+		          <% entr_gs += mv.entrada_guarani %>
+		          <% said_gs += mv.saida_guarani %>
+
+            	  <% end %>
+		          <tr>
+		            <td colspan="3" ><hr /></td>
+		          </tr>
+            	  
+		          <tr>
+		            <td width="500"  colspan="1" align="left" >Total ==> </td>
+            		<td width="100" align="right"><%= number_to_currency( entr_gs.to_f, :format=>' %n ', :precision => 0  ) %></td>
+            		<td width="100" align="right"><%= number_to_currency( said_gs.to_f, :format=>' %n ', :precision => 0  ) %></td>
+		          </tr>
+		          <tr>
+		            <td width="500"  colspan="1" align="left" >Ant.: <%= number_to_currency( movi_ant_gs.to_f, :format=>' %n ', :separator => "," ) %></td>
+            		<td width="100" align="right"><%= number_to_currency( entr_gs.to_f, :format=>' %n ', :separator => "," ) %></td>
+            		<td width="100" align="right"><%= number_to_currency( said_gs.to_f, :format=>' %n ', :separator => "," ) %></td>
+            		<td width="100" align="right"><%= number_to_currency(  (movi_ant_gs.to_f + entr_gs.to_f) - said_gs.to_f, :format=>' %n ', :separator => "," ) %></td>
+		          </tr>
+
+            	</table>
+				
+				</fieldset>
+				</td>
+			</tr>		</table>
+	</div>
+</div>
+
+<%= link_to 'Editar', edit_fechamento_caixa_path(@fechamento_caixa) %> |
+<a href="javascript:void(0)" onClick="ComprovanteOrden()">Comprovante</a>
+	<%= hidden_field_tag :id, @fechamento_caixa.id %>
+
+<%= link_to 'Salir', fechamento_caixas_path %>
+
+<script>
+	function ComprovanteOrden()                //
+	{
+		window.open('/fechamento_caixas/print/' + document.getElementById('id').value, 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	}
+
+</script>
+
+<style type="text/css">
+	#list {
+		font-size: 9px;
+	}
+</style>
+
+
+

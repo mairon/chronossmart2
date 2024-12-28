@@ -1,0 +1,331 @@
+<%= form_tag "/pagos/#{@pago.id}/baixa_divida" do %>
+<% ctz = @pago.cotacao.to_f %>
+<% ctz_rs_us = @pago.cotacao_rs_us.to_f %>
+<% ctz_rs = @pago.cotacao_real.to_f %>
+<div class="group">
+   <table class="head_grid">
+      <tr>
+        <td width="20" align="center"><input type="checkbox" id="selectAllM" value="selectAllM"></td>
+        <td width="68" align="center"><%= t('DATE') %></td>
+        <td width="50"></td>
+        <td width="120">CC</td>
+        <td width="150"><%= t('DOC') %></td>
+        <td width="150"><%= t('CLASSIFICATION') %></td>
+        <td width="150">Obs.</td>
+        <td width="50" align="center"><%= t('QUOTA') %></td>
+        <td width="70" align="center">Venc.</td>
+        <td width="40" align="center">Dias</td>
+        <td width="70" align="center"><%= t('VALUE') %></td>
+        <td width="70" align="center">Anterior</td>
+        <td width="70" align="center">Saldo</td>
+      </tr>
+    </table>
+
+    <div class="rolagem" dir="div" style='height:210px;'>
+
+      <table>
+        <% tot = 0 %>
+        <% @proveedor.each do |c| %>
+           <%  dias = Date.today - c.vencimento.to_date if c.liquidacao == 0 %>
+
+            <% if @pago.moeda.to_i == 0 %>
+
+              <% if c.moeda.to_i == 0 %>
+                <% saldo_dolar = (c.divida_dolar.to_f - c.anterior_us.to_f) %>
+                <% saldo_dolar_original = (c.divida_dolar.to_f - c.anterior_us.to_f) %>
+              <% elsif c.moeda.to_i == 1 %>
+                <% saldo_dolar_original = (c.divida_dolar.to_f - c.anterior_us.to_f) %>
+                <% saldo_dolar = ((c.divida_guarani.to_f - c.anterior_gs.to_f) / ctz) %>
+              <% elsif c.moeda.to_i == 2 %>
+                <% saldo_dolar_original = (c.divida_dolar.to_f - c.anterior_us.to_f) %>
+                <% saldo_dolar = ((c.divida_real.to_f - c.anterior_rs.to_f) / ctz_rs_us) %>
+              <% end %>
+
+              <% saldo_guarani = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+              <% saldo_real = (c.divida_real.to_f - c.anterior_rs.to_f) %>
+              <tr class = "<%= cycle( "cor1", "cor2" ) %>"
+                  onMouseOver="javascript:this.style.backgroundColor='#e6ebf2'"
+                  onMouseOut="javascript:this.style.backgroundColor=''"
+                  onClick="Fecha( '<%= c.vencimento.strftime("%d").to_i %>',
+                                  '<%= c.vencimento.strftime("%m").to_i %>',
+                                  '<%= c.vencimento.strftime("%Y").to_i %>',
+                                  '<%= c.documento_numero_01 %>',
+                                  '<%= c.documento_numero_02 %>',
+                                  '<%= c.documento_numero %>',
+                                  '<%= c.cota %>',
+                                  '<%= c.plano_de_conta_id %>',
+                                  '<%= c.centro_custo_id %>',
+                                  '<%= c.tot_cotas %>',
+                                  '<%= format_decimal(c.divida_dolar.to_f) %>',
+                                  '<%= format_decimal(c.anterior_us.to_f) %>',
+                                  '<%= format_decimal(saldo_guarani.to_f) %>',
+                                  '<%= format_decimal(saldo_real.to_f) %>',
+                                  '<%= format_decimal(saldo_dolar.to_f) %>',
+                                  '<%= format_decimal(saldo_dolar_original.to_f) %>')">
+
+
+            <% elsif @pago.moeda.to_i == 2 %>
+              <% if c.moeda.to_i == 0 %>
+                <% saldo_real_original = (c.divida_real.to_f - c.anterior_rs.to_f) %>
+                <% saldo_real = (c.divida_dolar.to_f - c.anterior_us.to_f) * @pago.cotacao_rs_us %>
+
+              <% elsif c.moeda.to_i == 1 %>
+                <% saldo_real_original = (c.divida_real.to_f - c.anterior_rs.to_f) %>
+                <% saldo_real = ((c.divida_guarani.to_f - c.anterior_gs.to_f) / ctz_rs) %>
+              <% elsif c.moeda.to_i == 2 %>
+                <% saldo_real_original = (c.divida_real.to_f - c.anterior_rs.to_f) %>
+                <% saldo_real = (c.divida_real.to_f - c.anterior_rs.to_f) %>
+              <% end %>
+
+              <% saldo_guarani = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+              <% saldo_dolar = (c.divida_dolar.to_f - c.anterior_us.to_f) %>
+              <tr class = "<%= cycle( "cor1", "cor2" ) %>"
+                  onMouseOver="javascript:this.style.backgroundColor='#e6ebf2'"
+                  onMouseOut="javascript:this.style.backgroundColor=''"
+                  onClick="Fecha( '<%= c.vencimento.strftime("%d").to_i %>',
+                                  '<%= c.vencimento.strftime("%m").to_i %>',
+                                  '<%= c.vencimento.strftime("%Y").to_i %>',
+                                  '<%= c.documento_numero_01 %>',
+                                  '<%= c.documento_numero_02 %>',
+                                  '<%= c.documento_numero %>',
+                                  '<%= c.cota %>',
+                                  '<%= c.plano_de_conta_id %>',
+                                  '<%= c.centro_custo_id %>',
+                                  '<%= c.tot_cotas %>',                                  
+                                  '<%= format_decimal(c.divida_real.to_f) %>',
+                                  '<%= format_decimal(c.anterior_rs.to_f) %>',
+                                  '<%= format_decimal(saldo_real.to_f) %>')">
+            <% else %>
+             
+              <% if c.moeda.to_i == 1 %>
+                <% saldo_guarani = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+                <% saldo_guarani_original = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+              <% elsif c.moeda.to_i == 2 %>
+                <% saldo_guarani_original = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+                <% saldo_guarani = ((c.divida_real.to_f - c.anterior_rs.to_f) * @pago.cotacao_real.to_f) %>
+              <% else %>
+                <% saldo_guarani_original = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+                <% saldo_guarani = ((c.divida_dolar.to_f - c.anterior_us.to_f) * @pago.cotacao.to_f) %>
+              <% end %>
+
+              <% saldo_dolar = (c.divida_dolar.to_f - c.anterior_us.to_f) %>
+              <% saldo_real = (c.divida_real.to_f - c.anterior_rs.to_f) %>
+              <tr class = "<%= cycle( "cor1", "cor2" ) %>"
+                  onMouseOver="javascript:this.style.backgroundColor='#e6ebf2'"
+                  onMouseOut="javascript:this.style.backgroundColor=''"
+                  onClick="Fecha( '<%= c.vencimento.strftime("%d").to_i %>',
+                                  '<%= c.vencimento.strftime("%m").to_i %>',
+                                  '<%= c.vencimento.strftime("%Y").to_i %>',
+                                  '<%= c.documento_numero_01 %>',
+                                  '<%= c.documento_numero_02 %>',
+                                  '<%= c.documento_numero %>',
+                                  '<%= c.cota %>',
+                                  '<%= c.plano_de_conta_id %>',
+                                  '<%= c.centro_custo_id %>',
+                                  '<%= c.tot_cotas %>',                                  
+                                  '<%= format_int(c.divida_guarani.to_f ) %>',
+                                  '<%= format_int(c.anterior_gs.to_f ) %>',
+                                  '<%= format_decimal(saldo_dolar.to_f ) %>',
+                                  '<%= format_int(saldo_guarani.to_f ) %>',
+                                  '<%= format_decimal(saldo_real.to_f ) %>',
+                                  '<%= format_int(saldo_guarani_original.to_f) %>')">
+
+            <% end %>
+           
+
+            <td width="20" align="center"><%= check_box_tag "pago[dividas_ids][]", c.id, false, { :class => 'm', onclick: "soma(this)"  } %></td>
+            
+            <td class="acao" width="60"  align="center"><%= c.data.strftime("%d/%m/%y")%></td>
+            <% if c.moeda.to_i == 0 %>
+              <td width="50" align="left">U$</td>
+            <% elsif c.moeda.to_i == 1 %>
+              <td width="50" align="left">G$</td>
+            <% elsif c.moeda.to_i == 2 %>
+              <td width="50" align="left">R$</td>
+            <% end %>
+            <td class="acao" width="120"><%= c.centro_custo_id %>-<%= c.centro_custo_nome %></td>
+            <td class="acao" width="150"><%= c.documento_numero_01 %>-<%= c.documento_numero_02%>-<%= c.documento_numero%></td>
+            <td class="acao" width="150"><small><%= c.plano_de_conta_id %>-<%= c.rubro_nome %></small></td>
+            <td class="acao" width="150"><small><%= c.descricao %></small></td>
+            <td class="acao" width="60"  align="center"><%= c.cota %>/<%= c.tot_cotas %></td>
+            <td class="acao" width="70"  align="center"><%= c.vencimento.strftime("%d/%m/%y")%></td>
+            <td class="acao" width="45" align="center"><%= dias.to_i %></td>
+
+            <% if @pago.moeda.to_i == 0 %>
+              <td class="acao" width="70" align="right"><%= format_decimal(c.divida_dolar.to_f)%></td>
+              <td class="acao" width="70" align="right"><%= format_decimal(c.anterior_us.to_f )%></td>
+              <td class="acao" width="70" align="right"><%= format_decimal(saldo_dolar.to_f )%></td>
+              <input type="hidden" name="valor_<%= c.id %>" id="valor_<%= c.id %>" value="<%= format_decimal(saldo_dolar) %>" />
+              <% tot += saldo_dolar.to_f %>
+            <% elsif @pago.moeda.to_i == 2 %>
+              <td class="acao" width="70" align="right"><%= format_decimal(c.divida_real.to_f)%></td>
+              <td class="acao" width="70" align="right"><%= format_decimal(c.anterior_rs.to_f )%></td>
+              <td class="acao" width="70" align="right"><%= format_decimal(saldo_real.to_f )%></td>
+              <input type="hidden" name="valor_<%= c.id %>" id="valor_<%= c.id %>" value="<%= format_decimal(saldo_real) %>" />
+              <% tot += saldo_real.to_f %>
+            <% else %>
+              <td class="acao" width="70" align="right"><%= format_int(c.divida_guarani.to_f )%></td>
+              <td class="acao" width="70" align="right"><%= format_int(c.anterior_gs.to_f )%></td>
+              <td class="acao" width="70" align="right"><%= format_int(saldo_guarani.to_f )%></td>
+              <input type="hidden" name="valor_<%= c.id %>" id="valor_<%= c.id %>" value="<%= format_int(saldo_guarani) %>" />
+              <% tot += saldo_guarani.to_f %>
+            <% end %>
+
+          </tr>
+        <% end %>
+      </table>
+    </div>
+		<table>
+      <tr class="head_grid">
+        <td width="920" align="right"></td>
+        <% if @pago.moeda == 1 %>
+          <td width="70" align="right"><b><%= format_int(tot.to_f) %></b></td>
+        <% else %>
+        	<td width="70" align="right"><b><%= format_decimal(tot.to_f) %></b></td>
+        <% end %>
+      </tr>
+      <tr>
+        <td><%= submit_tag " #{t('DOWNLOAD')} ", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %></td>
+        <td><input type="text" name="valor" id="valor" value="0" size="11" dir="rtl"></td>
+      </tr>
+    </table>
+</div>
+
+<% if @pago.moeda.to_i == 0 %>
+<script>
+  function Fecha(vencimento3,vencimento2,vencimento1,documento_numero_01,documento_numero_02,documento_numero,cota,plano_de_conta_id,centro_custo_id,tot_cotas,valor_dolar,anterior_dolar,saldo_guarani,saldo_real,saldo_dolar)
+  {
+    document.getElementById('pagos_detalhe_vencimento_3i').value        = vencimento3;
+    document.getElementById('pagos_detalhe_vencimento_2i').value        = vencimento2;
+    document.getElementById('pagos_detalhe_vencimento_1i').value        = vencimento1;
+    document.getElementById('pagos_detalhe_documento_numero_01').value  = documento_numero_01;
+    document.getElementById('pagos_detalhe_documento_numero_02').value  = documento_numero_02;
+    document.getElementById('pagos_detalhe_documento_numero').value     = documento_numero;
+    document.getElementById('pagos_detalhe_cota').value                 = cota;
+    document.getElementById('pagos_detalhe_plano_de_conta_id').value             = plano_de_conta_id;
+    document.getElementById('pagos_detalhe_centro_custo_id').value      = centro_custo_id;
+    document.getElementById('pagos_detalhe_tot_cotas').value            = tot_cotas;
+    document.getElementById('pagos_detalhe_valor_dolar').value          = valor_dolar;
+    document.getElementById('pagos_detalhe_anterior_guarani').value     = anterior_dolar;
+    document.getElementById('pagos_detalhe_pago_guarani').value         = saldo_guarani;
+    document.getElementById('pagos_detalhe_saldo_guarani').value        = saldo_guarani;
+    document.getElementById('pagos_detalhe_pago_real').value            = saldo_real;
+    document.getElementById('pagos_detalhe_saldo_real').value           = saldo_real;
+    document.getElementById('pagos_detalhe_pago_dolar').value           = saldo_dolar;
+    document.getElementById('pagos_detalhe_saldo_dolar').value          = saldo_dolar;
+    document.getElementById("pagos_detalhe_pago_dolar").focus()
+      }
+</script>
+
+<% elsif @pago.moeda.to_i == 2 %>
+<script>
+  function Fecha(vencimento3,vencimento2,vencimento1,documento_numero_01,documento_numero_02,documento_numero,cota,plano_de_conta_id,centro_custo_id,tot_cotas,valor_real,anterior_real,saldo_real)
+  {
+    document.getElementById('pagos_detalhe_vencimento_3i').value        = vencimento3;
+    document.getElementById('pagos_detalhe_vencimento_2i').value        = vencimento2;
+    document.getElementById('pagos_detalhe_vencimento_1i').value        = vencimento1;
+    document.getElementById('pagos_detalhe_documento_numero_01').value  = documento_numero_01;
+    document.getElementById('pagos_detalhe_documento_numero_02').value  = documento_numero_02;
+    document.getElementById('pagos_detalhe_documento_numero').value     = documento_numero;
+    document.getElementById('pagos_detalhe_cota').value                 = cota;
+    document.getElementById('pagos_detalhe_plano_de_conta_id').value             = plano_de_conta_id;
+    document.getElementById('pagos_detalhe_centro_custo_id').value      = centro_custo_id;
+    document.getElementById('pagos_detalhe_tot_cotas').value            = tot_cotas;
+    document.getElementById('pagos_detalhe_valor_real').value           = valor_real;
+    document.getElementById('pagos_detalhe_anterior_real').value        = anterior_real;
+    document.getElementById('pagos_detalhe_pago_real').value            = saldo_real;
+    document.getElementById('pagos_detalhe_saldo_real').value            = saldo_real;
+    document.getElementById("pagos_detalhe_pago_real").focus()
+      }
+</script>
+<% else %>
+
+<script>
+  function Fecha(vencimento3,vencimento2,vencimento1,documento_numero_01,documento_numero_02,documento_numero,cota,plano_de_conta_id,centro_custo_id,tot_cotas,valor_guarani,anterior_guarani,saldo_dolar,saldo_guarani,saldo_real)
+  {
+    document.getElementById('pagos_detalhe_vencimento_3i').value          = vencimento3;
+    document.getElementById('pagos_detalhe_vencimento_2i').value          = vencimento2;
+    document.getElementById('pagos_detalhe_vencimento_1i').value          = vencimento1;
+    document.getElementById('pagos_detalhe_documento_numero_01').value    = documento_numero_01;
+    document.getElementById('pagos_detalhe_documento_numero_02').value    = documento_numero_02;
+    document.getElementById('pagos_detalhe_documento_numero').value       = documento_numero;
+    document.getElementById('pagos_detalhe_cota').value                   = cota;
+    document.getElementById('pagos_detalhe_plano_de_conta_id').value             = plano_de_conta_id;
+    document.getElementById('pagos_detalhe_centro_custo_id').value      = centro_custo_id;
+    document.getElementById('pagos_detalhe_tot_cotas').value            = tot_cotas;    
+    document.getElementById('pagos_detalhe_valor_guarani').value          = valor_guarani;
+    document.getElementById('pagos_detalhe_anterior_guarani').value       = anterior_guarani;
+    document.getElementById('pagos_detalhe_pago_dolar').value             = saldo_dolar;
+    document.getElementById('pagos_detalhe_saldo_dolar').value            = saldo_dolar;
+    document.getElementById('pagos_detalhe_pago_real').value              = saldo_real;
+    document.getElementById('pagos_detalhe_saldo_real').value             = saldo_real;
+    document.getElementById('pagos_detalhe_saldo_guarani').value          = saldo_guarani;
+    document.getElementById('pagos_detalhe_pago_guarani').value           = saldo_guarani;
+  }
+</script>
+
+
+<% end %>
+<% end %>
+
+<script type="text/javascript">
+$('#selectAllM').click(function() {
+   if (this.checked) {
+       $('.m').each(function() {
+           this.checked = true;
+       });
+   } else {
+      $('.m').each(function() {
+           this.checked = false;
+       });
+   } 
+});
+</script>
+
+<script LANGUAGE="JavaScript">  
+     <!--  
+     var total     = 0;  
+     function soma(campo) { 
+      var valor = document.getElementById( 'valor_' + campo.value).value;
+
+      if (campo.checked)  {
+        total     += eval( valor.replace(/\./g, "").replace(",", ".") );
+        
+      } else {
+        total     -= eval( valor.replace(/\./g, "").replace(",", ".") );
+      }
+      document.getElementById('valor').value = ( number_format( total,2, ',', '.') );
+     }  
+     //-->  
+     </SCRIPT>  
+ 
+
+  <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="myModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel" align="center">Titulo</h4>
+      </div>
+      <div class="modal-body" align="center" style="padding: 10px 0px 25px 0px">
+        <%= render :partial=>"new_detalhe", :locals=>{:pagos_detalhe=>PagosDetalhe.new(:pago_id=>@pago.id)} %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(".acao").click(function() {
+    $('#myModal').modal('show');
+    $('#myModal').on('shown.bs.modal', function () {
+      $('#cobros_detalhe_cobro_guarani').focus();
+      $('#cobros_detalhe_cobro_guarani').select();
+        
+    })
+  });
+</script>
+
+
+ 

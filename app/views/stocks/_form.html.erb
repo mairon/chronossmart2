@@ -1,0 +1,106 @@
+<h1 id="header">Ingresso Stock - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+<%= form_for(@stock) do |f| %>
+  <%= f.hidden_field :persona_nome, :value => 'ENTRADA_DIRETA' %>
+  <%= f.hidden_field :tabela, :value => 'ENTRADA_DIRETA' %>
+  <%= f.hidden_field :sigla_proc, :value => 'ID' %>
+  <%= f.hidden_field :status, :value => 0 %>
+        <table>
+          <tr>
+            
+            <td> 
+              <label for=""><%= t('DATE') %></label> 
+              <%= f.date_select :data ,{},{:onblur => "StockCotacao()"} %></td>
+              <%= hidden_field_tag( 'key' ) %>
+            <td>
+              <label for="">Deposito</label>
+              <%= f.collection_select :deposito_id, Deposito.all(:select => 'id,nome', :conditions => ["unidade_id = #{current_unidade.id}"],:order => '1'),:id,:nome %></td>
+          </tr>       
+
+          <tr height="35">
+             <td colspan="6">
+              <label for=""><%= t('PRODUCT') %></label>
+              <%= text_field :cod, :busca,
+                  :onkeypress  => "return bloqEnter(event)",
+                  :size        => 20, :placeholder => 'Ref. / Cod. Barra', :autofocus   => true %>            
+
+             <%= f.text_field :produto_nome, :size => 60, class: 'autocomplete', required: true, autofocus: true %>
+
+             <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+
+             <%= f.hidden_field :produto_id %> 
+
+            </td>
+          </tr>
+
+          <tr height="35">
+                        
+              <td>
+                <label for="">Entrada</label>
+              <% if params[:action] == 'new' %>
+                <%= f.text_field :entrada, :size => 15, :dir   => "rtl" , :step  => ".01", value: '', required: true %>
+              <% else %>
+                <%= f.text_field :entrada, :size => 15, :dir   => "rtl" , :step  => ".01", required: true %>
+              <% end %>
+              </td>
+              <%= field_gs_label 'Costo Gs.:',f, :unitario_guarani, required: true %>
+          </tr>
+        </table>
+        <div class="footer-buttons">
+          <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false", required: true %>
+          <%= link_to t('BACK'), stock_inicial_stocks_path, :class => "btn btn-back" %>
+        </div>        
+      </div>      
+    <% end %>
+  </div>
+</div>
+<script>
+
+
+$("#cod_busca").change(function(){
+  $.ajax({url: "/buscas/busca_compra_produto",
+          type: 'GET',
+          beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+          data: "cod=" + escape($("#cod_busca").val()) +
+                "&id="+ $("#id").val(),
+          error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                  alert('Producto no Encontrado'); 
+                  $('#cod_busca').focus();
+                  $('#cod_busca').val('');
+              },
+          success: function(grade){
+            $('#stock_produto_nome').val(grade["produto"].nome);
+            $('#stock_produto_id').val(grade["produto"].produto_id);
+        }
+      });
+});
+
+
+$(function() {
+  $( "#stock_produto_nome" ).autocomplete({
+      source: function( request, response ) {
+      $("#sppiner").addClass("sppiner_show");
+      $.ajax({
+        url: "/buscas/search_all_produtos",
+        dataType: "json",
+        data: {
+          tipo: 'DESCRIPCION',
+          busca: request.term
+        },
+        success: function( data ) {
+          response( data );
+          $("#sppiner").removeClass("sppiner_show");
+        },
+      });
+    },
+    minLength: 2,
+    select: function( event, ui ) {
+      $("#stock_produto_id").val("");
+      $( "#stock_produto_nome" ).val(ui.item.label);
+      $('#stock_produto_id').val(ui.item.id);
+      return false;
+    }
+  });
+});
+
+</script>

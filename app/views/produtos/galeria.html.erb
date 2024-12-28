@@ -1,0 +1,57 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-md-11" style="padding-top: 5px;">
+
+          <label><i class="icon-tag"></i> <b><%= @produto.id.to_s.rjust(6,'0')%>-<%= @produto.nome %></b> | Marca: <%= @produto.clase.descricao %></label>
+        </div>
+        <div class="col-md-1" align="right">
+          <%= link_to  produto_path, :class => "btn btn-blue", style:"margin-top: 5px" do %>
+            <i class="icon-white icon-chevron-right"></i>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+    <div class="panel-body">
+      <%= form_for(ProdutoImagen.new) do |f| %>
+        <%= f.hidden_field :produto_id, value: @produto.id %>
+        <div class="row">
+          <div class="col-md-3">
+            <%= f.file_field :foto, class: 'panel-field button' %>
+          </div>
+          <div class="col-md-3">
+            <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+    <div class="panel-body">
+      <table>
+        <% @produto.produto_imagens.each do |pi| %>
+          <tr class="<%= cycle("cor1", "cor2")%>">
+            <td><%= link_to image_tag(pi.foto(:thumb)), pi.foto.url, target: "_blank?" , class: 'img-thumbnail' %></td>
+            <td><%= link_to '', pi, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div>

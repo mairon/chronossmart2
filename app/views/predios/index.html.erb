@@ -1,0 +1,28 @@
+<h1 id="header">Predios</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_predio_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="80">Código</td>
+    <td width="100">Nome</td>
+    <td width="100">Status</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @predios.each do |predio| %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td width="80"><%= predio.id.to_s.rjust(6,'0') %></td>
+        <td width="100"><%= predio.nome %></td>
+        <td width="100"><%= predio.status %></td>
+        <td><%= link_to '', edit_predio_path(predio), class: 'icon-pencil' %></td>
+        <td><%= link_to '', predio, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+        <td><%= link_to 'Apartamentos', predio %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

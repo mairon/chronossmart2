@@ -1,0 +1,112 @@
+<ul class="tabs">
+  <li><a href="#tab1">Compra Prod. - [<%= t('EDITION') %>]</a></li>
+</ul>
+<div class="tab_container">
+<br/>
+
+  <table class="head_grid">
+    <tr>
+      <td width="30" align="center"></td>
+      <td width="80" align="center">Ref.</td>
+      <td width="55">Tamanho</td>
+      <td width="230">Color</td>
+      <td width="350" >Producto</td>
+      <td width="60" align="right">Cant.</td>
+      <td width="60" align="right">Empaque</td>
+      <td width="60" align="right">Saldo</td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+    <table>
+      <% indice = 1 %>
+      <% qtd    = 0 %>
+      <% cust   = 0 %>
+      <% unit   = 0 %>
+      <% desc   = 0 %>
+      <% tot    = 0 %>
+      <% @compras_produtos.each do |cp| %>
+         <tr class = "<%= cycle("cor1", "cor2") %>">
+            <!--COMPRA !-->
+            <td width="30"  align="center">  <%= indice %></td>
+            <td width="80"  align="center">  <%= cp.fabricante_cod %></td>
+            <td width="50" align="left">     <%= cp.tamanho_nome %></td>
+            <td width="230" align="left">    <%= cp.cor_nome %></td>
+            <td width="350" align="left">    <%= cp.produto_nome %></td>
+            <td width="60"  align="right"><b><%= cp.quantidade.to_i %></b></td>
+            <td width="60"  align="right"><b><%= cp.sum_empaque.to_i %></b></td>
+            <td width="60"  align="right"><b><%= cp.quantidade.to_i - cp.sum_empaque.to_i %></b></td>
+           <% indice += 1 %>
+           <% qtd += cp.quantidade.to_i - cp.sum_empaque.to_i %>
+         </tr>
+      <% end %>
+    </table>
+  </div>
+
+  <!-- RESULTDOS!-->
+  <table>
+    <tr>
+      <td width="905"></td>
+      <td width="40" align="right"><b><%= qtd.to_i %></b></td>
+    </tr>
+  </table>
+
+  <table>
+    <tr>
+      <td><%= render :partial=>"compras_empaques/new_empaque", :locals=>{:compras_empaque=>ComprasEmpaque.new(:compra_id=>@compra.id)} %></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="grid">
+          <table class="head_grid">
+            <tr>
+              <td width="80" align="center">Ref.</td>
+              <td width="55">Tamanho</td>
+              <td width="230">Color</td>
+              <td width="350" >Producto</td>
+              <td width="200" >Barra</td>
+              <td width="70" align="right">Costo</td>
+              <td width="70" align="right">Precio Corri.</td>
+              <td width="70" align="right">Precio</td>
+              <td width="40" align="right">Cant.</td>
+            </tr>
+          </table>
+
+          <div class="rolagem" dir="div">
+            <table>
+              <% @compras_empaques.each do |compras_empaque| %>
+                <tr class = "<%= cycle("cor1", "cor2") %>">
+                  <td width="80"><%= compras_empaque.fabricante_cod %></td>
+                  <td width="55"><%= compras_empaque.tamanho_nome %></td>
+                  <td width="230"><%= compras_empaque.cor_nome %></td>
+                  <td width="350"><%= compras_empaque.produto_nome %></td>
+                  <td width="200"><%= compras_empaque.barra %></td>
+                  <td width="70" align="right"><%= number_to_currency(compras_empaque.custo_gs.to_f , :format=>' %n ', :precision => 0) %></td>
+
+                  <td width="70" align="right"><%= number_to_currency(compras_empaque.preco_alterado_gs.to_f , :format=>' %n ', :precision => 0) %></td>
+                  <td width="70" align="right"><%= number_to_currency(compras_empaque.preco_gs.to_f , :format=>' %n ', :precision => 0) %></td>
+                  <td width="40" align="right"><%= compras_empaque.quantidade.to_i %></td>
+                  <td><%= link_to t('DELETE'), compras_empaque, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+                </tr>
+              <% end %>
+            </table>
+          </div>
+
+
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <div class="buttons">
+    <a href="/compras/<%=params[:id]%>", class="button back"><%= t('BACK') %></a>
+    <a href="/compras/<%=params[:id]%>/compras_financa", class="button next">Seguir</a>
+    <a href="javascript:void(0)"class="button print" onClick="Etiquetas()">Etiquetas</a>
+  </div>
+
+</div>
+
+<script>
+  function Etiquetas(){
+  window.open('/compras/' +<%= @compra.id %>+'/etiquetas', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+</script>

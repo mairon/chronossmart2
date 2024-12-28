@@ -1,0 +1,119 @@
+<div class="group">
+
+   <table>
+
+    <% totentrada = 0 %>
+    <% totsaida   = 0 %>
+	  <% unit_us    = 0 %>
+	  <% unit_gs    = 0 %>
+	  <% toten_us   = 0 %>
+	  <% totsa_us   = 0 %>
+	  <% toten_gs   = 0 %>
+	  <% totsa_gs   = 0 %>
+    <% prod       = '' %>
+
+      <tr>
+        <td colspan="3" align="center"></td>
+        <td align="left">SALDO ANTERIOR</td>
+        <td colspan="3" align="center"></td>
+        <td align="right"><%=h format( "%.1f", @saldo_anterior.to_f ) %> </td>
+      </tr>
+
+      <% @stocks.each do |p| %>
+        <tr class="<%= cycle("cor1", "cor2")%>">
+          <% if p.tab == 'COMPRAS_PRODUTOS' %>
+            <% sigla = "CP" %>
+            <% find_compra = Compra.find_by_id(p.cod_processo.to_i) %>
+            <% p.cod_processo =  find_compra.documento_numero %>
+            <% elsif p.tab == 'VENDAS_PRODUTOS' %>
+              <% sigla = "VD" %>
+            <% elsif p.tab == 'CONDICIONAL_PRODUTOS' %>
+              <% sigla = "CD" %>
+            <% elsif p.tab == 'COND_LIQ_PRODUTOS' %>
+              <% sigla = "LD" %>
+            <% elsif p.tab == 'COND_LIQ_VENDIDOS' %>
+              <% sigla = "LV" %>
+            <% elsif p.tab == 'NOTA_CREDITOS_PROVEEDOR_PRODUTOS' %>
+              <% sigla = "NP" %>
+            <% elsif p.tab == 'NOTA_CREDITOS_DETALHES' %>
+              <% sigla = "NC" %>
+            <% elsif p.tab == 'TRANSFERENCIA_DEPOSITOS' %>
+              <% sigla = "TD" %>
+            <% end %>
+          <td width="60" align="center"> <%= sigla %>|<%= p.cod_processo.to_s.rjust(6,'0') %></td>
+          <td width="40" align="center">  <%= p.data.strftime("%d/%m/%y")%> </td>
+          <td width="60">  <%= p.fabricante_cod %></td>
+          <td width="150" align="left">   <%= truncate( p.persona_nome, :length => 14 ) %> </td>
+          <td width="350" align="left">   <%= truncate( p.produto_nome, :length => 38 ) %> </td>
+  	      <% if params[:moeda] == "0" %>
+            <td width="80" align="right"><%=h number_to_currency( p.unitario_dolar.to_f , :format=>' %n ', :separeitor => ',') %> </td>
+            <% if p.entrada.to_f > 0 %>
+              <td width="80" align="right"><%=h number_to_currency( p.unitario_dolar.to_f * ( p.entrada.to_f ).to_f , :format=>' %n ', :separeitor => ',') %> </td>
+              <% toten_us   += ( p.unitario_dolar.to_f * p.entrada.to_f ) %>
+            <% else %>
+              <td width="80" align="right"><%=h number_to_currency( p.unitario_dolar.to_f * ( p.saida.to_f ).to_f , :format=>' %n ', :separeitor => ',') %> </td>
+              <% totsa_us   += ( p.unitario_dolar.to_f * p.saida.to_f )%>
+            <% end %>
+  	        <% unit_us    += p.unitario_dolar.to_f %>
+	        <% else %>
+            <td width="80" align="right">  <%=h number_to_currency( p.unitario_guarani.to_f , :format=>' %n ', :precision => 0 ) %> </td>
+            <% if p.entrada.to_f > 0 %>
+              <td width="80" align="right">  <%=h number_to_currency( p.unitario_guarani.to_f * (p.entrada.to_f), :format=>' %n ', :precision => 0 ) %> </td>
+              <% toten_gs   += ( p.unitario_guarani.to_f * p.entrada.to_f ) %>
+            <% else %>
+              <td width="80" align="right">  <%=h number_to_currency( p.unitario_guarani.to_f * (p.saida.to_f), :format=>' %n ', :precision => 0 ) %> </td>
+              <% totsa_gs   += ( p.unitario_guarani.to_f * p.saida.to_f )%>
+            <% end %>
+			      <% unit_gs    += p.unitario_guarani.to_f %>
+	        <% end %>
+
+          <td width="80" align="right">  <%=h format( "%.1f",p.entrada.to_f ) %> </td>
+          <td width="80" align="right">  <%=h format( "%.1f",p.saida.to_f ) %> </td>
+            <% totentrada += p.entrada.to_f %>
+            <% totsaida   += p.saida.to_f %>
+
+          <td width="80" align="right">  <%=h format( "%.1f", (@saldo_anterior.to_f + (totentrada.to_f - totsaida.to_f) ) ) %> </td>
+        </tr>
+      <% end %>
+      <tr class="head" height="20">
+        <td colspan="7">Anterior : <%= @saldo_anterior %></td>
+        <td align="right"><%= format( "%.1f",totentrada ) %></td>
+        <td align="right"><%= format( "%.1f",totsaida ) %></td>
+        <td align="right"><%= format( "%.1f", ( @saldo_anterior.to_f + totentrada.to_f ) - totsaida.to_f  ) %></td>
+      </tr>
+
+      <tr>
+        <td colspan="7">LEGENDA:</td>
+      </tr>
+
+      <tr>
+        <td colspan="3"><small>VD-Venta</small></td>
+      </tr>
+      <tr>
+        <td colspan="3"><small>CP-Compra</small></td>
+      </tr>
+
+      <tr>
+        <td colspan="3"><small>CD-Condicional</small></td>
+      </tr>
+
+      <tr>
+        <td colspan="3"><small>LD-Liquidación Devolvida</small></td>
+      </tr>
+
+      <tr>
+        <td colspan="3"><small>LV-Liquidación P/ Facturar</small></td>
+      </tr>
+
+      <tr>
+        <td colspan="3"><small>NP-Nota de Credito Proveedor</small></td>
+      </tr>
+
+      <tr>
+        <td colspan="3"><small>NC-Nota de Credito Cliente</small></td>
+      </tr>
+   </table>
+</div>
+
+
+

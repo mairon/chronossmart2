@@ -1,0 +1,70 @@
+<table>
+		<% venda_config = VendasConfig.where(unidade_id: current_unidade.id).last %>
+		<tr class="<%= cycle('cor1','cor2') %>" title="<%= vendas_produto.obs %>">
+	
+		<td width="280" align="left">
+			<div id="opener<%= vendas_produto.id %>" hidden>
+				<%= image_tag 'icon_print_black.png'%>
+			</div>
+			<% if vendas_produto.print == true %>
+				<%= image_tag 'icon_print_black.png'%>
+			<% end %>
+			
+			<%= link_to vendas_produto.produto_nome, '#', onclick: "OpenUpdateVendasProdutos(#{vendas_produto.id},'#{vendas_produto.produto_nome}', $('#input_quantidade_#{vendas_produto.id}').val(), $('#input_unit_gs_#{vendas_produto.id}').val() )" %>
+		</td>
+		<td width="20" style="padding:0px !important">
+			<% unless vendas_produto.promo_id.nil? %>
+				<% if vendas_produto.promo.tipo.to_i == 0  %>
+					<%= image_tag('discount.png') %> <div style="color: #fff; position: relative; margin-top: -20px; margin-left: 4px; font-size: 10px;"><%= vendas_produto.promo.percen_desc.to_i unless vendas_produto.promo_id.nil? %>%</div>
+				<% else %>
+					<%= image_tag('discount.png') %> <div style="color: #fff; position: relative; margin-top: -20px; margin-left: 4px; font-size: 10px;"><%= vendas_produto.promo.promo_dts.last.desc_porce.to_i unless vendas_produto.promo_id.nil? %>%</div>
+				<% end %>
+
+			<% end %>
+		</td>		
+		<td width="60" align="right"> <span id="qtd_vendas_produtos_<%= vendas_produto.id %>"><%= vendas_produto.quantidade.to_f %></span></td>
+		<%= hidden_field_tag "input_quantidade_#{vendas_produto.id}", format_peso(vendas_produto.quantidade.to_f) %>
+		<%= hidden_field_tag "input_unit_gs_#{vendas_produto.id}", number_to_currency(vendas_produto.unitario_guarani, :format=>' %n ', :precision => 0) %>
+		<% if vendas_produto.moeda == 0 %>
+			<td width="80" align="right"><%= number_to_currency(vendas_produto.unitario_dolar, :format=>' %n ', :separeitor =>  ",", :precision => venda_config.unit_us_decimal.to_i ) %> </td>
+			<td width="80" align="right"><%= number_to_currency(vendas_produto.total_dolar, :format=>' %n ', :separeitor =>  "," ) %> </td>
+		<% elsif vendas_produto.moeda == 1 %>
+			<td width="80" align="right"><%= number_to_currency(vendas_produto.unitario_guarani, :format=>' %n ', :precision => 0) %> </td>
+			<td width="80" align="right"> <span id="total_gs_vendas_produtos_<%= vendas_produto.id %>"><%= number_to_currency(vendas_produto.total_guarani, :format=>' %n ', :precision => 0) %></span> </td>
+		<% else %>
+			<td width="80" align="right"><%= number_to_currency(vendas_produto.unitario_real, :format=>' %n ', :separeitor =>  "," ) %> </td>
+			<td width="80" align="right"><%= number_to_currency(vendas_produto.total_real, :format=>' %n ', :separeitor =>  "," ) %> </td>
+		<% end %>
+
+		<% fin = VendasFinanca.find_by_sql("select count(id) from vendas_financas where venda_id = #{vendas_produto.venda_id}").first() %>
+		<% vd = Venda.find_by_id(vendas_produto.venda_id) %>
+		
+
+		<% if venda_config.caixa_separado.to_i == 1 %>
+			<% if vd.op == false %>
+				<% if vendas_produto.op == false %>
+				<td><%= link_to 'Comple.', edit_vendas_produto_path(vendas_produto) %></td>
+					<% if venda_config.autoriza_gerente == true %>
+						<% if vendas_produto.print != true %>
+							<td><span id="borrar<%= vendas_produto.id %>"><%= link_to '', vendas_produto_path(vendas_produto), class: 'icon-trash' %></span></td>
+						<% end %>
+					<% else %>
+						<% if vendas_produto.print != true %>
+							<td><span id="borrar<%= vendas_produto.id %>"><%= link_to '', vendas_produto, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></span></td>
+						<% end %>
+					<% end %>
+				<% end %>
+			<% end %>
+
+
+		<% else %>		
+			<% if fin.count.to_i == 0 %>
+				<td><%= link_to 'Comple.', edit_vendas_produto_path(vendas_produto) %></td>
+				<% if vendas_produto.print != true %>
+					<td><span id="borrar<%= vendas_produto.id %>"><%= link_to '', vendas_produto, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></span></td>
+				<% end %>
+			<% end %>
+
+		<% end %>
+		</tr>
+</table>

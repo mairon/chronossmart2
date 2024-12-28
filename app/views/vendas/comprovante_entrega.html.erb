@@ -1,0 +1,173 @@
+<style type="text/css">
+
+	.border{
+		border-collapse: collapse;
+	}
+	p{
+		text-align: justify;
+		font-size: 10px;
+    	
+	}
+
+	hr{
+		border-collapse: collapse;
+		border-top: 1px solid black;
+
+	}
+</style>
+
+<table>
+	<tr height="200">
+		<td></td>
+	</tr>
+	<tr>
+		<td width="300"></td>
+		<td width="300" style="font-size: 12px;">Santa Rita, <%= l @venda.data, :format => :long %></td>
+	</tr>
+	<tr>
+		<td width="300" style="font-size: 12px;">Estimado:</td>
+	</tr>
+	<tr>
+		<td width="300" style="font-size: 10px;"><b><%= @venda.persona.nome %></b></td>
+	</tr>
+	<tr>
+		<td width="300" style="font-size: 10px;"><b>tel: <%= @venda.persona.persona_contatos.last.telefone_01 %></b></td>
+	</tr>
+	<tr>
+		<td style="font-size: 10px;">Direción: <%= @venda.cidade.nome %></td>
+	</tr>
+	<tr height="20">
+		<td width="300" style="font-size: 10px;"><b>Presente:</b></td>
+	</tr>
+
+	<tr>
+		<td colspan="2" style="padding: 30px; ">
+			<p style="text-align: justify;font-size: 10px;">
+				&nbsp&nbsp Nos dirigimos a Usted con el  objetivo de informales sobre las nuevas medidas  que ha tomado la empresa: Distribuidor 3 FRONTERAS S.A. con la finalidad de mejorar la atención que usted se  merece.				
+			</p>
+			<p style="text-align: justify;font-size: 10px;">
+				&nbsp&nbsp La carga de combustible será precintada por la empresa a fin de que Usted tenga la seguridad de no haber problema con adulteración, solicitamos que Usted, Señor Cliente o su encargado verifique los precintos como también la cantidad exacta de litros a ser medido con la regla correspondiente según su pedido.
+			</p>
+			<p style="text-align: justify;font-size: 10px;">
+				&nbsp&nbsp Cualquier duda o reclamo estamos a su entera disposición en nuestra  oficina o a los Teléfonos: 0673-220260, 0673-225037 al 225039 o al 0983-617497.-				
+			</p>
+			<p style="text-align: justify;font-size: 10px;">
+				&nbsp&nbsp Aprovechamos  la oportunidad para saludarle con el respeto que usted se merece.
+			</p>
+			<p style="color: red;text-align: justify;font-size: 10px;">
+				OBS. El camion posee una reserva de 200 Lts de gasoil que se usa para generar la descarga exacta a los clientes, o sea cuando empieza a descargar llena las mangeras con esa reserva para que usted cliente este seguro de la cantidad descargada.
+				<br>
+				Por favor verifique el numero de bomba del camion.
+				
+			</p>
+		</td>
+	</tr>	
+	<tr>
+		<td colspan="2" align="center">
+
+		<table>
+			<tr height="10">
+				<td width="200" style="font-size: 10px;"><b>PRECINTOS NRO:</b></td>
+				<td  style="font-size: 10px;"><b><%= @venda.lacres %></b></td>
+			</tr>
+		</table>
+		<table border="1" class="border">
+			<tr>
+				<td width="250" style="font-size: 10px;"><b>Producto</b></td>
+				<td align="right" width="120" style="font-size: 10px;"><b>Cantidad</b></td>
+			</tr>
+			<% tot = 0 %>
+			<% @venda.vendas_produtos.each do |vp| %>
+				<tr>
+					<td style="font-size: 10px;"><%= vp.produto_nome %></td>
+					<td align="right" style="font-size: 10px;"><%= vp.quantidade.to_i %></td>
+				</tr>
+				<% tot += vp.quantidade.to_i %>
+			<% end %>
+				<tr>
+					<td style="font-size: 10px;"><b>Total:</b></td>
+					<td align="right" style="font-size: 10px;"><b><%= tot.to_i %></b></td>
+				</tr>
+		</table>
+
+		</td>
+	</tr>
+
+	<tr  height="20">
+		<td colspan="4"  align="center">
+
+			<table border="1" class="border">
+				<tr>
+					<td width="250" style="font-size: 10px;"><b>Factura</b></td>
+					<td align="right" width="120" style="font-size: 10px;"><b><%= t('SALE') %></b></td>
+				</tr>
+
+				<% @venda.vendas_faturas.each do |vf| %>
+					<tr>
+						<td style="font-size: 10px;"><%= vf.documento_numero_01 %>-<%= vf.documento_numero_02 %>-<%= vf.documento_numero %></td>
+						<td align="right" style="font-size: 10px;"><%= vf.venda_id.to_s.rjust(6,'0') %></td>
+					</tr>
+				<% end %>
+			</table>			
+
+		</td>
+	</tr>
+
+	<tr>
+		<td colspan="4" height="20"><hr/></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+
+		<table>
+			<tr height="50">
+				<td width="200" style="font-size: 12px;"><b>Entregado por:</b></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td width="120" align="right" style="font-size: 12px;">Chofer:</td>
+				<% cf =  Persona.find_by_id(@venda.chofer_id) %>
+				<td style="font-size: 12px;"><b><%= cf.nome unless @venda.chofer_id.blank? %></b></td>
+			</tr>
+
+			<tr>
+				<td width="80" align="right" style="font-size: 12px;">Camión:</td>
+				<td style="font-size: 12px;"><b><%= @venda.rodado.controle %> <%= @venda.rodado.marcao %>  <%= @venda.rodado.modelo %> | Chapa: <%= @venda.rodado.placa %></b></td>
+			</tr>
+		</table>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="4" height="5"><hr/></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+		<table>
+			<tr height="50">
+				<td width="300" align="center" style="font-size: 12px;"><b>Verificado por:</b></td>
+				<td width="300" align="center" style="font-size: 12px;"><b>Recebí Conforme:</b></td>
+			</tr>
+
+			<tr height="50">
+				<td width="300" style="font-size: 12px;"><b>Firma.....:____________________________________________</b></td>
+				<td width="300" style="font-size: 12px;"><b>Firma.....:____________________________________________</b></td>
+			</tr>
+			<tr height="50">
+				<td width="300" style="font-size: 12px;"><b>Aclaración:____________________________________________</b></td>
+				<td width="300" style="font-size: 12px;"><b>Aclaración:____________________________________________</b></td>
+			</tr>
+			<tr height="50">				
+				<td width="300" style="font-size: 12px;"><b>Nº DE BOMBA CAMIÓN......:______________________________________</b></td>
+				<td width="300" style="font-size: 12px;"><b>Nº DE BOMBA CLIENTE.....:______________________________________</b></td>
+			</tr>
+		</table>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="4"><small>
+		</small></td>
+	</tr>
+
+
+
+</table>

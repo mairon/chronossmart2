@@ -1,0 +1,81 @@
+<%= form_for(@sueldo_pago) do |f| %>
+  <% if @sueldo_pago.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@sueldo_pago.errors.count, "error") %> prohibited this sueldo_pago from being saved:</h2>
+
+      <ul>
+      <% @sueldo_pago.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :data %><br />
+    <%= f.date_select :data %>
+  </div>
+  <div class="field">
+    <%= f.label :persona_id %><br />
+    <%= f.number_field :persona_id %>
+  </div>
+  <div class="field">
+    <%= f.label :persona_nome %><br />
+    <%= f.text_field :persona_nome %>
+  </div>
+  <div class="field">
+    <%= f.label :moeda %><br />
+    <%= f.number_field :moeda %>
+  </div>
+  <div class="field">
+    <%= f.label :valor_us %><br />
+    <%= f.text_field :valor_us %>
+  </div>
+  <div class="field">
+    <%= f.label :valor_gs %><br />
+    <%= f.text_field :valor_gs %>
+  </div>
+  <div class="field">
+    <%= f.label :valor_rs %><br />
+    <%= f.text_field :valor_rs %>
+  </div>
+  <div class="field">
+    <%= f.label :rubro_id %><br />
+    <%= f.number_field :rubro_id %>
+  </div>
+  <div class="field">
+    <%= f.label :rubro_nome %><br />
+    <%= f.text_field :rubro_nome %>
+  </div>
+  <div class="field">
+    <%= f.label :obs %><br />
+    <%= f.text_area :obs %>
+  </div>
+  <div class="field">
+    <%= f.label :documento_numero_01 %><br />
+    <%= f.text_field :documento_numero_01 %>
+  </div>
+  <div class="field">
+    <%= f.label :documento_numero_02 %><br />
+    <%= f.text_field :documento_numero_02 %>
+  </div>
+  <div class="field">
+    <%= f.label :documento_numero %><br />
+    <%= f.text_field :documento_numero %>
+  </div>
+  <div class="field">
+    <%= f.label :timbrado %><br />
+    <%= f.text_field :timbrado %>
+  </div>
+  <div class="field">
+    <%= f.label :cheque %><br />
+    <%= f.text_field :cheque %>
+  </div>
+  <div class="field">
+    <%= f.label :diferido %><br />
+    <%= f.date_select :diferido %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

@@ -1,0 +1,38 @@
+<h1 id="header">Contratos</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_contrato_path, :class => "button add" %>
+</div>
+<div class="group">
+  <h2>
+    <%= form_tag busca_contratos_path, :method => "get" do %>
+      <table>
+        <tr>
+
+          <td>
+             <select name="tipo" id="tipo">
+               <option>CLIENTE</option>
+               <option><%= t('DOC').upcase %></option>
+               <option>CODIGO</option>
+               <option>CENTRO CUSTOS</option>
+            </select>
+          </td>
+          <td colspan="4">
+            <input id="busca" name="busca" type="text" onkeyup = "pesquisa(this.value)" size="25"/>
+            <input type="button" class="btn btn-default" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar"/>
+            <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;") %>
+          </td>
+         </tr>
+      </table>
+    <input type="hidden" id="seta" value="0"/>
+    <% end %>
+  </h2>
+    <div id="pagina">
+    </div>
+</div>    
+<script language="javascript">
+  function pesquisa(valor){
+    url="/contratos/busca?" + $('form').serialize();
+    ajax(url);
+  }
+</script>
+<%= javascript_include_tag 'busca_ajax' %>

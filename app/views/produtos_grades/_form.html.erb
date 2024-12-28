@@ -1,0 +1,57 @@
+<%= form_for(@produtos_grade) do |f| %>
+  <% if @produtos_grade.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@produtos_grade.errors.count, "error") %> prohibited this produtos_grade from being saved:</h2>
+
+      <ul>
+      <% @produtos_grade.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> produtos_grades - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+
+                      <td align="right">produto_id :</td>
+                      <td><%= f.number_field :produto_id %></td>
+
+                      <td align="right">fabricante_id :</td>
+                      <td><%= f.number_field :fabricante_id %></td>
+
+                      <td align="right">barra :</td>
+                      <td><%= f.text_field :barra %></td>
+
+                      <td align="right">cor_id :</td>
+                      <td><%= f.number_field :cor_id %></td>
+
+                      <td align="right">tamanho_id :</td>
+                      <td><%= f.number_field :tamanho_id %></td>
+
+                                      </tr>
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), produtos_grades_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

@@ -1,0 +1,63 @@
+<table>
+  <% tot_div_us = 0 %>
+  <% tot_pg_us = 0 %>
+  <% tot_div_gs = 0 %>
+  <% tot_pg_gs = 0 %>
+  <% tot_div_rs = 0 %>
+  <% tot_pg_rs = 0 %>
+
+  <% @adelantos.each do |ad| %>
+	<tr class="<%= cycle("cor1", "cor2")%>">
+		<td width="30" align="center"><%= ad.id.to_s.rjust(6,'0') %></td>
+		<td width="40" align="center"><%= ad.data.strftime("%d/%m/%y") %></td>
+    <td width="100" align="center"><%= ad.doc %></td>
+		<td width="150" align="left"><%= truncate(ad.persona_nome, length: 25) %></td>
+		<td width="150" align="left"><%= ad.concepto %></td>
+    <% if params[:moeda] == '0' %>
+      <td width="60" align="right"><%= format_decimal(ad.pago_us)%></td>
+      <td width="60" align="right"><%= format_decimal(ad.div_us)%></td>
+      <td width="60" align="right"><%= format_decimal(ad.pago_us.to_f - ad.div_us.to_f)%></td>
+      <% tot_div_us += ad.div_us.to_f %>
+      <% tot_pg_us += ad.pago_us.to_f %>
+
+    <% elsif params[:moeda] == '1' %>
+      <td width="60" align="right"><%= format_int(ad.pago_gs)%></td>
+      <td width="60" align="right"><%= format_int(ad.div_gs)%></td>
+      <td width="60" align="right"><%= format_int(ad.pago_gs.to_f - ad.div_gs.to_f)%></td>
+      <% tot_div_gs += ad.div_gs.to_f %>
+      <% tot_pg_gs += ad.pago_gs.to_f %>
+
+    <% elsif params[:moeda] == '2' %>
+      <td width="60" align="right"><%= format_decimal(ad.pago_rs)%></td>
+      <td width="60" align="right"><%= format_decimal(ad.div_rs)%></td>
+      <td width="60" align="right"><%= format_decimal(ad.pago_rs.to_f - ad.div_rs.to_f)%></td>
+      <% tot_div_rs += ad.div_rs.to_f %>
+      <% tot_pg_rs += ad.pago_rs.to_f %>
+
+    <% end %>
+	</tr>
+  <% end %>
+  <tr class="head">
+	<td colspan="5"></td>
+      <% if params[:moeda] == "0" %>
+        <td align="right"><%= format_decimal(tot_pg_us.to_f) %></td>
+        <td align="right"><%= format_decimal(tot_div_us.to_f) %></td>
+        <td align="right"><%= format_int(tot_pg_us.to_f - tot_div_us.to_f) %></td>
+      <% elsif params[:moeda] == "1" %>
+        <td align="right"><%= format_int(tot_pg_gs.to_f) %></td>
+        <td align="right"><%= format_int(tot_div_gs.to_f) %></td>
+        <td align="right"><%= format_int(tot_pg_gs.to_f - tot_div_gs.to_f) %></td>
+      <% else %>
+        <td align="right"><%= format_decimal(tot_pg_rs.to_f) %></td>
+        <td align="right"><%= format_decimal(tot_div_rs.to_f) %></td>
+        <td align="right"><%= format_int(tot_pg_rs.to_f - tot_div_rs.to_f) %></td>
+      <% end %>
+  </tr>
+  
+</table>
+
+<style type="text/css">
+	table {
+		font-size: 9px
+	}
+</style>

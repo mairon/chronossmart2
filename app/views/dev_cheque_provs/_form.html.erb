@@ -1,0 +1,89 @@
+<%= form_for(@dev_cheque_prov) do |f| %>
+  <% if @dev_cheque_prov.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@dev_cheque_prov.errors.count, "error") %> prohibited this dev_cheque_prov from being saved:</h2>
+
+      <ul>
+      <% @dev_cheque_prov.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> Devolución de Cheque Proveedor - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                    <td align="right"><%= t('DATE') %>:</td>
+                    <td><%= f.date_select :data %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Cotizacion :</td>
+                      <td> <%= text_field  :dev_cheque_prov, :cotacao,
+                        :size     => 10,
+                        :value    => @dev_cheque_prov.cotacao.to_i,
+                        :onfocus  => " $.ajax({url: '/buscas/cotz_us_compra',
+                                          type: 'POST',
+                                          data: 'data=' + $('#dev_cheque_prov_data_3i').val()+'/'+
+                                          $('#dev_cheque_prov_data_2i').val()+'/'+
+                                          $('#dev_cheque_prov_data_1i').val(),
+                                          success: function(data){
+                                            $('#dev_cheque_prov_cotacao').val(data);} })"%>
+                    </td>
+
+                    <td align="right">Cotización :</td>
+                    <td> <%= text_field :dev_cheque_prov,:cotacao_real ,
+                                                  :size     => 10,
+                                                  :value    => @dev_cheque_prov.cotacao_real.to_i,
+                                                  :onfocus  => " $.ajax({url: '/buscas/cotz_rs_compra',
+                                                                 type: 'POST',
+                                                                 data: 'data=' + $('#dev_cheque_prov_data_3i').val()+'/'+
+                                                                 $('#dev_cheque_prov_data_2i').val()+'/'+
+                                                                 $('#dev_cheque_prov_data_1i').val(),
+                                                                 success: function(data){
+                                                                   $('#dev_cheque_prov_cotacao_real').val(data);} })"%>
+
+                                                 
+                    </td>
+                  </tr>
+                  <tr>
+                     <td align="right">Nombre :</td>
+                     <td colspan="4"><%= f.collection_select :persona_id, Persona.all( :select => ' id,nome', :conditions => ["tipo_fornecedor = 1"], :order  => '2' ), :id, :nome,{:prompt => 'Selecione lo Proveedor'},{:class => "selc_medium"} %></td>
+                  </tr>
+
+                  <tr>
+                     <td align="right">Cuenta :</td>
+                     <td><%= f.collection_select :conta_id, Conta.all( :select => ' id,nome', :conditions => ["unidade_id = #{current_unidade.id} and tipo = 1"], :order  => '2' ), :id, :nome,{:prompt => 'Selecione la Cuenta'} %></td>
+                  </tr>
+                  <tr>
+                     <td align="right" valign="top">Concepto :</td>
+                     <td colspan="5"><%= f.text_area   :obs,:cols => 65, :rows => 5 %></td>
+                  </tr>
+                                                                            
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Seguir ", :class => "button" %>
+        <%= link_to t('BACK'), dev_cheque_provs_path, :class => "button back" %>        
+      </div>
+    </div>
+    <script type="text/javascript">
+    $("#dev_cheque_prov_data_3i").focus();
+    </script>
+<% end %>

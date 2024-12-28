@@ -1,0 +1,288 @@
+
+<table>
+  <% quebra  = "" %>
+  <% sub_tot_gs  = 0 %>
+  <% sub_tot_us  = 0 %>
+  <% sub_tot_rs  = 0 %>
+  <% sub_comissao_gs  = 0 %>
+  <% sub_comissao_us  = 0 %>
+  <% sub_comissao_rs  = 0 %>
+  <% sub_venda_gs  = 0 %>
+  <% sub_venda_us  = 0 %>
+  <% sub_venda_rs  = 0 %>
+  <% sub_cobro_gs = 0 %>
+  <% sub_cobro_us = 0 %>
+  <% sub_cobro_rs = 0 %>
+
+  <% tot_gs  = 0 %>
+  <% tot_us  = 0 %>
+  <% tot_rs  = 0 %>
+ 
+
+  <% @comissaos.each do |d| %>
+    <% if quebra != d.vendedor_nome %>
+      <% if quebra != "" %>
+
+        <tr class="head">
+          <td colspan="6" align="right"> VENTA</td>
+          <td align="right"><%= format_int(sub_venda_gs) %></td>
+          <% sub_venda = 0 %>
+        </tr> 
+
+        <tr class="head">
+          <td colspan="6" align="right">COBRO</td>
+          <td align="right"><%= format_int(sub_cobro_gs) %></td>
+          <% sub_cobro = 0 %>
+        </tr>  
+
+        <tr class="head">
+          <td colspan="6"></td>
+          <td align="right"><%= format_int(sub_tot_gs) %></td>
+          <td></td>
+          <td align="right"><%= format_int(sub_comissao_gs) %></td>
+
+          <% sub_tot_gs  = 0 %>
+          <% sub_comissao_gs  = 0 %>
+          <% sub_venda_gs  = 0 %>
+          <% sub_cobro_gs = 0 %>
+
+        </tr>  
+      <% end %>
+      <tr>
+        <td class="head" colspan="5"><%= d.vendedor_id.to_s.rjust(6,'0')%>-<%= quebra = d.vendedor_nome %> - <%= format_int(d.comissao.to_f) %>% > 800.000</td>
+      </tr>
+    <% end %>
+
+    <!--GUARANI-->
+    <% if d.moeda.to_i == 1 %>
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td width="60"><%= d.sigla %></td>
+      <td width="40"><%= d.processo.to_s.rjust(6,'0') %></td>
+      <td width="60"><%= d.documento_numero.to_s.rjust(7,'0') %></td>
+      <td width="60" align="center"><%= d.data_op.to_date.strftime("%d/%m/%y") unless d.data_op.blank? %></td>
+      <td width="60" align="center"><%= d.data.to_date.strftime("%d/%m/%y") %></td>
+      <td width="240"><%= d.persona_nome %></td>
+      <td width="70" align="right">G$ <%= format_int((d.valor_guarani.to_f + d.interes_guarani.to_f  - d.troco_guarani.to_f)) %></td>
+      <td width="70" align="right">G$ <%= format_int( (d.valor_guarani.to_f + d.interes_guarani.to_f  - d.troco_guarani.to_f) - 800000) %></td>
+
+      <td width="70" align="right">
+        <% if (d.valor_guarani.to_f + d.interes_guarani.to_f - d.troco_guarani.to_f) >= 800000 %>
+          G$ <%= format_int( ( ((d.valor_guarani.to_f + d.interes_guarani.to_f  - d.troco_guarani.to_f) - 800000) * (d.comissao.to_f ) / 100) ) %>
+          <% sub_comissao_gs += ( ((d.valor_guarani.to_f + d.interes_guarani.to_f) - 800000) * (d.comissao.to_f ) / 100) %>
+        <% else %>
+        G$ 0
+        <% end %>
+        
+      </td>
+      <% sub_tot_gs  += (d.valor_guarani.to_f + d.interes_guarani.to_f) %>
+      
+
+      <% if params[:formapg] == '1' %>
+        <% if d.sigla.to_s == 'VENTA' %>
+          <% vendas_financas = VendasFinanca.where(venda_id: d.processo) %>
+          <tr>
+            <td colspan="10">
+              <table>
+                <% vendas_financas.each do |vf|  %>
+                  <tr>
+                    <td width="555" ><%= vf.forma_pago.nome %></td>
+                    <td width="70" align="right"><%= format_int(d.valor_guarani.to_f + d.interes_guarani.to_f) %></td>
+                  </tr>
+                <% end %>
+              </table>
+            </td>
+          </tr>
+        <% elsif d.sigla.to_s == 'COBRO' %>
+          <% cobros_financas = CobrosFinanca.where(cobro_id: d.processo) %>
+          <tr>
+            <td colspan="10">
+              <table>
+                <% cobros_financas.each do |vf|  %>
+                  <tr>
+                    <td width="555" ><%= vf.forma_pago.nome %></td>
+                    <td width="70" align="right"><%= format_int(d.valor_guarani.to_f + d.interes_guarani.to_f) %></td>
+                  </tr>
+                <% end %>
+              </table>
+            </td>
+          </tr>
+
+        <% end %>
+      <% end %>
+
+      <!--DOLAR-->
+
+      <% elsif d.moeda.to_i == 0 %>
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td width="60"><%= d.sigla %></td>
+      <td width="40"><%= d.processo.to_s.rjust(6,'0') %></td>
+      <td width="60"><%= d.documento_numero.to_s.rjust(7,'0') %></td>
+      <td width="60" align="center"><%= d.data_op.to_date.strftime("%d/%m/%y") unless d.data_op.blank? %></td>
+      <td width="60" align="center"><%= d.data.to_date.strftime("%d/%m/%y") %></td>
+      <td width="240"><%= d.persona_nome %></td>
+      <td width="70" align="right">U$ <%= format_decimal((d.valor_dolar.to_f + d.interes_dolar.to_f)) %></td>
+      <td width="70" align="right">U$ <%= format_decimal( ((d.valor_dolar.to_f + d.interes_dolar.to_f) * (d.comissao.to_f ) / 100) ) %></td>
+      <% sub_tot_us  += (d.valor_dolar.to_f + d.interes_dolar.to_f) %>
+      <% sub_comissao_us += ((d.valor_dolar.to_f + d.interes_dolar.to_f) * (d.comissao.to_f ) / 100) %>
+
+      <% if params[:formapg] == '1' %>
+        <% if d.sigla.to_s == 'VENTA' %>
+          <% vendas_financas = VendasFinanca.where(venda_id: d.processo) %>
+          <tr>
+            <td colspan="10">
+              <table>
+                <% vendas_financas.each do |vf|  %>
+                  <tr>
+                    <td width="555" ><%= vf.forma_pago.nome %></td>
+                    <td width="70" align="right"><%= format_int(d.valor_dolar.to_f + d.interes_dolar.to_f) %></td>
+                  </tr>
+                <% end %>
+              </table>
+            </td>
+          </tr>
+        <% elsif d.sigla.to_s == 'COBRO' %>
+          <% cobros_financas = CobrosFinanca.where(cobro_id: d.processo) %>
+          <tr>
+            <td colspan="10">
+              <table>
+                <% cobros_financas.each do |vf|  %>
+                  <tr>
+                    <td width="555" ><%= vf.forma_pago.nome %></td>
+                    <td width="70" align="right"><%= format_int(d.valor_dolar.to_f + d.interes_dolar.to_f) %></td>
+                  </tr>
+                <% end %>
+              </table>
+            </td>
+          </tr>
+
+        <% end %>
+      <% end %>
+
+      <!--REAL-->
+
+      <% elsif d.moeda.to_i == 2 %>
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td width="60"><%= d.sigla %></td>
+      <td width="40"><%= d.processo.to_s.rjust(6,'0') %></td>
+      <td width="60"><%= d.documento_numero.to_s.rjust(7,'0') %></td>
+      <td width="60" align="center"><%= d.data_op.to_date.strftime("%d/%m/%y") unless d.data_op.blank? %></td>
+      <td width="60" align="center"><%= d.data.to_date.strftime("%d/%m/%y") %></td>
+      <td width="240"><%= d.persona_nome %></td>
+      <td width="70" align="right">R$ <%= format_decimal((d.valor_real.to_f + d.interes_real.to_f)) %></td>
+      <td width="70" align="right">R$ <%= format_decimal( ((d.valor_real.to_f + d.interes_real.to_f) * (d.comissao.to_f ) / 100) ) %></td>
+      <% sub_tot_rs  += (d.valor_real.to_f + d.interes_real.to_f) %>
+      <% sub_comissao_rs += ((d.valor_real.to_f + d.interes_real.to_f) * (d.comissao.to_f ) / 100) %>
+
+      <% if params[:formapg] == '1' %>
+        <% if d.sigla.to_s == 'VENTA' %>
+          <% vendas_financas = VendasFinanca.where(venda_id: d.processo) %>
+          <tr>
+            <td colspan="10">
+              <table>
+                <% vendas_financas.each do |vf|  %>
+                  <tr>
+                    <td width="555" ><%= vf.forma_pago.nome %></td>
+                    <td width="70" align="right"><%= format_int(d.valor_real.to_f + d.interes_real.to_f) %></td>
+                  </tr>
+                <% end %>
+              </table>
+            </td>
+          </tr>
+        <% elsif d.sigla.to_s == 'COBRO' %>
+          <% cobros_financas = CobrosFinanca.where(cobro_id: d.processo) %>
+          <tr>
+            <td colspan="10">
+              <table>
+                <% cobros_financas.each do |vf|  %>
+                  <tr>
+                    <td width="555" ><%= vf.forma_pago.nome %></td>
+                    <td width="70" align="right"><%= format_int(d.valor_real.to_f + d.interes_real.to_f) %></td>
+                  </tr>
+                <% end %>
+              </table>
+            </td>
+          </tr>
+
+        <% end %>
+      <% end %>
+
+      <% end %>
+
+
+      <% if d.sigla.to_s == 'VENTA' %>
+        <% if d.moeda.to_i == 1 %>
+          <% sub_venda_gs  += (d.valor_guarani.to_f + d.interes_guarani.to_f) %>
+        <% elsif d.moeda.to_i == 0 %>
+          <% sub_venda_us  += (d.valor_dolar.to_f + d.interes_dolar.to_f) %>
+        <% elsif d.moeda.to_i == 2 %>
+          <% sub_venda_rs  += (d.valor_real.to_f + d.interes_real.to_f) %>
+        <% end %>
+
+      <% elsif d.sigla.to_s == 'COBRO' %>
+        <% if d.moeda.to_i == 1 %>
+          <% sub_cobro_gs  += (d.valor_guarani.to_f + d.interes_guarani.to_f) %>
+        <% elsif d.moeda.to_i == 0 %>
+          <% sub_cobro_us  += (d.valor_dolar.to_f + d.interes_dolar.to_f) %>
+        <% elsif d.moeda.to_i == 2 %>
+          <% sub_cobro_rs  += (d.valor_real.to_f + d.interes_real.to_f) %>
+        <% end %>
+      <% end %>
+
+
+        <% if d.moeda.to_i == 1 %>
+        <% tot_gs  += (d.valor_guarani.to_f + d.interes_guarani.to_f) %>
+        <% elsif d.moeda.to_i == 0 %>
+        <% tot_us  += (d.valor_dolar.to_f + d.interes_dolar.to_f) %>
+        <% elsif d.moeda.to_i == 2 %>
+        <% tot_rs  += (d.valor_real.to_f + d.interes_real.to_f) %>
+        <% end %>
+     
+
+
+    </tr>
+  <% end %>
+
+    <tr class="head">
+      <td colspan="6" align="right"> VENTA</td>
+      <td align="right"> G$ <%= format_int(sub_venda_gs) %></td>
+      <td align="right"> U$ <%= format_decimal(sub_venda_us) %></td>
+      <td align="right"> R$ <%= format_decimal(sub_venda_rs) %></td>
+      <% sub_venda_gs = 0 %>
+      <% sub_venda_us = 0 %>
+      <% sub_venda_rs = 0 %>
+    </tr> 
+
+    <tr class="head">
+      <td colspan="6" align="right">COBRO</td>
+      <td align="right">G$ <%= format_int(sub_cobro_gs) %></td>
+      <td align="right">U$ <%= format_decimal(sub_cobro_us) %></td>
+      <td align="right">R$ <%= format_decimal(sub_cobro_rs) %></td>
+      <% sub_cobro_gs = 0 %>
+      <% sub_cobro_rs = 0 %>
+      <% sub_cobro_us = 0 %>
+    </tr>     
+
+    <tr class="head">
+      <td colspan="6" align="right">SUB-TOTAL</td>
+      <td align="right">G$ <%= format_int(sub_tot_gs) %></td>
+      <td align="right">U$ <%= format_decimal(sub_tot_us) %></td>
+      <td align="right">R$ <%= format_decimal(sub_tot_rs) %></td>
+      <td align="right"></td>    
+    </tr>  
+
+    <tr class="head">
+      <td colspan="6" align="right">TOTAL COMISSION</td>
+      
+      <td colspan="1" align="right">G$ <%= format_int(sub_comissao_gs) %></td>
+      <td colspan="1" align="right">U$ <%= format_decimal(sub_comissao_us) %></td>
+      <td colspan="1" align="right">R$ <%= format_decimal(sub_comissao_rs) %></td>
+    </tr>  
+
+    <% sub_tot_gs  = 0 %>
+    <% sub_tot_us  = 0 %>
+    <% sub_tot_rs  = 0 %>
+    <% sub_comissao_gs  = 0 %>
+    <% sub_comissao_us  = 0 %>
+    <% sub_comissao_rs  = 0 %>
+
+</table>

@@ -1,0 +1,29 @@
+<div class="panel">
+  <header class="panel-heading">
+   <b>Medición de Tanques</b>
+  </header>
+
+<div class="group">
+   <table class="head_grid">
+      <tr>
+         <td width="150">Responsable</td>
+         <td width="200">Tanque</td>
+         <td width="70" align="right">Cantidad</td>
+         <td width="70" align="right">Cantidad Sis</td>
+         <td width="70" align="right">Dif.</td>
+      </tr>
+   </table>
+   <div class="rolagem" id="div">
+      <table>
+         <% @medicao.each do |sf| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+               <td width="150"><%=h sf.persona.nome %></td>
+               <td width="200"><%=h sf.deposito.nome %></td>
+               <td width="70" align="right"><%=h format_decimal(sf.quantidade) %></td>
+               <td width="70" align="right"><%=h format_decimal(sf.quantidade_sis) %></td>
+               <td width="70" align="right"><%=h format_decimal(sf.dif) %></td>
+            </tr>
+         <% end %>
+      </table>
+   </div>
+</div>

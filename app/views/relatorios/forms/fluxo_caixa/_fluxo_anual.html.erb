@@ -1,0 +1,91 @@
+<style>
+
+	.table-fluxo td{
+    border: 2px solid #F1F2F5;
+    color: #555555;
+    white-space: nowrap;
+    padding: 10px;
+	}
+</style>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">      
+      <div class="panel-content table-fluxo">
+      	<table>
+      		<tr>
+      			<td width="150">Meses</td>
+      			<% meses = 1 %>
+      			<% 12.times do |s| %>
+      				<td width="100" align="right"><b><%= Date::MONTHNAMES[meses.to_i].to_s %></b></td>
+      				<% meses += 1 %>
+      			<% end %>
+      		</tr>
+					<% saldo_anteriro = 0 %>
+					<% entrada = 0 %>
+					<% saida = 0 %>
+					<% saldo = 0 %>
+      		<tr>
+      			<td><b><span class="rs">Saldo Anterior</span></b></td>
+      			<% meses = 1 %>
+      			<% 12.times do |s| %>
+	      			<td align="right">	      				
+							  <% saldo_anteriro  = Financa.where("moeda = 0 AND date_part('month', DATA) < '#{meses}' AND date_part('year', DATA) = '2017'").sum("coalesce(entrada_dolar,0) - coalesce(saida_dolar,0)") %>
+							  <%= format_decimal(saldo_anteriro.to_f) %>
+	      				<% meses += 1 %>
+	      			</td>
+      			<% end %>
+      		</tr>
+
+      		<tr>
+      			<td><b><span class="us">Receitas</span></b></td>
+      			<% meses = 1 %>
+      			<% 12.times do |s| %>
+      				
+	      			<td align="right">	      				
+								<% entrada = Cliente.where("moeda = 0 AND date_part('month', vencimento) < '#{meses}' AND date_part('year', vencimento) = '2017' and liquidacao = 0").sum('coalesce(divida_dolar,0) - coalesce(cobro_dolar,0)') %>
+							  <%= format_decimal(entrada.to_f) %>
+	      				<% meses += 1 %>
+	      			</td>
+      			<% end %>
+      		</tr>
+
+      		<tr>
+      			<td><b><span class="gs">Despesas</span></b></td>
+      			<% meses = 1 %>
+      			<% 12.times do |s| %>
+	      			<td align="right">	
+								<% saida   = Proveedore.where("moeda = 0 AND date_part('month', vencimento) < '#{meses}' AND date_part('year', vencimento) = '2017' and liquidacao = 0").sum('coalesce(divida_dolar,0) - coalesce(pago_dolar,0)') %>
+							  <%= format_decimal(saida.to_f) %>
+	      				<% meses += 1 %>
+	      			</td>
+      			<% end %>
+      		</tr>
+
+      		<tr>
+      			<td><b>Saldos</b></td>
+      			<% meses = 1 %>
+						<% saldo_anteriro = 0 %>
+						<% entrada = 0 %>
+						<% saida = 0 %>
+						<% saldo = 0 %>
+
+      			<% 12.times do |s| %>
+							  <% saldo_anteriro  = Financa.where("moeda = 0 AND date_part('month', DATA) < '#{meses}' AND date_part('year', DATA) = '2017'").sum("coalesce(entrada_dolar,0) - coalesce(saida_dolar,0)") %>
+								<% entrada = Cliente.where("moeda = 0 AND date_part('month', vencimento) < '#{meses}' AND date_part('year', vencimento) = '2017' and liquidacao = 0").sum('coalesce(divida_dolar,0) - coalesce(cobro_dolar,0)') %>
+								<% saida   = Proveedore.where("moeda = 0 AND date_part('month', vencimento) < '#{meses}' AND date_part('year', vencimento) = '2017' and liquidacao = 0").sum('coalesce(divida_dolar,0) - coalesce(pago_dolar,0)') %>
+
+	      			<td align="right">
+	      				<% saldo   += (saldo_anteriro.to_f + (entrada.to_f - saida.to_f)) %>
+							  <%= format_decimal(saldo.to_f) %>
+	      				<% meses += 1 %>
+	      			</td>
+      			<% end %>
+      		</tr>
+
+
+      	</table>
+      </div>
+    </div>
+  </div>
+</div>

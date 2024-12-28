@@ -1,0 +1,49 @@
+<table>
+   <tr>
+      <td width="50"align="center">Cod.</td>
+      <td width="200">Nombre</td>
+      <td width="100">Unidad</td>
+      <td width="50">RUC/CI.</td>
+      <% if params['l_nome'] == '1' %>
+        <td width="350">Nombre</td>
+      <% end %>
+        <td width="100">Tel</td>
+        <td width="100">E-mail</td>
+      <td width="200">Direcion</td>
+      <% if params[:per] == 'EMPLEADO' %>
+      <% if params['l_cargo'] == '1' %>
+        <td width="150">Cargo</td>
+        <% end %>
+        <% if params['l_ingreso'] == '1' %>
+        <td width="100" align="center">Ingreso</td>
+        <% end %>
+        <% if params['l_salario'] == '1' %>
+        <td width="100" align="right">Sueldo</td>
+        <% end %>
+      <% end %>
+   </tr>
+
+   <% @personas.each do |persona|  %>
+    <tr class = "<%= cycle("cor1", "cor2")%>">
+      <td width="50"align="center"><%=h persona.id.to_s.rjust(6,'0') %></td>
+      <td width="200"><%=h persona.nome %></td>
+        <td width="100"><%=h persona.unidade.unidade_nome unless persona.unidade.nil? %></td>
+        <td width="50"><%=h persona.ruc %></td>
+        <td width="100"><%=h persona.telefone %></td>
+        <td width="100"><%=h persona.email %></td>
+        <td width="200"align="left"><%=h persona.direcao %></td>
+      <% if params[:per] == 'EMPLEADO' %>
+        <% if params['l_cargo'] == '1' %>
+          <td width="150" align="left"><%=h persona.cargo.nome %></td>
+        <% end %>
+        <% if params['l_ingreso'] == '1' %>
+          <td width="100" align="center"><%=h persona.data_entrada.strftime("%d/%m/%Y") %></td>
+        <% end %>
+        <% if params['l_salario'] == '1' %>
+          <td width="100" align="right"><%= format_int(persona.salario ) %></td>
+        <% end %>
+      <% end %>
+   </tr>
+   <% end %>
+</table>
+

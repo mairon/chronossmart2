@@ -1,0 +1,79 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+     <header class="panel-heading link-prod">
+      OS - <%= @ordem_serv.id.to_s.rjust(6,'0') %>
+
+      <div class="pull-right">
+        <%= link_to t('BACK'), edit_ordem_serv_path(@ordem_serv.id), class: 'btn' %>
+        <%= link_to 'CHECKLIST', checklist_ordem_serv_path(@ordem_serv.id), class: 'btn' %>
+        <%= link_to 'Compr.', comprovante_ordem_serv_path(@ordem_serv.id), class: 'btn btn-blue',:onclick=>"window.open(this.href,'Comprovante', 'height=600, width=600');return false;" %>
+        <%= link_to 'Compr. Interno', comprovante_ordem_serv_path(@ordem_serv.id, formato: 'interno'), class: 'btn btn-blue',:onclick=>"window.open(this.href,'Comprovante', 'height=600, width=600');return false;" %>
+        <%= link_to 'Finalizar', ordem_servs_url, class: 'btn btn-info next' %>
+      </div>
+     </header>
+      <div class="panel-content">
+        <i class="icon-user"></i> Cliente: <%= @ordem_serv.persona_nome %>
+        <%= form_for(@ordem_serv) do |f| %>
+          Equipo: <%= f.collection_select :persona_rodado_id, PersonaRodado.where(persona_id: @ordem_serv.persona_id).select("id, (chapa || ' - ' || modelo ||  ' - ' ||  marca || ' - ' || cor ) as nome").order('nome'), :id, :nome, {prompt: ''} %>
+          <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-4">
+    <div class="panel">
+      <div class="panel-content">
+        <%= render 'retirados' %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="panel">
+      <div class="panel-content">
+        <%= render 'devolvidos' %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="panel">
+      <div class="panel-content">
+        <%= render 'saldo' %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="myModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title us" id="myModalLabel" align="center">Producto Retirado</h4>
+      </div>
+      <div class="modal-body" style="padding: 10px 0px 25px 0px">
+        <%= render partial: "/ordem_serv_prods/new_retirados", locals: {ordem_serv_prod: OrdemServProd.new(ordem_serv_id: @ordem_serv.id)} %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(".acao").click(function() {
+    $('#myModal').modal('show');
+    $('#myModal').on('shown.bs.modal', function () {
+      $('#ordem_serv_prod_produto_id').focus();
+    })
+  });
+</script>
+
+
+

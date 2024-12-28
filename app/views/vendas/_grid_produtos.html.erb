@@ -1,0 +1,246 @@
+
+<% grupos = SubGrupo.order("descricao") %>
+<div class="gridprod">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="text-center">
+        <input type="search" id="myInput" onkeyup="myFunction()" placeholder="Buscar Grupo" title="Type in a name" class="panel-field">
+      </div>    
+    </div>
+    <div class="col-xs-12 div-top-list">
+      <div id="js_image_selection" class="horizontal-scrollable-tabs">
+        <div class="scroller arrow-left"><i class="icon-chevron-left"></i></div>
+        <div class="scroller arrow-right"><i class="icon-chevron-right"></i></div>
+        <div class="horizontal-tabs">
+          <ul role="tablist" class="nav nav-tabs nav-tabs-horizontal" id="myUL">
+            <% grupos.each do |g| %>
+            <li role="presentation" class="grupos list-prod"><a href="#<%= g.id %>" data-toggle="tab"><%= g.descricao %></a></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="tab-content">
+        <% grupos.each do |g| %>
+          <div id="<%= g.id %>" role="tabpanel" class="tab-pane fade">
+            <% produtos = Produto.find_by_sql("SELECT P.ID AS PRODUTO_ID, P.NOME AS PRODUTO_NOME, PTP.PRECO_1_GS FROM PRODUTOS_TABELA_PRECOS PTP INNER JOIN PRODUTOS P ON P.ID = PTP.PRODUTO_ID WHERE PTP.TABELA_PRECO_ID = #{@venda.tabela_preco_id} AND P.SUB_GRUPO_ID = #{g.id} ORDER BY 2") %>
+              <ul class="row" >
+                <% produtos.each do |p| %>          
+                <%= fields_for "vendas_produtos[]", p do |b| %>
+                  <li class="col-xs-6 col-sm-3 col-md-4" data-id="<%= p.produto_id %>"  data-preco="<%= format_int(p.preco_1_gs) %>"  data-produto-nome="<%= p.produto_nome %>">
+                    <div class="thumbnail btn-grid btn-blue" align="center">
+                      <h2 class="bold"><%= p.produto_nome %></h2>
+                      <p>
+                        <div class="number">
+                          <span class="minus">-</span>
+                          <%= text_field_tag "vendas_produtos_#{p.produto_id}_quantidade", 0 %>
+                          <span class="plus">+</span>
+                        </div>                       
+                      </p>
+                    </div>
+                  </li>
+                <% end %>
+                <% end %>
+              </ul>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <%= submit_tag "AGREGAR", id: "add_grid_prodts", :class => "btn btn-green", "data-plus-as-tab" => "false", style: 'width: 100%' %>
+</div>
+
+<style>
+  .thumbnail h2{
+    color: #fff;
+    height: 45px;
+    font-size: 14px;
+    vertical-align: middle;
+  }
+  
+  .btn-grid {
+    font-size: 16px;
+    line-height: 1.42857143;
+    text-align: center;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border-radius: 8px;
+    font-family: 'prox';
+    padding-bottom: 10px;
+  }
+
+  .plus{
+    color: #000;
+    margin-left: -5px;
+    border-top-right-radius: 4px ;
+    border-bottom-right-radius: 4px ;
+  }
+
+  .minus{
+    color: #000;
+    margin-right: -6px;
+    border-top-left-radius: 4px ;
+    border-bottom-left-radius: 4px ;
+  }
+
+
+  .btn-grid span{
+    font-family: 'prox';
+    height:35px;
+    width: 35px;
+    text-align: center;
+    font-size: 26px;
+    border:1px solid #ddd;
+    display: inline-block;
+    vertical-align: middle;
+    cursor:pointer;
+    background-color: #fff;
+  }
+
+  .btn-grid input{
+    font-family: 'prox';
+    height:35px;
+    width: 50px;
+    text-align: center;
+    font-size: 16px;
+    border:1px solid #ddd;
+    display: inline-block;
+    vertical-align: middle;
+    cursor:pointer;
+    border-radius: 0px !important;
+  }
+
+  .horizontal-scrollable-tabs .nav-tabs{
+    border: none;
+    padding-bottom: 15px !important;
+
+  }
+
+  .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+    background-color: #5076ff !important;
+    border-radius: 4px !important;
+    color: #fff;
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 20%), 0 2px 10px 0 rgb(0 0 0 / 10%);
+  }
+
+  #myInput{
+    margin-bottom: 10px;
+  }
+</style>
+
+<script type="text/JavaScript">
+  $("#js_image_selection").horizontalTabs();
+
+
+function myFunction() {
+    var input, filter, ul, li, a, i;
+    input = document.getElementById("myInput");
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("myUL");
+    li = ul.getElementsByTagName("li");
+    for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByTagName("a")[0];
+        if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+        } else {
+            li[i].style.display = "none";
+
+        }
+    }
+}
+
+
+  $(document).ready(function() {
+      $('.minus').click(function () {
+        var $input = $(this).parent().find('input');
+        var count = parseInt($input.val()) - 1;
+        count = count < 0 ? 0 : count;
+        $input.val(count);
+        $input.change();
+
+
+
+        var array = $('li[data-id]').map(function(){
+          qtd = $("#vendas_produtos_"+ $(this).data('id') +"_quantidade").val()
+          if ( parseInt(qtd) > 0 ) {
+            return "{produto_id: " + $(this).data('id') + ", quantidade: "+  qtd +"}";  
+          }
+          
+        }).get();
+
+        console.log(array);
+
+
+        return false;
+      });
+      $('.plus').click(function () {
+        var $input = $(this).parent().find('input');
+        $input.val(parseInt($input.val()) + 1);
+        $input.change();
+
+
+        var array = $('li[data-id]').map(function(){
+          qtd = $("#vendas_produtos_"+ $(this).data('id') +"_quantidade").val()
+          if ( parseInt(qtd) > 0 ) {
+            return "{produto_id: " + $(this).data('id') + ", quantidade: "+  qtd +"}";  
+          }
+          
+        }).get();
+
+        console.log(array);
+
+        return false;
+      });
+    });
+
+
+
+$('#add_grid_prodts').click(function () {
+
+    var array = $('li[data-id]').map(function(){
+      qtd = $("#vendas_produtos_"+ $(this).data('id') +"_quantidade").val()
+      if ( parseInt(qtd) > 0 ) {
+        return {preco: $(this).data('preco'), produto_nome: $(this).data('produto-nome'), produto_id: $(this).data('id'), quantidade: parseInt(qtd) };
+      }
+      
+    }).get();
+
+    console.log( array );
+
+
+    $.ajax({
+        type: "POST",
+        url: "/vendas/send_mult_prods",
+        data: {venda_id: <%= @venda.id %>, persona_id: <%= @venda.persona_id %>, data: <%= @venda.data %>, moeda: <%= @venda.moeda %>, itens: array },
+        success: function(msg){
+
+          var array = $('li[data-id]').map(function(){
+            qtd = $("#vendas_produtos_"+ $(this).data('id') +"_quantidade").val()
+            if ( parseInt(qtd) > 0 ) {
+              return $("#vendas_produtos_"+ $(this).data('id') +"_quantidade").val(0)
+            }
+            
+          }).get();
+
+          console.log( array );
+
+
+        }
+    });    
+  });
+
+
+</script>
+
+
+

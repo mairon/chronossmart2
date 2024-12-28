@@ -1,0 +1,150 @@
+<style type="text/css" media="print">
+    @page {
+          size: 4in 6in landscape;
+    }
+</style>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="group">
+        <h1 id="header">
+            Desempenho Anual Empleados Año <%= text_field_tag :date_year, params[:date_year], size: 5  %>
+          <div class="pull-right">
+            <a href="javascript:void(0)" class="btn btn-blue" onClick="window.print();"><%= image_tag('printer.png') %> Imprimir</a>
+            <a href="/avaliacao_funcs/ranked" class="btn btn-blue">Ranking</a>
+          </div>
+        </h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  $('#date_year').on('change', function() {
+    var year = $("#date_year").val();
+    window.location.href ="/avaliacao_funcs/desempenho_anual_refs?date_year=" + year
+  });
+</script>
+
+<% AvaliacaoFunc.joins(:persona).where("personas.estado = 0 ").select(:persona_id).uniq.each do |a| %>
+
+
+<%
+
+    sql = "SELECT AR.ID,
+       AR.NOME,
+     COALESCE((SELECT SUM(COALESCE(AFR.NOTA, 0) ) FROM AVALIACAO_FUNC_REFS AFR INNER JOIN AVALIACAO_FUNCS AF ON AFR.AVALIACAO_FUNC_ID = AF.ID WHERE AF.PERSONA_ID = #{a.persona_id} AND date_part('YEAR', AF.PERIODO) = '#{params[:date_year]}' AND AFR.AVALIACAO_REF_ID = AR.ID AND date_part('month', AF.PERIODO) = '1'),0) AS NOTA_01,
+       COALESCE((SELECT SUM(COALESCE(AFR.NOTA, 0) ) FROM AVALIACAO_FUNC_REFS AFR INNER JOIN AVALIACAO_FUNCS AF ON AFR.AVALIACAO_FUNC_ID = AF.ID WHERE AF.PERSONA_ID = #{a.persona_id} AND date_part('YEAR', AF.PERIODO) = '#{params[:date_year]}' AND AFR.AVALIACAO_REF_ID = AR.ID AND date_part('month', AF.PERIODO) = '2'),0) AS NOTA_02,
+     COALESCE((SELECT SUM(COALESCE(AFR.NOTA, 0) ) FROM AVALIACAO_FUNC_REFS AFR INNER JOIN AVALIACAO_FUNCS AF ON AFR.AVALIACAO_FUNC_ID = AF.ID WHERE AF.PERSONA_ID = #{a.persona_id} AND date_part('YEAR', AF.PERIODO) = '#{params[:date_year]}' AND AFR.AVALIACAO_REF_ID = AR.ID AND date_part('month', AF.PERIODO) = '3'),0) AS NOTA_03,
+     COALESCE((SELECT SUM(COALESCE(AFR.NOTA, 0) ) FROM AVALIACAO_FUNC_REFS AFR INNER JOIN AVALIACAO_FUNCS AF ON AFR.AVALIACAO_FUNC_ID = AF.ID WHERE AF.PERSONA_ID = #{a.persona_id} AND date_part('YEAR', AF.PERIODO) = '#{params[:date_year]}' AND AFR.AVALIACAO_REF_ID = AR.ID AND date_part('month', AF.PERIODO) = '4'),0) AS NOTA_04,
+     COALESCE((SELECT SUM(COALESCE(AFR.NOTA, 0) ) FROM AVALIACAO_FUNC_REFS AFR INNER JOIN AVALIACAO_FUNCS AF ON AFR.AVALIACAO_FUNC_ID = AF.ID WHERE AF.PERSONA_ID = #{a.persona_id} AND date_part('YEAR', AF.PERIODO) = '#{params[:date_year]}' AND AFR.AVALIACAO_REF_ID = AR.ID AND date_part('month', AF.PERIODO) = '5'),0) AS NOTA_05,
+     COALESCE((SELECT SUM(COALESCE(AFR.NOTA, 0) ) FROM AVALIACAO_FUNC_REFS AFR INNER JOIN AVALIACAO_FUNCS AF ON AFR.AVALIACAO_FUNC_ID = AF.ID WHERE AF.PERSONA_ID = #{a.persona_id} AND date_part('YEAR', AF.PERIODO) = '#{params[:date_year]}' AND AFR.AVALIACAO_REF_ID = AR.ID AND date_part('month', AF.PERIODO) = '6'),0) AS NOTA_06,
+     COALESCE((SELECT SUM(COALESCE(AFR.NOTA, 0) ) FROM AVALIACAO_FUNC_REFS AFR INNER JOIN AVALIACAO_FUNCS AF ON AFR.AVALIACAO_FUNC_ID = AF.ID WHERE AF.PERSONA_ID = #{a.persona_id} AND date_part('YEAR', AF.PERIODO) = '#{params[:date_year]}' AND AFR.AVALIACAO_REF_ID = AR.ID AND date_part('month', AF.PERIODO) = '7'),0) AS NOTA_07,
+     COALESCE((SELECT SUM(COALESCE(AFR.NOTA, 0) ) FROM AVALIACAO_FUNC_REFS AFR INNER JOIN AVALIACAO_FUNCS AF ON AFR.AVALIACAO_FUNC_ID = AF.ID WHERE AF.PERSONA_ID = #{a.persona_id} AND date_part('YEAR', AF.PERIODO) = '#{params[:date_year]}' AND AFR.AVALIACAO_REF_ID = AR.ID AND date_part('month', AF.PERIODO) = '8'),0) AS NOTA_08,
+     COALESCE((SELECT SUM(COALESCE(AFR.NOTA, 0) ) FROM AVALIACAO_FUNC_REFS AFR INNER JOIN AVALIACAO_FUNCS AF ON AFR.AVALIACAO_FUNC_ID = AF.ID WHERE AF.PERSONA_ID = #{a.persona_id} AND date_part('YEAR', AF.PERIODO) = '#{params[:date_year]}' AND AFR.AVALIACAO_REF_ID = AR.ID AND date_part('month', AF.PERIODO) = '9'),0) AS NOTA_09,
+     COALESCE((SELECT SUM(COALESCE(AFR.NOTA, 0) ) FROM AVALIACAO_FUNC_REFS AFR INNER JOIN AVALIACAO_FUNCS AF ON AFR.AVALIACAO_FUNC_ID = AF.ID WHERE AF.PERSONA_ID = #{a.persona_id} AND date_part('YEAR', AF.PERIODO) = '#{params[:date_year]}' AND AFR.AVALIACAO_REF_ID = AR.ID AND date_part('month', AF.PERIODO) = '10'),0) AS NOTA_10,
+     COALESCE((SELECT SUM(COALESCE(AFR.NOTA, 0) ) FROM AVALIACAO_FUNC_REFS AFR INNER JOIN AVALIACAO_FUNCS AF ON AFR.AVALIACAO_FUNC_ID = AF.ID WHERE AF.PERSONA_ID = #{a.persona_id} AND date_part('YEAR', AF.PERIODO) = '#{params[:date_year]}' AND AFR.AVALIACAO_REF_ID = AR.ID AND date_part('month', AF.PERIODO) = '11'),0) AS NOTA_11,
+     COALESCE((SELECT SUM(COALESCE(AFR.NOTA, 0) ) FROM AVALIACAO_FUNC_REFS AFR INNER JOIN AVALIACAO_FUNCS AF ON AFR.AVALIACAO_FUNC_ID = AF.ID WHERE AF.PERSONA_ID = #{a.persona_id} AND date_part('YEAR', AF.PERIODO) = '#{params[:date_year]}' AND AFR.AVALIACAO_REF_ID = AR.ID AND date_part('month', AF.PERIODO) = '12'),0) AS NOTA_12,
+     COALESCE((SELECT SUM(COALESCE(AFR.NOTA, 0) ) FROM AVALIACAO_FUNC_REFS AFR INNER JOIN AVALIACAO_FUNCS AF ON AFR.AVALIACAO_FUNC_ID = AF.ID WHERE AF.PERSONA_ID = #{a.persona_id} AND date_part('YEAR', AF.PERIODO) = '#{params[:date_year]}' AND AFR.AVALIACAO_REF_ID = AR.ID),0) AS NOTA
+
+
+FROM AVALIACAO_REFS AR
+ORDER BY 1
+
+
+"
+
+    @funcs = AvaliacaoFuncRef.find_by_sql(sql)
+%>
+
+<% indice = 0 %>
+<% sub_01 = 0 %>
+<% sub_02 = 0 %>
+<% sub_03 = 0 %>
+<% sub_04 = 0 %>
+<% sub_05 = 0 %>
+<% sub_06 = 0 %>
+<% sub_07 = 0 %>
+<% sub_08 = 0 %>
+<% sub_09 = 0 %>
+<% sub_10 = 0 %>
+<% sub_11 = 0 %>
+<% sub_12 = 0 %>
+<% sub_nt = 0 %>
+
+  <div class="row"  id="line_items">
+    <div class="col-md-12">
+      <div class="panel">
+        <header class="panel-heading">
+          <%= a.persona.nome %> | <%= a.persona.cargo.nome %>
+        </header>
+        <div class="panel-content">
+          <table>
+
+            <tr class="head_grid">
+              <td>Referencia</td>
+              <% meses = 1 %>
+              <% 12.times do |s| %>
+                <td align="center"><%= Date::MONTHNAMES[meses.to_i].to_s %></td>
+                <% meses += 1 %>
+              <% end %>
+              <td align="center">PONTUACAO ANUAL</td>
+            </tr>
+            <% @funcs.each do |f| %>
+              <tr class="<%= cycle("cor1", "cor2") %>">
+                <td width="350"> <small> <%= f.id.to_s.rjust(6,'0') %>-<%= f.nome %></small></td>
+                <td align="center"><%= f.nota_01.to_i %></td>
+                <td align="center"><%= f.nota_02.to_i %></td>
+                <td align="center"><%= f.nota_03.to_i %></td>
+                <td align="center"><%= f.nota_04.to_i %></td>
+                <td align="center"><%= f.nota_05.to_i %></td>
+                <td align="center"><%= f.nota_06.to_i %></td>
+                <td align="center"><%= f.nota_07.to_i %></td>
+                <td align="center"><%= f.nota_08.to_i %></td>
+                <td align="center"><%= f.nota_09.to_i %></td>
+                <td align="center"><%= f.nota_10.to_i %></td>
+                <td align="center"><%= f.nota_11.to_i %></td>
+                <td align="center"><%= f.nota_12.to_i %></td>
+                <td width="70" align="center" class="bold"><%= (f.nota.to_f / 12).round(4) %></td>
+              </tr>
+
+              <% indice += 1 %>
+              <% sub_01 += f.nota_01.to_i %>
+              <% sub_02 += f.nota_02.to_i %>
+              <% sub_03 += f.nota_03.to_i %>
+              <% sub_04 += f.nota_04.to_i %>
+              <% sub_05 += f.nota_05.to_i %>
+              <% sub_06 += f.nota_06.to_i %>
+              <% sub_07 += f.nota_07.to_i %>
+              <% sub_08 += f.nota_08.to_i %>
+              <% sub_09 += f.nota_09.to_i %>
+              <% sub_10 += f.nota_10.to_i %>
+              <% sub_11 += f.nota_11.to_i %>
+              <% sub_12 += f.nota_12.to_i %>
+              <% sub_nt += (f.nota.to_f / 12) %>
+            <% end %>
+
+            <tr class="head_grid">
+              <td width="350"> <small> PONTUACAO MENSAL(<%= indice %>)</small></td>
+              <td align="center"><%= (sub_01.to_f / indice.to_f).round(4) %></td>
+              <td align="center"><%= (sub_02.to_f / indice.to_f).round(4) %></td>
+              <td align="center"><%= (sub_03.to_f / indice.to_f).round(4) %></td>
+              <td align="center"><%= (sub_04.to_f / indice.to_f).round(4) %></td>
+              <td align="center"><%= (sub_05.to_f / indice.to_f).round(4) %></td>
+              <td align="center"><%= (sub_06.to_f / indice.to_f).round(4) %></td>
+              <td align="center"><%= (sub_07.to_f / indice.to_f).round(4) %></td>
+              <td align="center"><%= (sub_08.to_f / indice.to_f).round(4) %></td>
+              <td align="center"><%= (sub_09.to_f / indice.to_f).round(4) %></td>
+              <td align="center"><%= (sub_10.to_f / indice.to_f).round(4) %></td>
+              <td align="center"><%= (sub_11.to_f / indice.to_f).round(4) %></td>
+              <td align="center"><%= (sub_12.to_f / indice.to_f).round(4) %></td>
+              <td width="70" align="center" class="bold"><%= ( (sub_nt.to_f) / indice.to_f).round(4) %></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

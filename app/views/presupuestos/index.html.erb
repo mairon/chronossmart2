@@ -1,0 +1,72 @@
+<h1 id="header">Pedido de <%= t('SALE') %></h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_presupuesto_path ,:class => 'button add'%>
+</div>
+
+<div class="group">
+    <%= form_tag busca_presupuestos_path, :method => "get" do %>
+      <table>
+        <tr>
+
+          <td align="right">De:</td>
+          <td colspan="2">
+            <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+            <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+            </div>
+          <td style="padding-left: 10px"><%= t('TO') %></td>
+          <td>
+            <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+            <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+            </div>
+          </td>
+          <td align="right">Status</td>
+          <td>
+            <select name="status" id="status">
+              <option value="0">PENDIENTE</option>
+              <option value="1">EN PROCESO</option>
+              <option value="2">PARCIAL</option>              
+              <option value="3">FINALIZADO</option>
+              <option>TODOS</option>
+            </select>
+          </td>
+          <td>
+            <select name="tipo" id="tipo">
+              <option>NOMBRE</option>
+              <option>VENDEDOR</option>
+              <option>CODIGO</option>
+            </select>
+          </td>
+          <td colspan="3">
+            <input id="busca" name="busca" type="text" onkeyup = "pesquisa(this.value),f(this)"onkeydown = "f(this)" onkeypress ="return bloqEnter(event)" size="30" />
+            <input type="button" class="btn btn-blue" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar"/>
+          </td>
+          <td width="25"><%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;" ) %></td>
+        </tr>
+      </table>
+    <% end %>
+</div>
+
+<div id="pagina"></div>
+
+</div>
+<script language="javascript">
+  function pesquisa(valor){
+    url="/presupuestos/busca?" + $('form').serialize();
+    ajax(url);
+  }
+</script>
+
+<%= javascript_include_tag 'busca_ajax' %>
+
+<script type="text/javascript">
+  function Faturamento(tabela_preco,id,nome,vendedor,indicador){
+    window.open("/vendas/new?tabela_preco_id="+tabela_preco+"&tipo_venda=1&persona_id="+ id + "&persona_nome="+nome+"&vendedor_id=" + vendedor +"&indicador_id=" + indicador + "&pedi=true", 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=2500, HEIGHT=600');
+  }
+
+  function Comprovante(id){
+    window.open("/presupuestos/" + id + "/print_presupuesto", 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=500, HEIGHT=800');
+  }
+
+</script>

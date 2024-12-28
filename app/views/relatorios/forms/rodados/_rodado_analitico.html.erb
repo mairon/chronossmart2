@@ -1,0 +1,96 @@
+<div class="group list">
+		<% remicao = 0 %>
+		<% gastos  = 0 %>
+		<% cv = "AND id = #{params[:busca]["cavalito"]}" unless params[:busca]["cavalito"].blank? %>
+		<% Rodado.where("tipo = 0 #{cv}").each do |c|%>
+			<table style="margin-bottom: 15px">
+			<tr>
+				<td style="background-color: #ccc; color: #000" colspan="4">CAVALITO <%= c.placa %> - <%= c.marcao %></td>
+			</tr>		
+			<tr>
+				<td><h3>Remicioanes (<%= NotaRemicao.where("rodado_cv_id = #{c.id} and data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'").count(:id) %>)</h3></td>
+				<td></td>
+			</tr>
+			<% NotaRemicao.where("rodado_cv_id = #{c.id} and data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'").each do |nc| %>
+				<tr class="<%= cycle("cor1", "cor2")%>">
+					<td><%= nc.documento_numero %></td>
+					<td width="250"><%= nc.persona_nome %></td>
+					<td></td>
+					<td><%= format_int(nc.valor_guarani)%></td>
+				</tr>
+				<% remicao += nc.valor_guarani.to_f %>
+			<% end %>
+			
+		
+			<tr>
+				<td><h3>Gastos</h3></td>
+			</tr>
+			<% Compra.where("rodado_id = #{c.id} and data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'").each do |nc| %>
+				<tr class="<%= cycle("cor1", "cor2")%>">
+					<td><%= nc.documento_numero %></td>
+					<td width="250"><%= nc.persona_nome %></td>
+					<td width="250"><%= nc.plano_de_conta.descricao %></td>
+					<td align="right"><%= format_int(nc.total_guarani) %></td>
+				</tr>
+				<% gastos += nc.total_guarani.to_f %>
+			<% end %>
+
+			<tr>
+				<td style="background-color: #878686; color: #000"><b>Saldo</b></td>
+				<td style="background-color: #878686; color: #000" colspan="3" align="right"><b><%= format_int(remicao.to_f - gastos.to_f)%></b></td>
+			</tr>	
+
+			<% remicao = 0 %>
+			<% gastos  = 0 %>
+			</table>
+		<% end %>	
+</div>
+
+
+<div class="group list">
+		<% remicao = 0 %>
+		<% gastos  = 0 %>
+		<% cr = "AND id = #{params[:busca]["carreta"]}" unless params[:busca]["carreta"].blank? %>
+		<% Rodado.where("tipo = 1 #{cr}").each do |c|%>
+			<table style="margin-bottom: 15px">
+			<tr>
+				<td style="background-color: #ccc; color: #000" colspan="4">CARRETA <%= c.placa %> - <%= c.marcao %></td>
+			</tr>		
+			<tr>
+				<td><h3>Remicioanes (<%= NotaRemicao.where("rodado_cv_id = #{c.id} and data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'").count(:id) %>)</h3></td>
+				<td></td>
+			</tr>
+			<% NotaRemicao.where("rodado_cv_id = #{c.id} and data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'").each do |nc| %>
+				<tr class="<%= cycle("cor1", "cor2")%>">
+					<td><%= nc.documento_numero %></td>
+					<td width="250"><%= nc.persona_nome %></td>
+					<td></td>
+					<td><%= format_int(nc.valor_guarani)%></td>
+				</tr>
+				<% remicao += nc.valor_guarani.to_f %>
+			<% end %>
+			
+		
+			<tr>
+				<td><h3>Gastos</h3></td>
+			</tr>
+			<% Compra.where("rodado_id = #{c.id} and data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'").each do |nc| %>
+				<tr class="<%= cycle("cor1", "cor2")%>">
+					<td><%= nc.documento_numero %></td>
+					<td width="250"><%= nc.persona_nome %></td>
+					<td width="250"><%= nc.plano_de_conta.descricao %></td>
+					<td align="right"><%= format_int(nc.total_guarani) %></td>
+				</tr>
+				<% gastos += nc.total_guarani.to_f %>
+			<% end %>
+
+			<tr>
+				<td style="background-color: #878686; color: #000"><b>Saldo</b></td>
+				<td style="background-color: #878686; color: #000" colspan="3" align="right"><b><%= format_int(remicao.to_f - gastos.to_f)%></b></td>
+			</tr>	
+
+			<% remicao = 0 %>
+			<% gastos  = 0 %>
+			</table>
+		<% end %>	
+</div>

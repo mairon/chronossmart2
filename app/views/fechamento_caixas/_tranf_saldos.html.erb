@@ -1,0 +1,40 @@
+<div class="panel">
+  <header class="panel-heading">
+    <b>Saldos Transferidos</b>
+  </header>
+
+
+	<table class="head_grid">
+	  <tr>
+	    <td width="200"><%= t('FORM_OF_PAYMENT') %></td>
+	    <td width="70" align="right"><%= t('VALUE') %></td>
+	    <td width="130"></td>
+	  </tr>
+	</table>
+	<div class="rolagem" dir="div" style="height: 160px">
+	  <table>
+	  	<% tot_sis = 0 %>
+	    <% @saldo_transf.each do |fc| %>
+	      <tr class = "<%= cycle("cor1", "cor2") %>">
+	        <td width="200">
+	          <%= link_to "#{fc.forma_pago_id.to_s.rjust(3,'0')}-#{fc.forma_pago.nome}", fechamento_caixa_dt_path(fc), :target => "_blank" %> 
+	        </td>	       
+	        <% if fc.moeda.to_i == 0 %>
+	        	<td class="us">U$</td>
+	          <td width="70" align="right"><b><%= format_decimal(fc.valor) %></b></td>
+	        <% elsif fc.moeda.to_i == 1 %>
+	        	<td class="gs">Gs</td>
+	          <td width="70" align="right"><b><%= format_int(fc.valor) %></b></td>
+	          <% tot_sis += fc.valor_sis.to_f %>
+	        <% elsif fc.moeda.to_i == 2 %>
+	        	<td class="rs">R$</td>
+	          <td width="70" align="right"><%= format_decimal(fc.valor) %></td>
+	        <% end %>
+	        <% if @fechamento_caixa.status.to_i == 0 %>
+	        	<td><%= link_to '', fc, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+	        <% end %>
+	      </tr>
+	    <% end %>	    
+	  </table>
+	</div>
+</div>

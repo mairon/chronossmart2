@@ -1,0 +1,54 @@
+<h1>Listing pedido_compra_produtos</h1>
+
+<table>
+  <tr>
+    <th>Pedido <%= t('PURCHASE') %></th>
+    <th><%= t('DATE') %></th>
+    <th>Moeda</th>
+    <th>Cotacao</th>
+    <th>Clase produto</th>
+    <th>Produto</th>
+    <th>Produto <%= t('NAME') %></tth>
+    <th>Quantidade</th>
+    <th>Unitario dolar</th>
+    <th>Unitario guarani</th>
+    <th>Total dolar</th>
+    <th>Total guarani</th>
+    <th>Deposito</th>
+    <th>Deposito <%= t('NAME') %></tth>
+    <th>Unidade created</th>
+    <th>Usuario created</th>
+    <th>Unidade updated</th>
+    <th>Usuario updated</th>
+  </tr>
+
+<% @pedido_compra_produtos.each do |pedido_compra_produto| %>
+  <tr>
+    <td><%=h pedido_compra_produto.pedido_compra_id %></td>
+    <td><%=h pedido_compra_produto.data %></td>
+    <td><%=h pedido_compra_produto.moeda %></td>
+    <td><%=h pedido_compra_produto.cotacao %></td>
+    <td><%=h pedido_compra_produto.clase_produto %></td>
+    <td><%=h pedido_compra_produto.produto_id %></td>
+    <td><%=h pedido_compra_produto.produto_nome %></td>
+    <td><%=h pedido_compra_produto.quantidade %></td>
+    <td><%=h pedido_compra_produto.unitario_dolar %></td>
+    <td><%=h pedido_compra_produto.unitario_guarani %></td>
+    <td><%=h pedido_compra_produto.total_dolar %></td>
+    <td><%=h pedido_compra_produto.total_guarani %></td>
+    <td><%=h pedido_compra_produto.deposito_id %></td>
+    <td><%=h pedido_compra_produto.deposito_nome %></td>
+    <td><%=h pedido_compra_produto.unidade_created %></td>
+    <td><%=h pedido_compra_produto.usuario_created %></td>
+    <td><%=h pedido_compra_produto.unidade_updated %></td>
+    <td><%=h pedido_compra_produto.usuario_updated %></td>
+    <td><%= link_to 'Show', pedido_compra_produto %></td>
+    <td><%= link_to 'Edit', edit_pedido_compra_produto_path(pedido_compra_produto) %></td>
+    <td><%= link_to 'Destroy', pedido_compra_produto, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New pedido_compra_produto', new_pedido_compra_produto_path %>

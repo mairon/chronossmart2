@@ -1,0 +1,629 @@
+
+  
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Solicitud de Credito
+            <div class="pull-right">
+              <%= link_to edit_solicitude_credito_path(@solicitude_credito), :class => "btn btn-blue" do %>
+                Editar
+              <% end %>
+              <%= link_to solicitude_creditos_path, :class => "btn btn-default" do %>
+                Salir
+              <% end %>
+
+              <%= link_to 'Gerara Solicitud', comprovante_solicitude_credito_path(@solicitude_credito), :class => "btn btn-green", target:'_blank?' %>
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-4">
+                <label>Plan de Venta</label>
+                <%= @solicitude_credito.plano_venda_id.to_s.rjust(6,'0') %>
+              </div>
+
+              <div class="col-md-4">
+                <label>Fecha</label>
+                <%= @solicitude_credito.created_at.strftime("%d/%m/%y") %>
+              </div>
+
+              <div class="col-md-4">
+                <label>Vendedor</label>
+                <%= Persona.find(@solicitude_credito.plano_venda.vendedor_id).nome %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Cliente Solicitante
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+
+              <div class="col-md-6">
+                <label>Nombre y Apellido</label>
+                <%= @solicitude_credito.plano_venda.persona.nome %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Nº de Cedula/RUC</label>
+                <%= @solicitude_credito.plano_venda.persona.ruc %>
+              </div>
+
+            </div>
+
+            <div class="row">
+              <div class="col-md-4">
+                <label>Domicilio</label>
+                <%= @solicitude_credito.plano_venda.persona.direcao %>
+              </div>
+
+              <div class="col-md-4">
+                <label>Telefone</label>
+                <%= @solicitude_credito.plano_venda.persona.telefone %>
+              </div>
+
+              <div class="col-md-4">
+                <label>Data Nacimiento</label>
+                <%= @solicitude_credito.plano_venda.persona.data_nascimento.strftime("%d/%m/%Y") unless @solicitude_credito.plano_venda.persona.data_nascimento.blank? %>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Datos Financieros
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+
+              <div class="col-md-4">
+                <label>Profesión</label>
+                <%= @solicitude_credito.plano_venda.persona.profisao %>
+              </div>
+
+              <div class="col-md-4">
+                <label>Cargo</label>
+                <%= @solicitude_credito.plano_venda.persona.referencia3 %>
+              </div>
+
+              <div class="col-md-4">
+                <label>Empresa</label>
+                <%= @solicitude_credito.plano_venda.persona.referencia1 %>
+              </div>
+
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <label>Dirección de Trabajo</label>
+                <%= @solicitude_credito.plano_venda.persona.lugar_trabalho %>
+              </div>
+
+              <div class="col-md-12">
+                <label>Inmuebles</label>
+                <%= @solicitude_credito.plano_venda.persona.referencia2 %>
+                
+              </div>
+
+              <div class="col-md-12">
+                <label>Ingresos</label>
+                <%= @solicitude_credito.plano_venda.persona.salario %>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Conyugue
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+              <% pc = @solicitude_credito.plano_venda.persona.persona_contatos.last %>
+              <% if pc.blank? %>
+                <% nome = '' %>
+                <% ruc = '' %>
+                <% telefone = '' %>
+                <% profe = '' %>
+                <% cargo = '' %>
+                <% nasc = '' %>
+              <% else %>
+                <% nome = pc.nome %>
+                <% ruc = pc.ramal_01 %>
+                <% telefone = pc.telefone_01 %>
+                <% profe = pc.profissao %>
+                <% cargo = pc.ramal_02 %>
+                <% nasc = pc.data_nascimento %>
+              <% end %>
+              <div class="col-md-4">
+                <label>Nombre y Apellido</label>
+                <%= nome %>
+              </div>
+
+              <div class="col-md-4">
+                <label>Nº de Cedula/RUC</label>
+                <%= ruc %>
+              </div>
+
+              <div class="col-md-4">
+                <label>Teléfono</label>
+                <%= telefone %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-4">
+                <label>Profesión</label>
+                <%= profe %>
+              </div>
+
+              <div class="col-md-4">
+                <label>Cargo</label>
+                <%= cargo %>
+              </div>
+
+              <div class="col-md-4">
+                <label>Data Nacimiento</label>
+                <%= nasc %>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Garante 01
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+
+              <div class="col-md-6">
+                <label>Nombre y Apellido</label>
+                <%= @solicitude_credito.garantia_01_nome %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Profesión</label>
+                <%= @solicitude_credito.garantia_01_proficao %>
+              </div>
+
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label>Nº de Cedula</label>
+                <%= @solicitude_credito.garantia_01_documento %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Cargo</label>
+                <%= @solicitude_credito.garantia_01_cargo %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label>Domicilio</label>
+                <%= @solicitude_credito.garantia_01_domicio %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Empresa</label>
+                <%= @solicitude_credito.garantia_01_empresa %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label>Teléfono</label>
+                <%= @solicitude_credito.garantia_01_telefone %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Dirección de Trabajo</label>
+                <%= @solicitude_credito.garantia_01_endereco_trabalho %>
+              </div>
+            </div>    
+                    
+            <div class="row">
+              <div class="col-md-6">
+                <label>Fecha Nacimiento</label>
+                <%= @solicitude_credito.garantia_01_data_nascimento.strftime("%d/%m/%Y") unless @solicitude_credito.garantia_01_data_nascimento.blank? %>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Garante 02
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+
+              <div class="col-md-6">
+                <label>Nombre y Apellido</label>
+                <%= @solicitude_credito.garantia_02_nome %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Profesión</label>
+                <%= @solicitude_credito.garantia_02_proficao %>
+              </div>
+
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label>Nº de Cedula</label>
+                <%= @solicitude_credito.garantia_02_documento %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Cargo</label>
+                <%= @solicitude_credito.garantia_02_cargo %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label>Domicilio</label>
+                <%= @solicitude_credito.garantia_02_domicio %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Empresa</label>
+                <%= @solicitude_credito.garantia_02_empresa %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label>Teléfono</label>
+                <%= @solicitude_credito.garantia_02_telefone %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Dirección de Trabajo</label>
+                <%= @solicitude_credito.garantia_02_endereco_trabalho %>
+              </div>
+            </div>    
+                    
+            <div class="row">
+              <div class="col-md-6">
+                <label>Fecha Nacimiento</label>
+                <%= @solicitude_credito.garantia_02_data_nascimento.strftime("%d/%m/%Y") unless @solicitude_credito.garantia_02_data_nascimento.blank? %>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Vehículo en Compra
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+
+              <div class="col-md-4">
+                <label>Marca</label>
+                <%= @solicitude_credito.plano_venda.produto.clase.descricao %>
+              </div>
+
+              <div class="col-md-4">
+                <label>Modelo</label>
+                <%= @solicitude_credito.plano_venda.produto.nome %>
+              </div>
+
+              <div class="col-md-4">
+                <label>Tipo</label>
+                <%= @solicitude_credito.plano_venda.produto.grupo.descricao %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-4">
+                <label>Año</label>
+                <%= @solicitude_credito.plano_venda.produto.ano %>
+              </div>
+
+              <div class="col-md-4">
+                <label>Color</label>
+                <%= @solicitude_credito.plano_venda.produto.cor %>
+              </div>
+
+              <div class="col-md-4">
+                <label>Chassis Nº</label>
+                <%= @solicitude_credito.plano_venda.produto.chassi %>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Vehículo Entregado
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-6">
+                <label>Marca</label>
+                <%= @solicitude_credito.usado_marca %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Modelo</label>
+                <%= @solicitude_credito.usado_modelo %>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <label>Tipo</label>
+                <%= @solicitude_credito.usado_tipo %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Motor N•</label>
+                <%= @solicitude_credito.usado_motor %>
+              </div>              
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <label>Chassi N•</label>
+                <%= @solicitude_credito.usado_chassi %>
+              </div>              
+
+              <div class="col-md-6">
+                <label>Año</label>
+                <%= @solicitude_credito.usado_ano %>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <label>Color</label>
+                <%= @solicitude_credito.usado_cor %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Chapa</label>
+                <%= @solicitude_credito.usado_chapa %>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <label>Ex</label>
+                <%= @solicitude_credito.usado_ex %>
+              </div>              
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>    
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Detalhes Operación
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+
+              <div class="col-md-12">
+                <label>Monto</label>
+                <%= format_decimal(@solicitude_credito.plano_venda.valor_us) %>
+              </div>
+            </div>
+
+            <div class="row">
+
+              <div class="col-md-12">
+                <label>Condiciones</label>
+                <table class="list">
+
+                <% @solicitude_credito.plano_venda.plano_venda_conds.each do |pv| %>
+                  <tr class = "<%= cycle("cor1", "cor2") %>">
+                    <td width="80"><%= pv.nome %></td>
+                    <td width="100"><%= pv.quantidade.to_i %>x de <%= format_decimal(pv.valor_us) %></td>                    
+                    <td width="250"><small><%= pv.obs %></small></td>
+                  </tr>
+                <% end %>
+                </table>
+              </div>    
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Referencias Comerciales
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-12">
+                <label>Referencia 01</label>
+                <%= @solicitude_credito.referencia_comercial_01 %>
+              </div>
+
+              <div class="col-md-12">
+                <label>Referencia 02</label>
+                <%= @solicitude_credito.referencia_comercial_02 %>
+              </div>              
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Referencias Personales
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-6">
+                <label>Nombre y Apellido</label>
+                <%= @solicitude_credito.referencia_pessoal_01 %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Contacto</label>
+                <%= @solicitude_credito.referencia_pessoal_contato_01 %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label>Nombre y Apellido</label>
+                <%= @solicitude_credito.referencia_pessoal_02 %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Contacto</label>
+                <%= @solicitude_credito.referencia_pessoal_contato_02 %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label>Nombre y Apellido</label>
+                <%= @solicitude_credito.referencia_pessoal_03 %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Contacto</label>
+                <%= @solicitude_credito.referencia_pessoal_contato_03 %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label>Nombre y Apellido</label>
+                <%= @solicitude_credito.referencia_pessoal_04 %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Contacto</label>
+                <%= @solicitude_credito.referencia_pessoal_contato_04 %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-12">
+                <label>Obs</label>
+                <%= @solicitude_credito.obs %>
+              </div> 
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%= render "autorizacaos" %>
+     
+  </div>
+
+  <style>
+    div#contents{
+      background: none !important;
+    }
+    label{color: #000}
+  </style>

@@ -1,0 +1,48 @@
+<div class="group">
+<%= form_for(persona_contato) do |f| %>
+
+<%= f.hidden_field :persona_id %>
+  <div class="row">
+    <div class="col-md-6">
+      <label>Nombre</label>
+      <%= f.text_field :nome, class: 'panel-field' %>
+    </div>
+
+    <div class="col-md-6">
+      <label>Doc.</label>
+      <%= f.text_field :ramal_01, class: 'panel-field' %>
+    </div>
+
+    <div class="col-md-6">
+      <label>Profesión</label>
+      <%= f.text_field :profissao, class: 'panel-field' %>
+    </div>
+
+    <div class="col-md-6">
+      <label>Cargo</label>
+      <%= f.text_field :ramal_02, class: 'panel-field' %>
+    </div>
+
+    <div class="col-md-12">
+      <label>Cargo</label>
+      <%= f.collection_select :cargo_id, Cargo.all(:select => 'id,nome',:order => '2'),
+            :id,:nome, {prompt: 'Selecione lo Grupo'} %>
+    </div>
+    <div class="col-md-12">
+      <label>Telefone</label>
+      <%= f.text_field :telefone_01, placeholder: 'nrº', class: 'panel-field' %>
+    </div>
+    <div class="col-md-12">
+      <label>E-mail</label>
+      <%= f.email_field :email_01, placeholder: 'exemplo@exemplo.com', class: 'panel-field' %>
+    </div>
+    <div class="col-md-12">
+      <label><%= t('DATE') %> nascimento</label>
+      <%= f.date_select :data_nascimento,:start_year => 1930 %>
+    </div>
+  </div>
+  <div class="footer-buttons">
+    <%= f.submit "Seguir", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+  </div>
+  <% end %>
+</div>

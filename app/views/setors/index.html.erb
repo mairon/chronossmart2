@@ -1,0 +1,32 @@
+
+<div class="acessos">
+   <%= link_to t('NEW'), new_setor_path, :class => "button add" %>
+</div>
+
+<div class="group">
+  <h2>Sectores</h2>
+  <table>
+    <tr>
+      <td width="50" align="center">Cod.</td>
+      <td width="300" align="center">Descripcion</td>
+      <td width="50" align="center">Sigla</td>
+      <td width="300" align="center">Responsable</td>
+    </tr>
+  </table>
+  <div class="rolagem" id="div">
+    <table>
+    <% @setors.each do |setor| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="50" align="center"><%=h setor.id %></td>
+          <td width="300" align="left"><%=h setor.nome %></td>
+          <td width="50" align="center"><%=h setor.sigla %></td>
+          <td width="300" align="left"><%=h setor.responsavel_nome %></td>
+          <td><%= link_to 'Editar', edit_setor_path(setor) %></td>
+          <td><%= link_to t('DELETE'), setor, :confirm => 'Estas Seguro?', :method => :delete %></td>
+        </tr>
+    <% end %>
+    </table>
+  </div>
+</div>
+
+

@@ -1,0 +1,136 @@
+<body onload="ImputFocus('reclassif_stock_data_3i')">
+<style type="text/css">
+  #reclassif_stock_produto_id{
+    width: 600px;
+  }
+</style>
+<%= form_for(@reclassif_stock) do |f| %>
+   <ul class="tabs">
+      <li><a href="#tab1">Reclasificacion de Stock - [<%= t('EDITION') %>]</a></li>
+   </ul>
+
+   <div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="750">
+              <fieldset>
+                <legend>[Lanzamiento]</legend>
+                <table>
+                  <tr>
+                    <td align="right"><%= t('DATE') %> :</td>
+                    <td aling='right'> <%= f.date_select :data,{},{:onblur => "DataCotacao('reclassif_stock_data_3i','reclassif_stock_data_2i','reclassif_stock_data_1i')"} %></td>
+                    <%= hidden_field_tag( 'key' ) %>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Cotizacion :</td>
+                    <td> <%= text_field :reclassif_stock,:cotacao ,
+                                              :size     => 10,
+                                              :value    => @reclassif_stock.cotacao.to_i,
+                                                :onfocus  => " $.ajax({url: '/buscas/cotz_us_compra',
+                                                                     type: 'POST',
+                                                                     data: 'data=' + $('#reclassif_stock_data_1i').val()+'-'+
+                                                                                     $('#reclassif_stock_data_2i').val()+'-'+
+                                                                                     $('#reclassif_stock_data_3i').val(),
+                                                                                     success: function(data){
+                                                                                                      $('#reclassif_stock_cotacao').val(data);} })"%></td>
+
+                                                                                                      <td align="right">Cotizacion R$ :</td>
+                    <td><%= text_field :reclassif_stock,:cotacao_real ,
+                                              :size     => 10,
+                                              :value    => @reclassif_stock.cotacao_real.to_i,
+                                              :onfocus  => " $.ajax({url: '/buscas/cotz_rs_venda',
+                                                             type: 'POST',
+                                                             data: 'data=' + $('#reclassif_stock_data_1i').val()+'-'+
+                                                             $('#reclassif_stock_data_2i').val()+'-'+
+                                                             $('#reclassif_stock_data_3i').val(),
+                                                             success: function(data){
+                                                               $('#reclassif_stock_cotacao_real').val(data);} })"%>
+                    </td>
+                  </tr>
+                </table>                  
+              </fieldset>
+            </td>
+          </tr>
+
+          <tr>
+            <td width="950">
+              <fieldset>
+                <legend>[Stock]</legend>
+                <table>
+                  <tr>
+                    <td align="right">Producto :</td>
+                    <td colspan="5">
+
+
+
+                       <%= f.collection_select :produto_id, Produto.all(:select => 'id,nome',:order => '2'),:id,:nome %>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Deposito :</td>
+                    <td>
+                       <%= f.collection_select :deposito_id, Deposito.all(:select => 'id,nome',:order => '2'),:id,:nome %>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Cantidad :</td>
+                    <td><%= f.text_field :quantidade, :size => 15 %></td>
+                  </tr>
+                  <tr>
+                   <%= field_us 'Costo U$:',f,:custo_dolar,
+                         :onblur   => "UsToGsRs('reclassif_stock_cotacao','reclassif_stock_cotacao_real','reclassif_stock_custo_dolar','reclassif_stock_custo_guarani','reclassif_stock_custo_real')" %>
+
+                   <%= field_gs ' Gs.:',f,:custo_guarani,
+                   :onblur   => "GsToUsRs('reclassif_stock_cotacao','reclassif_stock_cotacao_real','reclassif_stock_custo_guarani','reclassif_stock_custo_dolar','reclassif_stock_custo_real')" %>
+
+                   <%= field_us 'R$:',f,:custo_real,
+                   :onblur   => "RsToUsGs('reclassif_stock_cotacao','reclassif_stock_cotacao_real','reclassif_stock_custo_guarani','reclassif_stock_custo_dolar','reclassif_stock_custo_real')" %>
+
+                  </tr>
+
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+
+          <% if current_user.tipo.to_i == 0 %>
+          <tr>
+            <td width="950">
+              <fieldset>
+                <legend>[Liberacion]</legend>
+                <table>
+                  <tr>
+                    <td align="right">Liberado :</td>
+                    </td>
+                    <td>
+                      <%= f.radio_button :liberado, 0, :Checked => "True" %> No
+                      <%= f.radio_button :liberado, 1 %> Si
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="right">Liberado Por:</td>
+                    <td colspan="5">
+                      <%= f.collection_select :liberado_por, Usuario.all( :conditions => ["tipo = 0"], :select => 'id,usuario_nome',:order => '2'),:id,:usuario_nome %>
+                      En la Fecha
+                       <%= f.date_select :liberado_data %>
+                    </td>
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+          <% end %>
+
+        </table>
+      </div>
+
+      <div class="buttons">
+        <%= link_to t('BACK'), reclassif_stocks_path, :class => "button back" %>
+        <%= f.submit t('SAVE'),:disable_with => "Aguarde Reclasificando..."  , :class => "button" %> 
+      </div>      
+    </div>
+<% end %>
+

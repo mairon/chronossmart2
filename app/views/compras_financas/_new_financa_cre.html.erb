@@ -1,0 +1,52 @@
+<body onload="ImputFocus('venci')">
+<%= form_tag gerar_cotas_credito_compras_path, :method => "get" do %>
+  <%= hidden_field_tag :id, @compra.id %>
+
+  <%= hidden_field_tag :tipo, 1 %>
+    <%= hidden_field_tag :diferido, @compra.data.strftime("%d/%m/%Y") %>
+    <div id="tab1" class="tab_content group">
+      <table>
+        <tr>
+          <td align="right"> Primeiro Venc.:</td>
+          <td><input type="tel" name="venci" id="venci" size="15" onkeyup="Formatadata(this,event)", value="<%= @compra.data.strftime("%d/%m/%Y")%>" required="true" />
+          </td>
+          <td align="right"> Cuotas:</td>
+          <td><input  type="tel"  name="cotas" id="cotas"  size="10" value="1" /></td>
+        </tr>
+        <tr>
+          <% if @compra.moeda == 0 %>
+            <td align="right"> Valor U$:</td>
+            <td>
+              <input  type="text"  name="valor_us" id="valor_us"  size="15" value="<%= format_decimal(@sum_dolar) %>"  class = "money_us" dir   = "rtl" />
+            </td>
+          <% elsif @compra.moeda == 1 %>
+            <td align="right"> Gs.:</td>
+            <td>
+              <input  type="text"  name="valor_gs" id="valor_gs"  size="15" value="<%= format_int(@sum_guarani) %>" class = "money_gs" dir   = "rtl" />
+            </td>
+          <% elsif @compra.moeda == 2 %>
+            <td align="right"> Valor R$: </td>
+            <td>
+              <input  type="text"  name="valor_rs" id="valor_rs"  size="15" value="<%= format_decimal(@sum_real) %>"  class = "money_us" dir   = "rtl" /> <%=  %>
+            </td>
+          <% elsif @compra.moeda == 4 %>
+            <td align="right"> Valor €: </td>
+            <td>
+              <input  type="text"  name="valor_eu" id="valor_eu"  size="15" value="<%= format_decimal(@sum_euro) %>"  class = "money_us" dir   = "rtl" /> <%=  %>
+            </td>
+          <% end %>
+          <td align="right">Cuenta p/ Pago:</td>
+          <td colspan="2">
+            <%= select("busca", "conta", Conta.all(:select => ' id,nome',
+                              :conditions => [" moeda = #{@compra.moeda} and unidade_id = #{current_unidade.id}"],
+                              :order      => '2').collect {|p| [ p.nome, p.id ] }, { prompt: 'Selecione la Cuenta' },{required: true})   %>
+          </td>
+          <td><%= submit_tag t('SAVE'), :class => "button add", :disable_with => "Aguarde...", "data-plus-as-tab" => "false"   %></td>
+
+
+        </tr>
+
+      </table>
+    </div>
+<% end %>
+

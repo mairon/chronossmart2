@@ -1,0 +1,136 @@
+
+<div class="row">
+
+
+  <div class="col-md-8">
+    <div class="panel">
+      <header class="panel-heading">
+        Liquidación de Haberes
+      </header>
+
+
+        <% if @recisao_func.antiguedad_meses.to_i == 0 %>
+        <% aguinaldo_mes = 1 %>
+        <% else %>
+        <% aguinaldo_mes = (@recisao_func.data_saida.to_date.strftime('%m').to_i - 1)   %>
+        <% end %>
+
+        <table>
+          <tr>
+            <td>Salario <b><%= @recisao_func.dias_trabalhados %></b> trabajados</td>
+            <td width="300" align="right"><b><%= format_int( sl = (@recisao_func.dias_trabalhados.to_i * (@recisao_func.salario_mensal.to_f / 30 )) ) %></b></td>
+          </tr>
+          <% agui_prop = @recisao_func.salario_mensal.to_f / 12 %>
+
+
+          <% tot_sueld_ano = SueldosDetalhe.where("tipo in ('SUELDO', 'VACACIONES') and persona_id = #{@recisao_func.persona_id} AND data BETWEEN  '01-01-#{@recisao_func.data_saida.to_date.strftime('%Y')}' and '#{@recisao_func.data_saida}'").sum("credito_gs") %>
+          <tr>
+            <td>Aguinaldo proporcional <b><%= aguinaldo_mes %> meses y <%= @recisao_func.dias_trabalhados %> días</b></td>
+            <td width="300" align="right"><b><%= format_int(agui = ((@recisao_func.salario_diario.to_f * @recisao_func.dias_trabalhados.to_i) +  tot_sueld_ano.to_f) / 12 ) %></b></td>
+          </tr>
+          <% dias_preaviso = 0 %>
+          <% if @recisao_func.antiguedad_ano.to_i <= 1 %>
+            <% dias_preaviso = 0 %>
+          <% elsif @recisao_func.antiguedad_ano.to_i > 1 and @recisao_func.antiguedad_ano.to_i <= 5 %>
+            <% dias_preaviso = 12 %>
+          <% elsif @recisao_func.antiguedad_ano.to_i > 5 and @recisao_func.antiguedad_ano.to_i <= 10 %>
+            <% dias_preaviso = 18 %>
+          <% elsif @recisao_func.antiguedad_ano.to_i > 10 %>
+            <% dias_preaviso = 30 %>
+          <% end %>
+
+
+
+
+
+
+  <tr>
+    <td>Vacaciones Causadas (<%= @saldo_dias %>)</td>
+    <td width="300" align="right">
+      <%= format_int( vac_pro = (@recisao_func.salario_mensal.to_f / 30 ) * @saldo_dias.to_i) %>
+    </td>
+  </tr>
+
+  <tr>
+    <td>Vacaciones Propocionales</td>
+    <td width="300" align="right"><b>--</b></td>
+  </tr>
+
+  <tr>
+    <td>SUB-TOTAL</td>
+    <td width="300" align="right"><b><%= format_int(sl.to_f + agui.to_f + vac_pro.to_f) %></b></td>
+  </tr>
+
+
+  <tr>
+    <td>(-) Descuento IPS</td>
+    <td width="300" align="right"><b><%= format_int( ips = (sl.to_f + vac_pro.to_f) * 0.09 ) %></b></td>
+  </tr>
+
+  <tr>
+    <td><b>TOTAL A PAGAR</b></td>
+    <td width="300" align="right"><b><%= format_int( @saldo = (sl.to_f + agui.to_f + vac_pro.to_f) - ips.to_f ) %></b></td>
+  </tr>
+</table>
+  </div>
+
+  </div>
+  <% if params[:action] == 'show' %>
+
+
+
+
+  <div class="col-md-4">
+    <div class="row">
+      <div class="col-md-12">
+
+
+    <div class="panel">
+      <header class="panel-heading">
+        Sueldo Últimos 6 meses
+      </header>
+    <div class="panel-content" align="center">
+    <table>
+      <% tot = 0 %>
+    <% SueldosDetalhe.where("tipo in ('SUELDO', 'VACACIONES') and persona_id = #{@recisao_func.persona_id} AND data BETWEEN  '#{@recisao_func.data_saida - 7.months}' and '#{@recisao_func.data_saida}'").order('data').each do |s| %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td width="80"><%= s.data.strftime("%d/%m/%y") %></td>
+        <td width="50"><%= s.tipo %></td>
+        <td width="100" align="right"><%= format_int(s.credito_gs) %></td>
+      </tr>
+      <% tot += s.credito_gs.to_f %>
+    <% end %>
+    <tr class="head">
+      <td>Total</td>
+      <td></td>
+      <td align="right"><%= format_int(tot) %></td>
+    </tr>
+    <tr class="head">
+      <td>Média 6 meses</td>
+      <td></td>
+      <td align="right"><%= format_int(tot.to_f / 6) %></td>
+    </tr>
+    <tr class="head">
+      <td>Valor dia</td>
+      <td></td>
+      <td align="right"><%= format_int( (tot.to_f / 6) / 30 ) %></td>
+    </tr>
+    </table>
+    </div>
+  </div>
+  </div>
+  <div class="col-md-12">
+      <div class="panel">
+        <header class="panel-heading">
+          Vacacciones
+        </header>
+      <div class="panel-content" align="center">
+        <%= render 'ferias', locals: {saldo_ferias: @saldo_dias} %>
+      </div>
+    </div>
+  </div>
+
+        
+      </div>
+  <% end %>
+</div>

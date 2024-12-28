@@ -1,0 +1,11 @@
+<h1 id="header">Persona - [Detalhe] <b><%= @persona.nome %></b></h1>
+<div class="acessos">
+  <%= link_to 'Contatos', contatos_persona_path(@persona.id), :class => "button" %>
+  <%= link_to 'Rodados', rodados_persona_path(@persona.id), :class => "button" %>
+  <%= link_to 'Tabla Descuentos', descontos_persona_path(@persona.id), :class => "button" %>
+  <%= link_to 'Hoja de Pago', folha_de_pagamento_persona_path(@persona.id), :class => "btn btn-info" %>
+</div>
+
+<%= form_for(@persona , html: { multipart: true })  do |f| %>
+	<%= render :partial => "personas/eps/form_empregado_E03", locals: {:f => f} %>
+<% end %>

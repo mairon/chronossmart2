@@ -1,0 +1,52 @@
+<h1 align="right" id="header">.</h1>
+Resumen de Compra
+<div class="group">
+  <h2>
+    <%= form_tag resultado_resumo_compra_contabilidades_path, :method => "get" do%>
+      <table>
+
+        <tr>
+          <td> Periodo :</td>
+          <td>
+            <fieldset>
+              <table>
+                <tr>
+                  <td>                    
+                      <input name="mes" id="mes"  size="5" type="text" />
+                      Hasta 
+                      <input name="ano"  id="ano"   size="5" type="text" />
+                  </td>
+                </tr>
+              </table>
+            </fieldset>
+          </td>
+        </tr>
+        
+        <tr>
+          <td align="right">Tipo :</td>
+          <td>
+            <fieldset>
+                <%= radio_button_tag :status, 0,  :Checked => "True"%>Contado
+                <%= radio_button_tag :status, 1  %> Credito
+                <%= radio_button_tag :status, 2  %> Todos
+            </fieldset>
+          </td>
+        </tr>
+                
+        <tr>
+          <td></td>
+          <td>
+            <input type="submit" value="           Informe           " onclick="Tipo('0')"/>
+            <input type="submit" value="          Excel          " onclick="Tipo('1')"/>
+            <input type="submit" value="       Demostrativo       " onclick="Tipo('2')"/>            
+          </td>
+
+        </tr>
+
+        <input type="hidden" name="tipo" id="tipo"  size="5" value="0"/>
+      </table>
+    <% end %>
+  </h2>
+</div>
+
+

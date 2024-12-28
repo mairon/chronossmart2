@@ -1,0 +1,171 @@
+<% form_for(cobros_financa) do |f| %>
+   <%= f.error_messages %>
+   <%=  f.hidden_field :cobro_id%>
+   <%=  f.hidden_field :data,:value => @cobro.data%>
+   <%=  f.hidden_field :persona_id,  :value => @cobro.persona_id%>
+   <%=  f.hidden_field :persona_nome,:value => @cobro.persona_nome%>
+   <%= hidden_field_tag :cotacao,@cobro.cotacao.to_i %>
+   <input type="hidden" id="data" value="<%= @cobro.data.strftime("%d").to_i%>"/>
+   <input type="hidden" id="mes" value="<%= @cobro.data.strftime("%m").to_i%>"/>
+   <input type="hidden" id="ano" value="<%= @cobro.data.strftime("%Y").to_i%>"/>
+    
+   <div class="group_cd">
+      <table>
+
+          <tr>
+           <td align="right"><%= t('COIN') %> :</td>
+            <td>
+              <fieldset>
+                <%= f.radio_button :moeda, 0 ,  :Checked => "True" %> Dolar
+                <%= f.radio_button :moeda, 1%> Gs.
+              </fieldset>
+            </td>
+          </tr>
+
+         <tr>
+               <%= field_us 'Total U$:',f,:valor_dolar,:value => number_to_currency( @total_cobro_dolar.to_f - @total_desconto_dolar.to_f + @total_interes_dolar.to_f,       :format =>' %n ', :separator => "," ),
+                                                       :onblur => "UsToGs('cotacao','cobros_financa_valor_dolar','cobros_financa_valor_guarani')" %>
+
+               <%= field_us 'Retencion U$:',f,:retencion_dolar, :value => 0,
+                                                                :onblur => "UsToGs('cotacao','cobros_financa.retencion_dolar','cobros_financa_retencion_guarani')" %>
+        </tr>
+        <tr>
+               <%= field_gs 'Total Gs.:',f,:valor_guarani, :value => number_to_currency( @total_cobro_guarani.to_f - @total_desconto_guarani.to_f + @total_interes_guarani.to_f,:format =>' %n ', :precision => 0 ),
+                                                           :onblur => "GsToUs('cotacao','cobros_financa_valor_guarani','cobros_financa_valor_dolar')" %>
+
+               <%= field_gs 'Retencion Gs.:',f,:retencion_guarani, :value => 0,
+                                                                   :onblur => "GsToUs('cotacao','cobros_financa_retencion_guarani','cobros_financa_retencion_dolar')" %>
+         </tr>
+
+         	<tr>
+              <td colspan="4">
+                <div class="group">
+                  <table>
+                    <tr>
+                      <td align="right">Cuenta :</td>
+                      <td><%= f.collection_select :conta_id, Conta.all( :select     =>' id,nome', :order      => '1'), :id,:nome,{},{:onkeyup     => "EnterTab(event,'vendas_financa_cheque')"} %></td>
+ 
+                      <td align="right"></td>
+                      <td><%= f.check_box :cheque_status, :onblur => "toggleDiv('mydiv'),toggleDiv('mydiv2');"%> Cheque?</td>
+                    </tr>
+                  </table>
+ 
+                  <div id="mydiv" style="display:none;">
+                    <table>
+
+                      <tr>
+                        <td align="right">Valor Us.: </td>
+                        <td><%= f.text_field :cheque_valor_dolar,
+                                             :size    => 15,
+                                             :value   => number_to_currency( @total_cobro_dolar.to_f - @total_desconto_dolar.to_f + @total_interes_dolar.to_f,       :format =>' %n ', :separator => "," ),
+                                             :onkeyup =>"maskIt(this,event,'###.###.###.###,##',true)",
+                                             :onblur  => "UsToGs('cotacao','cobros_financa_cheque_valor_dolar','cobros_financa_cheque_valor_guarani'),CobrosVultos()",
+                                             :dir     =>"rtl" %></td>
+
+                        <td align="right">Valor Gs.: </td>
+                        <td><%= f.text_field :cheque_valor_guarani,
+                                             :size    => 15,
+                                             :value   => number_to_currency( @total_cobro_guarani.to_f - @total_desconto_guarani.to_f + @total_interes_guarani.to_f,:format =>' %n ', :precision => 0 ),
+                                             :onkeyup =>"maskIt(this,event,'###.###.###.###',true)",
+                                             :onblur  => "GsToUs('cotacao','cobros_financa_cheque_valor_guarani','cobros_financa_cheque_valor_dolar'),CobrosVultos()",
+                                             :dir     =>"rtl" %></td>
+                      </tr>
+
+                      <tr>
+                        <td align="right">Cheque:</td>
+                        <td><%= f.text_field :cheque,
+                                             :size        => 15,
+                                             :onkeypress  => "return bloqEnter(event)",
+                                             :onkeyup     => "EnterTab(event,'vendas_financa_diferido_3i')"%></td>
+ 
+                        <td align="right">Diferido:</td>
+                        <td><%= f.date_select( :diferido, {},{:onkeyup     => "EnterTab(event,'vendas_financa_transportadora_id')"} )%></td>
+                      </tr>
+
+                      <tr>
+                        <td align="right">Banco : </td>
+                        <td><%= f.text_field :banco,:size => 15%></td>
+
+                        <td align="right">Titular : </td>
+                        <td colspan="3"><%= f.text_field :titular,:size => 25 %></td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+
+         		
+         		</td>
+
+               <td valign="top">
+                 <div id="mydiv2" style="display:none;">
+
+                  <div class="group">
+
+                 <table>
+                    <tr>
+                      <td align="right">Vuelto Cuenta :</td>
+                      <td><%= f.collection_select :vuelto_conta_id, Conta.all( :select     =>' id,nome', :order      => '1'), :id,:nome,{},{:onkeyup     => "EnterTab(event,'vendas_financa_cheque')"} %></td>
+
+                      <td align="right"></td>
+                      <td><%= f.check_box :vuelto_cheque_status %> Cheque?</td>
+
+                    </tr>
+
+                    <tr>
+                      <td align="right"> Vuelto Cheque:</td>
+                      <td><%= f.text_field :vuelto_cheque,
+                                           :size => 15,
+                                           :onkeypress  => "return bloqEnter(event)",
+                                           :onkeyup     => "EnterTab(event,'vendas_financa_diferido_3i')"%></td>
+
+                      <td align="right"> Vuelto Diferido:</td>
+                      <td><%= f.date_select( :vuelto_diferido, {},{:onkeyup     => "EnterTab(event,'vendas_financa_transportadora_id')"} )%></td>
+                    </tr>
+
+
+                    <tr>
+                       <%= field_us 'Vuelto Valor Us.:',f,:vuelto_valor_dolar,
+                                                          :onblur => "UsToGs('cotacao','cobros_financa_vuelto_valor_dolar','cobros_financa_vuelto_valor_guarani')" %>
+                    </tr>
+
+                    <tr>
+                       <%= field_gs 'Vuelto Valor Gs.:',f,:vuelto_valor_guarani,
+                                                          :onblur => "GsToUs('cotacao','cobros_financa_vuelto_valor_guarani','cobros_financa_vuelto_valor_dolar')" %>
+                    </tr>
+               	
+                 </table>
+                 </div>
+                 </div>
+       			</td>
+
+
+         	</tr>
+         </table>
+
+         <tr>
+            <td align="right">N.: Recibo : </td>
+            <td><%= f.text_field :numero_recibo,:size => 15%></td>
+         </tr>
+
+
+         <tr >
+            <td align="right">Documento:</td>
+            <td><%= f.collection_select :documento_id, Documento.all( :select => 'id,nome',
+                  :order  => '1' ),:id,
+                 :nome %></td>
+         </tr>
+         <tr >
+            <td valign="top" align="right">Descripcion :</td>
+            <td><%= f.text_area :descricao,
+                 :size => '35X5',
+                 :value => t('CHARGE') + @cobro.persona_nome %></td>
+
+            <td valign="bottom"><%= f.submit t('SAVE') %> 
+         </tr>
+<%= 
+%>
+
+      </table>
+   </div>
+
+<% end %>

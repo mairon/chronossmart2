@@ -1,0 +1,6 @@
+<% if session[:modal] == 'true' %>
+	<%= render :partial => "/compras/eps/modal_compra_custos" %>
+<% else %>
+	<%= render :partial => "/compras/eps/compra_custos" %>	
+<% end %>
+

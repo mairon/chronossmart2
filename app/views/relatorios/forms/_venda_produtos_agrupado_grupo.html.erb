@@ -1,0 +1,64 @@
+<% tot_qtd = 0 %>
+<% tot_gs  = 0 %>
+<% tot_us  = 0 %>
+
+<table>
+    <thead class="report-header">
+      <tr>
+        <td colspan="10" class="title" align="center">
+          <%= current_unidade.nome_sys %> <br>
+          Vendas Agrupado por Grupo
+        </td>
+      </tr>
+      <tr>
+        <td colspan="10">Fecha: <%= params[:inicio] %> hasta <%= params[:final] %></td>
+      </tr>
+
+      <%        
+          if params[:moeda].to_s == '0'
+            moeda = 'Dolar'
+          elsif params[:moeda].to_s == '1'
+            moeda = 'Guaranies'
+          else
+            moeda = 'Reales'
+          end
+      %>
+
+      <tr>
+        <td colspan="10">Moneda: <%= moeda %></td>
+      </tr>
+
+      <tr class="td-header">
+        <td align="center" width="50">Cod.</td>
+			<td width="350">Grupo</td>
+			<td width="80" align="right">Qtd</td>
+			<td width="80" align="right">Valor</td>
+    </thead>
+
+	<% @vendas.each do |v| %>	
+		<tr class="<%= cycle("cor1", "cor2")%>">
+			<td width="50"><%= v.grupo_id.to_s.rjust(6,'0') %></td>
+			<td width="350"><%= v.grupo_nome %></td>
+			<td width="80" align="right"><%= format_int(v.qtd) %></td>			
+			<% if params[:moeda] == '0' %>
+				<td width="80" align="right"><%= format_decimal(v.tot_us.to_f) %></td>
+			<% else %>
+				<td width="80" align="right"><%= format_int(v.tot_gs.to_f) %></td>
+			<% end %>
+		</tr>
+		<% tot_qtd += v.qtd.to_f %>
+		<% tot_gs += v.tot_gs.to_f %>
+		<% tot_us += v.tot_us.to_f %>
+
+	<% end %>
+	<tr class="head">
+		<td colspan="2"  height="25" align="right">Total ==> </td>
+		<td align="right"><%= format_int(tot_qtd.to_f) %></td>
+		<% if params[:moeda] == '0' %>
+			<td align="right"><%= format_decimal(tot_us.to_f) %></td>
+		<% else %>
+			<td align="right"><%= format_int(tot_gs.to_f) %></td>
+		<% end %>
+	</tr>
+
+</table>

@@ -1,0 +1,90 @@
+<div class="group">
+
+  <%= form_for(plano_vendas) do |f| %>
+    <div class="row">
+      <div class="col-md-6">
+        <label><%= t('DATE') %></label>
+        <%= f.text_field :data, value: Time.now.strftime("%d/%m/%Y"), size: 10,  class: "panel-field date" %>        
+      </div>
+      <div class="col-md-6">
+        <label><%= t('COIN') %></label>
+        <%= f.select :moeda, [['Gs.', 1], ['U$', 0], ['R$', 2]], :selected => current_unidade.moeda.to_i %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label>Cliente <a href="#" target="popup" style="font-size: 12px;" onclick="window.open('/personas/new?layout=resumido','popup','width=600,height=600'); return false;"> Nuevo+
+          </a></label>
+        <%= f.text_field :persona_nome, required: true, class: 'autocomplete panel-field', autofocus: true %>
+         <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+        <%= f.hidden_field :persona_id, value: params[:persona_id] %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <label>Producto</label>
+        <%= f.collection_select :produto_id, Produto.where(status: true), :id, :nome, { :prompt => 'Selecione' }, { required: true} %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label>Condición</label>
+        <%= f.collection_select :tabela_preco_id, TabelaPreco.where(status: true), :id, :nome, { :prompt => 'Selecione' }, {required: true} %>
+      </div>
+      
+    </div>
+
+  <br>
+  <div class="row">
+    <div class="col-md-12">
+      <%= f.text_area :obs, class: "panel-field", placeholder: 'Obs.', rows: '3' %>
+    </div>
+  </div>  
+    <div class="footer-buttons">
+      <%= f.submit 'Seguir', class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to 'Volver', plano_vendas_path, :class => "button back" %>        
+    </div>
+  <% end %>
+</div>
+
+
+<script>
+  $(function() {
+    $( "#plano_venda_persona_nome" ).autocomplete({
+        source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+        $.ajax({
+          url: "/personas/busca?per=CLIENTE",
+          dataType: "json",
+
+          data: {
+            tipo: 'DESCRIPCION',
+            busca: request.term
+          },
+          beforeSend: function(){
+          $("#spinner").addClass("sppiner_show");
+          },
+
+          success: function( data ) {
+            $("#sppiner").removeClass("sppiner_show");
+            response( data );
+          },
+        });
+      },
+      minLength: 2,
+      change: function( event, ui ) {
+        $("#plano_venda_persona_id").val("");
+        $('#plano_venda_persona_id').val(ui.item.id);
+        return false;
+      }
+    });
+    $( "#plano_venda_persona_nome" ).change(function(){
+      if ($( "#plano_venda_persona_id" ).val() == ''){
+      }
+    });
+  });  
+
+  $('#plano_venda_produto_id, #plano_venda_tabela_preco_id').selectize();
+</script>

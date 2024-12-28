@@ -1,0 +1,201 @@
+@font-face {
+  font-family: 'prox';
+	src: url("fonts/proxima-nova.otf") format("opentype");  
+}
+
+@font-face {
+  font-family: 'prox-bold';
+	src: url("fonts/proxima-nova-bold.otf") format("opentype");  
+}
+
+* { padding:0; margin:0; }
+.header{
+  font-weight: bold;
+}
+	
+body{display:none}
+
+body {
+  height: 100%;
+  font-family: 'prox';
+  background-color: #eef1f5;
+  font-size: 13px;
+  color: #999999;
+	}
+	
+ul li { list-style: none; }
+.clear { clear: both; height: 0; line-height: 0;}
+
+a {
+	color: #008ee8;
+	text-decoration: underline;
+	}
+	
+a:hover {
+	color: #3aaef7;
+	text-decoration: none;
+	}
+
+.loginbox{
+	margin: 80px auto 100px;
+	}
+
+.loginbox h1{
+margin-bottom: 15px; }
+
+.content-loginbox{
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+    max-width: 331px;
+    width: auto;
+    margin: 0 auto;
+    background: #FFF;
+    padding: 60px 35px;
+  -moz-box-shadow: 0 1px 2px rgba(0,0,0,.09);
+  -webkit-box-shadow: 0 1px 2px,rgba(0,0,0,.09);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%) !important;
+    position: relative;
+
+
+}
+
+.content-loginbox p{
+	margin-bottom: 15px;
+	display: flow-root;
+}
+
+.loginbox .message {
+	margin: 0 15px 15px;
+	}
+
+	
+	
+input:focus,textarea:focus,select:focus{
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  outline: none;
+  border: 1px solid #c0c0c0;
+  background-color:#EEE9E9;
+}
+
+input[type="text"]{
+  font-family: 'prox';
+  padding: 8px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #000;
+  background-color: #fff;
+  background-image: none;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  border: 1px solid #ccc;
+  height: 31px;
+  -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+  -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
+  -o-transition: border linear 0.2s, box-shadow linear 0.2s;
+  transition: border linear 0.2s, box-shadow linear 0.2s;
+}
+
+
+input[type="password"]{
+  font-family: 'prox';
+  padding: 8px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  height: 31px;
+  background-color: #fff;
+  background-image: none;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  
+  border: 1px solid #ccc;
+  -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+  -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
+  -o-transition: border linear 0.2s, box-shadow linear 0.2s;
+  transition: border linear 0.2s, box-shadow linear 0.2s;
+}
+
+
+select{
+  font-family: 'prox';
+  height: 50px;
+  padding: 8px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  color: #000;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #e6e6e6;
+  margin-left: 10px;
+  width: 80%;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+    -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+    -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
+    -o-transition: border linear 0.2s, box-shadow linear 0.2s;
+    transition: border linear 0.2s, box-shadow linear 0.2s;
+    float: right;
+}
+
+input:focus:invalid:focus,textarea:focus:invalid:focus,select:focus:invalid:focus,.cmxform .form-group input.error,.cmxform .form-group textarea.error {
+    border-color:#B94A48 !important;
+}
+
+.loginbox form input.submit {
+	margin-right: 15px;
+}
+
+.text-passwd{
+	width:95%;
+	float: left;
+}
+
+.text_seach{
+	width: 35px;
+}
+
+.formend{
+	padding-top:  20px;
+}
+.btn {
+    width: auto;
+    min-width: 100%;
+    height: 44px;
+    display: block;
+    margin: 0 auto;
+    outline: none;
+    font-size: 16px;
+    border:  none;
+    border-radius: 2px;
+}
+
+.btn-green{
+  background: #02bea2;
+  color: #fff !important;
+  box-shadow: 0 2px 5px 0 rgb(0 0 0 / 20%), 0 2px 10px 0 rgb(0 0 0 / 10%);
+}
+
+.btn-green:focus{
+  background: #02bea2;
+  color: #fff !important;
+  outline: none;
+  opacity: 0.8;
+}
+
+input:focus,textarea:focus,select:focus{
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  outline: none;
+  border: 1px solid #8cd6f8;
+  background-color:#f9f9f9;
+}

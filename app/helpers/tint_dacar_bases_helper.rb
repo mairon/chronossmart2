@@ -1,0 +1,2 @@
+module TintDacarBasesHelper
+end

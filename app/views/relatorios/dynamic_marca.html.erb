@@ -1,0 +1,6 @@
+$('#busca_sub_grupo').empty();
+
+$('#busca_sub_grupo').append('<option value="">Seleccione La Marca</option>');
+<% for ne in @marcas %>
+  $('#busca_sub_grupo').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.descricao %>').change());
+<% end %>

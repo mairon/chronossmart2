@@ -1,0 +1,37 @@
+<%= form_for(@cidade_area) do |f| %>
+  <% if @cidade_area.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@cidade_area.errors.count, "error") %> prohibited this cidade_area from being saved:</h2>
+
+      <ul>
+      <% @cidade_area.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+<ul class="tabs">
+      <li><a href="#tab1">Área</a></li>
+</ul>
+<div class="tab_container">
+  <div id="tab1" class="tab_content">
+    <table>
+      <tr>
+        <td width="1000">
+          <fieldset>
+            <table>
+              <tr>
+                <td align="right">Área :</td>                    
+                <td><%= f.text_field :nome, size: 60 %><%= f.submit :value => t('SAVE'), :class => "button" %></td>
+              </tr>                 
+            </table>
+        </fieldset>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="buttons">
+    <%= link_to 'Voltar', cidade_path(@cidade_area.cidade_id), :class => "button back" %>
+  </div>
+</div>
+<% end %>

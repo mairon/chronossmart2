@@ -1,0 +1,25 @@
+<table>
+  <tr>
+    <% if @pago.moeda == 0 %>
+      <td width="70" align="right">Valor: <%= number_to_currency( @pago_us, :format =>' %n ', :separator => "," ) %></td>
+      <td width="70" align="right">Desc.: <%= number_to_currency( @desconto_us, :format =>' %n ', :separator => "," ) %>(-)</td>
+      <td width="70" align="right">Ade..: <%= number_to_currency( @adelanto_us, :format =>' %n ', :separator => "," ) %>(-)</td>
+      <td width="70" align="right">Rete.: <%= number_to_currency( @retencao_us, :format =>' %n ', :separator => "," ) %>(-)</td>
+      <td width="70" align="right">Int... <%= number_to_currency( @interes_us, :format =>' %n ', :separator => "," ) %>(+)</td>
+      <td width="70" align="right">Total: <b><%= number_to_currency( @saldo_fina_us , :format =>' %n ', :separator => ",")%></b></td>
+    <% elsif @pago.moeda == 1 %>
+      <td width="130" align="right">Valor: <%= number_to_currency( @pago_gs, :format =>' %n ', :precision => 0 ) %></td>
+      <td width="130" align="right">Desc.: <%= number_to_currency( @desconto_gs, :format =>' %n ', :precision => 0 ) %>(-)</td>
+      <td width="130" align="right">Ade..: <%= number_to_currency( @adelanto_gs, :format =>' %n ', :precision => 0 ) %>(-)</td>
+      <td width="130" align="right">Rete.: <%= number_to_currency( @retencao_gs, :format =>' %n ', :precision => 0 ) %>(-)</td>
+      <td width="130" align="right">Int..:  <%= number_to_currency( @interes_gs, :format =>' %n ', :precision => 0 ) %>(+)</td>
+      <td width="175" align="right">Total: <b><%= number_to_currency( @saldo_fina_gs , :format =>' %n ', :precision => 0 ) %></b></td>
+    <% else %>
+      <td width="70" align="right">Valor: <%= number_to_currency( @pago_rs, :format =>' %n ', :separator => "," ) %></td>
+      <td width="70" align="right">Desc.: <%= number_to_currency( @desconto_rs, :format =>' %n ', :separator => "," ) %>(-)</td>
+      <td width="70" align="right">Ade.: <%= number_to_currency( @adelanto_rs, :format =>' %n ', :separator => "," ) %>(-)</td>
+      <td width="70" align="right">Int.:  <%= number_to_currency( @interes_rs, :format =>' %n ', :separator => "," ) %>(+)</td>
+      <td width="100" align="right">Total: <b><%= number_to_currency( ( ( @pago_rs.to_f + @interes_rs.to_f ) - (@desconto_rs.to_f + @adelanto_rs) ), :format =>' %n ', :separator => ",")%> </b> </td>
+    <% end %>
+  </tr>
+</table>

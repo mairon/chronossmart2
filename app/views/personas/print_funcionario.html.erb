@@ -1,0 +1,174 @@
+<style>
+  .group td{
+    padding: 6px;
+    font-size: 12px;
+  }
+
+</style>
+<table>
+  <tr>
+    <td align="left"><%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 90) %></td>
+    <td width="400"><h2 align="center">HISTORIAL DE  RRHH</h2></td>
+    
+  </tr>
+</table>
+
+<div class="group">
+  <table>
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td width="200"><b>Nombre</b></td>
+      <td width="530"><%= @persona.nome %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Sucursal</b></td>
+      <td><%= @persona.unidade.unidade_nome %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Cargo</b></td>
+      <td><%= @persona.cargo.nome unless @persona.cargo.nil? %> <%= @persona.departamento %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Direccion</b></td>
+      <td><%= @persona.direcao %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Telefono</b></td>
+      <td><%= @persona.telefone %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Sueldo Atual</b></td>
+      <td><%= format_int(@persona.salario) %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Fecha de Nacimiento</b></td>
+      <td><%= @persona.data_nascimento.strftime("%d/%m/%Y") unless @persona.data_nascimento.blank? %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Nivel educativo</b></td>
+      <td><%= @persona.escolaridade %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Carrera</b></td>
+      <td><%= @persona.escolaridade_outros %></td>
+    </tr>
+
+
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>C.I. NRO.</b></td>
+      <td><%= @persona.ruc %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>VCTO C.I.</b></td>
+      <td><%= PersonaDoc.where(persona_id: @persona.id, documento_id: 26).last.vencimento.strftime("%d/%m/%Y") unless PersonaDoc.where(persona_id: @persona.id, documento_id: 26).last.nil? %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Cumpleaños</b></td>
+      <td><%= @persona.data_nascimento.strftime("%d/%m/%Y") unless @persona.data_nascimento.blank? %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Edad</b></td>
+      <td><%= ((Time.now.to_date - @persona.data_nascimento.to_date ) / 365).to_i  %> </td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Certificado de Antecedentes</b></td>
+      <td><%= PersonaDoc.where(persona_id: @persona.id, documento_id: 25).last.vencimento.strftime("%d/%m/%Y") unless PersonaDoc.where(persona_id: @persona.id, documento_id: 25).last.nil? %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Estado de Antecedente</b></td>
+      <td><%= @persona.estado_antecedente %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>INFORMCONF</b></td>
+      <td><%= PersonaDoc.where(persona_id: @persona.id, documento_id: 27).last.vencimento.strftime("%d/%m/%Y") unless PersonaDoc.where(persona_id: @persona.id, documento_id: 27).last.nil? %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Declaracion Jurada de Bienes</b></td>
+      <td><%= PersonaDoc.where(persona_id: @persona.id, documento_id: 22).last.vencimento.strftime("%d/%m/%Y") unless PersonaDoc.where(persona_id: @persona.id, documento_id: 22).last.nil? %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Fecha Inicial</b></td>
+      <td><%= @persona.data_entrada.strftime("%d/%m/%Y") unless @persona.data_entrada.blank? %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Contrato NRO.</b></td>
+      <td><%= @persona.nr_contrato %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>E-mail</b></td>
+      <td><%= @persona.email %> </td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>E-mail Comercial</b></td>
+      <td><%= @persona.email_comercial %> </td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>OFAC</b></td>
+      <td><%= PersonaDoc.where(persona_id: @persona.id, documento_id: 29).last.vencimento.strftime("%d/%m/%Y") unless PersonaDoc.where(persona_id: @persona.id, documento_id: 29).last.nil? %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Perfil</b></td>
+      <td><%= @persona.perfil %> </td>
+    </tr>
+    <% saldo_dias = @persona.saldo_ferias %>
+    <% @persona.persona_ferias.order('inicio').each do |d| %>
+      <% saldo_dias += d.dias.to_i %>
+    <% end %>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Vacaciones</b></td>
+      <td><%= saldo_dias %> dias</td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Croquis</b></td>
+      <td><%= PersonaDoc.where(persona_id: @persona.id, documento_id: 39).last.vencimento.strftime("%d/%m/%Y") unless PersonaDoc.where(persona_id: @persona.id, documento_id: 39).last.nil? %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Factura Servicios</b></td>
+      <td><%= PersonaDoc.where(persona_id: @persona.id, documento_id: 156).last.vencimento.strftime("%d/%m/%Y") unless PersonaDoc.where(persona_id: @persona.id, documento_id: 156).last.nil? %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Ex. Médicos Periódicos</b></td>
+      <td><%= PersonaDoc.where(persona_id: @persona.id, documento_id: 158).last.vencimento.strftime("%d/%m/%Y") unless PersonaDoc.where(persona_id: @persona.id, documento_id: 158).last.nil? %></td>
+
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Antigüedad</b></td>
+      <td><%= ((Time.now.to_date - @persona.data_entrada.to_date ) / 365).to_i  %> </td>
+    </tr>
+   <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Brigada</b></td>
+      <td><%= @persona.brigada.nome unless @persona.brigada.nil? %> </td>
+    </tr>
+   <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td><b>Comite</b></td>
+      <td><%= @persona.comite.nome unless @persona.comite.nil? %> </td>
+    </tr>
+
+  </table>
+</div>

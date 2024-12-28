@@ -1,0 +1,50 @@
+<h1 id="header">Depósito - [<%= t('EDITION') %>]</h1>
+  <div class="group">
+<%= form_for(@deposito) do |f| %>
+  <% if @deposito.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@deposito.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @deposito.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+    <table>
+      <tr>
+        <td>
+          <label>Depósito</label>
+          <%= f.text_field :nome, required: true, autofocus: true, class: 'panel-field' %>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding-top: 10px">
+          <%= f.check_box :seta_produto %> Principal
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <label>Capacidad</label>
+          <%= f.text_field :capacidade, class: 'panel-field' %>
+        </td>
+      </tr>
+      <tr>        
+        <td>
+          <label><%= t('UNIT') %></label>
+          <%= f.collection_select :unidade_id, Unidade.all(:select => 'id,unidade_nome',:order => '2'),:id ,:unidade_nome,{}, { class: 'panel-field'} %></td>
+
+      </tr>
+    </table>
+    <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), depositos_path, :class => "btn btn-back" %>
+    </div>
+  <% end %>
+</div>
+
+

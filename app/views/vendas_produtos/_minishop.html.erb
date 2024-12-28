@@ -1,0 +1,246 @@
+<%= form_for(vendas_produto, remote: true) do |f| %>
+  <div id="error_explanation" style="display:none"></div>
+  <!-- form PDV ! -->
+  <style type="text/css">
+    input.produto{
+      height: 50px;
+      width: 510px;
+      margin: 5px 5px 5px 15px;
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    input.valores{
+      height: 50px;
+      width: 95%;
+      margin: 5px;
+      font-size: 22px;
+      float: right;
+      margin-bottom: 10px;
+    }
+
+
+    input.qtd{
+      height: 50px;
+      width: 250px;
+      margin: 5px;
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .add{
+      height: 50px;
+      width: 150px;
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .descp{
+      font-size: 22px;
+    }
+
+    .styled-select select {
+      width: 286px;
+      padding: 5px;
+      font-size: 16px;
+      border-radius: 0;
+      height: 48px;
+      -webkit-appearance: none;
+      margin-right: 5px;
+      margin-bottom: 4px;
+      margin-top: 1px;
+    }
+  </style>
+
+  <div class="group">  
+    <%= f.hidden_field :venda_id %>
+    <table >
+      <tr>
+        <td colspan="2">
+          <%= f.text_field :produto_nome, class: 'produto', placeholder: 'Producto' %>        
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+            <%= text_field_tag :cod_busca, nil, class: 'produto first', placeholder: 'Barra', autofocus: true %>
+        </td>
+      </tr>
+      <% if @venda.moeda.to_i == 1 %>
+        <tr>
+          <td class="descp" align="right" >Cantidad:</td>
+          <td align="right"><%= f.number_field :quantidade, class: 'qtd', dir: "rtl", value: '1', onblur: "CalcQtd('vendas_produto_quantidade','vendas_produto_unitario_guarani','vendas_produto_total_guarani')"%>
+            <%= f.submit "ADD", :class => "button add" , :id => "btn", "data-plus-as-tab" => "false" %>
+          </td>
+        </tr>
+
+        <%= f.hidden_field :preco_guarani %>
+        <% if @venda_config.edita_valores == true %>
+          <tr>
+            <td class="descp" align="right">Unit:</td>
+              <td><%= f.telephone_field :unitario_guarani, class: 'valores money_gs', precision: 0, dir: "rtl",  onchange: "CalcQtd('vendas_produto_unitario_guarani','vendas_produto_quantidade','vendas_produto_total_guarani') " %></td>
+            </tr>
+          <tr>
+            <td class="descp" align="right">Sub-Total:</td>
+            <td><%= f.telephone_field :total_guarani, class: 'valores', dir: "rtl" %></td>
+          </tr>
+
+        <% else %>
+          <tr>
+            <td class="descp" align="right">Unit:</td>
+              <td><%= f.telephone_field :unitario_guarani, class: 'valores money_gs', precision: 0, dir: "rtl", readonly: 'readonly' %></td>
+            </tr>
+          <tr>
+            <td class="descp" align="right">Sub-Total:</td>
+            <td><%= f.telephone_field :total_guarani, class: 'valores', dir: "rtl", readonly: 'readonly' %></td>
+          </tr>
+          
+        <% end %>
+      <% else %>
+      <tr>
+        <td class="descp" align="right">Cantidad:</td>
+        <td align="right"><%= f.number_field :quantidade, class: 'qtd', dir: "rtl", value: '1', onblur: "CalcQtdDescimal('vendas_produto_quantidade','vendas_produto_unitario_dolar','vendas_produto_total_dolar')"%>
+          <%= f.submit "ADD", :class => "button add" , :id => "btn", "data-plus-as-tab" => "false" %>
+        </td>
+      </tr>
+
+        <%= f.hidden_field :preco_dolar %>
+        <% if @venda_config.edita_valores == true %>
+          <tr>
+            <td class="descp" align="right">Unit:</td>
+              <td><%= f.telephone_field :unitario_dolar, class: 'valores money_us', precision: 2, dir: "rtl",  onchange: "CalcQtdDescimal('vendas_produto_unitario_dolar','vendas_produto_quantidade','vendas_produto_total_dolar') " %></td>
+            </tr>
+          <tr>
+            <td class="descp" align="right">Sub-Total:</td>
+            <td><%= f.telephone_field :total_dolar, class: 'valores money_us', dir: "rtl" %></td>
+          </tr>
+        <% else %>
+          <tr>
+            <td class="descp" align="right">Unit:</td>
+              <td><%= f.telephone_field :unitario_dolar, class: 'valores money_us', precision: 2, dir: "rtl", readonly: 'readonly' %></td>
+            </tr>
+          <tr>
+            <td class="descp" align="right">Sub-Total:</td>
+            <td><%= f.telephone_field :total_dolar, class: 'valores money_us', dir: "rtl", readonly: 'readonly' %></td>
+          </tr>
+
+        <% end %>
+      <% end %>
+    </table>
+    <br>
+  </div>
+<%= f.hidden_field :deposito_id, value: Deposito.where(seta_produto: 1).last %>
+<%= f.hidden_field :produto_id %>
+<%= f.hidden_field :data, value: @venda.data %>
+<%= f.hidden_field :moeda, value: @venda.moeda %>
+
+<%= hidden_field_tag :unidade, nil, value: current_unidade.id %>
+<%= hidden_field_tag :tabela_preco, nil, value: @venda.tabela_preco_id %>
+<%= hidden_field_tag :tipo_venda, nil, value: @venda.tipo_venda %>
+<%= hidden_field_tag :persona_id, nil, value: @venda.persona_id %>
+
+<% end %>
+<script type="text/javascript">
+
+    $("#cod_busca").change(function(){
+        $.ajax({url: "/buscas/busca_venda_produto",
+          type: 'GET',
+          beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+          data: 'cod=' + $('#cod_busca').val() +
+            "&unidade=" + $("#unidade").val() +
+            "&data=" + $("#vendas_produto_data").val() +
+            "&deposito=" + $("#vendas_produto_deposito_id").val() +
+            "&persona_id=" + <%= @venda.persona_id %> +
+            "&tabela_preco=" + $("#tabela_preco").val(),
+          success: function(grade){
+          $('#vendas_produto_produto_nome').val(grade["produto"].nome);
+          $('#vendas_produto_produto_id').val(grade["produto"].produto_id);
+          //tabela de preco
+          if ($('#vendas_produto_moeda').val() == '0'){
+            $('#vendas_produto_unitario_dolar').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
+            $('#vendas_produto_total_dolar').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
+            $('#vendas_produto_preco_dolar').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
+          }if ($('#vendas_produto_moeda').val() == '1'){
+            $('#vendas_produto_unitario_guarani').val(number_format( grade["produto"].preco_1_gs, 0, ',', '.'));
+            $('#vendas_produto_preco_guarani').val(number_format( grade["produto"].preco_1_gs, 0, ',', '.'));
+            $('#vendas_produto_total_guarani').val(number_format( grade["produto"].preco_1_gs, 0, ',', '.'));
+          }if ($('#vendas_produto_moeda').val() == '2'){
+            $('#vendas_produto_unitario_real').val(number_format( grade["produto"].preco_1_rs, 2, ',', '.'));
+          }          
+          $('#new_vendas_produto').submit();
+        }
+      });
+
+        
+    });
+
+    $("#busca_bico").blur(function(){
+        $.ajax({url: "/buscas/busca_bico",
+          type: 'GET',
+          beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+          data: 'cod=' + $('#busca_bico').val() +
+          '&persona_id=' + <%= @venda.persona_id %>
+          + '&tipo_venda=' + <%= @venda.tipo_venda %>,
+          success: function(grade){
+            $('#vendas_produto_produto_nome').val(grade["produto"].produto_nome);
+            $('#vendas_produto_produto_id').val(grade["produto"].id);
+            $('#vendas_produto_deposito_id').val(grade["produto"].deposito_id);
+            if ($('#vendas_produto_moeda').val() == '0'){
+              $('#vendas_produto_unitario_dolar').val(number_format( grade["produto"].preco_us, 2, ',', '.'));
+              $('#vendas_produto_total_dolar').val(number_format( grade["produto"].preco_us, 2, ',', '.'));
+              $('#vendas_produto_preco_dolar').val(number_format( grade["produto"].preco_us, 2, ',', '.'));
+            }if ($('#vendas_produto_moeda').val() == '1'){
+              if ($('#carta_flete').val() == '1'){
+                $('#vendas_produto_unitario_guarani').val(number_format( grade["produto"].preco_02_gs, 0, ',', '.'));
+                $('#vendas_produto_preco_guarani').val(number_format( grade["produto"].preco_02_gs, 0, ',', '.'));
+                $('#vendas_produto_total_guarani').val(number_format( grade["produto"].preco_02_gs, 0, ',', '.'));
+              }else{
+                $('#vendas_produto_unitario_guarani').val(number_format( grade["produto"].preco_gs, 0, ',', '.'));
+                $('#vendas_produto_preco_guarani').val(number_format( grade["produto"].preco_gs, 0, ',', '.'));
+                $('#vendas_produto_total_guarani').val(number_format( grade["produto"].preco_gs, 0, ',', '.'));                
+              }
+            }if ($('#vendas_produto_moeda').val() == '2'){
+              $('#vendas_produto_unitario_real').val(number_format( grade["produto"].preco_rs, 2, ',', '.'));
+            };
+        }})
+    });
+
+
+    function CalcResultQtd(unit,qtd,tot)                                      //
+    {
+        var result_qtd = eval( parseFloat( document.getElementById(tot).value.replace(/\./g, "").replace(",", ".") ) / parseFloat( document.getElementById(unit).value.replace(/\./g, "").replace(",", ".") ) )  ;
+        $("#vendas_produto_quantidade").val(number_format(result_qtd,3, ',', '.'));
+    }
+
+
+    function CalcQtdDescimal(unit,qtd,tot)                                      //
+    {
+        var total = eval( parseFloat( document.getElementById(unit).value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById(qtd).value.replace(/\./g, "").replace(",", ".") ) )  ;
+        document.getElementById(tot).value = ( number_format(total,2, ',', '.') );
+    }
+
+    function CalcQtd(unit,qtd,tot)                                      //
+    {
+        var total = eval( parseFloat( document.getElementById(unit).value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById(qtd).value.replace(/\./g, "").replace(",", ".") ) )  ;
+        document.getElementById(tot).value = ( number_format(total,0, ',', '.') );
+    }
+
+
+  document.onkeydown= function(e) {
+    //LISTA DE PRODUTOS
+    if(e.which == 113){
+      window.open('/produtos/busca_venda_produto?tipo_venda=<%= @venda.tipo_venda %>&data=<%= @venda.data %>&moeda=<%= @venda.moeda %>&cliente=<%= @venda.persona.tabela_preco_id %> &deposito_id='+$("#vendas_produto_deposito_id").val()+'&unidade='+<%= current_unidade.id %>+'', 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=1000, HEIGHT=800');
+
+    };
+    if(e.which == 118){
+        window.location.href = "/vendas/vendas_financa?id=<%= @venda.id %>";
+    }
+
+    if(e.which == 17){
+        $("#vendas_produto_quantidade").focus()
+    }
+    if(e.which == 27){
+      self.close();
+    }
+  }
+
+</script>

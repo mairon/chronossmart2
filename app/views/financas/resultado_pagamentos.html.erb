@@ -1,0 +1,5 @@
+<% if params[:detalhe] == "0" %>
+  <%= render :partial => "pagamentos_detalhado" %>
+<% else %>
+  <%= render :partial => "pagamentos_resumo_clasif"  %>
+<% end %>

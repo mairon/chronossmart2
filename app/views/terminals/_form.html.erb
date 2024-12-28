@@ -1,0 +1,64 @@
+<h1 id="header">Terminal - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+
+	<%= form_for(@terminal) do |f| %>
+		<% if @terminal.errors.any? %>
+		<div id="error_explanation">
+			<h2><%= pluralize(@terminal.errors.count, "error") %> prohibited this terminal from being saved:</h2>
+
+			<ul>
+			<% @terminal.errors.full_messages.each do |msg| %>
+				<li><%= msg %></li>
+			<% end %>
+			</ul>
+		</div>
+	<% end %>
+
+			<table>
+				<tr>
+					<td>
+						<label>Nombre</label>
+						<%= f.telephone_field :nome, autofocus: true, class: 'panel-field' %>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<label>Form</label>
+						<%= f.text_field :form_venda, class: 'panel-field' %>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<label>Deposito</label>
+						<%= f.collection_select :deposito_id, Deposito.all(:select => 'id,nome', conditions: "unidade_id = #{current_unidade.id} and seta_produto = 0",:order => '2'),:id,:nome, {prompt: 'Seleccione el Deposito'} %>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+					<label><%= t('UNIT') %></label>
+						<%= f.text_field :documento_numero_01, size: 6 %>Punto:<%= f.text_field :documento_numero_02, size: 6 %></td>
+				</tr>
+				<tr>
+					<td>
+						<label>Tipo Emissión</label>
+            <%= f.radio_button :tipo_emissao, 0,  :Checked => "True" %> Impreso
+            <%= f.radio_button :tipo_emissao, 1 %> Eletronico
+
+					</td>
+				</tr>
+			</table>
+
+   	<div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), terminals_path, :class => "btn btn-back" %>
+   	</div>
+	<% end %>
+</div>
+
+<script type="text/javascript">
+  $('#terminal_deposito_id').selectize();
+  
+</script>

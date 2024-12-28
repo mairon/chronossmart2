@@ -1,0 +1,31 @@
+<h1 id="header">Config Impressoras</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_config_printer_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="55">Cod.</td>
+    <td width="150">Processo</td>
+    <td width="300">Impressora</td>
+    <td width="150">Descricao</td>
+    <td width="150">Unidade</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @config_printers.each do |c| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="55"><%= c.id.to_s.rjust(3,'0') %></td>
+        <td width="150"><%= c.processo %></td>
+        <td width="300"><%= c.printer %></td>
+        <td width="150"><%= c.descricao %></td>
+        <td width="150"><%= c.unidade_id %></td>
+        <td><%= link_to 'Editar', edit_config_printer_path(c) %></td>
+        <td><%= link_to t('DELETE'), c, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

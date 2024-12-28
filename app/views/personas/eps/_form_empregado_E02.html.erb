@@ -1,0 +1,43 @@
+  
+    <fieldset>
+      <legend>Datos Del Empleado</legend>
+      <table>
+        <tr>
+          <td align="right">Departamento :</td>
+          <td><%= f.text_field :departamento %></td>
+        </tr>
+        <tr>
+          <td align="right"><%= t('DATE') %> Ingresso :</td>
+          <td><%= f.date_select :data_entrada %></td>
+        </tr>
+        <tr>
+          <td align="right">Sueldo :</td>
+          <td><%= f.text_field :salario,
+                               :size => 15%></td>
+        </tr>
+        <tr>
+          <td align="right">Sueldo Minimo :</td>
+          <td><%= f.text_field :salario_minimo,
+                               :size     => 15,
+                               :onchange => "CalculoDeIps()"%></td>
+        </tr>
+        <tr>
+          <td align="right">I.P.S. :</td>
+          <td><%= f.text_field :ips,
+                               :size => 15%></td>
+        </tr>
+
+        <tr>
+          <td align="right">Comision :</td>
+          <td><%= f.text_field :comissao,
+                               :size => 15%></td>
+        </tr>
+
+        <tr>
+          <td align="right">C.I.:</td>
+          <td><%= f.text_field :ci,
+                               :size => 15%></td>
+        </tr>
+
+      </table>
+    </fieldset>

@@ -1,0 +1,19 @@
+<% if params[:tipo] == '1' %>
+	<%= render 'laudo_pdf_sue' %>
+<% elsif params[:tipo] == '6' %>
+	<%= render 'laudo_pdf_tev' %>
+<% elsif params[:tipo] == '14' %>
+	<%= render 'laudo_pdf_gn' %>
+<% elsif params[:tipo] == '7' %>
+	<%= render 'laudo_pdf_cal' %>
+<% elsif params[:tipo] == '17' %>
+	<%= render 'laudo_pdf_sue' %>
+<% elsif params[:tipo] == '5' %>
+	<%= render 'laudo_pdf_yes' %>
+<% elsif params[:tipo] == '11' %>
+	<%= render 'laudo_pdf_ab' %>
+<% elsif params[:tipo] == '10' %>
+	<% viable = AmostraEnsaio.where("amostra between #{params[:inicio]} and #{params[:final]} and metodo_id = 190").count('id') %>
+	<% tetra  = AmostraEnsaio.where("amostra between #{params[:inicio]} and #{params[:final]} and metodo_id = 192").count('id') %>
+	<%= render 'laudo_pdf_se' %>
+<% end %>

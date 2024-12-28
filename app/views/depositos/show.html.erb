@@ -1,0 +1,5 @@
+    <fieldset>
+	   <%= render partial: "/deposito_produtos/index", locals: {deposito_produtos: @deposito.deposito_produtos } %>
+
+	  <%= render partial: "/deposito_produtos/new_detalhes", locals: {deposito_produtos: DepositoProduto.new(deposito_id: @deposito.id)} %>
+	</fieldset>

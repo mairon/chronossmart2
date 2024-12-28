@@ -1,0 +1,93 @@
+<table>
+	<tr>
+		<td>
+			<div style="border-right: 1px solid #eee; padding-right: 10px;margin-top: 10px">
+				<%= render :partial=>"index_financa_modal", :locals=>{:pagos_financas => @pago.pagos_financas} %>
+				
+				<% if @pago.moeda == 0 %>
+					<% if (@fecha_result_us.to_f.round(2) != (@financ_cred_us.to_f - @financ_deb_us.to_f).to_f.round(2)) %>
+					  <%= render :partial=>"new_financa_modal", :locals=>{:pagos_financa=>PagosFinanca.new(:pago_id=>@pago.id)} %>
+					  <% @pago.update_attributes(op: false) %>
+					<% elsif (@fecha_result_us.to_f.round(2) == (@financ_cred_us.to_f - @financ_deb_us.to_f).to_f.round(2)) %>
+				  	<div class="alert alert-success" align="center" style="margin: 10px">
+				  		<b><%= t('OPERATION_CONCLUDED') %></b>
+				  		<% @pago.update_attributes(op: true) %>
+				  	</div>
+				  	<a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"  style="margin: 10px"><%= image_tag('printer.png') %> Recibo</a>
+					<% end %>
+				<% elsif @pago.moeda == 1 %>
+				  <% if (@fecha_result_gs.to_f.round(2) != (@financ_cred_gs.to_f - @financ_deb_gs.to_f).to_f.round(2))  %>
+				    <%= render :partial=>"new_financa_modal", :locals=>{:pagos_financa=>PagosFinanca.new(:pago_id=>@pago.id)} %>
+				    	<% @pago.update_attributes(op: false) %>
+				  <% elsif (@fecha_result_gs.to_f.round(2) == (@financ_cred_gs.to_f - @financ_deb_gs.to_f).round(2)) %>
+				  	<div class="alert alert-success" align="center" style="margin: 10px">
+				  		<b><%= t('OPERATION_CONCLUDED') %></b>
+				  		<% @pago.update_attributes(op: true) %>
+				  	</div>
+				  	<a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"  style="margin: 10px"><%= image_tag('printer.png') %> Recibo</a>
+				  <% end %>
+				<% else %>
+				  <% if (@fecha_result_rs.to_f.round(2) != (@financ_cred_rs.to_f - @financ_deb_rs.to_f).to_f.round(2)) %>
+				    <%= render :partial=>"new_financa_modal", :locals=>{:pagos_financa=>PagosFinanca.new(:pago_id=>@pago.id)} %>
+				    	<% @pago.update_attributes(op: false) %>
+				  <% elsif (@fecha_result_rs.to_f.round(2) == (@financ_cred_rs.to_f - @financ_deb_rs.to_f).to_f.round(2)) %>
+				  	<div class="alert alert-success" align="center" style="margin: 10px">
+				  		<b><%= t('OPERATION_CONCLUDED') %></b>
+				  		<% @pago.update_attributes(op: true) %>
+				  	</div>
+				  	<a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"  style="margin: 10px"><%= image_tag('printer.png') %> Recibo</a>
+				  <% end %>
+				<% end %>
+			</div>			
+
+		</td>
+		<td valign="top" style="padding: 10px">
+			<%= form_for(@pago, remote: true) do |c| %>
+				<input type='hidden' name='_method' value='put'>
+				<label><%= t('DATE') %></label>
+				<%= c.date_select :data %>
+	      <%= image_tag("load.gif",
+	                  :align => "absmiddle",
+	                  :border => 0,
+	                  :id => "spinner",
+	                  :width => 21,
+	                  :height => 21,
+	                  :style =>"display: none;" ) %>            
+
+
+
+        <script type="text/javascript">
+	        $('#pago_data_3i, #pago_data_2i, #pago_data_1i').on('change', function() {
+				    var data = $(".edit_pago").serializeArray();
+
+				    $.ajax({
+				      method: 'PUT',
+				      url: '/pagos/<%= @pago.id %>',
+				      data: data,
+				      dataType: 'script',
+							beforeSend: function(){
+				      	$("#spinner").show("fast");
+				      },
+				      success: function(){
+				      $('#spinner').hide("slow");
+				      }				      
+				    });		
+
+	        });
+        </script>
+        <% if @pago.pagos_financas.present? %>
+	        <script type="text/javascript">
+	        	$(".edit_pago :input").prop("disabled", true);
+					</script>
+        <% end %>
+
+			<% end %>		
+			</div>	
+		</td>
+	</tr>
+</table>
+<script type="text/javascript">
+	  function Comprovante(){
+    window.open('/pagos/'+<%= @pago.id %>+'/comprovante', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=100, WIDTH=600, HEIGHT=400');
+  }  	
+</script>

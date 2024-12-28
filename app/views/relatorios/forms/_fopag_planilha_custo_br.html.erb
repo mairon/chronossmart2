@@ -1,0 +1,99 @@
+<% fopags = Relatorios.fopag(params) %>
+	<% tot_salario = 0 %>
+	<% tot_ips  = 0 %>
+	<% tot_prov = 0 %>
+	<% @tot_fopag = 0 %>
+	<% qtd_1  = 0 %>
+	<% qtd_5  = 0 %>
+	<% qtd_10 = 0 %>
+	<% qtd_11 = 0 %>
+
+	<% sal_1  = 0 %>
+	<% sal_5  = 0 %>
+	<% sal_10 = 0 %>
+	<% sal_11 = 0 %>
+	<% calc_tempo = 0 %>
+
+
+	<% ferias_um_terco = 0 %>
+	<% ferias = 0 %>
+	<% fgts_ferias = 0 %>
+	<% fgts_decimo = 0 %>
+	<% calc_tempo = 0 %>
+	<% multa_fgts = 0  %>
+	<% fopags.each do |f| %>
+				<% calc_tempo = (( ("#{params[:inicio]}").to_date - f.data_entrada.to_date) / 30 ).round %>
+				<% if calc_tempo.to_i < 0 %>
+					<% tempo = 0 %>
+				<% else %>
+					<% tempo = calc_tempo %>
+				<% end %>
+				<% if tempo.to_i < 12 %>
+					<% qtd_1  += 1 %>
+					<% sal_1  += f.salario.to_f %>
+				<% end %>
+				<% if tempo.to_i >= 12 and tempo.to_i < 60 %>
+					<% qtd_5  += 1 %>
+					<% sal_5  += f.salario.to_f %>
+				<% end %>
+				<% if tempo.to_i >= 60 and tempo.to_i < 120 %>
+					<% qtd_10 += 1 %>
+					<% sal_10 += f.salario.to_f %>
+				<% end %>
+				<% if tempo.to_i >= 120 %>
+					<% qtd_11 += 1 %>
+					<% sal_11 += f.salario.to_f %>
+				<% end %>
+	<% end %>
+		<tr class="<%= cycle("cor2", "cor2")%>">
+			<td colspan="4"  style="background-color: #999"><strong>FOPAG FIXA</strong></td>
+		</tr>
+		<!-- totais !-->
+		<tr class="<%= cycle("cor2", "cor2")%>">
+			<td width="100" >FOPAG</td>
+			<td width="400"><i>Salarios Mensais</i></td>
+			<td width="70" align="right"><%= format_decimal(tot_salario = sal_1.to_f + sal_5.to_f + sal_11.to_f + sal_11.to_f ) %></td>
+		</tr>
+		<tr class="<%= cycle("cor2", "cor2")%>">
+			<td width="100" >FOPAG</td>
+			<td width="400"><i>FGTS Sobre Salário Mensal</i></td>
+			<td align="right"><%= format_decimal(tot_ips = ((sal_1.to_f + sal_5.to_f + sal_11.to_f + sal_11.to_f) * 0.08)) %></td>
+		</tr>
+		<% format_decimal( agui = (sal_1.to_f + sal_5.to_f + sal_11.to_f + sal_11.to_f) / 12) %>
+		<tr class="<%= cycle("cor2", "cor2")%>">
+			<td width="100" >FOPAG</td>
+			<td width="400"><i>FGTS Sobre 13º Salário</i></td>
+			<td align="right"><%= format_decimal( fgts_decimo = (agui.to_f * 0.08)  ) %></td>
+		</tr>
+
+		<% format_decimal( fer_5 = ( (sal_1.to_f + sal_5.to_f)) / 12 ) %>
+		<% format_decimal( fer_10 = ( (sal_1.to_f + sal_5.to_f)) / 12 ) %>
+		<% format_decimal( fer_11 = ( (sal_1.to_f + sal_5.to_f)) / 12 ) %>
+
+		<tr class="<%= cycle("cor2", "cor2")%>">
+			<td width="100" >FOPAG</td>
+			<td><i>13º Salário</i></td>
+			<td align="right"><%= format_decimal( agui ) %></td>
+		</tr>
+		<tr class="<%= cycle("cor2", "cor2")%>">
+			<td width="100" >FOPAG</td>
+			<td><i>1/3 de Férias</i></td>
+			<td align="right"><%= format_decimal(ferias_um_terco =  (tot_salario.to_f / 3 / 12 ) ) %></td>
+		</tr>
+		<tr class="<%= cycle("cor2", "cor2")%>">
+			<td width="100" >FOPAG</td>
+			<td><i>Férias</i></td>
+			<td align="right"><%= format_decimal(ferias = (tot_salario.to_f / 12 ) ) %></td>
+		</tr>
+		<tr class="<%= cycle("cor2", "cor2")%>">
+			<td width="100" >FOPAG</td>
+			<td><i>FGTS Sobre : Férias + 1/3 de Férias</i></td>
+			<td align="right"><%= format_decimal(fgts_ferias = ( (ferias_um_terco.to_f + ferias.to_f) * 0.08) ) %></td>
+		</tr>
+		<tr class="<%= cycle("cor2", "cor2")%>">
+			<td width="100" >FOPAG</td>
+			<td><i>Multa FGTS</i></td>
+			<td align="right"><%= format_decimal(multa_fgts =  (fgts_ferias.to_f + tot_ips.to_f + fgts_decimo.to_f) * 0.4 ) %></td>
+		</tr>
+
+		<%  @tot_fopag = ( tot_ips.to_f + fgts_decimo.to_f + agui.to_f + ferias_um_terco.to_f + ferias.to_f + fgts_ferias.to_f + multa_fgts.to_f ) %>

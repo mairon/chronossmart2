@@ -1,0 +1,41 @@
+<%= form_for(@dev_cheque_prov_dt) do |f| %>
+  <% if @dev_cheque_prov_dt.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@dev_cheque_prov_dt.errors.count, "error") %> prohibited this dev_cheque_prov_dt from being saved:</h2>
+
+      <ul>
+      <% @dev_cheque_prov_dt.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> dev_cheque_prov_dts - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), dev_cheque_prov_dts_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

@@ -1,0 +1,87 @@
+<div class="tab_container">
+	<div class="group">
+	<table>
+		<tr>
+			<td>
+				<table>
+					<tr>
+						<td>
+						<% tot_qtd   = 0 %>
+						<% tot_valor = 0 %>
+						<% sub_tot_qtd   = 0 %>
+						<% sub_tot_valor = 0 %>
+
+						<% quebra = '' %>
+							<fieldset>
+								<table class="head_grid">
+								  <tr>
+								    <td width="50">Lanz.</td>
+								    <td width="40" align="right">Bico</td>
+								    <td width="350">Producto</td>
+								    <td width="60" align="right">Cantidad</td>
+								    <td width="80" align="right"><%= t('VALUE') %></td>
+								  </tr>
+								</table>
+								<div class="rolagem" dir="div">
+								<table>
+									<% @produtos.each do |p| %>
+											<% if quebra != p.bico %>
+											  <% if quebra != "" %>
+
+												<tr>
+													<td colspan="3"></td>
+													<td align="right" width="40"><b><%= format_decimal(sub_tot_qtd.to_f) %></b></td>
+													<td align="right" width="80"><b><%= format_int(sub_tot_valor) %></b></td>
+													<% sub_tot_qtd   = 0 %>
+													<% sub_tot_valor = 0 %>
+
+												</tr>
+
+											  <% end %>
+											  <tr>
+											  	<td class="head" colspan="5"><b>BICO/DEP: <%=h quebra = p.bico %></b></td>
+											  </tr>
+										  <% end %>
+
+
+										<tr class = "<%= cycle("cor1", "cor2") %>">
+											<td width="50"><%= link_to p.venda_id, venda_path(p.venda_id), target: '_blank' %></td>
+											<td align="right" width="40"><%= p.bico %></td>
+											<td width="350"><%= p.produto_nome %></td>
+											<td align="right" width="60"><%= format_decimal(p.quantidade) %></td>
+											<td align="right" width="80"><%= format_int(p.total_guarani) %></td>
+											<% tot_qtd   += p.quantidade.to_f %>
+											<% tot_valor += p.total_guarani.to_f %>
+											<% sub_tot_qtd   += p.quantidade.to_f  %>
+											<% sub_tot_valor += p.total_guarani.to_f  %>
+
+
+										</tr>
+									<% end %>
+
+									<tr>
+										<td colspan="3"></td>
+										<td align="right" width="40"><b><%= format_decimal(sub_tot_qtd.to_f) %></b></td>
+										<td align="right" width="80"><b><%= format_int(sub_tot_valor) %></b></td>
+									</tr>
+									<% sub_tot_qtd   = 0 %>
+									<% sub_tot_valor = 0 %>
+
+								</table>
+								</div>
+								<table  class="head_grid">
+									<tr >
+										<td width="467"></td>
+										<td align="right" width="40"><b><%= format_decimal(tot_qtd.to_f) %></b></td>
+										<td align="right" width="80"><b><%= format_int(tot_valor) %></b></td>
+									</tr>
+								</table>
+							</fieldset>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</div>
+</div>

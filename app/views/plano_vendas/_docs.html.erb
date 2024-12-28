@@ -1,0 +1,86 @@
+<div class="panel">
+  <h1 id="header">
+    Documientos
+    <div class="pull-right">
+
+      <a class="modalButton-frma btn btn-blue" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-linha-credito">+</a>
+    </div>
+  </h1>
+    <div class="row">
+      <div class="col-md-12">
+      <div class="group">
+         <table class="head_grid">
+          <td width="50"></td>
+
+           <td width="300">Tipo</td>
+           <td width="120">Obs</td>
+         </table>
+         <div class="rolagem" id="div">
+           <table>
+            <% @plano_venda.plano_venda_docs.each do |d| %>
+              <tr class="<%= cycle("cor1", "cor2")%>">
+                <td width="50">
+
+                  <%= link_to(d.anexo.url, target: '_blank') do %>
+                  <% if d.anexo_content_type == 'application/pdf' %>
+                      <%= image_tag 'ficheiro-pdf.png', class: 'img-thumbnail' %>
+                    <% else %>
+                      <%= image_tag d.anexo, class: 'img-thumbnail' %>
+                    <% end %>
+                  <% end %>
+                  </td>
+
+                <td width="300"><%= d.documento.nome unless d.documento.nil? %></td>
+                <td width="120"><%= d.obs %></td>
+                
+                <td><%= link_to '', edit_plano_venda_doc_path(d), class: 'icon-pencil' %></td>
+                <td><%= link_to '', d, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modal-linha-credito" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('DOC') %></h4>
+      </div>
+      <div class="modal-body">
+        <%= form_for(PlanoVendaDoc.new, :html => { :multipart => true }) do |f| %>
+        <%= f.hidden_field :plano_venda_id, value: @plano_venda.id %>
+          <div class="row panel-modal-body">
+            <div class="col-md-12">
+              <label><%= t('DOC') %></label>
+              <%= f.collection_select :documento_id, Documento.all,:id,:nome,{:prompt => 'Selecione '} %>
+            </div>
+            <div class="col-md-6">
+              <label>Imagem</label>
+              <%= f.file_field :anexo %>
+            </div>
+            <div class="col-md-12">
+              <label>Obs.</label>
+              <%= f.text_area :obs, class: "panel-field", rows: 5 %>
+            </div>
+
+           <div class="col-md-12">
+              <br>
+              <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+           </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $('#persona_doc_documento_id').selectize();
+</script>

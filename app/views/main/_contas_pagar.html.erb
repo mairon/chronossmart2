@@ -1,0 +1,54 @@
+<div class="panel">
+  <div class="panel-content dashboard-initial-page card-dashboard">
+    <div class="row">
+      <div class="col-md-10">
+        <h2>Pagar hoje: <%= @pagar_hoje.count %></h2>
+        <div class="circle-dash">
+          <div class="row">
+            <div class="col-md-4" align="center">
+              <label title="R$ 3.000,00" class="dash-body-text-values us"><text class="dash-body-text-values-cifrao">U$</text><span class="saldo-card-dash" style="text-decoration: none;"><%= format_decimal(@total_pagar_hoje_us) %></span></label>
+            </div>
+            <div class="col-md-4" align="center">
+              <label title="R$ 2.000" class="dash-body-text-values gs"><text class="dash-body-text-values-cifrao">Gs.</text><span class="saldo-card-dash" style="text-decoration: none;"><%= format_int(@total_pagar_hoje_gs) %></span></label>
+            </div>
+            <div class="col-md-4" align="center">
+              <label title="R$ 10.000,00" class="dash-body-text-values rs"><text class="dash-body-text-values-cifrao">R$</text><span class="saldo-card-dash" style="text-decoration: none;"><%= format_decimal(@total_pagar_hoje_rs) %></span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="badges-total col-md-2"><span class="badge badge-danger-lighten dash-icons dash-badge-icon-danger">
+        <img src="assets/down-arrow.png" class="badge-icon-dash dollar-dash"></span>
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-md-12" style="height: 200px;">
+        <ul class="group-list-dash-values">
+
+          <% @pagar_hoje.each do |ph| %>
+          <li class="list-dash-values">
+              <span class="descrip-list">
+                <%=  ph.descricao %> | <%= ph.persona.nome unless ph.persona.nil? %> <%= ph.cota %>/<%= ph.tot_cotas %><br>
+                <div class="category-list"> <small> <%= ph.rubro.descricao unless ph.rubro.nil? %></small></div>
+              </span>
+              <% if ph.moeda == 0 %>
+                <span class="value-list us">U$ <%= format_decimal(ph.divida_dolar) %></span>
+              <% elsif ph.moeda == 1 %>
+                <span class="value-list gs">Gs. <%= format_int(ph.divida_guarani) %></span>
+              <% elsif ph.moeda == 2 %>
+                <span class="value-list rs">R$ <%= format_decimal(ph.divida_real) %></span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12" align="center">
+        <%= link_to 'Painel Contas a Pagar', painel_pagar_proveedores_path %>
+      </div>
+    </div>
+  </div>
+</div>

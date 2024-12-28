@@ -1,0 +1,43 @@
+<%= form_for(@nota_creditos_doc) do |f| %>
+  <table>
+    <tr>
+      <td align="right">Doc. N.: </td>
+      <td><%= f.text_field :documento_numero_01, :size => 5 %> -
+        <%= f.text_field :documento_numero_02, :size => 5 %> - 
+        <%= f.text_field :documento_numero, :size => 15 %> </td>
+
+      <td align="right">Cuota : </td>
+      <td><%= f.text_field :cota, :size => 5, :value => '0' %></td>
+      <% if @nota_creditos_doc.nota_credito.operacao == 0 %>
+
+        <% if @nota_creditos_doc.nota_credito.moeda == 0 %>
+            <%=  field_us 'Valor U$:',f,:valor_dolar %>
+        <% else %>
+          <%=  field_gs 'Valor Gs.:',f,:valor_guarani %>
+          
+        <% end %>
+
+      <% else %>
+      <% if @nota_creditos_doc.nota_credito.moeda == 0 %>
+          <%=  field_us 'Valor U$:',f,:valor_dolar %>
+      <% else %>
+        <%=  field_gs 'Valor Gs.:',f,:valor_guarani %>
+        
+      <% end %>
+      <% end %>
+
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <fieldset>
+          <%= f.radio_button :liquidacao, 0, :checked => 'checked' %>Parte
+          <%= f.radio_button :liquidacao, 1 %>Cancelacion
+        </fieldset>
+        </td>
+        <td colspan="2" align="right">
+          <%= f.submit t('SAVE'), :class => 'button' %>
+        </td>
+    </tr>       
+  </table>
+<% end %>

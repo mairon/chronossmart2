@@ -1,0 +1,85 @@
+<div class="panel">
+  <h1 id="header">
+    Solicitidad de Creditos
+  </h1>
+</div>
+
+
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="80" align="center">Cod.</td>
+      <td width="80" align="center">PV</td>
+      <td width="150">Vendedor</td>
+      <td width="200">Cliente</td>
+      <td width="150">Producto</td>
+      <td width="120">Condición</td>
+      <td width="100" align="center">Autoriz. Gerencial</td>
+      <td width="100" align="center">Autoriz. Juridica</td>
+    </tr>
+   </table>
+   <div class="rolagem" id="div">
+      <table>
+         <% @solicitude_creditos.each do |nota| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="80" align="center"> <%= link_to nota.id.to_s.rjust(6,'0'), solicitude_credito_path(nota) %></td>
+              <td width="80" align="center"> <%= nota.plano_venda_id.to_s.rjust(6,'0') %></td>
+              <td width="150"> <%= Persona.find(nota.plano_venda.vendedor_id).nome unless nota.plano_venda.vendedor_id.nil?  %></td>
+              <td width="200"> <%= nota.plano_venda.persona_nome unless nota.plano_venda.persona.nil? %></td>
+              <td width="150"> <%= nota.plano_venda.produto.nome unless nota.plano_venda.produto.nil? %></td>
+              <td width="120"> <small><%= nota.plano_venda.tabela_preco.nome %></small></td>
+              <td width="100" align="center">
+                <% aut_gerencia = nota.solicitude_credito_autorizacoes.where(tipo: 0).order("id").last %>
+                <% unless aut_gerencia.blank? %>
+                  <% if aut_gerencia.status.to_i == 0 %>
+                    <span class="rs">Pendiente</span>
+                  <% elsif aut_gerencia.status.to_i == 1 %>
+                    <span class="us">Autorizado</span>
+                  <% elsif aut_gerencia.status.to_i == 2 %>
+                    <span class="gs">Rezachado</span>
+                  <% end %>
+                <% else %>
+                  <span class="rs">Pendiente</span>
+                <% end %>
+              </td> 
+
+              <td width="100" align="center">
+                <% aut_juridico = nota.solicitude_credito_autorizacoes.where(tipo: 1).order("id").last %>
+                <% unless aut_juridico.blank? %>
+                  <% if aut_juridico.status.to_i == 0 %>
+                    <span class="rs">Pendiente</span>
+                  <% elsif aut_juridico.status.to_i == 1 %>
+                    <span class="us">Autorizado</span>
+                  <% elsif aut_juridico.status.to_i == 2 %>
+                    <span class="gs">Rezachado</span>
+                  <% end %>
+                <% else %>
+                  <span class="rs">Pendiente</span>
+                <% end %>
+              </td>      
+
+              <td>
+                <% unless aut_juridico.blank? %>
+                  <% unless aut_gerencia.blank? %>
+                    <% if aut_gerencia.status.to_i == 1 and aut_juridico.status.to_i == 1 %>
+                      <% vd = Venda.find_by_plano_venda_id(nota.plano_venda_id) %>
+                      <% unless vd.blank? %>
+                        <%= link_to vd.id, financas_venda_path(vd.id) %>
+                      <% else %>
+                        <%= link_to 'Ciere de Venta', gera_venda_solicitude_creditos_path(plano_venda_id: nota.plano_venda_id) %>
+                      <% end %>
+                    <% end %>
+                  <% end %>
+                <% end %>
+              </td>         
+
+              <td><%= link_to '', edit_solicitude_credito_path(nota), class: 'icon-pencil' %></td>
+              <td><%= link_to '', nota, confirm: 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+            </tr>
+         <% end %>
+      </table>
+   </div>  
+</div>
+
+
+

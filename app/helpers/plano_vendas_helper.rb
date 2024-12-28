@@ -1,0 +1,2 @@
+module PlanoVendasHelper
+end

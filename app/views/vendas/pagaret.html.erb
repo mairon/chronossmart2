@@ -1,0 +1,156 @@
+<body onload="window.print()">
+<style type="text/css">
+	table{
+		font-family: Arial;
+		font-size: 12px
+	}
+</style>
+<table width="100">
+	<tr>
+		<td colspan="4">	
+      PAGARE A LA ORDEN
+		</td>
+	</tr>
+	<tr>
+		<td colspan="4">-------------------------------------------------------</td>
+	</tr>
+
+	<tr>
+		<td align="left">	
+      <b><%= current_unidade.nome_sys %></b>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="4">-------------------------------------------------------</td>
+	</tr>
+
+	<tr>
+		<td colspan="4">Fecha.....: <%= @venda.data.strftime("%d/%m/%Y")%> </td>
+	</tr>
+	<tr>
+		<td colspan="4">Nr...........: <%= @venda.id.to_s.rjust(6,'0') %></td>
+	</tr>
+	<tr>
+		<td align="left">
+	    Venci......: <%= @venci.vencimento.strftime("%d/%m/%Y")%>
+		</td>
+	</tr>	
+	<tr>
+		<td align="left">
+	    Cajero.....: <%= @venda.usuario.usuario_nome %>
+		</td>
+	</tr>	
+
+
+	
+
+	<tr>
+		<td>
+	    <% if @venda.moeda == 0 %>
+	      Por US$ <%= number_to_currency(@produto_sum_gs, :format=>' %n ', :separeitor => ',') %>
+	    <% else %>
+	    	<% tot_credito = VendasFinanca.sum(:valor_guarani, conditions: ["forma_pago_id = 2 and venda_id = #{@venda.id}"])%>
+	      Monto G$: <%= number_to_currency(tot_credito, :format=>' %n ', :precision => 0) %>
+	    <% end %>
+		</td>
+	</tr>
+	<tr>
+		<td align="left">
+	    Saldo Pendiente.: <%= format_int(@saldo_pendente) %>
+		</td>
+	</tr>	
+
+  <tr>
+  	<td colspan="4">
+			<table>
+				<tr>
+					<td colspan="4">------------------------------------------------------</td>
+				</tr>
+				<tr>
+					<td colspan="4" align="center">Productos</td>
+				</tr>
+				<tr>
+					<td colspan="4">------------------------------------------------------</td>
+				</tr>
+				<% tot_gs = 0 %>
+				<% @venda_produtos.each do |vp| %>
+					<tr>
+						<td colspan="4"><%= vp.produto_nome %></td>
+					</tr>
+					<tr>
+						<td align="right"><%= vp.quantidade %></td>
+						<% if @venda.moeda == 0 %>
+							<td align="right"><%= format_int(vp.unitario_dolar) %></td>
+							<td align="right"><%= format_int(vp.total_dolar) %></td>
+							<b><% tot_gs += vp.total_dolar.to_f %></b>
+						<% else %>
+							<td align="right"><%= format_int(vp.unitario_guarani) %></td>
+							<td align="right"><%= format_int(vp.total_guarani) %></td>
+							<b><% tot_gs += vp.total_guarani.to_f %></b>
+						<% end %>
+					</tr>					
+				<% end %>
+				<tr>
+					<td colspan="4">------------------------------------------------------</td>
+				</tr>
+					<tr>
+						<td align="right"></td>
+						<td align="right"></td>
+						<% if @venda.moeda == 0 %>
+							<b><td align="right"><%= format_decimal(tot_gs) %></td></b>
+						<% else %>
+							<b><td align="right"><%= format_int(tot_gs) %></td></b>
+						<% end %>
+					</tr>
+			</table>
+	  </td>
+  </tr>
+
+
+  <tr>
+  	<td colspan="4">-------------------------------------------------------</td>
+  </tr>
+	<tr >
+		<td colspan="4" align="center" width="50" style="text-align: justify;font-size: 11px">
+			Este pagaré a la orden deverganrá un interés de 1.5% mensual, hasta  el dia del pago efectivo. En caso de retardo o incumplimiento total o parcial a la fecha de su vencimento quedará constituida la mora automática sin necesidad de interpelación alguna. El simple vencimiento de este documento autoriza al acreedor de forma irrevocable a la consulta e inclusión a la base de datos de INFORMCONF u otra agencia de informaciones.
+			A todos los efectos legales y porcesales queda aceptado la jurisdicción y competencia de los juzgados en lo civil y comercial de la Circunsprición Judicial del Alto Paraná, con renuncia expresa a cualquier otro fuero o jurisdicción constituyendo el(los) libradores domicilio(s) en el(los) Lugar(es) indicador(s)
+    </td>
+	</tr>
+	<tr>
+		<td colspan="4">-------------------------------------------------------</td>
+	</tr>
+	<tr><td><br><br></td></tr>
+  <tr>
+    <td>Firma:____________________________</td>
+  </tr>
+	<tr>
+    <td>DEUDOR: <%= @venda.persona_nome %></td>
+	</tr>
+	<tr>
+    <td>RUC/CI: <%= @venda.persona.ruc %></td>
+	</tr>
+	<tr>
+    <td>Aclaracion de Firma:____________________________</td>
+  </tr>
+
+  <tr><td><br><br></td></tr>
+	<tr>
+		<td>Firma:____________________________ </td>
+	</tr>
+	<tr>
+		<td>CO-DEUDOR:</td>
+	</tr>
+	<tr>
+		<td >Aclaracion de Firma:____________________________</td>
+	</tr>
+    
+
+</table>
+
+
+  <script>
+    document.onkeydown=function(e){
+      if(e.which == 27)
+        self.close();
+    }
+  </script>

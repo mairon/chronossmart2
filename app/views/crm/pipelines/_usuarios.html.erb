@@ -1,0 +1,53 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content">
+        <%= form_for [:crm, PipelineUsuario.new] do |f| %>
+          <%= f.hidden_field :pipeline_id, value: @pipeline.id %>
+          <div class="row">
+            <div class="col-md-5">
+              <label>Usuario</label>
+              <%= f.collection_select :usuario_id, Usuario.where("id not in (?) ", (@pipeline.pipeline_usuarios.empty? ? 0 : @pipeline.pipeline_usuarios.pluck(:usuario_id) ) ), :id,:usuario_nome, {:prompt => 'Selecione '} %>
+            </div>
+            <div class="col-md-3">
+              <label>Permissão</label>
+              <%= f.select :permissao, [['Admin', 0], ['Supervisor', 1], ['Usuario', 2]] %>
+            </div>
+            <div class="col-md-3 padding-btn"><%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%></div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>    
+
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content">      
+      <ul id="sortable" class="list-group">
+        <% @pipeline.pipeline_usuarios.includes(:usuario).each do |pe| %>
+          <li class="list-group-item" id="<%= pe.id %>">
+            <b>
+              <%= pe.usuario.usuario_nome %> 
+              <% if pe.permissao.to_i == 0 %>
+                (Admin)
+              <% elsif pe.permissao.to_i == 1 %>
+                (Supervisor)
+              <% elsif pe.permissao.to_i == 2 %>
+                (Usuario)
+              <% end %>
+              
+            </b> 
+            <div class="pull-right">
+              <%= link_to '', [:crm, pe], :confirm => 'Estas Seguro?', :method => :delete , class: 'icon-trash' %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+
+      </div>
+    </div>
+  </div>    
+</div>
+<script>
+  $('#pipeline_usuario_usuario_id').selectize();
+</script>

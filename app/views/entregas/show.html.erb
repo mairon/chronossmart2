@@ -1,0 +1,52 @@
+<ul class="tabs">
+  <li><a href="#tab1"> Entregas - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+  <div id="tab1" class="tab_content group">
+    <table>
+    	<tr>
+    		<td>
+          <div class="group">
+      			<h2>Tipo: 
+      				<% if @entrega.tipo == 0 %>
+      					Rodados Proprios
+    					<% else %>
+      					Transportadoras	
+      				<% end %>
+      				|
+      				Resposable: <%= @entrega.persona.nome %>
+      				|
+      				<% if @entrega.tipo == 0 %>
+      					Rodado: <%= @entrega.rodado.placa %> | Capacidad: <%= @entrega.rodado.capacidade %>
+      				<% end %>
+      			</h2>
+          </div>
+    		</td>
+    	</tr>
+      <tr>
+        <td>
+          <%= render 'entregas_pendentes' %>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <%= render 'entregas' %>
+        </td>
+      </tr>
+    </table>
+  </div>
+    <div class="buttons">
+      <%= link_to t('BACK'), edit_entrega_venda_path(@entrega), :class => "button back" %>
+      <%= link_to t('VOUCHER'), '#', :class => "button print", onclick: "Comprovante(#{@entrega.id})" %>
+      <%= link_to 'Finalizar', entregas_path, :class => "button next" %>        
+    </div>
+</div>
+
+<script type="text/javascript">
+  function Comprovante(id){
+    window.open("/entregas/" + id + "/comprovante", '', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=800, HEIGHT=400');
+  }
+</script>
+
+

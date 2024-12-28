@@ -1,0 +1,25 @@
+  <div class="group">  
+    <table>
+      <tr>
+        <td width="150" align="center">Cod.</td>
+        <td width="350" align="center"><%= t('DOC') %></td>
+      </tr>
+    </table>
+
+    <div class="rolagem_cobro" dir="div">
+      <table>
+         <% nc_proveedor_faturas.each do |nc_proveedor_fatura| %>
+           <tr class = "<%= cycle("cor1", "cor2") %>">
+               <td width="150" align="center"><%=h nc_proveedor_fatura.compra_id %>
+               <td width="350" align="center"><%=h nc_proveedor_fatura.documento_numero_01 %> -
+                <%=h nc_proveedor_fatura.documento_numero_02 %> -
+               <%=h nc_proveedor_fatura.documento_numero %></td>
+               <td><%= link_to 'Editar', edit_nc_proveedor_fatura_path(nc_proveedor_fatura) %></td>
+               <td><%= link_to t('DELETE'), nc_proveedor_fatura, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+             </tr>
+         <% end %>
+      </table>
+    </div>
+  <div>  
+</div>  
+

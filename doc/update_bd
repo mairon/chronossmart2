@@ -1,0 +1,207 @@
+--relise  16-06-2017
+--- Table: config_forms
+
+DROP TABLE config_forms;
+
+CREATE TABLE config_forms
+(
+  id serial NOT NULL,
+  nome character varying(50),
+  created_at timestamp without time zone NOT NULL,
+  updated_at timestamp without time zone NOT NULL,
+  conteudo text,
+  processo character varying(30),
+  tipo_form integer,
+  modelo integer,
+  unidade_id integer,
+  terminal_id integer,
+
+  qtd_linhas integer DEFAULT 0,
+  CONSTRAINT config_forms_pkey PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE config_forms
+  OWNER TO postgres;
+
+
+-- Function: venda_update()
+
+-- DROP FUNCTION venda_update();
+
+CREATE OR REPLACE FUNCTION venda_update()
+  RETURNS trigger AS
+$BODY$begin 
+
+     UPDATE VENDAS_PRODUTOS SET 
+     DATA = NEW.DATA,
+     FINALIDADE = NEW.FINALIDADE
+     WHERE VENDA_ID = NEW.ID;
+     
+     
+     RETURN NEW;
+end;$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION venda_update()
+  OWNER TO postgres;
+
+
+
+-- Function: stock_vendas_produto_update()
+
+-- DROP FUNCTION stock_vendas_produto_update();
+
+CREATE OR REPLACE FUNCTION stock_vendas_produto_update()
+  RETURNS trigger AS
+$BODY$begin
+
+  DELETE FROM STOCKS
+  WHERE    TABELA    = 'VENDAS_PRODUTOS'
+  AND      TABELA_ID = NEW.ID ;
+
+  IF NEW.FINALIDADE <> 1 THEN
+        INSERT INTO STOCKS
+    ( 
+      VENDA_ID,
+      PRODUTO_ID,
+      PRODUTO_NOME,
+      PERSONA_ID,
+      PERSONA_NOME,
+      COD_PROCESSO,
+      SIGLA_PROC,
+      FABRICANTE_COD,
+      DEPOSITO_ID,
+      DEPOSITO_NOME,
+      DATA,
+      STATUS,
+      ENTRADA,          
+      SAIDA,   
+      UNITARIO_DOLAR,
+      UNITARIO_GUARANI,
+      UNITARIO_REAL,
+      IVA_DOLAR,
+      IVA_GUARANI,
+      TABELA,
+      TABELA_ID
+    )
+    VALUES
+    (
+      NEW.VENDA_ID,
+      NEW.PRODUTO_ID,
+      NEW.PRODUTO_NOME,
+      NEW.PERSONA_ID,
+      NEW.PERSONA_NOME,
+      NEW.VENDA_ID,
+      'VT',
+      NEW.FABRICANTE_COD,
+      NEW.DEPOSITO_ID,
+      NEW.DEPOSITO_NOME,          
+      NEW.DATA,
+      1, 
+      0,         
+      NEW.QUANTIDADE,          
+      NEW.UNITARIO_DOLAR,
+      NEW.UNITARIO_GUARANI,
+      NEW.UNITARIO_REAL,
+      NEW.IVA_DOLAR,
+      NEW.IVA_GUARANI,
+      'VENDAS_PRODUTOS',
+      NEW.ID
+    );
+  END IF;
+         RETURN NEW;
+    end;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION stock_vendas_produto_update()
+  OWNER TO postgres;
+
+
+-- Function: stock_vendas_produto_insert()
+
+-- DROP FUNCTION stock_vendas_produto_insert();
+
+CREATE OR REPLACE FUNCTION stock_vendas_produto_insert()
+  RETURNS trigger AS
+$BODY$begin
+
+--VENDA DIFERENTE DE PRESUPUESTO
+IF (SELECT FINALIDADE FROM VENDAS WHERE ID = NEW.VENDA_ID) <> 1 THEN
+      INSERT INTO STOCKS
+        ( 
+          VENDA_ID,
+          PRODUTO_ID,
+          PRODUTO_NOME,
+          PERSONA_ID,
+          PERSONA_NOME,
+          COD_PROCESSO,
+          SIGLA_PROC,
+          FABRICANTE_COD,
+          DEPOSITO_ID,
+          DEPOSITO_NOME,
+          DATA,
+          STATUS,
+          ENTRADA,          
+          SAIDA,   
+          UNITARIO_DOLAR,
+          UNITARIO_GUARANI,
+          UNITARIO_REAL,
+          IVA_DOLAR,
+          IVA_GUARANI,
+          TABELA,
+          TABELA_ID
+        )
+        VALUES
+        (
+          NEW.VENDA_ID,
+          NEW.PRODUTO_ID,
+          NEW.PRODUTO_NOME,
+          NEW.PERSONA_ID,
+          NEW.PERSONA_NOME,
+          NEW.VENDA_ID,
+          'VT',
+          NEW.FABRICANTE_COD,
+          NEW.DEPOSITO_ID,
+          NEW.DEPOSITO_NOME,          
+          NEW.DATA,
+          1, 
+          0,         
+          NEW.QUANTIDADE,          
+          NEW.UNITARIO_DOLAR,
+          NEW.UNITARIO_GUARANI,
+          NEW.UNITARIO_REAL,
+          NEW.IVA_DOLAR,
+          NEW.IVA_GUARANI,
+          'VENDAS_PRODUTOS',
+          NEW.ID
+        );
+END IF;
+         RETURN NEW;
+    end;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION stock_vendas_produto_insert()
+  OWNER TO postgres;
+
+
+-- Function: stock_vendas_produto_delete()
+
+-- DROP FUNCTION stock_vendas_produto_delete();
+
+CREATE OR REPLACE FUNCTION stock_vendas_produto_delete()
+  RETURNS trigger AS
+$BODY$begin 
+     DELETE FROM STOCKS             
+     WHERE TABELA='VENDAS_PRODUTOS'
+     AND TABELA_ID=OLD.ID;     
+     RETURN NEW;
+end;$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION stock_vendas_produto_delete()
+  OWNER TO postgres;
+

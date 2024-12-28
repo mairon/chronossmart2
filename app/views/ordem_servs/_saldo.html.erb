@@ -1,0 +1,47 @@
+<h1 class="rs">Saldo</h1>
+<table class="head_grid">
+  <tr>
+    <td width="240">Producto</td>
+    <td width="30" align="right">Ctd</td>
+    <td width="60" align="right">Monto</td>
+    <td></td>
+  </tr>
+</table>
+<div class="rolagem" dir="div" style="height: 250px;">
+   <table>
+      <% rt = 0 %>
+      <% vt = 0 %>
+      <% @ordem_serv.ordem_serv_prods.where(status: true).each do |os| %>
+        <tr class = "<%= cycle("cor1", "cor2") %> dv<%= os.id %>">
+          <td width="240">
+            <small><%= os.produto.nome %></small>
+          </td>
+          <% retirado =  OrdemServProd.where(status: false, ordem_serv_id: @ordem_serv.id, produto_id: os.produto_id).sum(:quantidade) %>
+          <td width="30" align="right"><%= (os.quantidade.to_i - retirado.to_i) %></td>
+          <% if @ordem_serv.moeda.to_i == 0 %>
+            <td width="60" align="right"><%= format_decimal(os.valor_us) %></td>
+            <% vt += (os.valor_us.to_f * os.quantidade.to_f) %>
+          <% elsif @ordem_serv.moeda.to_i == 1 %>
+            <td width="60" align="right"><%= format_int(os.valor_gs) %></td>
+            <% vt += (os.valor_gs.to_f * os.quantidade.to_f) %>
+          <% elsif @ordem_serv.moeda.to_i == 2 %>
+            <td width="60" align="right"><%= format_decimal(os.valor_rs) %></td>
+            <% vt += (os.valor_rs.to_f * os.quantidade.to_f) %>
+          <% end %>          
+        </tr>
+        <% rt += (os.quantidade.to_f - retirado.to_f) %>
+      <% end %>
+   </table>
+</div>
+<div class="row">
+  <div class="col-md-6">
+  </div>
+  <div class="col-md-6" align="right">
+    <b style="padding-right: 68px"><%= rt.to_i %></b>
+    <% if @ordem_serv.moeda.to_i == 1 %>
+      <b style="padding-right: 38px"><%= format_int(vt.to_i) %></b>
+    <% else %>
+      <b style="padding-right: 38px"><%= format_decimal(vt.to_f) %></b>
+    <% end %>
+  </div>
+</div>

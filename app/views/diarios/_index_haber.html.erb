@@ -1,0 +1,47 @@
+
+<div class="widget_tableDiv">
+  <table>
+    <thead>
+      <tr>
+        <td width="50" align="center">Numero</td>
+        <td width="150" align="center"><%= t('CODE') %></td>
+        <td width="450" align="center">Descripcion</td>
+        <td width="100" align="center">Valor Gs.</td>
+        <td width="100" align="center">Valor U$.</td>
+      </tr>
+    </thead>
+    <% total_haber_gs = 0 %>
+    <% total_haber_us = 0 %>
+    <% diario_habers.each do |diario_haber| %>
+      <tbody class="scrollingContent">
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td align="center"><%= diario_haber.id %></td>
+          <td align="left"><%= diario_haber.contabilidade %></td>
+          <td align="left"><%= diario_haber.descricao %></td>
+          <td align="right"><%= number_to_currency(diario_haber.valor_guarani, :format=>' %n ', :precision => 0) %></td>
+          <td align="right"><%= number_to_currency(diario_haber.valor_dolar, :format=>' %n ',   :separator => ",") %></td>
+          <td><%= link_to 'Editar', edit_diario_haber_path(diario_haber) %></td>
+          <td><%= link_to t('DELETE'), diario_haber, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+
+          <% total_haber_gs = total_haber_gs + diario_haber.valor_guarani%>
+          <% total_haber_us = total_haber_us + diario_haber.valor_dolar%>
+          <% @diario.update_attribute :credito_guarani, total_haber_gs %>
+          <% @diario.update_attribute :credito_dolar, total_haber_us %>
+
+
+        </tr>
+      </tbody>
+    <% end %>
+
+
+  </table>
+</div>
+<table>
+        <tr>
+          <td width="490"></td>
+          <td width="100" align="right"><%=  number_to_currency(total_haber_gs, :format=>' %n ', :precision => 0) %></td>
+          <td width="80" align="right"><%=  number_to_currency(total_haber_us, :format=>' %n ', :separator => ",") %></td>
+        </tr>
+</table>
+<input type="hidden" id="haber" value="<%= total_haber_gs %>"/>
+

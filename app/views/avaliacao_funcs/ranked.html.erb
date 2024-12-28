@@ -1,0 +1,133 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="group">
+        <h1 id="header">
+
+          <% if params[:date_year].blank? %>
+            <% dy = Time.now.strftime("%Y") %>
+            <% params[:date_year] = Time.now.strftime("%Y") %>
+          <% else %>
+            <% dy = params[:date_year] %>
+          <% end %>
+          Ranking Empleados Año <%= text_field_tag :date_year, params[:date_year], size: 5 %>
+          <div class="pull-right">
+            <a href="javascript:void(0)" class="btn btn-blue" onClick="window.print();"><%= image_tag('printer.png') %> Imprimir</a>
+            <a href="/avaliacao_funcs/desempenho_anual_refs?year=<%= Time.now.strftime("%Y")%>" class="btn btn-blue">Desempenho Anual</a>
+          </div>
+        </h1>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $('#date_year').on('change', function() {
+    var year = $("#date_year").val();
+    window.location.href ="/avaliacao_funcs/ranked?date_year=" + year
+  });
+</script>
+<style>
+  td{
+    padding: 15px;
+    border-bottom: 1px solid #efefef !important;
+  }
+</style>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <header class="panel-heading">
+        Ranking General
+      </header>
+      <div class="panel-content">
+        <table>
+          <% indice = 1 %>
+          <% @funcs.each do |f| %>
+            <tr class="<%= cycle("cor1", "cor2") %>">
+              <td width="50" align="center">
+                <% if indice.to_i == 1 %>
+                  <%= image_tag 'vencedora.png', height: '30' %>
+                <% elsif indice.to_i == 2 %>
+                  <%= image_tag 'medalha-de-prata.png', height: '30' %>
+                <% elsif indice.to_i == 3 %>
+                  <%= image_tag 'medalha-de-bronze.png', height: '30' %>
+                <% else %>
+                <span class="bold"><%= indice %>•</span>
+                <% end %>
+              </td>
+              <td width="200"><%= f.cargo_nome %></td>
+              <td width="350"><%= f.persona_nome %></td>
+              <td width="100" align="center" class="bold"><%= (f.nota.to_f / 17).round(4) %></td>
+            </tr>
+            <% indice += 1 %>
+          <% end %>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<% Unidade.order(:id).each do |u| %>
+
+<%
+    sql = "SELECT AF.PERSONA_ID,
+                  MAX(P.UNIDADE_ID) AS UNIDADE_ID,
+                  MAX(P.NOME) AS PERSONA_NOME,
+                  MAX(C.NOME) AS CARGO_NOME,
+                  (SUM(AFR.NOTA) / 12) AS NOTA
+              FROM AVALIACAO_FUNC_REFS AFR
+
+              INNER JOIN AVALIACAO_FUNCS AF
+              ON AF.ID = AFR.AVALIACAO_FUNC_ID
+
+              INNER JOIN PERSONAS P
+              ON P.ID = AF.PERSONA_ID
+
+              LEFT JOIN CARGOS C
+              ON C.ID = P.CARGO_ID
+
+              WHERE P.UNIDADE_ID = #{u.id}
+              AND date_part('YEAR', AF.PERIODO) = '#{dy}'
+              GROUP BY 1
+              ORDER BY 5 DESC"
+
+    func_unidade = AvaliacaoFuncRef.find_by_sql(sql)
+
+%>
+
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <header class="panel-heading">
+        Ranking <%= u.unidade_nome %>
+      </header>
+      <div class="panel-content">
+        <table>
+          <% indice = 1 %>
+          <% func_unidade.each do |f| %>
+            <tr class="<%= cycle("cor1", "cor2") %>">
+              <td width="50" align="center">
+                <% if indice.to_i == 1 %>
+                  <%= image_tag 'vencedora.png', height: '30' %>
+                <% elsif indice.to_i == 2 %>
+                  <%= image_tag 'medalha-de-prata.png', height: '30' %>
+                <% elsif indice.to_i == 3 %>
+                  <%= image_tag 'medalha-de-bronze.png', height: '30' %>
+                <% else %>
+                <span class="bold"><%= indice %>•</span>
+                <% end %>
+              </td>
+              <td width="200"><%= f.cargo_nome %></td>
+              <td width="350"><%= f.persona_nome %></td>
+              <td width="100" align="center" class="bold"><%= ( f.nota.to_f / 17).round(5) %></td>
+            </tr>
+            <% indice += 1 %>
+          <% end %>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>

@@ -1,0 +1,48 @@
+<table>
+  <tr>
+    <td width="35"></td>
+    <td width="120">Ref.</td>
+    <td width="250">Producto</td>
+    <td width="150">Color</td>
+    <td width="50">Tamanho</td>
+    <td width="50">Cantidad</td>
+    <td width="50">Agregado</td>
+    <td width="50">Saldo</td>
+  </tr>
+</table>
+
+<div class="rolagem" id="div">
+  <table>
+    <% count = 0 %>
+    <% @produtos.each do |p| %>
+      <% if p.quantidade.to_f != p.add.to_f %>
+        <tr class = "<%= cycle( "cor1", "cor2" )%>"
+            onMouseOver="javascript:this.style.backgroundColor='#949494'"
+            onMouseOut="javascript:this.style.backgroundColor=''">
+
+
+        <td  width="35"><input type="text" id="<%= count %>" value="<%= count %>" size="1" style="border: none;"
+                  onkeypress="Fecha( '<%= p.nome %>',
+                                      '<%= p.produto_id %>',
+                                      '<%= p.cor_id %>',
+                                      '<%= p.tamanho_id %>',
+                                      '<%= p.cor_nome %>',
+                                      '<%= p.tamanho_nome %>',
+                                      '<%= p.produtos_grade_id %>')"></td>
+          <td width="120"> <%= p.fabricante_cod %> </td>
+          <td width="250"> <%= p.nome %> </td>
+          <td width="150">
+            <div style="background-color: #<%= p.cod_cor %>; width: 10px;height: 10px;border: 2px solid black;float:left;margin: 3px;"></div>
+            <%= p.cor_nome %>
+         </td>
+          <td width="50" align="center"> <%= p.tamanho_nome %> </td>
+          <td width="50" align="center"> <%= p.quantidade %> </td>
+          <td width="50" align="center"> <%= p.add.to_f %> </td>
+           <td width="50" align="center"> <%= p.quantidade.to_f - p.add.to_f %> </td>
+        </tr>
+        <% count += 1 %>
+      <% end %>
+    <% end %>
+    <input type="hidden" id="foco" value="-1">
+  </table>
+</div>

@@ -1,0 +1,45 @@
+<h1 id="header">Promos</h1>
+<div class="acessos">
+  <%= link_to 'Cashback por Producto ', new_promo_path(tipo: 1), :class => "button add" %>
+  <%= link_to 'Cashback Volume de Venta ', new_promo_path(tipo: 2), :class => "button add" %>
+  <%= link_to 'Descuento Directo', new_promo_path(tipo: 0), :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="50" align="center">Código</td>
+    <td width="150" >Tipo</td>
+    <td width="300">Descripción</td>
+    <td width="80" align="center">Valid inicio</td>
+    <td width="80" align="center">Valid final</td>
+    <td width="50" align="center">Dias</td>
+    
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @promos.each do |promo| %>
+      <tr class = "<%= cycle("cor1", "cor2")%>" >
+        <td width="50" align="center"><%= link_to promo.id.to_s.rjust(6,'0'), promo_path(promo) %></td>
+        <td width="150">
+          <% case promo.tipo.to_i %>
+          <% when 0 %>
+            Promoción
+          <% when 1 %>
+            Cashback por Producto
+          <% when 2 %>
+            Cashback Volume de Venta
+          <% end %>          
+        </td>
+        <td width="300"><%= promo.nome %></td>
+        <td width="80" align="center"><%= promo.valid_inicio.strftime("%d/%m/%y") %></td>
+        <td width="80" align="center"><%= promo.valid_final.strftime("%d/%m/%y") %></td>
+        <td width="50" align="center"><%= (promo.valid_final.to_date - promo.valid_inicio.to_date).to_i %></td>        
+        <td><%= link_to '', edit_promo_path(promo), class: 'icon-pencil' %></td>
+        <td><%= link_to '', promo, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

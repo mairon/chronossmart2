@@ -1,0 +1,174 @@
+<div class="group">
+  <%= form_tag dinamic_busca_venda_produto_produtos_path, :method => "get" do %>
+    <div class="input-group" style="margin-top: 15px">
+      <span class="input-group-btn">
+        <button type="button" class="btn btn-default" >
+          <i class="icon-search" aria-hidden="true"></i>
+        </button>
+      </span>
+      <input id="busca" name="busca" style="padding: 12px" type="search" value="<%= params[:busca]%>" placeholder="Buscar" onKeyUp="pesquisa(document.getElementById('busca').value)" size="40" autocapitalize="off" autocomplete="off" autocorrect="off" autofocus />
+
+      <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinner", :width => 21, :height => 21, :style =>"display: none;" ) %>
+    </div>
+  <% end %>
+</div>
+
+<div class="group">
+  <div id="pagina">
+  </div>
+</div>
+
+    <%= hidden_field_tag :cliente, params[:cliente] %>
+    <%= hidden_field_tag :moeda, params[:moeda] %>
+    <%= hidden_field_tag :unidade, params[:unidade] %>
+    <%= hidden_field_tag :data, params[:data] %>
+    <%= hidden_field_tag :tipo_venda, params[:tipo_venda] %>
+    <input id="deposito_id" name="deposito_id" type="hidden" value="<%= params[:deposito_id]%>" />
+
+    <script language="javascript">
+
+    var moeda = document.getElementById('moeda').value
+    var tipo_venda = document.getElementById('tipo_venda').value
+    function Fecha(produto_nome,produto_id,preco_gs,preco_us,preco_rs){
+      window.opener.document.getElementById('vendas_produto_produto_nome').value      = produto_nome;
+      window.opener.document.getElementById('vendas_produto_produto_id').value        = produto_id;
+
+      if (moeda == '0'){
+        window.opener.document.getElementById('vendas_produto_unitario_dolar').value  = preco_us;
+        window.opener.document.getElementById('vendas_produto_preco_dolar').value     = preco_us;
+        window.opener.document.getElementById('vendas_produto_total_dolar').value     = preco_us;  
+        window.opener.document.getElementById("vendas_produto_quantidade").focus()  
+      }else if (moeda == '1'){        
+
+        window.opener.document.getElementById('vendas_produto_preco_guarani').value     = preco_gs;
+        window.opener.document.getElementById('vendas_produto_unitario_guarani').value  = preco_gs;
+        window.opener.document.getElementById('vendas_produto_total_guarani').value     = preco_gs;
+
+        if (tipo_venda == '0'){
+          window.opener.document.getElementById("vendas_produto_quantidade").focus()  
+        }else{
+          window.opener.document.getElementById("vendas_produto_total_guarani").focus()  
+        }
+
+      }else{
+        window.opener.document.getElementById('vendas_produto_unitario_real').value  = preco_rs;
+        window.opener.document.getElementById('vendas_produto_preco_real').value  = preco_rs;
+        window.opener.document.getElementById('vendas_produto_total_real').value  = preco_rs;
+      }
+
+      
+      self.close();
+    }
+
+      function pesquisa(valor){
+        count_caract = $("#busca").val().length;
+        if (count_caract > 2) {
+          var cliente  = document.getElementById('cliente').value
+          var deposito = document.getElementById('deposito_id').value
+          var moeda    = document.getElementById('moeda').value
+          var unidade  = document.getElementById('unidade').value
+          var dt       = document.getElementById('data').value
+          //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+          url="/produtos/dinamic_busca_venda_produto?deposito_id="+deposito+"&cliente="+cliente+"&data="+dt+"&moeda="+moeda+"&unidade="+unidade+"&busca="+valor;
+
+          ajax(url);
+        }
+
+      }
+
+
+      function ajax(url)
+
+      {
+
+
+        $('#spinner').show();
+        //alert(nick);
+
+        //alert(dest);
+
+        //alert(msg);
+
+
+
+        req = null;
+
+        // Procura por um objeto nativo (Mozilla/Safari)
+
+        if (window.XMLHttpRequest) {
+
+          req = new XMLHttpRequest();
+
+          req.onreadystatechange = processReqChange;
+
+          req.open("GET",url,true);
+
+          req.send(null);
+
+          // Procura por uma versão ActiveX (IE)
+
+        } else if (window.ActiveXObject) {
+
+          req = new ActiveXObject("Microsoft.XMLHTTP");
+
+          if (req) {
+
+
+
+            req.onreadystatechange = processReqChange;
+
+            req.open("GET",url,true);
+
+
+
+            req.send();
+
+          }
+
+        }
+
+      }
+
+
+
+      function processReqChange()
+
+      {
+
+
+
+        // apenas quando o estado for "completado"
+
+        if (req.readyState == 4) {
+
+
+
+          // apenas se o servidor retornar "OK"
+
+
+
+          if (req.status ==200) {
+
+
+
+            // procura pela div id="pagina" e insere o conteudo
+
+            // retornado nela, como texto HTML
+
+
+            onSuccess:$('#spinner').hide();
+            document.getElementById('pagina').innerHTML = req.responseText;
+          
+
+
+          } else {
+
+            alert("Houve um problema ao obter os dados:n" + req.statusText);
+
+          }
+
+        }
+
+      }
+    </script>

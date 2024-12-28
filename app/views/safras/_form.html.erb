@@ -1,0 +1,41 @@
+<h1 id="header">Safras - [<%= t('EDITION') %>]</h1>
+<div class="group">
+<%= form_for(@safra) do |f| %>
+  <% if @safra.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@safra.errors.count, "error") %> prohibited this safra from being saved:</h2>
+
+      <ul>
+      <% @safra.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+
+  <table>
+    <tr>
+
+      <td>
+        <label>Description</label>
+        <%= f.text_field :nome, required: false, class: 'panel-field', autofocus: true %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <br>
+        <%= f.text_area :obs, class: 'panel-field', rows: 5, placeholder: 'Obs'%>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.check_box :status %> Activo</td>
+    </tr>
+  </table>
+  <div class="footer-buttons">
+    <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    <%= link_to t('BACK'), safras_path, :class => "btn btn-back" %>
+  </div>
+    </div>
+<% end %>

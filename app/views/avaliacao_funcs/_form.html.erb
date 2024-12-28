@@ -1,0 +1,49 @@
+<%= form_for(@avaliacao_func) do |f| %>
+  <% if @avaliacao_func.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@avaliacao_func.errors.count, "error") %> prohibited this avaliacao_func from being saved:</h2>
+
+      <ul>
+      <% @avaliacao_func.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-center">
+        <header class="panel-heading">
+          Evaluación Empledos [<%= t('EDITION') %>]
+        </header>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-12">
+              <label>Mês Referente</label>
+              <%= f.date_select :periodo, :discard_day => true %>
+
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <label>Empleado</label>
+              <%= f.collection_select :persona_id,
+                Persona.all( :select     => 'id,nome,tipo_funcionario',
+                :conditions => ["tipo_funcionario = 1 AND UNIDADE_ID = #{current_unidade.id}"],
+                :order      => '2'),:id,:nome %>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="footer-buttons">
+                <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+                <%= link_to 'Volver', avaliacao_funcs_path, :class => "btn btn-back" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

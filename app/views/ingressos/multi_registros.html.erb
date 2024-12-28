@@ -1,0 +1,83 @@
+<style>
+  .panel-content td{
+    padding: 10px;
+    border-bottom: 1px solid #efefef !important;
+  }
+</style>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="group">
+        <h1 id="header">Multi Lançamentos</h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <header class="panel-heading">
+            <%= form_tag multi_registros_ingressos_path, :method => :get do %>
+
+                <% unless params[:registros].blank? %>
+                  Conta:
+                  <%= select("busca", "conta",
+                    Conta.all(:select => 'id,nome', conditions: 'tipo = 1', order: '2').collect {|p| [ p.nome, p.id ] },
+                    { :selected => params[:busca]["conta"], :prompt => 'Selecione la Cuenta'},{:style => "width:250px", required: true}) %>
+                  Cliente:
+                  <%= select("busca", "persona",
+                    Persona.all(:select => 'id,nome', conditions: 'tipo_cliente = 1', order: '2').collect {|p| [ p.nome, p.id ] },
+                    { :selected => params[:busca]["persona"], :prompt => 'Selecione la Cuenta'},{:style => "width:250px"}) %>
+
+                <% else %>
+                  Conta:
+                  <%= select("busca", "conta",
+                    Conta.all(:select => 'id,nome', conditions: 'tipo = 1', order: '2').collect {|p| [ p.nome, p.id ] },
+                    { :prompt => 'Selecione a Conta'},{:style => "width:250px", required: true}) %>
+
+                  Cliente:
+                  <%= select("busca", "persona",
+                    Persona.all(:select => 'id,nome', conditions: 'tipo_cliente = 1', order: '2').collect {|p| [ p.nome, p.id ] },
+                    { :prompt => 'Selecione Cliente'},{:style => "width:250px"}) %>
+
+                <% end %>
+                  Registros <%= text_field_tag :registros, nil, value: params[:registros] %>
+                  <%= submit_tag 'Filtrar', class: 'btn btn-blue' %>
+            <% end %>
+          </header>
+          <% unless params[:registros].blank? %>
+
+            <div class="panel-content">
+              <table>
+                <% indice = 1 %>
+                <%= form_tag create_multiple_ingressos_path, :method => :get do %>
+                  <% params[:registros].to_i.times do %>
+                    <%= fields_for "ingressos[]", Ingresso.new do |f| %>
+                      <%= f.hidden_field :conta_id, value: params[:busca]["conta"] %>
+                      <%= f.hidden_field :usuario_created, value: current_user.id %>
+                      <%= f.hidden_field :unidade_created, value: current_unidade.id %>
+                      <%= f.hidden_field :unidade_id, value: current_unidade.id %>
+                      <tr>
+                        <td><b><%= indice %></b></td>
+                        <td><%= f.text_field :data, value: Date.current.strftime("%d/%m/%Y"), class: 'date', size: '15' %></td>
+                        <td>Cliente</td>
+                        <td>
+                          <%= f.collection_select :persona_id, Persona.all( :select => ' id, nome', :conditions => ["tipo_cliente = 1"], :order  => '2' ), :id, :nome, {:selected => params[:busca]["persona"], :prompt => "Selecione"} %>
+                        </td>
+                        <td><%= f.text_area :concepto, cols: 15, rows: 1, placeholder: 'Obs:' %></td>
+                        <%= field_us 'Valor R$:',f, :valor_real %>
+
+                      </tr>
+                    <% end %>
+                    <% indice += 1 %>
+                  <% end %>
+                  <tr><td><%= submit_tag "Gravar", class: 'btn btn-blue'  %></td></tr>
+                <% end %>
+              </table>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>

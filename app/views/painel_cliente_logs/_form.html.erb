@@ -1,0 +1,50 @@
+<%= form_for(@painel_cliente_log) do |f| %>
+  <% if @painel_cliente_log.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@painel_cliente_log.errors.count, "error") %> prohibited this painel_cliente_log from being saved:</h2>
+
+      <ul>
+      <% @painel_cliente_log.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> painel_cliente_logs - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">ip :</td>                    
+                      <td><%= f.text_field :ip %></td>
+                                      
+                      <td align="right">login :</td>                    
+                      <td><%= f.text_field :login %></td>
+                                      
+                      <td align="right">senha :</td>                    
+                      <td><%= f.text_field :senha %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), painel_cliente_logs_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

@@ -1,0 +1,112 @@
+<div class="group" align="center">
+  <h1 id="header">Device <%= @device.nome %> <%= @device.token %></h1>
+  <br>
+  <h2 align="center">Status <span id="d_status"></span></h2>
+
+  <p>
+    <a href="#" id="gera_qrcode" class="btn btn-green"><i class="icon-white icon-qrcode"></i> Gera QR</a>
+    <a href="#" id="logout" class="btn btn-danger">Desconectar</a>
+  </p>
+  
+  <p><img id="img_qr" src=""></img></p>
+  <p><%= link_to 'Salir', devices_url %></p>
+</div>
+
+<script>
+
+//status
+var settings = {
+  "url": "https://<%= @device.host %>/rest/instance/<%= @device.instance_key %>",
+  "method": "GET",
+  "timeout": 0,
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <%= @device.token %>"
+  },
+
+};
+
+$.ajax(settings).done(function (response) {
+  $("#d_status").html(response["instance"]["status"])
+  if (response["instance"]["status"] == 'connected') {
+    $("#d_status").addClass('btn-success')
+  }else{
+    $("#d_status").addClass('btn-danger')
+  }
+  console.log(response);
+
+});
+
+</script>
+
+<script>
+$('#gera_qrcode').click(function() {
+  //gera QR
+  var settings = {
+    "url": "https://<%= @device.host %>/rest/instance/qrcode_base64/<%= @device.instance_key %>",
+    "method": "GET",
+    "timeout": 0,
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer <%= @device.token %>"
+    },
+
+  };
+
+  $.ajax(settings).done(function (response) {
+    $("#img_qr").attr("src", response["qrcode"]);
+    console.log(response);
+
+    setInterval(function() {
+        //status
+          var st = {
+            "url": "https://<%= @device.host %>/rest/instance/<%= @device.instance_key %>",
+            "method": "GET",
+            "timeout": 0,
+            "headers": {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer <%= @device.token %>"
+            },
+
+          };
+
+          $.ajax(st).done(function (responsest) {
+            $("#d_status").html(responsest["instance"]["status"])
+            console.log(responsest);
+
+            if (responsest["instance"]["status"] == 'connected'){
+              $("#d_status").removeClass('btn-danger').addClass('btn-success')
+              location.reload();
+            };
+
+          });
+        }, 1000); //10 seconds
+  });
+});
+
+
+
+</script>
+
+<script>
+$('#logout').click(function() {
+  //logout
+  var settings = {
+    "url": "https://<%= @device.host %>/rest/instance/<%= @device.instance_key %>/logout",
+    "method": "DELETE",
+    "timeout": 0,
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer <%= @device.token %>"
+    },
+  };
+
+  $.ajax(settings).done(function (response) {
+    location.reload();
+    console.log(response);
+  });
+});
+
+
+
+</script>

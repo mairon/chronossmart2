@@ -1,0 +1,46 @@
+<div class="group">
+	<div id="pagina"></div>
+</div>
+
+
+<script language="javascript">
+  $(".acao_vc").click(function() {
+  	$('#modal-gastos').modal('show');
+    url="/venda_compras/lista_gastos?venda_id="+ <%=  @venda.id %> +"&persona_id=" + $('#venda_persona_id').val();
+    ajax(url);  	
+  });
+</script>
+
+
+<script type="text/javascript">
+function checkclick() { 
+	 if ($("#selectAllM").is(':checked')) {
+       $('.m').each(function() {
+           this.checked = true;
+       });
+   } else {
+      $('.m').each(function() {
+           this.checked = false;
+       });
+   } 
+};
+</script>
+
+<script LANGUAGE="JavaScript">  
+ <!--  
+ var total     = 0;  
+ function soma(campo) { 
+  var valor = document.getElementById( 'valor_' + campo.value).value;
+
+  if (campo.checked)  {
+    total     += eval( valor.replace(/\./g, "").replace(",", ".") );
+    
+  } else {
+    total     -= eval( valor.replace(/\./g, "").replace(",", ".") );
+  }
+  document.getElementById('valor').value = ( number_format( total,0, ',', '.') );
+ }  
+ //-->  
+ </SCRIPT> 
+<%= javascript_include_tag 'busca_ajax' %>
+

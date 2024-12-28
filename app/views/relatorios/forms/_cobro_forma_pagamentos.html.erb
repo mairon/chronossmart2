@@ -1,0 +1,49 @@
+<table>
+<% quebra = '' %>
+<% cobro_us = 0 %>
+<% cobro_gs = 0 %>
+<% cobro_rs = 0 %>
+
+<% sub_cobro_us = 0 %>
+<% sub_cobro_gs = 0 %>
+<% sub_cobro_rs = 0 %>
+
+
+<% @cobros.each do |cobro| %>
+  <tr class = "<%= cycle("cor1", "cor2") %>">
+    <td width="30"><%= cobro.pago_id.to_s.rjust(5,'0') %></td>
+    <td width="40" align="center"><%= cobro.vencimento.to_date.strftime("%d/%m/%y") %></td>      
+    <td width="40" align="center"><%= cobro.data.strftime("%d/%m/%y") %></td>      
+    <td width="250"><%= cobro.persona_nome %></td>
+    <td width="40"><%= cobro.doc %></td>
+    <td width="100"><%= cobro.centro_custo_nome %></td>
+    <td width="250"><small><%= cobro.descricao %></small></td>
+    <td width="30" align="center"><%= cobro.cota %>/<%= cobro.tot_cotas %></td>   
+    <% if params[:moeda].to_s == '0'%>
+      <td width="60" align="right"><%= format_decimal( cobro.cobro_dolar ) %> </td>
+      <% cobro_us  += cobro.cobro_dolar.to_f %>
+      <% sub_cobro_us += cobro.cobro_dolar.to_f %>
+    <% elsif params[:moeda].to_s == '1' %>
+      <td width="60" align="right"><%= format_int( cobro.cobro_guarani ) %> </td>
+      <% cobro_gs  += cobro.cobro_guarani.to_f %>
+      <% sub_cobro_gs += cobro.cobro_guarani.to_f %>
+    <% else %>
+      <td width="60" align="right"><%= format_decimal( cobro.cobro_real ) %> </td>
+      <% cobro_rs  += cobro.cobro_real.to_f %>
+      <% sub_cobro_rs += cobro.cobro_real.to_f %>
+    <% end %>
+    <td width="60"><%= cobro.conta_nome %></td>     
+
+  </tr>
+<% end %>
+<tr class="head">
+  <td colspan="8"></td>
+  <% if params[:moeda].to_s == '0' %>
+    <td width="60" align="right"><%= format_decimal( cobro_us ) %> </td>
+  <% elsif params[:moeda].to_s == '1' %>
+    <td width="60" align="right"><%= format_int( cobro_gs ) %> </td>
+  <% else %>
+    <td width="60" align="right"><%= format_decimal( cobro_rs ) %> </td>
+  <% end %>
+</tr>
+</table>

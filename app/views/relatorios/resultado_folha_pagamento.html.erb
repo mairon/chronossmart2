@@ -1,0 +1,45 @@
+<% sql = "SELECT E.ID,
+E.NOME,
+E.SALARIO,
+(SELECT SUM(DEBITO) FROM EXTRACTOS WHERE EMPLEADO_ID = E.ID AND CONTABILIDAD_ID = 141 AND FECHA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}') AS ANTECIPO,
+(SELECT SUM(DEBITO) FROM EXTRACTOS WHERE EMPLEADO_ID = E.ID AND CONTABILIDAD_ID = 141 AND CONCEPTO LIKE '%PAGO DE DEUDA PENDIENTE%' AND FECHA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}') AS DIVIDA_ANTERIOR,
+(SELECT SUM(CREDITO) FROM EXTRACTOS WHERE EMPLEADO_ID = E.ID AND CONTABILIDAD_ID = 184 AND FECHA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}') AS COMICAO
+FROM   EMPLEADOS E
+WHERE  SALARIO > 0
+ORDER BY 2
+"%>
+
+<% empleado = Empleado.find_by_sql(sql) %>
+
+<table>
+	<% salario  = 0 %>
+	<% antecipo = 0 %>
+	<% div_anteroior = 0 %>
+	<% comicao  = 0 %>
+	<% tot      = 0 %>
+	<% empleado.each do |ep|%>
+	<tr>
+		<td width="250" align="left"> <%= ep.nome %> </td>
+		<td width="100" align="right"> <%= number_to_currency( ep.salario,          :format =>' %n ', :precision =>0 ) %> </td>
+		<td width="100" align="right"> <%= number_to_currency( ant = (ep.antecipo.to_f - ep.divida_anterior.to_f),         :format =>' %n ', :precision =>0 ) %> </td>
+		<td width="100" align="right"> <%= number_to_currency( ep.divida_anterior,  :format =>' %n ', :precision =>0 ) %> </td>
+		<td width="100" align="right"> <%= number_to_currency( ep.comicao,          :format =>' %n ', :precision =>0 ) %> </td>
+		<td width="100" align="right"> <%= number_to_currency(saldo = (ep.salario.to_f + ep.comicao.to_f - ep.divida_anterior.to_f - ep.antecipo.to_f) ,  :format =>' %n ', :precision =>0 ) %> </td>
+
+		<% salario  += ep.salario.to_f %>
+		<% antecipo += ant.to_f %>
+		<% div_anteroior += ep.divida_anterior.to_f %>
+		<% comicao  += ep.comicao.to_f %>
+		<% tot  += saldo.to_f %>
+	</tr>
+	<% end %>
+	<tr class="head">
+		<td></td>
+		<td align="right"><%= number_to_currency( salario,       :format =>' %n ', :precision =>0 ) %></td>
+		<td align="right"><%= number_to_currency( antecipo,       :format =>' %n ', :precision =>0 ) %></td>
+		<td align="right"><%= number_to_currency( div_anteroior,       :format =>' %n ', :precision =>0 ) %></td>
+		<td align="right"><%= number_to_currency( comicao,       :format =>' %n ', :precision =>0 ) %></td>
+		<td align="right"><%= number_to_currency( tot,       :format =>' %n ', :precision =>0 ) %></td>
+	</tr>
+</table>
+

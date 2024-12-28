@@ -1,0 +1,50 @@
+  <div class="group">
+    <%= form_tag dinamic_busca_venda_produto_produtos_path, :method => "get" do %>
+    <select name="tipo" id="tipo">
+      <option>REFERENCIA</option>
+      <option>DESCRIPCION</option>
+      <option>BARRA</option>
+    </select>
+      <input id         ="busca"
+             name       ="busca"
+             type       ="text"
+             size       ="40"
+             value="<%= params[:busca]%>"/>
+
+      <input type   ="button"
+             id     ="button"
+             class="button_info"
+             onclick="pesquisa(document.getElementById('busca').value)"
+             value  ="Buscar"/>
+
+    <% end %>
+    <hr/>
+    <div id="pagina">
+    </div>
+
+</div>
+
+
+
+    <%= hidden_field_tag :tabela_preco, params[:cliente] %>
+    <%= hidden_field_tag :moeda, @presupuesto.moeda %>
+    <%= hidden_field_tag :unidade, params[:unidade] %>
+    <%= hidden_field_tag :colecao, @presupuesto.colecao_id %>
+    <%= hidden_field_tag :presupuesto_id, @presupuesto.id %>
+
+<script language="javascript">
+   function pesquisa(valor){
+      tipo = document.getElementById('tipo').value
+      var tabela_preco = document.getElementById('tabela_preco').value
+      var unidade  = document.getElementById('unidade').value
+      var colecao  = document.getElementById('colecao').value
+      var tabela_preco = document.getElementById('tabela_preco').value
+      var presupuesto = document.getElementById('presupuesto_id').value
+
+      //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+      location.href="/presupuestos/"+presupuesto+"/resultado_grade?cliente="+tabela_preco+"&tipo="+tipo+"&colecao="+colecao+"&busca="+valor+"&unidade="+unidade+"";
+
+   }
+</script>
+</body>

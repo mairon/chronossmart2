@@ -1,0 +1,27 @@
+  <div class="group">  
+    <table>
+      <tr>
+        <td width="150"><%= t('UNIT') %></td>
+        <td width="150">Deposito</td>
+        <td width="150">Producto</td>
+        <td width="70" align="right">Costo</td>
+        <td width="70" align="right">Saldo</td>
+      </tr>
+    </table>
+
+    <div class="rolagem_cobro" dir="div">
+      <table>
+        <% @produtos.each do |p| %>
+          <tr class = "<%= cycle("cor1", "cor2") %>">
+            <td width="150"><%= p.unidade_nome %></td>
+            <td width="150"><%= p.deposito_nome %></td>
+            <td width="150"><%= p.produto_nome %></td>
+            <td width="70" align="right"><%= format_int(p.custo_medio_gs) %></td>
+            <td width="70" align="right"><%= format_int(p.stock) %></td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  <div>  
+</div>  
+

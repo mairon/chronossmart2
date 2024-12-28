@@ -1,0 +1,157 @@
+<h1 id="header">COMPRAS</h1>
+<div class="acessos">
+	<%= link_to 'Compra Fiscal', new_compra_path(tipo_compra: 'cmint', fiscal: 'true'), :class => 'button add' %>
+	<%= link_to "Compra #{t('NOT')} Fiscal", new_compra_path(tipo_compra: 'cmint', fiscal: 'false'), :class => 'button add' %>
+	<%= link_to "Compra #{t('IMPORTATION')}", new_compra_path(tipo_compra: 'cmimp', fiscal: 'false'), :class => 'button add' %>
+</div>
+ <div class="group">
+		 <%= form_tag busca_compras_path, :method => "get" do%>
+			<table>
+        <tr>
+          <!--FILTRO_DATA!-->
+          <td><%= t('DATE') %></td>
+          <td colspan="2">
+            <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+            <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+            </div>
+            <div class="date-separ"><%= t('TO') %></div>
+          <td class="date-separ">
+            <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+            <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+            </div>
+          </td>
+					<td>
+						<%= select_tag :tipo, options_for_select([[t('PROVIDER'),"PROVEEDOR"],['Código',"CODIGO"], [t('DOC'),"DOCUMENTO"]]) %>
+					</td>
+          <td colspan="4">
+            <input id="busca" name="busca" type="text" onkeyup = "pesquisa(this.value),f(this)"onkeydown = "f(this)" size="32"/>
+            <input type="button" class="btn btn-blue" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar"/>
+            <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;") %>
+          </td>
+				 </tr>
+			</table>
+			<input type="hidden" id="seta" value="0"/>
+		 <% end %>
+ </div>
+<div id="show_spinner_image" style="display: none">
+	 <%= image_tag("load.gif",
+							 :align => "absmiddle",
+							 :border => 0,
+							 :id => "spinner",
+							 :width => 21,
+							 :height => 21 ) %>
+</div>
+
+<div id="pagina"></div>
+
+<script language="javascript">
+
+ function VendaCampoFiltro(){
+	document.getElementById("filtro").focus();
+ }
+
+ function SetaFiltro(d){
+	document.getElementById('seta').value = d
+	if(document.getElementById('seta').value == '0')
+	{
+		 document.getElementById('busca').value = ''
+	}
+	else
+	{
+		 document.getElementById('inicio').value = ''
+		 document.getElementById('final').value = ''
+	}
+ }
+
+ function pesquisa(valor){
+	inicio = document.getElementById('inicio').value
+	finala = document.getElementById('final').value
+	tipo   = document.getElementById('tipo').value
+	busca  = document.getElementById('busca').value
+	seta   = document.getElementById('seta').value
+	//FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+	url="/compras/busca?seta="+seta+"&inicio="+inicio+"&final="+finala+"&tipo="+tipo+"&busca="+valor+"&commit=buscar";
+	ajax(url);
+ }
+
+
+ function ajax(url) {
+
+	$('#spinner').show();
+
+	req = null;
+
+	// Procura por um objeto nativo (Mozilla/Safari)
+
+	if (window.XMLHttpRequest) {
+
+		 req = new XMLHttpRequest();
+
+		 req.onreadystatechange = processReqChange;
+
+		 req.open("GET",url,true);
+
+		 req.send(null);
+
+		 // Procura por uma versão ActiveX (IE)
+
+	} else if (window.ActiveXObject) {
+
+		req = new ActiveXObject("Microsoft.XMLHTTP");
+
+		if (req) {
+			req.onreadystatechange = processReqChange;
+
+			req.open("GET",url,true);
+
+			req.send();
+		}
+	}
+ }
+
+
+
+ function processReqChange() {
+	// apenas quando o estado for "completado"
+
+	if (req.readyState == 4) {
+		 // apenas se o servidor retornar "OK"
+
+		 if (req.status ==200) {
+
+			// procura pela div id="pagina" e insere o conteudo
+
+			// retornado nela, como texto HTML
+
+			onSuccess:$('#spinner').hide();
+			document.getElementById('pagina').innerHTML = req.responseText;
+
+		 } else {
+				alert("Houve um problema ao obter os dados:n" + req.statusText);
+		 }
+	}
+ }
+
+$(function () {
+	// Sorting and pagination links.
+	$('.pagination a').live('click',
+		function () {
+			$.ajax({
+			method: "get",
+			url: this.href,
+			beforeSend: function(){
+			$("#spinner").show("fast");
+			},
+			success: function(retorno){
+			$('#spinner').hide("slow");
+			$("#pagina").html(retorno).fadeIn( "slow" );
+			}
+			});
+			return false;
+		}
+	);
+});
+</script>

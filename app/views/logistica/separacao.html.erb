@@ -1,0 +1,126 @@
+<ul class="tabs">
+  <li>
+    <a href="#tab1">Pedido para Separación - [<%= t('EDITION') %>]</a>
+  </li>
+</ul>
+
+<div class="tab_container">
+  <div id="tab1" class="tab_content">
+    <div class="group">
+    <table>
+      <tr>
+        <td align="right">Pedido:</td>
+        <td><%= @presupuesto.id.to_s.rjust(6,'0')%></td>
+
+        <td align="right"><%= t('DATE') %>:</td>
+        <td><%= @presupuesto.data.strftime("%d/%m/%y") %></td>
+      </tr>
+      <tr>
+        <td align="right">Tabla Precio:</td>
+        <td><b><%= @presupuesto.tabela_preco.nome %></b></td>
+
+        <td align="right">Condición de Pago:</td>
+        <td><%= @presupuesto.prazo.nome %></td>
+      </tr>
+
+      <tr>
+        <td align="right">Vendedor:</td>
+        <% vd = Persona.find_by_id(@presupuesto.vendedor_id)%>
+        <td colspan="4"><%= vd.nome %></td>
+      </tr>
+
+      <tr>
+        <td align="right">Cliente:</td>
+        <td colspan="4"><%= @presupuesto.persona.nome %></td>
+      </tr>
+    </table>
+    </div>
+
+    <div class="group">
+
+    <table class="head_grid">
+      <tr>
+        <td width="60">Pedido</td>
+        <td width="100">Ref.</td>
+        <td width="100">Cod</td>
+        <td width="350">Producto</td>
+        <td width="70" align="right">Stock</td>
+        <td width="70" align="right">Cantidad</td>
+        <td width="70" align="right">Faturar</td>
+        <td width="70" align="right">Total</td>
+      </tr>
+    </table>
+        <div class="rolagem" dir="div" style="height: 200px">
+          <table>
+            <% st  = 0 %>
+            <% qtd = 0 %>
+            <% tot = 0 %>
+            <% tot_faltante = 0 %>
+            <% tot_faturar  = 0 %>
+            <% @produtos_pedido_vendas.each do |p| %>
+            <% if  (p.stock.to_f - p.quantidade.to_f) < 0 %>
+              <% cor = '#fa3e40' %>
+            <% else %>
+              <% cor = '#bdefbd' %>
+            <% end %>
+              <tr class= "<%= cycle( "cor1", "cor2" )%>">
+                <td bgcolor="<%= cor %>" width="60"><%= p.presupuesto_id.to_s.rjust(6,'0') %></td>
+                <td bgcolor="<%= cor %>" width="100"><%= p.fabricante_cod %></td>
+                <td bgcolor="<%= cor %>" width="100"><%= p.produto_id %></td>
+                <td bgcolor="<%= cor %>" width="350"><%= p.produto_nome %></td>
+                <td bgcolor="<%= cor %>" width="70" align="right"><%= number_to_currency(p.stock, :format=>' %n ', :precision => 0 ) %></td>
+                <td bgcolor="<%= cor %>" width="70" align="right"><%= number_to_currency(p.quantidade, :format=>' %n ', :precision => 0 ) %></td>
+                <% if p.quantidade.to_f > 0 and p.stock.to_f > 0 %>
+                  <% if p.quantidade.to_f >= p.stock.to_f %>
+                    <% saldo = p.stock %>
+                  <% elsif p.stock.to_f >= p.quantidade.to_f %>
+                    <% saldo = p.quantidade %>
+                  <% end %>
+                <% end %>
+
+                <td bgcolor="<%= cor %>" width="70" align="right"><%= number_to_currency( saldo.to_f, :format=>' %n ', :precision => 0 ) %></td>
+                <td bgcolor="<%= cor %>" width="70" align="right"><%= number_to_currency(p.total_guarani, :format=>' %n ', :precision => 0 ) %></td>
+                <% st  += p.stock.to_f %>
+                <% qtd += p.quantidade.to_f %>
+                <% tot += p.total_dolar.to_f %>
+                <% tot_faturar  += saldo.to_f %>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+        <table class="head_grid">
+          <tr>
+            <td width="645"></td>
+            <td width="70" align="right"><%= number_to_currency(st, :format=>' %n ', :precision => 0 ) %></td>
+            <td width="70" align="right"><%= number_to_currency(qtd, :format=>' %n ', :precision => 0 ) %></td>
+            <td width="70" align="right"><%= number_to_currency(tot_faturar, :format=>' %n ', :precision => 0 ) %></td>
+            <td width="70" align="right"><b><%= number_to_currency(tot, :format=>' %n ', :separeitor => ',' ) %></b></td>
+          </tr>
+        </table>
+        </div>
+    </div>
+  <div class="buttons">
+    <%= form_tag controller: 'logistica', action: 'add_venda', :id => @presupuesto.id  do %>
+      Add a lista de Carga: <%= select("add", "lista_carga", @lista_cargas.collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...' })  %>
+      <%= button_tag 'Separar', :disable_with => "Aguarde..." , :class => "button" , :id => "btn", "data-plus-as-tab" => "false" %>
+    <% end %>
+  </div>
+</div>
+<script type="text/javascript">
+  
+$(document).ready(function () {
+
+  jQuery.validator.setDefaults({
+    success: "valid"
+  });
+
+  $('form').validate({
+    rules: {
+    "add[lista_carga]": {required: true}
+    }
+  });
+});
+
+
+
+</script>

@@ -1,0 +1,49 @@
+<div class="panel">
+  <h1 id="header">
+    Nota Remición
+    <div class="pull-right">
+      <%= link_to t('NEW'), new_nota_remicao_path, :class => 'button add' %>
+    </div>
+  </h1>
+</div>
+
+
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="60" align="center">Cod.</td>
+      <td width="80" align="center"><%= t('DATE') %></td>
+      <td width="80" align="center">Doc.</td>
+      <td width="250">Cliente</td>
+      <td width="200">Destino</td>
+      <td width="200">Chofer</td>
+      <td width="100">Chapa</td>
+      <td width="100" align="center">Romaneio</td>
+    </tr>
+   </table>
+   <div class="rolagem" id="div">
+      <table>
+         <% @nota_remicaos.each do |nota| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="60" align="center"> <%= nota.id.to_s.rjust(6,'0') %></td>
+              <td width="80" align="center"> <%= nota.data %></td>
+              <td width="80" align="left"> <%= nota.documento_numero %></td>
+              <td width="250" align="left"> <small><%= nota.persona_nome %></small></td>
+              <td width="200" align="left"> <small><%= nota.cidade_nome %></small></td>
+              <td width="200" align="left"> <small><%= nota.chofer_nome %></small></td>
+              <td width="100" align="left"> <%= nota.chapa_c %></td>
+              <td width="100" align="center">
+                <% if nota.romaneio.nil? %>
+                  <%= link_to 'ADD Romanio', new_romaneio_path(nota_remicao_id: nota.id, doc_01: nota.documento_numero_01, doc_02: nota.documento_numero_02, doc: nota.documento_numero, persona_id: nota.persona_id, persona_nome: nota.persona_nome ), target: '_blank' %>
+                <% else %>
+                  <b><%= nota.romaneio_numero %></b>
+                <% end %>
+                  
+                </td>
+              <td><%= link_to '', edit_nota_remicao_path(nota), class: 'icon-pencil' %></td>
+              <td><%= link_to '', nota, confirm: 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+            </tr>
+         <% end %>
+      </table>
+   </div>  
+</div>

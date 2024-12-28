@@ -1,0 +1,245 @@
+<%= form_for(@produto , :html => { :multipart => true }) do |f| %>
+
+<div class="row">
+  <% if @produto.errors.any? %>
+    <div class="col-md-12">
+      <div class="alert alert-block alert-danger fade in">
+        <button data-dismiss="alert" class="close close-sm" type="button">
+          <i class="fa fa-times"></i>
+        </button>
+        <h4><%= pluralize(@produto.errors.count, "error") %> no fue posible <%= t('SAVE') %>:</h4>
+        <ul>
+        <% @produto.errors.full_messages.each do |msg| %>
+          <li><strong><%= msg %></strong></li>
+        <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>  
+</div>   
+
+<div class="row">
+  <div class="col-sm-8">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <header class="panel-heading">
+            <%= t('PRODUCT') %> [<%= t('EDITION') %>]
+          </header>
+          <div class="panel-body">
+            <div class="form-group">
+              <div class="row">
+                <div class="col-md-12">
+                  <label>Tipo</label>
+                  <%= f.radio_button :tipo_produto, 0, :checked => true %>  <%= t('COMMODITY') %>
+                  <%= f.radio_button :tipo_produto, 1 %> <%= t('SERVICES') %>
+                  <%= f.radio_button :tipo_produto, 2 %>  <%= t('PRODUCT') %> <%= t('COMPOUND') %>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <label><%= t('PRODUCT') %></label>
+                  <%= f.text_field :nome, class: 'panel-field', autofocus: true, required: true %>                
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-4">
+                  <label>Marca/Clase</label>
+                   <%= f.collection_select :clase_id, Clase.all(:select => 'id,descricao',:order => '2'),
+                      :id,:descricao, {prompt: 'Seleccione la Marca'}, required: true %>
+                </div>
+                <div class="col-md-4">
+                  <label>Grupo</label>
+                  <%= f.collection_select :grupo_id, Grupo.all(:select => 'id,descricao',:order => '2'),
+                        :id,:descricao, {prompt: 'Seleccione lo Grupo'}, required: true %>
+                </div>
+                <div class="col-md-4">
+                  <label>Sub-Grupo</label>
+                  <%= f.collection_select :sub_grupo_id, SubGrupo.all(:select => 'id,descricao',:order => '2'),
+                          :id,:descricao, {prompt: 'Seleccione lo Sub-Grupo'}, required: true %>
+                </div>
+              </div>
+              <% if Empresa.last.segmento.to_i == 2 %>
+                <div class="row">
+                  <div class="col-md-3">
+                    <label>Color</label>
+                    <%= f.text_field :cor, class: 'panel-field' %>
+                  </div>
+                  <div class="col-md-3">
+                    <label>Año</label>
+                    <%= f.text_field :ano, class: 'panel-field' %>
+                  </div>
+                  <div class="col-md-3">
+                    <label>Chasis</label>
+                    <%= f.text_field :chassi, class: 'panel-field' %>
+                  </div>
+
+                  <div class="col-md-3">
+                    <label>Tipo</label>
+                    <%= f.select :referencia, [['AUTOMATICO', 'AUTOMATICO'],['MECANICO', 'MECANICO']], class: 'panel-field', prompt: 'Selecione' %>
+                  </div>
+
+                </div>              
+              <% else %>
+
+                <div class="row">
+                  <div class="col-md-3">
+                    <label>Balanza</label>
+                    <%= f.check_box :balanca %> Si
+                  </div>
+                  <div class="col-md-3">
+                    <label>Alterar Precio Venta</label>
+                    <%= f.check_box :altera_preco_venda %> Si
+                  </div>
+
+                  <div class="col-md-3">
+                    <label>Preparación</label>
+                    <%= f.check_box :preparacao %> Si
+                  </div>
+
+                  <div class="col-md-3">
+                    <label>Impresión Direcionada </label>
+                    <%= f.telephone_field :set_print, class: 'panel-field' %>
+                  </div>
+                </div>
+
+              <% end %>
+              
+              <div class="row">
+                <div class="col-md-4">
+                  <label>Unidade Medida</label>
+                  <%= f.collection_select :unidade_medida_id, UnidadeMedida.all(:select => 'id,sigla',:order => '2'), :id,:sigla, {prompt: 'Seleccione la Unidad medida'} %>
+                </div>
+
+                <div class="col-md-4">
+                  <label>Unidad Medida Rateio</label>
+                  <%= f.text_field :unid_rateio, class: 'panel-field money_3' %>
+                </div>
+
+                <div class="col-md-4">
+                  <label>Barras</label>
+                  <%= f.text_field :barra, class: 'panel-field' %>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-4">
+                  <label>Cod. Fab./Referencia</label>
+                  <%= f.text_field :fabricante_cod, class: 'panel-field' %>
+                </div>
+
+                <div class="col-md-4">
+                  <label>Ubicación</label>
+                  <%= f.text_field :locacao, class: 'panel-field' %>                  
+                </div>
+
+                <div class="col-md-4">
+                  <label>Qtd Tickets</label>
+                  <%= f.text_field :tickets, class: 'panel-field' %>                  
+                </div>                
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <label>Peso Bruto</label>
+                  <%= f.text_field :peso_bruto, class: 'panel-field' %>                  
+                </div>
+
+                <div class="col-md-6">
+                  <label>Peso Neto</label>
+                  <%= f.text_field :peso, class: 'panel-field' %>                  
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <label>Imposto</label>
+                  <% if params[:action] == 'new' %>
+                    <%= f.text_field :taxa, :value => '10', class: 'panel-field', :precision => 0 %>
+                  <% else %>
+                    <%= f.text_field :taxa, class: 'panel-field', :precision => 0 %>
+                  <% end %>
+                </div>
+                <div class="col-md-6">
+                  <label>% <%= t('COMMISSION') %></label>
+                    <%= f.text_field :perc_comissao, class: 'panel-field' %>
+                </div>
+              </div>
+            </div>
+            <div class="footer-buttons">
+              <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+              <%= link_to t('BACK'), produtos_path, :class => "btn btn-back" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <header class="panel-heading">
+            <%= t('RULES') %>
+          </header>
+          <div class="panel-body">
+            <div class="form-group">
+              <div class="row">
+                <div class="col-md-12">
+                  <fieldset>
+                    <legend>Status</legend>
+                    <%= f.radio_button :status, true, Checked: "True" %> <%= t('ACTIVE_S') %>
+                    <%= f.radio_button :status, false %> Bloqueado
+                  </fieldset>                
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                <hr/>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <fieldset>
+                    <legend>Tabla de Precios</legend>
+                    <table>
+                      <%= f.fields_for :produtos_tabela_precos do |builder| %>
+                        <% if builder.object.unidade_id == current_unidade.id %>
+                          <tr class="<%= cycle("cor1", "cor2")%>">
+                            <td width="150"><%= builder.object.tabela_preco.nome %></td>
+                            <td><%= builder.hidden_field :unidade_id, size: 10 %></td>
+                            <td><%= builder.hidden_field :tabela_preco_id, size: 10 %></td>
+                            
+                              <td>
+                                <% if current_unidade.moeda.to_i == 1 %>
+                                  <%= builder.telephone_field :preco_1_gs, size: 10, class: "money_gs", precision: 0, dir: "rtl", step: "any" %>
+                                <% elsif current_unidade.moeda.to_i == 0 %>
+                                  <%= builder.telephone_field :preco_1_us, size: 10, class: "money_us", class: "money_us panel-field", dir: "rtl" , step: ".01" %>
+                                <% end %>
+                              </td>
+                          </tr>
+                        <% end %>
+                      <% end %>
+                      </table>
+                    </fieldset>
+                </div>
+              </div> 
+              <div class="row">
+                <div class="col-md-12">
+                  <label for="">Converciones/Obs</label>
+                  <%= f.text_area :obs, rows: 10, placeholder: 'Converciones/Obs.', class: 'panel-field disable-plus-as-tab' %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>
+
+<script>
+  $('#produto_clase_id').selectize();
+  $('#produto_grupo_id').selectize();
+  $('#produto_sub_grupo_id').selectize();
+  $('#produto_unidade_medida_id').selectize();
+  
+</script>

@@ -1,0 +1,50 @@
+<%= form_for(@avaliacao_func_ref) do |f| %>
+  <% if @avaliacao_func_ref.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@avaliacao_func_ref.errors.count, "error") %> prohibited this avaliacao_func_ref from being saved:</h2>
+
+      <ul>
+      <% @avaliacao_func_ref.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> avaliacao_func_refs - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">avaliacao_func_id :</td>                    
+                      <td><%= f.number_field :avaliacao_func_id %></td>
+                                      
+                      <td align="right">avaliacao_ref_id :</td>                    
+                      <td><%= f.number_field :avaliacao_ref_id %></td>
+                                      
+                      <td align="right">nota :</td>                    
+                      <td><%= f.number_field :nota %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', avaliacao_func_refs_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

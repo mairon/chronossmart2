@@ -1,0 +1,57 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+     <header class="panel-heading">
+      #<%= @promo.id.to_s.rjust(6,'0')%>-<%= @promo.nome %>
+      Validad: <%= @promo.valid_inicio.strftime("%d/%m/%y") %> - <%= @promo.valid_final.strftime("%d/%m/%y") %> |
+      Dias: <%= (@promo.valid_final - @promo.valid_inicio).to_i %>
+      <div class="pull-right">
+        <%= link_to 'Volver', edit_promo_path(@promo), :class => "button back" %>
+      </div>
+     </header>
+     <div class="panel-body">
+      <%= form_tag gera_cashback_produtos_promos_path, :method => "get" do %>
+      <%= hidden_field_tag :promo_id, @promo.id %>
+        <div class="row">
+          <div class="col-md-3">
+            <label>Clase</label>
+            <%= select("busca", "clase", Clase.select('id,descricao').order('descricao').collect {|p| [ p.descricao, p.id ] },{prompt: 'Todos..'}, {class: 'panel-field'}) %>
+          </div>
+        
+          <div class="col-md-3">
+            <label>Grupo</label>
+            <%= select("busca", "grupo", Grupo.select('id,descricao').order('descricao').collect {|p| [ p.descricao, p.id ] },{prompt: 'Todos..'}, {class: 'panel-field'}) %>
+          </div>
+        
+          <div class="col-md-2">
+            <label>% Desc.</label>
+            <%= text_field_tag :desc, nil, class: 'panel-field', required: true %>
+          </div>
+          <div class="col-md-1 padding-btn">
+            <%= submit_tag 'Generar', class: 'btn btn-green' %>
+          </div>
+        </div>
+       
+      <% end %>
+     </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <%= render partial: "/promo_dts/index", locals: {promo_dts: @promo.promo_dts} %>      
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-body">
+        <%= render partial: "/promo_dts/new_promo", locals: {promo_dt: PromoDt.new(promo_id: @promo.id)} %>
+      </div>
+    </div>
+  </div>
+</div>

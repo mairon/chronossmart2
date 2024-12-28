@@ -1,0 +1,63 @@
+<% if params[:data_inicio] == nil %>
+<% periodo = "AND date_part('month', V.DATA) = '#{Time.now.strftime('%m')}'  AND  date_part('year', V.DATA) = '#{Time.now.strftime('%Y')}'" %>
+<% else %>
+<% periodo = "AND V.DATA BETWEEN '#{params[:data_inicio].to_s.split("/").reverse.join("-")}' AND '#{params[:data_final].to_s.split("/").reverse.join("-")}'" %>
+<% end %>
+
+<% sqlcon = "SELECT COUNT(V.ID) QTD_VENDA FROM VENDAS V  WHERE  V.UNIDADE_ID = #{current_unidade.id} AND V.TIPO = 0 #{periodo} AND (SELECT COUNT(VF) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID ) > 0" %>
+
+<% con_venda = Venda.find_by_sql(sqlcon) %>
+
+<% sqlcred = "SELECT COUNT(V.ID) QTD_VENDA FROM VENDAS V  WHERE  V.UNIDADE_ID = #{current_unidade.id} AND  V.TIPO = 1 #{periodo} AND (SELECT COUNT(VF) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID ) > 0" %>
+
+<% cred_venda = Venda.find_by_sql(sqlcred) %>
+
+    <script type="text/javascript">
+      google.charts.load("current", {packages:["corechart"]});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Task', 'Hours per Day'],
+          ['Contado', <%= con_venda[0].qtd_venda %>],
+          ['Credito', <%= cred_venda[0].qtd_venda %>]
+        ]);
+
+        var options = {
+          legend: 'none',
+          pieHole: 0.4,
+          'width': 480,
+          'chartArea': {'width': '100%', 'height': '100%'},
+        };
+
+
+        var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+        chart.draw(data, options);
+      }
+    </script>
+
+  <div class="row">
+    <div class="col-md-12">
+
+      <div class="panel">
+        <h1 id="header">
+          <div class="row">
+            <div class="col-md-6">
+              Contado: <span style="color: #3366cc"><%= con_venda[0].qtd_venda %></span>
+            </div>
+            <div class="col-md-6" align="right">
+              Credito: <span style="color: #dc3912"> <%= cred_venda[0].qtd_venda %></span>
+            </div>
+          </div>
+        </h1>
+
+        <div class="panel-body">
+          <div id="donutchart" style="height: 185px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+

@@ -1,0 +1,78 @@
+<%= form_for(@abertura_caixa) do |f| %>
+  <% if @abertura_caixa.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@abertura_caixa.errors.count, "error") %> prohibited this abertura_caixa from being saved:</h2>
+
+      <ul>
+      <% @abertura_caixa.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+    <li><a href="#tab1"> Apertura de Caja - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td>
+              <fieldset>
+
+                <table>
+                  <tr>
+                    <td align="right"><%= t('DATE') %>:</td>
+                    <td><%= f.date_select :data %></td>
+                  </tr>
+                  <tr>
+                    <td align="right">Usuario: </td>
+                    <td><%= f.collection_select :usuario_id, Usuario.all(:select => 'id,usuario_nome',:order => '2') ,:id,:usuario_nome, {prompt: 'Seleccione el usuario'},{:class => "selc_medium"} %></td>
+
+                  </tr>
+
+                  <tr>
+                    <td align="right">Turno: </td>
+                    <td><%= f.collection_select :turno_id, Turno.all(:select => 'id,nome',:order => '2'),:id,:nome, {prompt: 'Seleccione el Turno'},{:class => "selc_medium"} %></td>
+
+                  </tr>
+
+
+                  <tr>
+                    <td align="right">Terminal: </td>
+                    <td><%= f.collection_select :terminal_id, Terminal.all(:select => 'id,nome', conditions: "unidade_id = #{current_unidade.id}",:order => '2'),:id,:nome, {prompt: 'Seleccione el Terminal'},{:class => "selc_medium"} %></td>
+                  </tr>
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="4">
+              <fieldset>
+                <legend>Saldos:</legend>
+                <table>
+                  <tr>
+                    <%= field_gs 'Saldo G$.:',f,:saldo_gs %>
+                    <%= field_us 'Saldo U$.:',f,:saldo_us %>
+                  </tr>
+                  <tr>
+                    <%= field_us 'Saldo R$.:',f,:saldo_rs %>
+                    <%= field_gs 'Saldo P$.:',f,:saldo_ps %>
+                  </tr>
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+
+        </table>
+      </div>
+
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "btn btn-green" %>
+        <%= link_to t('BACK'), abertura_caixas_path, :class => "btn btn-back" %>        
+      </div>
+
+    </div>
+<% end %>

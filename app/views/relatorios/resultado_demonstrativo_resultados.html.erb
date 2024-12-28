@@ -1,0 +1,430 @@
+
+<% tot_f_us = 0 %>
+<% tot_v_us = 0 %>
+
+<% tot_f_gs = 0 %>
+<% tot_v_gs = 0 %>
+
+<% tot_f_rs = 0 %>
+<% tot_v_rs = 0 %>
+
+
+<% tot_f_g5_rs = 0 %>
+<% tot_v_g5_rs = 0 %>
+
+<% fat_us = 0 %>
+<% fat_gs = 0 %>
+<% fat_rs = 0 %>
+<% tot_nc = 0 %>
+<% tot_cmv = 0 %>
+
+<% cc_v = "AND V.CENTRO_CUSTO_ID = #{params[:busca]["cc"]}" unless params[:busca]["cc"].blank? %>
+<%
+
+	sql_fat = "SELECT SUM(VF.QUANTIDADE * VF.UNITARIO_DOLAR) AS FAT_US,
+										SUM( (VF.QUANTIDADE * VF.UNITARIO_GUARANI) - VF.DESCONTO_GUARANI ) AS FAT_GS,
+										SUM(VF.QUANTIDADE * VF.UNITARIO_REAL) AS FAT_RS
+							FROM VENDAS_PRODUTOS VF
+							INNER JOIN VENDAS V
+							ON V.ID = VF.VENDA_ID
+							WHERE V.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}' #{cc_v}"
+
+@faturamento = Venda.find_by_sql(sql_fat)
+%>
+
+
+
+
+<%
+
+uni = ""
+
+sql_nc = "	SELECT V.ID,
+							 V.DATA,
+							 0,
+							 0,
+							 VD.NOME AS VENDEDOR_NOME,
+							 P.NOME AS PERSONA_NOME,
+							 FF.DOC_01 || '-' || FF.DOC_02 || '-' || FF.DOC AS DOC,
+							 3,
+							 (SELECT SUM(VP.QUANTIDADE) FROM NOTA_CREDITOS_DETALHES VP WHERE VP.NOTA_CREDITO_ID = V.ID ) AS QTD,
+							 (SELECT SUM(VP.TOTAL_DOLAR) FROM NOTA_CREDITOS_DETALHES VP WHERE VP.NOTA_CREDITO_ID = V.ID ) AS TOTAL_DOLAR,
+							 (SELECT SUM(VP.TOTAL_GUARANI) FROM NOTA_CREDITOS_DETALHES VP WHERE VP.NOTA_CREDITO_ID = V.ID ) AS TOTAL_GUARANI
+						FROM
+							NOTA_CREDITOS V
+							LEFT JOIN PERSONAS P
+							ON V.PERSONA_ID = P.ID
+							LEFT JOIN PERSONAS VD
+							ON V.VENDEDOR_ID = VD.ID
+							LEFT JOIN FORM_FISCALS FF
+							ON FF.COD_PROC = V.ID AND FF.SIGLA_PROC = 'NC' AND FF.STATUS = 1
+
+						WHERE V.OPERACAO = 0
+						AND V.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{uni}
+						ORDER BY 3,2, 10"
+
+@nota_credito = NotaCredito.find_by_sql(sql_nc)
+%>
+
+<% cc_cf = "AND CC.CENTRO_CUSTO_ID = #{params[:busca]["cc"]}" unless params[:busca]["cc"].blank? %>
+
+<%
+
+	sql_f = "
+						
+								SELECT
+												CC.PLANO_DE_CONTA_ID AS RUBRO_ID,
+												MAX(R.CODIGO) AS COD,
+												MAX(R.DESCRICAO) AS DESC,
+												SUM(CC.TOTAL_DOLAR) AS VALOR_US,
+												SUM(CC.TOTAL_GUARANI) AS VALOR_GS,
+												SUM(CC.TOTAL_REAL) AS VALOR_RS
+								 FROM COMPRAS CC
+								 INNER JOIN PLANO_DE_CONTAS R
+								 ON R.ID = CC.PLANO_DE_CONTA_ID
+								 WHERE R.CODIGO LIKE '1.%'
+								 AND CC.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}' #{cc_cf}
+								 GROUP BY 1						
+					 ORDER BY 2,6 DESC
+					"
+
+	sql_v = "
+								SELECT
+												CC.PLANO_DE_CONTA_ID AS RUBRO_ID,
+												MAX(R.CODIGO) AS COD,
+												MAX(R.DESCRICAO) AS DESC,
+												SUM(CC.TOTAL_DOLAR) AS VALOR_US,
+												SUM(CC.TOTAL_GUARANI) AS VALOR_GS,
+												SUM(CC.TOTAL_REAL) AS VALOR_RS
+								 FROM COMPRAS CC
+
+								 INNER JOIN PLANO_DE_CONTAS R
+								 ON R.ID = CC.PLANO_DE_CONTA_ID
+								 WHERE R.CODIGO LIKE '2.%'
+								 AND CC.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}' #{cc_cf}
+								 GROUP BY 1
+					 ORDER BY 2,6 DESC
+					"
+
+	@fixos       = ComprasCusto.find_by_sql(sql_f)
+	@variaveis   = ComprasCusto.find_by_sql(sql_v)
+
+
+%>
+
+
+
+
+<%
+
+
+
+
+        sql_cmv = " SELECT
+                     P.ID AS PRODUTO_ID,
+                     V.PERSONA_ID,
+                     SUM(VP.QUANTIDADE) AS QUANTIDADE,
+                     SUM((SELECT SS.UNITARIO_GUARANI FROM STOCKS SS WHERE SS.STATUS = 0 AND SS.DEPOSITO_ID =  VP.DEPOSITO_ID AND SS.PRODUTO_ID = VP.PRODUTO_ID ORDER BY SS.DATA DESC, SS.TABELA_ID DESC LIMIT 1)) / SUM(VP.QUANTIDADE) CUSTO_MEDIO_GS
+
+                     FROM VENDAS_PRODUTOS VP
+
+                     INNER JOIN VENDAS V
+                     ON V.ID = VP.VENDA_ID
+
+                     INNER JOIN PRODUTOS P
+                     ON P.ID = VP.PRODUTO_ID
+
+                     INNER JOIN CLASES CL
+                     ON CL.ID = P.CLASE_ID
+
+
+                     WHERE V.UNIDADE_ID = 1
+                     AND (SELECT COUNT(VF) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID ) > 0
+                     AND V.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
+                     GROUP BY 1,2
+
+                UNION ALL
+
+                SELECT
+                     P.ID AS PRODUTO_ID,
+                     V.PERSONA_ID,
+                     SUM(VP.QUANTIDADE) AS QUANTIDADE,
+                     (SUM((SELECT SS.UNITARIO_GUARANI FROM STOCKS SS WHERE SS.STATUS = 0 AND SS.DEPOSITO_ID =  VP.DEPOSITO_ID AND SS.PRODUTO_ID = VP.PRODUTO_ID ORDER BY SS.DATA DESC, SS.TABELA_ID DESC LIMIT 1)) / SUM(VP.QUANTIDADE)) * -1 CUSTO_MEDIO_GS
+                     FROM NOTA_CREDITOS_DETALHES VP
+                     INNER JOIN NOTA_CREDITOS V
+                     ON V.ID = VP.NOTA_CREDITO_ID
+                     INNER JOIN PRODUTOS P
+                     ON P.ID = VP.PRODUTO_ID
+
+                     LEFT JOIN CLASES CL
+                     ON CL.ID = P.CLASE_ID
+
+
+                     WHERE V.OPERACAO = 0 AND V.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
+                     GROUP BY 1,2
+
+
+                     UNION ALL
+
+                    SELECT
+                     P.ID AS PRODUTO_ID,
+                     V.PERSONA_ID,
+                     SUM(VP.QUANTIDADE) AS QUANTIDADE,
+                     SUM((SELECT sum(PC.QUANTIDADE * ((SELECT (SS.UNITARIO_GUARANI / PV.PESO) FROM STOCKS SS WHERE SS.STATUS = 0 AND SS.ENTRADA > 0 AND SS.PRODUTO_ID = PC.COMPONENTE_ID AND SS.DATA <= VP.DATA ORDER BY SS.DATA DESC, SS.TABELA_ID DESC  LIMIT 1) ) )
+                                        FROM PRODUTO_COMPOSICAOS PC
+                                        INNER JOIN PRODUTOS PV
+                                        ON PV.ID = PC.COMPONENTE_ID
+                                        WHERE PC.PRODUTO_ID = VP.PRODUTO_ID)) / SUM(VP.QUANTIDADE) CUSTO_MEDIO_GS
+                     FROM VENDAS_PRODUTOS VP
+                     INNER JOIN VENDAS V
+                     ON V.ID = VP.VENDA_ID
+                     INNER JOIN PRODUTOS P
+                     ON P.ID = VP.PRODUTO_ID
+                     LEFT JOIN CLASES CL
+                     ON CL.ID = P.CLASE_ID
+
+                     WHERE  P.TIPO_PRODUTO = 2 AND V.UNIDADE_ID = 1
+                     AND (SELECT COUNT(VF) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID ) > 0
+                     AND V.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
+                     GROUP BY 1,2
+        "
+
+    @cmv  =  Produto.find_by_sql( sql_cmv )
+
+%>
+
+
+
+
+
+<% @faturamento.each do |fat| %>
+	<% fat_us += fat.fat_us.to_f %>
+	<% fat_gs += fat.fat_gs.to_f %>
+	<% fat_rs += fat.fat_rs.to_f %>
+<% end %>
+
+<% tot_gastos = 0 %>
+
+<% @fixos.each do |f| %>
+	<% tot_gastos += f.valor_gs.to_f %>
+<% end %>
+
+<% @variaveis.each do |f| %>
+	<% tot_gastos += f.valor_gs.to_f %>
+<% end %>
+
+<% @nota_credito.each do |f| %>
+	<% tot_nc += f.total_guarani.to_f %>
+<% end %>
+
+
+<% @cmv.each do |f| %>
+	<% tot_cmv += f.custo_medio_gs.to_f * f.quantidade.to_f %>
+<% end %>
+
+<table>
+
+
+	<tr class="<%= cycle("cor1", "cor2") %>" >
+		<td colspan="4" style="background-color: #ccc"><b>Receita Operacional Bruta</b></td>
+	</tr>
+
+	<tr>
+		<td><b>Total Receita Operacional Bruta</b></td>
+		<td><b>+</b></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(0) %></b></td>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(fat_gs ) %></b></td>
+			<% else %>
+				<td width="70" align="right"><b><%= format_decimal(fat_rs) %></b></td>
+			<% end %>
+	</tr>
+
+
+	<tr>
+		<td><b>Total Nota de Credito</b></td>
+		<td><b>=</b></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(0) %></b></td>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(tot_nc ) %></b></td>
+			<% else %>
+				<td width="70" align="right"><b><%= format_decimal(tot_nc) %></b></td>
+			<% end %>
+	</tr>
+
+	<tr>
+		<td><b>CMV</b></td>
+		<td><b>=</b></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(0) %></b></td>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(tot_cmv ) %></b></td>
+			<% else %>
+				<td width="70" align="right"><b><%= format_decimal(tot_cmv) %></b></td>
+			<% end %>
+	</tr>
+
+	<tr>
+
+		<% cc_c = "AND CENTRO_CUSTO_ID = #{params[:busca]["cc"]}" unless params[:busca]["cc"].blank? %>
+		<td><b>Compras</b></td>
+		<td><b>-</b></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(0) %></b></td>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(compras_gs =  Compra.where("moeda = 1 #{cc_c} and tipo_compra = 0 and data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}'").sum(:total_guarani) ) %></b></td>
+			<% else %>
+				<td width="70" align="right"><b><%= format_decimal(compras_us =  Compra.where("moeda = 0 #{cc_c} and tipo_compra = 0 and data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}'").sum(:total_guarani) ) %></b></td>
+			<% end %>
+	</tr>
+
+	<tr class="<%= cycle("cor1", "cor2") %>" >
+		<td><b>Impostos</b></td>
+		<td><b>-</b></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(0) %></b></td>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(0) %></b></td>
+			<% else %>
+				<td width="70" align="right"><b><%= format_decimal(imp_rs = ComprasCusto.joins(:rubro).where("SUBSTR(rubros.codigo, 0, 9) IN ('2.02.001' ) and compras_custos.data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}'").sum("valor_rs")) %></b></td>
+			<% end %>
+			<td></td>
+	</tr>
+
+
+	<tr class="<%= cycle("cor1", "cor2") %>" >
+		<td><b>Lucro Bruto</b></td>
+		<td><b>=</b></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(fat_us.to_f - compras_us.to_f) %></b></td>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int( ( ( (fat_gs.to_f)) - (tot_cmv.to_f + compras_gs.to_f ))  ) %></b></td>
+			<% else %>
+				<td width="70" align="right"><b><%= format_decimal(fat_rs.to_f - imp_rs.to_f ) %></b></td>
+			<% end %>
+			<td></td>
+	</tr>
+
+	<tr>
+		<td colspan="4" style="background-color: #ccc"><b>Custos Fixos</b></td>
+
+	</tr>
+
+	<% @fixos.each do |f| %>
+
+		<tr class="<%= cycle("cor1", "cor2") %>" >
+			<% grupo = PlanoDeConta.where("codigo = '#{f.cod[0..7]}'").limit(1) %>
+			<td width="550" ><%= grupo.last.descricao %> - <%= f.desc %></td>
+			<td><b>-</b></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(f.valor_us) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( ( f.valor_us.to_f / fat_us.to_f ) * 100 ) ) %> % </td>
+				<% tot_f_us += f.valor_us.to_f %>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(f.valor_gs) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( ( f.valor_gs.to_f / tot_gastos.to_f ) * 100 ) ) %> % </td>
+				<% tot_f_gs += f.valor_gs.to_f %>
+			<% else %>
+				<td width="70" align="right"><b><%= format_decimal(f.valor_rs) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( ( f.valor_rs.to_f / fat_rs.to_f ) * 100 ) ) %> % </td>
+				<% tot_f_rs += f.valor_rs.to_f %>
+			<% end %>
+		</tr>
+	<% end %>
+
+	<tr>
+		<td>Sueldos</td>
+		<td>-</td>
+		<td align="right"><b><%= format_int(SueldosDetalhe.where("tipo = 'SUELDO' AND DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'").sum(:credito_gs)) %></b></td>
+	</tr>
+
+	<tr>
+		<td><b>Total Custos Fixos</b></td>
+		<td><b>=</b></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(tot_f_us.to_f ) %></b></td>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(tot_f_gs.to_f ) %></b></td>
+			<% else %>
+				<td width="70" align="right"><b><%= format_decimal(tot_f_rs.to_f + tot_f_g5_rs.to_f ) %></b></td>
+			<% end %>
+			<td align="right"><b></b></td>
+	</tr>
+	<tr>
+		<td colspan="4" style="background-color: #ccc"><b>Custos Variáveis</b></td>
+	</tr>
+
+	<% @variaveis.each do |f| %>
+
+		<tr class="<%= cycle("cor1", "cor2") %>" >
+			<% grupo = PlanoDeConta.where("codigo = '#{f.cod[0..7]}'").limit(1) %>
+			<td width="550" ><%= grupo.last.descricao %> - <%= f.desc %></td>
+			<td><b>-</b></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(f.valor_us) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( ( f.valor_us.to_f / fat_us.to_f ) * 100 ) ) %> % </td>
+				<% tot_v_us += f.valor_us.to_f %>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(f.valor_gs) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( ( f.valor_gs.to_f / tot_gastos.to_f ) * 100 ) ) %> % </td>
+				<% tot_v_gs += f.valor_gs.to_f %>
+			<% else %>
+				<td width="70" align="right"><b><%= format_decimal(f.valor_rs) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( ( f.valor_rs.to_f / fat_rs.to_f ) * 100 ) ) %> % </td>
+				<% tot_v_rs += f.valor_rs.to_f %>
+			<% end %>
+		</tr>
+	<% end %>
+	<tr>
+		<td>Remisión/Flete</td>
+		<td>-</td>
+			<td width="70" align="right"><b><%= format_int(nc_gs = NotaRemicao.where("data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}'").sum(:valor_guarani) ) %></b></td>
+	</tr>
+
+	<tr>
+		<td><b>Total Custos Variáveis</b></td>
+		<td><b>=</b></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(tot_v_us.to_f ) %></b></td>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(tot_v_gs.to_f + nc_gs.to_f) %></b></td>
+			<% else %>
+				<td width="70" align="right"><b><%= format_decimal(tot_v_rs.to_f + tot_v_g5_rs.to_f) %></b></td>
+			<% end %>
+			<td align="right"><b></b></td>
+	</tr>
+
+	<tr>
+		<td><b>Total Despesas</b></td>
+		<td><b>=</b></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(fat_us.to_f) %></b></td>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(tot_v_gs.to_f + tot_f_gs.to_f + nc_gs.to_f) %></b></td>
+			<% else %>
+				<td width="70" align="right"><b><%= format_decimal( tot_v_rs.to_f + tot_f_g5_rs.to_f + tot_f_rs.to_f + tot_v_g5_rs ) %></b></td>
+			<% end %>
+	</tr>
+
+	<tr>
+		<td><b>Lucro/Prejuizo</b></td>
+		<td><b>=</b></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(fat_us.to_f) %></b></td>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int( (fat_gs.to_f) - (tot_cmv.to_f + tot_v_gs.to_f + tot_f_gs.to_f + compras_gs.to_f + nc_gs.to_f)) %></b></td>
+				<td width="70" align="right"><b><%= format_decimal( (((fat_gs.to_f + nc_gs.to_f ) - (tot_cmv.to_f + tot_v_gs.to_f + tot_f_gs.to_f + compras_gs.to_f + nc_gs.to_f)) / (fat_gs.to_f)) * 100) %>%</b></td>
+
+			<% else %>
+				<td width="70" align="right"><b><%= format_decimal( (fat_rs.to_f - imp_rs.to_f) - (tot_v_rs.to_f + tot_f_rs.to_f)) %></b></td>
+				<td width="70" align="right"><b>
+					<%= format_decimal( (((fat_rs.to_f - imp_rs.to_f) - (tot_v_rs.to_f + tot_f_g5_rs.to_f + tot_f_rs.to_f + tot_v_g5_rs)) / (fat_rs.to_f - imp_rs.to_f)) * 100) %>%
+				</b></td>
+
+			<% end %>
+	</tr>
+
+
+</table>

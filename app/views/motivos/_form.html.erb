@@ -1,0 +1,37 @@
+<h1 id="header">Motivos Solicitudes</h1>
+  <div class="group">
+  <%= form_for(@motivo) do |f| %>
+    <% if @motivo.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@motivo.errors.count, "error") %> prohibited this motivo from being saved:</h2>
+
+        <ul>
+        <% @motivo.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <table>
+
+      <tr>
+        <td>
+          <label>Descripción</label>
+          <%= f.text_field :nome, class: 'panel-field' %>
+        </td>
+      </tr>
+       <tr>
+         <td>
+           <label>Proceso</label>
+           <%= f.radio_button :processo, 0 %> Consumición Interna
+         </td>
+       </tr> 
+    </table>
+    <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), motivos_path, :class => "btn btn-back" %>
+    </div>
+  <% end %>
+
+</div>

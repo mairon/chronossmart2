@@ -1,0 +1,41 @@
+<div class="panel">
+  <div class="panel-content">
+
+    <table class="head_grid">
+      <tr>
+        <td width="50" align="center">Código</td>
+        <td width="150" align="center">Usuario</td>
+        <td width="80" align="center">Fecha</td>
+        <td width="200">Cuenta</td>
+        <td width="60" align="center">Moneda</td>
+        <td width="100" align="right">Valor</td>
+        <td width="130"></td>
+      </tr>
+    </table>
+    <div class="rolagem" id="div">
+      <table>
+        <% @egressos.each do |ingresso| %>
+          <tr class = "<%= cycle("cor1", "cor2") %>">
+            <td width="50" align="center"><%= ingresso.id.to_s.rjust(6,'0') %></td>
+            <td width="150"><small><%= ingresso.usuario_nome %></small></td>
+            <td width="80" align="center"><%= ingresso.data.strftime("%d/%m/%y") %></td>
+            <td width="200"><%= ingresso.conta_nome %></td>
+            <% if ingresso.moeda.to_i == 0 %>
+              <td width="60" align="center">U$</td>
+              <td width="100" align="right"><%= format_decimal(ingresso.valor_dolar)%></td>
+            <% elsif ingresso.moeda.to_i == 1 %>
+              <td width="60" align="center">Gs</td>
+              <td width="100" align="right"><%= format_int(ingresso.valor_guarani)%></td>
+            <% else %>
+              <td width="60" align="center">R$</td>
+              <td width="100" align="right"><%= format_decimal(ingresso.valor_real)%></td>
+            <% end %>
+            <td><%= link_to '', edit_egresso_path(ingresso), class: 'icon-pencil' %></td>
+            <td><%= link_to '', ingresso, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+            <td><%= link_to 'Comprobante', ingresso %></td>
+          </tr>
+         <% end %>
+      </table>
+    </div>
+  </div>
+</div>

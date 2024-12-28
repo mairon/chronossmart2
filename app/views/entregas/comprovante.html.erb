@@ -1,0 +1,94 @@
+<body  onload="print()">
+
+<table>
+    <tr>
+     <td style="font-size: 10px"><%= @entrega.data.strftime("%d")%> de <%= @entrega.data.strftime("%B")%>  de <%= @entrega.data.strftime("%Y")%></td>
+        <td style="font-size: 10px" align="right">
+          <b>
+          <%= t('VOUCHER') %>  de Entrega          
+           Nº: <%= @entrega.id.to_s.rjust(6,'0') %></b>
+        </td>
+    </tr>
+    <tr>
+      <td height="20"></td>
+    </tr>
+
+    <tr>
+      <td>Entregador..: <%= @entrega.persona.nome %></td>
+    </tr>
+
+
+    <tr>
+      <td>Rodado......: <%= @entrega.rodado.placa %></td>
+    </tr>
+    <tr>
+      <td colspan='2' align="center" style="border-bottom:1px dotted black;">
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="3" align="center"><b>Itens</b></td>
+    </tr>
+    <tr>
+      <td colspan='2' align="center" style="border-bottom:1px dotted black;">
+      </td>
+    </tr>
+    <tr>
+       <td colspan="3">
+         <table>
+            <tr class="head">
+              <td width="100"><b><%= t('SALE') %></b></td>
+              <td width="100"><b><%= t('DOC') %></b></td>
+              <td width="505"><b>Clientes</b></td>
+              <td align="right" width="60"><b>Cantidad</b></td>
+                <td align="right" width="60"><b>Tot.</b></td>
+            </tr>
+            <% qtd    = 0 %>
+            <% tot_gs = 0 %>
+            <% @entregas_selecionadas.each do |pc|%>
+            <tr>
+              <td width="100"><%= pc.venda_id.to_s.rjust(6,'0') %></td>
+              <td width="100"><%= pc.documento_numero %></td>
+              <td align="left" width="205"><%= pc.persona_nome %></td>
+              <td align="right" width="60"><b><%= pc.qtd %></b></td>
+              <td align="right" width="60"><b><%= format_int(pc.tot_gs.to_f) %></b></td>
+            </tr>
+            <% qtd    += pc.qtd.to_f %>
+            <% tot_gs += pc.tot_gs.to_f %>
+           <% end %>
+          <tr>
+            <td colspan='8' align="center" style="border-bottom:1px dotted black;">
+            </td>
+          </tr>
+
+           <tr class="head">
+			        <td><b>Total de Entregas: <%= @entregas_selecionadas.size %></b></td>
+          </tr>
+          <tr>
+            <td colspan='8' align="center" style="border-bottom:1px dotted black;">
+            </td>
+          </tr>
+
+         </table>
+       </td>
+    </tr>
+</table>
+
+<style type="text/css">
+  body {
+    font-family:arial;
+    font-size: 8px;
+  } 
+  td {
+    font-family:arial;
+    font-size: 8px;
+  } 
+</style>
+
+<script>
+  document.onkeydown=function(e){
+    if(e.which == 27)
+      self.close();
+  }
+</script>
+

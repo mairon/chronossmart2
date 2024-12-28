@@ -1,0 +1,50 @@
+<% qtd       = 0 %>
+<% unit_us   = 0 %>
+<% unit_gs   = 0 %>
+<% costo_us  = 0 %>
+<% costo_gs  = 0 %>
+
+<table>
+	<% @stocks.each do |st|%>
+		<tr class = "<%= cycle("cor1", "cor2")%>">
+			<td width="50" align="left"><%= st.data.strftime("%d/%m/%y") %></td>
+			<td width="50" align="center"><%= st.venda_id %></td>
+			<td width="120"><%= st.fabricante_cod %></td>
+			<td width="270" align="left"><%= truncate( st.produto_nome,:lenght => 180 ) %></td>
+			<td width="30" align="right"><%= st.quantidade %></td>
+			<% if params[:moeda] == '0'%>
+				<td width="60" align="right"><%= number_to_currency( ( st.unitario_dolar.to_f * st.quantidade ) , :format=>' %n ', :separeitor => ',') %></td>				
+				<td width="60" align="right"><%= number_to_currency( ( st.custo_promed_us.to_f  * st.quantidade ), :format=>' %n ', :separeitor => ',') %></td>				
+				<td width="60" align="right"><%= number_to_currency( dif =( (st.unitario_dolar.to_f * st.quantidade ) - (st.custo_promed_us.to_f * st.quantidade) ) , :format=>' %n ', :separeitor => ',') %></td>
+				<td width="60" align="right"><%= number_to_currency( total_us = ( ( dif.to_f * 100 ) /  ( st.custo_promed_us.to_f * st.quantidade ) ), :format=>' %n ', :precision => 2 ) %> %</td>				
+				<% unit_us += ( st.unitario_dolar.to_f * st.quantidade )%>
+				<% costo_us += ( st.custo_promed_us.to_f * st.quantidade ) %>
+
+			<% else %>
+				<td width="60" align="right"><%= number_to_currency( ( st.unitario_guarani.to_f * st.quantidade ), :format=>' %n ', :precision => 0 ) %></td>				
+				<td width="60" align="right"><%= number_to_currency( ( st.custo_promed_gs.to_f * st.quantidade ), :format=>' %n ', :precision => 0 ) %></td>				
+				<td width="60" align="right"><%= number_to_currency( dif = ( ( st.unitario_guarani.to_f * st.quantidade )- ( st.custo_promed_gs.to_f * st.quantidade )), :format=>' %n ', :precision => 0 ) %></td>				
+				<td width="60" align="right"><%= number_to_currency( total_gs = ( ( dif.to_f * 100 ) /  ( st.custo_promed_gs.to_f * st.quantidade ) ), :format=>' %n ', :precision => 2 ) %> %</td>				
+				<% unit_gs += ( st.unitario_guarani.to_f * st.quantidade ) %>
+				<% costo_gs += ( st.custo_promed_gs.to_f * st.quantidade ) %>
+			<% end %>
+		</tr>
+		<% qtd  += st.quantidade %>
+	<% end %>
+		<tr class="head" height="20">			
+			<td colspan="4"></td>				
+			<td width="40" align="right"><%= number_to_currency( qtd , :format=>' %n ', :separeitor => ',') %></td>				
+			<% if params[:moeda] == '0' %>
+				<td width="60" align="right"><%= number_to_currency( unit_us.to_f , :format=>' %n ', :separeitor => ',') %></td>				
+				<td width="60" align="right"><%= number_to_currency( costo_us.to_f , :format=>' %n ', :separeitor => ',') %></td>				
+				<td width="60" align="right"><%= number_to_currency( dif_tot =( unit_us.to_f - costo_us.to_f ) , :format=>' %n ', :separeitor => ',') %></td>				
+				<td width="60" align="right"><%= number_to_currency( total_all_us = ( ( dif_tot.to_f * 100 ) /  costo_us.to_f ), :format=>' %n ', :precision => 2 ) %> %</td>				
+			<% else %>
+				<td width="60" align="right"><%= number_to_currency( unit_gs.to_f, :format=>' %n ', :precision => 0 ) %></td>				
+				<td width="60" align="right"><%= number_to_currency( costo_gs.to_f, :format=>' %n ', :precision => 0 ) %></td>				
+				<td width="60" align="right"><%= number_to_currency( dif_tot = ( unit_gs.to_f - costo_gs.to_f ), :format=>' %n ', :precision => 0 ) %></td>				
+				<td width="60" align="right"><%= number_to_currency( total_all_gs = ( ( dif_tot.to_f * 100 ) /  costo_gs.to_f ), :format=>' %n ', :precision => 2 ) %> %</td>				
+			<% end %>
+		</tr>
+
+</table>

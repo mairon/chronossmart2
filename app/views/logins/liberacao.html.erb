@@ -1,0 +1,96 @@
+<style type="text/css">
+	#gerador {
+		width: 550px;
+		margin: 50px auto;
+		padding: 0px 0px 50px 0px;
+		border: 1px dotted #515FB6;
+		background: #FFFFFF;
+	}
+	#gerador h1 {
+		font: 210% Verdana, Arial, Sans-serif;
+		color: #1E4E8F;
+		text-align: center;
+		padding: 30px 0px 50px 0px;
+	}
+	#gerador h1 span {
+		font: 12px Verdana, Arial, Sans-serif;
+		color: #1E4E8F;
+	}
+	#gerador form {
+		text-align: center;
+	}
+	#gerador form input {
+		width: 250px;
+		font: 14px Verdana, Arial, Sans-serif;
+		color: #000000;
+		padding: 5px 10px;
+		border: 2px solid #E1E1E1;
+	}
+	#gerador form span input {
+		width: 150px;
+		font: 14px Verdana, Arial, Sans-serif;
+		color: #000000;
+		padding: 5px 10px;
+		margin: 20px 0px 0px 0px;
+		border: 2px solid #E1E1E1;
+		background: #F1F1F1;
+	}
+	#gerador form label {
+		font: 14px Verdana, Arial, Sans-serif;
+		color: #000000;
+	}
+	#gerador form label input {
+		width: 20px;
+		margin: 20px 10px 0px 0px;
+	}
+	#gerador #control {
+		padding-left: 50px;
+		text-align: left;
+	}
+	#options {
+		text-align: left;
+	}
+	#options.off {
+		display: none;
+	}
+	#options.on {
+		display: block;
+	}
+	#options div {
+		font: 14px Verdana, Arial, Sans-serif;
+		color: #000000;
+		padding: 10px 0px 0px 50px;
+	}
+	#options div input {
+		width: 50px;
+		text-align: right;
+	}
+</style>
+<body>
+	<div id="gerador">
+		<h1>Liberar  Acessos</h1>
+        <% form_tag :action => "liberacao" do  %>
+		<div>
+			<p align="left">
+			</p>
+
+			<p align="left">
+			</p>
+
+			<p align="left">
+				Senha :
+				<%= text_field_tag :senha  %>
+
+			</p>
+
+		</div>
+		<span> <%= submit_tag t('SAVE'),:disable_with => "Aguarde..." %> </span>
+		<% end %>
+	</div>
+	
+<p align="right" >   <%= link_to 'Salir', '/enterprise'%>
+	
+	</div>
+</p>
+</body>
+</html>

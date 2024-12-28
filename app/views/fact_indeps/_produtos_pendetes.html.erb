@@ -1,0 +1,110 @@
+<%= form_tag "/fact_indeps/#{@fact_indep.id}/baixa_produto" do %>
+	<table class="head_grid">
+		 <tr>
+			<td width="20" align="center"><input type="checkbox" id="selectAllM" value="selectAllM"></td>
+			<td width="80" align="center"><%= t('SALE') %></td>
+			<td width="80" align="center"><%= t('DATE') %></td>
+			<td width="300" >Producto</td>
+			<td width="70" align="right">Cant.</td>
+			<td width="70" align="right">Unit</td>
+			<td width="70" align="right">Total</td>
+	</table>
+<% tot_qtd = 0  %>
+<% tot = 0  %>
+
+	<div class="rolagem" dir="div" style="height: 200px">
+		<table>
+		<% @produtos_pendetes.each do |p| %>
+			<tr>
+				<td width="20" align="center"><%= check_box_tag "venda[produtos_ids][]", p.id, false, { :class => 'm', onclick: "soma(this)" }  %>
+				<td width="80" align="center"><%= p.venda_id.to_s.rjust(6,'0') %></td>
+				<td width="80" align="center"><%= p.data.strftime("%d/%m/%y") %></td>
+				<td width="300"><%= p.produto_nome %></td>
+				<td width="70" align="right"><%= format_int(p.quantidade.to_f) %></td>
+				<td width="70" align="right"><%= format_int(p.unitario_guarani.to_f) %></td>
+				<td width="70" align="right"><%= format_int(p.quantidade.to_f * p.unitario_guarani.to_f) %></td>
+        <% tot_qtd += p.quantidade.to_f  %>
+        <% tot += (p.quantidade.to_f * p.unitario_guarani.to_f)  %>
+
+			</tr>
+		<% end %>
+		</table>
+	</div>
+  <table class="head_grid">
+    <tr>
+      <td width="480">
+        <% if @ft_ativo.to_i == 0 %>
+          <%= submit_tag " Add Produtos ", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+          <a class="btn btn-blue" data-toggle="modal" data-width="800" data-height="781" data-target="#myiframe">Nuevo Produtos</a>
+        <% end %>
+      </td>
+      <td width="70" align="right"><%= format_int(tot_qtd) %></td>
+      <td width="65" align="right"></td>
+      <td width="70" align="right"><%= format_int(tot) %></td>
+    </tr>
+  </table>
+<% end %>
+
+<script type="text/javascript">
+$('#selectAllM').click(function() {
+   if (this.checked) {
+       $('.m').each(function() {
+           this.checked = true;
+       });
+   } else {
+      $('.m').each(function() {
+           this.checked = false;
+       });
+   } 
+});
+</script>
+
+<div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel">Nuevo Producto</h4>
+      </div>
+      <div class="modal-body">
+		<%= render :partial=>"fact_indep_produtos/new_produto", :locals=>{:fact_indep_produto=>FactIndepProduto.new(:fact_indep_id => @fact_indep.id)} %>
+      </div>      
+    </div>
+  </div>
+</div>
+
+<script>
+( function($) {
+  
+function iframeModalOpen(){
+
+    $('.acao').on('click', function(e) {
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+      
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+      
+      // stampiamo i nostri dati nell'iframe
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#myiframe').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+    });
+
+	$('#myiframe').on('shown.bs.modal', function() {
+	  $('#fact_indep_produto_produto_nome').focus();
+	})
+    
+  }
+  
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+  
+  } ) ( jQuery );
+
+</script>

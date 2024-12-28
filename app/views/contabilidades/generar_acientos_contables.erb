@@ -1,0 +1,178 @@
+<h1 id="header">Integralizar Datos Contables</h1>
+<div class="group">
+   <h2>
+      <%= form_tag resultado_generar_acientos_contables_contabilidades_path, :method => "get" do%>
+         <table>
+
+             <tr valign="top" height="35">
+          <td align="right"> De:</td>
+          <td>
+            <fieldset>
+              <table>
+                <tr>
+                  <td><input name       = "inicio"
+                             id         = "inicio"
+                             size       = "10"
+                             type       = "text"
+                             onkeypress = "return bloqEnter(event)"
+                             onkeyup    = "Formatadata(this,event),EnterTab(event,'final')" />
+                      Hasta
+                      <input name       = "final"
+                             id         = "final"
+                             size       = "10"
+                             type       = "text"
+                             onkeypress = "return bloqEnter(event)"
+                             onkeyup    = "Formatadata(this,event),EnterTab(event,'codigo')" /></td>
+                </tr>
+              </table>
+            </fieldset>
+          </td>
+        </tr>
+            <tr>
+               <td></td>
+               <td>
+                  <input type="button" onclick="pesquisa(document.getElementById('inicio').value,document.getElementById('final').value)" value="Integralizar" class="button"/>
+
+                     <%= image_tag("load.gif",
+                                   :align => "absmiddle",
+                                   :border => 0,
+                                   :id => "spinner",
+                                   :width => 21,
+                                   :height => 21,
+                                   :style =>"display: none;" ) %>
+               </td>
+
+            </tr>
+         </table>
+      <% end %>
+   </h2>
+</div>
+<div id="pagina">
+</div>
+<div id="msg"></div>
+
+
+<script language="javascript">
+
+   function VendaCampoFiltro()              //
+   {
+      document.getElementById("filtro").focus();
+   }
+
+
+   function pesquisa(inicio,final)
+
+
+   {
+      url="/contabilidades/resultado_generar_acientos_contables?inicio="+inicio+"&final="+final+"";
+
+
+      ajax(url);
+
+   }
+
+
+   function ajax(url)
+
+   {
+
+
+          $('#spinner').show();
+
+      //alert(nick);
+
+      //alert(dest);
+
+      //alert(msg);
+
+
+
+      req = null;
+
+      // Procura por um objeto nativo (Mozilla/Safari)
+
+      if (window.XMLHttpRequest) {
+
+         req = new XMLHttpRequest();
+
+         req.onreadystatechange = processReqChange;
+
+         req.open("GET",url,true);
+
+         req.send(null);
+
+         // Procura por uma versão ActiveX (IE)
+
+      } else if (window.ActiveXObject) {
+
+         req = new ActiveXObject("Microsoft.XMLHTTP");
+
+         if (req) {
+
+
+
+            req.onreadystatechange = processReqChange;
+
+            req.open("GET",url,true);
+
+
+
+            req.send();
+
+         }
+
+      }
+
+   }
+
+
+
+   function processReqChange()
+
+   {
+
+
+
+      // apenas quando o estado for "completado"
+
+      if (req.readyState == 4) {
+
+
+
+         // apenas se o servidor retornar "OK"
+
+
+
+         if (req.status ==200) {
+
+
+
+            // procura pela div id="pagina" e insere o conteudo
+
+            // retornado nela, como texto HTML
+
+
+            onSuccess:$('#spinner').hide();
+
+            document.getElementById('pagina').innerHTML = req.responseText;
+
+
+
+         } else {
+
+            alert("Houve um problema ao obter os dados:n" + req.statusText);
+
+         }
+
+      }
+
+   }
+</script>
+
+
+
+
+
+
+
+

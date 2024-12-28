@@ -1,0 +1,2 @@
+module LiqAnalizesHelper
+end

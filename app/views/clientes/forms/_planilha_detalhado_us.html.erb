@@ -1,0 +1,49 @@
+<div class="group">
+<table>
+	<% tot_prod = 0 %>	
+	<% tot_deb  = 0 %>	
+	<% tot_cre  = 0 %>		
+	<% @clientes.each do |cl|%>
+          <tr class = "<%= cycle("corb1", "corb2") %>">
+			<td width="30"  align="center"><%= cl.id %></td>
+			<td width="50"  align="center"><%= cl.data.strftime("%d/%m/%Y")%></td>
+			<td width="100" align="left"><%= truncate( cl.vendedor_nome, :length => 16 )  %></td>
+			<td width="150" align="left"><%= truncate( cl.persona_nome, :length => 26 )  %></td>
+			<td width="40"  align="center"><%= cl.fatura %></td>
+			<td width="20"  align="center"><%= cl.produto_id %></td>
+			<td width="350" align="left"><%= cl.produto_nome %></td>
+			<td width="40"  align="center"><%= cl.quantidade %></td>
+			<% if cl.pagare.to_f == 1 %>
+				<td width="50"  align="center"><font color="blue"><b><%= cl.venc.to_date.strftime("%d/%m/%Y") if cl.ordem == '3' and cl.debito.to_f > 0 %></b></font></td>
+			<% elsif cl.pagare.to_f == 2 %>
+				<td width="50"  align="center"><font color="green"><b><%= cl.venc.to_date.strftime("%d/%m/%Y") if cl.ordem == '3' and cl.debito.to_f > 0 %></b></font></td>
+			<% else %>
+				<td width="50"  align="center"><b><%= cl.venc.to_date.strftime("%d/%m/%Y") if cl.ordem == '3' and cl.debito.to_f > 0 %></b></td>
+			<% end %>
+            <td width="70" align="right">    <%=  number_to_currency(cl.total_produto , :format=>' %n ', :separeitor => ',') %></td>
+            <td width="70" align="right">    <%=  number_to_currency(cl.credito , :format=>' %n ', :separeitor => ',') %></td>
+
+			<% if cl.pagare.to_f == 1 %>
+            <td width="70" align="right"><font color="blue"><b>    <%=  number_to_currency(cl.debito , :format=>' %n ', :separeitor => ',') %></b> </font></td>
+			<% elsif cl.pagare.to_f == 2 %>
+            <td width="70" align="right"><font color="green"><b>    <%=  number_to_currency(cl.debito , :format=>' %n ', :separeitor => ',') %></b></font></td>
+			<% else %>
+            <td width="70" align="right"><b>    <%=  number_to_currency(cl.debito , :format=>' %n ', :separeitor => ',') %></td>
+			<% end %>
+			<% tot_prod += cl.total_produto.to_f %>	
+			<% tot_deb  += cl.debito.to_f %>	
+			<% tot_cre  += cl.credito.to_f %>		
+
+		</tr>
+	<% end %>
+
+
+	<tr class="head">
+		<td colspan="9" align="right"> Total ==></td>
+		<td width="70" align="right">    <%=  number_to_currency(tot_prod , :format=>' %n ', :separeitor => ',') %></td>
+    	<td width="70" align="right">    <%=  number_to_currency(tot_cre, :format=>' %n ', :separeitor => ',') %></td>
+        <td width="70" align="right">    <%=  number_to_currency(tot_deb , :format=>' %n ', :separeitor => ',') %></td>
+        <td width="70" align="right">    <%=  number_to_currency(tot_deb.to_f - tot_cre.to_f , :format=>' %n ', :separeitor => ',') %></td>
+	</tr>
+</table>
+</div>

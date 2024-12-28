@@ -1,0 +1,300 @@
+
+<div class="group">
+
+  <div>    
+
+    <table>
+
+      <% qb_data     = ""%>
+      <% qb_bomba    = ""%>
+      <% qb_deposito = ""%>
+      <% subbinicio  = 0 %>
+      <% subbfinal   = 0 %>
+      <% subbtotal   = 0 %>
+      <% subdinicio  = 0 %>
+      <% subdfinal   = 0 %>
+      <% subdtotal   = 0 %>
+      <% totinicio   = 0 %>
+      <% totfinal    = 0 %>
+      <% tottotal    = 0 %>
+      <% @fechamento_turnos.each do |fechamento|%>
+
+        <!--QUEBRAS !-->
+        <% if ( qb_data != fechamento.data.to_s ) or ( qb_bomba != fechamento.bomba_nome.to_s )  or ( qb_deposito != fechamento.deposito_nome.to_s )%>
+
+              <% if ( qb_bomba != fechamento.bomba_nome.to_s ) or ( qb_bomba != fechamento.deposito_nome.to_s ) or ( qb_data != fechamento.data.to_s )  %>
+                    <% if qb_bomba != "" %>
+
+                       <% if qb_deposito != "" %>
+                              <tr class="head">
+                                  <td colspan="2"></td>
+                                  <td class="head" align="right"> <%= subbinicio %></td>
+                                  <td class="head" align="right"> <%= subbfinal %></td>
+                                  <td class="head" align="right"> <%= subbtotal %></td>
+                              </tr>
+                              <% subbinicio   = 0 %>
+                              <% subbfinal    = 0 %>
+                              <% subbtotal    = 0 %>
+
+      <% anteriorstock = Stock.sum( 'entrada - saida',    :conditions => [" data       < ? AND
+                                                                            deposito_nome = ?  ", qb_data,
+                                                                                                  qb_deposito] )  %>
+
+      <% substock   = Stock.sum( 'entrada - saida',       :conditions => [" data       = ? AND
+                                                                            deposito_nome = ?  ", qb_data,
+                                                                                                  qb_deposito] )  %>
+
+      <% subcontado   = VendasProduto.sum( :total_guarani,:conditions => [" data       = ? AND
+                                                                            bomba_nome = ? AND
+                                                                            tipo       = 0 AND
+                                                                            tipo_ordem = 0 ", qb_data,
+                                                                                              qb_bomba] )  %>
+      <% subcredito   = VendasProduto.sum( :total_guarani,:conditions => [" data       = ? AND
+                                                                            bomba_nome = ? AND
+                                                                            tipo       = 1 AND
+                                                                            tipo_ordem = 0 ", qb_data,
+                                                                                              qb_bomba] )  %>
+      <% subordem     = VendasProduto.sum( :total_guarani,:conditions => [" data       = ? AND
+                                                                            bomba_nome = ? AND
+                                                                            tipo       = 1 AND
+                                                                            tipo_ordem = 1 ", qb_data,
+                                                                                              qb_bomba] )  %>
+      <tr class="head">
+          <td>En Stock</td>
+          <td align="right"><%= number_to_currency(anteriorstock.to_f + substock.to_f, :format=>' %n ', :precision => 3 ) %></td>
+      </tr>
+
+      <tr class="head">
+          <td>Contado</td>
+          <td align="right"><%= number_to_currency(subcontado, :format=>' %n ', :precision => 0 ) %></td>
+      </tr>
+      <tr class="head">
+          <td>Credito</td>
+          <td align="right"><%= number_to_currency(subcredito, :format=>' %n ', :precision => 0 ) %></td>
+      </tr>
+      <tr class="head">
+          <td>Orden</td>
+          <td align="right"><%= number_to_currency(subordem, :format=>' %n ', :precision => 0 ) %></td>
+      </tr>
+      <tr class="head">
+          <td></td>
+          <td align="right">------------------</td>
+      </tr>
+      <tr class="head">
+          <td>Total</td>
+          <td align="right"><%= number_to_currency(subcontado + subcredito + subordem, :format=>' %n ', :precision => 0 ) %></td>
+      </tr>
+
+                        <% end %>
+                    <% end %>
+              <% end %>
+
+              <% if ( qb_data != fechamento.data.to_s ) %>
+                    <% if qb_data != "" %>
+
+                          <tr class="head">
+                                    <td colspan="5">--------------------------------------------------------------------------------------------Total General--------------------------------------------------------------------------------------------</td>
+                          </tr>
+                          <tr class="head">
+                              <td colspan="2"></td>
+                              <td class="head" align="right"> <%= subdinicio %></td>
+                              <td class="head" align="right"> <%= subdfinal %></td>
+                              <td class="head" align="right"> <%= subdtotal %></td>
+                           </tr>
+                           <% subdinicio   = 0 %>
+                           <% subdfinal    = 0 %>
+                           <% subdtotal    = 0 %>
+                          <% contado   = VendasProduto.sum( :total_guarani,:conditions => [" data       = ? AND
+                                                                                             tipo       = 0 AND
+                                                                                             tipo_ordem = 0 ", qb_data] )  %>
+                          <% credito   = VendasProduto.sum( :total_guarani,:conditions => [" data       = ? AND
+                                                                                             tipo       = 1 AND
+                                                                                             tipo_ordem = 0 ", qb_data] )  %>
+                          <% ordem     = VendasProduto.sum( :total_guarani,:conditions => [" data       = ? AND
+                                                                                             tipo       = 1 AND
+                                                                                             tipo_ordem = 1 ", qb_data] )  %>
+
+                          <tr class="head">
+                              <td>Contado</td>
+                              <td align="right"><%= number_to_currency(contado, :format=>' %n ', :precision => 0 ) %></td>
+                          </tr>
+                          <tr class="head">
+                              <td>Credito</td>
+                              <td align="right"><%= number_to_currency(credito, :format=>' %n ', :precision => 0 ) %></td>
+                          </tr>
+                          <tr class="head">
+                              <td>Orden</td>
+                              <td align="right"><%= number_to_currency(ordem, :format=>' %n ', :precision => 0 ) %></td>
+                          </tr>
+                          <tr class="head">
+                              <td></td>
+                              <td align="right">------------------</td>
+                          </tr>
+                          <tr class="head">
+                              <td>Total</td>
+                              <td align="right"><%= number_to_currency(contado + credito + ordem, :format=>' %n ', :precision => 0 ) %></td>
+                          </tr>
+                          <tr height="15">
+                          </tr>
+
+                    <% end %>
+              <% end %>
+
+                <tr class="head">
+                  <td>
+                    <% if qb_data != fechamento.data.to_s %>
+                          <% qb_data = fechamento.data.to_s  %>
+                          <%= fechamento.data.strftime("%d/%m/%Y")  %>
+                    <% end %>
+                  </td>
+                </tr>
+
+                <tr class="head">
+                  <td></td>
+                  <td>
+                    <% if qb_bomba != fechamento.bomba_nome.to_s %>
+                          <%= qb_bomba = fechamento.bomba_nome.to_s  %>
+                    <% end %>
+                    <% if qb_deposito != fechamento.deposito_nome.to_s %>
+                          <% qb_deposito = fechamento.deposito_nome.to_s  %>
+                    <% end %>
+
+                  </td>
+                </tr>
+          <% end %>
+
+          <tr class = "<%= cycle("cor1", "cor2") %>">
+            <td width="50" align="left"></td>
+            <td width="100" align="left">      <%=  fechamento.turno_nome%></td>
+            <td width="100" align="right">     <%=  fechamento.inicio%></td>
+            <td width="100" align="right">     <%=  fechamento.final %></td>
+            <td width="100" align="right">     <%=h format( "%.3f",fechamento.final.to_f - fechamento.inicio.to_f)%></td>
+          </tr>
+
+          <% subdinicio    = subdinicio + fechamento.inicio %>
+          <% subdfinal    = subdfinal + fechamento.final %>
+          <% subdtotal    = subdfinal  - subdinicio   %>
+          <% subbinicio   = subbinicio + fechamento.inicio %>
+          <% subbfinal    = subbfinal  + fechamento.final %>
+          <% subbtotal    = subbfinal  - subbinicio   %>
+          <% totinicio    = totinicio  + fechamento.inicio %>
+          <% totfinal     = totfinal   + fechamento.final %>
+          <% tottotal     = totfinal   - totinicio   %>
+
+      <% end %>
+
+      <tr class="head">
+        <td colspan="2"></td>
+        <td class="head" align="right"> <%= subbinicio %></td>
+        <td class="head" align="right"> <%= subbfinal %></td>
+        <td class="head" align="right"> <%= subbtotal %></td>
+      </tr>
+      <tr class="head">
+          <td colspan="2">.</td>
+      </tr>
+
+      <tr class="head">
+        <td colspan="2"></td>
+        <td class="head" align="right"> <%= subdinicio %></td>
+        <td class="head" align="right"> <%= subdfinal %></td>
+        <td class="head" align="right"> <%= subdtotal %></td>
+      </tr>
+      <% anteriorstock = Stock.sum( 'entrada - saida',    :conditions => [" data       < ? AND
+                                                                            deposito_nome = ?  ", qb_data,
+                                                                                                  qb_deposito] )  %>
+
+      <% substock   = Stock.sum( 'entrada - saida',       :conditions => [" data       = ? AND
+                                                                            deposito_nome = ?  ", qb_data,
+                                                                                                  qb_deposito] )  %>
+
+      <% subcontado   = VendasProduto.sum( :total_guarani,:conditions => [" data       = ? AND
+                                                                            bomba_nome = ? AND
+                                                                            tipo       = 0 AND
+                                                                            tipo_ordem = 0 ", qb_data,
+                                                                                              qb_bomba] )  %>
+      <% subcredito   = VendasProduto.sum( :total_guarani,:conditions => [" data       = ? AND
+                                                                            bomba_nome = ? AND
+                                                                            tipo       = 1 AND
+                                                                            tipo_ordem = 0 ", qb_data,
+                                                                                              qb_bomba] )  %>
+      <% subordem     = VendasProduto.sum( :total_guarani,:conditions => [" data       = ? AND
+                                                                            bomba_nome = ? AND
+                                                                            tipo       = 1 AND
+                                                                            tipo_ordem = 1 ", qb_data,
+                                                                                              qb_bomba] )  %>
+      <tr class="head">
+          <td>En Stock</td>
+          <td align="right"><%= number_to_currency(anteriorstock.to_f + substock.to_f, :format=>' %n ', :precision => 3 ) %></td>
+      </tr>
+
+
+      <tr class="head">
+          <td>Contado</td>
+          <td align="right"><%= number_to_currency(subcontado, :format=>' %n ', :precision => 0 ) %></td>
+      </tr>
+      <tr class="head">
+          <td>Credito</td>
+          <td align="right"><%= number_to_currency(subcredito, :format=>' %n ', :precision => 0 ) %></td>
+      </tr>
+      <tr class="head">
+          <td>Orden</td>
+          <td align="right"><%= number_to_currency(subordem, :format=>' %n ', :precision => 0 ) %></td>
+      </tr>
+      <tr class="head">
+          <td></td>
+          <td align="right">------------------</td>
+      </tr>
+      <tr class="head">
+          <td>Total</td>
+          <td align="right"><%= number_to_currency(subcontado + subcredito + subordem, :format=>' %n ', :precision => 0 ) %></td>
+      </tr>
+      <% contado   = VendasProduto.sum( :total_guarani,:conditions => [" data       = ? AND
+                                                                         tipo       = 0 AND
+                                                                         tipo_ordem = 0 ", qb_data] )  %>
+      <% credito   = VendasProduto.sum( :total_guarani,:conditions => [" data       = ? AND
+                                                                         tipo       = 1 AND
+                                                                         tipo_ordem = 0 ", qb_data] )  %>
+      <% ordem     = VendasProduto.sum( :total_guarani,:conditions => [" data       = ? AND
+                                                                         tipo       = 1 AND
+                                                                         tipo_ordem = 1 ", qb_data] )  %>
+
+      <tr  class="head">
+        <td colspan="5">--------------------------------------------------------------------------------------------Total General--------------------------------------------------------------------------------------------</td>
+      </tr>
+
+      <tr class="head">
+        <td colspan="2">Total General</td>
+            <td class="head" align="right"> <%= subdinicio %></td>
+            <td class="head" align="right"> <%= subdfinal %></td>
+            <td class="head" align="right"> <%= subdtotal %></td>
+      </tr>
+
+      <tr class="head">
+          <td>Contado</td>
+          <td align="right"><%= number_to_currency(contado, :format=>' %n ', :precision => 0 ) %></td>
+      </tr>
+      <tr class="head">
+          <td>Credito</td>
+          <td align="right"><%= number_to_currency(credito, :format=>' %n ', :precision => 0 ) %></td>
+      </tr>
+      <tr class="head">
+          <td>Orden</td>
+          <td align="right"><%= number_to_currency(ordem, :format=>' %n ', :precision => 0 ) %></td>
+      </tr>
+      <tr class="head">
+          <td></td>
+          <td align="right">------------------</td>
+      </tr>
+      <tr class="head">
+          <td>Total</td>
+          <td align="right"><%= number_to_currency(contado + credito + ordem, :format=>' %n ', :precision => 0 ) %></td>
+      </tr>
+      <tr height="15">
+      </tr>
+
+
+
+    </table>
+  </div>
+</div>
+

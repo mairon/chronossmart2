@@ -1,0 +1,22 @@
+<%= form_tag "/form_fiscals/nota_cred_update_nc" do %>
+	<%= hidden_field_tag :cod_proc, @nota_credito.id %>
+	<%= hidden_field_tag :sigla_proc, 'CBP' %>
+	<%= hidden_field_tag :data, @nota_credito.data %>
+	<%= hidden_field_tag :status, 1 %>
+	<%= hidden_field_tag :tipo, 1 %>
+	<%= hidden_field_tag :ruc, @nota_credito.persona.ruc %>
+	<%= hidden_field_tag :persona_nome, @nota_credito.persona.nome_fatura %>
+	<%= hidden_field_tag :persona_id, @nota_credito.persona_id %>
+	<%= hidden_field_tag :cota, 1 %>
+	<%= hidden_field_tag :tipo_op, 9 %>
+	<%= hidden_field_tag :moeda, @nota_credito.moeda.to_i %>
+	<%= hidden_field_tag :tot_gs, @total_doc_guarani.to_i %>
+	<%= hidden_field_tag :tot_us, @total_doc_dolar.to_f %>
+	<table>
+		<tr>
+			<td align="right">NC:</td>
+			<td><%=   select("busca", "doc", FormFiscal.all(:select => 'id,doc,doc_01,doc_02',:conditions => ["tipo_doc = 3 and status = 0 AND UNIDADE_ID = #{current_unidade.id} "],limit: 20,:order => 'CAST(doc as integer)').collect {|p| [ p.doc_01 << '.' << p.doc_02 << '.' << p.doc, p.id ] },:class => "select")  %></td></td>
+			<td rowspan="2"><%= submit_tag " Grabar ", :disable_with => "Aguarde...", :class => "btn btn-blue", style:'height:40px'  %></td>
+		</tr>
+	</table>
+<% end %>

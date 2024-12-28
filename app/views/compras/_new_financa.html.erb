@@ -1,0 +1,40 @@
+<body onload="ImputFocus('venci')">
+  <%= form_tag gerar_cotas_credito_compras_path, :method => "get" do %>
+  <%= hidden_field_tag :id, @compra.id %>
+  <%= hidden_field_tag :tipo_compra, @compra.tipo_compra %>
+     <div id="tab1" class="tab_content group">
+      <table>
+        <tr>
+          <td align="right"> Primeiro Venc.:</td>
+          <td><input type="text" name="venci" id="venci" size="15" onkeyup="Formatadata(this,event)", value="<%= @compra.data.strftime("%d/%m/%Y")%>" />
+          </td>
+          <td align="right"> Doc.:</td>
+          <td>
+            <input  type="text"  name="documento_numero_01" id="documento_numero_01"  size="5" value="<%= @compra.documento_numero_01 %>" />-
+            <input  type="text"  name="documento_numero_02" id="documento_numero_02"  size="5" value="<%= @compra.documento_numero_02 %>" />
+            <input  type="text"  name="documento_numero" id="documento_numero"  size="10" value="<%= @compra.documento_numero %>" />
+          </td>
+          <td align="right"> <%= t('QUOTA') %>:</td>
+          <td><input  type="text"  name="cotas" id="cotas"  size="10" value="1" /></td>
+          <% if @compra.moeda == 0 %>
+            <td align="right"> Valor U$:</td>
+            <td>
+              <input  type="text"  name="valor_us" id="valor_us"  size="15" value="<%= format_decimal(@sum_dolar) %>" class = "money_us" dir   = "rtl" />
+            </td>
+          <% elsif @compra.moeda == 1 %>
+            <td align="right"> Gs.:</td>
+            <td>
+              <input  type="text"  name="valor_gs" id="valor_gs"  size="15" value="<%= format_int(@sum_guarani) %>" class = "money_gs" dir   = "rtl" />
+            </td>
+          <% else %>
+            <td align="right"> Valor R$: </td>
+            <td>
+              <input  type="text"  name="valor_rs" id="valor_rs"  size="15" value="<%= format_decimal(@sum_real) %>" class = "money_us" dir   = "rtl" /> <%=  %>
+            </td>
+          <% end %>
+          <td colspan='2' align="right"><%= submit_tag "     #{t('SAVE')}     ", :class=>'button', :disable_with => "Aguarde..." %></td>
+        </tr>
+       </table>
+      </div>
+<% end %>
+

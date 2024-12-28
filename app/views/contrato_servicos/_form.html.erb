@@ -1,0 +1,112 @@
+<%= form_for(@contrato_servico) do |f| %>
+	<% if @contrato_servico.errors.any? %>
+		<div id="error_explanation">
+		<h2><%= pluralize(@contrato_servico.errors.count, "error") %> prohibited this contrato_servicos from being saved:</h2>
+
+		<ul>
+			<% @contrato_servico.errors.full_messages.each do |msg| %>
+				<li><%= msg %></li>
+			<% end %>
+		</ul>
+	</div>
+<% end %>
+
+<ul class="tabs">
+	<li><a href="#tab1"> Contrato Serviços [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="group">
+	<table>
+		<tr>
+			<td align="right" hidden="">Contrato :</td>
+			<%= f.hidden_field :contrato_id, :value => params[:contrato_id] %>
+			<%= hidden_field_tag :moeda_padrao, params[:moeda] %>
+			<%= hidden_field_tag :cotacao, params[:cotacao] %>
+
+			<td align="right">Produto :</td>
+			<td><%= f.collection_select :produto_id, Produto.select('id,nome').order('nome'), :id,
+					     :nome,{prompt: 'Selecione o Produto'},{:style => "width:203px"} %></td>
+
+			<td align="right">Quantidade :</td>
+			<td><%= f.number_field :quantidade, :style => "width:203px" %></td>
+		</tr>
+		<tr id="valoresUSD">
+			<td align="right">Unitario USD :</td>
+			<td><%= f.text_field :unitario_us %></td>
+
+			<td align="right">Total USD :</td>
+			<td><%= f.text_field :total_us %></td>
+		</tr>
+		<tr id="valoresGS">
+			<td align="right">Unitario GS :</td>
+			<td><%= f.text_field :unitario_gs %></td>
+
+			<td align="right">Total GS :</td>
+			<td><%= f.text_field :total_gs %></td>
+		</tr>
+	</table>
+
+	<div class="buttons">
+		<%= f.submit :value => t('SAVE'),  :class => "button add", :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %>
+		<%= link_to t('BACK'), contrato_path(params[:contrato_id])  , :class => "button back" %>
+	</div>
+
+</div>
+<% end %>
+
+<script type="text/javascript">
+
+	$(document).ready(function () {
+		jQuery.validator.setDefaults({
+			success: "valid"
+		});
+
+		$('form').validate({
+			rules: {
+				"contrato_servicos[quantidade]": {required: true},
+			}
+		});
+	});
+
+	$("#contrato_servico_produto_id").on('change', function(){
+		$.ajax({
+			url: '/buscas/get_produtos_precos',
+			type: 'GET',
+			beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+			data: {
+				produto_id : $("#contrato_servico_produto_id").val(),
+				tabela_preco_id : 1
+			},
+			success: function(data){
+				if ($("#moeda_padrao").val() == 0) {
+					$("#contrato_servico_unitario_gs").val(eval(number_format(data["produto"].preco_1_us, 0, ',', '.') * parseFloat($("#cotacao").val())).toFixed(3));
+					$("#contrato_servico_unitario_us").val(number_format(data["produto"].preco_1_us, 2, ',', '.'));
+				}
+				else if ($("#moeda_padrao").val() == 1) {
+					$("#contrato_servico_unitario_us").val(eval(number_format(data["produto"].preco_1_gs, 0, ',', '.') / parseFloat($("#cotacao").val())).toFixed(3));
+					$("#contrato_servico_unitario_gs").val(number_format(data["produto"].preco_1_gs, 0, ',', '.'));
+				}
+				$("#contrato_servico_total_gs").val("");
+				$("#contrato_servico_total_us").val("");
+				$("#contrato_servico_quantidade").val("");
+			}
+		});
+	});
+
+	$("#contrato_servico_quantidade").on('change', function(){
+		var produto_gs_total = eval(parseFloat($("#contrato_servico_unitario_gs").val().replace(/\./g, "").replace(",", ".")) * $(this).val());
+		var produto_us_total = eval(parseFloat($("#contrato_servico_unitario_us").val().replace(/\./g, "").replace(",", ".")) * $(this).val());
+
+		$("#contrato_servico_total_gs").val(number_format(produto_gs_total, 0, ',', '.'));
+		$("#contrato_servico_total_us").val(number_format(produto_us_total, 2, ',', '.'));
+	});
+
+	if ($("#moeda_padrao").val() == 1) {
+		$("#valoresUSD").hide();
+		$("#valoresGS").show();
+	} else {
+		$("#valoresUSD").show();
+		$("#valoresGS").hide();
+	}
+
+</script>

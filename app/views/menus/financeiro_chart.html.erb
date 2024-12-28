@@ -1,0 +1,135 @@
+
+
+<script src="ajaxGetPost.js" ></script>
+<script src="https://www.google.com/jsapi"></script>
+<script>
+	$(document).ready(function ()
+	{
+		$.ajax({
+			url: '/menus/testeChartt',
+			type: 'GET',
+			success: function(data)
+			{
+				charts(data,"ColumnChart"); // Column Charts
+				charts(data,"PieChart"); // Pie Charts
+				charts(data,"BarChart"); // Bar Charts
+				charts(data,"GeoChart"); // Geo Charts
+			}
+		});
+	});
+
+	function charts(data, ChartType)
+	{
+		var c=ChartType;
+		var jsonData=data;
+		google.load("visualization", "1", {packages:["corechart"], callback: drawVisualization});
+		function drawVisualization()
+		{
+			var data = new google.visualization.DataTable();
+			data.addColumn('number', 'Country');
+			data.addColumn('number', 'Population Density');
+
+			$.each(jsonData, function(i,jsonData)
+			{
+				var value = 1;
+				var name = 1;
+				data.addRows([ [name, value]]);
+			});
+
+			var options = {
+				title : "Word Population Density",
+				animation:{
+				duration: 3000,
+				easing: 'out',
+				startup: true
+				},
+				colorAxis: {colors: ['#54C492', '#cc0000']},
+				datalessRegionColor: '#dedede',
+				defaultColor: '#dedede'
+			};
+
+			var chart;
+			if(c=="ColumnChart") // Column Charts
+			chart=new google.visualization.ColumnChart(document.getElementById('chart_div'));
+			else if(c=="PieChart") // Pie Charts
+			chart=new google.visualization.PieChart(document.getElementById('piechart_div'));
+			else if(c=="BarChart") // Bar Charts
+			chart=new google.visualization.BarChart(document.getElementById('bar_div'));
+			else if(c=="GeoChart") // Geo Charts
+			chart=new google.visualization.GeoChart(document.getElementById('regions_div'));
+
+			chart.draw(data, options);
+		}
+	}
+
+</script>
+
+
+<!-- <script src="ajaxGetPost.js" ></script>
+<script src="https://www.google.com/jsapi"></script>
+<script>
+	$(document).ready(function ()
+	{
+		$.ajax({
+			url: 'world-population-density.json',
+			type: 'GET',
+			function(data)
+			{
+				charts(data,"ColumnChart"); // Column Charts
+				charts(data,"PieChart"); // Pie Charts
+				charts(data,"BarChart"); // Bar Charts
+				charts(data,"GeoChart"); // Geo Charts
+			}
+		});
+	});
+
+	function charts(data,ChartType)
+	{
+		var c=ChartType;
+		var jsonData=data;
+		google.load("visualization", "1", {packages:["corechart"], callback: drawVisualization});
+		function drawVisualization()
+		{
+			var data = new google.visualization.DataTable();
+			data.addColumn('string', 'Country');
+			data.addColumn('number', 'Population Density');
+			$.each(jsonData, function(i,jsonData)
+			{
+				var value=jsonData.value;
+				var name=jsonData.name;
+				data.addRows([ [name, value]]);
+			});
+
+			var options = {
+				title : "Word Population Density",
+				animation:{
+				duration: 3000,
+				easing: 'out',
+				startup: true
+				},
+				colorAxis: {colors: ['#54C492', '#cc0000']},
+				datalessRegionColor: '#dedede',
+				defaultColor: '#dedede'
+			};
+
+			var chart;
+			if(c=="ColumnChart") // Column Charts
+			chart=new google.visualization.ColumnChart(document.getElementById('chart_div'));
+			else if(c=="PieChart") // Pie Charts
+			chart=new google.visualization.PieChart(document.getElementById('piechart_div'));
+			else if(c=="BarChart") // Bar Charts
+			chart=new google.visualization.BarChart(document.getElementById('bar_div'));
+			else if(c=="GeoChart") // Geo Charts
+			chart=new google.visualization.GeoChart(document.getElementById('regions_div'));
+
+			chart.draw(data, options);
+		}
+	}
+
+</script> -->
+
+<div id="chart_div"></div>
+<div id="regions_div" ></div>
+<div id="piechart_div" ></div>
+<div id="bar_div" ></div>
+

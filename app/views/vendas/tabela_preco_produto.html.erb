@@ -1,0 +1,62 @@
+<div class="group">
+  <h1 id="header">Ref. <%= @produto.fabricante_cod %> - <%= @produto.nome %></h1>
+
+  <div class="rolagem" id="div">
+    <table>
+      <% count = 0 %>
+      <% @produto.produtos_tabela_preco.where(unidade_id: current_unidade.unidade_tabela_preco_id).each do |p| %>
+      <% if p.tabela_preco.tipo_usuario >= current_user.tipo %>
+
+
+        <tr class = "<%= cycle( "cor1", "cor2" )%>"
+            onMouseOver="javascript:this.style.backgroundColor='#e6ebf2'"
+            onMouseOut="javascript:this.style.backgroundColor=''"
+            onclick="Fecha('<%= number_to_currency(p.preco_1_gs, :format=>'%n', :precision => 0)  %> ',
+                                      '<%= number_to_currency(p.preco_1_us, :format=>'%n', :separator => ",")  %>',
+                                      '<%= number_to_currency(p.preco_1_rs, :format=>'%n', :separator => ",")  %>' )" data-plus-as-tab="false"
+            >
+
+            <td  width="60" class="<%= count %>"><input type="text" id="<%= count %>" value="<%= count %>" size="2" style="border: none;"
+                  onkeypress="Fecha( '<%= number_to_currency(p.preco_1_gs, :format=>'%n', :precision => 0)  %>',
+                                     '<%= number_to_currency(p.preco_1_us, :format=>'%n', :separator => ",")  %>',
+                                     '<%= number_to_currency(p.preco_1_rs, :format=>'%n', :separator => ",")  %>' )" data-plus-as-tab="false" ></td>
+            <td width="150"><%= p.tabela_preco.nome %></td>
+            <td width="80" align="right"><%= format_int(p.preco_1_gs) %></td>
+          </tr>
+        <% count += 1 %>
+      <% elsif p.tabela_preco_id.to_i == params[:persona_tabela_preco_id].to_i%>
+        <tr class = "<%= cycle( "cor1", "cor2" )%>"
+            onMouseOver="javascript:this.style.backgroundColor='#e6ebf2'"
+            onMouseOut="javascript:this.style.backgroundColor=''"
+            onclick="Fecha('<%= number_to_currency(p.preco_1_gs, :format=>'%n', :precision => 0)  %> ',
+                                      '<%= number_to_currency(p.preco_1_us, :format=>'%n', :separator => ",")  %>',
+                                      '<%= number_to_currency(p.preco_1_rs, :format=>'%n', :separator => ",")  %>' )" data-plus-as-tab="false"
+            >
+
+            <td  width="60" class="<%= count %>"><input type="text" id="<%= count %>" value="<%= count %>" size="2" style="border: none;"
+                  onkeypress="Fecha( '<%= number_to_currency(p.preco_1_gs, :format=>'%n', :precision => 0)  %>',
+                                     '<%= number_to_currency(p.preco_1_us, :format=>'%n', :separator => ",")  %>',
+                                     '<%= number_to_currency(p.preco_1_rs, :format=>'%n', :separator => ",")  %>' )" data-plus-as-tab="false" ></td>
+            <td width="150"><%= p.tabela_preco.nome %></td>
+            <td width="80" align="right"><%= format_int(p.preco_1_gs) %></td>
+          </tr>
+          <% count += 1 %>
+      <% end %>
+      <% end %>
+      <input type="hidden" id="foco" value="-1">
+    </table>
+  </div>
+</div>
+
+
+<script>
+
+    function Fecha(preco_gs,preco_us,preco_rs){
+      window.opener.document.getElementById('vendas_produto_preco_guarani').value     = preco_gs;
+      window.opener.document.getElementById('vendas_produto_unitario_guarani').value  = preco_gs;
+      window.opener.document.getElementById('vendas_produto_total_guarani').value     = preco_gs;
+      window.opener.document.getElementById("vendas_produto_quantidade").focus()
+      self.close();
+    }
+
+</script>

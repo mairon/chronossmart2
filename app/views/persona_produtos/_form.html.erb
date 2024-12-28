@@ -1,0 +1,60 @@
+<%= form_for(@persona_produto) do |f| %>
+  <% if @persona_produto.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@persona_produto.errors.count, "error") %> prohibited this persona_produto from being saved:</h2>
+
+      <ul>
+      <% @persona_produto.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> persona_produtos - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                    <td>
+                      <fieldset>
+
+                        <table>
+                          <tr>
+                            <%= f.hidden_field :persona_id %>
+                            <td align="right">Producto:</td>                    
+                            <td><%= f.collection_select :produto_id, Produto.all(:select => 'id,nome', conditions: "grupo_id = 1",:order => '2'),:id,:nome,{prompt: 'Selecione o producto'}, {autofocus: true} %></td>
+                                            
+                            <%= field_gs 'Precio Gs.:',f,:preco_gs %>
+
+                           <%= field_us 'U$:',f,:preco_us %>
+
+                           <%= field_us 'R$:',f,:preco_rs %>                                
+                            <td><%= f.submit :value => t('SAVE'), :class => "button" %></td>
+                           </tr>                 
+                        </table>
+                      </fieldset>
+                    </td>
+                  </tr>
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), persona_produtos_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

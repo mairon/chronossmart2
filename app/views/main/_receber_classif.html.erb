@@ -1,0 +1,59 @@
+<%
+
+sqlr = "SELECT PC.DESCRICAO AS RUBRO_NOME,
+                   SUM(CC.DIVIDA_REAL) AS VALOR_RS,
+                   SUM(CC.DIVIDA_GUARANI) AS VALOR_GS,
+                   SUM(CC.DIVIDA_REAL) AS VALOR_US
+            FROM CLIENTES CC
+            INNER JOIN RUBROS PC
+            ON CC.RUBRO_ID = PC.ID
+            WHERE date_part('month', CC.data) = '#{Time.now.to_date.strftime("%m")}' and date_part('year', CC.data) = '#{Time.now.to_date.strftime("%Y")}'
+            GROUP BY 1"
+
+
+    @rubros = Cliente.find_by_sql(sqlr)
+
+%>
+
+
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+
+        var data = google.visualization.arrayToDataTable([
+          ['Clasificación', 'Montos'],
+        <% @rubros.each do |r| %>
+          <% v = 0 %>
+          <% if @unidade.moeda.to_i == 0 %>
+            <% v = r.valor_us %>
+          <% elsif @unidade.moeda.to_i == 1 %>
+            <% v = r.valor_gs %>
+          <% elsif @unidade.moeda.to_i == 2 %>
+            <% v = r.valor_rs %>
+          <% end %>
+          ['<%= r.rubro_nome %>',     <%= v.to_f %>],
+        <% end %>
+        ]);
+
+        var options = {
+          'pieHole': 0.2,
+          'chartArea': {'width': '100%', 'height': '80%'},
+          'fontSize': 11
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('donutchart2'));
+        chart.draw(data, options);
+
+      }
+    </script>
+
+<div class="panel  card-dashboard">
+  <h1 id="header" align="center">
+    Recebir por Clasificación
+  </h1>
+  <div class="group">
+    <div id="donutchart2" ></div>
+  </div>
+</div>

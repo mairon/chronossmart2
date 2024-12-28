@@ -1,0 +1,28 @@
+<p>
+  <b>Pagare:</b>
+  <%=h @pagares_detalhe.pagare_id %>
+</p>
+
+<p>
+  <b><%= t('DATE') %>:</b>
+  <%=h @pagares_detalhe.data %>
+</p>
+
+<p>
+  <b>Vencimento:</b>
+  <%=h @pagares_detalhe.vencimento %>
+</p>
+
+<p>
+  <b>Cota:</b>
+  <%=h @pagares_detalhe.cota %>
+</p>
+
+<p>
+  <b>Valor guarani:</b>
+  <%=h @pagares_detalhe.valor_guarani %>
+</p>
+
+
+<%= link_to 'Edit', edit_pagares_detalhe_path(@pagares_detalhe) %> |
+<%= link_to 'Back', pagares_detalhes_path %>

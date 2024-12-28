@@ -1,0 +1,105 @@
+<style type="text/css">
+   td{
+      padding: 2px;
+   }
+</style>
+<div class="group" style="padding: 10px;">
+   Cuenta Origen: <b><%= @transferencia_conta.ingreso_nome %></b> Periodo Diferido: <b><%= params[:inicio] %></b> hasta <b><%= params[:final] %></b>
+</div>
+<% tot    = 0 %>
+<% qtd_ch = 0 %>
+<%= form_tag resultado_busca_diferido_transferencia_contas_path, :name => "form1" do  %>
+   <div class="group">
+      <table class="head_grid">
+         <tr>
+            <td width="60" align="center"><%= t('CODE') %></td>
+            <td width="65" align="center"><%= t('DATE') %></td>
+            <td width="220" >Resp.</td>
+            <td width="70"  align="center">Diferido</td>
+            <td width="200" >Titular</td>
+            <td width="200" >Banco</td>
+            <td width="100" align="center">Nº <%= t('CHECKS') %></td>
+            <td width="100" align="right">Valores</td>
+            <td width="20" align="center"><input type="checkbox" id="selectAllM" value="selectAllM"></td>
+         </tr>
+      </table>
+      <div class="rolagem" id="div">
+         <table>
+            
+            <% @diferido.each do |diferido| %>
+               <% qtd_ch += 1 %>
+               <% if diferido.diferido.to_date < Time.now.to_date %>
+                  <% vencido = "style=\" background-color: #fa3e40; padding: 2px; color:#fff; border-radius: 4px \" " %>
+               <% end %>
+               <tr class = "<%= cycle("cor1", "cor2")%>">
+                  <td width="60" align="center"><%= diferido.cod_proc %></td>
+                  <td width="60" align="center" ><%= diferido.data.strftime("%d/%m/%y") %></td>
+                  <td width="220" align="left"><%= truncate(diferido.persona_nome, length: 30) %></td>
+                  <td width="60" align="center">
+                     <span <%= raw vencido %> ><%= diferido.diferido.strftime("%d/%m/%y") %></span>
+                  </td>
+                  <td width="200" align="left"><%= diferido.titular %></td>
+                  <td width="200" align="left"><%= diferido.banco %></td>
+                  <td width="100" align="center"><%= diferido.cheque %></td>
+
+                  <% if params[:moeda] == "0" %>
+                     <td width="100" align="right"><%= format_decimal(diferido.entrada_dolar) %></td>
+                     <% tot += diferido.entrada_dolar.to_f %>
+                  <% else %>
+                     <td width="100" align="right"><%= format_int(diferido.entrada_guarani) %></td>
+                     <% tot += diferido.entrada_guarani.to_f %>
+                  <% end %>
+
+                  <td width="10" align="center"><%= check_box_tag "diferido_ids[]", diferido.id, false, { :class => 'm', onclick: "soma(this)" }  %> <%= hidden_field_tag "id", params[:id] %></td>
+                  <input type="hidden" name="valor_<%= diferido.id %>" id="valor_<%= diferido.id %>" value="<%= format_int(diferido.entrada_guarani) %>" />
+               </tr>
+            <% end %>
+         </table>
+      </div>
+      <table class="head_grid">
+         <tr>
+            <td align="center"><b><%= qtd_ch %> Cheques</b></td>
+            <td width="815" align="right">Saldo:</td>
+            <% if params[:moeda] == '1' %>
+               <td width="80" align="right"><b><%= format_int(tot.to_f) %></b></td>
+            <% else %>
+               <td width="80" align="right"><b><%= format_decimal(tot.to_f) %></b></td>
+            <% end %>
+         </tr>
+         <tr>
+           <td><%= submit_tag "  Bajar Cheques  ",:disable_with => "Aguarde...", "data-plus-as-tab" => "false", :class => "btn btn-blue"  %></td>
+           <td></td>
+           <td><input type="text" name="valor" id="valor" value="0" size="11" dir="rtl"></td>
+         </tr>
+      </table>
+   </div>
+<% end %>
+
+
+<script type="text/javascript">
+   $('#selectAllM').click(function() {
+      if (this.checked) {
+          $('.m').each(function() {
+              this.checked = true;
+              document.getElementById('valor').value = ( '<%= format_int(tot.to_f) %>');
+          });
+      } else {
+         $('.m').each(function() {
+              this.checked = false;
+              document.getElementById('valor').value = ('0');
+          });
+      } 
+   });
+
+   function soma(campo) { 
+      var total  = eval(document.getElementById('valor').value.replace(/\./g, "").replace(",", "."));  
+      var valor = document.getElementById( 'valor_' + campo.value).value;
+
+      if (campo.checked)  {
+        total     += eval( valor.replace(/\./g, "").replace(",", ".") );     
+      } else {
+        total     -= eval( valor.replace(/\./g, "").replace(",", ".") );
+      }
+      document.getElementById('valor').value = ( number_format( total,0, ',', '.') );
+   }  
+ </script>

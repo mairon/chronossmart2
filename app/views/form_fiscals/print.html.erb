@@ -1,0 +1,100 @@
+<style type="text/css">
+  .page-break { display:block; clear:both; page-break-after:always; }
+  .header {
+    border-collapse: collapse;
+    font-size: 9px;
+  }
+  .header {
+    font-weight: bold;
+    background-color: #999;
+  }
+
+</style>
+
+
+<table class="head_grid">
+  <tr>
+    <td class="header" width="18">TM</td>
+    <td class="header" width="60">Status</td>
+    <td class="header" width="100">Tipo Doc.</td>
+    <td class="header" width="80">Fecha</td>
+    <td class="header" width="80">Venc</td>
+    <td class="header" width="30">Doc 01</td>
+    <td class="header" width="30">Doc 02</td>
+    <td class="header" width="55">Doc</td>
+    <td class="header" width="70">Timbrado</td>
+    <td class="header" width="20">Tipo</td>
+    <td class="header" width="100">Ruc</td>
+    <td class="header" width="300">Persona nome</td>
+    <td class="header" width="20">Cod proc</td>
+    <td class="header" width="20">Sigla proc</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @form_fiscals.each do |form_fiscal| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="20"><%= form_fiscal.terminal_id %></td>
+        <% if form_fiscal.status == 0 %>
+	        <td width="60" style="background: green; color: #fff">
+	          <b>Pendente</b>
+	        </td>
+        <% elsif form_fiscal.status == 1 %>
+        	<td width="60" style="background: yellow">
+          	<b>Activo</b>
+          </td>
+        <% elsif form_fiscal.status == 2 %>
+        	<td width="60" style="background: red;color: #fff">
+          	<b>Anulado</b>
+          </td>
+        <% end %>
+        
+        <td width="100">
+          <% if form_fiscal.tipo_doc == 1 %>
+            Factura
+          <% elsif form_fiscal.tipo_doc == 2 %>
+            Nota de débito
+          <% elsif form_fiscal.tipo_doc == 3 %>
+            Nota de crédito
+          <% elsif form_fiscal.tipo_doc == 4 %>
+            Despacho
+          <% elsif form_fiscal.tipo_doc == 5 %>
+            Auto Factura
+          <% elsif form_fiscal.tipo_doc == 7 %>
+            Pasaje Aérea
+          <% elsif form_fiscal.tipo_doc == 8 %>
+            Factura del Exterior
+          <% elsif form_fiscal.tipo_doc == 9 %>
+            Planilla de Sueldos
+          <% elsif form_fiscal.tipo_doc == 10 %>
+            Comprobante de Ingresos
+          <% elsif form_fiscal.tipo_doc == 11 %>
+            Retención Absorbida
+          <% elsif form_fiscal.tipo_doc == 13 %>
+            Pasaje Aérea Electronica
+          <% elsif form_fiscal.tipo_doc == 14 %>
+            Nota de Retención
+          <% end %>
+          </td>
+        <td width="80"><%= form_fiscal.data.strftime("%d/%m/%y") %></td>
+        <td width="80"><%= form_fiscal.vencimento.strftime("%d/%m/%y") %></td>
+        <td width="30"><%= form_fiscal.doc_01 %></td>
+        <td width="30"><%= form_fiscal.doc_02 %></td>
+        <td width="55"><%= form_fiscal.doc %></td>
+        <td width="70"><%= form_fiscal.timbrado %></td>
+        <td width="10">
+          <% if form_fiscal.tipo.to_i == 0 %>
+              CO
+          <% else %>
+              CR
+          <% end %>
+        </td>
+        <td width="100"><%= form_fiscal.ruc %></td>
+        <td width="300"><%= form_fiscal.persona_nome %></td>
+        <td width="20"><%= form_fiscal.cod_proc %></td>
+        <td width="20"><%= form_fiscal.sigla_proc %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>

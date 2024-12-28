@@ -1,0 +1,38 @@
+<% @produtos.each do |n| %>
+  <div class="card-stepp"  id="card-<%= n.id %>">
+    <div class="card-title">
+      #<%= n.id.to_s.rjust(6,'0') %> - Comanda <%= n.cartao_nome %>
+      <div class="card-time"><%= n.created_at.to_datetime.strftime("%d/%m/%y - %H:%M") %></div>
+    </div>
+    
+
+    <div class="card-cliente">
+      <ul>
+        <% venda_produto_ids = [] %>
+        <%  VendasProduto.joins(:produto).where("produtos.sub_grupo_id in (#{@painel_preparo.grupo_ids}) and produtos.preparacao = true and vendas_produtos.venda_id = #{n.id} AND vendas_produtos.status_preparo = 0 ").each do |vp| %>
+        <li>
+          <% venda_produto_ids += [vp.id] %>
+          <%= vp.quantidade.to_i %> - <%= vp.produto_nome %>
+          <ul>
+            <% vp.produto_composicaos.each do |pc| %>
+              <li><%= pc.componente_nome %></li>
+            <% end %>
+            <li><%= vp.obs.to_s %></li>
+          </ul>                  
+        </li>
+
+        <% end %>
+      </ul>
+
+      <div align="center">
+        <% if @painel_preparo.id == 1 and current_unidade.id == 3 %>
+          <%= link_to "EMPEZAR", "#", class: 'btn btn-green preparo', onclick: "print1(#{n.id}, #{venda_produto_ids} )" %>
+        <% else %>
+          <%= link_to "EMPEZAR", status_preparo_painel_preparos_path(venda_id: n.id, status_preparo: 1, painel_preparo_id: @painel_preparo.id,  venda_produto_ids: venda_produto_ids), class: 'btn btn-green preparo' %>
+
+        <% end %>
+      </div>
+
+    </div>
+  </div> 
+<% end %>

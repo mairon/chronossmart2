@@ -1,0 +1,189 @@
+
+  <style type="text/css">
+    td{  padding: 12px 5px 12px 5px !important;}
+    .title-list{
+      color: #444;
+      font-weight: bold;
+      font-size: 14px
+    } 
+
+    .list-result{
+      color: #969696;
+    }   
+
+    .result{
+      border-top: 1px solid #dcdcdc;
+      margin-top: 2px;
+      padding-top: 2px;    
+    }
+
+    .pull-right{
+      float: right;
+      font-weight: bold;
+    }
+    
+    .list-result li{
+      list-style: none;
+      padding:  3px;
+    }
+  </style>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel">
+
+        <h1 id="header">
+          Painel Contas a Pagar
+        </h1>
+      </div>
+    </div>
+  </div>
+  <form action="#" id="form_pagar">
+    <div class="row">
+      <div class="col-md-9">
+        <div class="panel">
+          <header class="panel-heading">
+            <div class="period-bar">
+              <div class="back-periodo">
+                <a href="#" title="Back"  id="back-month"><i class="icon i23 icon-26"></i></a>
+              </div>
+              <div class="label-periodo">
+                <% unless params[:month].present? %>
+                  <a id="filtro-data" href="#">
+                    <%= Date::MONTHNAMES[Time.now.strftime("%m").to_i].to_s %> / <%= Time.now.strftime("%Y") %>
+                  </a>
+                  <%= hidden_field_tag :date_month_f, Time.now.strftime("%m").to_i %>
+                  <%= hidden_field_tag :date_year_f, Time.now.strftime("%Y") %>
+                <% else %>
+                  <a id="filtro-data" href="#">
+                    <%= Date::MONTHNAMES[params[:month].to_i].to_s %> / <%= params[:year].to_i %>
+                  </a>
+                  <%= hidden_field_tag :date_month_f, params[:month] %>
+                  <%= hidden_field_tag :date_year_f, params[:year] %>
+                <% end %>
+              </div>
+              <div class="next-periodo">
+                <a href="#" title="Next" id="next-month"><i class="icon i23 icon-27"></i></a>
+              </div>
+            </div>
+          </header>
+          <header>
+
+            <nav class="navbar navbar-default">
+              <div class="row">
+                <div class="col-md-3">
+                  <%= search_field_tag :filtro_pagar, nil, placeholder: 'Filtrar', style:"margin: 15px 10px", size: 24 %>
+
+                </div>
+                <div class="col-md-2">
+                  <%= select_tag :liquidacao, options_for_select([['PENDIENTE', 0], ['PAGOS', 1]]), class: 'panel-field', style:"margin: 15px 10px" %>
+
+                </div>
+                <div class="col-md-3"><%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none; margin: 20px 10px") %></div>
+                <div class="col-md-4">
+                  <a href="javascript:void(0)" class="btn btn-blue" onClick="window.print();"  style="margin: 10px; float: right"><%= image_tag('printer.png') %> Imprimir</a>
+                </div>
+              </div>
+            </nav>
+          </header>
+
+        </form>
+          <div class="panel-content" id="pagina">
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <%= render 'proveedores/forms/resumo_perido' %>
+      </div>
+    </div>
+
+    <script>
+      $('#next-month').on('click', function() {
+        var year  = $("#date_year_f").val();
+        var month = $("#date_month_f").val();
+        next_month = parseInt(month) + 1
+        if (month == 12) {
+          next_year = parseInt(year) + 1
+          window.location.href ='/proveedores/painel_pagar?year='+ next_year + "&month=" + 1
+        }else{
+          window.location.href ='/proveedores/painel_pagar?year='+ year + "&month=" + next_month
+        }
+      });
+
+      $('#back-month').on('click', function() {
+        var year  = $("#date_year_f").val();
+        var month = $("#date_month_f").val();
+        next_month = parseInt(month) - 1
+        if (month == 1) {
+          next_year = parseInt(year) - 1
+          window.location.href ='/proveedores/painel_pagar?year='+ next_year + "&month=" + 12
+        }else{
+          window.location.href ='/proveedores/painel_pagar?year='+ year + "&month=" + next_month
+        }
+      });
+
+    </script>
+
+
+<div class="modal fade" id="ModalFiltroData" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="width: 250px">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Selecione o Periodo</h4>
+      </div>
+      <div class="modal-body">
+        <div class="group" align="center">
+          <%= select_date Time.now, :order => [ :month, :year] %>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="filtro" data-dismiss="modal">Filtrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script type="text/javascript">
+    $("#filtro-data").click(function() {
+      $('#ModalFiltroData').modal('show');
+    });
+
+    $('#ModalFiltroData').on('hidden.bs.modal', function (e) {
+      var year_m = $("#date_year").val()
+      var month_m = $("#date_month").val()
+      window.location.href ='/proveedores/painel_pagar?year='+ year_m + "&month=" + month_m
+      url="/proveedores/painel_pagar_lancamento?" + $('form').serialize();
+      ajax(url);
+    });
+  </script>
+
+  <script language="javascript">
+    $(document).ready(function() {
+      url="/proveedores/painel_pagar_lancamento?" + $('#form_pagar').serialize();
+      ajax(url);
+    });
+    $('#filtro_pagar, #liquidacao').on('change keyup', function(){
+        url="/proveedores/painel_pagar_lancamento?" + $('#form_pagar').serialize();
+        ajax(url);      
+    });
+  </script>
+
+  <%= render 'proveedores/modal_acao' %>
+
+  <%= render 'proveedores/modals/modal_pagar' %>
+
+  <%= render 'proveedores/modals/modal_titulo_historico' %>
+
+  <%= render 'proveedores/modals/modal_edit_doc' %>
+
+  <script>
+
+  function ActiveAlert(id){
+    if (confirm('Borrar ?')) {
+        $('.acao'+ id).hide();
+      };
+  }
+  </script>

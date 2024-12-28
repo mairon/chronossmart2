@@ -1,0 +1,31 @@
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="70" align="center">Cod.</td>
+      <td width="100" align="center"><%= t('DATE') %></td>
+      <td width="200">Unidad <%= t('SOURCE_S') %></td>
+      <td width="200">Depósito <%= t('SOURCE_S') %></td>
+      <td width="200">Unidad Destino</td>
+      <td width="200">Depósito Destino</td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+    <table>
+        <% @transf_deposito.each do |td| %>
+            <tr class = "<%= cycle("cor1", "cor2")%>">
+                <td width="70" align="center"><%= link_to td.id.to_s.rjust(6,'0'), transferencia_deposito_path(td) %></td>
+                <td width="100" align="center"><%= td.data %></td>
+                <td width="200"><%= td.unidade_origem %></td>
+                <td width="200"><%= td.deposito_origem %></td>
+                <td width="200"><%= td.unidade_destino %></td>
+                <td width="200"><%= td.deposito_destino %></td>
+                <td><%= link_to '', edit_transferencia_deposito_path(td), class: 'icon-pencil' %></td>
+                <td><%= link_to '', td, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+            </tr>
+        <% end %>
+    </table>
+  </div>
+</div>
+
+
+

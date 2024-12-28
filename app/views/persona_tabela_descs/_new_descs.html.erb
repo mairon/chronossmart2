@@ -1,0 +1,51 @@
+<%= form_for(persona_tabela_desc) do |f| %>
+  <% if persona_tabela_desc.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(persona_tabela_desc.errors.count, "error") %> prohibited this persona_tabela_desc from being saved:</h2>
+
+      <ul>
+      <% persona_tabela_desc.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= f.hidden_field :persona_id %>
+  <table>
+    <tr>
+        <td align="right"><%= t('DATE') %> :</td>
+        <td><%= f.date_select :data %></td>
+    </tr>
+    <tr>
+        <td align="right">Analisi :</td>
+        <td>
+          <%= f.collection_select :conj_ensaio_id, ConjEnsaio.all,
+                                    :id, :conjunto,{:prompt=> "Selecione o tipo..."},{:class => "selc_medium"} %></td>
+
+    </tr>
+    <tr>
+    <td colspan="5">
+      <fieldset>
+        <legend>Valores:</legend>
+          <table>
+            <tr>
+               <%= field_us 'U$:',f,:desc_us,
+                     :onblur   => "UsToGsRs('analizes_financa_cotacao','analizes_financa_cotacao_real','analizes_financa_desc_us','analizes_financa_desc_gs','analizes_financa_desc_rs')" %>
+
+
+               <%= field_gs 'Gs.:',f,:desc_gs,
+               :onblur   => "GsToUsRs('analizes_financa_cotacao','analizes_financa_cotacao_real','analizes_financa_desc_gs','analizes_financa_desc_us','analizes_financa_desc_rs')" %>
+
+
+               <%= field_us 'R$:',f,:desc_rs,
+               :onblur   => "RsToUsGs('analizes_financa_cotacao','analizes_financa_cotacao_real','analizes_financa_desc_gs','analizes_financa_desc_us','analizes_financa_desc_rs')" %>
+
+            </tr>
+          </table>
+      </fieldset>
+    </td>
+    <td><%= f.submit :value => t('SAVE'), :class => "button" %></td>
+  </tr>
+</table>
+<% end %>

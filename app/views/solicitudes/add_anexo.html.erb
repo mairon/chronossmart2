@@ -1,0 +1,30 @@
+<h1 id="header">Add Anexo</h1>
+
+<div class="group">
+  <%= form_for(@solicitude) do |f| %>
+  <% if @solicitude.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@solicitude.errors.count, "error") %> prohibited this solicitude from being saved:</h2>
+
+      <ul>
+      <% @solicitude.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <table>
+    <tr>
+      <td>
+        <label>Anexo</label>
+        <%= f.file_field :anexo %>
+      </td>
+    </tr>
+    </table>
+  <div class="footer-buttons">
+    <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    <%= link_to t('BACK'), solicitudes_path, :class => "btn btn-back" %>
+  </div>
+<% end %>
+</div>

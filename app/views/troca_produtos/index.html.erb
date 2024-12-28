@@ -1,0 +1,33 @@
+<h1 id="header">troca_produtos</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_troca_produto_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Troca</td>
+            <td>Producto</td>
+            <td>Cantidad</td>
+            <td>Unitario G$</td>
+            <td>Total G$</td>
+            <td>Status</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @troca_produtos.each do |troca_produto| %>
+      <tr>
+                  <td><%= troca_produto.troca %></td>
+                  <td><%= troca_produto.produto %></td>
+                  <td><%= troca_produto.quantidade %></td>
+                  <td><%= troca_produto.unitario_gs %></td>
+                  <td><%= troca_produto.total_gs %></td>
+                  <td><%= troca_produto.status %></td>
+                <td><%= link_to 'Editar', edit_troca_produto_path(troca_produto) %></td>
+        <td><%= link_to t('DELETE'), troca_produto, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

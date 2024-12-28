@@ -1,0 +1,94 @@
+<div class="panel">
+  <h1 id="header">
+
+    <form id="main_fc">
+      <div class="row">
+        <div class="col-md-4">
+          Fluxo Caja prox. 7 dias
+        </div>
+        <div class="col-md-1" style="padding-top: 18px">
+          <div class="material-switch">
+            <%= check_box_tag :convert, nil %>
+            <label for="convert" class="label-info"></label>
+          </div>
+        </div>
+        <div class="col-md-1" style="padding-top: 0px">
+          <small>Converter</small>
+        </div>
+
+        <div class="col-md-2">
+          <%= select_tag :moeda_fc, options_for_select([['U$', 0], ['Gs.', 1], ['R$', 2]], selected: @unidade.moeda) %>
+        </div>
+        <div class="col-md-4">
+          <small id="ct-gs" hidden>Ctz. Gs.x U$ <%= format_int(@ctz.dolar_compra) %> | Gs.x R$ <%= format_int(@ctz.real_compra) %></small>
+          <small id="ct-us" hidden>Ctz. U$ x Gs.<%= format_int(@ctz.dolar_venda) %> | U$ x R$ <%= format_decimal(@ctz.rs_us_venda) %></small>
+          <small id="ct-rs" hidden>Ctz. R$ x Gs.<%= format_int(@ctz.real_venda) %> | R$ x U$ <%= format_decimal(@ctz.rs_us_compra) %></small>
+          <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;", style:"margin: 20px 10px") %>
+        </div>
+      </div>
+    </form>
+  </h1>
+
+  <div class="panel-content"  id="pagina"></div>
+</div>
+
+<%= javascript_include_tag 'busca_ajax' %>
+
+<%= render 'main/modal_fc_detalhe' %>
+
+<script>
+  $(document).ready(function() {
+    url="/main/result_main_fluxo_caixa?" + $('#main_fc').serialize();
+
+    if(<%= @unidade.moeda.to_i %> == 0){
+      $("#ct-gs").hide()
+      $("#ct-us").show()
+      $("#ct-rs").hide()
+    } else if(<%= @unidade.moeda.to_i %> == 1){
+      $("#ct-gs").show()
+      $("#ct-us").hide()
+      $("#ct-rs").hide()
+    } else if(<%= @unidade.moeda.to_i %> == 2){
+      $("#ct-gs").hide()
+      $("#ct-us").hide()
+      $("#ct-rs").show()
+    };
+
+    ajax(url);
+  });
+
+  $('#moeda_fc, #convert').on('change keyup', function(){
+      url="/main/result_main_fluxo_caixa?" + $('#main_fc').serialize();
+      if( $("#moeda_fc").val() == 0){
+        $("#ct-gs").hide()
+        $("#ct-us").show()
+        $("#ct-rs").hide()
+      } else if( $("#moeda_fc").val() == 1){
+        $("#ct-gs").show()
+        $("#ct-us").hide()
+        $("#ct-rs").hide()
+      } else if( $("#moeda_fc").val() == 2){
+        $("#ct-gs").hide()
+        $("#ct-us").hide()
+        $("#ct-rs").show()
+      };
+      ajax(url);
+  });
+
+</script>
+
+
+<style>
+  .grid-fc td{
+    width: 90px;
+    padding: 10px;
+    border: 1px solid #cfd8e6;
+  }
+  .grid-fc{
+
+    border-radius: 5px;
+  }
+</style>
+
+
+

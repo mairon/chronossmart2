@@ -1,0 +1,13 @@
+<% if params[:tipo_listado] == '1' %>
+	<%= render '/relatorios/forms/ponto_detalhado' %>
+<% elsif params[:tipo_listado] == '2' %>
+	<%= render '/relatorios/forms/rh/ponto_funcionario' %>
+<% elsif params[:tipo_listado] == '3' %>
+	<%= render '/relatorios/forms/rh/resumo_unidade' %>
+<% elsif params[:tipo_listado] == '4' %>
+	<%= render '/relatorios/forms/rh/resumo_unidade_fiscal' %>
+<% elsif params[:tipo_listado] == '5' %>
+	<%= render '/relatorios/forms/rh/detalhado_unidade_fiscal' %>
+<% else %>
+	<%= render '/relatorios/forms/ponto_turno' %>
+<% end %>

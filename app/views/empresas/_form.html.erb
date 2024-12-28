@@ -1,0 +1,57 @@
+<h1 id="header">Config. Empresas</h1>
+<div class="panel">
+  <div class="panel-body">
+		<%= form_for(@empresa) do |f| %>
+    <div class="row">
+    	<div class="col-md-12">
+		    <label>Nome Base/Diretorio Arquivos</label>
+	    	<%= f.text_field :nome %>
+    	</div>
+    </div>
+
+    <div class="row">
+    	<div class="col-md-12">
+		    <label>Taxa Interes</label>
+	    	<%= f.text_field :taxa_interes %>
+    	</div>
+    </div>   
+
+    <div class="row">
+    	<div class="col-md-6">
+		    <label>Locale</label>
+	    	<%= f.select :locale, [['es','es'], ['pt-br']] %>
+    	</div>
+    </div>
+    <div class="row">
+    	<div class="col-md-12">
+		    <label></label>
+	    	<%= f.check_box :gasto_detalhado %> Gasto Detalhado
+    	</div>
+    </div>
+   	<div class="row">
+    	<div class="col-md-12">
+		    <label></label>
+	    	<%= f.check_box :mobile_integration %> Integración Mobile
+    	</div>
+    </div>   
+
+
+    <div class="row">
+    	<div class="col-md-12">
+				<fieldset>
+	      <legend>Segmento Padrão do sistema</legend>
+			    <%= f.radio_button :segmento, 0 %> Comercial <br>
+			    <%= f.radio_button :segmento, 1 %> Educação <br>
+			    <%= f.radio_button :segmento, 2 %> Comercio Automotor <br>
+				</fieldset>				
+    	</div>
+    </div> 	 
+	  <div class="footer-buttons">
+	    <%= f.submit t('SAVE'), :class => "btn btn-green" %>
+	    <%= link_to t('BACK'), empresas_path,:class => "button back" %>
+	  </div>
+	</div>
+<% end %>
+  </div>
+</div>
+

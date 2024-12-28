@@ -1,0 +1,35 @@
+<body onload="FechamentoTurnoData()">
+<h1 align="right" id="header">Cierre Turno</h1>
+Cierre Turno - Edicion
+<% form_for(@fechamento_turno) do |f| %>
+  <%= f.error_messages %>
+
+  <div class="group">
+    <table>
+      <tr>
+        <td><%= t('DATE') %>:</td>
+        <td><%= f.date_select :data %></td>
+        <td>Turno:</td>
+        <td><%= f.collection_select :turno_id, Turno.all(:select => 'id,nome',:order => '1'),:id,:nome %></td>
+      </tr>
+      <tr>
+        <td>Pico:</td>
+        <td><%= f.collection_select :bomba_id, Bomba.all(:select => 'id,nome',:order => '1'),:id,:nome %></td>
+      </tr>
+      <tr>
+        <td>Inicio:</td>
+        <td><%= f.text_field :inicio, :size => 15 %></td>
+        <td>Cierre:</td>
+        <td><%= f.text_field :final, :size => 15 %></td>
+
+      </tr>
+
+
+
+    </table>
+  </div>
+    <%= f.submit t('SAVE') %> |
+    <%= link_to t('BACK'), fechamento_turnos_path %>
+<% end %>
+
+</body>

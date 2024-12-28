@@ -1,0 +1,92 @@
+<div class="group">
+  <h1 id="header">Orden de Servicio - Checklist
+    <div style="float: right;"><%= link_to t('BACK'), ordem_servs_path, :class => "btn btn-back" %></div>
+  </h1>
+
+    <h1 id="header"> Equipo:
+      <%= @ordem_serv.persona_rodado.chapa unless @ordem_serv.persona_rodado.nil? %> -
+      <%= @ordem_serv.persona_rodado.modelo unless @ordem_serv.persona_rodado.nil? %> -
+      <%= @ordem_serv.persona_rodado.marca unless @ordem_serv.persona_rodado.nil? %> -
+      <%= @ordem_serv.persona_rodado.cor unless @ordem_serv.persona_rodado.nil? %>
+    </h1>
+
+  <%= form_for(@ordem_serv) do |f| %>
+  <%= hidden_field_tag :tela, 'checklist' %>
+  <style>
+    .rd{
+      zoom: 2;
+    }
+    table td{
+      padding:  15px;
+  </style>
+    <div class="row">
+      <div class="col-md-12">
+
+      <table border="1">
+        <tr>
+          <td align="center" width="100">OK</td>
+          <td align="center" width="100">NO OK</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td align="center"><%= f.radio_button :luz_display, true, class: 'rd' %></td>
+          <td align="center"> <%= f.radio_button :luz_display, false, class: 'rd' %></td>
+          <td><h1>Luces de ínstrumentos y display</h1></td>
+        </tr>
+
+        <tr>
+          <td align="center"><%= f.radio_button :luz_interna, true, class: 'rd' %></td>
+          <td align="center"> <%= f.radio_button :luz_interna, false, class: 'rd' %></td>
+          <td><h1>Luces interiores</h1></td>
+        </tr>
+
+        <tr>
+          <td align="center"><%= f.radio_button :freio, true, class: 'rd' %></td>
+          <td align="center"> <%= f.radio_button :freio, false, class: 'rd' %></td>
+          <td><h1>Freno de Estacionamiento</h1></td>
+        </tr>
+
+        <tr>
+          <td align="center"><%= f.radio_button :sinalizadores, true, class: 'rd' %></td>
+          <td align="center"> <%= f.radio_button :sinalizadores, false, class: 'rd' %></td>
+          <td><h1>Señaladores (luces señaladero, baliza, bocina)</h1></td>
+        </tr>
+
+        <tr>
+          <td align="center"><%= f.radio_button :volante, true, class: 'rd' %></td>
+          <td align="center"> <%= f.radio_button :volante, false, class: 'rd' %></td>
+          <td><h1>Volante</h1></td>
+        </tr>
+
+        <tr>
+          <td align="center"><%= f.radio_button :audio, true, class: 'rd' %></td>
+          <td align="center"> <%= f.radio_button :audio, false, class: 'rd' %></td>
+          <td><h1>Audio</h1></td>
+        </tr>
+
+        <tr>
+          <td align="center"><%= f.radio_button :ventilador, true, class: 'rd' %></td>
+          <td align="center"> <%= f.radio_button :ventilador, false, class: 'rd' %></td>
+          <td><h1>AA - Ventilador</h1></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <label></label>
+      <%= f.text_area :obs_checklist, rows: 5, cols: 50, class: 'panel-field', placeholder: 'Obs.' %>
+    </div>
+  </div>
+  <div class="footer-buttons">
+    <%= f.submit "Salvar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+  </div>
+<% end %>
+</div>
+
+<br>
+<br>
+<div class="group">
+  <%= render 'files' %>
+</div>

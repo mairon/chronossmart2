@@ -1,0 +1,19 @@
+<table class="head_grid">
+    <tr>
+      <td width="50" align="center">Id</td>
+      <td width="300" align="center">Cod. barra</td>
+    </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+  <% produto_barras.each do |prod_ba| %>
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td width="50" align="center"><%= prod_ba.produto_id %></td>
+      <td width="300" align="center"><%= prod_ba.barra %></td>
+      <td><%= link_to 'Edit', edit_produto_barra_path(prod_ba) %></td>
+      <td><%= link_to 'Destroy', prod_ba, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+    </tr>
+  <% end %>
+  </table>
+</div>

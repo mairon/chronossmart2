@@ -1,0 +1,96 @@
+  <h1 id="header">CMV Analitico</h1>
+  <style type="text/css">
+    select {
+      width: 350px;
+    }
+  </style>
+  <div class="group">
+    <h2>
+      <%= form_tag resultado_cmv_stocks_path, :method => "get" do %>
+        <table>
+          <tr>
+            <td align="right"> Fecha:</td>
+            <td>
+
+                <input name       = "inicio"
+                       id         = "inicio"
+                       size       = "10"
+                       type       = "text"
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'campo_clase')"
+                       autofocus/>
+                hasta
+
+                <input name       = "final"
+                       id         = "final"
+                       size       = "10"
+                       type       = "text"
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'campo_clase')"
+                       autofocus/></td>
+          </tr>
+
+          <tr>
+            <td align="right">Unidad:</td>
+            <td>
+              <%= select("busca", "unidade", Unidade.select('id,unidade_nome').order('unidade_nome').collect {|p| [ p.unidade_nome, p.id ] }) %>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="right">Grupo:</td>
+            <td>
+              <%= select("busca", "grupo", Grupo.select('id,descricao').order('descricao').collect {|p| [ p.descricao, p.id ] },{prompt: 'Todos..'}) %>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="right">Sub-Grupo:</td>
+            <td>
+              <%= select("busca", "sub-grupo", SubGrupo.select('id,descricao').order('descricao').collect {|p| [ p.descricao, p.id ] },{prompt: 'Todos..'}) %>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="right">Producto:</td>
+
+            <td>
+
+              <%= select("busca", "produto", Produto.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] },{ :include_blank => true })   %></td>
+          </tr>
+          <tr>
+              <td align="right">Moneda:</td>
+              <td>
+                <fieldset>
+                  <%= radio_button_tag 'moeda', '0' %> Dolar
+                  <%= radio_button_tag 'moeda', '1', Checked: 'true' %> Guaranies
+                  <%= radio_button_tag 'moeda', '2'%> Reais
+                </fieldset>
+              </td>
+          </tr>
+                <tr>
+                  <td></td>
+                  <td>
+                    <input  id      ="button"
+                            type    ="submit"
+                            class   = "btn btn-green"
+                            value   ="Informe"
+                            onclick = "Tipo('0')"/>
+
+                    <input type     = "submit"
+                           class   = "btn btn-blue"
+                           value    = "Excel"
+                           onclick  = "Tipo('1')"/>
+                </tr>
+
+               <input type  = "hidden"
+                      name  = "tipo"
+                      id    = "tipo"
+                      size  = "5"
+                      value = "0"/>
+
+        </table>
+      <% end %>
+
+    </h2>
+  </div>

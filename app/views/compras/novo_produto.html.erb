@@ -1,0 +1,18 @@
+<body onload="CampoCompraProduto()">
+
+   <h1 align="right" id="header">Nuevo Producto</h1>
+ 
+    <%= render :partial=>"compras/eps/new_produto_E03", :locals=>{:compras_produto=>ComprasProduto.new(:compra_id=>@compra.id)} %>
+</body>
+
+<script>
+  //ABRI POPUP-----------------------------------------------------------------
+document.onkeydown=function(e)
+{
+    if(e.which == 113)
+        window.open('/produtos/busca_compra_produto', 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=10, WIDTH=1000, HEIGHT=400');
+}
+     
+//FIM ABRI POPUP----------------------------------------------------------------
+
+</script>

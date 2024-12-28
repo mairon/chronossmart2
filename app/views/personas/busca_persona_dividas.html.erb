@@ -1,0 +1,28 @@
+<table>
+   <tr>
+      <td width="80"align="center">Cod.</td>
+      <td width="180"align="center"><%= t('NAME') %></ttd>
+      <td width="100"align="center"><%= t('EXPIRATION') %></td>
+      <td width="100"align="center">Divida</td>
+   </tr>
+</table>
+
+<div class="rolagem" id="div">
+   <table>
+      <% for persona in @personas %>
+         <% if $empresa == 'E01' %>
+            <% cod = persona.cod_velho%>
+         <% else %>
+            <% cod = persona.id %>
+         <% end %>
+         <tr class = "<%= cycle("cor1", "cor2")%>"
+             onMouseOver="javascript:this.style.backgroundColor='#949494'"
+             onMouseOut="javascript:this.style.backgroundColor=''">
+            <td width="80"align="center"><%= persona.id %></td>
+            <td width="180"align="center"><%= persona.nome %></td>
+            <td width="100"align="center"><%= persona.vencimento %></td>
+            <td width="100"align="center"><%= persona.divida_guarani %></td>
+         </tr>
+      <% end %>
+   </table>
+</div>

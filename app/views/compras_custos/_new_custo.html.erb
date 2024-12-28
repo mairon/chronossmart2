@@ -1,0 +1,150 @@
+<!-- antes de gravar é feito um loop no controller periodo ocorrente do lançamento que fica cadastrado no plano de contas !-->
+  <%= form_for(compras_custo) do |f| %>
+    <%= f.hidden_field :compra_id %>
+    <% if compras_custo.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(compras_custo.errors.count, "error") %> prohibited this compras_custo from being saved:</h2>
+
+        <ul>
+        <% compras_custo.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <table>
+      <tr>
+        <td style="padding: 0px 10px; width: 300px">
+        	<label><%= t('UNIT') %></label>
+        	<%= f.collection_select :unidade_id, 
+                  Unidade.all( :select => 'id,unidade_nome',
+                               :order  => '1' ),:id,
+                               :unidade_nome, { :prompt => 'Selecione la Unidad' },{autofocus: true, required: true} %>
+            <%= image_tag("load.gif",
+                            :align => "absmiddle",
+                            :border => 0,
+                            :id => "spinner2",
+                            :width => 21,
+                            :height => 21,
+                            :style =>"display: none;" ) %>                               
+        </td>
+        <td style="padding: 0px 10px; width: 300px">
+          <label><%= t('CENTER_OF_COSTOS') %></label>
+          <%= f.collection_select :centro_custo_id, 
+                    CentroCusto.all( :select => 'id,nome',
+                                 :order  => '1' ),:id,
+                                 :nome, { :prompt => 'Selecione lo centro de costo' }, {required: true} %>
+          </td>
+      </tr>
+
+      <tr>
+        <td style="padding: 0px 10px; width: 300px">
+          <label>Rodados</label>
+          <%= f.collection_select :rodado_id, 
+                  Rodado.all( :select => 'id,placa',
+                               :order  => '1' ),:id,
+                               :placa, { :prompt => 'Selecione la Rodado' } %>
+                                          
+        </td>
+        <td style="padding: 0px 10px; width: 300px">
+          <label>Empleado</label>
+          <%= f.collection_select :funcionario_id, 
+                    Persona.where(tipo_funcionario: 1).select('id,nome'), :id,
+                                 :nome, { :prompt => 'Selecione lo Empleado' } %>
+          </td>
+      </tr>
+ <% sql = "SELECT PC.ID,
+                     (PG.DESCRICAO || ' > ' || PC.DESCRICAO) AS DESCRICAO
+              FROM PLANO_DE_CONTAS PC
+              LEFT JOIN PLANO_DE_CONTAS PG
+              ON SUBSTRING(PG.CODIGO, 1, 8) = SUBSTRING(PC.CODIGO, 1, 8)
+              WHERE LENGTH(PC.CODIGO) >=12 AND LENGTH(PG.CODIGO) =8
+              ORDER BY 2"
+      plano = PlanoDeConta.find_by_sql(sql)
+    %>
+
+      <tr>
+
+      	<td style="padding: 1px 10px; width: 300px;">
+      	<label><%= t('CLASSIFICATION') %></label>
+        <%= f.collection_select :plano_de_conta_id, plano,:id, :descricao,{:prompt => 'Selecione'}, {required: true} %>
+        </td>
+        <% if @compra.moeda == 0 %>
+          <%= field_us_label 'U$:', f, :valor_us, value: format_decimal(( @compra.total_dolar.to_f) - @compra.desconto_dolar.to_f - @compra.compras_custos.sum(:valor_us).to_f) %>
+        <% elsif @compra.moeda == 2 %>
+          <%= field_us_label 'R$:', f, :valor_rs, value: format_decimal((@compra.total_real.to_f) - @compra.desconto_real.to_f - @compra.compras_custos.sum(:valor_rs).to_f) %>
+
+        <% else %>
+          <%= field_gs_label 'G$:', f, :valor_gs, value: format_int((  @compra.total_guarani.to_f - @compra.desconto_guarani.to_f) - @compra.compras_custos.sum(:valor_gs).to_f) %>
+        <% end %>
+
+        <td align="right" style="padding-top: 24px; padding-bottom: 4px"><%= f.submit t('SAVE'), :class => "button add", :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %></td>
+      </tr>
+    </table> 
+  <% end %>
+
+<script type="text/javascript">
+  
+$(document).ready(function() {
+  $('#compras_custo_centro_custo_id').selectize();
+  $('#compras_custo_plano_de_conta_id').selectize();
+  $('#compras_custo_rodado_id').selectize();
+  $('#compras_custo_funcionario_id').selectize();
+ 
+  $('#compras_custo_unidade_id').selectize();
+  $('#compras_custo_unidade_id')[0].selectize.focus();
+  var xhr;
+  var select_state, $select_state;
+  var select_city, $select_city;
+
+
+$select_state = $('#compras_custo_rubro_grupo_id').selectize({
+    persist: false,
+    onChange: function(value) {
+      if (!value.length) return;
+      select_city.clearOptions();
+      select_city.load(function(callback) {
+        xhr && xhr.abort();
+        xhr = $.ajax({
+          type: "GET",
+           url: "/compras/dynamic_rubro_grupo/"+value,
+          data: value,
+          dataType: 'json',
+          beforeSend: function(){
+            $('#spinner2').show();
+          },
+          success: function(results){
+            $('#spinner2').hide();
+            callback(results);
+            console.log(results);
+          },
+          error: function() {
+            callback();
+          }
+
+        });
+     });
+  }, 
+    sortField: {
+        field: 'text',
+        direction: 'asc'
+    },    
+    dropdownParent: 'body'
+});
+
+$select_city = $('#compras_custo_rubro_id').selectize({
+    persist: false,
+    valueField: 'id',
+    labelField: 'descricao',
+    searchField: ['descricao'],
+    preload: true,
+    dropdownParent: 'body'
+});
+
+
+select_city  = $select_city[0].selectize;
+select_state = $select_state[0].selectize;
+});
+
+
+</script>

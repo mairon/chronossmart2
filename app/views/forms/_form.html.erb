@@ -1,0 +1,146 @@
+
+<%= form_for(@form) do |f| %>
+  <% if @form.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@form.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @form.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+
+  <ul class="tabs">
+      <li><a href="#tab1">Venda</a></li>
+  </ul>
+
+    <div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <fieldset>
+        <table>
+          <tr>
+            <td width="1000">
+                <table>
+                  <tr>
+                    <td align="right">Venda Cliente :</td>
+                    <td><%= f.text_field :form_venda_cliente %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Venda Produto :</td>
+                    <td><%= f.text_field :form_venda_produtos %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Venda Index New :</td>
+                    <td><%= f.text_field :venda_index_new %></td>
+                    <td>form = 'new'</td>
+                    <td>form = 'new_balcao'</td>
+                  </tr>
+                  <tr>
+                    <td align="right">Busca Persona Venda :</td>
+                    <td><%= f.text_field :busca_venda_cliente %></td>
+                    <td>form = '/personas/eps/form_busca_cliente_E01'</td>
+                    <td>form = '/personas/eps/form_busca_cliente_E02'</td>
+                  </tr>
+                  <tr>
+                    <td align="right">Venda Financa :</td>
+                    <td><%= f.text_field :form_venda_financa %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Ingressos :</td>
+                    <td><%= f.text_field :form_ingressos %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Compras :</td>
+                    <td><%= f.text_field :form_compras %></td>
+                  </tr>
+
+
+                  <tr>
+                    <td align="right">Gastos :</td>
+                    <td><%= f.text_field :form_gastos %></td>
+                  </tr>
+                </table>
+            </td>
+          </tr>
+        </table>
+      </fieldset>
+      </div>
+
+      <ul class="tabs">
+        <li><a href="#tab1">Impressos</a></li>
+      </ul>
+
+      <div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <fieldset>
+        <table>
+          <tr>
+            <td>
+                <table>
+                  <tr>
+                    <td align="right">Venda Fatura :</td>
+                    <td><%= f.text_field :form_venda_fatura %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Recibo de <%= t('CHARGE') %>:</td>
+                    <td><%= f.text_field :recibo_cobro %></td>
+                  </tr>
+
+
+                  <tr>
+                    <td align="right">Recibo de Adelanto :</td>
+                    <td><%= f.text_field :recibo_adelanto %></td>
+                  </tr>
+                </table>
+            </td>
+          </tr>
+        </table>
+        </fieldset>
+      </div>
+
+
+      <ul class="tabs">
+        <li><a href="#tab1">Relatórios - Consultas</a></li>
+      </ul>
+
+      <div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <fieldset>
+        <table>
+          <tr>
+            <td>
+
+                <table>
+                  <tr>
+                    <td align="right">Relacao de comissão :</td>
+                    <td><%= f.text_field :rl_comissao %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Consulta de Stock :</td>
+                    <td><%= f.text_field :consulta_stock %></td>
+                  </tr>
+                </table>
+            </td>
+          </tr>
+        </table>
+        </fieldset>
+
+      </div>
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+      </div>
+
+ </div>
+<% end %>
+>>>>>>> karen/master

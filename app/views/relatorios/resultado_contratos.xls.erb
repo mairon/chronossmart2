@@ -1,0 +1,5 @@
+<% if params[:detalhe] == "0" %>
+  <%= render :partial => 'relatorios/forms/contratos/sintetico' %>
+<% elsif params[:detalhe] == "1" %>
+	<%= render :partial => 'relatorios/forms/contratos/analitico' %>
+<% end %>

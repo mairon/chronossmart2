@@ -1,0 +1,51 @@
+<%= form_for(@sub_grupo_preco) do |f| %>
+  <% if @sub_grupo_preco.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@sub_grupo_preco.errors.count, "error") %> prohibited this sub_grupo_preco from being saved:</h2>
+
+      <ul>
+      <% @sub_grupo_preco.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> Porcen Precios Unidad: <%= @sub_grupo_preco.unidade.unidade_nome %> - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                    <td align="right">Consumidor Final :</td>
+                    <td><%= f.text_field :porcen_tabela_01 %></td>
+
+                    <td align="right">Cliente Especial :</td>
+                    <td><%= f.text_field :porcen_tabela_02 %></td>
+
+                    <td align="right">Colaboradores :</td>
+                    <td><%= f.text_field :porcen_tabela_03 %></td>
+
+                    <td align="right">Tabla 04 :</td>
+                    <td><%= f.text_field :porcen_tabela_04 %></td>
+                  </tr>
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), "/sub_grupos/#{@sub_grupo_preco.sub_grupo_id}", :class => "button back" %>
+      </div>
+
+    </div>
+<% end %>

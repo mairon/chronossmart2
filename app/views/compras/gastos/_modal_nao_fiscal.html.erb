@@ -1,0 +1,560 @@
+<div class="group">
+  <%= form_for(Compra.new) do |f| %>
+    <%= f.hidden_field :tipo_compra, value: 1 %>
+    <%= f.hidden_field :tipo, value: 0 %>
+    <%= f.hidden_field :fiscal, value: '0' %>
+    <%= hidden_field_tag :moeda, current_unidade.moeda.to_i %>
+    <%= hidden_field_tag :modelo_form, 'modalv2' %>
+    <%= hidden_field_tag :doc, @last_doc.to_s.rjust(6, '0') %>
+    <%= f.hidden_field :cotacao %>
+    <%= f.hidden_field :cotacao_real %>
+    <%= f.hidden_field :cotacao_rs_us %>
+   
+
+    <% sql = "SELECT PC.ID,
+                     (PG.DESCRICAO || ' > ' || PC.DESCRICAO) AS DESCRICAO
+              FROM PLANO_DE_CONTAS PC
+              LEFT JOIN PLANO_DE_CONTAS PG
+              ON SUBSTRING(PG.CODIGO, 1, 8) = SUBSTRING(PC.CODIGO, 1, 8)
+              WHERE LENGTH(PC.CODIGO) >=12 AND LENGTH(PG.CODIGO) =8
+              ORDER BY 2"
+      plano = PlanoDeConta.find_by_sql(sql)
+    %>
+    <div class="row">
+      <div class="col-md-5">
+        <label>
+          <%= t('PROVIDER') %>
+          <a href="#" target="popup" style="font-size: 12px;" onclick="window.open('/personas/new?layout=resumido','popup','width=600,height=600'); return false;"> Add </a>
+        </label>
+        <%= f.text_field :persona_nome, required: true, class: 'autocomplete panel-field' %>
+         <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+        <%= f.hidden_field :persona_id %>
+      </div>
+      <div class="col-md-2">
+        <label><%= t('DATE') %></label>
+        <%= f.text_field :data, value: Time.now.strftime("%d/%m/%Y"), size: 8,  class: "panel-field date", autofocus: true, required: true %>
+      </div>
+
+      <div class="col-md-2">
+        <label><%= t('COIN') %></label>
+        <%= f.select :moeda, [['Gs.', 1], ['U$', 0], ['R$', 2]], :selected => current_unidade.moeda.to_i %>
+      </div>
+
+      <div class="col-md-3">
+        <label>Competencia</label>
+        <%= f.date_select :competencia, :discard_day => true %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-7">
+        <label><%= t('CLASSIFICATION') %></label>
+        <%= f.collection_select :plano_de_conta_id, plano,:id, :descricao,{:prompt => 'Selecione'}, {required: true} %>
+      </div>
+      <div class="col-md-5">
+        <label><%= t('CENTER_OF_COSTOS') %></label>
+        <%= f.collection_select :centro_custo_id, CentroCusto.all( :select => 'id,nome', :order  => '1' ),:id, :nome, { :prompt => 'Selecione' }, {required: true} %>
+      </div>
+    </div>
+
+      <div class="row">
+        <div class="col-md-7">
+            <label>Empleado</label>
+            <%= f.collection_select :funcionario_id, Persona.where(tipo_funcionario: 1).select('id,nome'),:id, :nome, { :prompt => 'Selecione' }%>
+        </div>
+
+        <div class="col-md-5">
+          <label>Viatico</label>
+          <select id="compra_viatico_id" name="compra[viatico_id]">
+            <option></option>
+          </select>
+        </div>
+
+      </div>
+
+    <% producao = Producao.all( :select => 'id,nome', :order  => '1' ) %>
+    <% unless producao.blank? %>
+
+      <div class="row">
+        <div class="col-md-12">
+            <label>Produción</label>
+            <%= f.collection_select :producao_id, producao,:id, :nome, { :prompt => 'Selecione' }%>
+        </div>
+      </div>
+
+    <% end %>
+
+    <% rodado = Rodado.all( :select => 'id,placa', :order  => '1' ) %>
+    <% unless rodado.blank? %>
+
+      <div class="row">
+        <div class="col-md-12">
+            <label>Rodado</label>
+            <%= f.collection_select :rodado_id, rodado,:id, :placa, { :prompt => 'Selecione' } %>
+        </div>
+      </div>
+
+    <% end %>
+
+    <% safra = Safra.all( :select => 'id,nome', :order  => '1' ) %>
+    <% unless safra.blank? %>
+
+      <div class="row">
+        <div class="col-md-12">
+            <label>Zafra</label>
+            <%= f.collection_select :safra_id, safra,:id, :nome, { :prompt => 'Selecione' } %>
+        </div>
+      </div>
+
+    <% end %>
+
+
+    <% contrato = Contrato.all( :select => 'id', :order  => '1' ) %>
+    <% unless contrato.blank? %>
+
+      <div class="row">
+        <div class="col-md-12">
+            <label>Contrato</label>
+            <%= f.collection_select :contrato_id,
+                       Contrato.find_by_sql("SELECT C.ID, (C.DOCUMENTO_NUMERO || ' - ' || P.NOME) AS PERSONA_NOME FROM CONTRATOS C INNER JOIN PERSONAS P ON P.ID = C.PERSONA_ID WHERE C.STATUS = 'Ativo' "),:id,:persona_nome,
+                                 { :prompt => 'Seleccione' } %>
+        </div>
+      </div>
+
+    <% end %>
+    <hr>
+    <div class="row">
+      <div class="col-md-2 fiscal">
+        <label class="label-sf">Número</label>
+        <%= f.text_field :documento_numero_01, value: '000', class: 'panel-field' %>
+      </div>
+      <div class="col-md-2 fiscal">
+        <label>.</label>
+        <%= f.text_field :documento_numero_02, value: '000', class: 'panel-field' %>
+      </div>
+      <div class="col-md-3">
+        <label class="label-nf">Número</label>
+        <label class="label-sf">.</label>
+        <%= f.text_field :documento_numero, value: '000', class: 'panel-field', required: true %>
+      </div>
+
+      <div class="col-md-5 fiscal">
+        <label>Timbrado</label>
+        <%= f.text_field :documento_timbrado, class: 'panel-field', maxlength: 8, placeholder: '8 Digitos' %>
+      </div>
+
+      <div class="col-md-3 fiscal valores-gs">
+        <%= panel_field_gs_label 'Exentas Gs.',f,:exentas_guarani %>
+      </div>
+
+      <div class="col-md-3 fiscal valores-gs">
+        <%= panel_field_gs_label 'Gravadas 5% Gs.',f,:gravadas_05_guarani %>
+      </div>
+
+      <div class="col-md-3 fiscal valores-gs">
+        <%= panel_field_gs_label 'Gravadas 10% Gs.',f,:gravadas_10_guarani %>
+      </div>
+
+      <div class="col-md-3 valores-gs">
+        <%= panel_field_gs_label 'Total Gs.',f,:total_guarani %>
+      </div>
+      <% if current_unidade.retencao == true %>
+        <div class="col-md-3 valores-gs">
+          <%= panel_field_gs_label 'Retención',f,:retencao_gs %>
+        </div>
+      <% end %>
+
+      <div class="col-md-3 fiscal valores-us">
+        <%= panel_field_us_label 'Exentas U$',f,:exentas_dolar %>
+      </div>
+
+      <div class="col-md-3 fiscal valores-us">
+        <%= panel_field_us_label 'Gravadas 5% U$',f,:gravadas_05_dolar %>
+      </div>
+
+      <div class="col-md-3 fiscal valores-us">
+        <%= panel_field_us_label 'Gravadas 10% U$',f,:gravadas_10_dolar %>
+      </div>
+
+      <div class="col-md-3 valores-us">
+        <%= panel_field_us_label 'Total U$',f,:total_dolar %>
+      </div>
+
+      <% if current_unidade.retencao == true %>
+        <div class="col-md-3 valores-us">
+          <%= panel_field_us_label 'Retención U$',f,:retencao_us %>
+        </div>
+      <% end %>
+
+
+      <div class="col-md-3 fiscal valores-rs">
+        <%= panel_field_us_label 'Exentas R$',f,:exentas_real %>
+      </div>
+
+      <div class="col-md-3 fiscal valores-rs">
+        <%= panel_field_us_label 'Gravadas 5% R$',f,:gravadas_05_real %>
+      </div>
+
+      <div class="col-md-3 fiscal valores-rs">
+        <%= panel_field_us_label 'Gravadas 10% R$',f,:gravadas_10_real %>
+      </div>
+
+      <div class="col-md-3 valores-rs">
+        <%= panel_field_us_label 'Total R$',f,:total_real %>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="row">
+      <div class="col-md-4">
+        <label><%= t('FORM_OF_PAYMENT') %></label>
+        <%= f.collection_select :forma_pago_id, FormaPago.all(:select => ' id,nome', :conditions => ["gasto = true"],
+              :order => '1'),:id, :nome,{:prompt => 'Selecione'}, {required: true} %>
+        <%= image_tag("select2-spinner.gif", align: "absmiddle", border: 0, id: "spinner-modal", width: 21, height: 21, style: "display: none;") %>
+      </div>
+
+      <div class="col-md-5 efetivo" hidden>
+        <label><%= t('ACCOUNT') %></label>
+        <% if current_unidade.conta_multi_unidades == true %>
+          <%= f.collection_select :conta_id, Conta.all(:select => ' id,nome', :conditions => ["status = true"], :order => '2'),:id, :nome,{:prompt => 'Selecione'}, {required: true, class: 'conta_id'} %>          
+        <% else %>
+          <%= f.collection_select :conta_id, Conta.all(:select => ' id,nome', :conditions => ["status = true and unidade_id = #{current_unidade.id}"], :order => '2'),:id, :nome,{:prompt => 'Selecione'}, {required: true, class: 'conta_id'} %>
+        <% end %> 
+      </div>
+
+      <div class="col-md-3 cheque" hidden>
+        <label>Nº Cheque</label>
+        <%= f.text_field :cheque, class: 'panel-field' %>
+      </div>
+
+      <div class="col-md-3 credito" hidden>
+        <label>Cuotas</label>
+        <%= f.text_field :cota, class: 'panel-field', value: '1' %>
+      </div>
+
+      <div class="col-md-3 credito" hidden>
+        <label>Venci.</label>
+        <%= f.text_field :vencimento, value: Time.now.strftime("%d/%m/%Y"), size: 10,  class: "panel-field date" %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-3 diferido" hidden>
+        <label>Venci.</label>
+        <%= f.text_field :diferido, value: Time.now.strftime("%d/%m/%Y"), size: 10,  class: "panel-field date" %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <%= f.text_area :descricao, class: "panel-field", placeholder: 'Obs.', rows: '3' %>
+      </div>
+    </div>
+    
+    <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    </div>
+
+  <% end %>
+</div>
+
+
+<script>
+  $("#compra_funcionario_id").change(function() {
+      $.ajax({
+        type: "GET",
+         url: "/buscas/busca_viaticos?funcionario_id=" + $("#compra_funcionario_id").val(),
+        beforeSend: function(){
+          $('#spinner-modal').show();
+        },
+        success: function(data){
+          $('#spinner-modal').hide();
+          console.log(data)
+          var $city = $('#compra_viatico_id');
+            $city.empty();
+            $city.append('<option id=' + '' + ' value=' + '' + '>' + '' + '</option>');
+            for (var i = 0; i < data.length; i++) {
+              $city.append('<option id=' + data[i].id + ' value=' + data[i].label + '>' + data[i].label + '</option>');
+            }          
+        }
+      });
+    });
+</script>
+
+<script>
+  $(document).ready(function() {
+
+    $.ajax({url: '/buscas/cotz_us_compra',
+            type: 'POST',
+            beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+            data: 'data=' + $('#compra_data_3i').val()+'/'+
+                            $('#compra_data_2i').val()+'/'+
+                            $('#compra_data_1i').val(),
+            success: function(data){
+            $('#compra_cotacao').val(number_format(data, 0, ',', '.'));} });
+
+    $.ajax({url: '/buscas/cotz_rs_compra',
+            type: 'POST',
+            beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+            data: 'data=' + $('#compra_data_3i').val()+'/'+
+                            $('#compra_data_2i').val()+'/'+
+                            $('#compra_data_1i').val(),
+            success: function(data){
+            $('#compra_cotacao_real').val(number_format(data, 0, ',', '.'));} });
+
+    $.ajax({url: '/buscas/cotz_rs_us_compra',
+            type: 'POST',
+            beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+            data: 'data=' + $('#compra_data_3i').val()+'/'+
+                            $('#compra_data_2i').val()+'/'+
+                            $('#compra_data_1i').val(),
+            success: function(data){
+            $('#compra_cotacao_rs_us').val(number_format(data, 2, ',', '.'));} });
+
+
+  });
+
+  $("#compra_moeda").change(function() {
+    $('#moeda').val(this.value);
+    if ($('#compra_fiscal').val() == '0'){
+      if (this.value == '1') {
+        $(".valores-gs").show();
+        $(".valores-rs").hide();
+        $(".valores-us").hide();
+
+      } else if (this.value == '0') {
+        $(".valores-us").show();
+        $(".valores-rs").hide();
+        $(".valores-gs").hide();
+
+      } else if (this.value == '2') {
+        $(".valores-rs").show();
+        $(".valores-us").hide();
+        $(".valores-gs").hide();
+      };
+      $(".fiscal").hide();
+    } else{
+      $(".fiscal").show();
+      if (this.value == '1') {
+          $(".valores-gs").show();
+          $(".valores-rs").hide();
+          $(".valores-us").hide();
+
+        } else if (this.value == '0') {
+          $(".valores-us").show();
+          $(".valores-rs").hide();
+          $(".valores-gs").hide();
+
+
+
+        } else if (this.value == '2') {
+          $(".valores-rs").show();
+          $(".valores-us").hide();
+          $(".valores-gs").hide();
+        };
+    };
+
+  })
+
+  $("#compra_forma_pago_id").change(function() {
+    if (this.value == '1' || this.value == '3' || this.value == '4') {
+      $(".efetivo").show();
+      $(".cheque").hide();
+      $(".credito").hide();
+      $(".diferido").hide();
+      $("#compra_cheque").prop('required', false);
+      $("#compra_conta_id").prop('required', true);
+      $("#compra_tipo").val('0');
+
+      $.ajax({
+        type: "GET",
+         url: "/buscas/busca_tipo_contas?unidade_id=<%= current_unidade.id %>&tipo=0",
+        beforeSend: function(){
+          $('#spinner-modal').show();
+        },
+        success: function(response){
+          $('#spinner-modal').hide();
+        }
+      });
+
+    } else if (this.value == '2') {
+      $(".efetivo").hide();
+      $(".credito").show();
+      $(".cheque").hide();
+      $(".diferido").hide();
+      $("#compra_cheque").prop('required', false);
+      $("#compra_conta_id").prop('required', false);
+      $("#compra_tipo").val('1');
+
+    } else if (this.value == '25') {
+      $(".efetivo").hide();
+      $(".credito").hide();
+      $(".cheque").hide();
+      $(".diferido").hide();
+      $("#compra_cheque").prop('required', false);
+      $("#compra_conta_id").prop('required', false);
+      $("#compra_tipo").val('0');
+
+    
+    } else if (this.value == '5') {
+      $(".efetivo").show();
+      $(".credito").hide();
+      $(".cheque").show();
+      $("#compra_cheque").prop('required', true);
+      $("#compra_conta_id").prop('required', true);
+      $("#compra_tipo").val('0');
+
+      $.ajax({
+        type: "GET",
+         url: "/buscas/busca_tipo_contas?unidade_id=<%= current_unidade.id %>&tipo=1",
+        beforeSend: function(){
+          $('#spinner-modal').show();
+        },
+        success: function(response){
+          $('#spinner-modal').hide();
+        }
+      });
+
+    } else if (this.value == '6') {
+      $(".efetivo").show();
+      $(".credito").hide();
+      $(".cheque").show();
+      $(".diferido").show();
+      $("#compra_cheque").prop('required', true);
+      $("#compra_conta_id").prop('required', true);
+      $("#compra_tipo").val('0');
+
+      $.ajax({
+        type: "GET",
+         url: "/buscas/busca_tipo_contas?unidade_id=<%= current_unidade.id %>&tipo=1",
+        beforeSend: function(){
+          $('#spinner-modal').show();
+        },
+        success: function(response){
+          $('#spinner-modal').hide();
+        }
+      });
+
+    } else if (this.value == '15') {
+      $(".efetivo").show();
+      $(".credito").hide();
+      $(".cheque").hide();
+      $(".diferido").hide();
+      $("#compra_cheque").prop('required', false);
+      $("#compra_conta_id").prop('required', true);
+      $("#compra_tipo").val('0');
+
+      $.ajax({
+        type: "GET",
+         url: "/buscas/busca_tipo_contas?unidade_id=<%= current_unidade.id %>&tipo=1",
+        beforeSend: function(){
+          $('#spinner-modal').show();
+        },
+        success: function(response){
+          $('#spinner-modal').hide();
+        }
+      });
+    }
+  });
+
+  $(function() {
+    $( "#compra_persona_nome" ).autocomplete({
+        source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+        $.ajax({
+          url: "/personas/busca?per=PROVEEDOR",
+          dataType: "json",
+
+          data: {
+            tipo: 'DESCRIPCION',
+            busca: request.term
+          },
+          beforeSend: function(){
+          $("#spinner").addClass("sppiner_show");
+          },
+
+          success: function( data ) {
+            $("#sppiner").removeClass("sppiner_show");
+            response( data );
+          },
+        });
+      },
+      minLength: 2,
+      change: function( event, ui ) {
+        $("#compra_persona_id").val("");
+        $('#compra_persona_id').val(ui.item.id);
+        return false;
+      }
+    });
+    $( "#compra_persona_nome" ).change(function(){
+      if ($( "#compra_persona_id" ).val() == ''){
+      }
+    });
+  });
+
+
+  $('#compra_centro_custo_id').selectize();
+  $('#compra_plano_de_conta_id').selectize();
+  $('#compra_moeda').selectize();
+  $('#compra_forma_pago_id').selectize();
+  $('#compra_producao_id').selectize();
+  $('#compra_safra_id').selectize();
+  $('#compra_rodado_id').selectize();
+  $('#compra_contrato_id').selectize();
+  $('#compra_funcionario_id').selectize();
+
+
+
+  //calc valores
+  $( "#compra_exentas_guarani, #compra_gravadas_05_guarani, #compra_gravadas_10_guarani" ).blur(function() {
+    var exentas_gs = $('#compra_exentas_guarani').val();
+    var grav_05_gs = $('#compra_gravadas_05_guarani').val();
+    var grav_10_gs = $('#compra_gravadas_10_guarani').val();
+
+    var tot_gs = (parseFloat(exentas_gs.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_05_gs.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_10_gs.replace(/\./g, "").replace(",", ".")) );
+
+    if (tot_gs >= 1073000){
+      var retencao_gs = ((parseFloat(grav_05_gs.replace(/\./g, "").replace(",", ".")) / 21) + (parseFloat(grav_10_gs.replace(/\./g, "").replace(",", ".")) / 11) ) * 0.70;
+    }else{
+      var retencao_gs = 0
+    };
+
+    
+
+    $('#compra_total_guarani').val(number_format(tot_gs, 0, ',', '.'));
+
+    <% if current_unidade.retencao == true %>
+      $('#compra_retencao_gs').val(number_format(retencao_gs, 0, ',', '.'));
+    <% end %>
+  });
+
+  $( "#compra_exentas_dolar, #compra_gravadas_05_dolar, #compra_gravadas_10_dolar" ).blur(function() {
+    var exentas_us = $('#compra_exentas_dolar').val();
+    var grav_05_us = $('#compra_gravadas_05_dolar').val();
+    var grav_10_us = $('#compra_gravadas_10_dolar').val();
+    var tot_us = (parseFloat(exentas_us.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_05_us.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_10_us.replace(/\./g, "").replace(",", ".")) );
+
+    if (tot_us >= (1073000 / parseFloat($('#compra_cotacao').val().replace(/\./g, "").replace(",", "."))) ) {
+      var retencao_us = (  (parseFloat(grav_05_us.replace(/\./g, "").replace(",", ".")) / 21) + (parseFloat(grav_10_us.replace(/\./g, "").replace(",", ".")) / 11) ) * 0.70;
+    }else{
+      var retencao_us = 0;
+      
+    }
+    
+    $('#compra_total_dolar').val(number_format(tot_us, 2, ',', '.'));
+
+    <% if current_unidade.retencao == true %>
+      $('#compra_retencao_us').val(number_format(retencao_us, 2, ',', '.'));
+    <% end %>
+  });
+
+  $( "#compra_exentas_real, #compra_gravadas_05_real, #compra_gravadas_10_real" ).blur(function() {
+    var exentas_rs = $('#compra_exentas_real').val();
+    var grav_05_rs = $('#compra_gravadas_05_real').val();
+    var grav_10_rs = $('#compra_gravadas_10_real').val();
+    var tot_rs = (parseFloat(exentas_rs.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_05_rs.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_10_rs.replace(/\./g, "").replace(",", ".")) );
+    $('#compra_total_real').val(number_format(tot_rs, 2, ',', '.'));
+  });
+
+</script>

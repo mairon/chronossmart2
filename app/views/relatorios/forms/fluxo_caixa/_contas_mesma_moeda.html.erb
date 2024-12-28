@@ -1,0 +1,121 @@
+
+<% if params[:formato] == '1' %>
+	<% ctm   = Conta.find_by_id(params[:busca_conta], select: 'moeda') %>
+	<% conta = "conta_id = #{params[:busca_conta]} and" %>
+	<% params[:moeda] = ctm.moeda.to_s %>
+<% end %>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">      
+      <div class="panel-content">
+      	<div class="modal-grid" style="padding: 10px; color: #444;font-family: 'prox-bold';">
+
+					<% if params[:moeda] == '0' %>
+
+	      		<% saldo_efetivo  = Financa.where("#{conta} moeda = 0 and data <= '#{params[:inicio].split("/").reverse.join("-")}'").sum("coalesce(entrada_dolar,0) - coalesce(saida_dolar,0)") %>
+						<% atraso_entrada = Cliente.where("#{conta} moeda = 0 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_dolar,0) - coalesce(cobro_dolar,0)') %>
+
+						<% atraso_saida   = Proveedore.where("#{conta} moeda = 0 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_dolar,0) - coalesce(pago_dolar,0)') %>
+
+					<% elsif params[:moeda] == '1' %>
+
+	      		<% saldo_efetivo  = Financa.where("#{conta} moeda = 1 and data <= '#{params[:inicio].split("/").reverse.join("-")}'").sum("entrada_guarani - saida_guarani") %>
+						<% atraso_entrada = Cliente.where("#{conta} moeda = 1 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_guarani,0) - coalesce(cobro_guarani,0)') %>
+
+						<% atraso_saida   = Proveedore.where("#{conta} moeda = 1 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_guarani,0) - coalesce(pago_guarani,0)') %>
+
+
+					<% elsif params[:moeda] == '2' %>
+
+	      		<% saldo_efetivo  = Financa.where("#{conta} moeda = 2 and data <= '#{params[:inicio].split("/").reverse.join("-")}'").sum("coalesce(entrada_real,0) - coalesce(saida_real,0)") %>
+						<% atraso_entrada = Cliente.where("#{conta} moeda = 2 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_real,0) - coalesce(cobro_real,0)') %>
+
+						<% atraso_saida   = Proveedore.where("#{conta} moeda = 2 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_real,0) - coalesce(pago_real,0)') %>
+
+					<% end %>
+
+
+      		<% saldo_anteriro = 0 %>
+      		<% saldo          = saldo_efetivo.to_f %>
+      		<% h_entreda      = 0 %>
+      		<% h_saida        = 0 %>
+
+					<% if params[:moeda] == '0' %>
+	       		Saldo Anterior Efetivo: <span class="us"><%= format_decimal(saldo_efetivo.to_f) %></span> |
+	       		Saldo Receber Atrasado: <span class="us"><%= format_decimal(atraso_entrada.to_f) %></span> |
+	       		Saldo Pagar Atrasado:   <span class="us"><%= format_decimal(atraso_saida.to_f) %></span>
+
+	       	<% elsif params[:moeda] == '1' %>
+	       		Saldo Anterior Efetivo: <span class="gs"><%= format_int(saldo_efetivo.to_f) %></span> |
+	       		Saldo Receber Atrasado: <span class="gs"><%= format_int(atraso_entrada.to_f) %></span> |
+	       		Saldo Pagar Atrasado:   <span class="gs"><%= format_int(atraso_saida.to_f) %></span>
+					<% else %>
+	       		Saldo Anterior Efetivo: <span class="rs"><%= format_decimal(saldo_efetivo.to_f) %></span> |
+	       		Saldo Receber Atrasado: <span class="rs"><%= format_decimal(atraso_entrada.to_f) %></span> |
+	       		Saldo Pagar Atrasado:   <span class="rs"><%= format_decimal(atraso_saida.to_f) %></span>
+
+					<% end %>
+       	</div>
+      </div>
+      <div class="panel-content">
+        <div class="modal-grid">					
+					<table class="head_grid">
+					  <tr>
+					    <td width="150" align="center"><%= t('DATE') %></td>
+					    <td width="200" align="right">Entrada</td>
+					    <td width="200" align="right">Salida</td>
+					    <td width="200" align="right">Saldo</td>
+					  </tr>
+					</table>
+					<% d = params[:inicio].split("/").reverse.join("-").to_date %>
+					<div class="rolagem" dir="div">
+					<table> 
+						<% (params[:inicio].split("/").reverse.join("-").to_date..params[:final].split("/").reverse.join("-").to_date).each do |w| %>
+
+						<% if params[:moeda] == '0' %>
+							<% entrada = Cliente.where("#{conta} moeda = 0 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_dolar,0) - coalesce(cobro_dolar,0)') %>
+							<% saida   = Proveedore.where("#{conta} moeda = 0 and  vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_dolar,0) - coalesce(pago_dolar,0)') %>
+
+						<% elsif params[:moeda] == '1' %>
+
+							<% entrada = Cliente.where("#{conta} moeda = 1 and  vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_guarani,0) - coalesce(cobro_guarani,0)') %>
+							<% saida   = Proveedore.where("#{conta} moeda = 1 and  vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_guarani,0) - coalesce(pago_guarani,0)') %>
+							
+						<% elsif params[:moeda] == '2' %>
+
+							<% entrada = Cliente.where("#{conta} moeda = 2 and  vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_real,0) - coalesce(cobro_real,0)') %>
+							<% saida   = Proveedore.where("#{conta} moeda = 2 and  vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_real,0) - coalesce(pago_real,0)') %>
+
+						<% end %>
+						<% saldo   += (saldo_anteriro.to_f + (entrada.to_f - saida.to_f)) %>
+
+							<tr>
+								<td width="150" align="center"><%= d.strftime("%d/%m/%y") %></td>
+								<% if params[:moeda] == '1' %>
+									<td width="200" align="right" onclick="OpenDt('<%= params[:cotacao] %>','<%= params[:cotacao_real] %>','<%= params[:cotacao_rs_us] %>','<%= params[:formato] %>', '<%= params[:moeda] %>', '0','<%= d.strftime("%Y-%m-%d") %>')"><%= format_int(entrada)%></td>
+									<td width="200" align="right" onclick="OpenDt('<%= params[:cotacao] %>','<%= params[:cotacao_real] %>','<%= params[:cotacao_rs_us] %>','<%= params[:formato] %>', '<%= params[:moeda] %>', '1','<%= d.strftime("%Y-%m-%d") %>')"><%= format_int(saida)%></td>
+									<td width="200" align="right"><%= format_int( saldo )%></td>
+								<% else %>
+
+									<td width="200" align="right" onclick="OpenDt('<%= params[:cotacao] %>','<%= params[:cotacao_real] %>','<%= params[:cotacao_rs_us] %>','<%= params[:formato] %>', '<%= params[:moeda] %>', '0','<%= d.strftime("%Y-%m-%d") %>')"><%= format_decimal(entrada)%></td>
+									<td width="200" align="right" onclick="OpenDt('<%= params[:cotacao] %>','<%= params[:cotacao_real] %>','<%= params[:cotacao_rs_us] %>','<%= params[:formato] %>', '<%= params[:moeda] %>', '1','<%= d.strftime("%Y-%m-%d") %>')"><%= format_decimal(saida)%></td>
+									<td width="200" align="right"><%= format_decimal( saldo )%></td>
+									
+								<% end %>
+								<% if d.strftime("%Y-%m-%d") == Time.now.strftime("%Y-%m-%d") %>
+				      		<% h_entreda = entrada.to_f %>
+				      		<% h_saida   = saida.to_f %>
+								<% end %>
+
+							</tr>
+							<% d += 1.days %>
+						<% end %>
+					</table>	
+					</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

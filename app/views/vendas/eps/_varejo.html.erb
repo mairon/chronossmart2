@@ -1,0 +1,25 @@
+   <%= form_for(@venda) do |f| %>
+      <% if @venda.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@venda.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+      <ul>
+        <% @venda.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+    <% end %>
+    <%= f.date_select :data %>
+    <%= f.hidden_field :tipo_venda, value: 0 %>
+    <%= f.hidden_field :moeda, value: Empresa.last.venda_moeda unless Empresa.last.venda_moeda.blank? %>
+    <%= f.hidden_field :persona_id, value: VendasConfig.where(unidade_id: current_unidade.id).last.persona_id %>
+    <%= f.hidden_field :vendedor_id, value: VendasConfig.where(unidade_id: current_unidade.id).last.vendedor_id %>
+    <%= f.hidden_field :tabela_preco_id, :value => Empresa.last.tabela_preco_id %>
+    <%= f.hidden_field :prazo_id, :value => VendasConfig.where(unidade_id: current_unidade.id).last.prazo_id %>
+    <%= f.submit "   Seguir   ",:disable_with => "Aguarde..." , :class => "button" , :id => "btn", "data-plus-as-tab" => "false" %>
+<% end %>
+<script type="text/javascript">
+  $("form:first").submit();
+</script>

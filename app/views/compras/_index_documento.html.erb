@@ -1,0 +1,51 @@
+<table class="head_grid">
+  <tr>
+    <td width="80" align="center">Tipo</td>
+    <td width="50" align="center"><%= t('DOC') %></td>
+    <td width="350" >Provedor</td>
+    <td width="150"><%= t('DOC') %></td>
+    <td width="40" align="center"><%= t('COIN') %></td>
+    <td width="70" align="right">U$</td>
+    <td width="70" align="right">Gs.</td>
+  </tr>
+</table>
+
+<% count = 1 %>
+<% totus = 0 %>
+<% totgs = 0 %>
+
+<div class="rolagem" dir="div" style="height: 150px;">
+  <table>
+    <% compras_documentos.each do |cd|  %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="80" align="center"> <%= cd.tipo_documento %></td>
+        <td width="50" align="center"><%= cd.documento.sigla %></td>
+        <td width="350"><%= cd.persona_nome%></td>
+        <td width="150"><%= cd.documento_numero_01 %>-<%= cd.documento_numero_02 %>-<%= cd.documento_numero %></td>
+        <td width="40" align="center">
+          <% if cd.moeda == 0 %>
+            U$
+          <% elsif cd.moeda == 1 %>
+            G$
+          <% else %>
+            R$
+          <% end %>
+        </td>
+        <td width="70" align="right"><%= format_decimal(cd.total_dolar)  %></td>
+        <td width="70" align="right"><%= format_int(cd.total_guarani)  %></td>
+        <td><%= link_to 'Editar', edit_compras_documento_path(cd) %></td>
+        <td><%= link_to t('DELETE'), cd, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+      </tr>
+      <% count += 1 %>
+      <% totus += cd.total_dolar.to_f %>
+      <% totgs += cd.total_guarani.to_f %>
+    <% end %>
+  </table>
+</div>
+<table class="head_grid">
+  <tr>
+    <td width="715"></td>
+    <td width="70" align="right"><b><%= format_decimal(totus) %></b></td>
+    <td width="70" align="right"><b><%= format_int(totgs) %></b></td>
+  </tr>
+</table>

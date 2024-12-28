@@ -1,0 +1,85 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b><%= t('DATE') %>:</b>
+  <%= @sueldo_pago.data %>
+</p>
+
+<p>
+  <b><%= t('PERSON') %>:</b>
+  <%= @sueldo_pago.persona_id %>
+</p>
+
+<p>
+  <b>Persona <%= t('NAME') %>:</b>
+  <%= @sueldo_pago.persona_nome %>
+</p>
+
+<p>
+  <b>Moeda:</b>
+  <%= @sueldo_pago.moeda %>
+</p>
+
+<p>
+  <b>Valor us:</b>
+  <%= @sueldo_pago.valor_us %>
+</p>
+
+<p>
+  <b>Valor gs:</b>
+  <%= @sueldo_pago.valor_gs %>
+</p>
+
+<p>
+  <b>Valor rs:</b>
+  <%= @sueldo_pago.valor_rs %>
+</p>
+
+<p>
+  <b>Rubro:</b>
+  <%= @sueldo_pago.rubro_id %>
+</p>
+
+<p>
+  <b>Rubro <%= t('NAME') %>:</b>
+  <%= @sueldo_pago.rubro_nome %>
+</p>
+
+<p>
+  <b>Obs:</b>
+  <%= @sueldo_pago.obs %>
+</p>
+
+<p>
+  <b>Documento numero 01:</b>
+  <%= @sueldo_pago.documento_numero_01 %>
+</p>
+
+<p>
+  <b>Documento numero 02:</b>
+  <%= @sueldo_pago.documento_numero_02 %>
+</p>
+
+<p>
+  <b>Documento numero:</b>
+  <%= @sueldo_pago.documento_numero %>
+</p>
+
+<p>
+  <b>Timbrado:</b>
+  <%= @sueldo_pago.timbrado %>
+</p>
+
+<p>
+  <b>Cheque:</b>
+  <%= @sueldo_pago.cheque %>
+</p>
+
+<p>
+  <b>Diferido:</b>
+  <%= @sueldo_pago.diferido %>
+</p>
+
+
+<%= link_to 'Edit', edit_sueldo_pago_path(@sueldo_pago) %> |
+<%= link_to 'Back', sueldo_pagos_path %>

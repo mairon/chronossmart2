@@ -1,0 +1,22 @@
+<table class="head_grid">
+  <tr>
+    <td width="100">Chapa</td>
+    <td width="200">Responsavel</td>
+    <td width="100">Km inicial</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% persona_rodados.each do |persona_rodado| %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td width="100"><%= persona_rodado.chapa %></td>
+        <td width="200"><%= persona_rodado.responsavel %></td>
+        <td width="100"><%= persona_rodado.km_inicial %></td>
+        <td><%= link_to 'Editar', edit_persona_rodado_path(persona_rodado) %></td>
+        <td><%= link_to t('DELETE'), persona_rodado, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

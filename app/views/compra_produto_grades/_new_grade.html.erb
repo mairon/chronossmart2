@@ -1,0 +1,43 @@
+
+<%= form_for(compra_produto_grade) do |f| %>
+  <% if compra_produto_grade.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(compra_produto_grade.errors.count, "error") %> prohibited this compra_produto_grade from being saved:</h2>
+
+      <ul>
+      <% compra_produto_grade.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= f.hidden_field :compras_produto_id %>
+	<%= f.hidden_field :produto_id, :value => @compras_produto.produto_id %>
+	<%= f.hidden_field :compra_id, :value => @compras_produto.compra_id %>
+  <table>
+    <tr>
+        <td align="right">Color :</td>
+  			<td><%= f.collection_select :cor_id, Cor.all(:select => 'id,nome',:order => '2'),:id,:nome,
+                                         {:include_blank => true } %></td>
+
+        <td align="right">Tamanho :</td>
+  			<td><%= f.collection_select :tamanho_id, Tamanho.all(:select => 'id,nome',:order => '2'),:id,:nome,
+                                         {:include_blank => true } %></td>
+
+        <td align="right">Cantidad :</td>
+        <td>
+        	<%= f.number_field :quantidade %>
+        	<%= f.submit :value => t('SAVE'), :class => "button" %>
+        </td>
+     </tr>
+  </table>
+
+<% end %>
+<script type="text/javascript">
+$(document).ready(function() {
+
+   $('#compra_produto_grade_cor_id').focus();
+
+   });
+
+</script>

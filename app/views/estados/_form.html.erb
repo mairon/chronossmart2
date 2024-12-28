@@ -1,0 +1,42 @@
+<h1 id="header"><%= t('STATE') %> - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+
+  <%= form_for(@estado) do |f| %>
+
+    <% if @estado.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@estado.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+        <ul>
+          <% @estado.errors.full_messages.each do |msg| %>
+          <li>
+            <%= msg %>
+          </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <table>
+
+      <tr>
+        <td>
+          <label><%= t('COUNTRY') %></label>
+          <%= f.collection_select :paise_id, Paise.all(:order => '1'),:id,:nome,{}, {autofocus: true, required: true} %></td>
+      </tr>
+
+      <tr>
+        <td colspan="4">
+        <label><%= t('STATE') %></label>
+        <%= f.text_field :nome, size: 50, required: true %></td>
+      </tr>
+    </table>
+     <div class="footer-buttons">
+        <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+        <%= link_to t('BACK'), estados_path, :class => "btn btn-back" %>
+     </div>
+  <% end %>
+</div>
+
+<script type="text/javascript">
+  $('#estado_paise_id').selectize();
+</script>

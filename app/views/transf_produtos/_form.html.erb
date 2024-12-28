@@ -1,0 +1,56 @@
+<div class="group">
+<%= form_for(@transf_produto) do |f| %>
+  <%= f.hidden_field :moeda, value: current_unidade.moeda.to_i %>
+  <div class="row">
+    <div class="col-md-6">
+      <label><%= t('DATE') %></label>
+      <%= f.text_field :data, value: Time.now.strftime("%d/%m/%Y"), size: 10,  class: "panel-field date", autofocus: true %>
+    </div>
+
+    <div class="col-md-6">
+      <label>Deposito</label>
+      <%= f.collection_select :deposito_id, Deposito.where(unidade_id: current_unidade.id).select('id,nome').order('2'), :id, :nome, {:required => true} %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <label>Producto Origen</label>
+      <%= f.collection_select :produto_origem_id, Produto.where(status: true).select('id,nome').order('2'), :id, :nome, {:include_blank => true}, {:required => true} %>
+    </div>    
+
+
+    <div class="col-md-6">
+      <label>Producto Destino</label>
+      <%= f.collection_select :produto_destino_id, Produto.where(status: true).select('id,nome').order('2'), :id, :nome, {:include_blank => true}, {:required => true} %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <label>Ctd. Origen</label>
+      <%= f.telephone_field :qtd_origem, size: 9, :required => true %>
+    </div>
+    <div class="col-md-6">
+      <label>Ctd. Destino</label>
+      <%= f.telephone_field :qtd_destino, size: 9, :required => true %>
+    </div>
+
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <br>
+      <%= f.text_area :obs, class: "panel-field", placeholder: 'Obs.', rows: '3' %>
+    </div>
+  </div>
+
+
+  <div class="footer-buttons">
+    <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+  </div>    
+<% end %>
+</div>
+
+<script>
+  $('#transf_produto_deposito_id, #transf_produto_produto_origem_id, #transf_produto_produto_destino_id').selectize();
+</script>

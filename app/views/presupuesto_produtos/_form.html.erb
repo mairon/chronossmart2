@@ -1,0 +1,152 @@
+<%= form_for [@presupuesto,@presupuesto_produto] do |f| %>
+
+   <div class="group">
+      <%= f.hidden_field :produto_id %>
+      <table>
+
+        <tr>
+          <td colspan="6">
+            <label>Dependente</label>
+            <%= f.text_field :persona_dependente_nome, size: 70 %>
+          </td>
+        </tr>
+
+        <tr>
+          <td colspan="6">
+            <label>Producto</label>
+            <%= f.text_field :produto_nome, size: 70 %>
+          </td>
+        </tr>
+        <tr>          
+          <td>
+            <label>Descuento</label>
+            <%= f.text_field :desconto, size: 15 %>
+          </td>
+          <td>
+            <label>Cuotas</label>
+            <%= f.text_field :cuotas, size: 15 %>
+          </td>
+        </tr>
+        <tr>          
+          <td>
+            <label>Vencimiento</label>
+            <%= f.date_select :vencimento, size: 15 %>
+          </td>
+        </tr>
+        <tr>
+          <% if @presupuesto.moeda == 0  %>
+            <td>
+              <label>Cantidad</label>
+              <%= f.text_field :quantidade, :size => 9, :onblur => "CalcQtdDescimal('presupuesto_produto_unitario_dolar','presupuesto_produto_quantidade','presupuesto_produto_total_dolar')" %>
+            </td>
+
+              <%= field_us_label 'Unit. U$ :',f, :unitario_dolar, :onblur => "CalcQtdDescimal('presupuesto_produto_unitario_dolar','presupuesto_produto_quantidade','presupuesto_produto_total_dolar')" %>
+              <%= field_us_label 'Total U$ :',f,:total_dolar %>
+
+          <% elsif @presupuesto.moeda == 1 %>
+              <td>
+              <label>Cantidad</label>
+              <%= f.text_field :quantidade, :size => 9, :onblur => "CalcQtd('presupuesto_produto_unitario_guarani','presupuesto_produto_quantidade','presupuesto_produto_total_guarani')" %>
+                
+              </td>
+               <%= field_gs_label 'Unit. Gs',f, :unitario_guarani, :onblur => "CalcQtd('presupuesto_produto_unitario_guarani','presupuesto_produto_quantidade','presupuesto_produto_total_guarani')" %>
+               <%= field_gs_label 'Total Gs',f,:total_guarani %>
+
+          <% else %>
+              <td>
+              <label>Cantidad</label>
+              <%= f.text_field :quantidade, :size => 9, :onblur => "CalcQtdDescimal('presupuesto_produto_unitario_real','presupuesto_produto_quantidade','presupuesto_produto_total_real')" %></td>
+
+            <%= field_us_label 'Unit. R$ :', f, :unitario_real, :onblur => "CalcQtdDescimal('presupuesto_produto_unitario_real','presupuesto_produto_quantidade','presupuesto_produto_total_real')" %>
+            <%= field_us_label 'Total R$ :', f, :total_real %>
+          <% end %>
+          <td style="padding-top: 21px">
+
+          <%= f.submit t('SAVE'),:disable_with => "Aguarde...", :class => "btn btn-green" , "data-plus-as-tab" => "false"   %></td>
+        </tr>
+      </table>
+
+   </div>
+   </body>
+
+<% end %>
+<%= hidden_field_tag :presupuesto_id, @presupuesto.id %>
+<script>
+
+  function CalcQtdDescimal(unit,qtd,tot)                                      //
+  {
+      var total = eval( parseFloat( document.getElementById(unit).value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById(qtd).value.replace(/\./g, "").replace(",", ".") ) )  ;
+      document.getElementById(tot).value = ( number_format(total,2, ',', '.') );
+  }
+
+  function CalcQtd(unit,qtd,tot)                                      //
+  {
+      var total = eval( parseFloat( document.getElementById(unit).value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById(qtd).value.replace(/\./g, "").replace(",", ".") ) )  ;
+      document.getElementById(tot).value = ( number_format(total,0, ',', '.') );
+  }
+
+</script>
+<script>
+
+  //busca por descricao produto
+    $(function() {
+      $( "#presupuesto_produto_produto_nome" ).autocomplete({
+          source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+          $.ajax({
+            url: "/buscas/search_all_produtos",
+            dataType: "json",
+            data: {
+              tipo: 'DESCRIPCION',
+              busca: request.term
+            },
+            success: function( data ) {
+              response( data );
+              $("#sppiner").removeClass("sppiner_show");
+            },
+          });
+        },
+        minLength: 2,
+        select: function( event, ui ) {
+          $("#presupuesto_produto_produto_id").val("");
+          $( "#presupuesto_produto_produto_nome" ).val(ui.item.label);
+          $('#presupuesto_produto_produto_id').val(ui.item.id);
+          return false;
+        }
+      });
+    });
+
+    $("#presupuesto_produto_produto_nome").change(function(){
+      if ($('#presupuesto_produto_produto_id').val().length != 0) {
+        $.ajax({url: "/buscas/busca_venda_produto",
+          type: 'GET',
+          beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+          data:
+            'cod=' + $('#presupuesto_produto_produto_id').val() +
+            "&unidade=" + <%= current_unidade.id %> +
+            "&tipo_busca=" + 'ID' +
+            "&data=" + $("#presupuesto_produto_data").val() +
+            "&deposito=" + 1 +
+            "&barra_balanca=false" +
+            "&persona_id=" + $("#presupuesto_produto_persona_id").val() +
+            "&tabela_preco=" + 1,
+          success: function(grade){
+          $('#presupuesto_produto_produto_nome').val(grade["produto"].nome);
+          $('#presupuesto_produto_produto_id').val(grade["produto"].produto_id);
+          //tabela de preco
+          if ($('#presupuesto_produto_moeda').val() == '0'){
+            $('#presupuesto_produto_unitario_dolar').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
+            $('#presupuesto_produto_total_dolar').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
+          }if ($('#presupuesto_produto_moeda').val() == '1'){
+            $('#presupuesto_produto_unitario_guarani').val(number_format( grade["produto"].preco_1_gs, 0, ',', '.'));
+            $('#presupuesto_produto_total_guarani').val( number_format( parseFloat(grade["produto"].preco_1_gs) * parseFloat(grade["produto"].qtd), 0, ',', '.') );
+          }if ($('#presupuesto_produto_moeda').val() == '2'){
+
+            $('#presupuesto_produto_unitario_real').val(number_format( grade["produto"].preco_1_rs, 2, ',', '.'));
+            $('#presupuesto_produto_total_real').val( number_format( parseFloat(grade["produto"].preco_1_rs) * parseFloat(grade["produto"].qtd), 2, ',', '.') );
+          }
+        }
+      });
+      };
+    });  
+</script>

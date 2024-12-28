@@ -1,0 +1,338 @@
+<%= form_for(@persona, html: {:multipart => true}) do |f| %>
+  <div class="row">
+    <!--breadcrumbs end -->
+    <% if @persona.errors.any? %>
+      <div class="col-md-12">
+        <div class="alert alert-block alert-danger fade in">
+          <button data-dismiss="alert" class="close close-sm" type="button">
+            <i class="fa fa-times"></i>
+          </button>
+          <h4><%= pluralize(@persona.errors.count, "error") %> no fue posible grabar:</h4>
+          <ul>
+          <% @persona.errors.full_messages.each do |msg| %>
+            <li><strong><%= msg %></strong></li>
+          <% end %>
+          </ul>
+        </div>
+      </div>
+    <% end %>  
+  </div>     
+  <div class="row">
+    <div class="col-sm-7">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel">
+            <header class="panel-heading">
+              Persona [Perfil]
+            </header>
+            <div class="panel-body">
+              <div class="form-group">
+                <div class="row">
+                  <div class="col-md-4">
+                    <label>CI/RUC</label>
+                    <%= f.text_field :ruc, size: 13, required: true, class: 'panel-field', autofocus: true %>
+                  </div>
+                  <div class="col-md-8">
+                    <label>Nombre Fantasia</label>
+                    <%= f.text_field :nome, class: 'panel-field', required: true %></td>                  
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <label>Razão Social</label>
+                    <%= f.text_field :nome_fatura, class: 'panel-field' %>                
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6">
+                  <label>Segmiento</label>
+                  <%= f.collection_select :seguimento_id, Seguimento.all( :select => 'id,nome',
+                        :order  => '2' ),:id,:nome,{:prompt => 'Selecione lo Seguimento'} %>
+                  </div>
+                  <div class="col-md-6">
+                    <label>Telefone 01</label>
+                    <%= f.text_field :telefone, size: 21, class: 'panel-field' %>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <label>E-mail</label>
+                    <%= f.email_field :email, size: 36, class: 'panel-field' %>
+
+                  </div>
+                  <div class="col-md-6">
+                    <label>Telefone 02</label>
+                    <%= f.text_field :telefone2, size: 21, class: 'panel-field' %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="panel">
+            <header class="panel-heading">
+              Persona [TIPOS]
+            </header>
+            <div class="panel-body">
+              <div class="form-group">
+                <table>
+                  <tr>
+                    <td width="125"><%= f.check_box :tipo_cliente %> Cliente</td>
+                    <td width="125"><%= f.check_box :tipo_fornecedor %> Proveedor</td>
+                    <td width="125"><%= f.check_box :tipo_vendedor %> Vendedor</td>
+                    <td width="125"><%= f.check_box :tipo_funcionario %> Empleado</td>
+                  </tr>                   
+                  <tr>
+                    <td><%= f.check_box :tipo_franquiado %> Franquiado</td>
+                    <td><%= f.check_box :tipo_trans %> Transportadora</td>
+                    <td><%= f.check_box :tipo_banco %> Banco</td>
+                    <td><%= f.check_box :tipo_chofer %> Chofer</td>
+                  </tr>
+                  <tr>
+                    <td width="125"><%= f.check_box :tipo_indicador %> Indicador</td>
+                    
+                    <td><%= f.check_box :tipo_maiorista %> Mayorista</td>
+                    
+                  </tr>
+
+               </table>
+              </div>
+            </div>   
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="panel">
+            <header class="panel-heading">
+              Persona [direción]
+            </header>
+            <div class="panel-body">
+              <div class="form-group">
+                <table>
+                  </tr>
+                    <td align="right">Ciudad:</td>
+                    <td><%= f.collection_select :cidade_id, Cidade.select('id,nome').order('2'), :id, :nome, {prompt: 'Selecione a cidade'},
+                      { style: "width: 100%;"} %>
+                        <%= image_tag("load.gif", border: 0, id: "spinne3", width: 21, height: 21, style: "display: none;") %>
+                      </td>
+                  </tr>
+                  <tr>
+                    <td align="right">Áreas:</td>
+                    <td><%= f.collection_select :cidade_area_id, CidadeArea.select('id,nome').order('2'), :id, :nome, {prompt: 'Selecione a Área'},
+                      { style: "width: 100%;"} %>
+                      <%= image_tag("load.gif", border: 0, id: "spinne4", width: 21, height: 21, style: "display: none;") %>
+                  </tr>
+                 <tr>
+                    <td align="right">Direción:</td>
+                    <td colspan="4"><%= f.text_field :direcao , style: "width: 100%;" %></td>
+                  </tr>
+                  <tr>                
+                    <td align="right">Barrio:</td>
+                    <td colspan="4"><%= f.text_field :bairro, size: 64 %>
+                    Nº: <%= f.text_field :residencia_numero, size: 5 %></td>
+
+                  </tr>
+                  <tr>
+                    <td align="right" valign="top"></td>
+                    <td colspan="8"><%= f.text_area :direcao_complemento, placeholder: 'Complemento:', cols: 76, rows: 3 %></td>
+                  </tr>
+                </table>         
+              </div>
+                <%= f.submit "Seguir", disable_with: "Aguarde...", class: "btn add", 'data-plus-as-tab' => "false" %> 
+                <%= link_to t('BACK'), personas_path, class: "btn btn-default" %>
+
+            </div>     
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-5">
+      <div class="row">
+
+        <div class="col-md-12">
+          <div class="panel">
+            <header class="panel-heading">
+              Persona [AVATAR]
+            </header>
+            <div class="panel-body">
+                <div class="form-group">
+                  <table width="100%">
+                    <tr>
+                      <td align="center" colspan="4">
+                        <%= image_tag @persona.picture.url, width: "100" %>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="4" align="center"><%= f.file_field :picture %></td>
+                    </tr>                  
+                  </table>
+              </div>
+            </div>   
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="panel">
+            <header class="panel-heading">
+              Persona [Reglas]
+            </header>
+            <div class="panel-body">
+              <div class="form-group">
+                <table>
+                  <tr>
+                    <td align="right"></td>
+                    <td>
+                    <fieldset>
+                      <legend>Status:</legend>
+                      <%= f.radio_button :estado, 0%> Activo <%= f.radio_button :estado,1%> Bloqueado
+                    </fieldset>
+                    </td>
+                    
+                  </tr>
+
+                  <tr>
+                    <td align="right">Vendedor:</td>
+                    <td colspan="2">
+                    <%= f.collection_select :vend_responsavel_id, Persona.where(tipo_vendedor: 1).select('id,nome').order('2'), :id, :nome, {prompt: 'Selecione lo vendedor'},{ style: "width: 100%;"} %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right"</td>
+                    <td>
+                      <fieldset>
+                        <legend>Tabla de Precio:</legend>
+                        <%= f.collection_select :tabela_preco_id, TabelaPreco.select('id,nome').order('2'), :id, :nome, {}, {} %>
+                      </fieldset>                      
+                    </td>
+                    <td>
+                      <fieldset>
+                        <legend>Clasificación:</legend>
+                        <%= f.select :classificacao, ([["A", "A"],
+                                ["B", "B"],
+                                ["C", "C"],
+                                ["D", "D"],
+                                ["E", "E"]]),{}, {} %>
+                      </fieldset>                      
+                    </td>
+                  </tr>
+                  <tr>
+                     <td></td>
+                    <td colspan="4">
+                      <%= f.text_area :observacao, cols: 48, rows: 5, placeholder: 'Concepto:' %>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="panel">
+            <header class="panel-heading">
+              Persona [LIMITE DE CREDITO]
+            </header>
+            <div class="panel-body">
+                <div class="form-group">
+                  <table>
+                  <tr>
+                    <td align="right">Limite:</td>
+                    <td><%= f.text_field :limite_credito, size: 13, clas: "money_us", dir: "rtl", step: ".01" %>
+                  </tr>
+                  <% if @persona.limite_credito.to_i > 0 %>
+                    
+                  <tr>
+                    <td align="right">Utilizado:</td>
+                    <td align="right"><strong><%= format_decimal(@cliente_saldo.to_f) %></strong></td>
+                    <td><span class="label label-danger"><%= format_decimal(@saldo_utilizado) %>-</span></td>
+                  </tr>
+                  <tr>
+                    <td align="right">Cheques:</td>
+                    <td align="right"><strong><%= format_decimal(@cheque_carteira.to_f) %></strong></td>
+                    <td><span class="label label-danger">-</span></td>
+                  </tr>
+                  
+                  <tr>
+                    <td align="right">Saldo Disp.:</td>
+                    <td align="right"><strong><%= format_decimal(@persona.limite_credito.to_f -  (@cliente_saldo.to_f + @cheque_carteira.to_f) ) %></strong></td>
+                    <td><span class="label label-success"><%= format_decimal(@saldo_diponivel )  %>=</span></td>
+                  </tr>
+                  <% end %>  
+               </table>
+              </div>
+              <button type="button" class="btn btn-info "><i class="fa fa-folder-open"></i> Histórico</button>
+            </div>   
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+ $(document).ready(function() {
+      $("#persona_paise_id").change(function() {
+        var data=$('#persona_paise_id').val();
+        $.ajax({
+          type: "GET",
+           url: "/personas/dynamic_estados/"+data,
+          data: data,
+          beforeSend: function()
+          {
+              $('#spinner').show();
+          },
+
+          success: function(response)
+          {
+            $('#spinner').hide();
+          }
+
+        });
+    });
+
+      $("#persona_estado_id").change(function() {
+        var data=$('#persona_estado_id').val();
+        $.ajax({
+          type: "GET",
+           url: "/personas/dynamic_cidades/"+data,
+          data: data,
+          beforeSend: function()
+          {
+              $('#spinner2').show();
+          },
+
+          success: function(response)
+          {
+            $('#spinner2').hide();
+          }
+
+        });
+    });
+
+
+      $("#persona_cidade_id").change(function() {
+        var data=$('#persona_cidade_id').val();
+        $.ajax({
+          type: "GET",
+           url: "/personas/dynamic_areas/"+data,
+          data: data,
+          beforeSend: function()
+          {
+              $('#spinner4').show();
+          },
+
+          success: function(response)
+          {
+            $('#spinner4').hide();
+          }
+
+        });
+    });
+
+  });
+  $('#persona_seguimento_id').selectize();
+</script>

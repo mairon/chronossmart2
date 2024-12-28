@@ -1,0 +1,53 @@
+<table>	
+	<% qtd = 0 %>
+	<% tot = 0 %>
+	<% @consumos.each do |c| %>
+	<tr class = "<%= cycle("cor1", "cor2") %>">
+		<td width="50" align="center"><%= c.data.strftime("%d/%m/%y") %></td>
+		<td width="280"><%= c.persona_nome %></td>
+		<td width="200"><%= c.produto_nome %></td>
+		<td width="70" align="right"><%= c.saida.to_i %></td>
+		<td width="70" align="right"><%= format_int(c.preco_persona) %></td>
+
+		<% qtd += c.saida.to_f %>
+		<% tot += c.preco_persona.to_f %>
+	</tr>
+	<% end %>
+	<tr class="head">
+		<td colspan="3"></td>
+		<td width="70" align="right"><%= qtd.to_i %></td>
+		<td width="70" align="right"><%= format_int(tot) %></td>
+
+	</tr>
+</table>
+
+<h2>Resumen</h2>
+
+<table>
+	<tr class="head">
+		<td>Producto</td>
+		<td align="right">Ctd</td>
+	</tr>
+	<% @consumo_group.each do |cg| %>
+	<tr class = "<%= cycle("cor1", "cor2") %>">
+		<td width="150"><%= cg.produto_nome %></td>
+		<td align="right" width="70"><b><%= cg.tot.to_i %></b></td>
+	</tr>
+	<% end %>
+</table>
+<br>
+<br>
+<table>
+	<tr class="head">
+		<td>Producto</td>
+		<td align="right">Precio</td>
+		<td align="right">Ctd</td>
+	</tr>
+	<% @consumo_group_preco.each do |cg| %>
+	<tr class = "<%= cycle("cor1", "cor2") %>">
+		<td width="150"><%= cg.produto_nome %></td>
+		<td align="right" width="70"><%= format_int(cg.preco_persona) %></td>
+		<td align="right" width="70"><b><%= cg.tot.to_i %></b></td>
+	</tr>
+	<% end %>
+</table>

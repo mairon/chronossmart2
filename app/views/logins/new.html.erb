@@ -1,0 +1,74 @@
+<%= form_tag :action => "logar", :html => { :id => "login_form" }  do  %>
+	<% unless notice.blank? %>
+		<div class="message errormsg" align="center">
+			<a class="close" data-dismiss="alert"></a>
+			<%= flash[:notice] %>
+		</div>	
+	<% end %>
+	<% mult_unidade = Unidade.count(:id) %>
+	<% if Empresa.last.modulo_producao == true %>
+		<div style="color:#a94442;background-color:#f2dede;border-color:#ebccd1;padding:15px;border-radius: 3px" align="center">
+			<a class="close" data-dismiss="alert"></a>
+			Consulte la equipo de suporte/financeira.
+		</div>
+
+	<% else %>
+	<% if mult_unidade.to_i > 1 %>
+	<p>
+		<label><%= t('UNIT') %>:</label><br/>
+		<%= text_field_tag( 'unidade',nil,
+	                                    :id       => "unidade",
+	                                    :class    => "text_seach",
+	                                    :onchange   => " $.ajax({url: '/buscas/get_unidade',
+	                                    	 										type: 'POST',
+         																										data: 'unidade=' + this.value,
+           																									success: function(data){
+             																								$('#busca_unidade_id').val(data);} })") %>
+             	
+	<%= select( "busca","unidade_id", Unidade.all( :select => 'id,unidade_nome',
+								:order  => 'unidade_nome').collect {|p| [ p.unidade_nome, p.id ] }, 
+	                           												{ :include_blank => true},
+	                           												{:required => true } ) %>
+	</p>
+	<% else %>
+	<%= hidden_field_tag "busca[unidade_id]", Unidade.last.id %>
+	<% end %>
+	<!--Usuario!-->
+	<p>
+		<label>Usuário</label><br />
+		<%= text_field_tag( 'usuario', nil,
+	                                 :id       => "unidade",
+	                                 :class    => "text_seach focus",	                                    
+	                                 :onchange => " $.ajax({url: '/buscas/get_usuario',
+	                                   	 										type: 'POST',
+         																									data: 'usuario=' + this.value,
+           																								success: function(data){
+             																							$('#busca_usuario_id').val(data);} })") %>
+
+	<%= select( "busca", "usuario_id", Usuario.all( :select => 'id,usuario_nome',
+																										 :order  => 'usuario_nome').collect {|p| [ p.usuario_nome, p.id ] }, 
+	                           												 { :include_blank => true},			                      
+		                         												 { :class => '', :required => true } )   %>
+	</p>
+
+	<p>
+		<label>Senha</label>
+		<br />
+		<%= password_field_tag :usuario_senha, nil, :class => 'text-passwd', :required => true %>
+	</p>
+
+	<p class="formend" align="center">
+			<%= submit_tag 'Entrar', 'data-disable-with' => "Aguarde...", class: "btn btn-green", id: "submit", "data-plus-as-tab" => "false"  %>
+	</p>
+<% end %>
+		<small style="float:right; margin-top:8px;" > <span class="style3">Powered by</span> <b>Chronos</b>		
+
+<% end %>
+
+
+
+<script type="text/javascript">
+$(document).ready(function(e) {
+		$(".focus").focus();
+});
+</script>

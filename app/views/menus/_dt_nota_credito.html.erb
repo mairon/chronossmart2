@@ -1,0 +1,115 @@
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel">
+			<h1 id="header">
+		    Cliente: <%= @nota_credito.persona.nome %>
+		    <div style="float: right">
+		    	<% if @nota_credito.operacao.to_i == 0 %>
+		    		DEVOLUCIÓN
+		    	<% else %>
+		    		DESCUENTO
+		    	<% end %>
+		    	#<%= @nota_credito.id.to_s.rjust(6,'0') %> 
+		    </div>
+		  </h1> 
+		  </div>
+	  </div> 
+	</div>
+<% if @nota_credito.operacao.to_i == 0 %>
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel">
+		<h1 id="header">Productos</h1>
+
+			<div class="group">
+			   <table class="head_grid">
+			      <tr>
+			         <td width="200"><%= t('VOUCHER') %></td>
+			         <td width="450">Producto</td>
+			         <td width="100" align="right">Cantidad</td>
+			         <td width="100" align="right">Unit.</td>
+			         <td width="100" align="right">Total</td>
+			      </tr>
+			   </table>
+
+			   <div class="rolagem" dir="div" style="height: 200px">
+				  <% qtd    = 0 %>
+				  <% tot_us = 0 %>
+				  <% tot_gs = 0 %>
+			      <table>
+
+			         <% @nota_credito.nota_creditos_detalhes.each do |nota_creditos_detalhe| %>
+			            <tr class = "<%= cycle("cor1", "cor2") %> ">
+			               <td width="200"><%= nota_creditos_detalhe.venda_id.to_s.rjust(6,'0') %>/<%= nota_creditos_detalhe.documento_numero.to_s.rjust(6,'0') %></td>
+			               <td width="450" align="left"><%= nota_creditos_detalhe.produto_nome %></td>
+			                     <td width="100" align="right"><%= number_to_currency(nota_creditos_detalhe.quantidade, :format=>' %n ', :separator => ",") %></td>
+			               <% if @nota_credito.moeda == 0 %>
+			                     <td width="100" align="right"><%= number_to_currency(nota_creditos_detalhe.unitario_dolar, :format=>' %n ', :separator => ",") %></td>
+			                     <td width="100" align="right"><%= number_to_currency(nota_creditos_detalhe.total_dolar,    :format=>' %n ', :separator => ",") %></td>
+				  				 <% tot_us += nota_creditos_detalhe.total_dolar.to_f %>
+			               <% else %>
+			                     <td width="100" align="right"><%= number_to_currency( nota_creditos_detalhe.unitario_guarani , :format=>' %n ', :precision => 0 )%></td>
+			                     <td width="100" align="right"><%= number_to_currency( nota_creditos_detalhe.total_guarani ,    :format=>' %n ', :precision => 0 ) %></td>
+						  		 <% tot_gs += nota_creditos_detalhe.total_guarani.to_f %>	
+			               <% end %>
+			            </tr>
+
+				  	    <% qtd    += nota_creditos_detalhe.quantidade.to_f %>
+
+			         <% end %>
+			      </table>
+			   </div>
+			   <table>
+			   		<tr>
+			   			<td width="540"></td>
+			            <td width="100" align="right"><%= number_to_currency(qtd, :format=>' %n ', :separator => ",") %></td>
+			   			<td width="100"></td>
+			            <% if @nota_credito.moeda == 0 %>
+			               <td width="100" align="right"><%= number_to_currency(tot_us,    :format=>' %n ', :separator => ",") %></td>
+						<% else %>
+			               <td width="100" align="right"><%= number_to_currency( tot_gs,    :format=>' %n ', :precision => 0 ) %></td>
+						<% end %>
+
+			   		</tr>
+			   </table>
+			</div>
+		</div>
+	</div>
+</div>
+<% end %>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel">
+		<h1 id="header"><%= t('DOC') %></h1>
+		<div class="group">
+			<table class="head_grid">
+				<tr>
+					<td width="80" align="center"><%= t('DATE') %></td>
+					<td width="400" align="center"><%= t('DOC') %></td>
+					<td width="50" align="center"><%= t('SHARE') %></td>
+					<td width="100" align="center"><%= t('VALUE') %></td>
+				</tr>
+			</table>
+			<div class="rolagem" dir="div">
+				<table>
+					<% @nota_credito.nota_creditos_docs.each do |ncd| %>
+					<tr class = "<%= cycle("cor1", "cor2") %> ">
+    					<td width="80" align="center"><%=h ncd.data.strftime("%d/%m/%Y") %></td>
+    					<td width="400" align="center"><%=h ncd.documento_numero_01 %> - <%=h ncd.documento_numero_02 %> - <%=h ncd.documento_numero %></td>
+    					<td width="50" align="center"><%=h ncd.cota %></td>
+						<% if @nota_credito.moeda.to_f == 0 %> 
+							<td width="100" align="right"><%= number_to_currency( ncd.valor_dolar,    :format=>' %n ', :separator => ",") %></td>
+						<% else %> 
+							<td width="100" align="right"><%= number_to_currency( ncd.valor_guarani,    :format=>' %n ', :precision => 0 ) %></td>
+						<% end %>
+  					</tr>
+					<% end %>
+				</table>
+			</div>
+		</div>
+
+			
+		</div>
+	</div>
+</div>			

@@ -1,0 +1,242 @@
+	<h1 id="header"><%= t('LISTING') %> de Contratos</h1>
+  <div class="group">
+    <%= form_tag resultado_contratos_relatorios_path, :method => "get" do %>
+    <div class="row">
+      <div class="col-md-12">
+        <label>Periodo</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <%= select_tag 'tipo_data', options_for_select([['Assinatura','Assinatura'],['Finalização','Finalizacao']]), autofocus: true %>
+      </div>
+      <div class="col-md-4">
+          <div class="input-group">
+            <%= text_field_tag :inicio, nil, onkeyup: "Formatadata(this,event)" %>
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default" >
+                <i class="icon-calendar" aria-hidden="true"></i>
+              </button>
+            </span>
+          </div>
+      </div>
+
+      <div class="col-md-4">
+          <div class="input-group">
+            <%= text_field_tag :final, nil, onkeyup: "Formatadata(this,event)" %>
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default" >
+                <i class="icon-calendar" aria-hidden="true"></i>
+              </button>
+            </span>
+          </div>
+      </div>
+      <div class="col-md-2"></div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <label>Cliente</label>
+        <%= text_field_tag :persona_nome, nil, class: 'panel-field' %>
+        <%= hidden_field_tag :persona_id , nil  %>        
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label>Vendedor</label>
+          <%= select("busca", "vendedor", Persona.all(:select => 'id,nome',:conditions => ["tipo_vendedor = 1"],:order => 'nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...'}) %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label>Plans</label>
+          <%= select("busca", "plano", Plano.all( :select => 'id,condicao', :order  => '2' ).collect {|p| [ p.condicao, p.id ] }, { prompt: 'Todos...'}) %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-3">
+        <label>Doc.</label>
+        <%= text_field_tag :doc,'', class: 'panel-field', size: 10 %>
+      </div>
+
+      <div class="col-md-3">
+        <label><%= t('QUOTA') %></label>
+        <%= text_field_tag :cota,'', class: 'panel-field', size: 5 %>
+      </div>
+
+      <div class="col-md-3">
+        <label>Valor Min.</label>
+        <%= telephone_field_tag :valor_min,'', class: 'panel-field', size: 15, class: "money_us", dir: "rtl", step: ".01" %>
+      </div>
+
+      <div class="col-md-3">
+        <label>Valor Max.</label>
+        <%= telephone_field_tag :valor_max,'', class: 'panel-field', size: 15, class: "money_us", dir: "rtl", step: ".01" %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+      	<label>Status</label>
+        <%= select_tag 'status_contrato', options_for_select([['Todos','Todos'], ['Ativo','Ativo'],['Finalizado','Finalizado'],['Pausado','Pausado'],['Cancelado','Cancelado']]), {autofocus: true} %>
+
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <label><%= t('CENTER_OF_COSTOS') %> </label>
+          <%= select("busca", "centro_custo", CentroCusto.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...'}) %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <fieldset>
+          <legend>Formato</legend>
+          <input type="radio" id="detalhe" name="detalhe" value="0" checked /> Sintético
+          <input type="radio" id="detalhe" name="detalhe" value="1" checked /> Analitico
+        </fieldset>
+      </div>
+    </div>
+
+    <div class="row pd"  style="display:none">
+      <div class="col-md-12">
+        <label>Prod/Serv. </label>
+          <%= select("busca", "produto", Produto.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...'}) %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <fieldset>
+          <legend>Tipo Contrato</legend>
+          <input type="radio" id="tipo_contrato" name="tipo_contrato" value="" checked /> Todos
+          <input type="radio" id="tipo_contrato" name="tipo_contrato" value ="0" /> Mensal
+          <input type="radio" id="tipo_contrato" name="tipo_contrato" value="1" /> Valor Fixo
+        </fieldset>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <fieldset>
+          <legend><%= t('COIN') %></legend>
+          <input type="radio" id="moeda" name="moeda" value="0" <%= 'checked' if current_unidade.moeda.to_i == 0 %> /> <%= t('DOLLARS') %>
+          <input type="radio" id="moeda" name="moeda" value ="1" <%= 'checked' if current_unidade.moeda.to_i == 1 %> /> <%= t('GUARANIS') %>
+          <input type="radio" id="moeda" name="moeda" value="2" <%= 'checked' if current_unidade.moeda.to_i == 2 %> /> <%= t('REAIS') %>
+        </fieldset>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <br>
+        <input type="submit" class="btn btn-green" value="Informe"  style="cursor:pointer;" id="acao" data-toggle="modal" data-width="500" data-height="781" data-dismiss="modal" />
+        <a href="#" class="xls btn btn-blue">Excel</a>
+        <input type="hidden" name="tipo" id="tipo" size="5" value="0"/>
+        
+      </div>
+    </div>
+   </div>
+ <% end %>
+
+
+<script>
+
+  $('.xls').click(function() {
+    window.location.href = '/relatorios/resultado_contratos.xls?' + $('form').serialize();
+  });
+
+  $('#busca_vendedor').selectize();
+  $('#busca_direcao').selectize();
+  $('#busca_centro_custo').selectize();
+  $('#busca_classif').selectize();
+  $('#busca_produto').selectize();
+
+
+  $('input[name="detalhe"]').click(function(){
+    if($(this).attr("value")=="0"){
+        $(".pd").hide('slow');
+    }
+    if($(this).attr("value")=="1"){
+        $(".pd").show('slow');
+
+    }        
+  });
+</script>
+
+<script>
+      $(function() {
+      $( "#persona_nome" ).autocomplete({
+          source: function( request, response ) {
+          $.ajax({
+            url: "/personas/busca",
+            dataType: "json",
+            data: {
+              tipo: 'DESCRIPCION',
+              busca: request.term
+            },
+            success: function( data ) {
+              response( data );
+            },
+          });
+        },
+        minLength: 2,
+        change: function( event, ui ) {
+          $("#persona_id").val("");
+          $('#persona_id').val(ui.item.id);
+          return false;
+        }
+      });
+      $( "#cobro_persona_nome" ).change(function(){
+        if ($( "#persona_id" ).val() == ''){
+        }
+      });
+    });
+</script>
+
+<script>
+  
+    $(document).on('submit', 'form', function(event) {
+      if ($("#tipo").val() == '0' ) {
+        event.preventDefault();
+        $('#myiframe').modal('show');
+        var width  = $(this).attr('data-width') || 640; 
+        var height = $(this).attr('data-height') || 760;
+        
+        var allowfullscreen = $(this).attr('data-video-fullscreen');
+
+        $("#myiframe iframe").attr({
+          'src': '/relatorios/resultado_contratos?' + $('form').serialize(),
+          'height': height,
+          'width': width,
+          'allowfullscreen':''
+        });
+
+        $('#myiframe').on('hidden.bs.modal', function(){
+          $(this).find('iframe').html("");
+          $(this).find('iframe').attr("src", "");
+        });
+      }
+    });
+  
+
+</script>
+
+
+<div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 1100px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel"><%= t('LISTING') %> de Contratos</h4>
+      </div>
+      <div class="modal-body" align="center">
+        <div class="embed-responsive embed-responsive-16by9" style="height: 460px">
+          <iframe class="embed-responsive-item" id="iframeModal" frameborder="0 " border="0"></iframe>
+        </div>
+      </div>      
+    </div>
+  </div>
+</div>

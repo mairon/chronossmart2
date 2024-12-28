@@ -1,0 +1,139 @@
+<body onload="window.print()">
+
+  <style type="text/css">
+    body {
+      margin: 0px;
+      font-family: arial;
+      font-size:8px;
+    }
+
+    td{
+      font-family: arial;
+      font-size:9px;
+      letter-spacing:2px
+    } 
+
+  </style>
+
+
+<table>
+    <tr>
+      <td colspan='3' align="center">
+      +
+        <% 62.times do |t| %>
+          -
+        <% end %>      
+      +
+      </td>
+    </tr>
+    <tr>
+      <td style="padding-left:7px;letter-spacing:1px">| 
+      <%= current_unidade.nome_sys %>
+        <%= @lista_carga.data_emisao.strftime("%d")%> de <%= l @lista_carga.data_emisao, :format => :mes %>  de <%= @lista_carga.data_emisao.strftime("%Y")%> | Horas: <%= @lista_carga.created_at.strftime("%H:%M")%>
+
+
+      </td>
+      <td align="right" style="padding-right:7px;letter-spacing:1px">
+
+       
+        Rota
+        Nº: <%= @lista_carga.id.to_s.rjust(6,'0') %>
+        |
+      </td>
+    </tr>
+    <tr>
+       <td colspan="8">
+         <table >
+            <tr>
+              <td colspan='8' align="center">
+              +
+                <% 62.times do |t| %>
+                  -
+                <% end %>      
+              +
+              </td>
+            </tr>
+
+            <tr>
+              <td width="440" style="padding-left:4px;letter-spacing:1px;">| Itens</td>
+              <td width="70" style="letter-spacing:1px" align="right">Cantidad |</td>
+                          </tr>
+          <tr>
+            <td colspan='7' align="center">
+            +
+              <% 62.times do |t| %>
+                -
+              <% end %>
+            +
+            </td>
+          </tr>
+            <% quebra  = "" %>
+            <% qtd     = 0 %>
+            <% sub_qtd = 0 %>
+
+            <% @lista_produtos.each do |pc|%>
+
+              <% if quebra != pc.persona_nome  %>
+                <% if quebra != "" %>
+                  <tr class="head" height="15" valign="top">
+                    <td width="440" style="padding-left:10px;letter-spacing:1px;">| <b>Sub-Total: <%= quebra %></b></td>
+                    <td width="70" style="letter-spacing:1px" align="right"><b><%= sub_qtd %></b> |</td>
+                    <% sub_qtd = 0 %>
+                  </tr>
+                  <tr>
+                    <td height="20"></td>
+                  </tr>
+                <% end %>
+                <tr>
+                  <td>| Cliente: <%= quebra = pc.persona_nome %> - Direción: </td>
+                </tr>                
+             <% end %>
+            <tr>
+              <td width="440" style="padding-left:10px;letter-spacing:1px;">| <%= pc.produto_nome %></td>              
+              <td width="70" style="letter-spacing:1px" align="right"><%= pc.quantidade.to_f %> |</td>
+            </tr>
+              <% qtd += pc.quantidade.to_f %>
+              <% sub_qtd += pc.quantidade.to_f %>
+            <% end %>
+            <tr class="head" height="15" valign="top">
+              <td width="440" style="padding-left:10px;letter-spacing:1px;">| <b>Sub-Total: <%= quebra %></b></td>
+              <td width="70" style="letter-spacing:1px" align="right"><b><%= sub_qtd %></b> |</td>
+            </tr>                  
+
+          <tr>
+            <td colspan='8' align="center" >
+            +
+              <% 62.times do |t| %>
+                -
+              <% end %>
+            +
+            </td>
+          </tr>
+
+          <tr style="font-style: bold;">
+          	<td width="440" style="padding-left:4px;letter-spacing:1px;">| <b>Total de Itens:</b></td>
+            <td style="padding-left:4px;"  align="right">&nbsp&nbsp&nbsp&nbsp<b><%= qtd %></b> |</td>
+          </tr>
+          <tr>
+            <td colspan='8' align="center" >
+            +
+              <% 62.times do |t| %>
+                -
+              <% end %>
+            +
+            </td>
+          </tr>
+
+         </table>
+       </td>
+    </tr>
+</table>
+
+
+<script>
+  document.onkeydown=function(e){
+    if(e.which == 27)
+      self.close();
+  }
+</script>
+

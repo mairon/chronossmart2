@@ -1,0 +1,45 @@
+
+
+<body onload="window.print()">
+<style type="text/css">
+  table{
+    font-family: verdana;
+    font-size: 09px;
+    border-spacing: 0px;
+    margin: 3 0 0 0;
+  }
+
+  .ft-header{
+    text-align: center;
+  }
+  .page-break { display:block; clear:both; page-break-after:always; }
+</style>
+ 
+<% if params[:modelo] == '1' %>
+  <% @produtos.each do |p| %>
+    <table class="page-break">
+      <tr><td align="center"><div id="bcTarget<%= p.id%>"></div></td></tr>     
+      <tr><td width="350"><b><%= p.nome.to_s[0..20] %></b></td></tr>
+      <tr><td width="350"><b><%= p.nome.to_s[21..40] %></b></td></tr>
+      <tr><td width="150">TAM: <%= p.tamanho %></td></tr>
+      <tr><td width="150">COLOR: <%= p.cor %></td></tr>
+      <tr><td width="150"><b>G$ <%= format_int(p.preco_1_gs) %></b></td></tr>
+      <script>
+        $("#2bcTarget<%= p.id%>").barcode("<%= p.barra %>", "code128",{barWidth:1.5, barHeight:60});
+      </script>
+    </table>
+  <% end %>
+<% else %>
+    <table class="page-break">
+      <tr><td align="left"><div id="2bcTarget<%= @produto.id%>"></div></td></tr>
+      <tr><td>Cod. <%= @produto.id %></td></tr>    
+      <tr><td width="350"><%= @produto.nome.to_s[0..15] %> </td></tr>
+      
+      <script>
+      $("#2bcTarget<%= @produto.id%>").barcode("<%= @produto.barra %>", "code128",{barWidth:1, barHeight:20});
+      </script>
+    </table>
+<% end %>
+
+
+</body>

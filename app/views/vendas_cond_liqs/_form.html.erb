@@ -1,0 +1,47 @@
+<%= form_for(@vendas_cond_liq) do |f| %>
+  <% if @vendas_cond_liq.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@vendas_cond_liq.errors.count, "error") %> prohibited this vendas_cond_liq from being saved:</h2>
+
+      <ul>
+      <% @vendas_cond_liq.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> vendas_cond_liqs - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">venda_id :</td>                    
+                      <td><%= f.number_field :venda_id %></td>
+                                      
+                      <td align="right">cond_liq_id :</td>                    
+                      <td><%= f.number_field :cond_liq_id %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), vendas_cond_liqs_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

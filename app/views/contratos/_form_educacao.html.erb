@@ -1,0 +1,276 @@
+<h1 id="header">Contrato - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+
+<%= form_for(@contrato) do |f| %>
+  <% if @contrato.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@contrato.errors.count, "error") %> prohibited this contrato from being saved:</h2>
+
+      <ul>
+      <% @contrato.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= f.hidden_field :unidade_id, value: current_unidade.id %>
+  <%= f.hidden_field :presupuesto_id, value: params[:presupuesto_id] %>
+  <%= f.hidden_field :gerar_financas, value: false %>
+                <table>
+                  <tr>
+                    <td colspan="2">
+                    <label><%= t('DATE') %></label>
+                      <%= f.date_select :data %>
+                    </td>
+                    <td colspan="2">
+                      <fieldset>
+                        <legend><%= t('COIN') %></legend>
+                        <% if current_unidade.moeda.to_i == 0 %>
+                          <%= f.radio_button :moeda, 1, onchange: "MoedaCompra('1')" %> <%= t('GUARANIS') %>
+                          <%= f.radio_button :moeda, 0, onchange: "MoedaCompra('0')",  :Checked => "True" %> <%= t('DOLLARS') %>
+                          <%= f.radio_button :moeda, 2, onchange: "MoedaCompra('2')" %> Real
+                        <% elsif current_unidade.moeda.to_i == 1 %>
+                          <%= f.radio_button :moeda, 1, onchange: "MoedaCompra('1')",  :Checked => "True" %> <%= t('GUARANIS') %>
+                          <%= f.radio_button :moeda, 0, onchange: "MoedaCompra('0')" %> <%= t('DOLLARS') %>
+                          <%= f.radio_button :moeda, 2, onchange: "MoedaCompra('2')" %> Real
+
+                        <% elsif current_unidade.moeda.to_i == 2 %>
+                          <%= f.radio_button :moeda, 1, onchange: "MoedaCompra('1')" %> <%= t('GUARANIS') %>
+                          <%= f.radio_button :moeda, 0, onchange: "MoedaCompra('0')" %> <%= t('DOLLARS') %>
+                          <%= f.radio_button :moeda, 2, onchange: "MoedaCompra('2')",  :Checked => "True" %> Real
+                        <% end %>
+                      </fieldset>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td colspan="2">
+                    <label>Plans</label>
+                    <%= f.collection_select :plano_id, 
+                               Plano.all( :select => 'id,condicao', :order  => '2' ),:id, :condicao,{:prompt => 'Selecione la Cuenta', selected: params[:plano_id]}, {required: true } %>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td colspan="4">
+                    <label>Tutor</label>
+                    <%= text_field_tag :persona_nome, "#{@contrato.persona.nome unless @contrato.persona_id.nil?}", size: '100%', required: true, class: 'autocomplete', autofocus: true, placeholder: 'Digite o nome do Tutor', value: params[:persona_nome] %>
+                      <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+                    <%= f.hidden_field :persona_id, value: params[:persona_id] %></td>
+                  </tr>
+
+                  <tr>
+                    <td colspan="2">
+                    <label>Conta p/ Recebimento</label>
+                    <%= f.collection_select :conta_id, 
+                               Conta.all( :select => 'id,nome', :order  => '2' ),:id, :nome,{:prompt => 'Selecione la Cuenta'}, {required: true} %>
+                    </td>
+                    <td colspan="2">
+                    <label><%= t('CENTER_OF_COSTOS') %></label>
+                    <%= f.collection_select :centro_custo_id,
+                               CentroCusto.select('id,nome').where("unidade_id = #{current_unidade.id}").order('2'),:id, :nome,{:prompt => 'Selecione Centro de Costo'}, {required: true} %>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td colspan="2">
+                    <label>Vendedor</label>
+                    <%= f.collection_select :vendedor_id, 
+                               Persona.where(tipo_vendedor: 1).select('id,nome').order('2'),:id, :nome,{:prompt => 'Selecione lo Vendedor', selected: params[:vendedor_id]} %>
+                    </td>
+
+                    <td colspan="2">
+                    <label>Terminal</label>
+                    <%= f.collection_select :terminal_id,
+                               Terminal.select('id,nome').where("unidade_id = #{current_unidade.id}").order('2'),:id, :nome,{:prompt => 'Selecione Terminal'}, {required: true} %>
+                    </td>
+                  </tr>
+
+          	      <tr>
+          	        <td colspan="4"><%= f.text_area :obs, rows: 3, cols: 10, placeholder: 'Obs' %></td>
+          	      </tr>                                      
+          			</table>
+           <div class="footer-buttons">
+              <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+              <%= link_to t('BACK'), contratos_path, :class => "btn btn-back" %>
+           </div>
+<% end %>
+</div>
+<% if params[:action] == 'new' %>
+  <%= hidden_field_tag :moeda, current_unidade.moeda %>
+  <script>
+    //cotacao
+    $(document).ready(function() {
+      $.ajax({url: '/buscas/cotz_us_compra',
+              type: 'POST',
+              beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+              data: 'data=' + $('#data_3i').val()+'/'+
+                              $('#data_2i').val()+'/'+
+                              $('#data_1i').val(),
+              success: function(data){
+              $('#contrato_cotacao').val(number_format(data, 0, ',', '.'));} });
+
+      $.ajax({url: '/buscas/cotz_rs_compra',
+              type: 'POST',
+              beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+              data: 'data=' + $('#data_3i').val()+'/'+
+                              $('#data_2i').val()+'/'+
+                              $('#data_1i').val(),
+              success: function(data){
+              $('#contrato_cotacao_real').val(number_format(data, 0, ',', '.'));} });
+
+    });
+  </script>  
+<% else %>
+  <%= hidden_field_tag :moeda, @contrato.moeda %>
+<% end %>
+
+<script>
+    $(document).ready(function() {
+      d = <%= current_unidade.moeda %>
+      if (d == '1') {
+        $(".valores-gs").show();
+        $(".valores-rs").hide();
+        $(".valores-us").hide();
+
+      } else if (d == '0') {
+
+        $(".valores-us").show();
+        $(".valores-rs").hide();
+        $(".valores-gs").hide();
+      } else if (d == '2') {
+        $(".valores-rs").show();
+        $(".valores-us").hide();
+        $(".valores-gs").hide();
+      }           
+    });
+  </script>
+
+
+<script type="text/javascript">
+  //moeda
+  function MoedaCompra(d){
+    moeda = $('#moeda').val(d);
+    if (d == '1') {
+      $(".valores-gs").show();
+      $(".valores-rs").hide();
+      $(".valores-us").hide();
+
+    } else if (d == '0') {
+
+      $(".valores-us").show();
+      $(".valores-rs").hide();
+      $(".valores-gs").hide();
+    } else if (d == '2') {
+      $(".valores-rs").show();
+      $(".valores-us").hide();
+      $(".valores-gs").hide();
+    }
+  }
+
+
+  $(function() {
+    $( "#persona_nome" ).autocomplete({
+        source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+        $.ajax({
+          url: "/personas/busca?per=CLIENTE",
+          dataType: "json",
+
+          data: {
+            tipo: 'DESCRIPCION',
+            busca: request.term
+          },
+          beforeSend: function(){
+          $("#spinner").addClass("sppiner_show");
+          },
+
+          success: function( data ) {
+            $("#sppiner").removeClass("sppiner_show");
+            response( data );
+          },
+        });
+      },
+      minLength: 2,
+      change: function( event, ui ) {
+        $('#contrato_persona_id').val(ui.item.id);
+        return false;
+      }
+    });
+    $( "#persona_nome" ).change(function(){
+      if ($( "#contrato_persona_id" ).val() == ''){
+      }
+    });
+  });
+
+  $('#contrato_conta_id').selectize();
+  $('#contrato_vendedor_id').selectize();
+  $('#contrato_centro_custo_id').selectize();
+  $('#contrato_deposito_id').selectize();
+  $('#contrato_terminal_id').selectize();
+  $('#contrato_apartamento_id').selectize();
+</script>
+
+<script type="text/javascript">
+  
+  function add_fields(link, association, content) {
+
+    var new_id = new Date().getTime();
+    var regexp = new RegExp("new_" + association, "g")
+    $(link).up().insert({    	
+	    before: content.replace(regexp, new_id)
+    });    
+  }
+
+  $('form').on('click', '.remove_field', function(event) {
+    $(this).prev('input[type=hidden]').val('1');
+    $(this).closest('tr').hide();    
+    return event.preventDefault();
+  });
+
+
+  $('form').on('click', '.add_fields', function(event) {
+    time = new Date().getTime();
+    regexp = new RegExp($(this).data('id'),'g')
+
+    $(this).before($(this).data('fields').replace(regexp, time))
+    moeda = $('#moeda').val();
+    if (moeda == '1') {
+      $(".valores-gs").show();
+      $(".valores-rs").hide();
+      $(".valores-us").hide();
+
+    } else if (moeda == '0') {
+
+      $(".valores-us").show();
+      $(".valores-rs").hide();
+      $(".valores-gs").hide();
+    } else if (moeda == '2') {
+      $(".valores-rs").show();
+      $(".valores-us").hide();
+      $(".valores-gs").hide();
+    }
+
+    return event.preventDefault();
+
+  });
+
+</script>
+<style>
+	.add_fields{
+		margin: 10px 10px 10px 5px;
+	}
+
+	.total{
+		margin:  -42px 37px 5px 0px;
+		padding: 10px;
+		font-size: 25px;
+		color:  #444;
+	}
+  .tots-prod{
+    margin-top: 10px;
+  }
+</style>
+
+
+

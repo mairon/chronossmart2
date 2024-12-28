@@ -1,0 +1,62 @@
+<% if params[:header] == 'true' %>
+<table>
+    <tr>
+      <td width="30" align="center">Lanz</td>
+      <td width="40" align="center">Fecha</td>
+      <td width="40" align="center">Venc</td>
+      <td width="280" align="left">Empleado</td>
+      <td width="80">Doc</td>
+      <td width="15">Cota</td>
+      <td width="70" align="right">Valor</td>
+      <td width="70" align="right">Pago</td>
+      <td width="70" align="right">Saldo</td>
+    </tr>
+</table>
+<% end %>
+
+<table>
+  <% tot_div  = 0 %>
+  <% tot_pago = 0 %>
+
+  <% @adelantos.each do |ad| %>
+  	<tr class="<%= cycle("cor1", "cor2")%>">
+  		<td width="30" align="center"><%= ad.id.to_s.rjust(6,'0') %></td>
+  		<td width="40" align="center"><%= ad.data.strftime("%d/%m/%y") %></td>
+      <td width="40" align="center"><%= ad.vencimento.strftime("%d/%m/%y") %></td>
+  		<td width="280" align="left"><%= truncate(ad.persona_nome, length: 25) %></td>
+      <td width="80"><%= ad.doc %></td>
+      <td width="15"><%= ad.cota.to_s.rjust(2,'0') %></td>
+      <% if params[:moeda] == '0' %>
+        <td width="70" align="right"><%= format_decimal(ad.div_us) %></td>
+        <td width="70" align="right"><%= format_decimal(ad.pago_us) %></td>
+        <td width="70" align="right"><%= format_decimal(ad.div_us.to_f - ad.pago_us.to_f) %></td>
+        <% tot_div  += ad.div_us.to_f %>
+        <% tot_pago += ad.pago_us.to_f %>
+      <% elsif params[:moeda] == '1' %>
+        <td width="70" align="right"><%= format_int(ad.div_gs) %></td>
+        <td width="70" align="right"><%= format_int(ad.pago_gs) %></td>
+        <td width="70" align="right"><%= format_int(ad.div_gs.to_f - ad.pago_gs.to_f) %></td>
+        <% tot_div  += ad.div_gs.to_f %>
+        <% tot_pago += ad.pago_gs.to_f %>
+      <% else %>
+        <td width="70" align="right"><%= format_decimal(ad.div_rs) %></td>
+        <td width="70" align="right"><%= format_decimal(ad.pago_rs) %></td>
+        <td width="70" align="right"><%= format_decimal(ad.div_rs.to_f - ad.pago_rs.to_f) %></td>
+        <% tot_div  += ad.div_rs.to_f %>
+        <% tot_pago += ad.pago_rs.to_f %>
+      <% end %>
+    </tr>
+  <% end %>
+  <tr class="head">
+    <td colspan="6"></td>
+    <% if params[:moeda] == '1' %>
+      <td width="70" align="right"><%= format_int(tot_div) %></td>
+      <td width="70" align="right"><%= format_int(tot_pago) %></td>
+      <td width="70" align="right"><%= format_int(tot_div.to_f - tot_pago.to_f) %></td>
+    <% else %>
+      <td width="70" align="right"><%= format_decimal(tot_div) %></td>
+      <td width="70" align="right"><%= format_decimal(tot_pago) %></td>
+      <td width="70" align="right"><%= format_decimal(tot_div.to_f - tot_pago.to_f) %></td>
+    <% end %>
+  </tr>
+</table>

@@ -1,0 +1,13 @@
+<% if params[:tela] == "index" %>
+  $('#deposito_origem_id').empty();
+  $('#deposito_origem_id').append('<option value="">Selecione lo Deposito</option>');
+  <% for ne in @deposito %>
+    $('#deposito_origem_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+  <% end %>
+<% else %>
+  $('#transferencia_deposito_deposito_origem_id').empty();
+  $('#transferencia_deposito_deposito_origem_id').append('<option value="">Selecione lo Deposito</option>');
+  <% for ne in @deposito %>
+    $('#transferencia_deposito_deposito_origem_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+  <% end %>
+<% end %>

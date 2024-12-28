@@ -1,0 +1,5 @@
+$('.conta_id').empty();
+$('.conta_id').append('<option value="">Selecione</option>');
+<% for ne in @contas %>
+  $('.conta_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+<% end %>

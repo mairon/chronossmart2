@@ -1,0 +1,45 @@
+<table>
+  <% tot = 0 %>
+  <% @financas.each do |f| %>
+  <tr class = "<%= cycle("cor1", "cor2") %>">
+    <td width="50" align="center"><%= f.data.strftime("%d/%m/%y") %></td>
+    <td width="150"><%= f.conta_nome %></td>
+    <td width="250"><%= f.persona_nome %></td>
+    <td width="250"><%= f.concepto %></td>
+    <td width="60" align="right"><%= format_decimal(f.entrada_dolar) %></td>
+    <% tot += f.entrada_dolar.to_f %>
+  </tr>
+  <% end %>
+  <tr class="head">
+    <td colspan="3"></td>
+    <td>Total</td>
+    <td width="60" align="right"><%= format_decimal( tot ) %></td>
+  </tr>
+
+  <tr class="head">
+    <td colspan="3"></td>
+    <td>IVA</td>
+    <td width="60" align="right"><%= format_decimal( sem_iva = (tot.to_f - (tot.to_f / 11 )) ) %></td>
+  </tr>
+
+  <tr class="head">
+    <td colspan="3"></td>
+    <td>Operacional(8%)</td>
+    <td width="60" align="right"><%= format_decimal( sem_operacional = ((sem_iva * 0.8 )) ) %></td>
+  </tr>
+  <% if params[:tipo_list] == '' or params[:tipo_list] == '0' %>
+    <tr class="head">
+      <td colspan="3"></td>
+      <td>Donación</td>
+      <td width="60" align="right"><%= format_decimal( sem_operacional * 0.1 ) %></td>
+    </tr>
+  <% end %>
+
+  <% if params[:tipo_list] == '' or params[:tipo_list] == '1' %>
+    <tr class="head">
+      <td colspan="3"></td>
+      <td>Inversión(35%)</td>
+      <td width="60" align="right"><%= format_decimal( tot.to_f * 0.35 ) %></td>
+    </tr>
+  <% end %>
+</table>

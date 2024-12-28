@@ -1,0 +1,27 @@
+<h1 id="header">painel_cliente_logs</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_painel_cliente_log_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Ip</td>
+            <td>Login</td>
+            <td>Senha</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @painel_cliente_logs.each do |painel_cliente_log| %>
+      <tr>
+                  <td><%= painel_cliente_log.ip %></td>
+                  <td><%= painel_cliente_log.login %></td>
+                  <td><%= painel_cliente_log.senha %></td>
+                <td><%= link_to 'Editar', edit_painel_cliente_log_path(painel_cliente_log) %></td>
+        <td><%= link_to t('DELETE'), painel_cliente_log, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

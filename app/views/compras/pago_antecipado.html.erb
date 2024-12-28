@@ -1,0 +1,69 @@
+<div class="group">
+  <table class="head_grid">
+     <tr> 
+        <td width="250"><%= t('DOC') %></td>
+        <td width="50"><%= t('SHARE') %></td>
+        <td width="70" align="right">Divida U$</td>
+        <td width="70" align="right">Monto U$</td>            
+        <td width="70" align="right">Divida G$</td>
+        <td width="70" align="right">Monto G$</td>
+     </tr>
+  </table>
+  <div class="rolagem" id="div" style="height: 250px">
+    <table> 
+      <% @pagos.each do |pa| %> 
+        <tr class = "<%= cycle("cor1", "cor2")%>"
+            onMouseOver="javascript:this.style.backgroundColor='#e6ebf2'"
+            onMouseOut="javascript:this.style.backgroundColor=''"
+            onClick="Fecha('<%= pa.documento_numero_01 %>',
+                           '<%= pa.documento_numero_02 %>',
+                           '<%= pa.documento_numero %>',
+                           '<%= pa.cota %>',
+                           '<%= format_int(pa.pago_guarani.to_f) %>',
+                           '<%= format_decimal(pa.pago_dolar.to_f) %>')"> 
+          <td width="250" align="left"><%= pa.documento_numero %>-<%= pa.documento_numero_01 %>-<%= pa.documento_numero_02 %></td>
+          <td width="50" align="center"><%= pa.cota %></td> 
+          <td width="70" align="center"><%= format_decimal(pa.divida_dolar) %></td> 
+          <td width="70" align="right"><%= format_decimal(pa.pago_dolar) %></td>                 
+          <td width="70" align="center"><%= format_int(pa.divida_guarani) %></td> 
+          <td width="70" align="right"><%= format_int(pa.pago_guarani) %></td> 
+        </tr>
+      <% end %> 
+    </table>
+  </div>
+  <% if params[:moeda].to_i == 1 %>
+    <%= hidden_field_tag :valor, format_int(@compra.total_guarani.to_i - @compra.compras_financas.sum(:valor_guarani).to_i) %>
+  <% else %>
+    <%= hidden_field_tag :valor, format_decimal(@compra.total_dolar.to_f - @compra.compras_financas.sum(:valor_dolar)) %>
+  <% end %> 
+</div>
+
+<script language="javascript">
+  function Fecha(doc01, doc02, doc, cota, pago_gs, pago_us){  
+    window.opener.document.getElementById('moeda').value = <%= params[:moeda].to_i %>;
+    window.opener.document.getElementById('fact_an_01').value = doc01;
+    window.opener.document.getElementById('fact_an_02').value = doc02;
+    window.opener.document.getElementById('fact_an').value = doc;
+    window.opener.document.getElementById('fact_an_cota').value = cota;
+    total_nota = $("#valor").val()
+
+    
+    if (<%= params[:moeda].to_i %> == 1) {
+      if ( parseFloat(pago_gs.replace(/\./g, "").replace(",", ".")) > parseFloat(total_nota.replace(/\./g, "").replace(",", ".")) ) {
+
+        window.opener.document.getElementById('valor_gs').value = total_nota;
+      }else{
+        window.opener.document.getElementById('valor_gs').value = pago_gs;
+      }
+    } else {
+      if ( parseFloat(pago_us.replace(/\./g, "").replace(",", ".")) > parseFloat(total_nota.replace(/\./g, "").replace(",", ".")) ) {
+        window.opener.document.getElementById('valor_us').value = total_nota;
+      }else{
+        window.opener.document.getElementById('valor_us').value = pago_us;
+      }
+    }
+
+
+    self.close();
+  }
+</script>

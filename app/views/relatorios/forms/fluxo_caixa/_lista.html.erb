@@ -1,0 +1,113 @@
+<% 
+sql = "SELECT DATA, SUM(EFETIVO) AS EFETIVO, SUM(RECEBER) AS RECEBER, SUM(DIFERIDO) AS DIFERIDO, SUM(PAGAR) AS PAGAR
+        FROM (SELECT F.DATA AS DATA, 
+               SUM(F.ENTRADA_GUARANI - F.SAIDA_GUARANI) AS EFETIVO,
+               0 AS RECEBER,
+               0 AS DIFERIDO,
+               0 AS PAGAR
+        FROM FINANCAS F
+        WHERE F.CHEQUE_STATUS <> 1
+        GROUP BY 1
+
+        UNION ALL
+
+        SELECT C.VENCIMENTO AS DATA, 
+               0 AS EFETIVO,
+               SUM(C.DIVIDA_GUARANI - C.COBRO_GUARANI) AS RECEBER,
+               0 AS DIFERIDO,
+               0 AS PAGAR
+        FROM CLIENTES C
+        WHERE C.LIQUIDACAO = 0
+        GROUP BY 1
+
+        UNION ALL
+
+        SELECT F.DATA AS DATA, 
+               0 AS EFETIVO,
+               0 AS RECEBER,
+               SUM(F.ENTRADA_GUARANI - F.SAIDA_GUARANI) AS DIFERIDO,
+               0 AS PAGAR
+        FROM FINANCAS F
+        WHERE F.CHEQUE_STATUS = 1
+        GROUP BY 1
+
+
+        UNION ALL
+
+        SELECT C.VENCIMENTO AS DATA, 
+               0 AS EFETIVO,
+               0 AS RECEBER,
+               0 AS DIFERIDO,
+               SUM(C.DIVIDA_GUARANI - C.PAGO_GUARANI) AS PAGAR
+        FROM PROVEEDORES C
+        WHERE C.LIQUIDACAO = 0
+        GROUP BY 1
+
+        ) AS TMP 
+        GROUP BY 1
+        ORDER BY 1
+"
+
+fluxo_caixa = Financa.find_by_sql(sql)
+%>
+
+<style type="text/css">
+  td{  padding: 12px 5px 12px 5px !important }
+</style>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <header class="panel-heading">
+        Fluxo de Caja
+      </header>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-7">
+    <div class="panel">
+      <div class="panel-content">
+        <div class="modal-grid">
+          <table class="head_grid">
+            <tr>
+              <td width="120"><%= t('DATE') %></td>
+              <td width="100" align="right">Efetivo</td>
+              <td width="100" align="right">Receber</td>
+              <td width="100" align="right">Cheque Diferido</td>
+              <td width="100" align="right">Pagar</td>
+              <td width="118" align="right">Saldo</td>
+            </tr>
+
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="120">Anterior</td>
+              <td width="100" align="right">0</td>
+              <td width="100" align="right">0</td>
+              <td width="100" align="right">0</td>
+              <td width="100" align="right">0</td>
+              <td width="118" align="right">0</td>
+            </tr>
+
+          </table>
+          <div class="rolagem" dir="div" style="height: 300px">
+            <table>
+              <% saldo = 0 %>
+              <% fluxo_caixa.each do |f| %>
+                <tr class = "<%= cycle("cor1", "cor2") %>" style="cursor:pointer;">
+                  <td width="120"><%= f.data.to_date.strftime("%d/%m/%y") %></td>
+                  <td width="100" align="right"><%= format_int(f.efetivo.to_f) %></td>
+                  <td width="100" align="right"><%= format_int(f.receber.to_f) %></td>
+                  <td width="100" align="right"><%= format_int(f.diferido.to_f) %></td>
+                  <td width="100" align="right"><%= format_int(f.pagar.to_f) %></td>
+                  <td width="118" align="right"><%= format_int(saldo += ((f.efetivo.to_f + f.receber.to_f + f.diferido.to_f) - f.pagar.to_f)) %></td>
+                </tr>
+              <% end %>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

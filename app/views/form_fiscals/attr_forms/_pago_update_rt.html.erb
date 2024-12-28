@@ -1,0 +1,29 @@
+<%= form_tag "/form_fiscals/retencao_update_cp" do %>
+	<%= hidden_field_tag :cod_proc, @pago.id %>
+	<%= hidden_field_tag :sigla_proc, 'PG' %>
+	<%= hidden_field_tag :data, @pago.data %>
+	<%= hidden_field_tag :status, 1 %>
+	<%= hidden_field_tag :tipo, 1 %>
+	<%= hidden_field_tag :ruc, @pago.persona.ruc %>
+	<%= hidden_field_tag :persona_nome, @pago.persona.nome_fatura %>
+	<%= hidden_field_tag :persona_id, @pago.persona_id %>
+	<%= hidden_field_tag :cota, 1 %>
+	<%= hidden_field_tag :tipo_op, 9 %>
+	<%= hidden_field_tag :moeda, @pago.moeda %>
+	<table>
+		<tr>
+			<td align="right">Retención:</td>
+			<td><%=   select("busca", "doc", FormFiscal.all(:select => 'id,doc,doc_01,doc_02',:conditions => ["tipo_doc = 14 and status = 0 "],limit: 1,:order => 'CAST(doc as integer)').collect {|p| [ p.doc_01 << '.' << p.doc_02 << '.' << p.doc, p.id ] },:class => "select")  %></td></td>
+			<td rowspan="2"><%= submit_tag " Grabar ", :disable_with => "Aguarde...", :class => "button", style:'height:40px'  %></td>
+		</tr>
+		<tr>
+			<td align="right">Monto:</td>
+			<% if @pago.moeda == 0 %>
+				<td><%= text_field_tag :tot_us, @retencao_us.to_f %></td>
+			<% else %>
+				<td><%= text_field_tag :tot_gs, @retencao_gs.to_i %></td>
+			<% end %>
+
+		</tr>
+	</table>
+<% end %>

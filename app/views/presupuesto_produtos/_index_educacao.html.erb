@@ -1,0 +1,100 @@
+   <table class="head_grid">
+      <tr>
+        <td width="150">Ref.</td>
+        <td width="120" >Grupo</td>
+        <td width="250" >Producto</td>
+        <td width="40" align="right">Ctd</td>
+        <td width="70" align="right">Unid.</td>
+        <td width="90" align="right">Total</td>
+        <td width="70" align="right">Desc.</td>
+        <td width="70" align="right">Monto c/ Desc.</td>
+        <td width="70" align="right">Cuotas</td>
+        <td width="70" align="right">Valor Cuotas</td>
+      </tr>
+   </table>
+   <div class="rolagem" dir="div">
+      <table>
+         <% indice     = 1 %>
+         <% qtd        = 0 %>
+         <% tot_us     = 0 %>
+         <% tot_gs     = 0 %>
+         <% @tot_desc_gs     = 0 %>
+         <% tot_cus_gs = 0 %>
+         <% tot_rs     = 0 %>
+         <% presupuesto_produtos.order("persona_dependente_nome, id, produto_nome").each do |pp| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="150"> <%= pp.persona.nome unless pp.persona.nil? %> <%= pp.persona_dependente_nome %></td>
+              <td width="120"><%= pp.produto.grupo.descricao %></td>
+              <td width="250"><%= pp.produto_nome %></td>
+              <td width="40"  align="right"><b><%= pp.quantidade.to_i %></b></td>
+               <% if @presupuesto.moeda == 0 %>
+                 <td width="70" align="right"><%= format_decimal( pp.unitario_dolar ) %></td>
+                 <td width="70" align="right"><%= format_decimal( pp.total_dolar ) %></td>
+                 <% tot_us += pp.total_dolar %>
+               <% elsif @presupuesto.moeda == 1 %>
+                 <td width="70" align="right"><%= format_int( pp.unitario_guarani) %></td>
+                 <td width="70" align="right"><%= format_int( pp.total_guarani) %></td>
+                 <td width="70" align="right">
+                  <% if pp.desconto.to_i > 0 %>
+                    -<%= pp.desconto.to_i %>%
+                  <% end %>
+                </td>
+                 <td width="70" align="right">
+                  <% if pp.desconto.to_i > 0 %>
+                    <%= format_int( (pp.total_guarani.to_f - (pp.total_guarani.to_f * (pp.desconto.to_f / 100)))  ) %>
+                    <% @tot_desc_gs += (pp.total_guarani.to_f - (pp.total_guarani.to_f * (pp.desconto.to_f / 100))) %>
+                    <% else %>
+                      <% @tot_desc_gs += (pp.total_guarani.to_f - (pp.total_guarani.to_f * (pp.desconto.to_f / 100))) %>
+                  <% end %>
+                </td>
+                 <td width="70" align="right">
+                  <% if pp.cuotas.to_i > 0 %>
+                    <%= pp.cuotas.to_i %>
+                  <% end %>
+                </td>
+                 <td width="70" align="right">
+                  <% if pp.cuotas.to_i > 0 %>
+                    <%= format_int( (pp.total_guarani.to_f - (pp.total_guarani.to_f * (pp.desconto.to_f / 100))) / pp.cuotas.to_i ) %>
+                  <% end %>
+                </td>                
+                 <% tot_gs += pp.total_guarani.to_f %>
+                 <% tot_cus_gs += (pp.promedio_guarani.to_f * pp.quantidade) %>
+               <% else %>
+                 <td width="70" align="right"><%= format_decimal( pp.unitario_real ) %></td>
+                 <td width="70" align="right"><%= format_decimal( pp.total_real ) %></td>
+                  <% tot_rs += pp.total_real %>
+               <% end %>
+               <td><%= link_to '', edit_presupuesto_presupuesto_produto_path(presupuesto,pp), class: 'icon-pencil' %></td>
+               <td><%= link_to '', [presupuesto,pp], :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>
+
+               <% qtd += pp.quantidade.to_f %>
+            </tr>
+            <% indice += 1 %>
+         <% end %>
+      </table>
+   </div>
+<table class="head_grid">
+  <tr>
+    <td align="right" width="540"></td>
+    <td width="100" align="right">Total General </td>
+    <td  align="right" width="60">
+        <% if @presupuesto.moeda == 0 %>
+          <%= format_decimal( tot_us) %>
+        <% elsif @presupuesto.moeda == 1 %>
+          <%= format_int( tot_gs.to_f ) %>
+        <% else %>
+          <%= format_decimal( tot_rs )   %>
+        <% end %>
+    </td>
+    <td width="100" align="right">Total c/ Desc.:</td>
+    <td  align="right" width="60">
+        <% if @presupuesto.moeda == 0 %>
+          <%= format_decimal( tot_us) %>
+        <% elsif @presupuesto.moeda == 1 %>
+          <%= format_int( @tot_desc_gs.to_f ) %>
+        <% else %>
+          <%= format_decimal( tot_rs )   %>
+        <% end %>
+    </td>
+  </tr>
+</table>

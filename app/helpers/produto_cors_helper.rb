@@ -1,0 +1,2 @@
+module ProdutoCorsHelper
+end

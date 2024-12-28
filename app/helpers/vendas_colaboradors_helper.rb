@@ -1,0 +1,2 @@
+module VendasColaboradorsHelper
+end

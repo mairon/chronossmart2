@@ -1,0 +1,193 @@
+
+<div class="group">
+  <table>
+    <%if params[:tipo] == '0' %>
+      <% co_sub_exentas     = 0 %>
+      <% co_sub_gravada_05  = 0 %>
+      <% co_sub_imposto_05  = 0 %>
+      <% co_sub_gravada_10  = 0 %>
+      <% co_sub_imposto_10  = 0 %>
+      <% co_sub_total_guarani = 0 %>
+      <!-- Contado -->
+      <% @venda.each do |venda| %>
+        <% if venda.def.to_i == 0 %>
+          <% cotiz = Moeda.find_by_data(venda.data,:select =>'id,data,cotacao_oficial_compra')%>      
+      
+          <% if  venda.tipo == 0 %>
+            <% if venda.status == 0 %>
+              <% if venda.moeda == 0 %>
+      
+                <% ex  = ( venda.exentas_dolar.to_f * cotiz.cotacao_oficial_compra.to_f ) %>
+                <% g05 =( (  venda.gravadas_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f) - (venda.imposto_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f ) ) %>
+
+                <% i05 = venda.imposto_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f %>
+
+                <% g10 =( ( venda.gravadas_10_dolar.to_f - ( venda.gravadas_10_dolar.to_f  / 11 ) )  * cotiz.cotacao_oficial_compra.to_f ) %>
+                <% i10 = ( ( venda.gravadas_10_dolar.to_f  / 11 ) * cotiz.cotacao_oficial_compra.to_f ) %>
+                <% tot = ( ex.to_f + g05.to_f + i05.to_f + g10 + i10.to_f ) %>
+
+              <% else %>
+
+                <% ex  = venda.exentas_guarani.to_f %></td>
+                <% g05 = (venda.gravadas_05_guarani.to_f - venda.imposto_05_guarani.to_f ) %></td>
+                <% i05 = venda.imposto_05_guarani.to_f %></td>
+                <% g10 = venda.gravadas_10_guarani.to_f - ( venda.gravadas_10_guarani.to_f / 11 ) %>
+                <% i10 = venda.gravadas_10_guarani.to_f / 11 %>
+                <% tot = ( ex.to_f + g05.to_f + i05.to_f + g10.to_f + i10.to_f ) %>
+
+              <% end %>
+
+                <% co_sub_exentas       += ex.to_f  %>
+                <% co_sub_gravada_05    += g05.to_f %>
+                <% co_sub_imposto_05    += i05.to_f %>
+                <% co_sub_gravada_10    += g10.to_f %>
+                <% co_sub_imposto_10    += i10.to_f %>
+                <% co_sub_total_guarani += tot.to_f %>
+
+            <% end %>
+          <% end %>
+        </tr>
+
+      <% end %>
+     <% end%>
+      <tr>
+        <td colspan="2" width="300"> Contado </td>
+        <td align="right" width="100" ><%= number_to_currency(co_sub_exentas, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" width="100" ><%= number_to_currency(co_sub_gravada_05, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" width="100" ><%= number_to_currency(co_sub_imposto_05, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" width="100" ><%= number_to_currency(co_sub_gravada_10, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" width="100" ><%= number_to_currency(co_sub_imposto_10, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" width="100" ><%= number_to_currency(co_sub_total_guarani, :format=>' %n ', :precision => 0) %></td>
+      </tr>
+      
+      <% cr_sub_exentas     = 0 %>
+      <% cr_sub_gravada_05  = 0 %>
+      <% cr_sub_imposto_05  = 0 %>
+      <% cr_sub_gravada_10  = 0 %>
+      <% cr_sub_imposto_10  = 0 %>
+      <% cr_sub_total_guarani = 0 %>
+
+      <!-- Credito -->
+      <% @venda.each do |venda| %>
+        <% if venda.def.to_i == 0 %>
+          <% cotiz = Moeda.find_by_data(venda.data,:select =>'id,data,cotacao_oficial_compra')%>      
+      
+          <% if  venda.tipo == 1 %>
+            <% if venda.status == 0 %>
+              <% if venda.moeda == 0 %>
+      
+                <% ex  = ( venda.exentas_dolar.to_f * cotiz.cotacao_oficial_compra.to_f ) %>
+                <% g05 =( (  venda.gravadas_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f) - (venda.imposto_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f ) ) %>
+
+                <% i05 = venda.imposto_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f %>
+
+                <% g10 =( ( venda.gravadas_10_dolar.to_f - ( venda.gravadas_10_dolar.to_f  / 11 ) )  * cotiz.cotacao_oficial_compra.to_f ) %>
+                <% i10 = ( ( venda.gravadas_10_dolar.to_f  / 11 ) * cotiz.cotacao_oficial_compra.to_f ) %>
+                <% tot = ( ex.to_f + g05.to_f + i05.to_f + g10 + i10.to_f ) %>
+
+              <% else %>
+
+                <% ex  = venda.exentas_guarani.to_f %></td>
+                <% g05 = (venda.gravadas_05_guarani.to_f - venda.imposto_05_guarani.to_f ) %></td>
+                <% i05 = venda.imposto_05_guarani.to_f %></td>
+                <% g10 = venda.gravadas_10_guarani.to_f - ( venda.gravadas_10_guarani.to_f / 11 ) %>
+                <% i10 = venda.gravadas_10_guarani.to_f / 11 %>
+                <% tot = ( ex.to_f + g05.to_f + i05.to_f + g10.to_f + i10.to_f ) %>
+
+              <% end %>
+
+                <% cr_sub_exentas       += ex.to_f  %>
+                <% cr_sub_gravada_05    += g05.to_f %>
+                <% cr_sub_imposto_05    += i05.to_f %>
+                <% cr_sub_gravada_10    += g10.to_f %>
+                <% cr_sub_imposto_10    += i10.to_f %>
+                <% cr_sub_total_guarani += tot.to_f %>
+
+            <% end %>
+          <% end %>
+        </tr>
+
+      <% end %>
+     <% end %>
+    <% end %>
+
+      <tr>
+        <td colspan="2">Credito </td>
+        <td align="right" width="100" ><%= number_to_currency(cr_sub_exentas, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" width="100" ><%= number_to_currency(cr_sub_gravada_05, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" width="100" ><%= number_to_currency(cr_sub_imposto_05, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" width="100" ><%= number_to_currency(cr_sub_gravada_10, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" width="100" ><%= number_to_currency(cr_sub_imposto_10, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" width="100" ><%= number_to_currency(cr_sub_total_guarani, :format=>' %n ', :precision => 0) %></td>
+      </tr>
+
+
+      <% nsub_exentas     = 0 %>
+      <% nsub_gravada_05  = 0 %>
+      <% nsub_imposto_05  = 0 %>
+      <% nsub_gravada_10  = 0 %>
+      <% nsub_imposto_10  = 0 %>
+      <% nsub_total_guarani = 0 %>
+
+      <% @venda.each do |venda| %>
+        <% if venda.def.to_i == 1 %>
+
+        <% cotiz = Moeda.find_by_data(venda.data,:select =>'id,data,cotacao_oficial_compra')%>      
+        <% per = Persona.find_by_id(venda.persona_id,:select =>'id,ruc' )%>
+      
+      <% if venda.status == 0%>
+            <% if venda.moeda == 0 %>
+      
+              <% ex  = venda.exentas_dolar.to_f * cotiz.cotacao_oficial_compra.to_f %>
+              <% g05 =( (  venda.gravadas_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f) - (venda.imposto_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f ) ) %>
+              <% i05 = venda.imposto_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f %>
+              <% g10 =( ( venda.gravadas_10_dolar.to_f - ( venda.gravadas_10_dolar.to_f  / 11 ) )  * cotiz.cotacao_oficial_compra.to_f ) %>
+              <% i10 = ( ( venda.gravadas_10_dolar.to_f  / 11 ) * cotiz.cotacao_oficial_compra.to_f ) %>
+              <% tot = ( ex.to_f + g05.to_f + i05.to_f + g10 + i10.to_f ) %>
+
+          <% else %>
+
+              <% ex = venda.exentas_guarani.to_f%>
+              <% g05 = (venda.gravadas_05_guarani.to_f - venda.imposto_05_guarani.to_f) %>
+              <% i05 = venda.imposto_05_guarani.to_f %>
+              <% g10 = venda.gravadas_10_guarani.to_f - ( venda.gravadas_10_guarani.to_f / 11 ) %>
+              <% i10 = venda.gravadas_10_guarani.to_f / 11%>
+              <% tot = ( ex.to_f + g05.to_f + i05.to_f + g10.to_f + i10.to_f )%>
+            <% end %>
+
+     <% end %>
+        </tr>
+
+        <% nsub_exentas       += ex.to_f  %>
+        <% nsub_gravada_05    += g05.to_f %>
+        <% nsub_imposto_05    += i05.to_f %>
+        <% nsub_gravada_10    += g10.to_f %>
+        <% nsub_imposto_10    += i10.to_f %>
+        <% nsub_total_guarani += tot.to_f %>
+        <% end %>
+      <% end %>
+
+      <tr>
+        <td colspan="2">Nc. Prov.</td>
+        <td align="right" ><%= number_to_currency(nsub_exentas, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" ><%= number_to_currency(nsub_gravada_05, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" ><%= number_to_currency(nsub_imposto_05, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" ><%= number_to_currency(nsub_gravada_10, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" ><%= number_to_currency(nsub_imposto_10, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" ><%= number_to_currency(nsub_total_guarani, :format=>' %n ', :precision => 0) %></td>
+
+      </tr>
+            
+      <tr height="30" class="head">
+        <td colspan="2">Total General</td>
+        <td align="right" ><%= number_to_currency(nsub_exentas.to_f + cr_sub_exentas.to_f + co_sub_exentas.to_f, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" ><%= number_to_currency(nsub_gravada_05.to_f + cr_sub_gravada_05.to_f + co_sub_gravada_05.to_f, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" ><%= number_to_currency(nsub_imposto_05.to_f + cr_sub_imposto_05.to_f + co_sub_imposto_05.to_f, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" ><%= number_to_currency(nsub_gravada_10.to_f + cr_sub_gravada_10.to_f + co_sub_gravada_10.to_f, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" ><%= number_to_currency(nsub_imposto_10.to_f + cr_sub_imposto_10.to_f + co_sub_imposto_10.to_f, :format=>' %n ', :precision => 0) %></td>
+        <td align="right" ><%= number_to_currency(nsub_total_guarani.to_f + cr_sub_total_guarani.to_f + co_sub_total_guarani.to_f, :format=>' %n ', :precision => 0) %></td>
+
+      </tr>
+    </table>
+</div>
+

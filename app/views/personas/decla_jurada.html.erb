@@ -1,0 +1,191 @@
+<%= form_for(@persona, html: {:multipart => true}) do |f| %>
+  <div class="row">
+    <!--breadcrumbs end -->
+    <% if @persona.errors.any? %>
+      <div class="col-md-12">
+        <div class="alert alert-block alert-danger fade in">
+          <button data-dismiss="alert" class="close close-sm" type="button">
+            <i class="fa fa-times"></i>
+          </button>
+          <h4><%= pluralize(@persona.errors.count, "error") %> no fue posible grabar:</h4>
+          <ul>
+          <% @persona.errors.full_messages.each do |msg| %>
+            <li><strong><%= msg %></strong></li>
+          <% end %>
+          </ul>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-center">
+        <header class="panel-heading">
+          DECLARACIÓN JURADA DE BIENES
+        </header>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-3">
+              <label>Primer Apellido</label>
+              <%= f.text_field :primeiro_apelido, required: false, class: 'panel-field', autofocus: true %>
+            </div>
+            <div class="col-md-2">
+              <label>Segundo Apellido</label>
+              <%= f.text_field :ultimo_apelido, required: false, class: 'panel-field', autofocus: true %>
+            </div>
+            <div class="col-md-3">
+              <label>Primer Nombre</label>
+              <%= f.text_field :primeiro_nome, required: false, class: 'panel-field', autofocus: true %>
+            </div>
+            <div class="col-md-3">
+              <label>Segundo Nombre</label>
+              <%= f.text_field :ultimo_nome, required: false, class: 'panel-field', autofocus: true %>
+            </div>
+          </div>
+
+
+          <div class="row">
+            <div class="col-md-3">
+              <label>Nacionalidad</label>
+              <%= f.text_field :nacionalidade, required: false, class: 'panel-field', autofocus: true %>
+            </div>
+            <div class="col-md-2">
+              <label>Cédula de Identidad N°</label>
+              <%= f.text_field :ruc, required: false, class: 'panel-field', autofocus: true %>
+            </div>
+            <div class="col-md-3">
+              <label>N° Pasaporte</label>
+              <%= f.text_field :n_passaporte, required: false, class: 'panel-field', autofocus: true %>
+            </div>
+            <div class="col-md-4">
+              <label>Fecha de nacimiento</label>
+              <%= f.date_select :data_nascimento, class: 'panel-field' %>
+            </div>
+          </div>
+
+
+          <div class="row">
+            <div class="col-md-8">
+              <label>Dirección - completa:</label>
+              <%= f.text_field :direcao, required: false, class: 'panel-field', autofocus: true %>
+            </div>
+            <div class="col-md-2">
+              <label>Teléfono</label>
+              <%= f.text_field :telefone, required: false, class: 'panel-field', autofocus: true %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <i>Me comprometo comunicar a EL EMPLEADOR, por escrito o cualquier medio fehaciente, el cambio o
+translado de mi domicilio. Mientras éste no se registre serán válidas todas las comunicaciones dirigidas al
+domicilio denunciado, con todos los efectos legales.-</i>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <label>E-mail</label>
+              <%= f.text_field :email, required: false, class: 'panel-field', autofocus: true %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <label>Nombre completo del padre</label>
+              <%= f.text_field :nome_pai, required: false, class: 'panel-field', autofocus: true %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <label>Nombre completo de la madre</label>
+              <%= f.text_field :nome_mae, required: false, class: 'panel-field', autofocus: true %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <fieldset>
+                <legend>Tipo de Residencia</legend>
+                <%= f.radio_button :tipo_residencia, 'Alquilado' %> Alquilado
+                <%= f.radio_button :tipo_residencia, 'Cedido' %> Cedido
+                <%= f.radio_button :tipo_residencia, 'Familiar' %> Familiar
+                <%= f.radio_button :tipo_residencia, 'Propio Financiado' %> Propio Financiado
+                <%= f.radio_button :tipo_residencia, 'Propio Pagado' %>  Propio Pagado
+              </fieldset>
+            </div>
+
+            <div class="col-md-6">
+              <fieldset>
+                <legend>Regimen de casamiento</legend>
+                <%= f.radio_button :regime_casamento, 'Comunión de bienes' %> Comunión de bienes
+                <%= f.radio_button :regime_casamento, 'Separación de bienes' %> Separación de bienes
+              </fieldset>
+            </div>
+
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <fieldset>
+                <legend>Estado Civil</legend>
+                <%= f.radio_button :estado_civil, 'Soltero' %> Soltero
+                <%= f.radio_button :estado_civil, 'Casado' %> Casado
+                <%= f.radio_button :estado_civil, 'Otro' %> Otro
+                Especifique: <%= f.text_field :estado_civil_outros, size: 15 %>
+              </fieldset>
+            </div>
+            <div class="col-md-6">
+              <fieldset>
+                <legend>Nivel educativo</legend>
+                <%= f.radio_button :escolaridade, 'Primario' %> Primario
+                <%= f.radio_button :escolaridade, 'Secundario' %> Secundario
+                <%= f.radio_button :escolaridade, 'Tecnico' %> Tecnico
+                <%= f.radio_button :escolaridade, 'Universitario' %> Universitario
+                <%= f.radio_button :escolaridade, 'Otro' %> Otro
+                Especifique: <%= f.text_field :escolaridade_outros, size: 10 %>
+              </fieldset>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-8">
+              <label>Nombre completo del conyuge</label>
+              <%= f.text_field :conyuge, class: 'panel-field' %>
+            </div>
+
+            <div class="col-md-4">
+              <fieldset>
+                <legend>Trabaja (conyuge)</legend>
+                <%= f.radio_button :conyuge_trabalho, false %> No
+                <%= f.radio_button :conyuge_trabalho, true %> Si
+              </fieldset>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+<br>
+
+<div class="row">
+  <div class="col-md-12">
+    <%= render "/personas/decla_jurada/ativos" %>
+  </div>
+</div>
+
+<br>
+
+<div class="row">
+  <div class="col-md-12">
+    <%= render "/personas/decla_jurada/bancos" %>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  $('#persona_seguimento_id').selectize();
+</script>

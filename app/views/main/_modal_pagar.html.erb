@@ -1,0 +1,233 @@
+<div class="modal fade" id="modal-pagar" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-danger">
+        <h1 style="font-size: 16px; font-weight: bold;">Nuevo Cuentas a Pagar</h1>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 5px 20px 20px 20px">
+        <%= form_for(Proveedore.new) do |f| %>
+        <%= hidden_field_tag :origin, 'main', class: 'pagar-origin'  %>
+        <%= f.hidden_field :sigla_proc, value: 'CL' %>
+        <%= f.hidden_field :cota, value: 1 %>
+        <%= f.hidden_field :moeda, class: 'pg-moeda' %>
+
+        <div class="row">
+          <div class="col-md-12">
+            <label>Descripción</label>
+            <%= f.text_field :descricao, required: true, class: 'panel-field pagar-descricao' %>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <label>Proveedor</label>
+            <%= f.text_field :persona_nome, class: 'autocomplete panel-field prov-persona_nome', placeholder: 'Busca..' %>
+             <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+            <%= f.hidden_field :persona_id, class: 'prov-persona_id' %>
+            <div id="add_per_pg" class="ui-menu ui-menu-item" hidden>
+              <a href="#" data-toggle="modal" data-target="#modal-new-persona">+ Novo Proveedor</a>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3">
+            <label>Fecha</label>
+            <div class="ant-picker-input">
+              <%= f.text_field :data, value: Time.now.strftime("%d/%m/%Y"), size: 12, class: "date", onkeyup: "Formatadata(this,event)", autocomplete: 'off', required: true %>
+              <span class="ant-picker-suffix"><span role="img" aria-label="calendar" class="anticon anticon-calendar"><svg viewBox="64 64 896 896" focusable="false" data-icon="calendar" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M880 184H712v-64c0-4.4-3.6-8-8-8h-56c-4.4 0-8 3.6-8 8v64H384v-64c0-4.4-3.6-8-8-8h-56c-4.4 0-8 3.6-8 8v64H144c-17.7 0-32 14.3-32 32v664c0 17.7 14.3 32 32 32h736c17.7 0 32-14.3 32-32V216c0-17.7-14.3-32-32-32zm-40 656H184V460h656v380zM184 392V256h128v48c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8v-48h256v48c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8v-48h128v136H184z"></path></svg></span></span>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label>Vencimiento</label>
+            <div class="ant-picker-input">
+              <%= f.text_field :vencimento, size: 12, class: "date", onkeyup: "Formatadata(this,event)", autocomplete: 'off', required: true %>
+              <span class="ant-picker-suffix"><span role="img" aria-label="calendar" class="anticon anticon-calendar"><svg viewBox="64 64 896 896" focusable="false" data-icon="calendar" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M880 184H712v-64c0-4.4-3.6-8-8-8h-56c-4.4 0-8 3.6-8 8v64H384v-64c0-4.4-3.6-8-8-8h-56c-4.4 0-8 3.6-8 8v64H144c-17.7 0-32 14.3-32 32v664c0 17.7 14.3 32 32 32h736c17.7 0 32-14.3 32-32V216c0-17.7-14.3-32-32-32zm-40 656H184V460h656v380zM184 392V256h128v48c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8v-48h256v48c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8v-48h128v136H184z"></path></svg></span></span>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label>Categoria</label>
+            <%
+              sqlp = "SELECT R.ID, (RP.DESCRICAO || ' > ' || R.DESCRICAO) AS DESCRICAO FROM RUBROS R LEFT JOIN RUBROS RP ON RP.ID = R.RUBRO_PAI WHERE R.TIPO = 1 AND R.SUB = TRUE ORDER BY 2"
+            %>
+            <%= f.collection_select :rubro_id, Rubro.find_by_sql(sqlp), :id, :descricao, {:prompt => 'Selecione la Classificación'}, {required: true, class: 'panel-field pagar-rubro-id'} %>
+          </div>
+
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <label>Cuenta</label>
+            <%= f.collection_select :conta_id,
+                   Conta.select('id,nome').order(2), :id, :nome, {:prompt => 'Selecione la Cuenta'}, {required: true, class: 'panel-field pagar-conta-id'} %>
+          </div>
+
+          <div class="col-md-3" align="right">
+            <div class="divida-us" hidden>
+              <%= field_us_label 'Monto U$', f, :divida_dolar %>
+            </div>
+            <div class="divida-gs" hidden>
+              <%= field_gs_label 'Monto Gs.', f, :divida_guarani %>
+            </div>
+            <div class="divida-rs" hidden>
+              <%= field_us_label 'Monto R$', f, :divida_real %>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <label>Pago?</label>
+            <div class="material-switch">
+              <%= f.check_box :liquidacao %>
+              <label for="proveedore_liquidacao" class="label-info"></label>
+            </div>
+          </div>
+
+        </div>
+
+        <br>
+          <div class="row">
+            <div class="col-md-12">
+
+              <div id="tab-pagar">
+
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                  <li role="presentation"><a href="#tab-p-doc" aria-controls="tab-p-doc" role="tab" data-toggle="tab">Nº Doc.</a></li>
+                  <li role="presentation"><a href="#tab-p-rec" aria-controls="tab-p-rec" role="tab" data-toggle="tab">Recorrencia</a></li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                  <div role="tabpanel" class="tab-pane" id="tab-p-doc">
+                    <label>Doc.</label>
+                    <%= f.text_field :documento_numero_01, size: 5 %>
+                    <%= f.text_field :documento_numero_02, size: 5 %>
+                    <%= f.text_field :documento_numero %>
+
+                  </div>
+                  <div role="tabpanel" class="tab-pane" id="tab-p-rec">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <label>Frecuencia</label>
+                        <%= f.select :frequencia, [['UNICO','UNICO'],['MENSUAL','MENSUAL'],['TRIMESTRAL','TRIMESTRAL'],['SEMESTRAL','SEMESTRAL'],['ANUAL','ANUAL']] %>
+
+                      </div>
+                      <div class="col-md-6">
+                        <label>Repetir</label>
+                        <%= f.text_field :tot_cotas, size: 5 , value: 1 %> X
+                      </div>
+                    </div>
+
+                  </div>
+                  <div role="tabpanel" class="tab-pane" id="tab-p-anex"></div>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12 footer-buttons" >
+              <%= f.submit "Grabar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  $('#tab-pagar a').click(function (e) {
+    e.preventDefault()
+    $(this).tab('show')
+  })
+
+  $('#modal-pagar').on('shown.bs.modal', function(event) {
+    $('.pagar-descricao').focus();
+    $(".pagar-origin").val($(event.relatedTarget).data('origin'));
+  })
+
+  $('.pagar-rubro-id, .pagar-conta-id').selectize();
+
+
+  $(".pagar-conta-id").change(function() {
+    $.ajax({url: "/buscas/get_moeda_conta",
+      type: 'GET',
+      beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+      data: "conta=" + escape($(".pagar-conta-id").val()),
+      error: function(XMLHttpRequest, textStatus, errorThrown) {
+        alert('Moneda no Encontrada!');
+      },
+      success: function(data){
+        $('.pg-moeda').val(data);
+        d = $('.pg-moeda').val();
+        if (d == '1') {
+          $(".divida-gs").show();
+          $(".divida-rs").hide();
+          $(".divida-us").hide();
+
+        } else if (d == '0') {
+          $(".divida-us").show();
+          $(".divida-rs").hide();
+          $(".divida-gs").hide();
+        } else if (d == '2') {
+          $(".divida-rs").show();
+          $(".divida-us").hide();
+          $(".divida-gs").hide();
+        }
+      }
+    });
+  });
+
+</script>
+
+<script type="text/javascript">
+  $(function() {
+    $( ".prov-persona_nome" ).autocomplete({
+        source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+        $.ajax({
+          url: "/personas/busca?per=PROVEEDOR",
+          dataType: "json",
+
+          data: {
+            tipo: 'DESCRIPCION',
+            busca: request.term
+          },
+          beforeSend: function(){
+          $("#spinner").addClass("sppiner_show");
+          },
+
+          success: function( data ) {
+            $("#sppiner").removeClass("sppiner_show");
+            response( data );
+
+            if (data.length == 0 ){
+              $("#add_per_pg").show("slow");
+            } else{
+              $("#add_per_pg").hiden("slow");
+            }
+
+          },
+        });
+      },
+      minLength: 2,
+      change: function( event, ui ) {
+        $(".prov-persona_id").val("");
+        $('.prov-persona_id').val(ui.item.id);
+        return false;
+      }
+    });
+    $( ".prov-persona_nome" ).change(function(){
+      if ($( ".prov_persona_id" ).val() == ''){
+      }
+    });
+  });
+
+</script>

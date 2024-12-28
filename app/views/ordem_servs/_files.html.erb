@@ -1,0 +1,54 @@
+<h1 id="header">Anexos</h1>
+<table class="head_grid">
+  <tr>
+    <td width="60" align="right">Img</td>
+    <td width="200">Desc.</td>
+    <td></td>
+  </tr>
+</table>
+<div class="rolagem" dir="div" style="height: 250px;">
+   <table>
+      <% rt = 0 %>
+      <% vt = 0 %>
+      <% @ordem_serv.ordem_serv_files.each do |os| %>
+        <tr class = "<%= cycle("cor1", "cor2") %> dv<%= os.id %>">
+          <td width="80">
+            <small> <%= link_to (image_tag os.picture, class: 'img-thumbnail'), os.picture.url, target: '_blank' %></small>
+          </td>
+          <td width="150"><%= os.nome %></td>
+          <td><%= link_to '', os, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+        </tr>
+      <% end %>
+   </table>
+</div>
+
+<div class="group" style="padding: 25px">
+  <a class="add-file btn btn-green">Nuevo Anexo</a>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="add-file">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title us" id="myModalLabel" align="center">Anexo</h4>
+      </div>
+      <div class="modal-body" style="padding: 10px 0px 25px 0px">
+        <%= render partial: "/ordem_serv_files/form", locals: {ordem_serv_file: OrdemServFile.new(ordem_serv_id: @ordem_serv.id)} %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  $(".add-file").click(function() {
+    $('#add-file').modal('show');
+  });
+</script>
+
+
+

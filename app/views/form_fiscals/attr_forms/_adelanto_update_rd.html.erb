@@ -1,0 +1,27 @@
+<%= form_tag "/form_fiscals/adelanto_update_rd" do %>
+	<%= hidden_field_tag :cod_proc, @adelanto.id %>
+	<%= hidden_field_tag :sigla_proc, 'AD' %>
+	<%= hidden_field_tag :data, @adelanto.data %>
+	<%= hidden_field_tag :produto_id, Empresa.last.produto_id %>
+	<%= hidden_field_tag :status, 1 %>
+	<%= hidden_field_tag :tipo, 0 %>
+	<%= hidden_field_tag :ruc, @adelanto.persona.ruc %>
+	<%= hidden_field_tag :persona_nome, @adelanto.persona.nome_fatura %>
+	<%= hidden_field_tag :persona_id, @adelanto.persona_id %>
+	<%= hidden_field_tag :cota, 1 %>
+	<%= hidden_field_tag :tipo_op, 15 %>
+	<%= hidden_field_tag :moeda, 1 %>
+	<div class="row">
+		<div class="col-md-4">
+			<label>Factura</label>
+			<%= select("busca", "doc", FormFiscal.all(:select => 'id,doc,doc_01,doc_02',:conditions => ["tipo_doc = 15 and status = 0 and unidade_id = #{current_unidade.id}  and terminal_id = #{@adelanto.terminal_id}"],limit: 60,:order => 'CAST(doc as integer)').collect {|p| [ p.doc_01 << '.' << p.doc_02 << '.' << p.doc, p.id ] },:class => "select", )  %>			
+		</div>
+		<div class="col-md-4">
+			<label>Monto</label>
+			<%= text_field_tag :tot_gs, @adelanto.valor_guarani.to_i, size: 10 %>			
+		</div>
+		<div class="col-md-4" style="margin-top: 25px">
+			<%= submit_tag " Grabar ", :disable_with => "Aguarde...", :class => "btn btn-green" %>
+		</div>
+	</div>
+<% end %>

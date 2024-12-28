@@ -1,0 +1,220 @@
+<h1 id="header">Prov Gasto - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+
+<%= form_for(@prov_gasto) do |f| %>
+
+  <%= f.hidden_field :unidade_id, value: current_unidade.id %>
+
+  <% sql = "SELECT PC.ID,
+                     (PG.DESCRICAO || ' > ' || PC.DESCRICAO) AS DESCRICAO
+              FROM PLANO_DE_CONTAS PC
+              LEFT JOIN PLANO_DE_CONTAS PG
+              ON SUBSTRING(PG.CODIGO, 1, 8) = SUBSTRING(PC.CODIGO, 1, 8)
+              WHERE LENGTH(PC.CODIGO) >=12 AND LENGTH(PG.CODIGO) =8
+              ORDER BY 2"
+      plano = PlanoDeConta.find_by_sql(sql)
+    %>
+
+        <table>
+          <tr>
+            <td colspan="4">
+            	<label><%= t('PROVIDER') %></label>
+            	<%= text_field_tag :persona_nome, "", size: 85, required: true, class: 'autocomplete', autofocus: true %>
+              <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+            <%= f.hidden_field :persona_id %></td>
+          </tr>
+          <tr>
+            <td colspan="2">
+          		<label><%= t('COIN') %></label>
+              <%= f.radio_button  :moeda, 1, Checked: "True", onfocus: "MoedaCompra('1')" %> Guaranies
+              <%= f.radio_button :moeda, 0, onfocus: "MoedaCompra('0')"%> Dolares
+              <%= f.radio_button :moeda, 2, onfocus: "MoedaCompra('2')"%> Reais
+            </td>
+            <td>
+            <label>Cot.U$xGs</label>
+            	<%= f.text_field :cotacao, size: 10, class: "money_gs", dir: "rtl", :required => true %>
+            </td>
+            <td> 
+              <label>Cot.R$xGs</label>
+              <%= f.text_field :cotacao_real, size: 10, dir: "rtl", class: "money_gs", :required => true %>
+            </td>
+            <td>
+              <label>R$xU$</label>
+              <%= f.text_field :cotacao_rs_us, size: 10, dir: "rtl", class: "money_us", :required => true %>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="4"> 
+            <label><%= t('CENTER_OF_COSTOS') %></label>
+            <%= f.collection_select :centro_custo_id, 
+                       CentroCusto.all( :select => 'id,nome',
+                                  :order  => '2' ),:id,
+                                  :nome,{:prompt => 'Seleccione lo Centro de Costo'}, {required: true} %>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="4"> 
+              <label><%= t('CLASSIFICATION') %></label>
+              <%= f.collection_select :plano_de_conta_id, plano,:id, :descricao,{:prompt => 'Selecione'}, {required: true} %>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="4">
+            <label><%= t('ACCOUNT') %></label>
+            <%= f.collection_select :conta_id, 
+                       Conta.all( :select => 'id,nome',
+                                  :order  => '2' ),:id,
+                                  :nome,{:prompt => 'Seleccione la Cuenta'}, {required: true} %>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+            	<label><%= t('DATE') %> Venc.</label>
+             	<%= f.number_field :dia_venc, required: true %> 
+            </td>
+            <% if params[:action] == 'new' %>
+              <td>
+                <label>Mês Inicio</label>
+                <%= f.number_field :mes_inicio, required: true, value: Time.now.strftime("%m") %> 
+              </td>
+
+              <td>
+                <label>Año Inicio</label>
+                <%= f.number_field :ano_inicio, required: true, value: Time.now.strftime("%Y") %>
+              </td>
+
+            <% else %>
+              <td>
+                <label>Mês Inicio</label>
+                <%= f.number_field :mes_inicio, required: true %> 
+              </td>
+              
+            <% end %>
+
+            <td>
+              <label>Competencia</label>
+              <%= f.number_field :competencia, required: true %> 
+            </td>
+            <td>
+            	<label><%= t('VALUE') %></label>
+            	<%= f.telephone_field :valor_us, size: 15, class: "money_us valores-us", dir: "rtl" , step: ".01", hidden: true %>
+            	<%= f.telephone_field :valor_gs, size: 15, class: "money_gs valores-gs", precision: 0, dir: "rtl", step: "any" %>
+            	<%= f.telephone_field :valor_rs, size: 15, class: "money_us valores-rs", dir: "rtl" , step: ".01", hidden: true %>
+            </td>
+          </tr>              
+          <tr>
+            <td colspan="6">
+              <label>Obs.</label>
+              <%= f.text_area :obs, rows: 3, cols: 83 %>
+            </td>
+          </tr>                                      
+        </table>
+       <div class="footer-buttons">
+          <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+          <%= link_to t('BACK'), prov_gastos_path, :class => "btn btn-back" %>
+       </div>
+<% end %>
+</div>
+
+  <%= hidden_field_tag :moeda, '1' %>
+  
+  <% if params[:action] == 'new' %>
+    <script>
+      //cotacao
+      $(document).ready(function() {
+        $.ajax({url: '/buscas/cotz_us_compra',
+                type: 'POST',
+                beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+                data: 'data=' + $('#data_3i').val()+'/'+
+                                $('#data_2i').val()+'/'+
+                                $('#data_1i').val(),
+                success: function(data){
+                $('#prov_gasto_cotacao').val(number_format(data, 0, ',', '.'));} });
+
+        $.ajax({url: '/buscas/cotz_rs_compra',
+                type: 'POST',
+                beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+                data: 'data=' + $('#data_3i').val()+'/'+
+                                $('#data_2i').val()+'/'+
+                                $('#data_1i').val(),
+                success: function(data){
+                $('#prov_gasto_cotacao_real').val(number_format(data, 0, ',', '.'));} });
+
+        $.ajax({url: '/buscas/cotz_rs_us_compra',
+                type: 'POST',
+                beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+                data: 'data=' + $('#data_3i').val()+'/'+
+                                $('#data_2i').val()+'/'+
+                                $('#data_1i').val(),
+                success: function(data){
+                $('#prov_gasto_cotacao_rs_us').val(number_format(data, 2, ',', '.'));} });
+
+      });
+    </script>
+  <% end %>
+
+<script type="text/javascript">
+  //moeda
+  function MoedaCompra(d){
+    moeda = $('#moeda').val(d);
+    if (d == '1') {
+      $(".valores-gs").show();
+      $(".valores-rs").hide();
+      $(".valores-us").hide();
+
+    } else if (d == '0') {
+
+      $(".valores-us").show();
+      $(".valores-rs").hide();
+      $(".valores-gs").hide();
+    } else if (d == '2') {
+      $(".valores-rs").show();
+      $(".valores-us").hide();
+      $(".valores-gs").hide();
+    }
+  }
+
+
+  $(function() {
+    $( "#persona_nome" ).autocomplete({
+        source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+        $.ajax({
+          url: "/personas/busca?per=PROVEEDOR",
+          dataType: "json",
+
+          data: {
+            tipo: 'DESCRIPCION',
+            busca: request.term
+          },
+          beforeSend: function(){
+          $("#spinner").addClass("sppiner_show");
+          },
+
+          success: function( data ) {
+            $("#sppiner").removeClass("sppiner_show");
+            response( data );
+          },
+        });
+      },
+      minLength: 2,
+      change: function( event, ui ) {
+        $("#prov_gasto_persona_id").val("");
+        $('#prov_gasto_persona_id').val(ui.item.id);
+        return false;
+      }
+    });
+    $( "#persona_nome" ).change(function(){
+      if ($( "#prov_gasto_persona_id" ).val() == ''){
+      }
+    });
+  });
+
+  $('#prov_gasto_plano_de_conta_id').selectize();
+  $('#prov_gasto_conta_id').selectize();
+  $('#prov_gasto_centro_custo_id').selectize();
+
+</script>

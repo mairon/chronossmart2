@@ -1,0 +1,41 @@
+<h1 align="right" id="header">.</h1>
+<div class="group">
+   <table>
+      <tr>
+         <td width="100" align="center"><%= t('SALE') %></td>
+         <td width="100" align="center"><%= t('SHARE') %></td>
+         <td width="350" align="left">Factura</td>
+         <td width="350" ></td>
+      </tr>
+   </table>
+
+   <div class="rolagem" dir="div">
+
+      <table>
+         <% @faturas.each do |f| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>"
+            	onMouseOver ="javascript:this.style.backgroundColor='#949494'"
+             	onMouseOut  ="javascript:this.style.backgroundColor=''"
+             	onclick     ="Fecha( '<%=h f.documento_numero_01 %>',
+                                  '<%=h f.documento_numero_02 %>',
+                                  '<%=h f.documento_numero %>' )">
+
+               <td width="100" align="left"><%= f.venda_id %></td>
+               <td width="100" align="center"><%= f.cota %></td>
+               <td width="350" align="left"><%= f.documento_numero_01.to_s << ' - '<< f.documento_numero_02.to_s<< ' - ' << f.documento_numero.to_s  %></td>
+            </tr>
+         <% end %>
+      </table>
+
+   </div>
+</div>
+
+    <script language="javascript">
+      function Fecha(documento_numero_01,documento_numero_02,documento_numero)
+      {
+        window.opener.document.getElementById('nota_credito_fatura_01').value     = documento_numero_01;
+        window.opener.document.getElementById('nota_credito_fatura_02').value     = documento_numero_02;
+        window.opener.document.getElementById('nota_credito_fatura').value        = documento_numero;
+        self.close();
+      }
+    </script>

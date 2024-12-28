@@ -1,0 +1,62 @@
+<h1 id="header"><%= t('DATE') %> <%= @pago.data.strftime("%d/%m/%Y")%> |
+  <%= @pago.persona_nome %> |
+  <%= t('COIN') %> :
+  <% if @pago.moeda == 0 %>
+    <font color="green"> Dolar
+      <%= '| Valor Adelanto aplicado : ' <<  number_to_currency(@pago.pagos_adelantos.sum(:valor_us), :format =>' %n ', :separeitor => ',' ) if @pago.adelanto.to_i == 1 %>
+    </font>
+  <% elsif @pago.moeda == 1 %>
+    <font color="red"> Guaranies 
+      <%= '| Valor Adelanto aplicado : ' <<  number_to_currency(@pago.pagos_adelantos.sum(:valor_gs), :format =>' %n ', :precision => 0 ) if @pago.adelanto.to_i == 1 %>
+    </font>
+  <% else %>
+    <font color="blue">Real
+      <%= '| Valor Adelanto aplicado : ' <<  number_to_currency(@pago.pagos_adelantos.sum(:valor_rs), :format =>' %n ', :separeitor => ',' ) if @pago.adelanto.to_i == 1 %>
+    </font>
+  <% end %>
+  | <%= t('QUOTE') %> U$.: 
+  <%= number_to_currency( @pago.cotacao, :format =>' %n ', :precision => 0 ) %> 
+  R$.: <%= number_to_currency( @pago.cotacao_real, :format =>' %n ', :precision => 0 ) %>
+</h1>
+
+<div class="group">
+<%= render :partial=>"dividas" %>
+<hr>
+  <%= render :partial=>"index_detalhe", :locals=>{:pagos_detalhes => @pago.pagos_detalhes} %>
+
+  <div class="footer-buttons">
+    <a href="#" onclick="SeguirCobros()" class="btn btn-info next">Seguir</a> 
+    <a href="/pagos/<%=params[:id]%>/edit" class="btn btn-back"><%= t('BACK') %></a> 
+    <% if @int.to_f > 0 %>
+      <a href="/pagos/<%=params[:id]%>?tira_interes=true" class="btn btn-warning" ><%= t('TAKE_OUT') %> <%= t('INTEREST') %></a>  
+    <% end %>
+
+ 
+  </div> 
+
+  <br>
+
+</div>
+
+<%= hidden_field_tag :id, @pago.id %>
+<%= hidden_field_tag :count, @count %>
+
+
+<script>
+function SeguirCobros(){
+  id = document.getElementById('id').value;
+
+  if ( document.getElementById('count').value <= 0  ){
+    alert ('Selecione un Titulo');
+    return false;
+  }else{
+    location.href="/pagos/" + id +"/pago_final" ;
+  }
+};
+</script>
+
+<style>
+  form{
+    padding: 0px !important;
+  }
+</style>

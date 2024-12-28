@@ -1,0 +1,40 @@
+   <div>
+      <ul class="tabs">
+        <li><a href="/personas/<%= @persona.id %>/prazos">Prazos</a></li>
+        <li><a href="/personas/<%= @persona.id %>">Contatos</a></li>
+        <li><a href="/personas/<%= @persona.id %>/local_entregas">Locais Entrega(Obras)</a></li>
+        <li><a href="/personas/<%= @persona.id%>/rodados">Rodados</a></li>
+      </ul>
+
+      <div class="tab_container">
+              <table>
+                <tr>
+                    <td>
+                      <div>
+                        <table>
+                          <tr>
+                            <td>
+                              <div class="group">
+                                <%= render :partial=>"/persona_prazos/index_prazo", :locals=>{:persona_prazos => @persona.persona_prazos} %>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="group">
+                              <%= render :partial=>"/persona_prazos/new_prazo", :locals=>{:persona_prazo=>PersonaPrazo.new(:persona_id=>@persona.id)} %>
+                              </div>
+                            </td>
+                          </tr>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+              </table>
+   <div class="buttons">
+     <%= link_to 'Editar', edit_persona_path(@persona), :class => "button back" %> 
+     <%= link_to 'Finalizar', personas_path, :class => "button delete" %>
+   </div>
+</div>
+</div>
+

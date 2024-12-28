@@ -1,0 +1,58 @@
+<div class="panel">
+  <header class="panel-heading">
+    Efectivo Disponible
+    <a class="modalButton-frma panel-icon-default" data-toggle="modal" data-width="500" data-height="781" data-target="#form-bc">
+      +
+    </a>
+  </header>
+  <div class="panel-body">
+    <%= render :partial=>"persona_ativos/index", locals: {persona_ativos: @persona.persona_ativos} %>
+  </div>
+</div>
+
+
+<div class="modal fade" id="form-bc" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel">Add Activos</h4>
+      </div>
+      <div class="modal-body">
+        <%= render :partial=>"persona_ativos/form", locals: {persona_ativo: PersonaAtivo.new(persona_id: @persona.id)} %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+( function($) {
+
+function iframeModalOpen(){
+
+    $('.acao').on('click', function(e) {
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+
+      // stampiamo i nostri dati nell'iframe
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#form-bc').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+    });
+  }
+
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+
+  } ) ( jQuery );
+
+</script>

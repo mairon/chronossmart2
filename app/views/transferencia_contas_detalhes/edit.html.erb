@@ -1,0 +1,22 @@
+<h1>Actuliza Status del <%= t('CHECKS') %></h1>
+
+<%= form_for(@transferencia_contas_detalhe) do |f| %>
+      <% if @transferencia_contas_detalhe.transferencia_conta.documento_id == 14 %>
+        <tr>
+          <td align="right">Cheque:</td>
+          <td align="right"><%= f.text_field :cheque, :size => 15, :value => 'VC' %></td>
+          <%= f.hidden_field :cheque_status, :value => 1 %>
+        </tr>
+      <% else %>
+        <tr>
+          <td align="right">Cheque:</td>
+          <td align="right"><%= f.text_field :cheque, :size => 15 %></td>
+        </tr>
+      <% end %>
+
+  <p>
+    <%= f.submit 'Actualizar' %>
+  </p>
+<% end %>
+
+<%= link_to 'Back', transferencia_contas_detalhes_path %>

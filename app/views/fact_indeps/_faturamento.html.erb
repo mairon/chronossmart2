@@ -1,0 +1,64 @@
+<table class="head_grid">
+  <tr>
+    <td width="100">Lanz.</td>
+    <td width="100">Factura</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div" style="height: 80px">
+  <table>  
+    <% @fts.each do |ft| %>
+    <% if ft.status == 2 %>
+      <% color = '#ffa0a2' %>
+    <% end %>
+
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td  width="100"  bgcolor="<%=color%>"><%= ft.id %></td>
+        <td  width="100"  bgcolor="<%=color%>"><%= ft.doc_01 %>.<%= ft.doc_02 %>.<%= ft.doc %></td>
+        <% if ft.status == 1 %>
+          <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(ft, status: '2') %></td>          
+          <td><%= link_to 'Imprimir', "#",  :onclick => "MultiplaFaturaVenda(#{ft.id})" %></td>
+        <% end %>
+        <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0') %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+<% if @ft_ativo.to_i == 0 %>
+	<%= render partial: "form_fiscals/attr_forms/fact_indep_update_ft" %> 
+<% else %>
+  <div class="alert alert-success" align="center" style="margin: 10px;">
+    <font color="green"><h1> <b>Facturado com Sucesso</b></h1></font>
+  </div>	
+  <br>
+<% end %>
+
+  <!-- controle de impressao !-->
+  <% if @ft_ativo.to_i == 1 %>
+    <script type="text/javascript">
+      function MultiplaFaturaVenda(){
+        window.open('/form_fiscals/' + <%= @fts.first.id %> +'/impressao_ft', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+
+          $.ajax({
+              type: "POST",
+              url: '/form_fiscals/'+ <%= @fts.first.id %> +'/update_impressao',
+              data: 'id=' + <%= @fts.first.id %>,
+              dataType: 'script'
+          })
+
+      }
+      window.onload = MultiplaFaturaVenda;
+    </script>
+  <% else %>
+    <script type="text/javascript">
+      function MultiplaFaturaVenda(id){
+        window.open('/form_fiscals/' + id +'/impressao_ft', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+          $.ajax({
+              type: "POST",
+              url: '/form_fiscals/'+ id +'/update_impressao',
+              data: 'id=' + id,
+              dataType: 'script'
+          })
+      }
+    </script>
+  <% end %>

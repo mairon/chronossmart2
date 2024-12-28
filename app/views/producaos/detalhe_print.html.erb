@@ -1,0 +1,102 @@
+
+<table>
+   <tr>
+      <td>
+         ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      </td>
+   </tr>
+</table>
+
+<table>
+
+   <tr>
+      <td>Producto :</td>
+      <td><b><%= @manutencao_maquina.produto_nome %></b></td>
+   </tr>
+
+   <tr>
+      <td>Cantidad :</td>
+      <td><b><%= @manutencao_maquina.quantidade %></b></td>
+
+      <td>Costo de Produción U$.:</td>
+      <td align="left"><b><%= number_to_currency( @manutencao_maquina.custo_dolar , :format =>' %n ', :separeitor => ',') %></b></td>
+      <td>Gs.:</td>
+      <td><b><%= number_to_currency( @manutencao_maquina.custo_guarani , :format =>' %n ', :precision => 0) %></b></td>
+   </tr>
+
+</table>
+
+<table>
+   <tr>
+      <td>
+         ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      </td>
+   </tr>
+   <tr>
+      <td align="center">
+         <h2>Materia-Prima</h2>
+      </td>
+   </tr>
+</table>
+
+<table>
+   <tr>
+      <td>
+         ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      </td>
+   </tr>
+</table>
+<table>
+   <tr class="head">
+      <td width="50" align="center"></td>
+      <td width="80" align="center"><%= t('DATE') %></td>
+      <td width="200" align="center">Responsable</td>
+      <td width="400" align="center">Producto</td>
+      <td width="80" align="center">Requisitado</td>
+      <td width="80" align="center">Devolvido</td>
+      <td width="100" align="center">Costo</td>
+      <td width="100" align="center">Total</td>
+   </tr>
+   <tr>
+      <td colspan="8">
+         ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      </td>
+   </tr>
+   <% entrada = 0 %>
+   <% saida   = 0 %>
+   <% indice  = 1 %>
+   <% @total  = 0 %>
+   <% @manutencao_maquina_produtos.each do |producao_produto| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+         <td width="50" align="center"><%=h indice %></td>
+         <td width="80" align="center"><%=h producao_produto.data.strftime("%d/%m/%Y") %></td>
+         <td width="200" align="left"><%=h producao_produto.responsavel_nome %></td>
+         <td width="300" align="left"><%=h producao_produto.produto_nome %></td>
+         <% if  producao_produto.status == 0 %>
+            <td width="80" align="right"><%=h producao_produto.quantidade %></td>
+            <td width="80" align="right">0</td>
+            <% saida +=  producao_produto.quantidade %>
+            <% @total += ( producao_produto.quantidade * producao_produto.custo_dolar )%>
+         <% else %>
+            <td width="80" align="right">0</td>
+            <td width="80" align="right"><%= producao_produto.quantidade %></td>
+            <% entrada +=  producao_produto.quantidade %>
+            <% @total -= ( producao_produto.quantidade *  producao_produto.custo_dolar) %>
+         <% end %>
+
+         <td width="100" align="right"><%= number_to_currency( producao_produto.custo_dolar, :format =>' %n ', :separator => ",")   %></td>
+         <td width="100" align="right"><%=h number_to_currency( producao_produto.quantidade * producao_produto.custo_dolar, :format =>' %n ', :separator => ",") %></td>
+      </tr>
+      <% indice += 1 %>
+   <% end %>
+
+      <tr class="head" height="30">
+      <td colspan="4"></td>
+      <td width="80" align="right"><%= saida %></td>
+      <td width="80" align="right"><%= entrada %></td>
+      <td width="100" align="right"></td>
+      <td width="100" align="right"><%= number_to_currency( @total, :format =>' %n ', :separator => ",")%></td>
+   </tr>
+
+
+</table>

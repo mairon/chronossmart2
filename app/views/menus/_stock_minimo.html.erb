@@ -1,0 +1,35 @@
+<table>
+   <tr>
+      <td>
+         <a href="javascript:;" onmousedown="toggleDiv('mydiv');" class="button spark">Stock Minimo</a>
+            <div id="mydiv" style="display:none">
+            <table>
+               <tr>
+                  <td width="50" align="center">Cod.</td>
+                  <td width="480" align="center">Producto</td>
+                  <td width="100" align="center">Stock</td>
+                  <td width="100" align="center">Minimo</td>
+               </tr>
+            </table>
+            
+            <div class="RolagemMenu" id="div">
+               <table>
+                  <% total = 0 %>
+                  <% @stock_minimo.each do |stm| %>
+                     <tr class = "<%= cycle("cor1", "cor2") %>">
+                         <td align="center"><%= stm.id %></td>
+                         <td width="480"><%= stm.nome %></td>
+                         <td width="100" align="right"><%= stm.stock %></td>
+                         <td width="100" align="right"><%= stm.stock_minimo %></td>
+                     </tr>
+                     
+                     <% total +=  1 %>
+                  <% end %>
+               </table>
+            </div>            
+            Total Productos : <%= total %>
+            </div>
+      </td>      
+   </tr>
+</table>
+

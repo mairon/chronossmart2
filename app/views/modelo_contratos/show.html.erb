@@ -1,0 +1,17 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <header class="panel-heading">
+        <%= @modelo_contrato.id %> - <%= @modelo_contrato.nome %> - <%= @modelo_contrato.processo %>
+        <div class="pull-right">
+          <%= link_to 'Editar', edit_modelo_contrato_path(@modelo_contrato), :class => "btn btn-blue" %> 
+          <%= link_to 'Finalizar', modelo_contratos_url, :class => "btn btn-blue" %>                     
+        </div>
+      </header>
+      
+      <div class="panel-content">
+        <%=raw @modelo_contrato.modelo %>
+      </div>
+    </div>
+  </div>
+</div>

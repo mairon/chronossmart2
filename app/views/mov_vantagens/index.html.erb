@@ -1,0 +1,21 @@
+<h1 id="header">mov_vantagens</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_mov_vantagen_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @mov_vantagens.each do |mov_vantagen| %>
+      <tr>
+                <td><%= link_to 'Editar', edit_mov_vantagen_path(mov_vantagen) %></td>
+        <td><%= link_to 'Borrar', mov_vantagen, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

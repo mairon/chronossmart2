@@ -1,0 +1,53 @@
+  <div class="group">
+   <table class="head_grid">
+      <tr>
+        <td width="150">PA</td>
+          <% if params[:moeda] == "0" %>
+            <td width="70" align="right">Divida U$</td>
+            <td width="70" align="right">Monto U$</td>
+          <% else %>
+            <td width="70" align="right">Divida G$</td>
+            <td width="70" align="right">Monto G$</td>
+          <% end %>
+      </tr>
+   </table>
+   <div class="rolagem" dir="div" style="height: 250px">
+      <table>
+         <% @pagos_antecipados.each do |pa| %>
+           <tr class = "<%= cycle( "cor1", "cor2" )%>"
+               onclick="Fecha('<%= pa.cobro_guarani.to_i %>',
+                        '<%= pa.cobro_dolar.to_f %>',
+                              '<%= pa.documento_numero_01 %>',
+                              '<%= pa.documento_numero_02 %>',
+                              '<%= pa.documento_numero %>',)">
+
+              <td width="150"><%= pa.documento_numero_01 %>-<%= pa.documento_numero_02 %>-<%= pa.documento_numero %></td>
+              <% if params[:moeda] == "0" %>
+                <td width="70" align="right"><%= format_decimal(pa.divida_dolar) %></td>
+                <td width="70" align="right"><%= format_decimal(pa.cobro_dolar) %></td>
+              <% else %>
+                <td width="70" align="right"><%= format_int(pa.divida_guarani) %></td>
+                <td width="70" align="right"><%= format_int(pa.cobro_guarani) %></td>
+              <% end %>
+           </tr>
+         <% end %>
+      </table>
+   </div>
+
+   <%= hidden_field_tag :valor, @venda.vendas_produtos.sum(:total_guarani) %>
+
+</div>
+
+<script>
+  function Fecha(cobro_gs, cobro_us, doc01, doc02, doc){
+    window.opener.document.getElementById('fact_ad_01').value = doc01;
+    window.opener.document.getElementById('fact_ad_02').value = doc02;
+    window.opener.document.getElementById('fact_ad').value = doc;
+
+    if (parseFloat($("#valor").val()) > parseFloat(cobro_gs)) {
+      window.opener.document.getElementById('valor_gs').value = cobro_gs;
+    }
+
+    self.close();
+  }
+</script>

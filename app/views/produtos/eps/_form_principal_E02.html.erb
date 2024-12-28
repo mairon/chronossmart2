@@ -1,0 +1,235 @@
+
+<table>
+   <tr>
+      <td valign="top">
+         <fieldset>
+         <table>
+            <tr>
+              <%= field_text 'Producto :',2,f,:nome,80,'produto_tipo_produto_0' %>
+
+              <td colspan="2" rowspan="2" valign="top">
+              <fieldset>
+              <legend>Tipo</legend>
+                <table>
+                  <tr>
+                    <td><%= f.radio_button :tipo_produto, 0,
+                                 :onkeyup    => "EnterTab(event,'produto_nome_fatura')",
+                                 :onkeypress => "return bloqEnter(event)",
+                                 :checked => true %>  Mercaderia</td>
+                    <td><%= f.radio_button :tipo_produto, 1,
+                                 :onkeyup    => "EnterTab(event,'produto_nome_fatura')",
+                                 :onkeypress => "return bloqEnter(event)" %>  Servicios</td>
+                  </tr>
+                </table>
+              </fieldset>
+             </td>
+            </tr>
+
+            <tr>
+               <%= field_text 'Nombre en la Factura :',2,f,:nome_fatura,80,'produto_clase_id' %>
+            </tr>
+
+
+            <tr>
+              <td align="right">Clase :</td>
+              <td colspan="3"><%= f.collection_select :clase_id, Clase.all(:select => 'id,descricao',:order => '2'),:id,:descricao,{},{
+                                      :onkeyup    => "EnterTab(event,'produto_grupo_id')",
+                                        :onkeypress => "return bloqEnter(event)"} %>
+                  Grupo :
+                  <%= f.collection_select :grupo_id, Grupo.all(:select => 'id,descricao',:order => '2'),:id,:descricao,{},{
+                                      :onkeyup    => "EnterTab(event,'produto_sub_grupo_id')",
+                                        :onkeypress => "return bloqEnter(event)"} %>
+
+                  Marca :
+                  <%= f.collection_select :sub_grupo_id, SubGrupo.all(:select => 'id,descricao',:order => '2'),:id,:descricao %>
+
+Colecion: <%= f.select :lote,
+                    (
+                     [
+                        ["PRIMAVERA/VERAO 2013", "PRIMAVERA/VERAO 2013"],
+                        ["INVERNO 2013", "INVERNO 2013"],
+                        ["OUTONO 2013", "OUTONO 2013"],
+                        ["VERAO 2013", "VERAO 2013"]
+
+                     ]
+                  ),{},{:onkeyup    => "EnterTab(event,'produto_fabricante_id')",
+                      :onkeypress => "return bloqEnter(event)"} %>
+                </td>
+
+              </td>
+            </tr>
+            <tr>
+               <td align="right">Embalagem :</td>
+               <td><%= f.text_field :embalagem,
+                                    :size       => 20,
+                                    :onkeyup    => "EnterTab(event,'produto_montagem')",
+                            :onkeypress => "return bloqEnter(event)" %>
+                   <%= f.check_box :montagem,
+                                    :onkeyup    => "EnterTab(event,'produto_referencia')",
+                            :onkeypress => "return bloqEnter(event)" %>Montagen</td>
+
+               <td align="right">Referencia :</td>
+               <td width="230"><%= f.select :referencia,
+                    (
+                     [
+                        ["UN", "UN"],
+                        ["BL", "BL"],
+                        ["LT", "LT"],
+                        ["MT", "MT"],
+                        ["KG", "KG"],
+                        ["PQ", "PQ"],
+                        ["TON", "TON"]
+
+                     ]
+                  ),{},{:onkeyup    => "EnterTab(event,'produto_fabricante_id')",
+                      :onkeypress => "return bloqEnter(event)"} %>
+                  <a href="javascript:;" onmousedown="toggleDiv('mydiv');">Detalhes de Ref.</a>
+                  <div id="mydiv" style="display:none">
+                     <p>UN  = UNIDADE</p>
+                     <p>BL  = BOLSAS</p>
+                     <p>LT  = LITROS</p>
+                     <p>MT  = METROS</p>
+                     <p>KG  = KILOS</p>
+                     <p>PQ  = PAQUETE</p>
+                     <p>TON = TONELADA</p>
+
+                  </div>
+               </td>
+            </tr>
+
+            <tr >
+               <td align="right">Proveedor :</td>
+               <td><%= f.collection_select :fabricante_id, Persona.all(:select => 'id,nome',:conditions =>['tipo_fornecedor = 1'],:order => '2'),:id,:nome,
+                              {:include_blank => true },
+                              {:onkeyup    => "EnterTab(event,'produto_fabricante_cod')",
+                      :onkeypress => "return bloqEnter(event)"} %></td>
+
+               <td align="right">Cod. Fabricante :</td>
+               <td><%= f.text_field :fabricante_cod,
+                    :size => 20,:onkeyup    => "EnterTab(event,'produto_barra')",
+                          :onkeypress => "return bloqEnter(event)" %></td>
+            </tr>
+
+            <tr >
+               <td align="right">Barra :</td>
+               <td><%= f.text_field :barra,
+                            :size       => 20,
+                            :onkeyup    => "EnterTab(event,'produto_locacao')",
+                            :onkeypress => "return bloqEnter(event)" %></td>
+                    
+                    
+               <td align="right">Ubicacion :</td>
+               <td><%= f.text_field :locacao,
+                                    :size => 20,
+                            :onkeyup    => "EnterTab(event,'produto_taxa')",
+                            :onkeypress => "return bloqEnter(event)" %></td>
+                    
+            </tr>
+            <tr >
+
+               <td align="right">Peso Bruto :</td>
+               <td><%= f.text_field :peso_bruto,
+                            :size       => 20,
+                            :onkeyup    => "EnterTab(event,'produto_peso')",
+                            :onkeypress => "return bloqEnter(event)" %></td>
+
+               <td align="right">Peso Neto :</td>
+               <td><%= f.text_field :peso,
+                            :size       => 20,
+                            :onkeyup    => "EnterTab(event,'produto_stock_minimo')",
+                            :onkeypress => "return bloqEnter(event)" %></td>
+
+            </tr>
+            <tr>
+               <td align="right">Iva :</td>
+               <% if @produto.taxa == 0 %>
+               <td width="230"><%= f.text_field :taxa, :value => 10, :size => 20 %>
+                <% else %>
+                <td width="230"><%= f.text_field :taxa, :size => 20 %>
+                <% end %>
+               </td>          
+            </tr>
+
+            <tr>
+               <td align="right">Stock Min. :</td>
+               <td><%= f.text_field :stock_minimo,
+                            :size       => 20,
+                            :onkeyup    => "EnterTab(event,'produto_stock_maximo')",
+                            :onkeypress => "return bloqEnter(event)" %>  </td>
+
+               <td align="right">Stock Max. :</td>
+               <td><%= f.text_field :stock_maximo,
+                            :size       => 20,
+                            :onkeyup    => "EnterTab(event,'produto_data')",
+                            :onkeypress => "return bloqEnter(event)" %>  </td>
+
+            </tr>
+         </table>
+        </fieldset>
+      </td>
+
+
+      <td rowspan="4" valign="top">
+      <div id="sidebar">
+      <table>
+        <tr>
+           <td>
+              <div class="avatar">
+              <table>
+                 <tr>
+
+                    <td>
+                       <% if @produto.picture_content_type.present? %>
+                          <%= image_tag @produto.picture.url,:size => "240x210" %>
+                       <% else %>
+                          <%= image_tag ('../images/defalt.jpg') %>
+                       <% end %>
+                    </td>
+
+                 </tr>
+              </table>
+                 </div>
+           </td>
+        </tr>
+
+        <tr>
+           <td colspan="2"><%= f.file_field :picture,:size => 23 %><br/><hr/></td>
+        </tr>
+              <tr>
+                <td colspan="2">
+                  <fieldset>
+                     <table>
+                      <tr>
+                       <td>
+                          <div class="stock_atual">
+                                Stock Atual : <%= @quantidade %>  |
+                          </div>
+                       </td>
+                       <td align="right">
+                           <a href="javascript:void(0)" onClick="AbrirHistoricoPreco('<%= @produto.id.to_i %>')">Hist. Precio</a>
+                       </td>
+                      </tr>
+                    </table>
+                  </fieldset>
+                </td>
+              </tr>
+              <tr>
+                <td valign="top" colspan="2">
+                Obs.: <%= f.text_area :obs, :rows => 5, :cols => 25 %>
+                </td>
+              </tr>
+         </table>
+        </div>
+      </td>
+   </tr>
+
+   <tr>
+      <td>
+        <%= link_to 'Nueva Color', new_cor_path, :class => "button right" %>
+        <%= link_to 'Nuevo Tamanho', new_tamanho_path, :class => "button right" %>
+      </td>
+    </tr>
+  </table>
+
+
+

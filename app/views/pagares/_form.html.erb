@@ -1,0 +1,175 @@
+
+<h1 align="right" id="header">Pagare</h1>
+
+<%= form_for(@pagare) do |f| %>
+  
+    <% if @pagare.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@pagare.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @pagare.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+      <ul class="tabs">
+         <li><a href="#tab1">Pagares - [<%= t('EDITION') %>]</a></li>
+      </ul>
+
+      <div class="tab_container">
+        <div id="tab1" class="tab_content">
+          <table>
+            <tr>
+              <td>
+                <fieldset>
+                  <table>
+                    <tr>
+                      <td align="right"><%= t('DATE') %>:</td>
+                      <td colspan="3"> <%= f.date_select :data %></td>
+
+                      <td align="right">Cotizacion :</td>
+                      <td> <%= text_field  :pagare, :cotacao,
+                                           :size     => 10,
+                                           :value    => @pagare.cotacao.to_i,
+                                           :onfocus  => " $.ajax({url: '/buscas/cotz_us_compra',
+                                                          type: 'POST',
+                                                          data: 'data=' + $('#pagare_data_3i').val()+'/'+
+                                                          $('#pagare_data_2i').val()+'/'+
+                                                          $('#pagare_data_1i').val(),
+                                                          success: function(data){
+                                                            $('#pagare_cotacao').val(data);} })"%>
+                      </td>
+
+
+                      <td align="right">Vencimento :</td>
+                      <td colspan="3"><%= f.date_select :vencimento %>
+           	        </tr>
+
+           	        <tr>
+                      <td align="right">Deodor:</td>
+                      <td colspan="3"><%= f.text_field :persona_nome, :size => 55,
+                                                       :onkeydown  =>"return tabE(this,event)",
+                                                       :onkeypress => "return bloqEnter(event)" %>
+
+                      <td align="right">Ruc :</td>
+                      <td ><%= f.text_field :persona_ruc, :size => 15 %>
+           	        </tr>
+
+           	        <tr>
+                      <td align="right">Co-Deodor:</td>
+                      <td colspan="3"><%= f.text_field :co_deodor, :size => 55,
+                                                       :onkeydown  =>"return tabE(this,event)",
+                                                       :onkeypress => "return bloqEnter(event)" %>
+
+                      <td align="right">Ruc :</td>
+                      <td ><%= f.text_field :co_deodor_ruc, :size => 15 %>
+           	        </tr>
+
+           	        <tr>
+                      <td align="right">Domicilio:</td>
+                      <td colspan="3"><%= f.text_field :domicilio, :size => 55,
+                                                       :onkeydown  =>"return tabE(this,event)",
+                                                       :onkeypress => "return bloqEnter(event)" %>
+
+                      <td align="right">Nacionalidad:</td>
+                      <td><%= f.select :nacionalidade, ( [ ["Brasileña", "Brasileña"],
+                                                           ["Paraguaya", "Paraguaya"] ] ) %></td>
+           	        </tr>
+
+                    <tr>
+                      <td align="right">Ciudad :</td>
+                      <td><%= f.collection_select :cidade_id, Cidade.all(:select => 'id,nome',
+                                                                         :order => '2'),:id,
+                                                                         :nome, {:onkeypress => "return bloqEnter(event)"} %></td>
+
+                      <td align="right">Depart.:</td>
+                      <td><%= f.collection_select :estado_id, Estado.all(:select => 'id,nome',
+                                                                         :order => '2'),:id,
+                                                                         :nome, {:onkeypress => "return bloqEnter(event)"} %></td>
+
+                      <td align="right">Pais :</td>
+                      <td colspan="3"><%= f.collection_select :pais_id, Paise.all(:select => 'id,nome',
+                                                                                  :order => '2'),:id,
+                                                                                  :nome, {:onkeypress => "return bloqEnter(event)"} %></td>
+                    </tr>
+
+                    <tr>
+                      <td align="right"> Moneda :</td>
+                        <td>
+                          <fieldset>
+                            <%= f.radio_button :moeda, 0,  :Checked => "True"  %> Dolar
+                            <%= f.radio_button :moeda, 1%> Guaranies
+                          </fieldset>
+                        </td>
+
+                    <%= field_us 'Entrega U$.:',f,:entrega_dolar, :onblur => "UsToGs('pagare_cotacao','pagare_entrega_dolar','pagare_entrega_guarani')" %>
+                    <%= field_gs 'Entraga Gs.:',f,:entrega_guarani, :onblur => "GsToUs('pagare_cotacao','pagare_entrega_guarani','pagare_entrega_dolar')" %>
+                    </tr>
+
+           	        <tr>
+                      <td align="right">Cuotas :</td>
+                      <td ><%= f.text_field :cota, :size => 5 %>
+
+                    <%= field_us 'Total U$.:',f,:valor_dolar, :onblur => "UsToGs('pagare_cotacao','pagare_valor_dolar','pagare_valor_guarani')" %>
+                    <%= field_gs 'Total Gs.:',f,:valor_guarani, :onblur => "GsToUs('pagare_cotacao','pagare_valor_guarani','pagare_valor_dolar')" %>
+                  </tr>
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        <tr>
+      <td>
+
+              <fieldset>
+                <legend>Detalhes del Producto</legend>
+                  <table>
+                    <tr>
+                      <td align="right">Tipo :</td>
+                      <td><%= f.text_field :m_tipo, :size => 30 %></td>
+
+                      <td align="right">Marca :</td>
+                      <td><%= f.text_field :marca, :size => 30 %></td>
+
+                      <td align="right">Modelo :</td>
+                      <td><%= f.text_field :modelo, :size => 30 %></td>
+
+                      <td align="right">Año :</td>
+                      <td><%= f.text_field :ano, :size => 30 %></td>
+                    </tr>
+
+                    <tr>
+                      <td align="right">Chassis :</td>
+                      <td><%= f.text_field :chassi, :size => 30 %></td>
+
+                      <td align="right">Motor :</td>
+                      <td><%= f.text_field :motor, :size => 30 %></td>
+
+                      <td align="right">Serie :</td>
+                      <td><%= f.text_field :seria, :size => 30 %></td>
+                    </tr>
+
+                    <tr>
+                      <td align="right" valign="top">Obs :</td>
+                      <td colspan="8"><%= f.text_area :obs, :cols => 90, :rows => 4%></td>
+                    </tr>
+                  </table>                 
+                </fieldset>
+              </td>
+            </tr>
+          </table>
+        </div>
+      <div class="buttons">
+        <%= f.submit t('SAVE'), :class => 'button' %> <%= link_to t('BACK'), pagares_path,:class => 'button' %>      	
+      </div>
+
+  </div>
+            
+
+<% end %>
+
+

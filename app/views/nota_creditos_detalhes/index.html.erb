@@ -1,0 +1,20 @@
+<h1>Listing nota_creditos_detalhes</h1>
+
+<table>
+  <tr>
+  </tr>
+
+<% for nota_creditos_detalhe in @nota_creditos_detalhes %>
+<% vendedor = Venda.all(:first,:conditions =>["documento_numero = ?",nota_creditos_detalhe.documento_numero])%>
+  <tr>
+    <%= vendedor.documento_numero%>  	
+    <td><%= link_to 'Show', nota_creditos_detalhe %></td>
+    <td><%= link_to 'Edit', edit_nota_creditos_detalhe_path(nota_creditos_detalhe) %></td>
+    <td><%= link_to 'Destroy', nota_creditos_detalhe, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New nota_creditos_detalhe', new_nota_creditos_detalhe_path %>

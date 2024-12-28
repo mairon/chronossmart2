@@ -1,0 +1,17 @@
+<%=raw current_user.menu_code %>
+<ul class="nav navbar-nav navbar-right">
+  <li><a href="/tarefas"><i class="icon-white icon-calendar"></i></a></li>
+  <li class="divider-vertical"></li>
+  <li><a href="#"><i class="icon-white icon-th"></i> <%= current_unidade.unidade_nome %></a></li>
+  <li class="dropdown">
+  	<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+  		<i class="icon-white icon-user"></i> <%= current_user.usuario_nome %> <small>(<%= I18n.locale %>)</small> <span class="caret"></span>
+  	</a>
+
+  	<ul class="dropdown-menu">
+    <% if session[:logged] %>
+      <li><%= link_to "logout", new_login_path, :action => :delete %></li>
+    <% end %>
+  	</ul>
+  </li>
+</ul>

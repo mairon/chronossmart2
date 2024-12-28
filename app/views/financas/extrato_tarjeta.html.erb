@@ -1,0 +1,53 @@
+<body onload="DataFinal(),CampoInicio()">
+   <h1 id="header">Extracto Tarjeta</h1>
+   <div class="group">
+      <h2>
+         <%= form_tag resultado_extrato_tarjeta_financas_path, :method => "get" do %>
+            <table>
+			   <input type="hidden" name="filtro"  id="filtro"   size="10" value="1" />
+               <tr>
+                  <td> <%= t('DATE') %> </td>
+
+                  <td><input name="inicio" id="inicio"  size="10"  type="text" onkeyup="Formatadata(this,event)" />
+                     Hasta
+                     <input name="final"  id="final"   size="10" type="text" onkeyup="Formatadata(this,event)"/></td>
+               </tr>
+
+               <tr>
+                  <td>Cuenta :</td>
+                  <td>
+                     <%= select("busca", "conta", Conta.all( :select => 'id,nome',:conditions => ["tipo = 0 and unidade_id = #{current_unidade.id} and nome like ?", '%TARJETA%'],:order => 'nome').collect {|p| [ p.nome, p.id ] }, { :include_blank => true},
+                                                         {:class         => "selc_medium"})   %>
+                  </td>
+               </tr>
+
+               <tr>
+                  <td></td>
+                  <td>
+                     <fieldset>
+                        <legend>Status Viatico</legend>
+                        <input id="st" name="st" type="radio" value="0"/>En abierto
+                        <input id="st" name="st" type="radio" value="1"/>Cancelada
+                        <input id="st" name="st" type="radio" value="" checked/>Todos
+                     </fieldset>
+                  </td>
+               </tr>
+
+               <tr>
+                  <td></td>
+                  <td>
+                    <input type="submit" value="Informe" onclick="Tipo('0')" class="button_info"/>
+                    <input type="submit" value="Excel" onclick="Tipo('1')" class="button_info"/>
+                  </td>
+               </tr>
+               <input type="hidden" name="tipo" id="tipo"  size="5" value="0"/>
+            <% end %>
+
+         </table>
+
+
+      </h2>
+   </div>
+</body>
+
+

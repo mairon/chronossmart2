@@ -1,0 +1,139 @@
+<table>
+	<!--cajas us  -->
+	<tr>
+		<td colspan="5" style="background-color: #999">Cajas (U$)</td>
+	</tr>
+	<% tot_a_c_us = 0 %>
+	<% tot_e_c_us = 0 %>
+	<% tot_s_c_us = 0 %>
+	<% @financas_cajas.each do |f| %>
+		<% if f.tipo.to_i == 0 and f.moeda.to_i == 0 %>
+			<tr class = "<%= cycle( "cor2", "cor1" )%>">
+				<td width="150"><%= f.nome %></td>
+				<td width="80" align="right"><%= number_to_currency( f.anterior_us.to_f, :format=>' %n ', :separeitor => ',') %> </td>
+				<td width="80" align="right"><%= number_to_currency( f.entrada_us.to_f, :format=>' %n ', :separeitor => ',') %> </td>
+				<td width="80" align="right"><%= number_to_currency( f.saida_us.to_f, :format=>' %n ', :separeitor => ',') %> </td>
+				<td width="80" align="right"><b><%= number_to_currency( ( ( f.anterior_us.to_f + f.entrada_us.to_f) - f.saida_us.to_f), :format=>' %n ', :separeitor => ',') %></b> </td>
+			</tr>			
+		<% tot_a_c_us += f.anterior_us.to_f %>
+		<% tot_e_c_us += f.entrada_us.to_f %>
+		<% tot_s_c_us += f.saida_us.to_f %>
+
+
+		<% end %>
+	<% end %>	
+
+	<tr class="head" height="40" valign="top">
+		<td>Totales de Cuentas en (U$)</td>
+		<td width="80" align="right"><%= number_to_currency( tot_a_c_us.to_f, :format=>' %n ', :separeitor => ',') %> </td>
+		<td width="80" align="right"><%= number_to_currency( tot_e_c_us.to_f, :format=>' %n ', :separeitor => ',') %> </td>
+		<td width="80" align="right"><%= number_to_currency( tot_s_c_us.to_f, :format=>' %n ', :separeitor => ',') %> </td>
+		<td width="80" align="right"><%= number_to_currency( ( ( tot_a_c_us.to_f + tot_e_c_us.to_f) - tot_s_c_us.to_f ), :format=>' %n ', :separeitor => ',') %> </td>
+	</tr>
+
+
+	<!--cajas gs  -->
+	<tr>
+		<td colspan="5" style="background-color: #999">Cajas (GS)</td>
+	</tr>
+	<% tot_a_c_gs = 0 %>
+	<% tot_e_c_gs = 0 %>
+	<% tot_s_c_gs = 0 %>
+	<% @financas_cajas.each do |f| %>
+		<% if f.tipo.to_i == 0 and f.moeda.to_i == 1 %>
+		<tr  height="25" class = "<%= cycle( "cor2", "cor2" )%>">
+			<td width="150"><%= f.nome %></td>
+			<td width="80" align="right"><%= number_to_currency( f.anterior_gs.to_f, :format=>' %n ', :precision => 0) %> </td>
+			<td width="80" align="right"><%= number_to_currency( f.entrada_gs.to_f, :format=>' %n ', :precision => 0) %> </td>
+			<td width="80" align="right"><%= number_to_currency( f.saida_gs.to_f, :format=>' %n ', :precision => 0) %> </td>
+			<td width="80" align="right"><b><%= number_to_currency( ( ( f.anterior_gs.to_f + f.entrada_gs.to_f) - f.saida_gs.to_f), :format=>' %n ', :precision => 0) %></b> </td>
+		</tr>
+
+		<% tot_a_c_gs += f.anterior_gs.to_f %>
+		<% tot_e_c_gs += f.entrada_gs.to_f %>
+		<% tot_s_c_gs += f.saida_gs.to_f %>
+
+
+		<% end %>
+
+	<% end %>	
+
+	<tr class="head" height="40" valign="top">
+		<td>Totales de Cuentas en (Gs)</td>
+		<td width="80" align="right"><%= number_to_currency( tot_a_c_gs.to_f, :format=>' %n ', :precision => 0) %> </td>
+		<td width="80" align="right"><%= number_to_currency( tot_e_c_gs.to_f, :format=>' %n ', :precision => 0) %> </td>
+		<td width="80" align="right"><%= number_to_currency( tot_s_c_gs.to_f, :format=>' %n ', :precision => 0) %> </td>
+		<td width="80" align="right"><%= number_to_currency( ( ( tot_a_c_gs.to_f + tot_e_c_gs.to_f) - tot_s_c_gs.to_f ), :format=>' %n ', :precision => 0) %> </td>
+	</tr>
+
+
+
+	<!--Bancos us  -->
+	<tr>
+		<td colspan="5" style="background-color: #999">Bancos (U$)</td>
+	</tr>
+	<% tot_a_b_us = 0 %>
+	<% tot_e_b_us = 0 %>
+	<% tot_s_b_us = 0 %>
+	<% @financas_bancos.each do |f| %>
+		<% if f.tipo.to_i == 1 and f.moeda.to_i == 0 %>
+		<tr  height="25" class = "<%= cycle( "cor2", "cor1" )%>">
+			<td width="150"><%= f.nome %></td>
+			<td width="80" align="right"><%= number_to_currency( f.anterior_us.to_f, :format=>' %n ', :separeitor => ',') %> </td>
+			<td width="80" align="right"><%= number_to_currency( f.entrada_us.to_f, :format=>' %n ', :separeitor => ',') %> </td>
+			<td width="80" align="right"><%= number_to_currency( f.saida_us.to_f, :format=>' %n ', :separeitor => ',') %> </td>
+			<td width="80" align="right"><b><%= number_to_currency( ( ( f.anterior_us.to_f + f.entrada_us.to_f) - f.saida_us.to_f), :format=>' %n ', :separeitor => ',') %></b> </td>
+		</tr>
+
+	
+		<% tot_a_b_us += f.anterior_us.to_f %>
+		<% tot_e_b_us += f.entrada_us.to_f %>
+		<% tot_s_b_us += f.saida_us.to_f %>
+
+
+		<% end %>
+	<% end %>	
+
+
+	<tr class="head" height="40" valign="top">
+		<td>Totales de Cuentas en (U$)</td>
+		<td width="80" align="right"><%= number_to_currency( tot_a_b_us.to_f, :format=>' %n ', :separeitor => ',') %> </td>
+		<td width="80" align="right"><%= number_to_currency( tot_e_b_us.to_f, :format=>' %n ', :separeitor => ',') %> </td>
+		<td width="80" align="right"><%= number_to_currency( tot_s_b_us.to_f, :format=>' %n ', :separeitor => ',') %> </td>
+		<td width="80" align="right"><%= number_to_currency( ( ( tot_a_b_us.to_f + tot_e_b_us.to_f) - tot_s_b_us.to_f ), :format=>' %n ', :separeitor => ',') %> </td>
+	</tr>
+
+
+	<!--bancos gs  -->
+	<tr>
+		<td colspan="5" style="background-color: #999">Bancos (Gs)</td>
+	</tr>
+	<% tot_a_b_gs = 0 %>
+	<% tot_e_b_gs = 0 %>
+	<% tot_s_b_gs = 0 %>
+	<% @financas_bancos.each do |f| %>
+		<% if f.tipo.to_i == 1 and f.moeda.to_i == 1 %>
+		<tr  height="25" class = "<%= cycle( "cor2", "cor1" )%>">
+			<td width="150"><%= f.nome %></td>
+			<td width="80" align="right"><%= number_to_currency( f.anterior_gs.to_f, :format=>' %n ', :precision => 0) %> </td>
+			<td width="80" align="right"><%= number_to_currency( f.entrada_gs.to_f, :format=>' %n ', :precision => 0) %> </td>
+			<td width="80" align="right"><%= number_to_currency( f.saida_gs.to_f, :format=>' %n ', :precision => 0) %> </td>
+			<td width="80" align="right"><b><%= number_to_currency( ( ( f.anterior_gs.to_f + f.entrada_gs.to_f) - f.saida_gs.to_f), :format=>' %n ', :precision => 0) %></b> </td>
+		</tr>
+		<% tot_a_b_gs += f.anterior_gs.to_f %>
+		<% tot_e_b_gs += f.entrada_gs.to_f %>
+		<% tot_s_b_gs += f.saida_gs.to_f %>
+
+		<% end %>
+
+	<% end %>	
+
+	<tr class="head" height="40" valign="top">
+		<td>Totales de Cuentas en (Gs)</td>
+		<td width="80" align="right"><%= number_to_currency( tot_a_b_gs.to_f, :format=>' %n ', :precision => 0) %> </td>
+		<td width="80" align="right"><%= number_to_currency( tot_e_b_gs.to_f, :format=>' %n ', :precision => 0) %> </td>
+		<td width="80" align="right"><%= number_to_currency( tot_s_b_gs.to_f, :format=>' %n ', :precision => 0) %> </td>
+		<td width="80" align="right"><%= number_to_currency( ( ( tot_a_b_gs.to_f + tot_e_b_gs.to_f) - tot_s_b_gs.to_f ), :format=>' %n ', :precision => 0) %> </td>
+	</tr>
+
+</table>

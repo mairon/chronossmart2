@@ -1,0 +1,15 @@
+$('#vendas_produtos').append("<%= escape_javascript(render(:partial => @vendas_produtos)) %>");
+$("#sub_total_dolar").html("<%= number_to_currency(VendasProduto.sum(:total_dolar,   :conditions => ['venda_id = ?',@venda.id]), :format=>' %n ', :precision => 2)%>");	
+$("#total_dolar").html("<%= number_to_currency( ( (VendasProduto.sum(:total_dolar,   :conditions => ['venda_id = ?',@venda.id]).to_f ) - (Venda.where(id: @venda.id).last.desconto_us.to_f )  ), :format=>' %n ', :precision => 2)%>");	
+
+$("#sub_total_guarani").html("<%= number_to_currency(VendasProduto.sum(:total_guarani,   :conditions => ['venda_id = ?',@venda.id]), :format=>' %n ', :precision => 0)%>");	
+$("#total_guarani").html("<%= number_to_currency( ( (VendasProduto.sum(:total_guarani,   :conditions => ['venda_id = ?',@venda.id]).to_f ) - (Venda.where(id: @venda.id).last.desconto_gs.to_f )  ), :format=>' %n ', :precision => 0)%>");	
+
+
+$("#total_real").html("<%= number_to_currency(VendasProduto.sum(:total_real,   :conditions => ['venda_id = ?',@venda.id]), :format=>' %n ', :precision => 2)%>");
+
+$("#new_vendas_produto")[0].reset();
+$('.first').focus();
+ $('.button').attr({
+    disabled: false
+  });

@@ -1,0 +1,99 @@
+<div class="panel">
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-10">
+        <h3>Equipos</h3>
+      </div>
+      <div class="col-md-2">
+        <a class="modalButton-frma panel-icon-right" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-equipos">
+          <%= image_tag("icon-edit.png", width: '13') %>
+        </a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+
+        <table class="head_grid">
+          <tr>
+            <td width="100">Chapa</td>
+            <td width="150">Marca</td>
+            <td width="150">Modelo</td>
+            <td width="100">Color</td>
+          </tr>
+        </table>
+
+        <div class="rolagem" dir="div" style="height: 200px;">
+          <table>
+            <% @persona.persona_rodados.each do |persona_rodado| %>
+              <tr class="<%= cycle("cor1", "cor2")%>">
+                <td width="100"><%= persona_rodado.chapa %></td>
+                <td width="150"><%= persona_rodado.marca %></td>
+                <td width="150"><%= persona_rodado.modelo %></td>
+                <td width="100"><%= persona_rodado.cor %></td>
+                <td><%= link_to '', edit_persona_rodado_path(persona_rodado), class: 'icon-pencil' %></td>
+                <td><%= link_to '', persona_rodado, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modal-equipos" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel">Equipo</h4>
+      </div>
+      <div class="modal-body">
+        <%= form_for(PersonaRodado.new) do |f| %>
+        <%= f.hidden_field :persona_id, value: @persona.id %>
+          <div class="row panel-modal-body">
+            <div class="col-md-3">
+              <label>Chapa</label>
+              <%= f.text_field :chapa, size: 13, class: "panel-field" %>
+            </div>
+
+            <div class="col-md-3">
+              <label>Puetas</label>
+              <%= f.text_field :portas, class: "panel-field" %>
+            </div>
+            <div class="col-md-3">
+              <label>Color</label>
+              <%= f.text_field :cor, class: "panel-field" %>
+            </div>
+
+           <div class="col-md-3">
+              <label>Año</label>
+              <%= f.text_field :ano, class: "panel-field" %>
+            </div>
+            <div class="col-md-6">
+              <label>Marca</label>
+              <%= f.text_field :marca, class: "panel-field" %>
+            </div>
+
+            <div class="col-md-6">
+              <label>Modelo</label>
+              <%= f.text_field :modelo, class: "panel-field" %>
+            </div>
+
+            <div class="col-md-12">
+              <label>Obs</label>
+              <%= f.text_area :obs, class: "panel-field", rows: 5 %>
+            </div>
+           <div class="col-md-12">
+              <br>
+              <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+           </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

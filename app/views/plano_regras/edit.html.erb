@@ -1,0 +1,36 @@
+<ul class="tabs">
+    <li><a href="#tab1">Plan de Pago - [<%= t('EDITION') %>]</a></li>
+  </ul>
+
+  <div class="tab_container">
+    <div id="tab1" class="tab_content">
+			<%= form_for(@plano_regra) do |f| %>
+			  <% if @plano_regra.errors.any? %>
+			    <div id="error_explanation">
+			      <h2><%= pluralize(@plano_regra.errors.count, "error") %> prohibited this plano_regra from being saved:</h2>
+
+			      <ul>
+			      <% @plano_regra.errors.full_messages.each do |msg| %>
+			        <li><%= msg %></li>
+			      <% end %>
+			      </ul>
+			    </div>
+			  <% end %>
+			  <%= f.hidden_field :plano_id %>
+			  <div class="group">
+			    <table>
+			      <tr>    
+			        <%= field_gs 'Facturación U$:',f,:min_gs, autofocus: true %>
+			        <%= field_gs 'Hasta:',f,:max_gs %>
+			        <%= field_us 'Max desc.:',f,:max_desc %>
+			        <td><%= f.submit :value => t('SAVE'), class: "button", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %></td>
+			      </tr>
+			    </table>
+			  </div>
+			<% end %>
+		</div>
+    <div class="buttons">
+			<%= link_to t('BACK'), plano_path(@plano_regra.plano_id), :class => "button back" %>
+    </div>
+
+	</div>

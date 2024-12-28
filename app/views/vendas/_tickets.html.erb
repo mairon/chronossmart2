@@ -1,0 +1,26 @@
+<div class="panel">
+  <div class="panel-content" align="center">
+
+    <table>
+      <% count = 1 %>
+      <% @venda.evento_convidados.each do |ec| %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td><%= ec.id.to_s.rjust(6,'0') %></td>
+        <td width="100" align="center">
+          <% if ec.presente == true %>
+            <span class="btn-success">SI</span>
+          <% else %>
+            <span class="btn-danger">NO</span>
+          <% end %>
+        </td>
+        <td width="50">
+          <%= link_to qrcode_evento_convidado_path(ec.id), class: 'bt-list btn-blue', target: '_blank' do %>
+            <i class="icon-white icon-qrcode"></i> QR
+          <% end %>
+        </td>              
+      </tr>
+      <% count += 1 %>
+    <% end %>
+    </table>
+  </div>
+</div>

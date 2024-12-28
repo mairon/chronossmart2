@@ -1,0 +1,47 @@
+<%= form_for(@plano_venda_doc) do |f| %>
+  <% if @plano_venda_doc.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@plano_venda_doc.errors.count, "error") %> prohibited this plano_venda_doc from being saved:</h2>
+
+      <ul>
+      <% @plano_venda_doc.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> plano_venda_docs - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">nome :</td>                    
+                      <td><%= f.text_field :nome %></td>
+                                      
+                      <td align="right">obs :</td>                    
+                      <td><%= f.text_field :obs %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', plano_venda_docs_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

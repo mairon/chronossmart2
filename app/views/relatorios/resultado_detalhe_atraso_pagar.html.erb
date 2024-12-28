@@ -1,0 +1,29 @@
+
+<div class="group" style="width: 600px">
+	<tr>
+		<td colspan='2'>
+			<p style="padding: 5px; font-size:16px">A pagar</p>
+		</td>
+	</tr>
+	<table class="head_grid">
+		<tr>
+			<td width="120"><%= t('DOC') %></td>
+			<td width="300"><%= t('PURCHASE') %></td>
+			<td width="150" align="center"><%= t('DATE') %></td>
+			<td width="150" align="center"><%= t('VALUE') %></td>
+		</tr>
+	</table>
+
+	<div class="rolagem" dir="div" style="height:150px">
+		<table>
+			<% @acumulado_pagar.each do |acumulado| %>
+				<tr>
+					<td width="120"><%= acumulado.documento_nome %></td>
+					<td width="300"><%= acumulado.compra %></td>
+					<td width="150" align="center"><%= acumulado.data.strftime("%d/%m/%Y") %></td>
+					<td width="150" align="center"><%= format_decimal(acumulado.divida_valor) %></td>
+				</tr>
+			<% end %>
+		</table>
+	</div>
+</div>

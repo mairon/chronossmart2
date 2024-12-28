@@ -1,0 +1,22 @@
+<br />
+<div class="group" style="padding: 15px;">
+	<p>Producto : <%= @produto.nome %></p>
+</div>
+<br />
+
+<div class="group">
+			<table>
+				<tr>
+					<td>
+  					  <% if @produto.picture_content_type.present? %>
+					    <%= image_tag @produto.picture.url, height: '400', width: '500' %>
+					  <% else %>
+					    <%= image_tag ('../images/defalt.jpg'), height: '400', width: '500' %>
+					  <% end %>
+					<br />
+					Obs.: <%= @produto.obs %>
+					</td>
+      		</tr>
+ 			</table>
+</div>
+

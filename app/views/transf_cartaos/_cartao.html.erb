@@ -1,0 +1,96 @@
+<% c_valor = 0 %>
+<% c_taxa  = 0 %>
+<% c_saldo = 0 %>
+<table class="head_grid">
+  <tr>
+    <td width="20" align="center"><input type="checkbox" id="selectAllM" value="selectAllM"></td>
+    <td width="60" align="center"><%= t('DATE') %></td>
+    <td width="250">Bandeira</td>
+    <td width="50">Nº</td>
+    <td width="80" align="right"><%= t('VALUE') %></td>
+    <td width="80" align="right">Tasa</td>
+    <td width="80" align="right">Saldo Transf.</td>
+  </tr>
+</table>  
+<div class="rolagem" id="div">
+  <table>
+  <% @cartoes.each do |c| %>
+    <tr class="<%= cycle("cor1", "cor2")%>">
+      <td width="20" align="center"><%= check_box_tag "transf[cartao_ids][]", c.id, false,
+       { :class => 'm', onclick:"soma(this)" } %></td>
+      <input type="hidden" name="valor_<%= c.id %>" id="valor_<%= c.id %>" value="<%= format_int(c.entrada_guarani) %>" />
+      <input type="hidden" name="taxa_<%= c.id %>" id="taxa_<%= c.id %>" value="<%= format_int((c.entrada_guarani.to_i * ( @transf_cartao.taxa.to_f / 100)).to_i ) %>" />
+
+      <input type="hidden" name="saldo_<%= c.id %>" id="saldo_<%= c.id %>" value="<%= format_int(c.entrada_guarani.to_f - (c.entrada_guarani.to_f * ( @transf_cartao.taxa.to_f / 100))) %>" />
+
+      <td width="60" align="center"><%= c.data.strftime("%d/%m/%y")%></td>
+      <td width="250"><%= c.bandeira %></td>
+      <td width="50"><%= c.documento_numero %></td>
+      <td width="80" align="right"><%= format_int(c.entrada_guarani) %></td>
+      <td width="80" align="right"><%= format_int(c.entrada_guarani.to_f * ( @transf_cartao.taxa.to_f / 100)) %></td>
+      <td width="80" align="right"><%= format_int(c.entrada_guarani.to_f - (c.entrada_guarani.to_f * ( @transf_cartao.taxa.to_f / 100))) %></td>
+
+      <% c_valor += c.entrada_guarani.to_f %>
+      <% c_taxa  += (c.entrada_guarani.to_f * ( @transf_cartao.taxa.to_f / 100)) %>
+      <% c_saldo += (c.entrada_guarani.to_f - (c.entrada_guarani.to_f * ( @transf_cartao.taxa.to_f / 100))) %>
+
+    </tr>            
+  <% end %>
+  </table>
+</div>
+<table class="head_grid">
+  <tr>
+    <td width="390"></td>
+    <td width="80" align="right"><b><%= format_int(c_valor) %></b></td>
+    <td width="80" align="right"><b><%= format_int(c_taxa) %></b></td>
+    <td width="80" align="right"><b><%= format_int(c_saldo) %></b></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><input type="text" name="valor" id="valor" value="0" size="11" dir="rtl"></td>
+    <td><input type="text" name="tot_taxa" id="tot_taxa" value="0" size="11" dir="rtl"></td>
+    <td><input type="text" name="tot_saldo" id="tot_saldo" value="0" size="11" dir="rtl"></td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+$('#selectAllM').click(function() {
+   if (this.checked) {
+       $('.m').each(function() {
+           this.checked = true;
+       });
+   } else {
+      $('.m').each(function() {
+           this.checked = false;
+       });
+   } 
+});
+</script>
+
+<script LANGUAGE="JavaScript">  
+     <!--  
+     var total     = 0;  
+     var tot_taxa  = 0;
+     var tot_saldo = 0;
+     function soma(campo) { 
+      var valor = document.getElementById( 'valor_' + campo.value).value;
+      var taxa  = document.getElementById( 'taxa_' + campo.value).value;
+      var saldo = document.getElementById( 'saldo_' + campo.value).value;
+
+      if (campo.checked)  {
+        total     += eval( valor.replace(/\./g, "").replace(",", ".") );
+        tot_taxa  += eval( taxa.replace(/\./g, "").replace(",", "."));
+        tot_saldo += eval( saldo.replace(/\./g, "").replace(",", "."));
+        
+      } else {
+        total     -= eval( valor.replace(/\./g, "").replace(",", ".") );
+        tot_taxa  -= eval( taxa.replace(/\./g, "").replace(",", ".") );
+        tot_saldo -= eval( saldo.replace(/\./g, "").replace(",", "."));
+      }
+      document.getElementById('valor').value = ( number_format( total,0, ',', '.') );
+      document.getElementById('tot_taxa').value = ( number_format( tot_taxa,0, ',', '.') );
+      document.getElementById('tot_saldo').value = ( number_format( tot_saldo,0, ',', '.') );
+     }  
+     //-->  
+     </SCRIPT>  
+ 

@@ -1,0 +1,354 @@
+<body onload="FocusField('ordemcarga_rodado_chapa_')">
+	<% form_for(@ordemcarga) do |f| %>
+	<%= f.error_messages %>
+
+	<%= f.hidden_field   :rodado_id%>
+	<%= f.hidden_field   :chofer_id%>
+	<%= f.hidden_field   :proprietario_id%>
+	<%= f.hidden_field   :origem_id%>
+	<%= f.hidden_field   :destino_id%>
+	<%= f.hidden_field   :remitente%>
+	<%= f.hidden_field   :produto_id%>
+	<%= f.hidden_field   :precio_produto%>
+	<%= f.hidden_field   :comision%>
+	<%= f.hidden_field   :rucremitente%>
+	<%= f.hidden_field   :fleterem%>
+	<%= f.hidden_field   :chapa%>
+	<%= f.hidden_field   :empleado_id%>
+	<%= f.hidden_field   :peso_dinatran%>
+	<%= f.hidden_field   :estado,:value => '0'%>
+
+	<ul class="tabs">
+		<li>
+			<a href="#tab1">Orden Carga</a>
+		</li>
+	</ul>
+	<div class="tab_container">
+		<div id="tab1" class="tab_content">
+
+			<div class="group">
+				<h2> Datos del Camion</h2>
+				<table >
+					<tr>
+						<td align="right">Chapa:</td>
+						<td> <%= text_field_with_auto_complete  :ordemcarga_rodado_chapa,nil,
+						{ :onblur   => remote_function( :update       => "ordemcarga_rodado_chapa_",
+						:url        => { :action => :get_cliente},
+						:with       => "'rodado_chapa='+this.value"),
+						:size       => 15,
+						:value      => @ordemcarga.chapa,
+						:onkeyup    => "f(this),EnterTab(event,'ordemcarga_remitente_id')",
+						:onkeydown  => "f(this)",
+                        :onkeypress => "return bloqEnter(event)" },
+						{ :url        => rodados_path(:js),
+						:method     => :get,
+						:param_name => 'busca'}%></td>
+
+						<td align="right"><%= t('DATE') %>:</td>
+						<td> <%= f.date_select :fecha %></td>
+					</tr>
+
+
+					<tr>
+						<td align="right">Color:</td>
+						<td><%= f.text_field :color,
+              :size => '15',
+              :readonly => "readonly"  %></td>
+
+						<td align="right">Chapa B:</td>
+						<td><%= f.text_field :chapab,
+              :size => '15',
+              :readonly => "readonly"  %></td>
+					</tr>
+
+					<tr>
+						<td align="right">Marca:</td>
+						<td><%= f.text_field :marca,
+              :size => '15',
+              :readonly => "readonly"%></td>
+
+						<td align="right">Modelo:</td>
+						<td><%= f.text_field :modelo,
+              :size => '15',
+              :readonly => "readonly"  %></td>
+					</tr>
+					<tr>
+						<td align="right">Chofer:</td>
+						<td colspan="5"><%= f.text_field :chofer_nome,
+              :size => '50',
+              :readonly => "readonly"  %></td>
+
+					</tr>
+					<tr>
+						<td align="right">Proprietario:</td>
+						<td colspan="5"><%= f.text_field :proprietario_nome,
+              :size => '50',
+              :readonly => "readonly"  %></td>
+
+						<td align="right">Kilometragem :</td>
+						<td><%= f.text_field :kilometragem_inicio,
+              :size => '15'%></td>
+
+					</tr>
+				</table>
+			</div>
+
+			<div class="group">
+				<h2> Datos del Remitente</h2>
+				<table>
+
+					<tr>
+						<td  align="right">Cliente :</td>
+					    <td colspan="2"> <%= f.collection_select :remitente_id, Remitente.all( :select     => ' id,nome',
+                                                     :order      => '2'),:id,:nome, { :include_blank => true},              
+                                                                                      :onblur     => "abrir_pedido()", 
+                                                                                      :onkeypress => "return bloqEnter(event)", 
+									                                                  :onkeyup    => "f(this),EnterTab(event,'dadosproducto')"  %>
+                        <a href="#" onclick="abrir_pedido('/pedidotralados/search')">Buscar</a>                             
+                        </td>
+
+						<td align="left">Filtro:
+						<%= f.radio_button :estado, 0,
+                                               :Checked    => "True",
+                                               :onkeyup    => "EnterTab(event,'ordemcarga_proveedore_id')",
+                                               :onkeypress => "return bloqEnter(event)",              
+                                               :onblur     => "CalcularFleteCapacidad(),
+						                                   CalcularFleteDisponible()" %> En curso
+						<%= f.radio_button :estado, 1 %> pendente
+						<%= f.radio_button :estado, 2 %> cierrado</td>
+                        <td colspan="2">
+                        Pedido Nr.:
+						<%= f.text_field :pedidotralado_id,
+                                         :size       => 5,
+						                 :onkeyup    => "f(this),EnterTab(event,'ordemcarga_estado_0')",
+                                         :onkeypress => "return bloqEnter(event)",
+                                         :readonly   => "readonly" %>
+
+					
+						</td>
+					</tr>
+
+					<tr>
+						<td align="right">Origen:</td>
+						<td><%= f.text_field :origem,
+              :size => '30',
+              :readonly => "readonly" %></td>
+
+						<td align="right">Destino:</td>
+						<td><%= f.text_field :destino,
+              :size => '30',
+              :readonly => "readonly" %></td>
+					</tr>
+
+					<tr>
+						<td align="right">Produto:</td>
+						<td><%= f.text_field :produto,
+              :size => '15',
+              :readonly => "readonly" %></td>
+
+						<td align="right"></td>
+						<td></td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+					</tr>
+
+					<tr>
+						<td align="right">Flete:</td>
+						<td><%= f.text_field :fletechof,
+              :size => '15',
+              :readonly => "readonly"
+%></td>
+
+						<td align="right">Tolerancia:</td>
+						<td><%= f.text_field :tolerancia,
+              :size => '15',
+              :readonly => "readonly" %></td>
+
+						<td align="right">Seguro:</td>
+						<td><%= f.text_field :seguro,
+              :size => '15',
+              :readonly => "readonly" %></td>
+
+					</tr>
+					<tr>
+						<td align="right">Obs:</td>
+						<td colspan="6"><%= f.text_area :obs,
+              :cols =>63,:rows => 2,
+              :readonly => "readonly" %></td>
+					</tr>
+					<tr>
+						<td align="right">Capacidad:</td>
+						<td><%= f.text_field :capacidad,
+              :size => 15,
+              :readonly => "readonly"
+%></td>
+
+						<td align="right">Valor del Flete(Est.):</td>
+						<td><%= f.text_field :valor_flete_estimado,
+              :size     => 15,
+              :readonly => "readonly" %></td>
+
+						<td align="right">Disp:</td>
+
+						<td>
+						<% if current_user.tipo == 0 || current_user.tipo == 1 %>
+							<%= f.text_field :porcentagem,
+                                             :size     => 5,
+                                             :onblur   => "calcularFleteCapacidad(),CalcularFleteDisponible()" %>
+
+						<% else %>
+							<%= f.text_field :porcentagem,
+                                             :size     => 5,
+                                             :onblur   => "calcularFleteCapacidad(),CalcularFleteDisponible()",
+                                             :readonly => "readonly"%>
+						<% end %>
+						<%= f.text_field :autorizado,
+                                         :size     => 15,
+                                         :readonly => "readonly" %>
+						</td>
+
+					</tr>
+				</table>
+
+			</div>
+
+			<table>
+				<tr>
+					<td valign="top">
+					<div class="group">
+						<h2> Ordem Suministro - Chofer</h2>
+
+						<table >
+
+							<tr>
+								<td align="right">Prov.:</td>
+								<td><%= f.collection_select :proveedore_id, Proveedore.all(:select =>'id,nome',:order => '1'),:id,:nome,{},{ :onkeypress => "return bloqEnter(event),f(this),EnterTab(event,'dadosproducto')"} %></td>
+
+								<td align="right">Prod.:</td>
+								<td><%= select_tag("dadosproducto", options_for_select(Proveedorproduto.find(:all).collect{|e| [e.produto, e.id]}),
+								:onkeypress => "return bloqEnter(event)", :onkeyup    => "f(this),EnterTab(event,'prod')",:onkeydown => "buscaprodutoordem()" ) %>
+
+								<%= text_field_tag( 'prod',
+								nil,
+								:id => "prod",
+								:onfocus => remote_function(:update => "prod",
+								:url => { :action => :get_producto, :id => 1},
+								:with => "'prod='+this.value" ),
+								:onkeypress => "return bloqEnter(event)", 
+								:onkeyup    => "f(this),EnterTab(event,'ordemcarga_cantidad_suministro')",
+								:size => 5) %></td>
+								
+								<%= f.hidden_field :produto_suministro %>
+							 </td>	
+							</tr>
+
+							<tr>
+								<td align="right">Prec.</td>
+								<td><%= f.text_field :precio,
+                  :size => 15,
+                  :readonly => "readonly" %></td>
+
+								<td align="right">Cant.:</td>
+								<td><%= f.text_field :cantidad_suministro,
+                  :size => 16,
+				  :onkeypress => "return bloqEnter(event)", 
+				  :onkeyup    => "f(this),EnterTab(event,'ordemcarga_cajas_id')",                  
+                  :onblur     => "SuministroOrdem()"%></td>
+							</tr>
+
+							<tr>
+								<td align="right">Import:</td>
+								<td><%= f.text_field :importe_suministro,
+													 :size => '15',:onblur => "importe()"  %></td>
+							</tr>
+						</table>
+					</div>
+					</td>
+
+					<td valign="top">
+
+					<div class="group">
+						<h2> Adelanto Flete - Chofer</h2>
+						<table border="0">
+							<%= f.hidden_field :caja_tipo,:value => 'EFETIVO' %>
+							<tr>
+								<td align="right">Caja:</td>
+								<td><%= f.collection_select :cajas_id, Caja.all(:order => '1'),:id,:caja,{},{ :onkeypress => "return bloqEnter(event)", 
+				                                                                                              :onkeyup    => "f(this),EnterTab(event,'ordemcarga_importe_adelanto')"} %></td>
+								<td align="right">Concepto:</td>
+								<td rowspan="4" valign="top"><%= f.text_area :concepto, :cols =>26,:rows => 5, :value => "EFETIVO" %></td>
+							</tr>
+
+							<tr>
+							  <td colspan="3">
+                                 <table>
+                                   <tr>
+                                    <td>
+                                       <fieldset>
+                                          <legend><%= t('COIN') %></legend>
+                                          <%= f.radio_button :moeda, 1,  :Checked => "True" %> Gs.
+                                          <br/>
+                                          <%= f.radio_button :moeda, 0,:onblur => "MoedaCompra('0')"%> Dolar
+
+                                       </fieldset>
+                                    </td>																
+                                   </tr>
+                                 </table>  
+                              </td>																
+                            </tr>
+
+
+							<tr>
+								<td align="right">Import:</td>
+								<td colspan="2"><%= f.text_field :importe_adelanto,
+                                                                 :size       => 15,
+                                                                 :onkeypress => "return bloqEnter(event)", 
+				                                                 :onkeyup    => "f(this),EnterTab(event,'resultado_soma')",                                                                 
+                                                                 :onblur     => "SomaAdelantos(),DiferencaAdelanto()"%></td>
+                            </tr>
+                            
+                            <tr>                                     
+								<td align="right">Total Import:</td>
+                   
+								<td>
+								<input type="text"  id="resultado_soma" name="resultado_soma" size="15" onkeypress="return bloqEnter(event)", 
+				                                                 onkeyup="f(this),EnterTab(event,'submit')"/>
+								</td>
+							</tr>
+						</table>
+					</div>
+
+					</td>
+				</tr>
+			</table>
+			</div>
+			</div>
+			
+			<div class="button">
+   			     <%= f.submit  '    OK    ',:disable_with => "Aguarde...",:class => 'enviar'%> 
+                 <a href="#" class="sair">Salir</a> 
+		    </div>
+			<% end %>
+</body>
+
+<script>
+	
+//PEDIDO TRASLADO-------
+function abrir_pedido()
+{
+ remit_id = document.getElementById('ordemcarga_remitente_id').value
+ busca    = '/pedidotralados/search?remitente_id='+remit_id
+window.open(busca, busca.target, ' SCROLLBARS=NO, TOP=0, LEFT=10, WIDTH=1350, HEIGHT=400'); return false;
+}
+	
+
+function importe()
+{
+ imp = document.getElementById('ordemcarga_importe_suministro').value
+ pre = document.getElementById('ordemcarga_precio').value
+ document.getElementById('ordemcarga_cantidad_suministro').value =  (imp / pre)
+
+}
+	
+</script>
+

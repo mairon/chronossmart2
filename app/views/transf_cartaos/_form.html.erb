@@ -1,0 +1,62 @@
+<%= form_for(@transf_cartao) do |f| %>
+  <% if @transf_cartao.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@transf_cartao.errors.count, "error") %> prohibited this transf_cartao from being saved:</h2>
+
+      <ul>
+      <% @transf_cartao.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> Transferencia de Tarjetas - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+
+                <table>
+                  <tr>
+                    <td align="right"><%= t('DATE') %>:</td>
+                    <td><%= f.date_select :data %></td>
+                  </tr>
+                  <tr>
+                    <td align="right">Origin:</td>
+                    <td><%= f.collection_select :conta_origem_id, Conta.all( :select => ' id,nome',
+                            :conditions => ["unidade_id = #{current_unidade.id} and forma_pago_id in (3, 4)"],
+                            :order  => '2' ), :id, :nome, {prompt: 'Seleccione la Cuenta'} %></td>
+
+                    <td align="right">Destino:</td>
+                    <td><%= f.collection_select :conta_destino_id, Conta.all( :select => ' id,nome',
+                            :conditions => ["unidade_id = #{current_unidade.id} and tipo = 1"],
+                            :order  => '2' ), :id, :nome, {prompt: 'Seleccione la Cuenta'} %></td>
+                  </tr>
+                <tr>
+                  <td align="right">Taxa:</td>
+                    <td>
+                    <% if params[:action] == 'new' %>
+                      <%= f.text_field :taxa, value: '2,10', size: 15 %>%
+                    <% else %>
+                      <%= f.text_field :taxa, size: 15 %>%
+                    <% end %>
+                    </td>
+                </tr>
+
+                <tr>
+                  <td></td>
+                  <td><%= f.check_box :tipo_transf %>Transf. Agrupado</td>
+                </tr>
+
+                </table>
+      </div>
+
+      <div class="buttons">
+        <%= f.submit :value => " Seguir ", :class => "btn btn-green" %>
+        <%= link_to t('BACK'), transf_cartaos_path, :class => "btn btn-back" %>
+      </div>
+
+    </div>
+<% end %>

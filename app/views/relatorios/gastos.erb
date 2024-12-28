@@ -1,0 +1,239 @@
+<h1 id="header"><%= t('LISTING') %> de <%= t('EXPENSES') %>s</h1>
+  <div class="group">
+    <% sql = "SELECT PC.ID,
+                     (PG.DESCRICAO || ' > ' || PC.DESCRICAO) AS nome
+              FROM PLANO_DE_CONTAS PC
+              LEFT JOIN PLANO_DE_CONTAS PG
+              ON SUBSTRING(PG.CODIGO, 1, 8) = SUBSTRING(PC.CODIGO, 1, 8)
+              WHERE LENGTH(PC.CODIGO) >=12 AND LENGTH(PG.CODIGO) =8
+              ORDER BY 2"
+      plano = PlanoDeConta.find_by_sql(sql)
+    %>
+
+
+    <%= form_tag resultado_gastos_relatorios_path, :method => "get" do %>
+
+    <div class="row">
+
+      <div class="col-md-5">
+        <label>Fecha</label>
+        <fieldset>
+          <%= radio_button_tag :data_f, 0,  :Checked => "True"%> Documiento
+          <%= radio_button_tag :data_f, 1 %> Competencia 
+        </fieldset>        
+      </div>
+
+      <div class="col-md-7">
+        <label><%= t('PERIOD') %></label>
+        <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+        <div class="input-group-addon-f">
+          <span class="icon-calendar"></span>
+        </div>
+        <div class="date-separ"><%= t('TO') %></div>
+        <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+        <div class="input-group-addon-f">
+        <span class="icon-calendar"></span>
+        </div>
+      </td>        
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label><%= t('PROVIDER') %></label>
+         <%=   select("busca", "prov", Persona.all(:select => 'id,nome',:conditions => ['tipo_fornecedor = 1'],:order => 'nome').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Todos...' })   %>
+        
+      </div>
+    </div>
+
+    <% rodado = Rodado.all( :select => 'id,placa', :order  => '1' ) %>
+    <% unless rodado.blank? %>
+
+      <div class="row">
+        <div class="col-md-12">
+            <label>Rodado</label>
+            <%= select("busca", "rodado", rodado.collect {|p| [ p.placa, p.id ] }, { :prompt => 'Selecione' }) %>
+        </div>
+      </div>
+
+    <% end %>
+
+    <% safra = Safra.all( :select => 'id,nome', :order  => '1' ) %>
+    <% unless safra.blank? %>
+
+      <div class="row">
+        <div class="col-md-12">
+            <label>Zafra</label>
+            <%= select("busca", "safra", safra.collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione' }) %>
+        </div>
+      </div>
+
+    <% end %>
+
+    <% producao = Producao.all( :select => 'id,nome', :order  => '1' ) %>
+    <% unless producao.blank? %>
+
+      <div class="row">
+        <div class="col-md-12">
+            <label>Produción</label>
+            <%=  select("busca", "producao", producao.collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione' }) %>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label><%= t('CLASSIFICATION') %></label>
+        <%= select("busca", "plano_de_conta", plano.collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione' }) %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label><%= t('CENTER_OF_COSTOS') %></label>
+        <%= select("busca", "centro_custo", CentroCusto.all.collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione' }) %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <%= check_box_tag :lancamento,'1', checked: 'true' %> <%= t('ALL_RELEASES') %>        
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <fieldset>
+          <input type="radio" id= "tp" name="tp" value="0"  />
+          Analítico
+          <input type="radio" id= "tp" name="tp" value="3" />
+          Sintetico por Clasificación
+
+          <input type="radio" id= "tp" name="tp" value="1" checked="true"  />
+          Analítico Costo
+         </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset>
+          <legend>Tipo Doc.</legend>
+          <input type="radio" id="tipo_doc" name="tipo_doc" value="0" /> Contado
+          <input type="radio" id="tipo_doc" name="tipo_doc" value ="1"  /> Credito
+          <input type="radio" id="tipo_doc" name="tipo_doc" value="2" checked /> Todos
+        </fieldset>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <fieldset>
+          <legend>Tipo Fiscal</legend>
+          <input type="radio" id="tipo_fiscal" name="tipo_fiscal" value="1" /> Fiscal
+          <input type="radio" id="tipo_fiscal" name="tipo_fiscal" value ="0"  /> Não Fiscal
+          <input type="radio" id="tipo_fiscal" name="tipo_fiscal" value="2" checked /> Todos
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset>
+          <legend><%= t('COIN') %></legend>
+          <input type="radio" id="moeda" name="moeda" value="0" <%= 'checked' if current_unidade.moeda.to_i == 0 %> /> <%= t('DOLLARS') %>
+          <input type="radio" id="moeda" name="moeda" value ="1" <%= 'checked' if current_unidade.moeda.to_i == 1 %> /> <%= t('GUARANIS') %>
+          <input type="radio" id="moeda" name="moeda" value="2" <%= 'checked' if current_unidade.moeda.to_i == 2 %> /> <%= t('REAIS') %>
+        </fieldset>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12 footer-buttons">
+        <input  id="button" class="acao btn btn-green" value="Informe"  style="cursor:pointer;" id="myModalLabel" data-toggle="modal" data-width="500" data-height="781" data-target="#myiframe" data-dismiss="modal" />
+        <input  id="button" type="submit" class="btn btn-blue" value="Excel" onclick = "Tipo('1')"/>
+      </div>
+    </div>
+    <input type="hidden" name="tipo" id="tipo" size="5" value="0"/>
+    <% end %>
+</div>
+
+<div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 1100px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('LISTING') %> de <%= t('EXPENSES') %>s</h4>
+      </div>
+      <div class="modal-body" align="center">
+        <div class="embed-responsive embed-responsive-16by9" style="height: 460px">
+          <iframe class="embed-responsive-item" id="iframeModal" frameborder="0 " border="0"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  $('select').selectize();
+
+
+  $(document).ready(function() {
+    $(".Tp").click(function() {
+      $("#tp").val($(this).attr('data-value'));
+      $(".Tp").css("border-bottom", "none");
+      $(".Tp").css("color", "#918f8f");
+      $(this).css("border-bottom", "2px solid #B94A48");
+      $(this).css("text-align", "center");
+      $(this).css("color", "#B94A48");
+    });
+
+    $(".Status").click(function() {
+      $("#status").val($(this).attr('data-value'));
+      $(".Status").css("border-bottom", "none");
+      $(".Status").css("color", "#918f8f");
+      $(this).css("border-bottom", "2px solid #B94A48");
+      $(this).css("text-align", "center");
+      $(this).css("color", "#B94A48");
+    });
+
+    $(".Moeda").click(function() {
+      $("#moeda").val($(this).attr('data-value'));
+      $(".Moeda").css("border-bottom", "none");
+      $(".Moeda").css("color", "#918f8f");
+      $(this).css("border-bottom", "2px solid #B94A48");
+      $(this).css("text-align", "center");
+      $(this).css("color", "#B94A48");
+    });
+  });
+
+( function($) {
+
+function iframeModalOpen(){
+
+    $('.acao').on('click', function(e) {
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+
+      // stampiamo i nostri dati nell'iframe
+      $("#myiframe iframe").attr({
+        'src': '/relatorios/resultado_gastos?' + $('form').serialize(),
+        'height': height,
+        'width': width,
+        'allowfullscreen':''
+      });
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#myiframe').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+    });
+  }
+
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+
+  } ) ( jQuery );
+
+</script>

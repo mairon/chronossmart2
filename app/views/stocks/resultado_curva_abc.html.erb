@@ -1,0 +1,30 @@
+<% sub_tot_qtd = 0 %>
+<% sub_tot_val = 0 %>
+<% acumula_porcen = 0 %>
+<% quebra = '' %>
+<table>
+	<% @vendas.each do |v| %>
+
+		<tr class="<%= cycle("cor1", "cor2")%>">
+			<td width="250"><%= v.produto_nome %></td>
+			<td width="40" align="right"><%= format_int(v.qtd) %></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><%= format_decimal(v.tot_us.to_f - v.custo_medio_us.to_f ) %></td>
+				<td width="70" align="right"><%= format_decimal(v.tot_us) %></td>
+				<td width="70" align="right"><b><%= format_decimal( porcen = ((v.tot_us.to_f /  v.sum_tot_us.to_f) * 100)) %>%</b></td>
+				<td width="70" align="right"><b><%= format_decimal( acumula_porcen += porcen.to_f  ) %>%</b></td>
+			<% else %>
+				<td width="70" align="right"><%= format_decimal(v.tot_gs.to_f - v.custo_medio_gs.to_f ) %></td>
+				<td width="70" align="right"><%= format_int(v.tot_gs) %></td>
+				<td width="70" align="right"><b><%= format_decimal( porcen = ((v.tot_gs.to_f /  v.sum_tot_gs.to_f) * 100)) %>%</b></td>
+				<td width="70" align="right"><b><%= format_decimal( acumula_porcen += porcen.to_f  ) %>%</b></td>
+			<% end %>
+		</tr>
+	<% end %>
+    <tr class="head">
+      <td colspan="2" align="right">Sub-Total ==> </td>
+      <td align="right"> <%= format_int(sub_tot_qtd.to_f) %></td>
+      <td align="right"> <%= format_int(sub_tot_val.to_f) %></td>
+    </tr>
+
+</table>

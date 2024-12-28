@@ -1,0 +1,20 @@
+<div class="group list">
+  <table>
+    <% comp = Compra.where("producao_id = #{@producao.id}") %>
+    <% comp.sum("total_dolar") %>
+    <tr class="head_grid">
+      <td colspan="3">Gastos</td>
+    </tr>
+    <% comp.each do |c| %>
+    <tr class="<%= cycle("cor1", "cor2")%>">
+      <td width="320"><small><%= c.plano_de_conta.descricao %></small></td>
+      <td align="60" align="right"><%= format_decimal(c.total_dolar) %></td>
+      <td align="60" align="right"><%= format_decimal(  (c.total_dolar.to_f / comp.sum("total_dolar").to_f) * 100 ) %>%</td>
+    </tr>
+    <% end %>
+    <tr class="head_grid">
+      <td>Sub-Total</td>
+      <td align="right" ><%= format_decimal( comp.sum("total_dolar")) %></td>
+    </tr>
+  </table>
+</div>

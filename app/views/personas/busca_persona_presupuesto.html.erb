@@ -1,0 +1,56 @@
+<table>
+  <tr>
+    <td width="40" align="center"></td>
+    <td width="50" align="center">Cod.</td>
+    <td width="300">Fantasia</td>
+    <td width="300">Razao Social</td>
+    <td width="100">Ruc</td>
+    <td width="100">Clasificacion</td>
+  </tr>
+</table>
+
+<div class="rolagem" id="div">
+   <table>
+    <% count = 0 %>
+      <% for persona in @personas %>
+          <% cod = persona.id %>
+         <tr class       ="<%= cycle("cor1", "cor2")%>"
+             onMouseOver ="javascript:this.style.backgroundColor='#949494'"
+             onMouseOut  ="javascript:this.style.backgroundColor=''"
+             onclick     ="Fecha( '<%= persona.id %>',
+                                  '<%= cod %>',
+                                  '<%= persona.nome %>',
+                                  '<%=h persona.classificacao %>',
+                                  '<%=h persona.ruc %>',
+                                  '<%=h persona.cliente %>',
+                                  '<%=h persona.direcao %>',
+                                  '<%=h persona.cidade_id %>',
+                                  '<%=h persona.cidade %>',
+                                  '<%=h persona.bairro %>' )">
+
+          <td  width="35"><input type="text" id="<%= count %>" value="<%= count %>" size="1" style="border: none;"
+                onkeypress="Fecha( '<%= persona.id %>',
+                                  '<%= cod %>',
+                                  '<%= persona.nome %>',
+                                  '<%=h persona.classificacao %>',
+                                  '<%=h persona.ruc %>',
+                                  '<%=h persona.cliente %>',
+                                  '<%=h persona.direcao %>',
+                                  '<%=h persona.cidade_id %>',
+                                  '<%=h persona.cidade %>',
+                                  '<%=h persona.bairro %>' )">
+            </td>
+            <td width="50"align="center"> <%= cod %></td>
+            <td width="300"><%= persona.nome %></td>
+            <td width="300"><%= persona.nome_fatura %></td>
+            <td width="100"><%= persona.ruc %></td>
+            <td width="100"><%= persona.classificacao %></td>
+         </tr>
+         <% count += 1 %>
+      <% end %>
+      <input type="hidden" id="foco" value="-1">
+   </table>
+  
+   <%= will_paginate @personas, :update => 'pagina',:prev_label => '<< Anterior',:next_label => 'Próximo >>'%>
+
+</div>

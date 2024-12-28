@@ -1,0 +1,109 @@
+
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="panel" >
+
+        <header class="panel-heading">
+          <small>Sueldos Detalhes <%= @sueldo.persona_nome %></small>
+          <div class="pull-right"><a href="/sueldos/<%=@sueldo.id%>/form_sueldos_detalhes" class="button add" >Nuevo</a></div>
+        </header>
+        <div  class="panel-content"  style="height: 195px;">
+        <br>
+        <br>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="panel panel-center">
+      <header class="panel-heading">
+        Solicitaciones del Empleado
+      </header>
+
+      <div class="panel-body">
+
+        <% soli = Solicitude.joins(:usuario).where("date_part('month', solicitudes.data ) = '#{@sueldo.data_inicio.strftime("%m")}' and date_part('year', solicitudes.data ) = '#{@sueldo.data_inicio.strftime("%Y")}' and usuarios.persona_id = #{@sueldo.persona_id} ") %>
+
+
+
+        <table class="head_grid">
+          <tr>
+            <td width="150" align="center">Fecha Soli.</td>
+            <td width="150" align="center">Quando</td>
+            <td width="150">Motivo</td>
+            <td width="50">Desc. Hoja</td>
+            <td width="50" align="center">Hrs.</td>
+            <td width="120" align="center">Status</td>
+            <td width="100">Obs</td>
+          </tr>
+        </table>
+
+        <div class="rolagem" dir="div" style="height: 100px;">
+          <table>
+            <% soli.each do |solicitude| %>
+              <tr>
+                <td width="150" align="center"><%= solicitude.created_at.strftime("%d/%m/%y - %H:%M") %></td>
+                <td width="150" align="center"><%= solicitude.data.strftime("%d/%m/%y") unless solicitude.data.blank? %> - <%= solicitude.time.strftime("%H:%M")  unless solicitude.data.blank? %></td>
+                <td width="150"><small><%= solicitude.motivo.nome %></small> </td>
+                <td>
+                  <% if solicitude.desc_folha == true %>
+                    SI
+                  <% else %>
+                    NO
+                  <% end %>
+                </td>
+                <td><%= solicitude.hrs_desc %></td>
+                <td width="120" align="center">
+                  <small>
+                    <% if solicitude.status == 'NEGADO' %>
+                      <span style="background-color: #D80027;" class="panel-tag"><%= solicitude.status %></span>
+                    <% elsif solicitude.status == 'AUTORIZADO'%>
+                      <span style="background-color: #91DC5A;" class="panel-tag"><%= solicitude.status %></span>
+                    <% else %>
+                      <span style="background-color: #FFDA44;" class="panel-tag"><%= solicitude.status %></span>
+                    <% end %>
+                  </small>
+                </td>
+                <td width="180"><%= solicitude.status_obs %></td>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<br>
+
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <header class="panel-heading">
+        Pendencias
+      </header>
+      <div  class="panel-content">
+        <%= render :partial=>"pendentes" %>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+<%= render :partial=>"index_sueldos_detalhes", :locals=>{:sueldos_detalhes => @sueldo.sueldos_detalhes} %>
+<div class="buttons">
+  
+  <%= link_to 'Volver', edit_sueldo_path(@sueldo), :class => "button back" %>
+  <%= link_to 'Seguir', financas_sueldo_path(@sueldo), :class => "button next" %>
+
+  <input type="hidden" id="id" name="id" value="<%=params[:id]%>" />
+</div>
+
+<script>
+  function ComprovanteSueldo()                //
+  {
+    window.open('/sueldos/' + document.getElementById('id').value+'/comprovante', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+</script>
+

@@ -1,0 +1,169 @@
+<body onload="pesquisa('<%= params[:busca]%>'), CampoTipo()">
+  <div class="groupvenda">
+    <%= form_tag dinamic_busca_empaque_produto_produtos_path, :method => "get" do%>
+
+   Deposito :       <input id         ="deposito_id"
+             name       ="deposito_id"
+             type       ="text"
+             size       ="3"
+             value="<%= params[:deposito_id]%>"
+             onkeypress ="return bloqEnter(event)"
+             onKeyUp    ="EnterTab(event,'tipo')"
+             onkeydown  ="f(this)" />
+
+
+    <select name="tipo" id="tipo">
+      <option>REFERENCIA</option>
+      <option>DESCRIPCION</option>
+      <option>BARRA</option>
+    </select>
+
+      <input id         ="busca"
+             name       ="busca"
+             type       ="text"
+             value="<%= params[:busca]%>"
+             size       ="40"
+             onkeydown  ="f(this)" />
+
+      <input type   ="button"
+             id     ="button"
+             onclick="pesquisa(document.getElementById('busca').value)"
+             value  ="Buscar..."/>
+
+      <%= image_tag("load.gif",
+              :align => "absmiddle",
+              :border => 0,
+              :id => "spinner",
+              :width => 21,
+              :height => 21,
+              :style =>"display: none;" ) %>
+    <% end %>
+    <hr/>
+    <div id="pagina">
+    </div>
+  </div>
+
+    <%= hidden_field_tag :venda_id, params[:venda_id] %>
+    <%= hidden_field_tag :empaque, params[:empaque] %>
+    <script language="javascript">
+
+    function Fecha(produto_nome,produto_id,cor_id,tamanho_id,cor_nome,tamanho_nome,produtos_grade_id){
+      window.opener.document.getElementById('empaque_produto_produto_nome').value      = produto_nome;
+      window.opener.document.getElementById('empaque_produto_produto_id').value        = produto_id;
+      window.opener.document.getElementById('empaque_produto_cor_id').value            = cor_id;
+      window.opener.document.getElementById('empaque_produto_tamanho_id').value        = tamanho_id;
+      window.opener.document.getElementById('empaque_produto_cor_nome').value          = cor_nome;
+      window.opener.document.getElementById('empaque_produto_tamanho_nome').value      = tamanho_nome;
+      window.opener.document.getElementById('empaque_produto_produtos_grade_id').value = produtos_grade_id;
+      self.close();
+    }
+
+      function pesquisa(valor){
+
+        var tipo     = document.getElementById('tipo').value
+        //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+        url="/produtos/dinamic_busca_empaque_produto?&tipo="+tipo+"&venda_id="+$('#venda_id').val()+"&empaque="+$('#empaque').val()+"&busca="+valor;
+
+        ajax(url);
+
+      }
+
+
+      function ajax(url)
+
+      {
+
+
+        $('#spinner').show();
+        //alert(nick);
+
+        //alert(dest);
+
+        //alert(msg);
+
+
+
+        req = null;
+
+        // Procura por um objeto nativo (Mozilla/Safari)
+
+        if (window.XMLHttpRequest) {
+
+          req = new XMLHttpRequest();
+
+          req.onreadystatechange = processReqChange;
+
+          req.open("GET",url,true);
+
+          req.send(null);
+
+          // Procura por uma versão ActiveX (IE)
+
+        } else if (window.ActiveXObject) {
+
+          req = new ActiveXObject("Microsoft.XMLHTTP");
+
+          if (req) {
+
+
+
+            req.onreadystatechange = processReqChange;
+
+            req.open("GET",url,true);
+
+
+
+            req.send();
+
+          }
+
+        }
+
+      }
+
+
+
+      function processReqChange()
+
+      {
+
+
+
+        // apenas quando o estado for "completado"
+
+        if (req.readyState == 4) {
+
+
+
+          // apenas se o servidor retornar "OK"
+
+
+
+          if (req.status ==200) {
+
+
+
+            // procura pela div id="pagina" e insere o conteudo
+
+            // retornado nela, como texto HTML
+
+
+            onSuccess:$('#spinner').hide();
+            document.getElementById('pagina').innerHTML = req.responseText;
+          
+
+
+          } else {
+
+            alert("Houve um problema ao obter os dados:n" + req.statusText);
+
+          }
+
+        }
+
+      }
+    </script>
+  
+</body>
+

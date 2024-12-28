@@ -1,0 +1,43 @@
+<h1 id="header"><%= t('CHARGE') %>s_faturas</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_cobros_fatura_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td><%= t('CHARGE') %></td>
+            <td><%= t('DATE') %></td>
+            <td>Documento numero 01</td>
+            <td>Documento numero 02</td>
+            <td>Documento numero</td>
+            <td>Valor us</td>
+            <td>Valor gs</td>
+            <td>Moeda</td>
+            <td>Persona</td>
+            <td>Persona <%= t('NAME') %></td>
+            <td>Tipo</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @cobros_faturas.each do |cobros_fatura| %>
+      <tr>
+                  <td><%= cobros_fatura.cobro_id %></td>
+                  <td><%= cobros_fatura.data %></td>
+                  <td><%= cobros_fatura.documento_numero_01 %></td>
+                  <td><%= cobros_fatura.documento_numero_02 %></td>
+                  <td><%= cobros_fatura.documento_numero %></td>
+                  <td><%= cobros_fatura.valor_us %></td>
+                  <td><%= cobros_fatura.valor_gs %></td>
+                  <td><%= cobros_fatura.moeda %></td>
+                  <td><%= cobros_fatura.persona_id %></td>
+                  <td><%= cobros_fatura.persona_nome %></td>
+                  <td><%= cobros_fatura.tipo %></td>
+                <td><%= link_to 'Editar', edit_cobros_fatura_path(cobros_fatura) %></td>
+        <td><%= link_to t('DELETE'), cobros_fatura, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

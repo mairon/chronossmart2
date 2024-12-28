@@ -1,0 +1,119 @@
+<table class="head_grid">
+   <tr>
+      <td width="30" align="center"></td>
+      <td width="165" >Deposito</td>
+      <td width="350" >Producto</td>
+      <td width="40" align="right">Cant.</td>
+      <td width="120" align="right">Unit.</td>
+      <td width="120" align="right">Total</td>
+      <td width="120" align="right">VRB</td>
+      <td width="70" align="center">Anos</td>
+      <td width="70" align="right">%</td>
+
+   </tr>
+</table>
+<div class="rolagem" dir="div">
+   <table>
+      <% indice = 1 %>
+      <% qtd    = 0 %>
+      <% cust   = 0 %>
+      <% unit   = 0 %>
+      <% desc   = 0 %>
+      <% tot    = 0 %>
+      <% @compras_produto.each do |cp| %>
+         <tr class = "<%= cycle("cor1", "cor2") %>">
+            <td width="30"  align="center">  <%= indice %></td>
+            <td width="165" align="left">    <%= cp.deposito_nome %></td>
+            <td width="350" align="left">    <%= cp.produto_nome %></td>
+            <td width="40"  align="right"><b><%= cp.quantidade %></b></td>
+            <% if @compra.moeda == 0 %>
+              <td width="120" align="right"><b><%= number_to_currency( cp.unitario_dolar, :format =>'%n', :separator => ",", :precision => 4 )  %></b></td>
+              <td width="120" align="right"><b><%= number_to_currency( cp.total_dolar, :format =>'%n', :separator => ",", :precision => 4 )  %></b></td>
+              <td width="120" align="right"><b><%= number_to_currency( cp.valor_real_ben_us, :format =>'%n', :separator => ",", :precision => 4 )  %></b></td>
+
+              <% cust   += cp.custo_dolar.to_f %>
+              <% unit   += cp.unitario_dolar.to_f %>
+              <% desc   += cp.desconto_dolar.to_f %>
+              <% tot    += cp.total_dolar.to_f %>
+            <% elsif @compra.moeda == 1 %>
+              <td width="120" align="right"><b><%= number_to_currency( cp.unitario_guarani, :format =>'%n', :precision => 0 )  %></b></td>
+              <td width="120" align="right"><b><%= number_to_currency( cp.total_guarani, :format =>'%n', :precision => 0 )  %></b></td>
+
+              <td width="120" align="right"><b><%= number_to_currency( cp.valor_real_ben_gs, :format =>'%n', :precision => 0 )  %></b></td>
+
+              <% cust   += cp.custo_guarani.to_f %>
+              <% unit   += cp.unitario_guarani.to_f %>
+              <% desc   += cp.desconto_guarani.to_f %>
+              <% tot    += cp.total_guarani.to_f %>
+            <% else %>
+              <td width="120" align="right"><b><%= number_to_currency( cp.unitario_real, :format =>'%n', :separator => ",", :precision => 4 )  %></b></td>
+              <td width="120" align="right"><b><%= number_to_currency( cp.total_real, :format =>'%n', :separator => ",", :precision => 4 )  %></b></td>
+              <td width="120" align="right"><b><%= number_to_currency( cp.valor_real_ben_rs, :format =>'%n', :separator => ",", :precision => 4 )  %></b></td>
+              <% cust   += cp.custo_real.to_f %>
+              <% unit   += cp.unitario_real.to_f %>
+              <% desc   += cp.desconto_real.to_f %>
+              <% tot    += cp.total_real %>
+            <% end %>
+            <td width="70" align="center"><%= cp.anos %></td>
+            <td width="70" align="right"><%= cp.porcen %></td>
+
+           <td><a href="/compras_produtos/<%= cp.id %>/edit" >Editar</a> </td>
+           <td><%= link_to t('DELETE'), cp, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+           <% indice += 1 %>
+           <% qtd += cp.quantidade.to_f %>
+
+         </tr>
+        <% if @compra.tipo_compra == 3 %>
+          <tr>
+            <td colspan="12">
+              <table>
+                <tr class="head_grid">
+                  <td width="28"></td>
+                  <td width="30" align="center">Periodo</td>
+                  <td width="100" align="center"><%= t('DATE') %></td>
+                  <td width="70" align="center">Valor Corrigido</td>
+                  <td width="70" align="center">Depre. Acumulada</td>
+                  <td width="70" align="center"></td>
+                </tr>
+
+                <% depre_apre = ComprasDepreApre.where("compras_produto_id = #{cp.id}").order('mes') %>
+                <% depre_apre.each do |da| %>
+                <tr class = "<%= cycle("cor1", "cor2") %>">
+                  <td width="28"></td>
+                  <td width="30" align="center"><%= da.mes %></td>
+                  <td width="100" align="center"><%= da.data.strftime("%d/%m/%y") %></td>
+                  <% if @compra.moeda == 0 %>
+                    <td width="70" align="right"><%= format_decimal(da.depre_us.to_f) %></td>
+                    <td width="70" align="right"><%= format_decimal( cp.total_dolar.to_f - da.depre_us.to_f) %></td>
+                    <td width="70" align="right"><%= format_decimal((da.depre_us.to_f * 100) / cp.total_dolar.to_f) %>%</td>
+                  <% elsif @compra.moeda == 1 %>
+                    <td width="70" align="right"><%= format_int(da.depre_gs.to_f) %></td>
+                  <% else %>
+                    <td width="70" align="right"><%= format_decimal(da.depre_rs.to_f) %></td>
+                  <% end %>
+                </tr>
+              <% end %>
+
+              </table>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+
+   </table>
+</div>
+<!-- RESULTDOS!-->
+<table>
+   <tr>
+      <td width="785"></td>
+      <td width="40" align="right"><b><%= qtd %></b></td>
+      <% if @compra.moeda == 1  %>
+         <td width="70" align="right"><b><%=number_to_currency( unit,  :format =>' %n ', :precision => 0 )%></b></td>
+         <td width="70" align="right"><b><%=number_to_currency( tot,   :format =>' %n ', :precision => 0 )%></b></td>
+      <% else %>
+         <td width="70" align="right"><b><%=number_to_currency( unit,  :format =>' %n ', :separator => "," )%></b></td>
+         <td width="70" align="right"><b><%=number_to_currency( tot,   :format =>' %n ', :separator => ",", :precision => 2 )%></b></td>
+      <% end  %>
+   </tr>
+</table>
+

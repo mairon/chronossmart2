@@ -1,0 +1,56 @@
+<%= form_for(@promo_dt) do |f| %>
+  <% if @promo_dt.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@promo_dt.errors.count, "error") %> prohibited this promo_dt from being saved:</h2>
+
+      <ul>
+      <% @promo_dt.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> Promoción - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">promo_id :</td>                    
+                      <td><%= f.number_field :promo_id %></td>
+                                      
+                      <td align="right">produto_id :</td>                    
+                      <td><%= f.number_field :produto_id %></td>
+                                      
+                      <td align="right">desc_porce :</td>                    
+                      <td><%= f.text_field :desc_porce %></td>
+                                      
+                      <td align="right">preco_venda_gs :</td>                    
+                      <td><%= f.text_field :preco_venda_gs %></td>
+                                      
+                      <td align="right">preco_venda_us :</td>                    
+                      <td><%= f.text_field :preco_venda_us %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', promo_dts_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

@@ -1,0 +1,42 @@
+<div class="panel">
+
+  <h1 id="header">
+    Resumo para os próximos 10 dias em <span class="us">U$</span>:
+    <div class="row-rtl">
+      <span class="label label-danger">Pagar</span>
+      <span class="label label-primary">Receber</span>
+    </div>
+
+  </h1>
+  <div class="panel-content  card-dashboard">
+    <div id="columnchart_material"></div>
+  </div>
+</div>
+
+<script type="text/javascript">
+      google.charts.load('current', {'packages':['bar']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Dias', 'Pagar', 'Receber'],
+          <% @chart_venc_week.each do |c| %>
+            ["<%= c.vencimento.to_date.strftime('%d/%m/%y') %>", <%= c.pagar_gs %>, <%= c.receber_gs %>],
+          <% end %>
+        ]);
+
+        var options = {
+          bars: 'vertical',
+          vAxis: {format: 'decimal'},
+          height: 250,
+          legend: { position: "none" },
+          bar: { groupWidth: '100%' },
+
+          colors: ['#f35b5b', '#0088f9']
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+      }
+    </script>

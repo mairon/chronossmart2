@@ -1,0 +1,47 @@
+<%= form_for(@produtos_tamanho) do |f| %>
+  <% if @produtos_tamanho.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@produtos_tamanho.errors.count, "error") %> prohibited this produtos_tamanho from being saved:</h2>
+
+      <ul>
+      <% @produtos_tamanho.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> produtos_tamanhos - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">produto_id :</td>                    
+                      <td><%= f.number_field :produto_id %></td>
+                                      
+                      <td align="right">tamanho_id :</td>                    
+                      <td><%= f.number_field :tamanho_id %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), produtos_tamanhos_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

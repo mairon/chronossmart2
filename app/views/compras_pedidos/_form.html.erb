@@ -1,0 +1,44 @@
+<%= form_for(@compras_pedido) do |f| %>
+  <% if @compras_pedido.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@compras_pedido.errors.count, "error") %> prohibited this compras_pedido from being saved:</h2>
+
+      <ul>
+      <% @compras_pedido.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> compras_pedidos - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">pedido_compra_id :</td>                    
+                      <td><%= f.number_field :pedido_compra_id %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), compras_pedidos_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

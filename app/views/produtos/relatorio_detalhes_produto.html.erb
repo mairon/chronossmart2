@@ -1,0 +1,148 @@
+<table>
+	<tr height="20">
+		<td align="right"> <b>Producto : </b></td>
+		<td ><%= @pd.clase_id.to_s.rjust(2, '0')<< '.' << @pd.grupo_id.to_s.rjust(4, '0') << '.' <<  @pd.id.to_s.rjust(8, '0')%> 
+
+		<td rowspan="4" valign="top">
+		    <% if @pd.picture_content_type.present? %>
+			    <%= pdf_image_tag @pd.picture.url,:size => "240x210" %>
+		    <% else %>
+		    	<%= pdf_image_tag('logo.JPG',:width=>"220", :height=>"100")%>
+		    <% end %>
+        </td>
+	</tr>
+
+	<tr height="20">
+		<td width="70" align="right" valign="top"> <b>Descripcion : </b> </td>
+		<td  width="450" valign="top"> <%= @pd.nome %></td>		
+	</tr>
+	<tr height="20">
+		<td align="right" valign="top"><b>Stock Atual : </b> </td>
+		<td  valign="top"> <%= @quantidade %></td>		
+	</tr>
+
+	<tr height="20">
+		<td align="right" valign="top"> <b>Obs : </b></td>
+		<td  valign="top"> <%= @pd.obs %></td>		
+	</tr>
+
+
+</table>
+
+<table  border="1">
+	<tr>
+		<td align="right" > <b> Cod Fabricante : </b></td>
+		<td width="150"><%= @pd.fabricante_cod %></td>
+
+		<td align="right" > <b>Ubicacion : </b></td>
+		<td width="120"><%= @pd.fabricante_cod %></td>
+
+		<td align="right" > <b> Ref.:</b></td>
+		<td width="50"><%= @pd.referencia %></td>
+
+
+		<td align="right" > <b>Iva :</b></td>
+		<td width="50"><%= @pd.taxa %></td>
+
+		<td align="right" > <b>Peso Neto : </b></td>
+		<td width="100"><%= @pd.peso %></td>
+
+	</tr>
+	<tr height="20">
+		<td colspan="10"> <b>Ultima Compra :</b></td>
+	</tr>
+   <tr>
+     <td align="right" > <b><%= t('DATE') %> : </b></td>
+     <td align="center"><%= @pd.compras_produtos.last ? @pd.compras_produtos.last.data.strftime("%d/%m/%Y") : "00/00/0000" %></td>
+
+     <td align="right" ><b>Cantidad : </b></td>
+     <td align="center"><%= @pd.compras_produtos.last ? @pd.compras_produtos.last.quantidade : "0.000" %></td>
+
+     <td align="right" > <b>Unit. Gs.:</b></td>
+     <td align="right"><%= @pd.compras_produtos.last ? @pd.compras_produtos.last.unitario_guarani : "0.000" %></td>
+
+     <td align="right" > <b>U$ :</b></td>
+     <td align="right"><%= @pd.compras_produtos.last ? @pd.compras_produtos.last.unitario_dolar : "0.000" %></td>
+
+     <td align="right" > <b>Prov:</b></td>
+     <td ><%= truncate( @pd.vendas_produtos.last ? @pd.vendas_produtos.last.persona_nome : "----", :leght => 15) %></td>
+   </tr>
+
+
+	<tr height="40">
+		<td colspan="10" align="center"> <b>Composicion del Producto</b></td>
+	</tr>
+
+
+	<tr height="20">
+		<td align="center"> <b>Cod.</b></td>
+		<td align="center"> <b>Fabr.</b></td>
+		<td align="center" colspan="5"> <b>Descricao</b></td>
+		<td align="center"> <b>Cantidad</b></td>
+		<td align="center"> <b>Costo</b></td>
+		<td align="center"> <b>Tot. Costo</b></td>
+	</tr>
+	<% tot_qtd  = 0 %>
+	<% tot_cust = 0 %>	
+	<% @cp.each do |c| %>
+		<tr>
+			<td ><%= c.clase_id.to_s.rjust(2, '0')<< '.' << c.grupo_id.to_s.rjust(4, '0') << '.' <<  c.componente_id.to_s.rjust(8, '0')%> </td>
+			<td align="center" ><%= c.produto.fabricante_cod %></td>			
+			<td colspan="5" ><%= c.componente_nome %></td>
+			<td align="right" ><%= c.quantidade %></td>
+			<% if  ProdutoComposicao.count(:ultimo_custo_dolar, :conditions => ["produto_id = ?",c.componente_id]) > 0 %>
+			<td align="right" ><%= number_to_currency( ProdutoComposicao.sum('quantidade * ultimo_custo_dolar', :conditions => ["produto_id = ?",c.componente_id]), :format =>' %n ', :separeitor => ',')  %></td>
+
+			<% cust =  (  ProdutoComposicao.sum('quantidade * ultimo_custo_dolar', :conditions => ["produto_id = ?",c.componente_id])) %>
+
+			<td align="right" > <%= number_to_currency(ut_tot = (c.quantidade.to_f * cust.to_f), :format =>' %n ', :separeitor => ',')  %></td>
+			<% else %>
+			<td align="right" ><%= number_to_currency( ut_unit = c.ultimo_custo_dolar, :format =>' %n ', :separeitor => ',')  %></td>
+			<td align="right" ><%= number_to_currency( ut_tot  = c.quantidade.to_f * c.ultimo_custo_dolar.to_f, :format =>' %n ', :separeitor => ',')  %></td>
+			<% end %>
+
+		</tr>
+		<% tot_qtd += c.quantidade.to_f %>
+		<% tot_cust += ut_tot.to_f %>	
+	<% end %>
+
+	<tr height="20">
+		<td align="center"></td>
+		<td align="right" colspan="6">Total ==> </td>
+		<td align="right"> <b><%= tot_qtd %></b></td>
+		<td align="right"></td>
+		<td align="right" ><b><%= number_to_currency(  tot_cust, :format =>' %n ', :separeitor => ',')  %></b></td>
+
+		<td align="center"></td>
+	</tr>
+
+
+
+	<tr height="40">
+		<td colspan="10" align="center"> <b>Roteiro</b></td>
+	</tr>
+
+
+	<tr height="20">
+		<td align="center" colspan="2"> <b>Resp.</b></td>
+		<td align="center"> <b>Sector</b></td>
+		<td align="center" colspan="6"> <b>Descricao</b></td>
+		<td align="center"> <b>Timpo Esti.</b></td>
+	</tr>
+
+	<% @pr.each do |r| %>
+		<tr>
+			<td colspan="2" ><%= r.responsavel_nome %></td>			
+			<td ><%= r.setor %></td>
+			<td  colspan="6" ><%= r.descricao %></td>
+			<td align="center" ><%= r.tempo_estimado %> m</td>
+		</tr>
+	<% end %>
+
+</table>
+
+<style type="text/css">
+	table {
+		border-collapse: collapse;
+	}
+</style>

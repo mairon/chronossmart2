@@ -1,0 +1,29 @@
+<h1 id="header">Contrato finanças</h1>
+
+<table class="head_grid">
+	<tr>
+		<td width="150" align="center">Parcela</td>
+		<td width="150" align="center"><%= t('EXPIRATION') %></td>
+		<% if @contrato.moeda == 1 %>
+			<td width="150" align="center">Valor G$</td>
+		<% else %>
+			<td width="150" align="center">Valor US$</td>
+		<% end %>
+	</tr>
+</table>
+
+<div class="rolagem" dir="div">
+	<table>
+		<% contrato_financas.each do |contrato_financa| %>
+			<tr>
+				 <td width="150" align="center"><%= contrato_financa.cota %></td>
+				 <td width="150" align="center"><%= contrato_financa.vencimento.strftime("%d/%m/%Y")  %></td>
+				 <% if @contrato.moeda == 1 %>
+				 	<td width="150" align="center"><%= format_decimal(contrato_financa.valor_gs) %></td>
+				 <% else %>
+				 	<td width="150" align="center"><%= format_decimal(contrato_financa.valor_us) %></td>
+				 <% end %>
+			</tr>
+		<% end %>
+	</table>
+</div>

@@ -1,0 +1,190 @@
+<%= form_for(@produto , :html => { :multipart => true }) do |f| %>
+
+<div class="row">
+  <% if @produto.errors.any? %>
+    <div class="col-md-12">
+      <div class="alert alert-block alert-danger fade in">
+        <button data-dismiss="alert" class="close close-sm" type="button">
+          <i class="fa fa-times"></i>
+        </button>
+        <h4><%= pluralize(@produto.errors.count, "error") %> no fue posible grabar:</h4>
+        <ul>
+        <% @produto.errors.full_messages.each do |msg| %>
+          <li><strong><%= msg %></strong></li>
+        <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>  
+</div>   
+
+<div class="row">
+  <div class="col-sm-8">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <header class="panel-heading">
+            Producto [Perfil]
+          </header>
+          <div class="panel-body">
+            <div class="form-group">
+              <table>
+                <tr>
+                  <td align="right">Tipo:</td>
+                  <td colspan="3">
+                    <%= f.radio_button :tipo_produto, 0, :checked => true %>  Mercaderia
+                    <%= f.radio_button :tipo_produto, 1 %> Servicios
+                    <%= f.radio_button :tipo_produto, 2 %>  Producto Compuesto
+                  </td>
+                </tr>
+                <tr>
+                  <td align="right">Producto:</td>
+                  <td colspan="3"><%= f.text_field :nome, :size => 76, autofocus: true, required: true %></td>
+                </tr>
+
+                <tr>
+                  <td align="right">Marca/Clase:</td>
+                  <td>
+                     <%= f.collection_select :clase_id, Clase.all(:select => 'id,descricao',:order => '2'),
+                        :id,:descricao, {prompt: 'Seleccione la Marca'},:class => "selc_mini" %>
+                  </td>
+                  <td align="right">Barras:</td>
+                  <td><%= f.text_field :barra, :size => 20 %></td>
+                </tr>
+
+                <tr>
+                  <td align="right">Grupo:</td>
+                  <td>
+                     <%= f.collection_select :grupo_id, Grupo.all(:select => 'id,descricao',:order => '2'),
+                        :id,:descricao, {prompt: 'Seleccione lo Grupo'},:class => "selc_mini" %>
+                  </td>
+                  <td align="right">Sub-Grupo:</td>
+                  <td>
+                     <%= f.collection_select :sub_grupo_id, SubGrupo.all(:select => 'id,descricao',:order => '2'),
+                          :id,:descricao, {prompt: 'Seleccione lo Sub-Grupo'},:class => "selc_mini" %>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="right">Unidad Medida:</td>
+                  <td><%= f.collection_select :unidade_medida_id, UnidadeMedida.all(:select => 'id,sigla',:order => '2'), :id,:sigla, {prompt: 'Seleccione la Unidad medida'},:class => "selc_mini" %>
+                  </td>
+                  <td align="right">Volumen:</td>
+                  <td></td>              
+                </tr>
+
+                <tr >
+                   <td align="right">Proveedor:</td>
+                   <td><%= f.collection_select :fabricante_id, Persona.all(:select => 'id,nome',:conditions =>['tipo_fornecedor = 1'],:order => '2'),:id,:nome,
+                                  {:include_blank => true },{style: 'width: 190px'} %></td>
+
+                   <td align="right">Cod. Fab./Referencia:</td>
+                   <td><%= f.text_field :fabricante_cod,
+                        :size => 20 %></td>
+                </tr>
+
+                <tr>
+                  <td align="right">Ubicación:</td>
+                  <td><%= f.text_field :locacao, size: 20 %></td>
+                        
+                  <td align="right">Multiplo de Compras:</td>
+                  <td><%= f.text_field :multiplo_compra, size: 20 %></td>
+                </tr>
+                <tr >
+
+                   <td align="right">Peso Bruto:</td>
+                   <td><%= f.text_field :peso_bruto, size: 20 %></td>
+
+                   <td align="right">Peso Neto:</td>
+                   <td><%= f.text_field :peso, size: 20 %></td>
+
+                </tr>
+                <tr>
+                   <td align="right">IVA:</td>
+                   <% if @produto.taxa == 0 %>
+                   <td width="230"><%= f.text_field :taxa, :value => 10, :size => 20 %>
+                    <% else %>
+                    <td width="230"><%= f.text_field :taxa, :size => 20 %>
+                    <% end %>
+                   </td>
+                   <td align="right">Embalaje:</td>
+                   <td><%= f.text_field :embalagem,
+                                :size       => 20, placehoder: 'Ex.: Cantidad en caja' %>  </td>
+                </tr>
+
+                <tr>
+                   <td align="right">Stock Min.:</td>
+                   <td><%= f.text_field :stock_minimo, size: 20 %>  </td>
+
+                   <td align="right">Stock Max.:</td>
+                   <td><%= f.text_field :stock_maximo, size: 20 %>  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+            <div class="buttons">
+                <%= f.submit "Seguir", :class => "button add", :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %>
+                
+                <%= link_to t('BACK'), produtos_path, :class => "button back" %>              
+            </div>          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <header class="panel-heading">
+            Reglas
+          </header>
+          <div class="panel-body">
+            <div class="form-group">
+              <table>
+                <tr>
+                  <td>
+                    <fieldset>
+                      <legend>Status</legend>
+                      <%= f.radio_button :status, true, Checked: "True" %> Activo
+                      <%= f.radio_button :status, false %> Bloqueado
+                    </fieldset>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <fieldset>
+                      <%= f.check_box :black_list %> Black List
+                    </fieldset>              
+                  </td>
+                </tr>
+                <tr>
+                   <td>
+                    <div align="center">
+                      <hr/>
+                      <table>
+                         <tr>
+                          <td align="center">
+                            <%= image_tag @produto.picture.url, width: 138 %>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                   </td>
+                </tr>
+                <tr>
+                  <td colspan="2" align="center"><%= f.file_field :picture, align: 'center' %><br/><hr/></td>
+                </tr>
+                <tr>
+                  <td valign="top" colspan="2">
+                    <%= f.text_area :obs, rows: 5, cols: 43, placeholder: 'Obs.'%>
+                  </td>
+                </tr>
+              </table>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>

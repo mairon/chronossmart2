@@ -1,0 +1,56 @@
+<%= form_for(@contrato_financa) do |f| %>
+  <% if @contrato_financa.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@contrato_financa.errors.count, "error") %> prohibited this contrato_financa from being saved:</h2>
+
+      <ul>
+      <% @contrato_financa.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> contrato_financas - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">contrato :</td>                    
+                      <td><%= f.text_field :contrato %></td>
+                                      
+                      <td align="right">cota :</td>                    
+                      <td><%= f.number_field :cota %></td>
+                                      
+                      <td align="right">vencimento :</td>                    
+                      <td><%= f.date_select :vencimento %></td>
+                                      
+                      <td align="right">valor_us :</td>                    
+                      <td><%= f.text_field :valor_us %></td>
+                                      
+                      <td align="right">valor_gs :</td>                    
+                      <td><%= f.text_field :valor_gs %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), contrato_financas_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

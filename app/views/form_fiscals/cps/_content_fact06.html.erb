@@ -1,0 +1,297 @@
+﻿
+	<% if @venda.tipo == 0
+    tipo="CONTADO"
+  else
+    tipo="CREDITO"
+  end
+%>
+<% if @venda.moeda == 0
+	 	d = "DOLAR"
+	 else
+	 	d = "GUARANIES"
+	 end
+ %>
+<table>
+ <small style="float:right; margin-right: 30px"><%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc %>/<%= @ft.cod_proc %></small></table>
+<div class="border-principal" style="width:395px; ">
+	<table>
+		<tr>
+			<td width="60" align="right"><%= t('DATE') %>.:</td>
+			<td width="150"><%=l @ft.data.to_date.to_date %> - <%= Time.now.strftime('%H:%M') %></td>
+
+			<td colspan="3">Condición de Venta: <%= tipo %></td>
+		</tr>
+
+		<tr>
+			<td align="right">RUC/CI.:</td>
+			<td><b><%= @ft.ruc %></b></td>
+			<td align="right">Teléfono: </td>
+			<td><%= @ft.persona.telefone %></td>
+		</tr>
+		<tr>
+			<td align="right">Razon Social:</td>
+			<td width="571" colspan="4"><b><%= @ft.persona_id.to_s.rjust(6,'0') %>-<%= @ft.persona_nome %></b></td>
+		</tr>
+		<tr>
+
+			<td align="right">Dirección:</td>
+			<td colspan="4"><%= @venda.persona.direcao unless @venda.persona.cidade_id.blank? %> - <%= @venda.persona.cidade.nome unless @venda.persona.cidade_id.blank? %> </td>
+		</tr>
+	</table>
+</div>
+<br>
+<div class="border-principal" style="width:395px; height: 475px">
+	<table>
+		<tr>
+			<td valign="top">
+				<table border="0"  cellspacing="0" cellpadding="0" value="top">
+					<tr class="head">
+						<td><%= t('CODE') %></td>
+						<td align="center">Ctd.</td>
+						<td>Descripción de la mercadoria y/o servico</td>
+						<td align="right">Unitario</td>
+						<td align="right">Total</td>
+						<td align="right">IVA</td>
+					</tr>
+					<tr>
+						<td colspan="8"><hr/></td>
+					</tr>
+					<% count        = 1 %>
+					<% tottaxa0_gs  = 0 %>
+					<% tottaxa0_us  = 0 %>
+					<% tottaxa10_gs = 0 %>
+					<% tottaxa10_us = 0 %>
+					<% tottaxa05_gs = 0 %>
+					<% tottaxa05_us = 0 %>
+					<% tot_ps = 0 %>
+					<% teste = 0 %>
+					<% valor_antecipo = 0 %>
+
+					<% @venda_produto.each do |prod| %>
+						<% tot_ps += (prod.produto.peso.to_f * prod.quantidade.to_f) %>
+						<tr>
+						  <td width="30">
+						    <%= prod.produto_id.to_s.rjust(6,'0') %>
+						  </td>
+						  <td width="25"  align="center">
+						    <%= prod.quantidade.to_i %>
+						  </td>
+
+						  <td width="220">
+								<%= truncate(prod.produto_nome, length: 800, omission: ' ') %>.
+				      </td>
+							<td width="50"  align="right">
+					      
+									<% if @venda.moeda.to_i == 0 %>
+										<%= format_decimal(prod.unitario_dolar) %>
+									<% else %>
+										<%= format_int(prod.unitario_guarani) %>
+									<% end %>
+								
+							</td>
+
+
+								<td width="80" align="right">
+									<% if @venda.moeda.to_i == 0 %>
+										<%= format_decimal(prod.quantidade.to_f * prod.unitario_dolar) %>
+									<% else %>
+										<%= format_int( prod.quantidade.to_f * (prod.unitario_guarani.to_f) ) %>
+									<% end %>
+								</td>
+
+								<% if prod.taxa.to_i == 0 %>
+									<% tottaxa0_gs  = tottaxa0_gs + prod.total_guarani %>
+									<% tottaxa0_us  = tottaxa0_us + prod.total_dolar %>
+									<td width="25" align="right">0%</td>
+								<% end %>
+								<% if prod.taxa.to_i == 5 %>
+									<% tottaxa05_gs  = tottaxa05_gs + prod.total_guarani %>
+									<% tottaxa05_us  = tottaxa05_us + prod.total_dolar %>
+									<td width="25" align="right">5%</td>
+								<% end %>
+								<% if prod.taxa.to_i == 10 %>
+									<% tottaxa10_gs  = tottaxa10_gs + prod.total_guarani %>
+									<% tottaxa10_us  = tottaxa10_us + prod.total_dolar %>
+									<td width="25" align="right">10%</td>
+								<% end %>
+				      
+						</tr>
+					<% end %>
+					
+
+					
+			  </table>
+			</td>
+		</tr>
+	</table>
+</div>
+<br>
+
+<!-- resultado !-->
+<div class="border-principal" style="width:395px;">
+	<table  border="0"  cellspacing="0" cellpadding="0" value="top">
+		<tr>
+			<td id="totales" width="380">
+				<% vd = Persona.find_by_id(@venda.vendedor_id) %>
+				Vendedor: <%= vd.nome %>  
+			</td>
+			<td id="totales" align="right" width="250">Sub-Total:</td>
+			<td id="totales" align="right" width="74">
+			<% if @venda_financa.present? %>
+					<%= format_int((tottaxa10_gs.to_i + tottaxa05_gs.to_i + tottaxa0_gs.to_i) - valor_antecipo) %>
+			<% else %>
+				<% if @venda.moeda.to_i == 0 %>
+					<%= format_decimal(tottaxa10_us.to_f + tottaxa05_us.to_f + tottaxa0_us.to_f) %>
+				<% else %>
+					<%= format_int(tottaxa10_gs.to_i + tottaxa05_gs.to_i + tottaxa0_gs.to_i) %>
+				<% end %>
+			<% end %>
+			</td>
+		</tr>
+		<tr>
+			<td id="totales" width="380">
+				Peso: <%= tot_ps.to_i %>
+			</td>
+			<td id="totales" align="right" width="150">Sub-Total Exentas:</td>
+			<td id="totales" align="right" width="74">
+				<% if @venda.moeda.to_i == 0 %>
+					<%= format_decimal(tottaxa0_us) %>
+				<% else %>
+					<%= format_int(tottaxa0_gs) %>
+				<% end %>
+			</td>
+		</tr>
+		<tr>
+			<td id="totales" width="380"></td>
+
+			<td id="totales" align="right">Sub-Total gravadas 05%:</td>
+			<td id="totales" align="right" width="74">
+		  	<% if @venda.moeda.to_i == 0 %>
+		  		<%= format_decimal(tottaxa05_us) %>
+		  	<% else %>
+		  		<%= format_int(tottaxa05_gs) %>
+		  	<% end %>
+			</td>
+		</tr>
+		<tr>
+			<td id="totales">
+				Descuento: (<%= format_decimal(@venda.desconto) %>%) <%= format_int((tottaxa10_gs.to_i * (@venda.desconto.to_f / 100))) %>
+			</td>
+
+			<td id="totales" align="right">Sub-Total gravadas 10%:</td>
+			<td id="totales" align="right" width="74">
+			<% if @venda_financa.present? %>
+	  		<%= format_int((tottaxa10_gs - (tottaxa10_gs.to_f * (@venda.desconto.to_f / 100) )) - valor_antecipo) %>
+		  <% else %>
+		  	<% if @venda.moeda.to_i == 0 %>
+		  		<%= format_decimal(tottaxa10_us) %>
+		  	<% else %>
+		  		<%= format_int((tottaxa10_gs - (tottaxa10_gs.to_f * (@venda.desconto.to_f / 100) ))) %>
+		  	<% end %>
+		  <% end %>
+			</td>
+		</tr>
+		<tr>
+			<td id="totales" width="380"></td>
+			<td id="totales" align="right">Total a Pagar:</td>
+			<td id="totales" align="right" width="74">
+				<b>
+					<% if @venda_financa.present? %>
+				  		<%= format_int((( (tottaxa0_gs + tottaxa10_gs) - ( (tottaxa0_gs + tottaxa10_gs.to_f) * (@venda.desconto.to_f / 100) ))) - valor_antecipo) %>
+			  	<% else %>
+				  	<% if @venda.moeda.to_i == 0 %>
+				  		<%= format_decimal(tottaxa10_us) %>
+				  	<% else %>
+				  		<%= format_int(( (tottaxa0_gs + tottaxa10_gs) - ( (tottaxa0_gs + tottaxa10_gs.to_f) * (@venda.desconto.to_f / 100) ))) %>
+				  	<% end %>
+				  <% end %>
+			  	</b>
+			</td>
+		</tr>
+			<tr>
+				<td colspan="3">
+				Total a pagar en Letras:
+			  	<% if @venda.moeda.to_i == 0 %>
+						U$ <% real,cents= ("%.2f" % @produto_sum_dolar.to_f).to_s.split(/\./).map{ |m| m.to_i}
+					      valor_cents=Extenso.por_extenso(cents%100)
+					      valor_cents+= case cents.to_i%100
+					      when 0 then ""
+					      when 1 then " "
+					      when 2..99 then " "
+					      end %>
+						<%= I18n.with_locale(:es) { @produto_sum_dolar.to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS' %>
+			  	<% else %>
+			  		<% if @venda_financa.present? %>
+			  			<%= I18n.with_locale(:es) { (format_int((( tottaxa0_gs.to_f + tottaxa10_gs.to_f + tottaxa05_gs ) - (( tottaxa0_gs.to_f + tottaxa10_gs.to_f + tottaxa05_gs ) * (@venda.desconto.to_f / 100) )) - valor_antecipo)).gsub('.','').to_i.to_words.upcase } %> GUARANIES
+			  		<% else %>
+			  			<%= I18n.with_locale(:es) { (format_int((( tottaxa0_gs.to_f + tottaxa10_gs.to_f + tottaxa05_gs ) - (( tottaxa0_gs.to_f + tottaxa10_gs.to_f + tottaxa05_gs ) * (@venda.desconto.to_f / 100) )))).gsub('.','').to_i.to_words.upcase } %> GUARANIES
+			  		<% end %>
+							<% @ft.update_attributes(tot_gs: (( ( tottaxa0_gs.to_f + tottaxa10_gs.to_f + tottaxa05_gs ) - (( tottaxa0_gs.to_f + tottaxa10_gs.to_f + tottaxa05_gs ) * (@venda.desconto.to_f / 100) )))
+							 )  %>
+			  	<% end %>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="7">
+					<table>
+						<tr>
+							<td width="230">
+								Liquidación del IVA: (05%)
+								<% if @ft.moeda == 0 %>
+									<%= number_to_currency((tottaxa05_us.to_f) / 21, :format=>' %n ', :precision => 0)%>
+								<% else %>
+									<%= number_to_currency((tottaxa05_gs.to_i) / 21, :format=>' %n ', :precision => 0)%>
+								<% end %>
+							</td>
+							<td width="230">
+								(10%)
+								<% if @venda_financa.present? %>
+						  		<%= format_int((((tottaxa10_gs.to_f  - (tottaxa10_gs.to_i * (@venda.desconto.to_f / 100)))) - valor_antecipo)  / 11 ) %>
+								<% else %>
+									<% if @ft.moeda == 0 %>
+										<%= number_to_currency((tottaxa10_us.to_f) / 11, :format=>' %n ', :precision => 2)%>
+									<% else %>
+							  		<%= format_int( ((tottaxa10_gs.to_f  - (tottaxa10_gs.to_i * (@venda.desconto.to_f / 100))))  / 11 ) %>
+									<% end %>
+								<% end %>
+							</td>
+							<td width="200">
+								Total del IVA:
+								<% if @venda_financa.present? %>
+						  		<%= format_int((@produto_sum_iva05_gs.to_f + ((tottaxa10_gs.to_f  - (tottaxa10_gs.to_i * (@venda.desconto.to_f / 100)))) - valor_antecipo) / 11.to_f) %>
+								<% else %>
+									<% if @ft.moeda == 0 %>
+										<%= number_to_currency( ((tottaxa05_us.to_f) / 21) + ((tottaxa10_us.to_f) / 11), :format=>' %n ', :precision => 2)%>
+									<% else %>
+							  		<%= format_int(@produto_sum_iva05_gs.to_f + ((tottaxa10_gs.to_f  - (tottaxa10_gs.to_i * (@venda.desconto.to_f / 100)))) / 11.to_f) %>
+									<% end %>
+								<% end %>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br>
+<table>
+			<tr>
+				<td>_____________________________</td>
+				<td>_____________________________</td>
+				<td>_____________________________</td>
+			</tr>
+			<tr>
+				<td align="center">Firma</td>
+				<td align="center">Aclaración</td>
+				<td align="center">CI</td>
+			</tr>
+		</table>
+	<% @ft.update_attributes(gv_10_gs: ((tottaxa10_gs - (tottaxa10_gs.to_f * (@venda.desconto.to_f / 100) )) - valor_antecipo ),
+														gv_05_gs: tottaxa05_gs.to_f,
+														ex_gs: tottaxa0_gs.to_f )  %>
+
+	<% @ft.update_attributes(tot_gs: (( ( tottaxa0_gs.to_f + tottaxa10_gs.to_f + tottaxa05_gs ) - (( tottaxa0_gs.to_f + tottaxa10_gs.to_f + tottaxa05_gs ) * (@venda.desconto.to_f / 100) )) - valor_antecipo.to_f)
+ )  %>
+
+	<% @ft.update_attributes(ip_10_gs: (((tottaxa10_gs.to_f  - (tottaxa10_gs.to_i * (@venda.desconto.to_f / 100))) - valor_antecipo.to_f)  / 11),
+														ip_05_gs: (tottaxa05_gs.to_f / 21) ) %>

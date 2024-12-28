@@ -1,0 +1,64 @@
+<h1 align="right" id="header">.</h1>
+Nota de Credito Producto - Edicion
+<% form_for(@nota_creditos_detalhe) do |f| %>
+  <%= f.error_messages %>
+   <%= f.hidden_field :nota_credito_id  %>
+   <%= f.hidden_field :produto_id  %>
+   <%= f.hidden_field :documento_nome  %>
+   <%= f.hidden_field :documento_numero_01  %>
+   <%= f.hidden_field :documento_numero_02  %>
+   <%= f.hidden_field :documento_numero  %>
+   <%= f.hidden_field :deposito_id  %>
+   <%= f.hidden_field :deposito_nome  %>
+   <%= f.hidden_field :codigo%>
+   <%= f.hidden_field :fabricante_cod%>
+   <%= f.hidden_field :data, :value => @nota_creditos_detalhe.nota_credito.data%>
+   <%= f.hidden_field :cotacao, :value => @nota_creditos_detalhe.nota_credito.cotacao%>
+<div class="group">
+   <table>
+      <tr>
+         <td>Producto : </td>
+         <td><%= f.text_field :produto_nome,
+                              :size => 30 %></td>
+         <td>Cantidad : </td>
+         <td><%= f.text_field :quantidade,
+                              :size => 5 %></td>
+<%= f.hidden_field :taxa %>
+      </tr>
+      <% if @nota_creditos_detalhe.nota_credito.moeda == 0 %>
+          <tr>
+             <td>Unit U$ : </td>
+             <td><%= f.text_field :unitario_dolar,
+                                  :size => 10,
+                                  :onblur => "NotaCreditoUnitGs(),NotaCreditoTotalDolar(),NotaCreditoTotalGs(),NotaCreditoIvaDolar(),NotaCreditoIvaGs()" %></td>
+             <%= f.hidden_field :unitario_guarani  %>
+             <td>Total U$ : </td>
+             <td><%= f.text_field :total_dolar,
+                                  :size => 10 %><%= f.submit t('SAVE') %></td>
+             <%= f.hidden_field :total_guarani  %>
+             <%= f.hidden_field :iva_dolar %>
+             <%= f.hidden_field :iva_guarani  %>
+          </tr>
+      <% else %>
+          <tr>
+             <td>Unit Gs.: </td>
+             <td><%= f.text_field :unitario_guarani,
+                                  :size => 10,
+                                  :onblur => "NotaCreditoUnitDolar(),NotaCreditoTotalDolar(),NotaCreditoTotalGs(),NotaCreditoIvaDolar(),NotaCreditoIvaGs()"%></td>
+             <%= f.hidden_field :unitario_dolar %>
+             <td>Total Gs.: </td>
+             <td><%= f.text_field :total_guarani,
+                                  :size => 10 %><%= f.submit t('SAVE') %></td>
+             <%= f.hidden_field :total_dolar  %>
+             <%= f.hidden_field :iva_guarani  %>
+             <%= f.hidden_field :iva_dolar %>
+
+          </tr>
+      <% end %>
+   </table>
+    </div>
+
+    <a href="/nota_creditos/<%= @nota_creditos_detalhe.nota_credito.id.to_i %>"> << <%= t('BACK') %> </a>
+
+<% end %>
+

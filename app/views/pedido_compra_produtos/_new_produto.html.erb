@@ -1,0 +1,149 @@
+<body onload="ImputFocus('codigo')">
+<%= form_for(pedido_compra_produto) do |f| %>
+  <%= f.hidden_field :pedido_compra_id %>
+  <%= f.hidden_field :cotacao,   :value => @pedido_compra.cotacao.to_i %>
+  <%= f.hidden_field :moeda,     :value => @pedido_compra.moeda %>
+  <%= f.hidden_field :data,      :value => @pedido_compra.data %>
+  <%= f.hidden_field :persona_id, :value => @pedido_compra.persona_id %>
+  <%= f.hidden_field :persona_nome, :value => @pedido_compra.persona_nome %>
+  <!-- do produto -->
+  <%= f.hidden_field :produtos_grade_id %>
+  <%= f.hidden_field :fabricante_cod %>
+  <%= f.hidden_field :clase_id %>
+  <%= f.hidden_field :grupo_id %>
+  <%= f.hidden_field :sub_grupo_id %>
+
+
+      <table>
+        <tr>
+          <td align="right" width="70">Producto:</td>
+          <td colspan="6">
+            <%= f.text_field :produto_id, size: 15, autofocus: true  %>
+            <%= f.text_field :produto_nome, size: 78, placeholder: 'Pulse [F2] para buscar lo Producto' %>
+          </td>
+          <td>
+            <%= image_tag("load.gif", align: "absmiddle", border: 0,
+                  id: "spinner", width: 21, height: 21, style:" display: none;") %>            
+          </td>
+        </tr>
+        <tr>
+          <td align="right">Cantidad :</td>
+          <td><%= f.number_field :quantidade, :size => 9, :value => 1 %></td>
+          <% if @pedido_compra.moeda.to_i == 0  %>
+            <%= field_us 'Unit U$ :', f, :unitario_dolar, :onblur => "TotalUs()" %>
+            <%= field_us 'Total U$ :', f, :total_dolar, :readonly => "readonly" %>
+          <% elsif @pedido_compra.moeda.to_i == 1 %>
+            <%= field_gs 'Unit. G$:', f, :unitario_guarani, :onblur => "TotalGs()" %>
+            <%= field_gs 'Total G$:', f, :total_guarani, :readonly => "readonly" %>
+          <% else %>
+            <%= field_us 'Unit. R$ :', f, :unitario_real, :onblur => "TotalRs()" %>
+            <%= field_us 'Total R$ :', f, :total_real, :readonly => "readonly" %>
+          <% end %>
+          <td>
+            <%= f.submit t('SAVE'),:disable_with => "Aguarde...", :class => "button", "data-plus-as-tab" => "false"   %>
+          </td>
+
+        </tr>
+
+      </table>
+<% end %>
+
+<%= hidden_field_tag :pedido_copmra_id, @pedido_compra.id %>
+<%= hidden_field_tag :multiplo %>
+
+<script>
+
+  $("#pedido_compra_produto_quantidade").blur(function() {
+    var numero = parseInt($(this).val());
+    if (parseInt($("#multiplo").val()) != 0){
+      if (!isNaN(numero)){
+        if (numero % parseInt($("#multiplo").val()) === 0) {        
+        } else {
+          alert("La cantidad no es múltiplo de " + parseInt($("#multiplo").val()) );
+        }
+      } else {
+        alert("Entrada não é um número.");
+      }
+    }
+  });
+
+  document.onkeydown=function(e){
+    if(e.which == 113)
+      window.open('/produtos/busca_pedido_compra_produto?moeda=<%= @pedido_compra.moeda %>', 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=10, WIDTH=1200, HEIGHT=600');
+  }
+
+  function TotalUs(){
+    var unit  = $('#pedido_compra_produto_unitario_dolar').val().replace(/\./g, "").replace(",", ".");
+    var qtd   = $('#pedido_compra_produto_quantidade').val().replace(/\./g, "").replace(",", ".");
+    //calcs
+    $('#pedido_compra_produto_total_dolar').val(number_format(( unit * qtd), 2, ',', '.'));
+  }
+
+  function TotalGs(){
+    var unit  = $('#pedido_compra_produto_unitario_guarani').val().replace(/\./g, "").replace(",", ".");
+    var qtd   = $('#pedido_compra_produto_quantidade').val().replace(/\./g, "").replace(",", ".");
+    //calcs
+    $('#pedido_compra_produto_total_guarani').val(number_format(( unit * qtd), 0, ',', '.'));
+  }
+
+  function TotalRs(){
+    var unit  = $('#pedido_compra_produto_unitario_real').val().replace(/\./g, "").replace(",", ".");
+    var qtd   = $('#pedido_compra_produto_quantidade').val().replace(/\./g, "").replace(",", ".");
+    $('#pedido_compra_produto_total_real').val(number_format(( unit * qtd), 2, ',', '.'));
+  }
+
+
+$("#pedido_compra_produto_produto_id").change(function(){
+  $.ajax({url: "/buscas/busca_compra_produto",
+          type: 'GET',
+          beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+          data: "cod=" + escape($("#pedido_compra_produto_produto_id").val()) +
+                "&id="+ $("#id").val() +
+                "&filtro=ID",
+          error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                  alert('Producto no Encontrado'); 
+                  $('#pedido_compra_produto_produto_id').focus();
+                  $('#pedido_compra_produto_produto_id').val('');
+              },
+          success: function(grade){
+          $('#pedido_compra_produto_produto_nome').val(grade["produto"].nome);
+          $('#pedido_compra_produto_produto_id').val(grade["produto"].produto_id);
+          $('#multiplo').val(grade["produto"].multiplo_compra);
+
+        }
+      });
+});
+
+
+$(function() {
+  $( "#pedido_compra_produto_produto_nome" ).autocomplete({
+      source: function( request, response ) {
+      $.ajax({
+        url: "/buscas/search_all_produtos",
+        dataType: "json",
+        data: {
+          tipo: 'DESCRIPCION',
+          busca: request.term
+        },
+        beforeSend: function(){
+          $("#spinner").show("fast");
+        },
+
+        success: function( data ) {         
+          response( data );
+          $('#spinner').hide("slow");
+
+        },
+      });
+    },
+    minLength: 2,
+    select: function( event, ui ) {
+      $("#pedido_compra_produto_produto_id").val("");
+      $('#pedido_compra_produto_produto_id').val(ui.item.id);
+      $('#multiplo').val(number_format(ui.item.multiplo_compra, 0, ',', '.'));
+      return false;
+    }
+  });
+  });
+
+</script>

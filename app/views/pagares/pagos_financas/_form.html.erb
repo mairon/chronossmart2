@@ -1,0 +1,53 @@
+<%= form_for(@pagos_financa) do |f| %>
+  <td><%= f.hidden_field :pago_id,:value      => @pagos_financa.pago.id%></td>
+  <td><%= f.hidden_field :data,:value         => @pagos_financa.pago.data%></td>
+  <td><%= f.hidden_field :moeda,:value        => @pagos_financa.pago.moeda%></td>
+  <td><%= f.hidden_field :persona_id,:value   => @pagos_financa.pago.persona_id%></td>
+  <td><%= f.hidden_field :persona_nome,:value => @pagos_financa.pago.persona_nome%></td>
+  <div class="group_cd">
+    <table>
+
+      <tr>
+         <td class="label">Conta :</td>
+        <td>
+          <%= f.collection_select :conta_id, Conta.all(:select => 'id,nome',:order => '1'),:id,:nome %>
+          <%= f.check_box :cheque_status %> Cheque?
+        </td>
+
+        <td class="label">Cheque:</td>
+        <td><%= f.text_field :cheque, :size => 15%></td>
+        <td class="label">Diferido:</td>
+        <td><%= f.date_select :diferido  %></td>
+      </tr>
+          
+
+      <tr>
+          <%= field_us 'Valor U$ :',f,:valor_dolar %>
+
+          <%= field_gs 'Gs.:',f,:valor_guarani %>
+
+          <%= field_us 'R$ :',f,:valor_real %>
+
+      </tr>
+      <tr>
+        <td class="label">Documento:</td>
+        <td><%= f.collection_select :documento_id, Documento.all( :select => 'id,nome',
+                                                                  :order  => '1' ),:id,
+                                                                                   :nome %></td>
+        <td class="label" valign="top" rowspan="4">Descripcion :</td>
+        <td colspan="3" rowspan="4"><%= f.text_area :descricao,
+                             :cols => 55, :rows => 5 %></td>
+        
+      </tr>
+
+        <td class="label">Nr. Recibo:</td>
+        <td><%= f.text_field :numero_recibo, :size => 15%></td>
+
+
+    </table>
+  </div>
+<div class="buttons">
+  <%= f.submit t('SAVE'), :class => "button" %> 
+  <a href="/pagos/<%=@pagos_financa.pago.id%>/pago_final" class="button back"><%= t('BACK') %></a> 
+</div>
+<% end %>

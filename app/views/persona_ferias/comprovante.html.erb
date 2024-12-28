@@ -1,0 +1,109 @@
+<style>
+  .group td{
+    padding: 6px;
+    font-size: 12px;
+  }
+
+</style>
+<table>
+  <tr>
+    <td align="left"></td>
+  </tr>
+</table>
+
+<div class="group" align="center">
+   <% count_fds = 0 %>
+    <% anos = (( ("#{@pf.inicio.strftime("%Y")}-#{@persona.data_entrada.strftime("%m")}-#{@persona.data_entrada.strftime("%d")}").to_date - @persona.data_entrada.to_date).to_i  / 365) %>
+    <% if anos <= 5 %>
+      <% anos_causado = 12 %>
+    <% elsif anos > 5  and anos <= 10 %>
+      <% anos_causado = 18 %>
+    <% elsif anos > 10 %>
+      <% anos_causado = 30 %>
+    <% end %>
+
+    <% DiasUtei.where("data BETWEEN '#{@pf.inicio}' and '#{@pf.final}'").each do |ut| %>
+      <% if ut.util == false %>
+        <% count_fds += 1 %>
+      <% end %>
+      <% if anos_causado.to_i != 30 %>
+        <% if l(ut.data.to_date, :format => :dia_semana, locale: 'es') == 'domingo' and ut.util == true %>
+          <% count_fds += 1 %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <table>
+    <tr>
+      <td width="200"><%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 90) %></td>
+      <td width="300"><%= current_unidade.cidade.nome %> <%= l(Time.now.to_date, format: :short) %></td>
+    </tr>
+    <tr>
+      <td colspan="2">Señor(a):</td>
+    </tr>
+    <tr>
+      <td colspan="2"><%= @persona.nome %></td>
+    </tr>
+  </table>
+  <br>
+  <table>
+
+    <tr>
+      <td style="text-align: justify;" width="500">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Tengo el agrado de dirigirme a Ud. a fin de notificarle su periodo de vacaciones. Que las vacaciones que le correspodem de acuerdo a su antigüedad, es de:
+       <%=  (@pf.dias.to_i * - 1) %> (<%= I18n.with_locale(:es) { (@pf.dias.to_i * - 1).to_words.upcase } %>)
+
+         días hábiles, correspondiente al periodo año <%= @pf.ano_ref %>.
+      </td>
+    </tr>
+
+    <tr>
+      <td style="text-align: justify;">Cumplimos en informar-le que las podrá usufructuar a partir</td>
+    </tr>
+
+ 
+
+    <tr>
+      <td cospan="2">
+        <table>
+          <tr>
+            <td width="250" align="center"> Del <%= @pf.inicio.strftime("%d/%m/%y") %> hasta <%= @pf.final.strftime("%d/%m/%y") %></td>
+            <td width="50" align="center"><%=  (@pf.dias.to_i * - 1) %> días</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+
+      
+      <td style="text-align: justify;">Debiendo reintegrarse a sus tareas en fecha
+        <% if l( (@pf.final.to_date + 1), :format => :dia_semana, locale: 'es') == 'domingo' %>
+            <%= (@pf.final.to_date + 2).strftime("%d/%m/%y") %>
+          <% else %>
+            <%= (@pf.final.to_date + 1).strftime("%d/%m/%y") %>
+          <% end %>
+
+      em su horario habitual.</td>
+    </tr>
+    <tr>
+      <td style="text-align: justify;"> Sírvase firmar la presente como constancia de notificación.</td>
+    </tr>
+    <tr>
+      <td style="text-align: justify;">Si, otro particular, le saludo atentamente.</td>
+    </tr>
+
+  </table>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <p>___________________________________</p>
+  <p>Recibí la presente notificación:</p>
+
+  <br>
+  <br>
+  <br>
+
+  <p>Aclaración:.............................</p>
+</div>

@@ -1,0 +1,62 @@
+<div class="group">
+   <table>
+      <% totgt = 0 %>
+      <% subtotal = 0 %>
+      <% quebra = "" %>
+      <% @gastos.each do |gt| %>
+      <% if params[:quebra] == '1' %>
+        <% if quebra != gt.setor  %>
+          <% if quebra != "" %>
+            <tr class="head">
+              <td colspan="2"></td>
+              <% if params[:moeda] == '0'%>
+                <td width="80" align="right"><%= format_decimal( subtotal ) %> </td>
+              <% else %>
+                <td width="80" align="right"><%= format_int( subtotal ) %> </td>
+              <% end %>
+              <% subtotal  = 0 %>
+            </tr>
+          <% end %>
+          <tr>
+            <td colspan="7" class="head"><%=h quebra = gt.setor %> - <% pd = Unidade.last(:conditions => ["id = ?",quebra]) unless quebra.blank? %> <%= pd.unidade_nome  unless pd.nil? %></td>
+          </tr>
+          <% end %>
+        <% end %>
+
+          <tr class = "<%= cycle("cor1", "cor2") %>">
+            <td width="70"  align="center"><%= gt.id %></td>
+            <td width="1050" align="left"><%= gt.descricao %></td>
+            <% if params[:moeda] == '1' %>
+              <td width="100" align="right"><%= format_int( totais = ( gt.total_compra.to_f )  ) %></td>
+            <% else %>
+              <td width="100" align="right"><%= format_decimal( totais = ( gt.total_compra.to_f ) ) %></td>
+            <% end %>
+          </tr>
+        <% totgt    += totais.to_f %>
+        <% subtotal += gt.total_compra.to_f %>
+
+      <% end %>
+      <% if params[:quebra] == '1' %>
+      <!--sub total !-->
+      <tr class="head">
+        <td colspan="2"></td>
+        <% if params[:moeda] == '0' %>
+          <td width="80" align="right"><%= format_decimal( subtotal ) %> </td>
+        <% else %>
+          <td width="80" align="right"><%= format_int( subtotal ) %> </td>
+        <% end %>
+      </tr>
+      <% end %>
+
+      <% subtotal  = 0 %>
+         <!--total !-->
+         <tr class="head" height="30">
+            <td colspan="2"></td>
+            <% if params[:moeda] == '1'%>
+               <td width="100" align="right"><%= format_int( totgt ) %> </td>
+            <% else %>
+               <td width="100" align="right"><%= format_decimal( totgt ) %> </td>
+            <% end %>
+         </tr>
+   </table>
+</div>

@@ -1,0 +1,63 @@
+<table>
+<% quebra = '' %>
+<% pago_us = 0 %>
+<% pago_gs = 0 %>
+<% pago_rs = 0 %>
+
+<% sub_pago_us = 0 %>
+<% sub_pago_gs = 0 %>
+<% sub_pago_rs = 0 %>
+
+
+<% @cobros.each do |pago| %>
+  <tr class = "<%= cycle("cor1", "cor2") %>">
+    <td width="30"><%= pago.pago_id.to_s.rjust(5,'0') %></td>
+    <td width="40" align="center"><%= pago.data.strftime("%d/%m/%y") %></td>
+    <td width="250"><%= pago.persona_nome %></td>
+    <td width="215" align="left">
+      <small>
+        <% pd = PagosDetalhe.where(pago_id: pago.pago_id) %>
+      <% pd.each do |pd| %>
+        <ul >
+          <li><%= pd.rubro.descricao unless pd.rubro.nil? %></li>
+        </ul>
+      <% end %>
+      </small>
+    </td>
+    <td width="250"><small><%= pago.descricao %></small></td>
+    <td width="50" align="left">
+    <% pd.each do |pd| %>
+      <ul>
+        <%= pd.cota %>/<%= pd.tot_cotas %></li>
+      </ul>
+    <% end %>
+    </td>
+
+    <% if params[:moeda].to_s == '0'%>
+      <td width="60" align="right"><%= format_decimal( pago.pago_dolar ) %> </td>
+      <% pago_us  += pago.pago_dolar.to_f %>
+      <% sub_pago_us += pago.pago_dolar.to_f %>
+    <% elsif params[:moeda].to_s == '1' %>
+      <td width="60" align="right"><%= format_int( pago.pago_guarani ) %> </td>
+      <% pago_gs  += pago.pago_guarani.to_f %>
+      <% sub_pago_gs += pago.pago_guarani.to_f %>
+    <% else %>
+      <td width="60" align="right"><%= format_decimal( pago.pago_real ) %> </td>
+      <% pago_rs  += pago.pago_real.to_f %>
+      <% sub_pago_rs += pago.pago_real.to_f %>
+    <% end %>
+    <td width="60"><%= pago.conta_nome %></td>
+
+  </tr>
+<% end %>
+<tr class="head">
+  <td colspan="6"></td>
+  <% if params[:moeda].to_s == '0' %>
+    <td width="60" align="right"><%= format_decimal( pago_us ) %> </td>
+  <% elsif params[:moeda].to_s == '1' %>
+    <td width="60" align="right"><%= format_int( pago_gs ) %> </td>
+  <% else %>
+    <td width="60" align="right"><%= format_decimal( pago_rs ) %> </td>
+  <% end %>
+</tr>
+</table>

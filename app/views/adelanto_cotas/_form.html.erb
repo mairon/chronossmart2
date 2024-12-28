@@ -1,0 +1,65 @@
+<%= form_for(@adelanto_cota) do |f| %>
+  <% if @adelanto_cota.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@adelanto_cota.errors.count, "error") %> prohibited this adelanto_cota from being saved:</h2>
+
+      <ul>
+      <% @adelanto_cota.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> adelanto_cotas - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<%= f.hidden_field :documento_numero, :value => @adelanto_cota.adelanto.documento_numero %>
+<input type="hidden" id="cotacao" value="<%= @adelanto_cota.adelanto.cotacao.to_i %>">
+<input type="hidden" id="cotacao_real" value="<%= @adelanto_cota.adelanto.cotacao_real.to_i %>">
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                      <td align="right">Cota :</td>
+                      <td><%= f.number_field :cota %></td>
+                    </tr>
+                    <tr>
+                      <td align="right"><%= t('DATE') %> :</td>
+                      <td><%= f.date_select :data %></td>
+
+                      <td align="right">Vencimento :</td>
+                      <td><%= f.date_select :vencimento %></td>
+                  </tr>
+                        <tr>
+
+                           <%= field_us 'Valor U$:',f,:valor_us,
+                                 :onchange   => "UsToGsRs('cotacao','cotacao_real','adelanto_cota_valor_us','adelanto_cota_valor_gs','adelanto_cota_valor_rs')" %>
+
+                           <%= field_gs 'Valor Gs.:',f,:valor_gs,
+                           :onchange   => "GsToUsRs('cotacao','cotacao_real','adelanto_cota_valor_gs','adelanto_cota_valor_us','adelanto_cota_valor_rs')" %>
+
+
+                           <%= field_us 'Valor R$:',f,:valor_rs,
+                           :onchange   => "RsToUsGs('cotacao','adelanto_cota_cotacao_real','adelanto_cota_valor_gs','adelanto_cota_valor_us','adelanto_cota_valor_rs')" %>
+
+                        </tr>
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), "adelantos/#{@adelanto_cota.id}", :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

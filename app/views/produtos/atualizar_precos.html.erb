@@ -1,0 +1,87 @@
+<h1 id="header">Actualiza Tabla de Precio - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+
+    <%= form_tag update_individual_compra_produtos_path :method => :put do %>
+      <table>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td>Marca:</td>
+          <td><%= @produto.clase.descricao unless @produto.clase.blank? %></td>
+        </tr>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td>Producto:</td>
+          <td><b><%= @produto.nome %></b></td>
+        </tr>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td>Referencia:</td>
+          <td><%= @produto.fabricante_cod %></td>
+        </tr>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td>Costo Gs:</td>
+          <td><b><%= format_int(params[:custo_gs]) %></b></td>
+        </tr>
+
+
+      </table>
+      <table class="head_grid">
+        <tr>
+          <td width="200"><%= t('UNIT') %></td>
+          <td width="150">Tabla</td>
+          <td width="118" align="right"><b>%</b></td>
+          <td width="118" align="right"><b>Precio</b></td>
+        </tr>
+      </table>
+      <%= hidden_field_tag :custo, params[:custo_gs] %>
+      <div class="rolagem" dir="div" style="height: 200px">
+        <table>
+          <%= hidden_field_tag :id, @produto.id %>
+          <% @unidades_tabelas.each do |up| %>
+          <% for_tabela = @produto.id %>
+            <%= fields_for "products[]", up do |f| %>
+              <tr class = "<%= cycle("cor1", "cor2") %>">
+                <% for_tabela += 1 %>
+                <td width="200"><b><%= up.unidade.unidade_nome %></b></td>
+                <td width="100"><%= up.tabela_preco.nome %></td>
+                <% if  Unidade.last.moeda == 0 %>
+                  <%= field_us '', f, :margem, onchange: "CalcPreco('custo', 'products_#{up.id}_margem', 'products_#{up.id}_preco_1_us')" %>
+                  <%= field_us '', f, :preco_1_us %>
+
+                <% elsif  Unidade.last.moeda == 1 %>
+                  <%= field_us '', f, :margem, onchange: "CalcPreco('custo', 'products_#{up.id}_margem', 'products_#{up.id}_preco_1_gs')" %>
+                  <%= field_gs '', f, :preco_1_gs, onchange: "CalcMargem('custo', 'products_#{up.id}_margem', 'products_#{up.id}_preco_1_gs')" %>
+                <% elsif  Unidade.last.moeda == 2 %>
+                  <%= field_us '', f, :margem %>
+                  <%= field_us '', f, :preco_1_rs %>
+                <% end %>
+              </tr>
+            <% end %>
+          <% end %>
+        </table>
+      </div>
+    <%= submit_tag "Actulizar Precios", :class => "btn btn-green", :disable_with => "Aguarde..." %>
+    <% end %>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+  document.onkeydown=function(e){
+    if(e.which == 27)
+      self.close();
+  }
+
+  function PegaCusto(custo){
+    $(".custo").val(custo);
+  }
+  function CalcPreco(media, margem, preco){
+    var porcen = eval( parseFloat( document.getElementById(media).value.replace(/\./g, "").replace(",", ".") ) ) * eval( parseFloat( document.getElementById(margem ).value.replace(/\./g, "").replace(",", ".") / 100 ) )  ;
+    var result = (parseFloat( document.getElementById(media).value.replace(/\./g, "").replace(",", ".") ) + porcen)
+    document.getElementById(preco).value = ( number_format( result,0, ',', '.') )
+  }
+
+  function CalcMargem(media, margem, preco){
+    var porcen = eval( parseFloat( document.getElementById(preco).value.replace(/\./g, "").replace(",", ".") ) ) - eval( parseFloat( document.getElementById(media ).value.replace(/\./g, "").replace(",", ".") ) ) ;
+    var result = eval( porcen ) / eval( parseFloat( document.getElementById(media ).value.replace(/\./g, "").replace(",", ".") ) ) ;
+    document.getElementById(margem).value = ( number_format( (result * 100),2, ',', '.') )
+  }
+
+</script>

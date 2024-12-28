@@ -1,0 +1,40 @@
+<h1 id="header">Catastros > Menu</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), {:action => 'new'}, :class => 'button add' %>
+</div>
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="100">ID</td>
+      <td width="100"><%= t('COUNTRIES') %></td>
+      <td width="300"><%= t('NAME') %></ttd>
+      <td width="300">Url</td>
+      <td width="55"></td>
+    </tr>
+  </table>
+  <div class="rolagem" id="div">
+		<table>
+		<% @menu.each do |m| %>
+			<tr class="<%= cycle("cor1", "cor2")%>">
+			<% if m.codigo.size.to_i == 2 %>
+				<% color = '#ccc' %>
+			<% else %>
+				<% color = '' %>
+			<% end %>
+
+				<td width="100" bgcolor="<%=color%>"><%= m.id.to_s.rjust(6,'0') %></td>
+				<td width="100" bgcolor="<%=color%>"><%= m.codigo %></td>
+				<td width="300" bgcolor="<%=color%>"><%= m.nome %></td>
+				<td width="300" bgcolor="<%=color%>"><%= m.url %></td>
+				<td width="10" bgcolor="<%=color%>">
+					<% if m.sub.to_i == 1 %>
+						Sub
+					<% end %>
+				</td>
+        <td bgcolor="<%=color%>"><%= link_to '', edit_menu_path(m), class: 'icon-pencil' %></td>
+        <td bgcolor="<%=color%>"><%= link_to '', m, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+			</tr>
+		<% end %>
+		</table>
+	</div>
+</div>

@@ -1,0 +1,87 @@
+<div class="group">
+  <h1 id="header">Device [Edición]</h1>
+
+    <%= form_for(@device) do |f| %>
+      <% if @device.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@device.errors.count, "error") %> prohibited this device from being saved:</h2>
+
+          <ul>
+          <% @device.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="row">
+        <div class="col-md-12">
+          <label>Nome</label>
+          <%= f.telephone_field :nome, class: 'panel-field' %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <label>Id Control</label>
+          <%= f.telephone_field :id_control, class: 'panel-field' %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <label>Host</label>
+          <%= f.telephone_field :host, class: 'panel-field' %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <label>Instace Key</label>
+          <%= f.telephone_field :instance_key, class: 'panel-field' %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <label>Token</label>
+          <%= f.telephone_field :token, class: 'panel-field' %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <label>Webhook</label>
+          <%= f.telephone_field :webhook, class: 'panel-field' %>
+        </div>
+      </div>
+
+      <div class="footer-buttons">
+        <%= f.submit :value => " Grabar ", :class => "btn btn-green" %>
+        <%= link_to 'Volver', brigadas_path, :class => "btn btn-back" %>
+      </div>
+    <% end %>
+</div>
+
+
+
+<script>
+  
+var settings = {
+  "url": "https://apistart02.megaapi.com.br/rest/instance/megastart-Mg6BmsxIPkT",
+  "method": "GET",
+  "timeout": 0,
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer Mg6BmsxIPkT"
+  },
+
+};
+
+$.ajax(settings).done(function (response) {
+  console.log(response);
+});
+
+</script>
+
+<div id="content-html"></div>

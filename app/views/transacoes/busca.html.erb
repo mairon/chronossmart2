@@ -1,0 +1,70 @@
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="60" align="center"><%= t('DATE') %></td>
+      <td width="80" align="center">Operação</td>
+      <td width="180">Favorecido</td>
+      <td width="200">Concepto</td>
+      <td width="70" align="right">Taxa</td>
+      <td width="80" align="right">Mov. R$</td>
+      <td width="80" align="right">Saldo R$</td>
+
+      <td width="80" align="right">Mov. USDT</td>
+      <td width="80" align="right">Saldo USDT</td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+
+    <table>      
+      <% saldo_rs = @saldo_rs.to_f %>
+      <% saldo_usdt = @saldo_usdt.to_f %>
+      <tr class="head_grid">
+        <td colspan="6" align="right">Saldo</td>
+        <td width="80" align="right"> <%= format_decimal(saldo_rs) %></td>
+        <td></td>
+        <td width="80" align="right"> <%= format_decimal(saldo_usdt) %></td>
+      </tr>
+      <% @transacoes.each do |c| %>
+
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="60" align="center"> <%= c.data.strftime("%d/%m/%y")%></td>
+        <td width="80" align="center"> 
+          <% if c.operacao == 0  %>
+            <span class="btn btn-danger">Compra</span>
+          <% elsif c.operacao == 1 %>
+            <span class="btn-success">Venta</span>
+          <% elsif c.operacao == 2 %>
+            <span class="btn-primary">Receb</span>
+          <% elsif c.operacao == 3 %>
+            <span class="btn-warning">Pgt</span>
+          <% end %>
+        </td>
+        <td width="180" align="left"> <%= truncate( c.persona_nome, :legth => 90) %></td>
+        <td width="200" align="left"><small><%= truncate( c.obs, :legth => 90) %></small></td>
+        <td width="70" align="right"> <%= format_decimal(c.taxa) %></td>
+        <td width="80" align="right"> 
+          <% if c.credito_rs.to_i > 0 %>
+            <span class="rs"><%= format_decimal(c.credito_rs) %></span>
+          <% else %>
+            <span class="gs">-<%= format_decimal(c.debito_rs) %></span>
+          <% end %>          
+        </td>
+        <td width="80" align="right"> <b class="bold-black"><%= format_decimal(saldo_rs += (c.credito_rs.to_f - c.debito_rs.to_f)) %></b></td>
+
+        <td width="80" align="right"> 
+          <% if c.credito_usdt.to_i > 0 %>
+            <span class="rs"><%= format_decimal(c.credito_usdt) %></span>
+          <% else %>
+            <span class="gs">-<%= format_decimal(c.debito_usdt) %></span>
+          <% end %>          
+        </td>
+
+        <td width="80" align="right"> <b class="bold-black"><%= format_decimal(saldo_usdt += (c.credito_usdt.to_f - c.debito_usdt.to_f)) %></b></td>
+        <td>
+          <%= link_to '', c, :confirm => 'Estas Seguro?', :method => :delete , class: 'icon-trash' %>
+        </td>      
+      </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

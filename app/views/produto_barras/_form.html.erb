@@ -1,0 +1,28 @@
+<%= form_for(produto_barra) do |f| %>
+  <% if produto_barra.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(produto_barra.errors.count, "error") %> prohibited this produto_barra from being saved:</h2>
+
+      <ul>
+      <% produto_barra.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= f.hidden_field :produto_id %>
+  <table>
+    <tr>
+      <td>
+        <td align="right">Barras:</td>
+        <td><%= f.text_field :barra %></td>  
+      </td>
+      <td>
+        <%= f.submit t('SAVE'), :class => "button add", :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %>
+      </td>
+    </tr>
+  </table>
+<% end %>
+<script>
+  $("#produto_barra_barra").focus()
+</script>

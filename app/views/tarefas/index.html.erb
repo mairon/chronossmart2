@@ -1,0 +1,257 @@
+<%= stylesheet_link_tag 'calendar/main', :media => 'all'%>
+<%= javascript_include_tag 'calendar/main' %>
+
+
+<% unless params[:data].blank? %>
+  <% init_data = params[:data] %>
+<% else %>
+  <% init_data = Time.now.strftime("%Y-%m-%d") %>
+
+<% end %>
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          selectable: true,
+          locale: 'es',
+          initialDate: '<%= init_data %>',
+          initialView: 'timeGrid',
+          dayMaxEvents: 3,
+          height: 600,
+          slotLabelFormat: {hour: 'numeric', minute: '2-digit', hour12: false},
+          headerToolbar: {
+            left: 'prev,next,today',
+            center: 'title',
+            right: 'dayGridMonth,timeGrid'
+          },
+          events:[
+            <% @tarefas.each do |t| %>
+              {
+                title: "<div class='fc-event-time'><%= t.dia_inicio.to_datetime.strftime("%H:%M") %> - <%= t.dia_final.to_datetime.strftime("%H:%M") %></div><div class='fc-event-title'><%= t.persona_nome %><hr><%= t.descricao %></div>",
+                date: '<%= t.dia_inicio.to_date.strftime("%Y-%m-%d") %>',
+                start: '<%= t.dia_inicio.to_datetime.strftime("%Y-%m-%dT%H:%M:%S") %>',
+                end: '<%= t.dia_final.to_datetime.strftime("%Y-%m-%dT%H:%M:%S") %>',
+                id: '<%= t.id.to_s %>',
+                color: '<%= t.color_tag  %>',
+                background: "<%= t.color_tag  %>"
+              },
+            <% end %>
+          ],
+
+          dateClick: function(info) {
+              if(info.view.type=="dayGridMonth"){
+                  this.changeView("timeGrid", info.dateStr);
+              }
+            },
+
+          select: function(info) {
+            if(info.view.type=="timeGrid"){
+              var d = new Date(info.startStr),
+              dia = info.startStr.substring(8, 10),
+              mes = info.startStr.substring(5, 7),
+              ano = info.startStr.substring(0, 4);
+              hora_s = info.startStr.substring(11, 13);
+              min_s  = info.startStr.substring(14, 16);
+
+              hora_e = info.endStr.substring(11, 13);
+              min_e  = info.endStr.substring(14, 16);
+
+            if(info.startStr.substring(5, 6) == '0') mes = info.startStr.substring(6, 7);
+
+            if(info.startStr.substring(8, 9) == '0') dia = info.startStr.substring(9, 10);
+
+            $('#tarefa_dia_inicio_3i').val(dia);
+            $('#tarefa_dia_inicio_2i').val(mes);
+            $('#tarefa_dia_inicio_1i').val(ano);
+            $('#tarefa_dia_inicio_4i').val(hora_s);
+            $('#tarefa_dia_inicio_5i').val(min_s);
+            $('#tarefa_dia_final_3i').val(dia);
+            $('#tarefa_dia_final_2i').val(mes);
+            $('#tarefa_dia_final_1i').val(ano);
+            $('#tarefa_dia_final_4i').val(hora_e);
+            $('#tarefa_dia_final_5i').val(min_e);
+            $('#modal-tarefa').modal('show');
+            }
+
+          },
+
+          eventDidMount: function (info) {
+                if (info.event.extendedProps.background) {
+                  info.el.style.background = info.event.extendedProps.background;
+                }
+              },
+          eventContent: function( info ) {
+            return {html: info.event.title};
+          },
+
+        });
+        calendar.setOption('locale', 'es');
+        calendar.render();
+      });
+
+</script>
+
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="panel">
+      <header class="panel-heading">
+        <form action="#" id="form_tarefas">
+        <%= link_to t('NEW'), '#', "data-toggle" => "modal", 'data-target' => '#modal-tarefa', class: 'btn btn-green' %>
+        <%= link_to  '#modal-busca', class: 'btn', "data-toggle" => "modal" do %>
+              <i class="icon-search"></i>
+        <% end %>
+      </form>
+
+      </header>
+      <div  class="panel-body">
+        <div id="calendar"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="panel">
+        <div  class="panel-body">
+          <label>Responsable</label>
+          <%= select("busca", "vendedor", Persona.all(:select => 'id,nome',:conditions => ["tipo_vendedor = 1"],:order => 'nome').collect {|p| [ p.nome, p.id ] }, {:selected => params[:vendedor_id],  prompt: 'Todos...'}) %>
+        </div>
+
+          <table class="head_grid">
+            <tr>
+              <td width="85">Hoy</td>
+              <td width="320">Concepto</td>
+              <td width="55"></td>
+            </tr>
+          </table>
+          <div class="rolagem" id="div">
+            <table>
+              <% ct = 0 %>
+              <% @tarefas_hoy.each do |c| %>
+                <% ct += 1 %>
+                <tr class = "<%= cycle("cor1", "cor2")%>" >
+                  <td width="85" align="center">
+                    <small>
+                      <b class="bold">
+                      <%= c.dia_inicio.to_datetime.strftime("%H:%M") %>-<%= c.dia_final.to_datetime.strftime("%H:%M") %>
+                      </b>
+                    </small>
+                  </td>
+                  <td width="300">
+                    <small>
+                      <p style=" margin-top: 3px; padding: 4px; border-radius: 5px; display: inherit; background-color: <%= c.color_tag %>;">
+                        <%= c.vendedor_nome %>
+                      </p>
+                      <p>
+                        <br>
+                      Cliente: <%= c.persona_nome %>
+                      </p>
+                      <p>
+                      <%= c.descricao %>
+
+                      </p>
+                    </small>
+                  </td>
+                  <td>
+                    <%= link_to '', edit_tarefa_path(c), class: 'icon-pencil' %>
+                    <%= link_to '', c, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %>
+                  </td>
+                </tr>
+              <% end %>
+            </table>
+
+          </div>
+          <b>Total: <%= ct %></b>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+<style>
+  .fc-event-main, .fc-daygrid-dot-event .fc-event-title{
+    color: #000 !important;
+  }
+
+  .fc .fc-col-header-cell-cushion {
+      display: inline-block;
+      padding: 4px 4px;
+      font-size: 18px;
+      color: #000;
+      font-family: 'prox';
+  }
+
+  .fc .fc-timegrid-axis-cushion, .fc .fc-timegrid-slot-label-cushion{
+    color: #000 !important;
+    font-family: 'prox-bold';
+  }
+
+  .fc-timegrid-slot {
+      height: 65px !important;
+      border-bottom: 0 !important;
+  }
+
+
+  .fc-event-title hr{
+    margin: 0px;
+  }
+
+  .fc-timegrid{
+
+  }
+
+  .fc-daygrid .fc-event-time{
+    display: none;
+
+  }
+
+  .fc .fc-daygrid-event-harness{
+    margin: 5px 0px 5px 0px
+  }
+</style>
+
+
+<%= render 'modal_busca' %>
+
+<%= render 'modal_new' %>
+
+
+<script>
+    $('#busca_vendedor').on('change keyup', function(){
+      window.location.href = "/tarefas?vendedor_id=" +  $('#busca_vendedor').val();
+    });
+
+  $('#tarefa_produto_ids, #busca_vendedor').selectize();
+
+  $(function() {
+    $( "#tarefa_persona_nome" ).autocomplete({
+      source: function( request, response ) {
+        $.ajax({
+          url: "/personas/busca",
+          dataType: "json",
+          data: {
+            tipo: 'DESCRIPCION',
+            per:  'CLIENTE',
+            busca: request.term
+          },
+          success: function( data ) {
+            response( data );
+          },
+        });
+      },
+      minLength: 2,
+      change: function( event, ui ) {
+        $("#tarefa_persona_id").val("");
+        $('#tarefa_persona_id').val(ui.item.id);
+        return false;
+      }
+    });
+  });
+
+</script>

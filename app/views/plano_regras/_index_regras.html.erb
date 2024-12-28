@@ -1,0 +1,21 @@
+<table class="head_grid">
+  <tr>
+    <td width="300">Facturión G$</td>
+    <td width="80" align="right">Max Desc</td>
+    <td width="55"></td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% plano_regras.each do |p| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="300"><%= format_int(p.min_gs) %> hasta <%= format_int(p.max_gs) %></td>
+        <td width="80" align="right"><%= format_decimal(p.max_desc) %>%</td>
+        <td><%= link_to '', edit_plano_regra_path(p), class: 'icon-pencil' %></td>
+        <td><%= link_to '', p, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>          
+      </tr>
+    <% end %>
+  </table>
+</div>
+

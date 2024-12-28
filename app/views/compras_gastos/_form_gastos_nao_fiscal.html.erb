@@ -1,0 +1,27 @@
+
+<% form_for(@compras_gasto) do |f| %>
+	 <%= f.error_messages %>
+	 <%= f.hidden_field :compra_id%>
+
+
+	 <ul class="tabs">
+		<li><a href="#tab1">Gastos</a></li>
+	 </ul>
+	 <div class="tab_container">
+		<div id="tab1" class="tab_content">
+			<table>
+				<tr>
+					 <td align="right">Rubro:</td>
+					 <td><%= f.collection_select :rubro_id, Rubro.all( :select => 'id,descricao',
+																														 :order  => '1' ),:id,:descricao %></td>
+
+				</tr>
+
+			</table>
+		</div>
+	 </div>
+	 <div class="button">
+			<a class="clean-gray" href="/compras/compras_gasto/<%=@compras_gasto.compra_id%>" >&#171;&nbsp; <%= t('BACK') %></a>  |
+			<%= f.submit t('SAVE'),:disable_with => "Aguarde...", :class => "clean-gray"  %>
+	 </div>
+<% end %>

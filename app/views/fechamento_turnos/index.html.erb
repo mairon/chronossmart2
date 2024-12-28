@@ -1,0 +1,37 @@
+<h1 align="right" id="header">Picos</h1>
+<%= link_to t('NEW'), new_fechamento_turno_path %>
+
+<div class="group">
+  <table>
+    <tr>
+      <td width="50" align="center">Cod.</td>
+      <td width="80" align="center"><%= t('DATE') %></td>
+      <td width="100" align="center">Turno</td>
+      <td width="100" align="center">Tico</td>
+      <td width="120" align="center">Inicio</td>
+      <td width="120" align="center">Cierre</td>
+    </tr>
+  </table>
+  <div class="rolagem" id="div">
+    <table>
+
+      <% @fechamento_turnos.each do |fechamento_turno| %>
+        <tr class       ="<%= cycle("cor1", "cor2")%>"
+            onMouseOver ="javascript:this.style.backgroundColor='#949494'"
+            onMouseOut  ="javascript:this.style.backgroundColor=''" >
+
+          <td width="50" align="center" ><%=h fechamento_turno.id %></td>
+          <td width="80" align="center"><%=h fechamento_turno.data.strftime('%d/%m/%Y') %></td>
+          <td width="100" align="left"><%=h fechamento_turno.turno_nome %></td>
+          <td width="100" align="left"><%=h fechamento_turno.bomba_nome %></td>
+          <td width="120" align="right"><%=h fechamento_turno.inicio %></td>
+          <td width="120" align="right"><%=h fechamento_turno.final %></td>
+
+          <td><%= link_to 'Editar', edit_fechamento_turno_path(fechamento_turno) %></td>
+          <td><%= link_to t('DELETE'), fechamento_turno, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+        </tr>
+      <% end %>
+    </table>
+
+    <br />
+

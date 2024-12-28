@@ -1,0 +1,62 @@
+<%= form_for(vendas_fatura) do |f| %>
+  <% if vendas_fatura.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(vendas_fatura.errors.count, "error") %> prohibited this vendas_fatura from being saved:</h2>
+
+      <ul>
+      <% vendas_fatura.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+    <%= f.hidden_field :venda_id %>
+    <%= f.hidden_field :status, value: 0 %>
+    <%= f.hidden_field :tipo, value: 0 %>
+    <%= f.hidden_field :timbrado, value: current_unidade.timbrado %>
+    <%= f.hidden_field :data, value: @venda.data %>
+    <%= f.hidden_field :total_dolar, value: format_decimal(@produto_sum_dolar.to_f) %>
+    <%= f.hidden_field :total_guarani, value: format_int(@produto_sum_guarani.to_f) %>
+    <%= f.hidden_field :exentas_us, value: format_decimal(@produto_sum_exet_us.to_f) %>
+    <%= f.hidden_field :exentas_gs, value: format_int(@produto_sum_exet_gs.to_f) %>
+    <%= f.hidden_field :gravadas_10_us, value: number_to_currency((@produto_sum_grav10_us.to_f - @produto_sum_iva10_us.to_f), :format=>'%n', :precision => 4) %>
+    <%= f.hidden_field :gravadas_10_gs, value: format_int((@produto_sum_grav10_gs.to_f - @produto_sum_iva10_gs.to_f) ) %>
+    <%= f.hidden_field :gravadas_05_us, value: number_to_currency((@produto_sum_grav05_us.to_f - @produto_sum_iva05_us.to_f), :format=>'%n', :precision => 4) %>
+    <%= f.hidden_field :gravadas_05_gs, value: format_int((@produto_sum_grav05_gs.to_f - @produto_sum_iva05_gs.to_f) ) %>
+
+    <%= f.hidden_field :imposto_10_us, value: number_to_currency(@produto_sum_iva10_us.to_f, :format=>'%n', :precision => 4) %>
+    <%= f.hidden_field :imposto_10_gs, value: format_int(@produto_sum_iva10_gs.to_f) %>
+    <%= f.hidden_field :imposto_05_us, value: number_to_currency(@produto_sum_iva05_us.to_f, :format=>'%n', :precision => 4) %>
+    <%= f.hidden_field :imposto_05_gs, value: format_int(@produto_sum_iva05_gs.to_f) %>
+
+    <table>
+      <tr>
+        <td align="right">RUC/CI:</td>
+        <% if @venda.persona_id == 3 %>
+          <td><%= f.text_field :ruc_fatura, size: 15 %></td>
+          <td align="right">Nombre:</td>
+          <td><%= f.text_field :nome_fatura, size: 50 %></td>
+        <% else %>
+          <td><%= f.text_field :ruc_fatura, size: 15, value: @venda.persona.ruc %></td>
+          <td align="right">Nombre:</td>
+          <td><%= f.text_field :nome_fatura, size: 50, value: @venda.persona.nome_fatura %></td>        
+        <% end %>
+      </tr>
+      <tr>
+      <% if @venda.tipo_venda.to_i == 2 %>
+       <% numero = VendasFatura.maximum(:documento_numero,:conditions => ["documento_numero_01 = '#{current_unidade.doc_01}' and documento_numero_02 = '#{current_unidade.doc_02}' and timbrado = '#{current_unidade.timbrado}'"])%>
+        <td align="right">Nº:</td>                                        
+        <td colspan="4"><%= f.text_field :documento_numero_01, size: 5, value: current_unidade.doc_01 %>-<%= f.text_field :documento_numero_02, size: 5, value: current_unidade.doc_02 %>-<%= f.text_field :documento_numero, size: 20,value: (numero.to_i + 1).to_s.rjust(7,'0')  %><%= f.submit :value => " Facturar ", :class => "button",:style=>"position:absolute; top:-1000px" %></td>
+
+      <% else %>
+      <% if @venda.terminal.present? %>
+        
+      
+       <% numero = VendasFatura.maximum(:documento_numero,:conditions => ["documento_numero_01 = '#{@venda.terminal.documento_numero_01}' and documento_numero_02 = '#{@venda.terminal.documento_numero_02}' and timbrado = '#{current_unidade.timbrado}'"])%>
+        <td align="right">Nº:</td>                                        
+        <td colspan="4"><%= f.text_field :documento_numero_01, size: 5, value: @venda.terminal.documento_numero_01 %>-<%= f.text_field :documento_numero_02, size: 5, value: @venda.terminal.documento_numero_02 %>-<%= f.text_field :documento_numero, size: 20,value: (numero.to_i + 1).to_s.rjust(7,'0')  %><%= f.submit :value => " Facturar ", :class => "button",:style=>"position:absolute; top:-1000px" %></td>
+      <% end %>  
+      <% end %>
+      </tr>                 
+    </table>
+<% end %>

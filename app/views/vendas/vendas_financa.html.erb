@@ -1,0 +1,450 @@
+<% session[:pagina] = '1' %>
+
+<style type="text/css">
+	td{
+		font-size:  13px;
+	}
+</style>
+<div class="layout-pdv">
+	<div id="back-pdv">
+   	<table style="width: max-content">
+	   	<tr>
+	   		<td colspan="">
+					<div style="margin: 5px; padding: 5px">
+					  <div id="contents">
+					    <div class="group">
+								<table>
+									<tr>
+										<td colspan="">
+										  <%= t('DATE') %>: <%= @venda.data.strftime("%d/%m/%y") %> -
+											<% if @venda.moeda == 0 %>
+												Cotizaciones: U$xG$: <b><%= format_int(@venda.cotacao) %></b> | U$xR$: <b><%= format_decimal(@venda.cotacao_rs_us.to_f) %></b> | U$xP$: <b><%= format_decimal(@venda.cotacao_us_ps) %></b>
+											<% else %>
+												Cotizaciones: U$xG$: <b><%= format_int(@venda.cotacao) %></b> | G$xR$:<b><%= format_int(@venda.cotacao_real) %></b> | U$xR$:<b><%= format_decimal(@venda.cotacao_rs_us.to_f) %></b> | G$xP$:<b><%= format_decimal(@venda.cotacao_gs_ps) %></b>
+											<% end %>
+											| Total Prod.: <%= format( "%.3f", @produto_count.to_f )%>
+											|
+						   				<b>SALDO ANTECIPADO DISPONIBLE: <%= format_int(@saldo_antecipado.to_f) %></b> |
+											<b>SALDO CREDITO DISPONIBLE: <%= format_int(@cliente_saldo.to_f) %></b>
+
+										</td>
+
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+	   		</td>
+	   	</tr>
+
+    </table>
+	  <table style="width: max-content">
+	   	<tr>
+	   		<td colspan="">
+					<div style="margin: 5px; padding: 5px">
+					  <div id="contents">
+					    <div class="group">
+								<table>
+									<tr>
+										<td width="219" align="right">
+										<font size="3" color="green">
+											Total U$:
+										</font>
+										</td>
+										<td align="right">
+											<font size="3" color="green">
+												<%= format_decimal(@produto_sum_dolar.to_f + @venda.desconto_us.to_f) %>
+											</font>
+										</td>
+
+										<td width="219" align="right">
+											<font size="3" color="red">
+												Total Gs:
+											</font>
+										</td>
+										<td align="right">
+											<font size="3" color="red">
+												<%= format_int(@produto_sum_guarani.to_f + @venda.desconto_gs.to_f) %>
+											</font>
+										</td>
+
+										<td width="219" align="right">
+											<font size="3" color="blue">
+												Total R$:
+											</font>
+										</td>
+										<td align="right">
+											<font size="3" color="blue">
+												<%= format_decimal(@produto_sum_real) %>
+											</font>
+										</td>
+
+										<td width="219" align="right">
+											<font size="3">
+												Total P$:
+											</font>
+										</td>
+										<td align="right">
+											<font size="3">
+												<% if @venda.moeda.to_i == 0 %>
+													<%= format_decimal(@produto_sum_dolar * @venda.cotacao_us_ps.to_f) %>
+												<% else %>
+													<%= format_decimal(@produto_sum_guarani / @venda.cotacao_gs_ps.to_f) %>
+												<% end %>
+											</font>
+										</td>
+									</tr>
+									<tr>
+
+										<td align="right">
+										<font size="2" color="green">
+											Descuento U$:
+										</font>
+										</td>
+										<td align="right">
+											<font size="2" color="green">
+												<%= format_decimal( @venda.desconto_us) %>
+											</font>
+										</td>
+
+										<td width="219" align="right">
+											<font size="2" color="red">
+												Descuento Gs:
+											</font>
+										</td>
+										<td align="right">
+											<font size="2" color="red">
+												<%= format_int( @venda.desconto_gs) %>
+											</font>
+										</td>
+										
+									</tr>
+
+									<tr>
+										<td align="right">
+										<font size="2" color="green">
+											Faltante U$:
+										</font>
+										</td>
+										<td align="right">
+											<font size="2" color="green">
+												<%= format_decimal( (@produto_sum_dolar.to_f) - (@cred_us.to_f - @deb_us.to_f)) %>
+											</font>
+										</td>
+
+										<td width="219" align="right">
+											<font size="2" color="red">
+												Faltante Gs:
+											</font>
+										</td>
+										<td align="right">
+											<font size="2" color="red">
+												<%= format_int( (@produto_sum_guarani.to_f - @produto_desc_guarani.to_f) - (@cred_gs.to_f - @deb_gs.to_f)) %>
+											</font>
+										</td>
+
+										<td width="219" align="right">
+											<font size="2" color="blue">
+												Faltante R$:
+											</font>
+										</td>
+										<td align="right">
+											<font size="2" color="blue">
+												<%= format_decimal( @produto_sum_real.to_f - (@cred_rs.to_f - @deb_rs.to_f)) %>
+											</font>
+										</td>
+
+										<td width="219" align="right">
+											<font size="2" >
+												Faltante P$:
+											</font>
+										</td>
+										<td align="right">
+											<font size="2">
+											<% if @venda.moeda.to_i == 0 %>
+												<%= format_decimal( (@produto_sum_dolar / @venda.cotacao_us_ps.to_f) - (@cred_ps.to_f - @deb_ps.to_f)) %>
+											<% else %>
+												<%= format_decimal( (@produto_sum_guarani / @venda.cotacao_gs_ps.to_f) - (@cred_ps.to_f - @deb_ps.to_f)) %>
+											<% end %>
+											</font>
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+	   		</td>
+	   	</tr>
+	  </table>
+	  <table>
+	   	<tr>
+	   		<td valign="top">
+					<table>
+						<tr>
+							<td>
+								<div style="margin: 5px; padding: 5px">
+								  <div id="contents">
+								    <div class="group">
+											<%= render :partial => "atualiza_cliente_fin" %>
+								    </div>
+							    </div>
+						    </div>
+							</td>
+						</tr>
+						<tr>
+							<td>
+							  <div style="margin: 5px; padding: 5px">
+							  	<small><% Form.last.form_venda_financa %></small>
+							    <div id="contents">
+							      <div class="group">							      	
+											<% if current_user.terminal_id.to_i != 0 #verifica se é obrigatrio abertura de caixa %>
+												<% if ((format_int(@produto_sum_guarani.to_f).gsub('.','').to_i) != (format_int(@cred_gs.to_f - @deb_gs.to_f).gsub('.','').to_i)) #valida financeiro com produtos %>
+													<%= render partial: Form.last.form_venda_financa, locals: { vendas_financa: VendasFinanca.new(venda_id: @venda.id)} %>
+												<% else %>
+													<div width="500">
+													<font size="3" color="green">Click en [F9]  para Finalizar ou [F10] Facturar </font>
+													<%= @venda.cartao.nome unless @venda.cartao.nil? %>
+													<% unless @venda.cartao.nil? %>
+														<% if @venda.cartao.venda_id == @venda.id %>
+														<% @venda.cartao.update_attributes(status_op: 0)  %>
+														<% end %>
+													<% end %>
+													</div>
+												<% end %>
+											<% else %>
+												<div class="alert alert-danger" align="center">
+													<h1 style="font-size:22px">Ese usuario no tiene terminal vinculado, por favor vincule um terminal a su catastr
+												</div>
+											<% end %>
+										</div>
+									</div>
+								</div>
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+								<div style="margin: 5px; padding: 5px">
+								  <div id="contents">
+								    <div align="center">
+											<% if VendasConfig.last.caixa_separado.to_i == 1 %>
+												<% if @venda.tipo_venda == 0 %>
+													<a href="/vendas/painel_cobranca_venda" class="btn btn-back"><%= t('BACK') %></a>
+													<a href="#" class="btn btn-blue" onClick="ListaProdutos()">Lista Productos</a>
+													<a href="javascript:void(0)" class="btn btn-blue" onClick="BuscaCliente()">Busca Cliente</a>
+												<% else %>
+													<a href="/vendas/<%= @venda.id.to_i %>" class="btn btn-back"><%= t('BACK') %></a>
+												<% end %>
+											<% else %>
+												<a href="/vendas/<%= @venda.id.to_i %>" class="btn btn-back"><%= t('BACK') %></a>
+											<% end  %>
+												<a href="javascript:void(0)" class="btn btn-blue" onClick="ComprovanteVenda()" style="margin: 5px"><%= t('VOUCHER') %></a>
+												<a href="javascript:void(0)" class="btn btn-blue" onClick="PagareVenda()" style="margin: 5px">Pagare</a>
+												<% if @count_all.to_i > 0 %>
+											    <% sum_gs = VendasFinanca.sum('valor_guarani',:conditions => ["forma_pago_id != 8 AND venda_id = ?",@venda.id]) %>
+											    <% sum_vuelto_gs = VendasFinanca.sum('valor_guarani',:conditions => ["forma_pago_id = 8 AND venda_id = ?",@venda.id]) %>
+											    <input type="hidden" id="fac" value="<%= number_to_currency( (@produto_sum_guarani.to_f) , :format=>'%n', :precision => 0) %>">
+											    <input type="hidden" id="sum" value="<%= number_to_currency( @cred_gs.to_i - @deb_gs.to_i, :format=>'%n', :precision => 0) %>">
+											    <% if format_int(@produto_sum_guarani.to_f).gsub('.','').to_f != format_int(@cred_gs.to_f - @deb_gs.to_f).gsub('.','').to_f %>
+											      <h1 style="color:red; float:left; font-size:32px"><%= t('PENDING') %></h1>
+											    <% else %>
+												    <%= hidden_field_tag :tela, 'finalizar' %>
+												    <a href="javascript:void(0)" class="btn btn-green" onClick="ValidVenda()"  style="margin: 15px">Finalizar</a>
+												  <% end %>
+												<% end %>
+										</div>
+									</div>
+								</div>
+								<div style="margin: 5px; padding: 5px">
+								  <div id="contents">
+										<div class="group">
+											<b>[F2 ]</b> Buscar Cliente para Factura <br>
+											<b>[F8 ]</b> Grabar forma de Pago <br>
+											<b>[F9 ]</b> Finalizar <br>
+											<b>[F10]</b> Facturar <br>
+										</div>
+									</div>
+								</div>							</td>
+						</tr>
+					</table>
+	   		</td>
+	   		<td valign="top">
+					<div style="margin: 5px; padding: 5px">
+					  <div id="contents">
+							<div class="group">
+								<h2> FORMA DE PAGO</h2>
+								<%= render :partial=>"/vendas/eps/index_financa_E03", :locals=>{:vendas_financas => @venda.vendas_financas} %>
+							</div>
+						</div>
+					</div>
+					<div style="margin: 5px; padding: 5px">
+					  <div id="contents">
+							<div class="group">
+								<h2> FACTURACIÓN</h2>
+								<%= render "faturamento" %>
+							</div>
+						</div>
+					</div>
+	   		</td>
+	   	</tr>
+   	</table>
+	</div>
+</div>
+<%= hidden_field_tag :id, @venda.id %>
+<%= hidden_field_tag :count, @count_all.to_i %>
+<%= hidden_field_tag :sum_dolar, @produto_sum_dolar.to_f %>
+<%= hidden_field_tag :sum_guarani, @produto_sum_guarani.to_f %>
+<%= hidden_field_tag :moeda, @venda.moeda %>
+
+
+<%= form_for(@venda) do |vdc| %>
+<input type='hidden' name='_method' value='put'>
+<%= vdc.hidden_field :op, value: true %>
+<% end %>
+<script>
+
+  function ValidVenda(){
+    var saldo = parseInt( document.getElementById("fac").value.replace(/\./g, "").replace(",", "."))
+    var sum   = parseInt( document.getElementById("sum").value.replace(/\./g, "").replace(",", ".") )
+  		if (( saldo - sum ) == 0 ){
+  			if(<%= VendasConfig.last.caixa_separado.to_i %> == '1'){
+  				if(<%= @venda.tipo_venda.to_i %> == '0'){
+
+		        $.ajax({
+		            type: 'PUT',
+		            url:  '/vendas/'+ <%= @venda.id %>,
+		            data: $('.edit_venda').serialize(),
+		            dataType: "JSON",
+		            success: function(data) {
+		                console.log(data);
+		            }
+		        });
+		        window.open('/vendas/' + document.getElementById('id').value + '/comprovante01', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  					location.href="/vendas/painel_cobranca_venda"
+  				}else{
+
+		        $.ajax({
+		            type: 'PUT',
+		            url:  '/vendas/'+ <%= @venda.id %>,
+		            data: $('.edit_venda').serialize(),
+		            dataType: "JSON",
+		            success: function(data) {
+		                console.log(data);
+		            }
+		        });
+
+  					location.href="/vendas/new?tipo_venda=<%= @venda.tipo_venda %>"
+  				}
+				}else{
+
+	        $.ajax({
+	            type: 'PUT',
+	            url:  '/vendas/'+ <%= @venda.id %>,
+	            data: $('.edit_venda').serialize(),
+	            dataType: "JSON",
+	            success: function(data) {
+	                console.log(data);
+	            }
+	        });
+
+					location.href="/vendas/new?tipo_venda=<%= @venda.tipo_venda %>"
+				}
+  		}else{
+  			alert('Financiero no Cerra con la suma de los Productos!')
+  		};
+
+  }
+
+	function ComprovanteVenda(){
+		window.open('/vendas/' + document.getElementById('id').value + '/comprovante01', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	}
+
+	function PagareVenda(){
+		window.open('/vendas/' + document.getElementById('id').value + '/pagare', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	}
+
+	function ListaProdutos(){
+		window.open('/vendas/' + document.getElementById('id').value, '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=800');
+	}
+
+
+	function ComprovanteEntrega(){
+		window.open('/vendas/' + document.getElementById('id').value + '/comprovante_entrega', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	}
+
+
+
+	function FaturaVenda(){
+		window.open('/vendas/' + document.getElementById('id').value+'/fatura', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	}
+
+	function fecha(){
+		self.close();
+	}
+
+$(window).keydown(function(event) {
+  if(event.ctrlKey && event.keyCode == 71) {
+			location.href="/vendas/" + document.getElementById('id').value +"/gerador_cotas"
+    event.preventDefault();
+  }
+  if(event.ctrlKey && event.keyCode == 67) {
+		window.open('/vendas/' + document.getElementById('id').value + '/comprovante', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+
+    event.preventDefault();
+  }
+
+  if(event.ctrlKey && event.keyCode == 70) {
+		window.open('/vendas/' + document.getElementById('id').value+'/fatura', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+
+    event.preventDefault();
+  }
+
+
+  if(event.ctrlKey && event.keyCode == 80) {
+		window.open('/vendas/' + document.getElementById('id').value + '/pagare', '', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+    event.preventDefault();
+  }
+
+});
+</script>
+
+<% if @venda.vendas_financas.present? %>
+	<script>
+	document.onkeydown= function(e) {
+	  //LISTA DE PRODUTOS
+	  if(e.which == 119){
+	    $("#FinancaForm").submit();
+	  };
+	  if(e.which == 120){
+			document.getElementById('venda_status').value = 1
+      location.href="/vendas"
+	  };
+
+	  if(e.which == 121){
+	  	$('#ruc').focus();
+	  };
+
+	}
+	</script>
+<% else %>
+	<script>
+	document.onkeydown= function(e) {
+	  //LISTA DE PRODUTOS
+	  if(e.which == 119){
+	    $("#FinancaForm").submit();
+	  };
+
+    if(e.which == 113){ //F2
+        window.open('/personas/persona_venda', '', ' SCROLLBARS=YES, TOP=0, LEFT=50, WIDTH=1000, HEIGHT=450');
+    };
+
+	}
+
+
+	function BuscaCliente(){
+		window.open('/personas/persona_venda', '', ' SCROLLBARS=YES, TOP=0, LEFT=50, WIDTH=1000, HEIGHT=450');
+	}
+	</script>
+
+<% end %>
+

@@ -1,0 +1,135 @@
+<% tot_saldo  = 0 %>
+<% tot        = 0 %>
+
+<% sub_tot_saldo  = 0 %>
+<% sub_tot        = 0 %>
+
+<% quebra     = '' %>
+
+<table>
+	<% @stocks.each do |p| %>
+		<% if params[:agrupar] == 'clase' %>
+			<% if quebra != p.clase_nome %>
+
+				<% if quebra != "" %>
+
+					<tr class="head">
+						<td colspan="5" align="right">Total <%= quebra %>:</td>
+						<td align="right"><%= format_decimal(sub_tot_saldo) %></td>
+						<td></td>
+						<% if params[:moeda] == '0' %>
+							<td align="right"><%= format_decimal(sub_tot.to_f) %></td>
+						<% else %>
+							<td align="right"><%= format_int(sub_tot.to_f) %></td>
+						<% end %>
+
+					</tr>
+
+					<% sub_tot_saldo = 0 %>
+					<% sub_tot       = 0 %>
+
+				 <% end %>
+				 <tr>
+					<td class="head" colspan="5" style="background: #ccc"><%= quebra = p.clase_nome %></td>
+				 </tr>
+			<% end %>
+
+		<% elsif params[:agrupar] == 'grupo' %>
+
+			<% if quebra != p.grupo_nome %>
+
+				<% if quebra != "" %>
+
+					<tr class="head">
+						<td colspan="8" align="right">Total <%= quebra %>:</td>
+						<td align="right"><%= format_decimal(sub_tot_saldo) %></td>
+						<td></td>
+						<% if params[:moeda] == '0' %>
+							<td align="right"><%= format_decimal(sub_tot.to_f) %></td>
+						<% else %>
+							<td align="right"><%= format_int(sub_tot.to_f) %></td>
+						<% end %>
+					</tr>
+
+					<% sub_tot_saldo = 0 %>
+					<% sub_tot       = 0 %>
+
+				 <% end %>
+				 <tr>
+					<td class="head" colspan="8" style="background: #ccc"><%= quebra = p.grupo_nome %></td>
+				 </tr>
+			<% end %>
+
+		<% elsif params[:agrupar] == 'subgrupo' %>
+
+			<% if quebra != p.subgrupo_nome %>
+
+				<% if quebra != "" %>
+
+					<tr class="head" >
+						<td colspan="5" align="right" height="20">Total <%= quebra %>:</td>
+						<td align="right"><%= format_decimal(sub_tot_saldo) %></td>
+						<td></td>
+						<% if params[:moeda] == '0' %>
+							<td align="right"><%= format_decimal(sub_tot.to_f) %></td>
+						<% else %>
+							<td align="right"><%= format_int(sub_tot.to_f) %></td>
+						<% end %>
+					</tr>
+
+					<% sub_tot_saldo = 0 %>
+					<% sub_tot       = 0 %>
+
+				 <% end %>
+				 <tr>
+					<td class="head" colspan="8"  style="background: #ccc"><%= quebra = p.subgrupo_nome %></td>
+				 </tr>
+			<% end %>
+		<% end %>
+
+		<tr class = "<%= cycle("cor1", "cor2")%>">
+			<td width="50"><%= p.produto_id.to_s.rjust(6,'0') %></td>
+			<td width="150"><%= truncate( p.grupo_nome, :length => 90 ) %></td>
+			<td width="150"><%= truncate( p.subgrupo_nome, :length => 90 ) %></td>
+			<td width="100"><%= p.fabricante_cod %></td>
+			<td width="350"><%= truncate( p.produto_nome, :length => 90 ) %></td>
+			<td width="80" align="right"><%= format_decimal(p.stock.to_f) %></td>
+			<% if params[:moeda].to_s == '0' %>
+				<td width="80" align="right"><%= format_decimal(p.custo_medio_us.to_f) %> </td>
+				<td width="80" align="right"><%= format_decimal(p.stock.to_f * p.custo_medio_us.to_f) %> </td>
+				<% tot += (p.stock.to_f * p.custo_medio_us.to_f) %>
+				<% sub_tot += (p.stock.to_f * p.custo_medio_us.to_f) %>
+			<% else %>
+				<td width="80" align="right"><%= format_int(p.custo_medio_gs.to_f) %> </td>
+				<td width="80" align="right"><%= format_int(p.stock.to_f * p.custo_medio_gs.to_f) %> </td>
+				<% tot += (p.stock.to_f * p.custo_medio_gs.to_f) %>
+				<% sub_tot += (p.stock.to_f * p.custo_medio_gs.to_f) %>
+			<% end %>
+		</tr>
+		<% tot_saldo += p.stock.to_f %>
+		<% sub_tot_saldo += p.stock.to_f %>
+	<% end %>
+	<tr class="head">
+		<td colspan="5" align="right">Total <%= quebra %>:</td>
+		<td align="right"><%= format_decimal(sub_tot_saldo) %></td>
+		<td></td>
+		<% if params[:moeda] == '0' %>
+			<td align="right"><%= format_decimal(sub_tot.to_f) %></td>
+		<% else %>
+			<td align="right"><%= format_int(sub_tot.to_f) %></td>
+		<% end %>		
+	</tr>
+	<% sub_tot_saldo = 0 %>
+	<% sub_tot       = 0 %>
+
+	<tr height="30" class="head">
+		<td colspan="5" align="right">Total General:</td>
+		<td width="80" align="right">  <%= format_decimal(tot_saldo.to_f) %> </td>
+		<td width="80" align="right"></td>
+		<% if params[:moeda] == '0' %>
+			<td width="80" align="right">  <%= format_decimal(tot.to_f) %> </td>
+		<% else %>
+			<td width="80" align="right">  <%= format_int(tot.to_f) %> </td>
+		<% end %>
+	</tr>
+</table>

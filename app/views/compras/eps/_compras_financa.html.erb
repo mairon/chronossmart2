@@ -1,0 +1,109 @@
+<h1 id="header">
+	<% if @compra.tipo_compra == 1 %>
+		Gastos
+	<% else %>
+		Compras
+	<% end %>
+	 - <%= link_to t('DOC'), edit_gasto_compra_path(@compra) %> &#8250;
+	<% if @compra.tipo_compra != 1 %>
+		<%= link_to t('PRODUCT'), compra_path(@compra)%> &#8250;
+	<% else %>
+		<%= link_to t('CLASSIFICATION'), compras_custos_compra_path(@compra) %> &#8250;
+	<% end %>
+	<%= link_to t('FINANCIAL'), compras_financa_compra_path(@compra), class: 'active' %>
+</h1>
+
+<div class="group">
+	<h2 class="header" style="margin-left: 12px">
+		<%= t('PROVIDER') %>: <b> <%= @compra.persona_nome %></b> |
+		<% if @compra.moeda.to_i == 0 %>
+			<span style="color:green">
+			Total U$:<%= format_decimal( @compra.total_dolar.to_f ) %>
+			</span>
+			Desc. U$: <span style="color:green"><%= format_decimal( @compra.desconto_dolar.to_f ) %></span>
+			Total c/ Desc. U$: <span style="color:green"><%= format_decimal( @compra.total_dolar.to_f - @compra.desconto_dolar.to_f ) %></span>
+
+		<% elsif @compra.moeda.to_i == 1 %>
+			<span style="color:red">
+			Total Gs.:<%= format_int( @compra.total_guarani.to_f ) %>
+			</span>
+			Desc. Gs.: <span style="color:red"><%= format_int( @compra.desconto_guarani.to_f ) %></span>
+			Total c/ Desc. Gs.: <span style="color:red"><%= format_int( @compra.total_guarani.to_f - @compra.desconto_guarani.to_f ) %></span>
+		<% elsif @compra.moeda.to_i == 2 %>
+			<span style="color:blue">
+			Total R$:<%= format_decimal( @compra.total_real.to_f ) %>
+			</span>
+			Desc. R$: <span style="color:blue"><%= format_decimal( @compra.desconto_real.to_f ) %></span>
+			Total c/ Desc. R$: <span style="color:blue"><%= format_decimal( @compra.total_real.to_f - @compra.desconto_real.to_f ) %></span>
+		<% elsif @compra.moeda.to_i == 4 %>
+			<span style="color:blue">
+			Total €:<%= format_decimal( @compra.total_euro.to_f ) %>
+			</span>
+		<% end %>
+
+		<% if @compra.tipo.to_i == 0 %>
+	 		- Tipo: <b><%= t('IN_CASH') %></b>
+	 	<% else %>
+	 		Tipo: <b>Crédito</b>
+	  <% end %>
+	</h2>
+
+	<% if @compra.tipo.to_i == 0 %>
+		<%= render partial: "compras_financas/index_co", :locals=>{:compras_financas => @compra.compras_financas} %>
+	<% else %>
+		<%= render partial: "compras_financas/index_cr", :locals=>{:compras_financas => @compra.compras_financas} %>
+	<% end %>
+	<% if (@compra.moeda == 0 and @sum_dolar.to_f > 0) or (@compra.moeda == 1 and @sum_guarani.to_f > 0) or (@compra.moeda == 2  and @sum_real.to_f > 0) or (@compra.moeda == 4  and @sum_euro.to_f > 0) %>
+		<% if @compra.tipo.to_i == 0 %>
+			<%= render :partial=>"/compras_financas/new_financa_co", :locals=>{:compras_financa=>ComprasFinanca.new(:compra_id=>@compra.id)} %>
+		<% else %>
+			<%= render :partial=>"/compras_financas/new_financa_cre", :locals=>{:compras_financa=>ComprasFinanca.new(:compra_id=>@compra.id)} %>
+		<% end %>
+
+	<% elsif (@compra.moeda == 0 and @sum_dolar.to_f < 0) or (@compra.moeda == 1 and @sum_guarani.to_f < 0) or (@compra.moeda == 2  and @sum_real.to_f < 0) or (@compra.moeda == 4 and @sum_euro.to_f < 0) %>
+		<% if @compra.tipo.to_i == 0 %>
+			<%= render :partial=>"/compras_financas/new_financa_co", :locals=>{:compras_financa=>ComprasFinanca.new(:compra_id=>@compra.id)} %>
+		<% else %>
+			<%= render :partial=>"/compras_financas/new_financa_cre", :locals=>{:compras_financa=>ComprasFinanca.new(:compra_id=>@compra.id)} %>
+		<% end %>
+	<% elsif (@compra.moeda == 0 and @sum_dolar.to_f == 0) or (@compra.moeda == 1 and @sum_guarani.to_f == 0) or (@compra.moeda == 2  and @sum_real.to_f == 0) or (@compra.moeda == 4 and @sum_euro.to_f == 0) %>
+		<div class="alert alert-success" align="center" style="margin: 10px">
+			<h1> <b>Registro Concluida Click en Finalizar para Sair!</b></h1>
+		</div>
+	<% end %>
+</div>
+
+
+
+<div class="footer-buttons" style="padding: 20px 0px  20px 12px">
+	<% if @compra.tipo_compra == 0 %>
+	  <%= link_to t('BACK'), compra_path(@compra), class: "btn btn-back" %>
+
+	  <%= link_to t('VOUCHER'), comprovante_compra_path(@compra), class: "btn btn-blue" %>
+		<% if (@compra.moeda == 0 and @sum_dolar.to_f == 0) or (@compra.moeda == 1 and @sum_guarani.to_f == 0) or (@compra.moeda == 2  and @sum_real.to_f == 0) or (@compra.moeda == 4 and @sum_euro.to_f == 0) %>
+		<%= link_to ' Finalizar', compras_path, class: "btn btn-info next", "data-plus-as-tab" => "false"  %>
+		<% end %>
+
+	<% elsif @compra.tipo_compra == 1 %>
+
+	  <%= link_to t('BACK'), compras_custos_compra_path(@compra), class: "btn btn-back" %>
+	  <%= link_to t('VOUCHER'), comprovante_compra_path(@compra), class: "btn btn-blue" %>
+		<% if (@compra.moeda == 0 and @sum_dolar.to_f == 0) or (@compra.moeda == 1 and @sum_guarani.to_f == 0) or (@compra.moeda == 2  and @sum_real.to_f == 0) or (@compra.moeda == 4 and @sum_euro.to_f == 0) %>
+		<%= link_to ' Finalizar', index_gasto_compras_path, class: "btn btn-info next", "data-plus-as-tab" => "false" %>
+		<% end %>
+
+	<% elsif @compra.tipo_compra == 3 %>
+
+	  <%= link_to t('BACK'), compra_path(@compra), class: "btn btn-back" %>
+	  <%= link_to t('VOUCHER'), comprovante_compra_path(@compra), class: "btn btn-blue" %>
+		<% if (@compra.moeda == 0 and @sum_dolar.to_f == 0) or (@compra.moeda == 1 and @sum_guarani.to_f == 0) or (@compra.moeda == 2  and @sum_real.to_f == 0) or (@compra.moeda == 4 and @sum_euro.to_f == 0) %>
+		<%= link_to ' Finalizar', index_bens_compras_path, class: "btn btn-info next", "data-plus-as-tab" => "false" %>
+		<% end %>
+
+	<% end %>
+</div>
+
+<%= hidden_field_tag :id, @compra.id %>
+<script>
+	$(".next").focus()
+</script>

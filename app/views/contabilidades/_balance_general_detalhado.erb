@@ -1,0 +1,256 @@
+
+
+<div class="group">
+  
+  <table>
+
+		<tr class = "head">
+			<td colspan="3" width="80" align="center">Cod.</td>
+			<td width="300">Descripcion</td>
+			<td align="right" width="80"></td>
+			<td align="right" width="80">Saldo</td>
+		</tr>
+
+      <% qb_clase           = "" %>
+      <% qb_grupo           = "" %>
+      <% totalgrupoanterior_gs   = 0 %>
+      <% totalgruposaldo_gs      = 0 %>
+      <% totalclaseanterior_gs   = 0 %>
+      <% totalclasesaldo_gs      = 0 %>
+
+      <% totalgrupoanterior_us   = 0 %>
+      <% totalgruposaldo_us      = 0 %>
+      <% totalclaseanterior_us   = 0 %>
+      <% totalclasesaldo_us      = 0 %>
+
+      <% total_us   = 0 %>
+      <% total_us    = 0 %>
+
+      <% @balance.each do |balance|%>
+                  <% if ( qb_grupo != balance.codigo[0..03] ) or ( qb_clase != balance.codigo[0..01] ) %>
+                     <% if ( qb_grupo != "" ) %>
+                           <tr class="head">
+                              <td bgcolor="white"></td>
+                              <td bgcolor="white"></td>
+                              <td width="80" align="left">        </td>
+                              <td width="300" align="left">       </td>
+                              <% if params[:moeda].to_s == "0" %>
+									             <% if totalgruposaldo_us != 0 %>
+                                <td width="100" align="right"><% number_to_currency( totalgrupoanterior_us , :format=>' %n ', :separeitor => ',' ) %></td>
+                                <td width="100" align="right"  style="border-top: 1px solid black;">      <%= number_to_currency( totalgruposaldo_us , :format=>' %n ', :separeitor => ',' ) %></td>
+							    <% totalgrupoanterior_us   = 0 %>
+      							<% totalgruposaldo_us      = 0 %>
+								<% end %>
+                              <% else %>  
+                                <td width="100" align="right"  style="border-top: 1px solid black;">      <% number_to_currency( totalgrupoanterior_gs , :format=>' %n ', :precision => 0) %></td>
+                                <td width="100" align="right"  style="border-top: 1px solid black;">      <%= number_to_currency( totalgruposaldo_gs , :format=>' %n ', :precision => 0) %></td>
+							    <% totalgrupoanterior_gs   = 0 %>
+      							<% totalgruposaldo_gs      = 0 %>
+
+                              <% end %>  
+                           </tr>
+
+                           <tr class="head">
+                              <td bgcolor="white"></td>
+                              <td bgcolor="white"></td>
+                              <td width="80" align="left">        </td>
+                              <td width="300" align="left">       </td>
+                              <td width="100" align="right">      </td>
+                              <td width="100" align="right">      </td>
+                           </tr>
+                           
+                           <% totalgrupoanterior   = 0 %>
+                           <% totalgruposaldo      = 0 %>
+                     <% end %>
+                  <% end %>
+
+                  <% if ( qb_clase != balance.codigo[0..01] ) %>
+                     <% if ( qb_clase != "" ) %>
+                           <tr class="head" height="35">
+                              <td bgcolor="white"></td>
+                              <td bgcolor="white"></td>
+                              <td width="80" align="left">        </td>
+                              <td width="280" align="right">TOTAL ==> </td>
+							  <% qb_descri           = "" %>
+                              <% if params[:moeda].to_s == "0" %>
+                                <td width="100" align="right">      <% number_to_currency( totalclaseanterior_us , :format=>' %n ', :separeitor => ',') %></td>
+                                <td width="100" align="right">      <%= number_to_currency( totalclasesaldo_us , :format=>' %n ', :separeitor => ',') %></td>
+						        <% totalclaseanterior_us   = 0 %>
+					            <% totalclasesaldo_us      = 0 %>
+                              <% else %>
+                                <td width="100" align="right">      <% number_to_currency( totalclaseanterior_gs , :format=>' %n ', :precision => 0) %></td>
+                                <td width="100" align="right">      <%= number_to_currency( totalclasesaldo_gs , :format=>' %n ', :precision => 0) %></td>
+						        <% totalclaseanterior_gs   = 0 %>
+					            <% totalclasesaldo_gs      = 0 %>
+                              <% end %>  
+                           </tr>
+
+                           <% totalclaseanterior   = 0 %>
+                           <% totalclasesaldo      = 0 %>
+
+                     <% end %>
+                  <% end %>
+
+
+                  <%
+                     #CLASE
+                     if balance.codigo[02..14]== ""
+                        varcodigo = balance.codigo[0..01].to_s
+                     #GRUPO
+                     elsif balance.codigo[04..10]== ""
+                        varcodigo = balance.codigo[0..03].to_s
+                     #CONTA
+                     elsif balance.codigo[7..8]== ""
+                        varcodigo = balance.codigo[0..6].to_s
+                     #ITEM
+                     elsif balance.codigo[11..3]== ""
+                        varcodigo = balance.codigo[0..10].to_s
+                     #SUB_ITEM
+                     else
+                        varcodigo = balance.codigo.to_s
+
+                     end 
+
+                     sum_debe_anterior_us  = DiarioDebe.sum(:valor_dolar,:conditions => [ "data < '#{params[:inicio]}' AND contabilidade LIKE ?","#{varcodigo}%"])
+                     sum_haber_anterior_us = DiarioHaber.sum(:valor_dolar,:conditions => [ "data < '#{params[:inicio]}' AND contabilidade LIKE ?","#{varcodigo}%"])
+                     sum_debe_us  = DiarioDebe.sum(:valor_dolar,:conditions => [ "data BETWEEN '#{params[:inicio]}'  AND  '#{params[:final]}' AND contabilidade LIKE ?","#{varcodigo}%"])
+                     sum_haber_us = DiarioHaber.sum(:valor_dolar,:conditions => [ "data BETWEEN '#{params[:inicio]}'  AND  '#{params[:final]}' AND contabilidade LIKE ?","#{varcodigo}%"])
+
+                     sum_debe_anterior_gs  = DiarioDebe.sum(:valor_guarani,:conditions => [ "data < '#{params[:inicio]}' AND contabilidade LIKE ?","#{varcodigo}%"])
+                     sum_haber_anterior_gs = DiarioHaber.sum(:valor_guarani,:conditions => [ "data < '#{params[:inicio]}' AND contabilidade LIKE ?","#{varcodigo}%"])
+                     sum_debe_gs  = DiarioDebe.sum(:valor_guarani,:conditions => [ "data BETWEEN '#{params[:inicio]}'  AND  '#{params[:final]}' AND contabilidade LIKE ?","#{varcodigo}%"])
+                     sum_haber_gs = DiarioHaber.sum(:valor_guarani,:conditions => [ "data BETWEEN '#{params[:inicio]}'  AND  '#{params[:final]}' AND contabilidade LIKE ?","#{varcodigo}%"])
+
+                  %>
+                        <% if ( balance.codigo[2..11] == "" ) %>
+                        <% qb_clase = balance.codigo[0..1] %>
+                        <% qb_grupo = "" %>
+                        <% end %>
+
+                        <% if ( balance.codigo[4..10] == "" ) %>
+                              <tr class = "<%= cycle("corb1", "corb2") %>">
+                                 <td bgcolor="white"></td>
+                                 <td bgcolor="white"></td>
+                                 <td width="80" align="left">        <%=  balance.codigo[0..4]%></td>
+                                 <td width="280" align="left">       <%=  balance.descricao %></td>
+                                 <td width="100" align="right">      </td>
+                                 <td width="100" align="right">      </td>
+                              </tr>
+                        <% qb_grupo = balance.codigo[0..4] %>
+                        <% end %>
+
+                        <% if ( balance.codigo[2..10] != "" ) %>
+								<% if ( ( sum_debe_anterior_us.to_f - sum_haber_anterior_us.to_f ) + sum_debe_us.to_f - sum_haber_us.to_f ) != 0 %>
+                              <tr class = "<%= cycle("corb1", "corb2") %>">
+                                 <td bgcolor="white"></td>
+                                 <td bgcolor="white"></td>
+                                 <td width="80" align="left">        <%=  balance.codigo[0..10]%></td>
+                                 <td width="580" align="left">       <%=  balance.descricao %></td>
+                                 <% if params[:moeda].to_s == "0" %>                   
+					                <% if balance.codigo[04..10]== "" or  balance.codigo[7..8]== ""%>           
+		                                   <td width="100" align="right"></td>
+        		                           <td width="100" align="right"></td>
+									<% else %>
+		                                   <td width="100" align="right">      <%  number_to_currency( sum_anterior_us =  ( sum_debe_anterior_us.to_f - sum_haber_anterior_us.to_f ) , :format=>' %n ', :separeitor => ',')  %></td>
+        		                           <td width="100" align="right">      <%=  number_to_currency( ( ( sum_anterior_us + sum_debe_us.to_f ) - sum_haber_us.to_f ) , :format=>' %n ', :separeitor => ',')  %></td>
+
+				                             <% totalgrupoanterior_us  = totalgrupoanterior_us.to_f + sum_anterior_us.to_f
+				                              totalgruposaldo_us     = totalgruposaldo_us.to_f    + ( (sum_anterior_us.to_f + sum_debe_us.to_f ) - sum_haber_us.to_f )
+		
+				                              totalclaseanterior_us  = totalclaseanterior_us.to_f + sum_anterior_us.to_f
+				                              totalclasesaldo_us     = totalclasesaldo_us.to_f    + ( (sum_anterior_us.to_f + sum_debe_us.to_f )- sum_haber_us.to_f )%>
+										      <% total_us   += ( (sum_anterior_us.to_f + sum_debe_us.to_f )- sum_haber_us.to_f ) %>
+      										  
+
+									<% end %>
+                                 <% else %>  
+
+					                <% if balance.codigo[04..10]== "" or  balance.codigo[7..8]== ""%>           
+		                                   <td width="100" align="right"></td>
+        		                           <td width="100" align="right"></td>
+									<% else %>
+                                   <td width="100" align="right">      <%  number_to_currency( sum_anterior_gs =  ( sum_debe_anterior_gs.to_f - sum_haber_anterior_gs.to_f ) , :format=>' %n ', :precision => 0)  %></td>
+                                   <td width="100" align="right">      <%=  number_to_currency( ( sum_anterior_gs + sum_debe_gs.to_f - sum_haber_gs.to_f ) , :format=>' %n ', :precision => 0)  %></td>
+
+		                              <% totalgrupoanterior_gs  = totalgrupoanterior_gs.to_f + sum_anterior_gs.to_f
+    				                          totalgruposaldo_gs     = totalgruposaldo_gs.to_f    + ( sum_anterior_gs.to_f + sum_debe_gs.to_f - sum_haber_gs.to_f )
+	
+    				                          totalclaseanterior_gs  = totalclaseanterior_gs.to_f + sum_anterior_gs.to_f
+    				                          totalclasesaldo_gs     = totalclasesaldo_gs.to_f    + ( sum_anterior_gs.to_f + sum_debe_gs.to_f - sum_haber_gs.to_f ) %>
+											<% total_gs    += ( sum_anterior_gs.to_f + sum_debe_gs.to_f - sum_haber_gs.to_f ) %>
+
+									<% end %>
+
+
+                                 <% end %>  
+							<% end %>
+                              </tr>
+					<% end %>
+
+
+
+      <% end %>
+
+                           <tr class="head">
+                              <td bgcolor="white"></td>
+                              <td bgcolor="white"></td>
+                              <td width="80" align="left">        </td>
+                              <td width="300" align="left">       </td>
+                              <% if params[:moeda].to_s == "0" %>
+									<% if totalgruposaldo_us != 0 %>
+                                <td width="100" align="right">      <% number_to_currency( totalgrupoanterior_us , :format=>' %n ', :separeitor => ',' ) %></td>
+                                <td width="100" align="right"  style="border-top: 1px solid black;">      <%= number_to_currency( totalgruposaldo_us , :format=>' %n ', :separeitor => ',' ) %></td>
+							    <% totalgrupoanterior_us   = 0 %>
+      							<% totalgruposaldo_us      = 0 %>
+								<% end %>
+                              <% else %>  
+                                <td width="100" align="right"  style="border-top: 1px solid black;">      <% number_to_currency( totalgrupoanterior_gs , :format=>' %n ', :precision => 0) %></td>
+                                <td width="100" align="right"  style="border-top: 1px solid black;">      <%= number_to_currency( totalgruposaldo_gs , :format=>' %n ', :precision => 0) %></td>
+							    <% totalgrupoanterior_gs   = 0 %>
+      							<% totalgruposaldo_gs      = 0 %>
+
+                              <% end %>  
+                           </tr>
+
+                           <tr class="head">
+                              <td bgcolor="white"></td>
+                              <td bgcolor="white"></td>
+                              <td width="80" align="left">        </td>
+                              <td width="300" align="left">       </td>
+                              <td width="100" align="right">      </td>
+                              <td width="100" align="right">      </td>
+                           </tr>
+                           
+                           <% totalgrupoanterior   = 0 %>
+                           <% totalgruposaldo      = 0 %>
+
+
+                           <tr class="head" height="35">
+                              <td bgcolor="white"></td>
+                              <td bgcolor="white"></td>
+                              <td width="80" align="left">        </td>
+                              <td width="280" align="right">TOTAL ==> </td>
+							  <% qb_descri           = "" %>
+                              <% if params[:moeda].to_s == "0" %>
+                                <td width="100" align="right">      <% number_to_currency( totalclaseanterior_us , :format=>' %n ', :separeitor => ',') %></td>
+                                <td width="100" align="right">      <%= number_to_currency( totalclasesaldo_us , :format=>' %n ', :separeitor => ',') %></td>
+						        <% totalclaseanterior_us   = 0 %>
+					            <% totalclasesaldo_us      = 0 %>
+                              <% else %>
+                                <td width="100" align="right">      <% number_to_currency( totalclaseanterior_gs , :format=>' %n ', :precision => 0) %></td>
+                                <td width="100" align="right">      <%= number_to_currency( totalclasesaldo_gs , :format=>' %n ', :precision => 0) %></td>
+						        <% totalclaseanterior_gs   = 0 %>
+					            <% totalclasesaldo_gs      = 0 %>
+                              <% end %>  
+                           </tr>
+
+      <tr>
+      	<td colspan="5">___________________________________________________________________________________________________________________________________________________</td>
+      </tr>
+    </table>
+</div>
+
+<style type="text/css">
+  table { border-collapse: collapse;}
+
+</style>

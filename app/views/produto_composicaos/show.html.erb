@@ -1,0 +1,38 @@
+<p>
+  <b>Produto:</b>
+  <%=h @produto_composicao.produto_id %>
+</p>
+
+<p>
+  <b>Componente:</b>
+  <%=h @produto_composicao.componente_id %>
+</p>
+
+<p>
+  <b>Componente <%= t('NAME') %>:</b>
+  <%=h @produto_composicao.componente_nome %>
+</p>
+
+<p>
+  <b>Clase:</b>
+  <%=h @produto_composicao.clase_id %>
+</p>
+
+<p>
+  <b>Grupo:</b>
+  <%=h @produto_composicao.grupo_id %>
+</p>
+
+<p>
+  <b>Quantidade:</b>
+  <%=h @produto_composicao.quantidade %>
+</p>
+
+<p>
+  <b>Ultimo custo:</b>
+  <%=h @produto_composicao.ultimo_custo %>
+</p>
+
+
+<%= link_to 'Edit', edit_produto_composicao_path(@produto_composicao) %> |
+<%= link_to 'Back', produto_composicaos_path %>

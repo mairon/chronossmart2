@@ -1,0 +1,160 @@
+<h2 align="center">Deudas</h2>
+
+<h5>
+  Cliente : <%= @cobro.persona_nome %>
+
+</h5>
+<div class="group">
+  <% empresa = Empresa.last(:select => "taxa_interes") %>
+   <table class="head_grid">
+      <tr>
+        <td width="20" align="center"><input type="checkbox" id="selectAllM" value="selectAllM"></td>
+        <td width="60" align="center"><%= t('DATE') %></td>
+        <td width="150"><%= t('UNIT') %></td>
+        <td width="30">M OP</td>
+        <td width="40"><%= t('QUOTE') %> <%= t('SALE') %></td>
+        <td width="70"><%= t('SOURCE_S') %></td>
+        <td width="150"><%= t('DOC') %></td>
+        <td width="20" align="center"><%= t('SHARE') %></td>
+        <td width="60" align="center">Venc.</td>
+        <td width="40" align="center">Dias</td>
+        <td width="80" align="center"><%= t('INTEREST') %></td>
+        <td width="80" align="center"><%= t('VALUE') %></td>
+        <td width="80" align="center">Anterior</td>
+        <td width="80" align="center">Saldo Orig.</td>
+        <td width="80" align="center">Saldo Corig.</td>
+        <td width="50" align="center">Dif.Camb</td>
+        <% tot_interes_gs   = 0 %>
+        <% tot_divida_gs    = 0 %>
+        <% tot_corrigida_gs = 0 %>
+        <% @cliente.each do |c| %>
+
+            <% if @cobro.moeda.to_i == 0 %>
+              <% if c.moeda.to_i == 0 %>
+                <% saldo_dolar = (c.divida_dolar.to_f - c.anterior_us.to_f) %>
+                <% saldo_dolar_original = (c.divida_dolar.to_f - c.anterior_us.to_f) %>
+              <% else %>
+                <% saldo_dolar_original = (c.divida_dolar.to_f - c.anterior_us.to_f) %>
+                <% saldo_dolar = ((c.divida_guarani.to_f - c.anterior_gs.to_f) / @cobro.cotacao.to_f) %>
+              <% end %>
+
+              <!-- calculo de interes -->
+              <%  dias = Date.today - c.vencimento.to_date if c.liquidacao == 0  %>
+              <%  if dias >= 0  %>           
+                  <%  interes_us = ( ( dias.to_i * empresa.taxa_interes.to_f ) * saldo_dolar.to_f) / 100  %>          
+              <% else %>
+                 <%  interes_us = 0  %>          
+              <% end %>
+              <% saldo_guarani = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+              <tr class = "<%= cycle( "cor1", "cor2" ) %>"
+                  onMouseOver="javascript:this.style.backgroundColor='#949494'"
+                  onMouseOut="javascript:this.style.backgroundColor=''"
+                  onClick="Fecha( '<%= c.vencimento.strftime("%d").to_i %>',
+                                  '<%= c.vencimento.strftime("%m").to_i %>',
+                                  '<%= c.vencimento.strftime("%Y").to_i %>',
+                                  '<%= c.documento_numero_01 %>',
+                                  '<%= c.documento_numero_02 %>',
+                                  '<%= c.documento_numero %>',
+                                  '<%= c.cota %>',
+                                  '<%= number_to_currency(interes_us.to_f, :format=>'%n', :separeitor => ',') %>',
+                                  '<%= number_to_currency(c.divida_dolar.to_f, :format=>'%n', :separeitor => ',') %>',
+                                  '<%= number_to_currency(c.anterior_us.to_f, :format=>'%n', :separeitor => ',') %>',
+                                  '<%= number_to_currency(saldo_guarani.to_f, :format=>'%n', :separeitor => ',') %>',
+                                  '<%= number_to_currency(saldo_dolar.to_f, :format=>'%n', :separeitor => ',') %>',
+                                  '<%= number_to_currency(saldo_dolar_original.to_f, :format=>'%n', :separeitor => ',') %>',
+                                  '<%= number_to_currency((saldo_dolar.to_f - saldo_dolar_original.to_f), :format=>'%n', :separeitor => ',') %>',
+                                  '<%= c.venda_id %>')">
+
+            <% else %>
+             
+              <% if c.moeda.to_i == 1 %>
+                <% saldo_guarani = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+                <% saldo_guarani_original = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+              <% else %>
+                <% saldo_guarani_original = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+                <% saldo_guarani = ((c.divida_dolar.to_f - c.anterior_us.to_f) * @cobro.cotacao.to_f) %>
+              <% end %>
+
+              <!-- calculo de interes -->
+              <%  dias = Date.today - c.vencimento.to_date if c.liquidacao == 0  %>
+              <%  if dias >= 0  %>           
+                  <%  interes_gs = ( ( dias.to_i * empresa.taxa_interes.to_f ) * saldo_guarani.to_f) / 100  %>      
+              <% else %>
+                 <%  interes_gs = 0  %>    
+              <% end %>
+
+              <% saldo_dolar = (c.divida_dolar.to_f - c.anterior_us.to_f) %>
+              <tr class = "<%= cycle( "cor1", "cor2" ) %>"
+                  onMouseOver="javascript:this.style.backgroundColor='#949494'"
+                  onMouseOut="javascript:this.style.backgroundColor=''"
+                  onClick="Fecha( '<%= c.vencimento.strftime("%d").to_i %>',
+                                  '<%= c.vencimento.strftime("%m").to_i %>',
+                                  '<%= c.vencimento.strftime("%Y").to_i %>',
+                                  '<%= c.documento_numero_01 %>',
+                                  '<%= c.documento_numero_02 %>',
+                                  '<%= c.documento_numero %>',
+                                  '<%= c.cota %>',
+                                  '<%= number_to_currency(interes_gs.to_f, :format=>'%n', :precision => 0 ) %>',
+                                  '<%= number_to_currency(c.divida_guarani.to_f, :format=>'%n', :precision => 0 ) %>',
+                                  '<%= number_to_currency(c.anterior_gs.to_f, :format=>'%n', :precision => 0 ) %>',
+                                  '<%= number_to_currency(saldo_dolar.to_f, :format=>'%n', :separeitor => ',' ) %>',
+                                  '<%= number_to_currency(saldo_guarani.to_f, :format=>'%n', :precision => 0 ) %>',
+                                  '<%= number_to_currency(saldo_guarani_original.to_f, :format=>'%n', :precision => 0 ) %>',
+                                  '<%= number_to_currency(saldo_guarani.to_f - saldo_guarani_original.to_f, :format=>'%n', :precision => 0 ) %>',
+                                  '<%= c.venda_id %>')">
+
+            <% end %>
+           
+            <td width="20" align="center"><%= check_box_tag "cobro[dividas_ids][]", c.id, false, { :class => 'm' } %></td>
+            <td width="60"  align="center"><%= c.data.strftime("%d/%m/%y")%></td>
+            <td width="150"><%= c.unidade_nome %></td>
+            <td width="30" align="left">
+              <% if c.moeda == 0 %>
+                U$
+              <% elsif c.moeda == 1 %>
+                G$
+              <% else c.moeda == 0 %>
+                R$
+              <% end %>
+            </td>
+            <td width="40" align="right"><%= number_to_currency(c.cotacao_venda, :format=>' %n ', :precision => 0 ) %></td>
+            <td width="70" align="left"><%= c.sigla_proc %>.<%= c.cod_proc.to_s.rjust(4,'0')%></td>
+            <td width="150"><%= c.documento_numero_01%>-<%= c.documento_numero_02%>-<%= c.documento_numero%></td>
+            <td width="30"  align="center"><%= c.cota %></td>
+            <td width="60"  align="center"><%= c.vencimento.strftime("%d/%m/%y")%></td>
+            <td width="40" align="center"><%= dias.to_i %></td>
+
+            <% if @cobro.moeda.to_i == 0 %>
+            <td width="80" align="right"><%= number_to_currency(interes_us, :format=>' %n ', :separeitor => ',')%></td>
+              <td width="80" align="right"><%= number_to_currency(c.divida_dolar, :format=>' %n ', :separeitor => ',')%></td>
+              <td width="80" align="right"><%= number_to_currency(c.anterior_us, :format=>' %n ', :separeitor => ',' )%></td>
+              <td width="80" align="right"><%= number_to_currency(saldo_dolar_original, :format=>' %n ', :separeitor => ',' )%></td>
+              <td width="80" align="right"><%= number_to_currency(saldo_dolar.to_f, :format=>' %n ', :separeitor => ',' )%></td>
+              <td width="50" align="right"><%= number_to_currency((saldo_dolar.to_f) - saldo_dolar_original.to_f, :format=>' %n ', :separeitor => ',' )%></td>
+            <% else %>
+              <td width="80" align="right"><%= number_to_currency(interes_gs, :format=>' %n ', :precision => 0 )%></td>
+              <td width="80" align="right"><%= number_to_currency(c.divida_guarani, :format=>' %n ', :precision => 0 )%></td>
+              <td width="80" align="right"><%= number_to_currency(c.anterior_gs, :format=>' %n ', :precision => 0 )%></td>
+              <td width="80" align="right"><%= number_to_currency(saldo_guarani_original, :format=>' %n ', :precision => 0 )%></td>
+              <td width="80" align="right"><%= number_to_currency(saldo_guarani.to_f, :format=>' %n ', :precision => 0 )%></td>
+              <td width="50" align="right"><%= number_to_currency((saldo_guarani.to_f) - saldo_guarani_original.to_f, :format=>' %n ', :precision => 0 )%></td>
+              <% tot_interes_gs   += interes_gs.to_f %>
+              <% tot_divida_gs    += saldo_guarani_original.to_f %>
+              <% tot_corrigida_gs += ( saldo_guarani.to_f ) %>
+
+            <% end %>
+
+          </tr>
+        <% end %>
+        <td align="right" colspan="10">Saldo:</td>
+        <% if @cobro.moeda == 1 %>
+          <td width="80" align="right"><b><%= format_int(tot_interes_gs.to_f) %></b></td>
+          <td width="80" align="right"></td>
+          <td width="80" align="right"></td>
+          <td width="80" align="right"><b><%= format_int(tot_divida_gs.to_f) %></b></td>
+          <td width="80" align="right"><b><%= format_int(tot_corrigida_gs.to_f) %></b></td>
+        <% else %>
+        <% end %>
+      </tr>
+    </table>
+</div>

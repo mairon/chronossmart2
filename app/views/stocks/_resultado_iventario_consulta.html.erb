@@ -1,0 +1,185 @@
+
+<div class="group">
+
+  <table>
+      <% quebra_clase            = ""%>
+      <% quebra_grupo            = ""%>
+      <% qtd                     = 0 %>
+      <% subclaseqtd             = 0 %>
+      <% subgrupoqtd             = 0 %>
+
+      <% @stocks.each do |produto| %>
+
+                 <%if quebra_clase != produto.clase_id or quebra_grupo != produto.grupo_id %>
+
+                     <%if quebra_grupo != produto.grupo_id or quebra_clase != produto.clase_id %>
+
+                         <%if quebra_grupo != ""  %>
+
+                             <tr class="head">
+                                 <td colspan="3"></td>
+                                 <td><%= number_to_currency( subgrupoqtd,           :format=>' %n ', :precision => 0 ) %></td>
+                                 <td></td>
+                                 <td></td>
+                             </tr>
+
+                             <tr>
+                                 <td></td>
+                             </tr>
+
+                             <% subgrupoqtd            = 0 %>
+
+                        <%end%>
+
+                        <%if quebra_clase != ""  %>
+
+                             <tr class="head">
+                                 <td colspan="3"></td>
+                                 <td align="right"><%= number_to_currency( subclaseqtd,           :format=>' %n ', :precision => 0 ) %></td>
+                                 <td></td>                                 
+                             </tr>
+
+                             <tr>
+                                 <td></td>
+                             </tr>
+
+                             <% subclaseqtd            = 0 %>
+
+                        <%end%>
+
+                     <%end%>
+
+                     <tr class="head">
+                       <td><%=h quebra_clase = produto.clase_id %> - </td>
+                       <td>
+                                                     <%clase_descricao =  Clase.find_by_id(quebra_clase) %>
+                                                     <%= clase_descricao.descricao %></td>
+                       <td></td>
+
+
+
+                     </tr>
+         
+                     <tr class="head">
+                        <td colspan="1"></td>
+                        <td><%=h quebra_grupo = produto.grupo_id %> - </td>
+                        
+                        <td>                         <%grupo_descricao =  Grupo.find_by_id(quebra_grupo) %>
+                                                     <%= grupo_descricao.descricao %></td>
+                        <td></td>
+                        <td></td>
+                     </tr>
+
+                 <%end%>
+
+                <% stock = Stock.sum( 'entrada - saida',:conditions => ['produto_id = ?',produto.id] ) %>
+
+                <% if params[:filtro].to_s == "1" %>
+
+                   <% if stock.to_i > 0 %>
+                           
+                      <% suma_entrada = Stock.sum(:entrada, :conditions => ["produto_id = #{produto.id} AND data <= '#{params[:inicio]}'"])
+
+                           if suma_entrada > 0
+
+                               suma_custo_dolar    = Stock.sum('( entrada * custo_contabil_dolar )',   :conditions => ["produto_id = #{produto.id} AND data <= '#{params[:inicio]}'"])
+                               suma_custo_guarani  = Stock.sum('( entrada * custo_contabil_guarani )', :conditions => ["produto_id = #{produto.id} AND data <= '#{params[:inicio]}'"])
+
+                            end %>
+
+                            <tr>
+                              <td width="50"></td>
+                              <td width="80" align="center">  <%= produto.cod_velho%> </td>
+                              <td width="570"  align="left">  <%= produto.nome%> </td>
+                              <td width="100" align="right">  <%= number_to_currency(stock,                                                :format=>' %n ', :precision => 0) %> </td>
+                              <td width="400" align="right"></td>
+                            </tr>
+
+                            <% subgrupoqtd               = subgrupoqtd.to_f        + stock.to_f %>
+
+                            <% subclaseqtd               = subclaseqtd.to_f        + stock.to_f %>
+
+
+                            <% qtd               = qtd.to_f        + stock.to_f %>
+
+                   <%end%>
+
+                <% else %>
+
+                   <% suma_entrada        = Stock.sum(:entrada, :conditions => ["produto_id = #{produto.id} AND data <= '#{params[:inicio]}'"])
+
+                           if suma_entrada > 0
+                              suma_custo_dolar    = Stock.sum('( entrada * custo_contabil_dolar )',   :conditions => ["produto_id = #{produto.id} AND data <= '#{params[:inicio]}'"])
+                              suma_custo_guarani  = Stock.sum('( entrada * custo_contabil_guarani )', :conditions => ["produto_id = #{produto.id} AND data <= '#{params[:inicio]}'"])
+
+                              stock_custo_dolar   = ( suma_custo_dolar.to_f / suma_entrada.to_f )
+                              stock_custo_guarani = ( suma_custo_guarani.to_f / suma_entrada.to_f )
+
+                           else
+
+                              stock_custo_dolar   = 0
+                              stock_custo_guarani = 0
+
+                           end %>
+
+                           <tr>
+                             <td width="50"></td>
+                             <td width="80" align="center">  <%= produto.cod_velho%> </td>
+                             <td width="570"  align="left">  <%= produto.nome%> </td>
+                             <td width="100" align="right">  <%= number_to_currency( stock,                                                :format=>' %n ', :precision => 0) %> </td>
+                             <td width="400" align="right"></td>
+                           </tr>
+
+                           <% subgrupoqtd               = subgrupoqtd.to_f        + stock.to_f %>
+
+                           <% subclaseqtd               = subclaseqtd.to_f        + stock.to_f %>
+
+                           <% qtd               = qtd.to_f        + stock.to_f %>
+
+                <% end %>
+
+      <% end %>
+
+
+       <tr class="head">
+           <td colspan="3"></td>
+           <td align="right"><%= number_to_currency( subgrupoqtd,           :format=>' %n ', :precision => 0 ) %></td>
+           <td></td>
+       </tr>
+
+       <% subgrupoqtd            = 0 %>
+
+      <tr class="head">
+           <td colspan="3"></td>
+           <td align="right"><%= number_to_currency( subclaseqtd,           :format=>' %n ', :precision => 0 ) %></td>
+           <td></td>
+      </tr>
+
+      <tr>
+           <td></td>
+      </tr>
+
+       <% subclaseqtd            = 0 %>
+
+        <tr class="head" height="20">
+          <td></td>
+          <td></td>
+          <td></td>
+          <td align="right"><%= number_to_currency( qtd,           :format=>' %n ', :precision => 0 ) %></td>
+          <td></td>
+        </tr>
+        <tr>
+        </tr>
+    </table>
+</div>
+
+
+<style type="text/css">
+  table { border-collapse: collapse;
+          font-size: 10px}
+
+  .titulo{font-size: 22px}
+  td,tr { border: 1px solid black; }
+</style>
+
+

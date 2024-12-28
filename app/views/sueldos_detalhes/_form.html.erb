@@ -1,0 +1,91 @@
+<h1 id="header">Sueldo Detalhe - Edicion </h1>
+<body onload="SueldoDetalheFocoData()">
+  <%= form_for(@sueldos_detalhe) do |f| %>
+
+  <%= f.hidden_field :sueldo_id %>
+  <%= f.hidden_field :persona_id, :value => @sueldos_detalhe.sueldo.persona_id %>
+  <%= f.hidden_field :persona_nome, :value => @sueldos_detalhe.sueldo.persona_nome %>
+
+  <div class="group_cd">
+    <table>
+        <tr>
+          <td align="right"><%= t('DATE') %> :</td>
+          <td><%= f.date_select :data ,{},{:onblur => "SueldoDetalheCotacao()"} %></td>
+          <%= hidden_field_tag( 'key' ) %>
+        </tr>
+          <tr>
+             <td></td>
+            <td>
+              <fieldset>
+                <legend><%= t('COIN') %></legend>
+                <%= f.radio_button :moeda, 1,  :Checked => "True" %> Gs.
+                <%= f.radio_button :moeda, 0 %> Dolar
+                <%= f.radio_button :moeda, 2 %> Real
+              </fieldset>
+            </td>
+          </tr>
+        
+
+    <tr>
+       <td align="right">Tipo :</td>
+                      <td><%= f.select :tipo,
+                          ([["SUELDO", "SUELDO"],
+                            ["BONIFICACION", "BONIFICACION"],
+                            ["EXTRA", "EXTRA"],
+                            ["ADELANTO", "ADELANTO"],
+                            ["COMISION", "COMISION"],
+                            ["VACACIONES", "VACACIONES"],
+                            ["AGUINALDO", "AGUINALDO"],
+                            ["IPS", "IPS"],
+                            ["OTROS", "OTROS"]
+                            ]) %>
+                      </td>
+    </tr>
+    <tr>
+      <td align="right">Doc.:</td>
+      <td>
+        <%= f.text_field :documento_numero_01, size: 5 %>
+        <%= f.text_field :documento_numero_02, size: 5 %>
+        <%= f.text_field :documento_numero, size: 15 %>
+      </td>
+    </tr>
+
+    <tr>
+      <td align="right">Estado:</td>
+      <td colspan="3">
+        <fieldset>
+          <legend>Liquidacion</legend>
+          <%= f.radio_button :estado,0, :Checked => "True"%> Parte
+          <%= f.radio_button :estado,1  %> Cancelacion
+        </fieldset>
+        </td>
+    </tr>
+
+    <tr>
+      <%= field_us 'Credito U$:',f,:credito_us %>
+      <%= field_us 'Debito U$:',f,:debito_us %>
+    </tr>
+
+    <tr>
+      <%= field_gs 'Credito G$:',f,:credito_gs %>
+      <%= field_gs 'Debito G$:',f,:debito_gs %>
+    </tr>
+    <tr>
+      <%= field_us 'Credito R$:',f,:credito_rs %>
+      <%= field_us 'Debito R$:',f,:debito_rs %>
+    </tr>
+
+      <tr>
+        <td valign="top" align="right">Descripcion :</td>
+        <td colspan="4"><%= f.text_area :descricao,
+                             :size => '73x5'%></td>
+
+      </tr>
+
+    </table>
+  </div>
+    <div class="buttons">
+      <%= f.submit t('SAVE'),:disable_with => "Aguarde...", class: 'button'  %> <a href="/sueldos/<%=  @sueldos_detalhe.sueldo.id%>" class="button"><%= t('BACK') %></a>
+    </div>
+  <% end %>
+</body>

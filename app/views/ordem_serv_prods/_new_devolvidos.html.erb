@@ -1,0 +1,48 @@
+<div class="group">
+<%= form_for(ordem_serv_prod_dv) do |f| %>
+  <% if ordem_serv_prod_dv.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(ordem_serv_prod_dv.errors.count, "error") %> prohibited this ordem_serv_prod_dv from being saved:</h2>
+
+      <ul>
+      <% ordem_serv_prod.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= f.hidden_field :ordem_serv_id %>
+  <%= f.hidden_field :status, value: false %>
+  <div class="row">
+    <div class="col-md-12">
+      <label><%= t('DATE') %></label>
+      <%= f.date_select :data, {},{ readonly: true} %>
+    </div>
+  </div>  
+  <div class="row">
+    <div class="col-md-12">
+      <label>Deposito</label>
+      <%= f.collection_select :deposito_id, Deposito.all( :select => ' id,nome', :order  => '2' ), :id, :nome, {},{ readonly: true} %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Producto</label>
+      <%= f.collection_select :produto_id, Produto.all( :select => ' id,nome', :order  => '2' ), :id, :nome,{prompt: 'Selecione lo producto'}, {required: true, readonly: true} %>
+      
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Cantidad</label>
+      <%= f.number_field :quantidade, required: true %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <br>      
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    </div>
+  </div>
+<% end %>
+</div>

@@ -1,0 +1,83 @@
+<% if params[:data_inicio] == nil %>
+<% periodo = "AND date_part('month', V.DATA) = '#{Time.now.strftime('%m')}'  AND  date_part('year', V.DATA) = '#{Time.now.strftime('%Y')}'" %>
+<% else %>
+<% periodo = "AND V.DATA BETWEEN '#{params[:data_inicio].split("/").reverse.join("-")}' AND '#{params[:data_final].split("/").reverse.join("-")}'" %>
+<% end %>
+
+<% sql = "SELECT VENDEDOR_ID, MAX(VENDEDOR_NOME) AS VENDEDOR_NOME, SUM(TOT_GS) AS TOT_GS, SUM(QTD) AS QTD FROM (
+        SELECT V.VENDEDOR_ID,
+         MAX(PN.NOME) AS VENDEDOR_NOME,
+              SUM(VP.TOTAL_GUARANI - VP.DESCONTO_GUARANI) AS TOT_GS,
+              SUM(VP.QUANTIDADE) AS QTD
+        FROM VENDAS_PRODUTOS VP
+        INNER JOIN VENDAS V
+        ON V.ID = VP.VENDA_ID
+
+        INNER JOIN PERSONAS PN
+        ON PN.ID = V.VENDEDOR_ID
+
+        WHERE V.UNIDADE_ID = #{current_unidade.id}
+        #{periodo}
+        AND (SELECT COUNT(VF) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID ) > 0
+
+        GROUP BY 1
+
+        UNION ALL
+
+        SELECT V.VENDEDOR_ID,
+         MAX(PN.NOME) AS VENDEDOR_NOME,
+                (SUM(VP.TOTAL_GUARANI) * -1) AS TOT_GS,
+                (SUM(VP.QUANTIDADE) * -1) AS QTD
+            FROM
+            NOTA_CREDITOS_DETALHES VP
+            INNER JOIN NOTA_CREDITOS V
+            ON V.ID = VP.NOTA_CREDITO_ID
+            INNER JOIN PERSONAS PN
+            ON PN.ID = V.VENDEDOR_ID
+            WHERE V.OPERACAO = 0
+            #{periodo}
+            AND V.UNIDADE_ID = #{current_unidade.id}
+
+            GROUP BY 1
+
+        ) AS X GROUP BY 1
+        ORDER BY 3 desc"
+
+    top_vendedores = Venda.find_by_sql(sql)
+  %>
+
+
+
+
+
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['bar']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Vendedores', 'Facturación'],
+          <% count = 0 %>
+          <% top_vendedores.each do |fm| %>
+          <% count += 1 %>
+          ['<%= count.to_s.rjust(2,'0') %> - <%= fm.vendedor_nome[0..10] %>| <%= fm.qtd.to_i %> | <%= format_int(fm.tot_gs) %>', <%= fm.tot_gs %>],
+          <% end %>
+        ]);
+
+        var options = {
+          chartArea: {width: '100%'},
+          legend: { position: 'none' },
+          vAxis: {title: ''},
+          hAxis: {title: ''},
+
+
+          bars: 'horizontal' // Required for Material Bar Charts.
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('barchart_vendedor'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+      }
+    </script>
+
+<div id="barchart_vendedor" style="height: 300px;"></div>

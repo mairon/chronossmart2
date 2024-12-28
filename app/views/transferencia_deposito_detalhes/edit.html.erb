@@ -1,0 +1,60 @@
+<h1>Editing transferencia_deposito_detalhe</h1>
+
+<% form_for(@transferencia_deposito_detalhe) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :transferencia_deposito_id %><br />
+    <%= f.text_field :transferencia_deposito_id %>
+  </p>
+  <p>
+    <%= f.label :deposito_origem_id %><br />
+    <%= f.text_field :deposito_origem_id %>
+  </p>
+  <p>
+    <%= f.label :deposito_origem_nome %><br />
+    <%= f.text_field :deposito_origem_nome %>
+  </p>
+  <p>
+    <%= f.label :deposito_destino_id %><br />
+    <%= f.text_field :deposito_destino_id %>
+  </p>
+  <p>
+    <%= f.label :deposito_destino_nome %><br />
+    <%= f.text_field :deposito_destino_nome %>
+  </p>
+  <p>
+    <%= f.label :produto_id %><br />
+    <%= f.text_field :produto_id %>
+  </p>
+  <p>
+    <%= f.label :produto_nome %><br />
+    <%= f.text_field :produto_nome %>
+  </p>
+  <p>
+    <%= f.label :quantidade %><br />
+    <%= f.text_field :quantidade %>
+  </p>
+  <p>
+    <%= f.label :custo_dolar %><br />
+    <%= f.text_field :custo_dolar %>
+  </p>
+  <p>
+    <%= f.label :custo_guarani %><br />
+    <%= f.text_field :custo_guarani %>
+  </p>
+  <p>
+    <%= f.label :preco_guarani %><br />
+    <%= f.text_field :preco_guarani %>
+  </p>
+  <p>
+    <%= f.label :preco_dolar %><br />
+    <%= f.text_field :preco_dolar %>
+  </p>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @transferencia_deposito_detalhe %> |
+<%= link_to 'Back', transferencia_deposito_detalhes_path %>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <title><%= ('MESA: ' + @venda.cartao.nome) unless @venda.cartao.nil? %> | Chronos Smart | <%= current_unidade.unidade_nome %></title>
+    <link rel="shortcut icon" href="/assets/icon.png" />
+    <%= stylesheet_link_tag 'application', 'themes/base/jquery.ui.all', :media => 'all'%>
+    <%= javascript_include_tag 'application','vendas' %>
+    <%= csrf_meta_tag %>
+  </head>
+
+  <body data-plus-as-tab="true">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/menus" class="navbar-brand"><%= image_tag "logo.png", class: 'brand-l' %></a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
+           <ul class="nav navbar-nav navbar-right">
+
+
+            <li>
+              <a href="#"  style="margin-top:3px;">
+                  Ctz: U$xG$: <b><%= format_int(@venda.cotacao) %></b> | G$xR$: <b><%= format_int(@venda.cotacao_real) %></b> | U$xR$: <b><%= format_decimal(@venda.cotacao_rs_us.to_f) %></b>
+                </a>
+            </li>
+            <li>
+              <a href="/vendas" style="margin-top:1px;">Mi Ventas</a>      
+            </li>
+            <li><a href="/vendas/mapa_mesas" style="margin-top:1px;">Mapa de Mesas</a></li>
+            <li class="divider-vertical"></li>
+            <li><a href="#"><i class="icon-white icon-th"></i> <%= current_unidade.unidade_nome %></a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                <i class="icon-white icon-user"></i> <%= current_user.usuario_nome %> <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu">
+                <% if session[:logged] %>
+                  <li><%= link_to "logout", new_login_path, :action => :delete %></li>
+                <% end %>
+              </ul>
+            </li>
+           </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /container -->
+    </nav>
+
+    <% if flash[:notice] or flash[:observacao] %>
+      <div class="Mensagem" id="observacao">
+        <%= flash[:observacao] %>
+        <%= flash[:notice] %>
+      </div>
+    <% end %>
+    <div class="Mensagem_error" id="observacao">
+      <%= flash[:error] %>
+    </div>
+
+    <div id="back">
+      <div class="container box-panel">
+        <div class="to-print" align="center">
+          <%= image_tag "logo-login.png", width: '100' %>
+          <br>
+          <%= current_unidade.unidade_nome %>
+        </div>
+
+        <%= yield :layout %>
+        <% session[:modal] = "false" %>
+      </div>
+    </div>
+
+    <div class="footer">
+      Copyright © 2011 - <%= Time.now.strftime("%Y") %> - <img src="/assets/icon.png" height="16">  - Powered by <a href="http://chronos.com.py">Chronos Software</a>
+    </div>
+
+  </body>
+</html>

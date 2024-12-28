@@ -1,0 +1,92 @@
+<body onload="DataFinal(),CampoInicio()">
+   <h1 id="header">FOPAG</h1>
+   <div class="group">
+      <h2>
+         <%= form_tag resultado_fopag_relatorios_path, :method => "get" do%>
+            <table>
+              <tr>
+                <td align="right"></td>
+                <td>
+                  <fieldset>
+                    <legend>Seleccione la hoja de pago:</legend>
+                    <%= radio_button_tag :tipo, 0,  :Checked => "True" %> Todos
+                    <%= radio_button_tag :tipo, 1  %> Fijo
+                    <%= radio_button_tag :tipo, 2  %> Variables
+                  </fieldset>
+                </td>
+              </tr>
+
+              <tr>
+                <td align="right">Mes de Referencia:</td>
+                <td>
+                   <input name="mes"  id="mes"   size="10" value="<%= Time.now.strftime('%m')%>" type="text"/>
+                   <input name="ano"  id="ano"   size="10" value="<%= Time.now.strftime("%Y")%>" type="text"/>
+                </td>
+              </tr>
+
+              <tr height="35">
+                <td align="right">Centro de Costo(CC) :</td>
+                <td colspan="4">
+                  <%=   select("busca", "cc", Unidade.all(:select => 'id,unidade_nome',:order => 'unidade_nome').collect {|p| [ p.unidade_nome, p.id ] }, { prompt: 'Todos...' },{:class => "selc_medium"})   %>
+                </td>
+              </tr>
+
+              <tr>
+                <td align="right"><%= t('COIN') %> :</td>
+                <td>
+                  <fieldset>
+                    <%= radio_button_tag :moeda, 0 %>Dolar
+                    <%= radio_button_tag :moeda, 1, :Checked => "True" %> <%= t('GUARANIS') %>
+                    <%= radio_button_tag :moeda, 2 %> <%= t('REAIS') %>
+                  </fieldset>
+                </td>
+              </tr>
+
+              <tr>
+                <td align="right"></td>
+                <td>
+                  <fieldset>
+                    <legend>Ordenado por:</legend>
+                    <%= radio_button_tag :order, 0,  :Checked => "True" %> Nombre
+                    <%= radio_button_tag :order, 1  %> Tiempo en la empresa
+                    <%= radio_button_tag :order, 2  %> Departamento
+                  </fieldset>
+                </td>
+              </tr>
+
+               <tr>
+                  <td></td>
+                  <td>
+                     <input  id      = "button"
+                             class   = "btn btn-green"
+                             type    = "submit"
+                             value   = "Informe"
+                             onclick = "Tipo('0','html')"/>
+
+                     <input type     = "submit"
+                            id       = "button"
+                            class    = "btn btn-blue"
+                            value    = "Excel"
+                            onclick  = "Tipo('1','xls')"/>
+                  </td>
+               </tr>
+                <input type  = "hidden"
+                      name  = "tipo"
+                      id    = "tipo"
+                      size  = "5"
+                      value = "0"/>
+                <input type="hidden" name="format" id="format"  size="5" value="html"/>
+
+            </table>
+         <% end %>
+      </h2>
+   </div>
+</body>
+
+
+<script>
+  function Tipo(d,f){
+    document.getElementById('tipo').value = d;
+    document.getElementById('format').value = f;
+  };
+</script>

@@ -1,0 +1,274 @@
+<br>
+<br>
+<br>
+<br>
+<br>
+
+  <table>
+    <tr>
+      <td align="left"><%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 60) %></td>
+      <td width="350">
+        <h3 align="center">
+          LIQUIDACIÓN DE SALARIO
+        </h3>
+      </td>
+    </tr>
+  </table>
+<div class="group" align="center">
+  <table class="bord">
+    <tr>
+      <td width="200">EMPLEADOR:</td>
+      <td width="300"><%= current_unidade.nome_sys %></td>
+      <td width="150">HOJA:</td>
+      <td width="100"><b><%= @adelanto.id.to_s.rjust(6,'0') %></b></td>
+    </tr>
+
+    <tr>
+      <td>NOMBRE:</td>
+      <td><%= @adelanto.persona.nome %></td>
+      <td>C.I.:</td>
+      <td><%= @adelanto.persona.ruc %></td>
+    </tr>
+
+    <tr>
+      <td>CARGO:</td>
+      <td><%= @adelanto.persona.cargo.nome %></td>
+      <td>MÊS DE PAGO:</td>
+      <td><%= l @adelanto.data, :format => :mes  %>/<%= @adelanto.data.strftime("%Y")  %></td>
+    </tr>
+  </table>
+  <br>
+  <table class="bord">
+    <tr>
+      <td width="150">SALARIO BASE:</td>
+      <td width="300" align="right"><%= format_int(@adelanto.persona.salario) %></td>
+    </tr>
+    <tr>
+      <td width="150">JORNAL DIARIO:</td>
+      <td width="300" align="right"><%= format_int( @adelanto.persona.salario.to_f / 30 ) %></td>
+    </tr>
+
+  </table>
+
+  <br>
+  <% credito_gs = 0 %>
+  <table class="bord">
+    <tr>
+      <td width="460"><b>HABERES</b></td>
+      <td width="80" align="center"><b>CANT</b></td>
+      <td width="200" align="right"><b>IMPORTE</b></td>
+    </tr>
+      <tr>
+        <td><%= @adelanto.concepto %></td>
+        <td align="center"></td>
+        <td align="right"><%= format_int(@adelanto.valor_guarani) %></td>
+      </tr>
+      <% credito_gs += @adelanto.valor_guarani.to_f %>
+
+    <tr class="head">
+      <td colspan="2" align="right">TOTAL HABERES:</td>
+      <td align="right"><%= format_int(credito_gs) %></td>
+    </tr>
+  </table>
+
+  <% debito_gs = 0 %>
+  <table class="bord">
+    <tr>
+      <td width="460"><b>DEDUCCIONES</b></td>
+      <td width="80"><b>CANT</b></td>
+      <td width="200" align="right"><b>IMPORTE</b></td>
+    </tr>
+      <tr>
+        <td>IPS</td>
+        <td></td>
+        <td align="right"><%= format_int(@adelanto.valor_guarani.to_f * 0.09)%></td>
+      </tr>
+      <% debito_gs += @adelanto.valor_guarani.to_f * 0.09 %>
+
+    <tr class="head">
+      <td colspan="2" align="right">TOTAL DEDUCCIONES:</td>
+      <td align="right"><%= format_int(debito_gs) %></td>
+    </tr>
+  </table>
+  <p style="font-size:10px">Recibi conforme de la Empresa, el importe neto de la presente liquidación.-</p>
+  <table class="bord">
+    <tr class="head">
+      <td width="540" align="right">NETO A COBRAR:</td>
+      <td width="200" align="right"><%= format_int(credito_gs.to_f - debito_gs.to_f) %></td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table>
+    <tr>
+      <td align="center">________________________________________________</td>
+      <td align="center" width="350"></td>
+      <td align="center"><%= current_unidade.nome_sys %> - <%= @adelanto.data.strftime("%d/%m/%Y") %></td>
+    </tr>
+   <tr>
+      <td align="center">Firma del Empleado</td>
+      <td align="center"></td>
+      <td align="center">Lugar y Fecha</td>
+    </tr>
+
+  </table>
+
+</div>
+
+< /** SEGUNDA VIA  **/>
+<p align="center">
+  <hr>
+</p>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<table>
+  <tr>
+    <td align="left"><%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 60) %></td>
+    <td width="350">
+      <h3 align="center">
+        LIQUIDACIÓN DE SALARIO
+      </h3>
+    </td>
+
+  </tr>
+</table>
+
+<div class="group" align="center">
+  <table class="bord">
+    <tr>
+      <td width="200">EMPLEADOR:</td>
+      <td width="300"><%= current_unidade.nome_sys %></td>
+      <td width="150">HOJA:</td>
+      <td width="100"><b><%= @adelanto.id.to_s.rjust(6,'0') %></b></td>
+    </tr>
+
+    <tr>
+      <td>NOMBRE:</td>
+      <td><%= @adelanto.persona.nome %></td>
+      <td>C.I.:</td>
+      <td><%= @adelanto.persona.ruc %></td>
+    </tr>
+
+    <tr>
+      <td>CARGO:</td>
+      <td><%= @adelanto.persona.cargo.nome %></td>
+      <td>MÊS DE PAGO:</td>
+      <td><%= l @adelanto.data, :format => :mes  %>/<%= @adelanto.data.strftime("%Y")  %></td>
+    </tr>
+  </table>
+  <br>
+  <table class="bord">
+    <tr>
+      <td width="150">SALARIO BASE:</td>
+      <td width="300" align="right"><%= format_int(@adelanto.persona.salario) %></td>
+    </tr>
+    <tr>
+      <td width="150">JORNAL DIARIO:</td>
+      <td width="300" align="right"><%= format_int( @adelanto.persona.salario.to_f / 30 ) %></td>
+    </tr>
+
+  </table>
+
+  <br>
+  <% credito_gs = 0 %>
+  <table class="bord">
+    <tr>
+      <td width="460"><b>HABERES</b></td>
+      <td width="80" align="center"><b>CANT</b></td>
+      <td width="200" align="right"><b>IMPORTE</b></td>
+    </tr>
+      <tr>
+        <td><%= @adelanto.concepto %></td>
+        <td align="center"></td>
+        <td align="right"><%= format_int(@adelanto.valor_guarani) %></td>
+      </tr>
+      <% credito_gs += @adelanto.valor_guarani.to_f %>
+
+    <tr class="head">
+      <td colspan="2" align="right">TOTAL HABERES:</td>
+      <td align="right"><%= format_int(credito_gs) %></td>
+    </tr>
+  </table>
+
+  <% debito_gs = 0 %>
+  <table class="bord">
+    <tr>
+      <td width="460"><b>DEDUCCIONES</b></td>
+      <td width="80"><b>CANT</b></td>
+      <td width="200" align="right"><b>IMPORTE</b></td>
+    </tr>
+      <tr>
+        <td>IPS</td>
+        <td></td>
+        <td align="right"><%= format_int(@adelanto.valor_guarani.to_f * 0.09)%></td>
+      </tr>
+      <% debito_gs += @adelanto.valor_guarani.to_f * 0.09 %>
+
+    <tr class="head">
+      <td colspan="2" align="right">TOTAL DEDUCCIONES:</td>
+      <td align="right"><%= format_int(debito_gs) %></td>
+    </tr>
+  </table>
+  <p style="font-size:10px">Recibi conforme de la Empresa, el importe neto de la presente liquidación.-</p>
+  <table class="bord">
+    <tr class="head">
+      <td width="540" align="right">NETO A COBRAR:</td>
+      <td width="200" align="right"><%= format_int(credito_gs.to_f - debito_gs.to_f) %></td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table>
+    <tr>
+      <td align="center">________________________________________________</td>
+      <td align="center" width="350"></td>
+      <td align="center"><%= current_unidade.nome_sys %> - <%= @adelanto.data.strftime("%d/%m/%Y") %></td>
+    </tr>
+   <tr>
+      <td align="center">Firma del Empleado</td>
+      <td align="center"></td>
+      <td align="center">Lugar y Fecha</td>
+    </tr>
+
+  </table>
+
+</div>
+
+
+
+
+
+
+
+
+<style type="text/css">
+  .bord {
+    border-collapse: collapse;
+    font-size: 9px
+  }
+   .bord td, .bord tr {
+    border: 1px solid black;
+  }
+  td{font-size: 9px}
+@font-face {
+  font-family: 'prox';
+  src: url("/assets/fonts/proxima-nova.otf") format("opentype");
+}
+
+  body {
+    font-family: 'prox';
+
+  }
+
+
+</style>
+

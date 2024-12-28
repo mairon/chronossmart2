@@ -1,0 +1,166 @@
+<ul class="tabs">
+  <li><a href="#tab1">Venta[Producto] - <%= @venda.tipo_venda %></a></li>
+</ul>
+<div class="tab_container">
+
+	<table>
+		<tr>
+			<td colspan="10">Cotizaciones: U$xG$: <b><%= format_int(@venda.cotacao) %></b> | G$xR$:<b><%= format_int(@venda.cotacao_real) %></b> | U$xR$:<b><%= format_decimal(@venda.cotacao_rs_us.to_f) %></b> | G$xP$:<b><%= format_decimal(@venda.cotacao_gs_ps) %></b></td>
+
+		</tr>
+	<tr>
+	<% if @venda.tipo_venda != 0 %>
+		<td colspan="" rowspan="5">
+			<table>
+			<tr>
+				<td>
+					<div class="rolagem" id="div" style="height:500px">
+						<table class="head_grid">
+							<tr>
+								<td width="20">FT</td>
+								<td width="30">HR</td>
+								<td width="10">BC</td>
+								<td width="60" align="right">LTs</td>
+								<td width="70" align="right">Tot.</td>
+							</tr>
+						</table>
+						<table>
+							<div id="lista_abastecidas">
+							</div>
+						</table>
+					</div>
+				</td>
+			</tr>				
+			</table>
+		</td>
+		<% end %>
+		<td valign="top">
+		<table>
+			<% if @venda.tipo_venda != 0 %>
+				<tr>
+					<td>
+							<%= render :partial => "atuliza_cliente" %>
+					</td>
+				</tr>
+			<% end %>
+			<tr>
+				<td valign="top">
+					<%= render :partial => "/vendas_produtos/new_produto" %>
+				</td>
+			</tr>
+		</table>
+		</td>
+		<td>
+			<table>
+				<tr>
+					<td>
+
+						<div class="group">
+							<table class="head_grid">
+								<tr>
+									<td width="20">DP</td>
+									<td width="250">Producto</td>
+									<td width="80" align="right">Cantidad</td>
+									<td width="80" align="right">Unit </td>
+									<td width="80" align="right">Total </td>
+
+								</tr>
+							</table>
+							<div class="rolagem" dir="div" style="height:400px">
+								<div id="vendas_produtos">
+									<%= render :partial => @venda.vendas_produtos %>
+								</div>
+							</div>
+						</div>					
+						
+					</td>
+				</tr>
+				<tr>
+					<td  align="center">
+					<div class="group">						
+						<table>
+							<tr>
+								<% if @venda.moeda == 0 %>
+
+									<td>
+										<font class="style3" color="green">Total U$.:</font>
+										<font class="style3" color="green">
+											<span id="total_dolar">	<%= number_to_currency(@total_dolar, :format=>' %n ', :separator => ",") %></span>
+										</font>
+									</td>
+
+								<% elsif @venda.moeda == 1 %>
+
+									<td>
+										<font class="style3" color="red">Total Gs.:</font>
+										<font class="style3" color="red">
+											<span id="sub_total"><%= number_to_currency(@total_guarani, :format=>' %n ',:precision => 0) %></span>
+										</font>
+									</td>
+
+								<% else %>
+
+									<td>
+										<font class="style3" color="blue">Total R$.:</font>
+										<font class="style3" color="blue">
+											<span id="total_real"><%= number_to_currency(@total_real, :format=>' %n ', :separator => ",") %></span>
+										</font>
+									</td>
+								<% end %>
+							</tr>
+						</table>
+					</div>
+					</td>
+				</tr>
+			</table>
+		</td>
+		</tr>
+	</table>
+
+
+	<div class="buttons">
+	  <%= link_to t('BACK'), edit_venda_path(@venda), :class => "button back" %>
+	  <%= link_to 'Seguir', vendas_financa_vendas_path(:id => @venda.id) , :class => "button next" %>
+	</div>
+<div class="group">
+		<b>[F2 ]</b> Busca Producto <br>
+		<b>[F7 ]</b> Seguir <br>
+	</div>
+</div>
+
+
+<% if @venda.tipo_venda != 0 %>
+	<script type="text/javascript">
+	$(document).ready(function() { 
+		$.getScript('/vendas/abastecidas.js?venda_id=<%= @venda.id %>&data=<%= @venda.data %>');
+	})
+
+	$(function () {
+	  if ($('#lista_abastecidas').length > 0) {
+	    setTimeout(updateComments, 10000);
+	  }
+	});
+
+	function updateComments() {
+	  $.getScript('/vendas/abastecidas.js?venda_id=<%= @venda.id %>&data=<%= @venda.data %>');
+	  setTimeout(updateComments, 3000);
+	}
+	</script>
+<% end %>
+
+<style type="text/css" media="screen">
+	li{
+		list-style: none;
+  	cursor:  pointer;
+	}
+
+	table.abast {
+		border-collapse: collapse;
+		font-size: 12px;
+	}
+	table.abast td, tr {
+		border: 1px solid #fff;
+	}
+
+
+</style>

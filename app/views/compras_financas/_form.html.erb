@@ -1,0 +1,37 @@
+<h1 id="header">Compras Financas</h1>
+
+<div class="group">
+<%= form_for(@compras_financa) do |f| %>
+  <%= f.hidden_field :compra_id %>
+     <div class="row">
+       <div class="col-md-12">
+        <label><%= t('SHARE') %></label>
+        <%= f.text_field :cota, :size => 10 %>
+       </div>
+     </div>
+
+    <div class="row">
+      <div class="col-md-12">
+       <label>Vencimiento</label>
+       <%= f.date_select :vencimento %>
+      </div>
+    </div>
+
+     <div class="row">
+       <div class="col-md-12">
+         <% if @compras_financa.moeda.to_i == 0 %>
+           <%= field_us_label 'Valor U$.', f, :valor_dolar  %>
+         <% elsif @compras_financa.moeda.to_i == 1 %>
+           <%= field_gs_label 'Valor Gs.',f,:valor_guarani %>
+         <% elsif @compras_financa.moeda.to_i == 2 %>
+           <%= field_us_label 'Valor R$.',f,:valor_real  %>
+         <% end %>
+       </div>
+     </div>
+</div>
+<div class="buttons">
+   <%= f.submit t('SAVE'), :class => "button add", :disable_with => "Aguarde...", "data-plus-as-tab" => "false"     %>
+   <a href="/compras/<%=@compras_financa.compra_id%>/compras_financa" class="btn btn-back"><%= t('BACK') %></a>
+</div>
+
+<% end %>

@@ -1,0 +1,68 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <header class="panel-heading" style="font-family: 'prox'; font-size: 18px; padding-bottom: 10px;">
+       Multi Facturación
+        <div class="pull-right">
+        </div>  
+      </header>
+
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content">
+		    <table class="head_grid">
+		       <tr>
+		       		<td width="30"></td>
+		          <td width="55">Contrato</td>
+		          <td width="250">Cliente</td>
+		          <td width="250">Razón Social</td>
+		          <td width="100">Ruc</td>
+		          <td width="80">Doc.</td>
+		          <td width="70" align="center"><%= t('QUOTA') %></td>
+		          <td width="55"></td>
+		          <td width="70" align="right"><%= t('VALUE') %></td>
+		          <td width="100" align="center">Venc.</td>
+		          <td width="80"></td>
+		       </tr>
+		    </table>
+		    <div class="rolagem" dir="div" style="height: 345px;">
+		       <table>
+		       		<% count = 0 %>
+		          <% @dividas.includes(:persona).each do |cf| %>
+
+		          	<% count += 1 %>
+
+		            <tr class = "<%= cycle("cor1", "cor2") %>">
+		            	<td width="30"><%= count %></td>
+		              <td width="55"><%= link_to cf.tabela_id.to_s.rjust(6,'0'), contrato_path(cf.tabela_id), target: '_blank' %></td>
+		              <td width="250"><%= cf.persona.nome %></td>
+		              <td width="250"><%= cf.persona.nome_fatura %></td>
+		              <td width="100"><%= cf.persona.ruc %></td>
+		              <td width="80"><%= cf.documento_numero %></td>
+		              <td width="70" align="center"><%= cf.cota %></td>
+		              <% if cf.moeda.to_i == 0 %>
+		                <td width="55" align="center"><span class="us">U$</span></td>
+		                <td width="70" align="right"><b><span class="us"><%= format_decimal(cf.divida_dolar) %></span></b></td>
+		              <% elsif cf.moeda.to_i == 1 %>
+		                <td width="55" align="center"><span class="gs">Gs</span></td>
+		                <td width="70" align="right"><b><span class="gs"><%= format_int(cf.divida_guarani) %></span></b></td>
+		              <% elsif cf.moeda.to_i == 2 %>
+		                <td width="55" align="center"><span class="rs">R$</span></td>
+		                <td width="70" align="right"><b><span class="rs"><%= format_decimal(cf.divida_real) %></span></b></td>
+		              <% end %>
+		              <td width="100" align="center"><%= cf.vencimento.to_date.strftime("%d/%m/%y") %></td>
+		            </tr>
+		          <% end %>
+		       </table>
+        
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+

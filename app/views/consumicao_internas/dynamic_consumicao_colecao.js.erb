@@ -1,0 +1,6 @@
+$('#consumicao_interna_colecao_id').empty();
+
+$('#consumicao_interna_colecao_id').append('<option value="">Todos...</option>');
+<% for ne in @personas %>
+  $('#consumicao_interna_colecao_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+<% end %>

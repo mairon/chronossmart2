@@ -1,0 +1,137 @@
+ <table>
+ 	<% obra = 0 %>
+ 	<% valor_obra = 0 %>
+	<% @obra.each do |m| %>
+
+		<% if m.od.to_i == 1 %>
+
+		<% obra = m.id.to_i %>		
+			<tr class="head">
+				<td align="center" width="35" ><%= m.id.to_s.rjust(6,'0') %></td>
+				<td colspan="5" width="450" align="left" ><%= m.nome %></td>
+				<td width="50" align="right" ><%= number_to_currency( m.valor_dolar, :format =>' %n ', :separeitor => ',' ) %></td>
+				<% valor_obra += m.valor_dolar.to_f %>
+			</tr>
+
+			<tr>
+				<td>Entradas</td>
+			</tr>
+
+			<% sub_v_tot_us = 0 %>
+			<% sub_v_tot_gs = 0 %>
+			<% @obra.each do |m| %>
+  		
+				<% if m.od.to_i == 2 and obra.to_i == m.id %>
+					<tr>
+						<td align="center" width="35" > - </td>
+						<td align="center" width="35" ><%=l m.data.to_date.to_date, :format => :default %></td>
+						<td width="500" align="left" ><%= m.nome %></td>
+						<td width="300" align="left" ><%= m.rubro %></td>
+						<td width="80" align="center" ><%= m.documento %></td>
+						<td width="70" align="center" > 
+							<% if m.moeda.to_i == 0 %>
+						  U$
+						  <% else %>
+						  G$
+						  <% end %>
+						</td>
+						<td width="50" align="right" ><%= number_to_currency( m.valor_dolar, :format =>' %n ', :separeitor => ',' ) %></td>
+						<td width="50" align="right" ><%= number_to_currency( m.valor_guarani, :format =>' %n ', :precision => 0 ) %></td>
+					</tr>
+
+					<% sub_v_tot_us += m.valor_dolar.to_f %>
+					<% sub_v_tot_gs += m.valor_guarani.to_f %>
+
+				<% end %>
+			<% end %>
+			<!-- Sub Total Vendas !-->
+			<tr class="head">
+				<td colspan="6"	>Total ==></td>
+				<td width="50" align="right" ><%= number_to_currency( sub_v_tot_us, :format =>' %n ', :separeitor => ',' ) %></td>
+				<td width="50" align="right" ><%= number_to_currency( sub_v_tot_gs, :format =>' %n ', :precision => 0 ) %></td>
+
+
+			</tr>
+			<tr height="10"><td></td> </tr>
+
+			<tr>
+				<td>Gastos</td>
+			</tr>
+
+			<% sub_g_tot_us = 0 %>
+			<% sub_g_tot_gs = 0 %>
+			<% @obra.each do |m| %>
+
+				<% if m.od.to_i == 3  and obra.to_i == m.id %>
+					<tr>
+						<td align="center" width="35" > - </td>
+						<td align="center" width="35" ><%=l m.data.to_date.to_date, :format => :default %></td>
+						<td width="500" align="left" ><%= m.nome %></td>
+						<td width="300" align="left" ><%= m.rubro %></td>
+						<td width="80" align="center" ><%= m.documento %></td>
+						<td width="70" align="center" >
+							<% if m.moeda.to_i == 0 %>
+						  U$
+						  <% else %>
+						  G$
+						  <% end %>
+						</td>
+						<td width="50" align="right" ><%= number_to_currency( m.valor_dolar, :format =>' %n ', :separeitor => ',' ) %></td>
+						<td width="50" align="right" ><%= number_to_currency( m.valor_guarani, :format =>' %n ', :precision => 0 ) %></td>
+					</tr>
+
+					<% sub_g_tot_us += m.valor_dolar.to_f %>
+					<% sub_g_tot_gs += m.valor_guarani.to_f %>
+
+				<% end %>
+			<% end %>
+			<!-- Sub Total Gastos !-->
+			<tr class="head">
+				<td colspan="6"	>Total ==></td>
+				<td width="50" align="right" ><%= number_to_currency( sub_g_tot_us, :format =>' %n ', :separeitor => ',' ) %></td>
+				<td width="50" align="right" ><%= number_to_currency( sub_g_tot_gs, :format =>' %n ', :precision => 0 ) %></td>
+			</tr>
+			<tr height="10"><td></td> </tr>
+			<tr>
+				<td colspan="6">
+					<table>
+						<tr>
+							<td colspan="2"> - Resumen Y Saldo U$</td>
+						</tr>
+						<tr>
+							<td width="10"></td>
+							<td> - Valor de la Obra..:</td>
+							<td width="50" align="right" ><%= number_to_currency( valor_obra, :format =>' %n ', :separeitor => ',' ) %></td>
+						</tr>
+
+						<tr>
+							<td width="10"></td>
+							<td> - Entradas..........:</td>
+							<td width="50" align="right" ><%= number_to_currency( sub_v_tot_us, :format =>' %n ', :separeitor => ',' ) %></td>
+						</tr>
+
+						<tr>
+							<td width="10"></td>
+							<td> - Salidas...........:</td>
+							<td width="50" align="right" ><%= number_to_currency( sub_g_tot_us, :format =>' %n ', :separeitor => ',' ) %></td>
+						</tr>
+
+						<tr>
+							<td width="10"></td>
+							<td> - Saldo.............:</td>
+							<td width="50" align="right" ><%= number_to_currency( sub_v_tot_us - sub_g_tot_us, :format =>' %n ', :separeitor => ',' ) %></td>
+						</tr>
+
+					</table>	
+				</td>	
+			</tr>
+
+			<% obra = 0 %>
+			<% valor_obra = 0 %>
+			<tr height="20"	> <td></td> </tr>
+		<% end %>
+	<% end %>
+</table>
+
+
+

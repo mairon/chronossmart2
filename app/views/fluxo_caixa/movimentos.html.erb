@@ -1,0 +1,170 @@
+<script src="https://kit.fontawesome.com/afd48b06c4.js" crossorigin="anonymous"></script>
+<div class="row">
+  <div class="col-md-12">
+    <div class="group">
+      <h1 id="header">
+        Movimentos</b>
+        <div class="pull-right">
+
+          <a class="btn btn-green modalButton-frma" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-input" href="#" title="Filtro">
+            <i class='icon-white icon-circle-arrow-up'></i> Entrada
+          </a>
+
+          <a class="btn btn-green modalButton-frma" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-output" href="#" title="Filtro">
+            <i class='icon-white icon-circle-arrow-down'></i> Saida
+          </a>
+
+
+          <a class="btn modalButton-frma" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-movimento" href="#" title="Filtro">
+            <i class='icon-search'></i>
+          </a>
+        </div>
+      </h1>
+
+      <div style="width: 1130px; overflow:auto;">
+      <div style="width: 1400px">
+
+      <table class="head_grid">
+        <tr>
+          <td width="50" align="center"><%= t('CODE') %></td>
+          <td width="50"></td>
+          <td width="100" align="center">Status </td>
+          <td width="120" align="center"><%= t('DATE') %> Agendada</td>
+          <td width="120" align="center"><%= t('DATE') %> Realizada</td>
+          <td width="300">Plano de Contas</td>
+          <td width="300">Histórico</td>
+          <td width="50" align="center">Moeda</td>
+          <td width="70" align="right">Valor Agendado</td>
+          <td width="70" align="right">Valor Realizado</td>
+          <td width="150">Conta</td>
+        </tr>
+      </table>
+
+      <div class="rolagem" dir="div">
+        <table>
+        <% @movimentos.each do |c| %>
+          <tr class= "<%= cycle( "cor1", "cor2" )%>">
+            <td width="50"><%= c.id.to_s.rjust(6,'0') %></td>
+            <td width="50">
+              <% if c.tag == 'C' %>
+                <i class="fas fa-arrow-circle-up us"></i>
+              <% else %>
+                <i class="fas fa-arrow-circle-down gs"></i>
+              <% end %>
+            </td>
+
+            <td width="100" align="center">
+              <% if c.vencimento.to_date > Time.now.to_date and c.divida_guarani.to_f != c.cobro_guarani.to_f %>
+                <span class="label label-primary" style="font-size:12px; padding-top: 3px">No Prazo</span>
+              <% elsif c.vencimento.to_date == Time.now.to_date and c.divida_guarani.to_f != c.cobro_guarani.to_f %>
+                <span class="label label-warning" style="font-size:12px; padding-top: 3px">Hoy</span>
+              <% elsif c.vencimento.to_date < Time.now.to_date and c.divida_guarani.to_f != c.cobro_guarani.to_f %>
+                <span class="label label-danger" style="font-size:12px; padding-top: 3px">Vencido</span>
+              <% elsif c.divida_guarani.to_f == c.cobro_guarani.to_f %>
+                <span class="label label-success" style="font-size:12px; padding-top: 3px">Realizado</span>
+              <% end %>
+            </td>
+
+            <td width="120" align="center"><%= c.vencimento.strftime("%d/%m/%y") unless c.vencimento.nil? %></td>
+            <td width="120" align="center"><%= c.data.strftime("%d/%m/%y") unless c.data.nil? %></td>
+            <td width="300"><small> <%= c.codigo %> - <%= c.rubro_nome %></small></td>
+            <td width="300"><small><%= truncate(c.descricao, length: 100) %></small></td>
+            <% if c.moeda.to_i == 1 %>
+              <td width="50"  align="center"><span class="gs">Gs</span></td>
+              <td width="70" align="right"><%= format_int( c.divida_guarani) %></td>
+              <td width="70" align="right"><%= format_int( c.cobro_guarani) %></td>
+            <% elsif c.moeda.to_i == 0 %>
+              <td width="50"  align="center"><span class="us">U$</span></td>
+              <td width="70" align="right"><%= format_decimal( c.divida_dolar) %></td>
+              <td width="70" align="right"><%= format_decimal( c.cobro_dolar) %></td>
+            <% else %>
+              <td width="50"  align="center"><span class="rs">R$</span></td>
+              <td width="70" align="right"><%= format_decimal( c.divida_real) %></td>
+              <td width="70" align="right"><%= format_decimal( c.cobro_real) %></td>
+            <% end %>
+            <td width="150"><%= c.conta.nome  unless c.conta.nil? %></td>
+          </tr>
+        <% end %>
+        </table>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+</div>
+
+<script>
+  $('#busca_rubro').selectize();
+</script>
+
+
+
+<%= render "/fluxo_caixa/modals/modal_input" %>
+<%= render "/fluxo_caixa/modals/modal_output" %>
+
+
+
+<div class="modal fade" id="modal-movimento" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel">Filtro</h4>
+      </div>
+      <div class="modal-body">
+
+        <%= form_tag fluxo_caixa_busca_path, :method => "get" do %>
+          <div class="panel-modal-body">
+            <div class="row">
+              <div class="col-md-12">
+                <label>Receber em </label>
+                <%= select_tag :data_tipo, options_for_select([["Receber em ","RECEBER"], ["Recebido em","RECEBIDO"]]) %>
+                <%= text_field_tag :inicio, nil, onkeyup: "Formatadata(this,event)", size: 10, placeholder: 'inicio' %>
+                <%= text_field_tag :final, nil, onkeyup: "Formatadata(this,event)", size: 10, placeholder: 'final' %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <label ><%= t('CLASSIFICATION') %></label>
+                <%= select("busca", "rubro", Rubro.select("id, (codigo || ' - ' || descricao) as descricao" ).order('codigo').collect {|p| [ p.descricao, p.id ] }, { :prompt => 'Todos..' }) %>
+
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <label>Moeda</label>
+                <%= select_tag :moeda, options_for_select([["Gs ","GS"], ["U$","US"], ["R$","RS"]]) %>
+                <%= select_tag :moeda, options_for_select([["Igual ","="], ["Maior que",">"], ["Menor que","<"]]) %>
+                <%= text_field_tag :valor, nil, size: 10, placeholder: 'valor' %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <label>Status</label><%= select_tag :moeda, options_for_select([["Pendente ","0"], ["Baixado","1"]]) %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <label>Conta</label><%= select("busca", "conta", Conta.where(unidade_id: current_unidade.id).select("id,nome" ).collect {|p| [ p.nome, p.id ] }, { :prompt => 'Todos..' }) %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <br>
+                <input type="button" class="btn btn-blue" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar"/>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

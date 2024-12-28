@@ -1,0 +1,55 @@
+<table>
+  <tr>
+    <td align="left"><%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 90) %></td>
+    <td width="600"><h2 align="center">Listado de Vacacciones</h2></td>
+  </tr>
+</table>
+
+<% per = "AND ID = #{params[:busca]["empregado"]}" unless params[:busca]["empregado"].blank? %>
+<% uni = "AND UNIDADE_ID = #{params[:busca]["unidade"]}" unless params[:busca]["unidade"].blank? %>
+
+<table>
+  <tr class="head_grid">
+    <td>Sucursal</td>
+    <td>Empleado</td>
+    <td align="center">Feche Ingreso</td>
+    <td align="center">Antiguidad Años</td>
+    <td align="center">Dias Causados</td>
+    <td align="center">Dias Faltantes</td>
+    <td align="center">Saldo Vacacciones Pendientes</td>
+    <td align="center">Notificaciones</td>
+  </tr>
+  <% count_fds = 0 %>
+  <% Persona.where("estado = 0 #{per} #{uni} and tipo_funcionario = 1").order("date_part('MONTH', data_entrada), date_part('DAY', data_entrada)").each do |p| %>
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td width="150"><%= p.unidade.unidade_nome %></td>
+      <td width="250"><%= p.id.to_s.rjust(6,'0') %>-<%= p.nome %></td>      
+      <td width="50" align="center"><%= p.data_entrada.strftime("%d/%m/%Y") %></td>
+      <td width="50" align="center"><%= anos = ((Time.now.to_date - p.data_entrada.to_date ) / 365).to_i %> años</td>
+      <td width="50" align="center">
+        <% last_pf = PersonaFeria.where(persona_id: p.id, tipo: 'CAUSADAS', ano_ref: params[:ano]).last %>
+        <%= last_pf = last_pf.dias unless last_pf.nil? %>
+      </td>
+      
+      <td width="50" align="center">
+        <% if anos.to_i > 0 %>
+          <% if ((("#{Time.now.strftime("%Y")}-#{p.data_entrada.strftime("%m-%d")}").to_date - Time.now.strftime("%Y-%m-%d").to_date ).to_i) > 0 %>
+            <%= ((("#{Time.now.strftime("%Y")}-#{p.data_entrada.strftime("%m-%d")}").to_date - Time.now.strftime("%Y-%m-%d").to_date ).to_i) %>
+          <% else %>
+            CAUSADAS
+          <% end %>
+        <% else %>
+         -- 
+        <% end %>
+      </td>
+      <td width="50" align="center"><%= PersonaFeria.where(persona_id: p.id).sum(:dias).to_i + p.saldo_ferias.to_i %></td>
+      <td>
+        <ul>
+          <% PersonaFeria.where(persona_id: p.id, ano_ref: params[:ano], tipo: 'CONCEDIDO').each do |pf| %>
+          <li><%= pf.inicio.strftime("%d/%m/%y") %>-<%= pf.final.strftime("%d/%m/%y") %> <%= pf.dias %> dias</li>
+          <% end %>
+        </ul>
+      </td>
+    </tr>
+  <% end %>
+</table>

@@ -1,0 +1,19 @@
+
+<%= form_for(nc_proveedor_fatura) do |f| %>
+
+  <%= f.hidden_field :nota_credito_proveedor_id %>
+  <%= f.hidden_field :data,:value         => @nota_credito_proveedor.data %>
+  <%= f.hidden_field :persona_id,:value   => @nota_credito_proveedor.persona_id %>
+  <%= f.hidden_field :persona_nome,:value => @nota_credito_proveedor.persona_nome %>
+  <%= f.hidden_field :operacao,:value => @nota_credito_proveedor.operacao %>  
+  <%= f.hidden_field :moeda,:value => @nota_credito_proveedor.moeda %>  
+  <%= f.hidden_field :clase_produto,:value => @nota_credito_proveedor.clase_produto %>  
+  <%= f.hidden_field :tipo,:value => @nota_credito_proveedor.tipo %>  
+  <%= f.hidden_field :compra_id %>  
+    Documento :
+    <%= f.text_field :documento_numero_01, :size => 5 %> -
+    <%= f.text_field :documento_numero_02, :size => 5%> -
+    <%= f.text_field :documento_numero %>
+    <%= f.submit '  Add  ' %>
+  </p>
+<% end %>

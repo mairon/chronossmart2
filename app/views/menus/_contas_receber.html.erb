@@ -1,0 +1,132 @@
+<%
+sql_contas_pagar = "SELECT C.VENCIMENTO,
+										       C.MOEDA,
+										       P.NOME AS PERSONA_NOME,
+										       MIN(C.DATA) AS DATA,
+										       MIN(C.DOCUMENTO_NUMERO) AS DOCUMENTO_NUMERO,
+										       MIN(C.COTA) AS COTA,
+										       SUM(C.DIVIDA_GUARANI - C.COBRO_GUARANI) AS DIVIDA_GS,
+										       SUM(C.DIVIDA_DOLAR - C.COBRO_DOLAR) AS DIVIDA_US,
+										       SUM(C.DIVIDA_REAL - C.COBRO_REAL) AS DIVIDA_RS
+										FROM CLIENTES C
+										LEFT JOIN UNIDADES U
+										ON C.UNIDADE_ID = U.ID
+										INNER JOIN PERSONAS P
+										ON P.ID = C.PERSONA_ID
+										WHERE (C.DIVIDA_GUARANI + C.DIVIDA_DOLAR + C.DIVIDA_REAL ) > 0 AND C.UNIDADE_ID = 1 AND P.TIPO_CLIENTE = 1 AND C.VENCIMENTO BETWEEN '#{Date.today.beginning_of_week.strftime('%Y-%m-%d')}' AND '#{Date.today.end_of_week.strftime('%Y-%m-%d')}' AND C.LIQUIDACAO = 0
+
+										GROUP BY 1,2,3"
+
+			contas_pagar = Financa.find_by_sql(sql_contas_pagar)
+
+%>
+
+<div class="panel">
+	<h1 id="header">
+    <%= image_tag('001-download.png', height: '14px',style: "margin-top: -3px") %> Cuentas a Receber
+	</h1>
+
+	<div class="row">
+  	<div class="col-md-12">
+    	<div class="panel-content" style="margin: 10px">
+    			<div class="modal-grid">
+
+						<table class="head_grid">
+			  			<tr>
+						    <td width="400">Favorecido</td>
+						    <td width="100">Doc.</td>
+						    <td width="90" align="center">Cuota</td>
+						    <td width="120" align="right">Salida</td>
+			  			</tr>
+						</table>
+						<hr>
+
+						<div class="rolagem_rl" dir="div">
+							<table>
+								<% quebra = '' %>
+								<% sub_gs = 0 %>
+								<% sub_us = 0 %>
+								<% sub_rs = 0 %>
+
+								<% contas_pagar.each do |cp| %>
+
+	         			<% if quebra != cp.vencimento %>
+		            	<% if quebra != "" %>
+				            <tr class="head_grid" style="background-color: #eeedff">
+				           		<td><b>Total del Dia</b></td>
+				           		<td></td>
+
+											<td align="right" colspan="3">
+												<b class="gs">Gs <%= format_int(sub_gs) %></b> |
+												<b class="us">U$ <%= format_decimal(sub_us) %></b> |
+												<b class="rs">R$ <%= format_decimal(sub_rs) %></b>
+											</td>
+											<% sub_gs = 0 %>
+											<% sub_us = 0 %>
+											<% sub_rs = 0 %>
+				           	</tr>
+		            	<% end %>
+									<tr>
+										<td colspan="6"><b style="font-family: 'prox-bold';"><% quebra = cp.vencimento %> <%= Date::DAYNAMES[cp.vencimento.wday].to_s %> - <%= cp.vencimento.to_date.strftime("%d/%m/%y") %> </b></td>
+									</tr>
+	            	<% end %>
+
+									<tr class = "<%= cycle("cor1", "cor2") %>">
+										<td width="400"><small>	<%= cp.persona_nome %></small></td>
+										<td width="100"><%= cp.documento_numero %></td>
+										<td width="50" align="center"><%= cp.cota.to_s.rjust(2,'0') %></td>
+											<% if cp.moeda.to_i == 0 %>
+
+												<td><span class="us">U$</span></td>
+												<td width="120" align="right"><b class="us"><%= format_decimal(cp.divida_us.to_f) %></b></td>
+												<% sub_us += cp.divida_us.to_f %>
+
+											<% elsif cp.moeda.to_i == 1 %>
+
+												<td><span class="gs">Gs</span></td>
+												<td width="120" align="right"><b class="gs"><%= format_int(cp.divida_gs.to_f ) %></b></td>
+												<% sub_gs += cp.divida_gs.to_f %>
+
+											<% elsif cp.moeda.to_i == 2 %>
+
+												<td><span class="rs">R$</span></td>
+												<td width="120" align="right"><b class="rs"><%= format_decimal(cp.divida_rs.to_f) %></b></td>
+												<% sub_rs += cp.divida_rs.to_f %>
+											<% end %>
+									</tr>
+								<% end %>
+		            <tr class="head_grid" style="background-color: #eeedff">
+		           		<td><b>Total del Dia</b></td>
+		           		<td></td>
+									<td align="right" colspan="3">
+										<b class="gs">Gs <%= format_int(sub_gs) %></b> |
+										<b class="us">U$ <%= format_decimal(sub_us) %></b> |
+										<b class="rs">R$ <%= format_decimal(sub_rs) %></b>
+									</td>
+									<% sub_gs = 0 %>
+									<% sub_us = 0 %>
+									<% sub_rs = 0 %>
+		           	</tr>
+							</table>
+						</div>
+    			</div>
+    		</div>
+	    </div>
+	</div>
+</div>
+
+<style>
+
+	.rolagem_rl{
+		background: white;
+    overflow: auto;
+    padding: 1px 1px 1px 1px;
+	}
+
+
+	.rolagem_rl td {
+  padding: 10px;
+  border-bottom: 1px solid #efefef !important;
+  cursor: pointer;
+}
+</style>

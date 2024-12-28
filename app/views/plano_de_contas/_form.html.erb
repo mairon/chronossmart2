@@ -1,0 +1,45 @@
+<h1 id="header">Plano de Cuenta - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+
+    <%= form_for(@plano_de_conta) do |f| %>
+
+    <% if @plano_de_conta.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@plano_de_conta.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @plano_de_conta.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+      <table>
+        <tr>
+          <td>
+          <label>Codigo</label>
+          <%= f.text_field :codigo, :size => 15 %></td>
+        </tr>
+        <tr>
+          <td>
+            <label><%= t('DESCRIPTION') %></label>
+            <%= f.telephone_field :descricao,  size: 50 %>
+          </td>
+        </tr>
+        <tr>
+          <td>
+          <label>Regime de Competência</label>
+          <%= f.text_field :competencia,:size => 15 %><small>meses</small></td>
+        </tr>
+        <tr>
+          <td><br><%= f.check_box :rubro %> <%= t('ACTIVE_S') %> Rubros</td>
+        </tr>        
+      </table>
+      <div class="footer-buttons">
+        <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+        <%= link_to t('BACK'), plano_de_contas_path, :class => "btn btn-back" %>
+      </div>      
+  <% end %>
+</div>

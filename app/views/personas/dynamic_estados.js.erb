@@ -1,0 +1,11 @@
+$('#persona_estado_id').empty();
+$('#persona_estado_id').append('<option value="">Selecione o Estado</option>');
+<% for ne in @estados %>
+  $('#persona_estado_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+<% end %>
+
+$('#persona_locais_entrega_estado_id').empty();
+$('#persona_locais_entrega_estado_id').append('<option value="">Selecione lo Departamento</option>');
+<% for ne in @estados %>
+  $('#persona_locais_entrega_estado_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+<% end %>

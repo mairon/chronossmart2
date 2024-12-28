@@ -1,0 +1,171 @@
+
+<body onload="window.print()">
+
+<style type="text/css">
+  body {
+    margin: 0px;
+    font-family: arial ;
+    font-size:12px;
+  }
+
+  td{
+    font-family: arial ;
+    font-size:12px;
+    letter-spacing:3px
+  } 
+
+</style>
+
+<table >
+    <tr>
+      <td colspan='3' align="center">
+      +
+        <% 88.times do |t| %>
+          -
+        <% end %>      
+      +
+      </td>
+    </tr>
+    <tr>
+      <td style="padding-left:7px;letter-spacing:5px">| 
+      <%= current_unidade.nome_sys %>
+        <%= @nota_credito.data.strftime("%d")%> de <%= l @nota_credito.data, :format => :mes %>  de <%= @nota_credito.data.strftime("%Y")%> | Horas: <%= @nota_credito.created_at.strftime("%H:%M")%>
+
+
+      </td>
+      <td align="right" style="padding-right:7px;letter-spacing:5px">
+         <%= t('VOUCHER') %> Nº: <%= @nota_credito.id.to_s.rjust(6,'0') %>
+         |
+      </td>
+    </tr>
+    <tr>
+      <td style="padding-left:7px;letter-spacing:5px">
+      |
+        Cliente........: <%= @nota_credito.persona.nome %>  | <%= @nota_credito.persona.nome_fatura %> 
+        RUC/CI.........: <%= @nota_credito.persona.ruc %>
+      </td>
+      <% vend = Persona.find_by_id(@nota_credito.vendedor_id) %>
+      <td align="right" style="padding-right:7px;letter-spacing:5px">Vendedor.......: <%= vend.nome %> |</td>
+    </tr>
+    <tr>
+       <td colspan="8">
+         <table >
+            <tr>
+              <td colspan='8' align="center">
+              +
+                <% 88.times do |t| %>
+                  -
+                <% end %>      
+              +
+              </td>
+            </tr>
+
+            <tr>
+              <td width="60" style="padding-right:7px;letter-spacing:5px">| Ctd</td>
+              <td width="100" style="padding-left:4px;letter-spacing:5px;">Ref.</td>
+              <td width="200" style="letter-spacing:5px">Marca</td>
+              <td width="500" style="letter-spacing:5px">Producto</td>
+              
+              <% if params[:status] == '0' %>
+                <td align="right" width="155" style="letter-spacing:5px">Unit.</td>
+                <td align="right" width="155" style="padding-right:4px;">Tot. |</td>
+              <% end %>
+            </tr>
+          <tr>
+            <td colspan='7' align="center">
+            +
+              <% 88.times do |t| %>
+                -
+              <% end %>
+            +
+            </td>
+          </tr>
+
+            <% qtd    = 0 %>
+            <% tot_us = 0 %>
+            <% tot_gs = 0 %>
+            <% tot_rs = 0 %>
+            <% @produtos.each do |pc|%>
+            <tr>
+              <td style="padding-right:7px;letter-spacing:5px">| &nbsp&nbsp&nbsp<%= pc.quantidade.to_i %></td>
+              <td colspan="3" style="letter-spacing:5px"><%= pc.produto_nome %></td>
+              
+              <% if params[:status] == '0' %>
+                <% if @nota_credito.moeda = 0 %>
+                  <td align="right" style="padding-right:4px;letter-spacing:5px"><%= format_decimal(pc.unitario_dolar.to_f) %></td>
+                  <td align="right"style="padding-right:4px;letter-spacing:5px"><%= format_decimal(pc.total_dolar.to_f) %> |</td>
+                  <% tot_gs += pc.total_dolar.to_f %>
+              <% else %>
+                  <td align="right" style="padding-right:4px;"><%= format_int(pc.unitario_guarani.to_f) %></td>
+                  <td align="right" style="padding-right:4px;"><%= format_int(pc.total_guarani.to_f) %> |</td>
+                  <% tot_gs += pc.total_guarani.to_f %>
+
+                <% end %>
+              <% else %>
+                  <td align="right" style="padding-right:4px;letter-spacing:5px"><%= format_decimal(pc.unitario_dolar.to_f) %></td>
+                  <td align="right" style="padding-right:4px;letter-spacing:5px"><%= format_decimal(pc.total_dolar.to_f) %> |</td>
+                  <% tot_gs += pc.total_dolar.to_f %>
+
+              <% end %>
+            </tr>
+            <% qtd    += pc.quantidade.to_f %>
+           <% end %>
+          <tr>
+            <td colspan='8' align="center" >
+            +
+              <% 88.times do |t| %>
+                -
+              <% end %>
+            +
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding-left:4px;">| &nbsp&nbsp&nbsp&nbsp<%= qtd.to_i %></td>
+            <td ></td>
+            <td></td>
+            <td></td>
+            <td align="right"></td>
+            <% if @nota_credito.moeda = 0 %>
+              <td align="right" style="padding-right:4px;letter-spacing:5px"><%= format_decimal(tot_gs) %> |</td>
+            <% else %>
+              <td align="right" style="padding-right:4px;letter-spacing:5px"><%= format_int(tot_gs) %> |</td>
+            <% end %>
+          </tr>
+
+          <tr>
+            <td colspan='8' align="center">
+            +
+            <% 88.times do |t| %>
+            -
+            <% end %>
+            +
+            </td>
+          </tr>
+
+          <tr>
+          </tr>
+
+          <tr>
+            <td colspan='8' align="center" >
+            +
+              <% 88.times do |t| %>
+                -
+              <% end %>
+            +
+            </td>
+          </tr>
+
+         </table>
+       </td>
+    </tr>
+</table>
+
+
+<script>
+  document.onkeydown=function(e){
+    if(e.which == 27)
+      self.close();
+  }
+</script>
+

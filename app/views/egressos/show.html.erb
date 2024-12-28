@@ -1,0 +1,18 @@
+<h1 id="header">Egresos</h1>
+<div class="buttons">
+  <%= link_to 'Editar', edit_egresso_path(@egresso), :class => 'button back' %> 
+  
+  <a href="javascript:void(0)" onClick="Comprovante()" class="button print">Comprobante</a>
+  
+  <%= link_to 'Finalizar', egressos_path, :class => 'button delete' %>	
+</div>
+
+<%= hidden_field_tag :id, @egresso.id %>
+<script>
+	function Comprovante()                //
+	{
+		window.open('/egressos/' + document.getElementById('id').value + '/comprovante', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	}
+
+</script>
+

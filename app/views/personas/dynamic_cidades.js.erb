@@ -1,0 +1,17 @@
+$('#persona_cidade_id').empty();
+$('#persona_cidade_id').append('<option value="">Selecione a Cidade</option>');
+<% for ne in @cidades %>
+  $('#persona_cidade_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+<% end %>
+
+$('#persona_locais_entrega_cidade_id').empty();
+$('#persona_locais_entrega_cidade_id').append('<option value="">Selecione la Ciudad</option>');
+<% for ne in @cidades %>
+  $('#persona_locais_entrega_cidade_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+<% end %>
+
+$('#venda_cidade_id').empty();
+$('#venda_cidade_id').append('<option value="">Selecione la Ciudad</option>');
+<% for ne in @cidades %>
+  $('#venda_cidade_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+<% end %>

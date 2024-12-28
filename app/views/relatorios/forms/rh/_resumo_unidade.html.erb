@@ -1,0 +1,111 @@
+<% resumen_per = Persona.where("unidade_id = #{params[:busca]["unidade"]} and estado = 0") %>
+<table>
+
+<% resumen_per.each do |re| %>
+<% sqld = "SELECT DU.DATA,
+     (DU.DATA || ' ' || DU.ENTRADA) AS D_ENTRADA,
+     (DU.DATA || ' ' || DU.SAIDA) AS D_SAIDA,
+     (DU.DATA || ' ' || DU.ALMOCO_ENTRADA) AS D_BREAK,
+     (DU.DATA || ' ' || DU.ALMOCO_SAIDA )AS D_B_BREAK,
+     DU.OBS,
+     (SELECT CP.CHECKPOINT FROM CHECK_POINTS CP WHERE CP.CHECKPOINT::DATE = DU.DATA AND CP.CHECK_POINT_TYPE = '0' AND CP.PERSONA_ID = #{re.id} LIMIT 1 ) AS ENTRADA,
+     (SELECT CP.CHECKPOINT FROM CHECK_POINTS CP WHERE CP.CHECKPOINT::DATE = DU.DATA AND CP.CHECK_POINT_TYPE = '1' AND CP.PERSONA_ID = #{re.id} LIMIT 1 ) AS SAIDA,
+     (SELECT CP.CHECKPOINT FROM CHECK_POINTS CP WHERE CP.CHECKPOINT::DATE = DU.DATA AND CP.CHECK_POINT_TYPE = '2' AND CP.PERSONA_ID = #{re.id} LIMIT 1 ) AS BREAK,
+     (SELECT CP.CHECKPOINT FROM CHECK_POINTS CP WHERE CP.CHECKPOINT::DATE = DU.DATA AND CP.CHECK_POINT_TYPE = '3' AND CP.PERSONA_ID = #{re.id} LIMIT 1 ) AS B_BREAK,
+     (SELECT M.NOME FROM SOLICITUDES S INNER JOIN MOTIVOS M ON M.ID = S.MOTIVO_ID INNER JOIN USUARIOS U ON U.ID = S.USUARIO_ID WHERE U.PERSONA_ID = #{re.id} AND S.DATA = DU.DATA  LIMIT 1 ) AS SOLICITUDE_MOTIVO
+FROM DIAS_UTEIS DU
+WHERE DU.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
+ORDER BY DU.DATA
+"
+
+@dias_uteis =  DiasUtei.find_by_sql(sqld)
+%>
+
+
+  <% tot_hr    = 0 %>
+  <% tot_min   = 0 %>
+  <% d_tot_hr  = 0 %>
+  <% d_tot_min = 0 %>
+  <% i_tot_hr  = 0 %>
+  <% i_tot_min = 0 %>
+  <% conf_reg = 0 %>
+  <% tot_dias = 0 %>
+  <% @dias_uteis.each do |cp| %>
+    <% unless cp.entrada.blank? %>
+      <% conf_reg += 1 %>
+    <% end %>
+    <% unless cp.break.blank? %>
+      <% conf_reg += 1 %>
+    <% end %>
+
+    <% unless cp.b_break.blank? %>
+      <% conf_reg += 1 %>
+    <% end %>
+
+    <% unless cp.saida.blank? %>
+      <% conf_reg += 1 %>
+    <% end %>
+
+
+    <% if l(cp.data.to_date, :format => :dia_semana, locale: 'es') == 'sábado' %>
+      <% if conf_reg == 2 %>
+        <% tot_hr += (60 * Time.at((cp.saida.to_time - cp.entrada.to_time)).utc.strftime("%H").to_i) %>
+        <% tot_min += (Time.at((cp.saida.to_time - cp.entrada.to_time)).utc.strftime("%M").to_i) %>
+      <% end %>
+    <% else %>
+      <% if conf_reg == 4 %>
+        <% tot_hr += (60 * Time.at((cp.break.to_time - cp.entrada.to_time) + (cp.saida.to_time - cp.b_break.to_time)).utc.strftime("%H").to_i) %>
+        <% tot_min += (Time.at((cp.break.to_time - cp.entrada.to_time) + (cp.saida.to_time - cp.b_break.to_time)).utc.strftime("%M").to_i) %>
+      <% end %>
+    <% end %>
+
+    <% tot_dias += 1 %>
+    <% if l(cp.data.to_date, :format => :dia_semana, locale: 'es') != 'domingo' %>
+    <!-- inicio as 07 !-->
+    <% if l(cp.data.to_date, :format => :dia_semana, locale: 'es') == 'sábado' %>
+      <% if conf_reg == 2 %>
+        <% i_tot_hr += (60 * Time.at((cp.saida.to_time - "#{cp.data.strftime("%Y-%m-%d")} 07:00:00".to_s.to_time)).utc.strftime("%H").to_i) %>
+        <% i_tot_min += (Time.at((cp.saida.to_time - "#{cp.data.strftime("%Y-%m-%d")} 07:00:00".to_s.to_time)).utc.strftime("%M").to_i) %>
+      <% end %>
+    <% else %>
+      <% if conf_reg == 4 %>
+        <% i_tot_hr += (60 * Time.at((cp.break.to_time - "#{cp.data.strftime("%Y-%m-%d")} 07:00:00".to_s.to_time) + (cp.saida.to_time - cp.b_break.to_time)).utc.strftime("%H").to_i) %>
+        <% i_tot_min += (Time.at((cp.break.to_time - "#{cp.data.strftime("%Y-%m-%d")} 07:00:00".to_s.to_time) + (cp.saida.to_time - cp.b_break.to_time)).utc.strftime("%M").to_i) %>
+      <% end %>
+    <% end %>
+
+    <!--  dias uteis !-->
+    <% if l(cp.data.to_date, :format => :dia_semana, locale: 'es') == 'sábado' %>
+        <% d_tot_hr += (60 * Time.at((cp.d_saida.to_time - cp.d_entrada.to_time)).utc.strftime("%H").to_i) %>
+        <% d_tot_min += (Time.at((cp.d_saida.to_time - cp.d_entrada.to_time)).utc.strftime("%M").to_i) %>
+
+    <% else %>
+        <% d_tot_hr += (60 * Time.at((cp.d_break.to_time - cp.d_entrada.to_time) + (cp.d_saida.to_time - cp.d_b_break.to_time)).utc.strftime("%H").to_i) %>
+        <% d_tot_min += (Time.at((cp.d_break.to_time - cp.d_entrada.to_time) + (cp.d_saida.to_time - cp.d_b_break.to_time)).utc.strftime("%M").to_i) %>
+    <% end %>
+    <% end %>
+    <% conf_reg = 0 %>
+  <% end %>
+  <% hm = (tot_hr + tot_min).divmod(60) %>
+  <% if hm.join(':').to_s != '0:0' %>
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td width="50" align="center"><%= re.id.to_s.rjust(6,'0') %></td>
+      <td width="250"><%= re.nome %></td>
+      <td width="150"><%= re.cargo.nome unless re.cargo.blank? %></td>
+      <td align="center" width="30"><%= tot_dias %></td>
+
+      <td align="center" width="50"><%= hm.join(':') %></td>
+
+
+      <% i_dhm = (i_tot_hr + i_tot_min).divmod(60) %>
+      <td align="center" width="50"><%= i_dhm.join(':') %></td>
+
+      <% dhm = (d_tot_hr + d_tot_min).divmod(60) %>
+      <td align="center" width="50"><%= dhm.join(':') %></td>
+      <td align="center" width="50"><%=  ((tot_hr + tot_min) - (d_tot_hr + d_tot_min)).divmod(60).join(':') %></td>
+      <td align="center" width="50"><%=  ((tot_hr + tot_min) - (i_tot_hr + i_tot_min)).divmod(60).join(':') %></td>
+    </tr>
+  <% end %>
+
+<% end %>
+<table>

@@ -1,0 +1,208 @@
+<ul class="tabs">
+  <li><a href="#tab1">Productos Grade - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+  <div class="tab_container">
+	    <div id="tab1" class="tab_content">
+			<div class="group">
+				<p>Producto : <%= @produto.nome %> - Ref. <%= @produto.fabricante_cod %></p>
+			</div>
+			<br />
+
+		<style>
+        #colorSelector div {
+          width: 10px;
+          height: 10px;
+          border: 2px solid black;
+          float: left;
+          margin-top: 3px;
+          margin-right: 5px;
+
+        }
+      </style>
+
+        <table>
+          <tr>
+            <td>
+            <%= form_tag "/produtos/#{@produto.id}/add_cor" do %>
+	            <fieldset>
+	            <legend>Colores</legend>
+	              <table>
+	                <tr>
+	                  <td width="250">
+	                      <div class="rolagem" dir="div" >
+	                      <div class="rolagem" dir="div" >
+	                      <table class="categories-field">
+	                        <% @cores.each do |c| %>
+	                          <% cp = CorsProduto.find_by_cor_id(c.id, :conditions => ["produto_id = #{@produto.id}"]) %>
+	                          <% if cp != nil %>
+	                              <% r_rp  =  cp.cor_id %>
+	                            <% else %>
+	                              <% r_rp  =  0 %>
+	                            <% end %>
+	                          <% if c.id != r_rp %>
+	                          <tr class = "<%= cycle("cor1", "cor2") %>">
+	                          	<td><%= check_box_tag "produto[cor_ids][]", c.id, @produto.cors.include?(c) %></td>
+	                          	<td><div id="colorSelector"><div style="background-color: #<%= c.cod_cor %>"></div></td>
+	                          	<td width="220"> <%= c.nome %></td>
+	                          	<%= hidden_field_tag "id", params[:id] %>
+	                          </tr>
+	                          <% end %>
+	                        <% end %>
+	                      </table>
+	                      </div>
+	                  </td>
+	                  <td> >> </td>
+
+	                  <td width="250">
+	                      <div class="rolagem" dir="div" >
+	                      <table class="categories-field">
+	                        <% @cors_prod.each do |c| %>
+	                        	<tr class = "<%= cycle("cor1", "cor2") %>">
+	                      			<td><div style="background-color: #<%= c.cor.cod_cor %>; width: 10px;height: 10px;border: 2px solid black;float:left;margin: 3px;"></div></td>
+	                      			<td width="200"><%= c.cor.nome %></td>
+	                      			<td><%= link_to t('DELETE'), c, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+	                      		</tr>
+	                        <% end %>
+
+	                      </table>
+	                      </div>
+	                  </td>
+	                </tr>
+	                <tr>
+	                	<td><%= submit_tag " Add Colores ",:disable_with => "Aguarde...", :class => "button"  %></td>
+	                </tr>
+	              </table>
+	              </fieldset>
+              <% end %>
+            </td>
+
+            <td>
+            <%= form_tag "/produtos/#{@produto.id}/add_tamanho" do %>
+            <fieldset>
+            <legend>Tamaños</legend>
+              <table>
+                <tr>
+                  <td width="70">
+                      <div class="rolagem" dir="div" >
+                      <table class="categories-field">
+                        <% @tamanhos.each do |c| %>
+                          <% cp = ProdutosTamanho.find_by_tamanho_id(c.id, :conditions => ["produto_id = #{@produto.id}"]) %>
+                          <% if cp != nil %>
+                              <% r_rp  =  cp.tamanho_id %>
+                            <% else %>
+                              <% r_rp  =  0 %>
+                            <% end %>
+                          <% if c.id != r_rp %>
+                          <tr class = "<%= cycle("cor1", "cor2") %>">
+                          	<td><%= check_box_tag "produto[tamanho_ids][]", c.id %></td>
+                          	<td width="110"><%= c.nome %></td>
+                          </tr>
+                          <% end %>
+                        <% end %>
+                      </table>
+                      </div>
+                  </td>
+                  <td> >> </td>
+
+                  <td width="120">
+                      <div class="rolagem" dir="div" >
+                      <table class="categories-field">
+                        <% @tamanhos_prod.each do |c| %>
+                        <tr class = "<%= cycle("cor1", "cor2") %>">
+                        	<td width="110"><%= c.tamanho.nome %></td>
+                        	<td><%= link_to t('DELETE'), c, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+                        </tr>
+                        <% end %>
+                      </table>
+                      </div>
+                  </td>
+                </tr>
+                <tr>
+                	<td><%= submit_tag " Add Tamaños ",:disable_with => "Aguarde...", :class => "button"  %></td>
+                </tr>
+              </table>
+              </fieldset>
+              <% end %>
+            </td>
+
+          <td valign="top">
+            <fieldset >
+            <legend>Disponibilidads</legend>
+              <table  height="295" width="200">
+                <tr valign="top">
+                  <td>
+                    <p>
+                      Colores..........: <b> <%= cor = CorsProduto.count(:conditions => ["produto_id = #{@produto.id}"]) %></b>
+                    </p>
+                    <p>
+                      Tamanhos.....: <b> <%=  tama = ProdutosTamanho.count(:conditions => ["produto_id = #{@produto.id}"]) %></b>
+                    </p>
+                    <p>
+                      Posibilidades: <b> <%= (cor.to_i * tama.to_i) %></b>
+                    </p>
+                    <p>
+                    	<%= form_tag "/produtos/#{@produto.id}/gerar_disponibilidades" do %>
+                    		<%= submit_tag " Generar Disponibilidades ",:disable_with => "Aguarde...", :class => "button"  %>
+                    	<% end %>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+              </fieldset>
+            </td>
+
+          </tr>
+        </table>
+
+			<table>
+				<tr>
+					<td>
+						<div class="group_menu">
+			        <table  class="head_grid">
+			          <tr>
+			            <td width="225">Barra</td>
+			            <td width="250">Colores</td>
+			            <td width="250">Tamaños</td>
+			            <td width="70" align="right">Precio 01</td>
+			            <td width="70" align="right">Precio 02</td>
+			            <td width="70" align="right">Precio 03</td>
+			            <td width="70" align="right">Precio 04</td>
+			          </tr>
+			        </table>
+			        <div class="RolagemShow" id="div">
+			          <table>
+			            <% total = 0 %>
+			            <%= form_tag update_individual_produtos_path :method => :put do %>
+				            <% @grade.each do |g| %>
+					            <%= fields_for "products[]", g do |f| %>
+					            <tr class = "<%= cycle("cor1", "cor2") %>">
+					              <td width="225"><%= f.text_field :barra %></td>
+					              <td width="250"><%= g.cor.nome %></td>
+					              <td width="250"><%= g.tamanho.nome %></td>
+					              <td width="70" align="right"> <%= number_to_currency(g.preco_1_us, :format=>' %n ', :separator => ",")  %></td>
+					              <td width="70" align="right"> <%= number_to_currency(g.preco_2_us, :format=>' %n ', :separator => ",")  %></td>
+					              <td width="70" align="right"> <%= number_to_currency(g.preco_3_us, :format=>' %n ', :separator => ",")  %></td>
+					              <td width="70" align="right"> <%= number_to_currency(g.preco_4_us, :format=>' %n ', :separator => ",")  %></td>
+					            </tr>
+					            <% end %>
+				            <% end %>
+				            <%= hidden_field_tag :id, @produto.id %>
+
+			          </table>
+			        </div>
+			      </div>
+	      	</td>
+				</tr>
+			</table>
+		</div>
+		<div class="buttons">
+			<%= link_to t('BACK'), edit_produto_path(@produto), :class => "button back" %>
+			<%= link_to 'Salir', produtos_path , :class => "button delete"%>
+			<%= submit_tag "Atulizar Cod. Barras" , :class => "button delete", :disable_with => "Aguarde..." %>
+			<%= link_to 'Etiquetas', "/produtos/#{@produto.id}/etiquetas" , :class => "button print"%>
+		</div>
+<% end %>
+	</div>
+</div>
+

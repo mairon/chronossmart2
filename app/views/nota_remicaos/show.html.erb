@@ -1,0 +1,58 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <h1 id="header">
+        Nota Remición
+        <div class="pull-right">
+          <%= link_to t('BACK'), edit_nota_remicao_path(@nota_remicao), class: 'btn btn-blue' %>
+          <%= link_to 'Salir', nota_remicaos_url, class: 'btn btn-blue' %>
+          <a href="javascript:void(0)" onClick="Comprovante()"  class="btn btn-blue">Comprovante</a>        
+        </div>
+      </h1>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-body">
+        <%= render :partial=>"index_produtos", :locals=>{:nota_remicao_produtos => @nota_remicao.nota_remicao_produtos} %>
+      </div>
+    </div>
+  </div>
+</div>
+          
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-body">
+        <%= render :partial=>"form_produtos", :locals=>{:nota_remicao_produto=>NotaRemicaoProduto.new(:nota_remicao_id=>@nota_remicao.id)} %>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script>
+
+  function Listado()                //
+  {
+    window.open('/nota_remicaos/<%= @nota_remicao.id %>/detalhes_produtos_print/', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+  function Comprovante()            //
+  {
+    window.open('/nota_remicaos/<%= @nota_remicao.id %>/comprovante', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+  //ABRI POPUP-----------------------------------------------------------------
+document.onkeydown=function(e)
+{
+    if(e.which == 113)
+        window.open('/produtos/busca_remicao_produto', 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=10, WIDTH=1000, HEIGHT=400');
+}
+
+//FIM ABRI POPUP----------------------------------------------------------------
+
+</script>

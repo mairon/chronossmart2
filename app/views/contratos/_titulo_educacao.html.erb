@@ -1,0 +1,76 @@
+        <div>
+         <h1><%= t('CONDITION') %> de Pago</h1>
+          <table class="head_grid">
+             <tr>
+                <td width="100">Aluno</td>
+                <td width="150">Descripción</td>
+                <td width="50" align="center"><%= t('QUOTA') %></td>
+                <td width="55"></td>
+                <td width="70" align="right"><%= t('VALUE') %></td>
+                <td width="100" align="center">Venc.</td>
+                <td width="100" align="center">Status</td>
+                <td width="80"></td>
+             </tr>
+          </table>
+          <div class="rolagem" dir="div" style="height: 345px;">
+             <table>
+                <% faturado = 0 %>
+                <% @pago = 0 %>
+                <% @cotas_cont.each do |cf| %>
+
+                  <% if cf.documento_numero_01 != '000' %>
+                    <% faturado = 1 %>
+                  <% end %>
+                  <tr class = "<%= cycle("cor1", "cor2") %>">
+                    <td width="100"><small><%= cf.persona.nome unless cf.persona.nil? %></small></td>
+                    <td width="150"><small><%= cf.descricao %></small></td>
+                    <td width="50" align="center"><%= cf.cota %></td>
+                    <% if cf.moeda.to_i == 0 %>
+                      <td width="55" align="center"><span class="us">U$</span></td>
+                      <td width="70" align="right"><b><span class="us"><%= format_decimal(cf.divida_dolar) %></span></b></td>
+                    <% elsif cf.moeda.to_i == 1 %>
+                      <td width="55" align="center"><span class="gs">Gs</span></td>
+                      <td width="70" align="right"><b><span class="gs"><%= format_int(cf.divida_guarani) %></span></b></td>
+                    <% elsif cf.moeda.to_i == 2 %>
+                      <td width="55" align="center"><span class="rs">R$</span></td>
+                      <td width="70" align="right"><b><span class="rs"><%= format_decimal(cf.divida_real) %></span></b></td>
+                    <% end %>
+                    <td width="100" align="center"><%= cf.vencimento.to_date.strftime("%d/%m/%y") %></td>
+
+                    <% if current_user.tipo.to_i != 2 %>
+                    <td width="100" align="center">
+                      <% if @contrato.status == 'Cancelado' %>
+                        <span class="gs">Cancelado</span>
+                      <% else %>
+                        <% if cf.liquidacao.to_i == 0 %>
+                          <span class="gs">Pendente</span>
+                        <% else %>
+                          <span class="us">Pago</span>
+                          <% @pago = 0 %>
+                        <% end %>
+                      <% end %>
+
+                    </td>
+                    <td>
+                        <%= link_to image_tag('icon-invoice.png', height: 20), faturamento_cliente_path(cf, proc: 'contrato', terminal_id: @contrato.terminal_id) %>
+                    </td>
+                    <% end %>
+
+					          <td>
+                      <% if cf.liquidacao.to_i == 0 %>
+                        <%= link_to '', edit_cliente_path(cf, proc: 'contrato'), class: 'icon-pencil' %>
+                      <% end %>
+                    </td>
+                    <% if current_user.tipo.to_i != 2 %>
+					          <td>
+                      <% if cf.liquidacao.to_i == 0 %>
+                        <%= link_to '', cliente_path(:id => cf.id, :proc => 'contrato', id_proc: cf.cod_proc), :confirm => 'Estas Seguro?', :method => :delete, :class => "icon-trash" %>
+                      <% end %>
+                    </td>
+                    <% end %>
+
+                  </tr>
+                <% end %>
+             </table>
+          </div>
+        </div>

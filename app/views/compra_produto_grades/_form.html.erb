@@ -1,0 +1,56 @@
+<%= form_for(@compra_produto_grade) do |f| %>
+  <% if @compra_produto_grade.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@compra_produto_grade.errors.count, "error") %> prohibited this compra_produto_grade from being saved:</h2>
+
+      <ul>
+      <% @compra_produto_grade.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> compra_produto_grades - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">compra_id :</td>                    
+                      <td><%= f.number_field :compra_id %></td>
+                                      
+                      <td align="right">produto_id :</td>                    
+                      <td><%= f.number_field :produto_id %></td>
+                                      
+                      <td align="right">cor_id :</td>                    
+                      <td><%= f.number_field :cor_id %></td>
+                                      
+                      <td align="right">tamanho_id :</td>                    
+                      <td><%= f.number_field :tamanho_id %></td>
+                                      
+                      <td align="right">quantidade :</td>                    
+                      <td><%= f.text_field :quantidade %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), compra_produto_grades_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

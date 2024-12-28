@@ -1,0 +1,168 @@
+<div class="modal-header btn-primary">
+  <h1 style="font-size: 16px; font-weight: bold; padding: 0px !important; color: #fff">Editar Titulo #<%= @proveedore.titulo.to_s.rjust(6,'0') %>
+  </h1>
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body" style="padding: 5px 15px 15px 15px">
+  <%= form_for(@proveedore) do |f| %>
+
+  <div class="row">
+    <div class="col-md-4">
+      <label>Status</label>
+      <%= f.select :tipo_conta, options_for_select([['Ativo', true], ['Cancelado', false]]), {}, {class: 'panel-field'} %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Descripción</label>
+      <%= f.text_field :descricao, required: true, class: 'panel-field pagar-descricao' %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <label>Cliente</label>
+      <%= f.text_field :persona_nome, class: 'autocomplete panel-field prov-persona_nome' %>
+       <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+      <%= f.hidden_field :persona_id, class: 'prov-persona_id' %>
+    </div>
+  </div>
+  <hr>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Favorecido</label>
+      <%= f.text_field :favorecido, class: 'panel-field' %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <label><%= t('DOC_PER') %></label>
+      <%= f.text_field :ruc, class: 'panel-field' %>
+    </div>
+  </div>
+
+  <div class="row">
+
+    <div class="col-md-8">
+      <label>Banco</label>
+      <%= f.collection_select :banco_id,
+             Persona.select('id,nome').where("tipo_banco = 1").order(2), :id, :nome, {:prompt => 'Selecione'}, {class: 'panel-field'} %>
+    </div>
+
+    <div class="col-md-4">
+      <label>Tipo</label>
+      <%= f.select :tipo_conta, options_for_select([['Corrente', 'Corrente'], ['Poupança', 'Poupança'], ['Pix', 'Pix']]), {}, {class: 'panel-field'} %>
+    </div>
+
+    <div class="col-md-6">
+      <label>Agência</label>
+      <%= f.text_field :bc_agencia, class: 'panel-field' %>
+    </div>
+    <div class="col-md-6">
+      <label>Conta</label>
+      <%= f.text_field :bc_conta, class: 'panel-field' %>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="row">
+      <div class="col-md-7">
+        <label>Data</label>
+          <%= f.text_field :data, value: Time.now.strftime("%d/%m/%Y"), size: 10, class: "input-addon date", onkeyup: "Formatadata(this,event)", autocomplete: 'off', required: true %>
+          <div class="input-group-addon-f">
+            <span class="icon-calendar"></span>
+          </div>
+      </div>
+      <div class="col-md-5">
+        <label>Vencimento</label>
+        <%= f.text_field :vencimento, value: Time.now.strftime("%d/%m/%Y"), size: 11, class: "input-addon date", onkeyup: "Formatadata(this,event)", autocomplete: 'off', required: true %>
+        <div class="input-group-addon-f">
+          <span class="icon-calendar"></span>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-5">
+        <label>Moneda</label>
+        <%= f.select :moeda, options_for_select([['Reais', 2], ['Dolar', 0], ['Guaranies', 1]]), {}, {class: 'panel-field, pagar-moeda'} %>
+      </div>
+      <div class="col-md-7" align="right">
+        <div class="divida-us" hidden>
+          <%= field_us_label 'Valor U$', f, :divida_dolar %>
+        </div>
+        <div class="divida-gs" hidden>
+          <%= field_gs_label 'Valor Gs.', f, :divida_guarani%>
+        </div>
+        <div class="divida-rs">
+          <%= field_us_label 'Valor R$', f, :divida_real %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12 footer-buttons" >
+        <%= f.submit "Grabar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+      </div>
+    </div>
+  <% end %>
+</div>
+      <script>
+
+$('.pg-moeda').change(function(){
+
+  if ($('.pg-moeda').val() == '0') {
+    $(".pg-divida-us").show();
+    $(".pg-divida-gs").hide();
+    $(".pg-divida-rs").hide();
+  } else if ($('.pg-moeda').val() == '1') {
+    $(".pg-divida-us").hide();
+    $(".pg-divida-gs").show();
+    $(".pg-divida-rs").hide();
+  } else if ($('.pg-moeda').val() == '2') {
+    $(".pg-divida-us").hide();
+    $(".pg-divida-gs").hide();
+    $(".pg-divida-rs").show();
+  };
+})
+
+  $(function() {
+    $( "#proveedore_persona_nome" ).autocomplete({
+        source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+        $.ajax({
+          url: "/personas/busca?per=CLIENTE",
+          dataType: "json",
+
+          data: {
+            tipo: 'DESCRIPCION',
+            busca: request.term
+          },
+          beforeSend: function(){
+          $("#spinner").addClass("sppiner_show");
+          },
+
+          success: function( data ) {
+            $("#sppiner").removeClass("sppiner_show");
+            response( data );
+          },
+        });
+      },
+      minLength: 2,
+      change: function( event, ui ) {
+        $("#proveedore_persona_id").val("");
+        $('#proveedore_persona_id').val(ui.item.id);
+        return false;
+      }
+    });
+    $( "#proveedore_persona_nome" ).change(function(){
+      if ($( "#proveedore_persona_id" ).val() == ''){
+      }
+    });
+  });
+
+
+</script>

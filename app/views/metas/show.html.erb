@@ -1,0 +1,37 @@
+  <ul class="tabs">
+      <li><a href="#tab1">Metas - [<%= t('EDITION') %>]</a></li>
+   </ul>
+
+   <div class="tab_container">
+   		<br>
+      	<div class="group">
+      		<b><%= t('DATE') %> Inicio:</b>
+					<%= @meta.periodo_inicio.strftime("%d/%m/%Y") %>
+  				<b><%= t('DATE') %> Final:</b>
+  				<%= @meta.periodo_final.strftime("%d/%m/%Y") %>
+  				<br>
+  				<% if @meta.moeda == 0 %>
+  					Meta Min. <%= number_to_currency( @meta.valor_min_us,      :format =>' %n ', :separeitor => "," )%>
+  					Max. <%= number_to_currency( @meta.valor_max_us,      :format =>' %n ', :separeitor => "," )%>
+  				<% elsif @meta.moeda == 1 %>
+  					Meta Min. <%= number_to_currency( @meta.valor_min_gs,      :format =>' %n ', :precision => 0 )%>
+  					Max. <%= number_to_currency( @meta.valor_max_gs,      :format =>' %n ', :precision => 0 )%>
+  				<% else %>
+  					Meta Min. <%= number_to_currency( @meta.valor_min_rs,      :format =>' %n ', :separeitor => "," )%>
+  					Max. <%= number_to_currency( @meta.valor_max_rs,      :format =>' %n ', :separeitor => "," )%>
+  				<% end %>
+  				
+      	</div>
+      	<div class="group">
+			  	<%= render :partial=>"/meta_detalhes/index_detalhes", :locals=>{:meta_detalhes => @meta.meta_detalhes}%>
+			  </div>
+				<%= render :partial=>"/meta_detalhes/new_detalhes", :locals=>{ :meta_detalhe => MetaDetalhe.new(:meta_id=>@meta.id) } %> 
+        <div class="buttons">
+        <%= link_to t('BACK'), edit_meta_path(@meta), :class => "button back" %>
+        <%= link_to 'Salir', metas_path, :class => "button next" %>
+
+      </div>
+  	</div>
+
+
+

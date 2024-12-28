@@ -1,0 +1,31 @@
+<%= form_for(persona_prazo) do |f| %>
+  <% if persona_prazo.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(persona_prazo.errors.count, "error") %> prohibited this persona_prazo from being saved:</h2>
+
+      <ul>
+      <% persona_prazo.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= f.hidden_field :persona_id %>
+    <table>
+      <tr>
+        <td>
+         	<%= f.collection_select :grupo_id, Grupo.all(:select => 'id,descricao',:order => '2'),
+            :id,:descricao, {prompt: 'Selecione lo Grupo'},:class => "selc_mini" %>
+
+        </td>
+      </tr>
+      <tr>
+      	<td>
+          <%= f.collection_select :prazo_ids, Prazo.all, :id, :nome, {}, {:multiple => true, class: "pre-selected-options"} %>
+      	</td>
+      </tr>
+      <tr>
+      	<td><%= f.submit :value => t('SAVE'), :class => "button" %></td>
+      </tr>
+    </table>
+<% end %>

@@ -1,0 +1,43 @@
+ <div class="tab_container">
+    <div id="tab1" class="tab_content">
+
+      <table>
+        <tr>
+          <td colspan="" rowspan="" headers="">
+            <%= link_to 'Imprimir', "#",  :onclick => "MultiplaFaturaVenda(#{@form_fiscal.id})", class: 'button' %>
+            <%= link_to 'Finalizar', form_fiscals_path, class: 'button' %>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+
+    <% if @form_fiscal.status.to_i == 1 and  @form_fiscal.impressao.to_i == 0 %>
+    <script type="text/javascript">
+      function MultiplaFaturaVenda(){
+        window.open('/form_fiscals/' + <%= @form_fiscal.id %> +'/impressao_ft', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+
+          $.ajax({
+              type: "POST",
+              url: '/form_fiscals/'+ <%= @form_fiscal.id %> +'/update_impressao',
+              data: 'id=' + <%= @form_fiscal.id %>,
+              dataType: 'script'
+          })
+
+      }
+      window.onload = MultiplaFaturaVenda;
+    </script>
+  <% else %>
+    <script type="text/javascript">
+      function MultiplaFaturaVenda(id){
+        window.open('/form_fiscals/' + id +'/impressao_ft', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+          $.ajax({
+              type: "POST",
+              url: '/form_fiscals/'+ id +'/update_impressao',
+              data: 'id=' + id,
+              dataType: 'script'
+          })
+      }
+    </script>
+  <% end %>

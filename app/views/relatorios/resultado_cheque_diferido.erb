@@ -1,0 +1,45 @@
+
+<div class="group">
+   <table>
+      <%entradaus = 0 %>
+      <%entradags = 0 %>
+      <%saidaus   = 0 %>
+      <%saidags   = 0 %>
+      <% @cheque_diferido.each do |d|%>
+         <tr class="<%= cycle("cor1", "cor2") %>" >
+            <td width="40" align="center"> <%= d.data.strftime("%d/%m/%y") %></td>
+            <td width="40" align="center"> <%= d.diferido.strftime("%d/%m/%y") %></td>
+            <td width="150" align="left">  <%= truncate(d.persona_nome, :length => 25)%></td>
+            <td width="130" align="left"> <%= truncate(d.conta_nome, :length => 20) %></td>
+            <td width="70" align="left"> <%= truncate(d.titular, :length => 11)%></td>
+            <td width="70" align="left"> <%= truncate(d.banco, :length => 10)%></td>
+            <td width="40" align="center">  <%= d.cheque %></td>
+            <td width="240">  <%= d.concepto %></td>
+            <% if params[:moeda].to_s == "0" %>
+               <td width="50" align="right">  <%= number_to_currency(d.entrada_dolar.to_f, :format=>' %n ', :separeitor => "," )%></td>
+               <td width="50" align="right">  <%= number_to_currency(d.saida_dolar.to_f, :format=>' %n ', :separeitor => "," )%></td>
+            <% else %>
+               <td width="50" align="right">  <%= number_to_currency(d.entrada_guarani.to_f, :format=>' %n ', :precision => 0 )%></td>
+               <td width="50" align="right">  <%= number_to_currency(d.saida_guarani.to_f, :format=>' %n ', :precision => 0 )%></td>
+            <% end %>
+            <% entradaus +=  d.entrada_dolar.to_f %>
+            <% entradags +=  d.entrada_guarani.to_f %>
+            <% saidaus   +=  d.saida_dolar.to_f %>
+            <% saidags   +=  d.saida_guarani.to_f %>
+         </tr>
+
+      <% end %>
+      <tr class="head">
+         <% if params[:moeda].to_s == "0" %>
+            <td colspan="8"></td>
+            <td width="50" align="right">  <%= number_to_currency( entradaus.to_f, :format=>' %n ', :separeitor => "," )%></td>
+            <td width="50" align="right">  <%= number_to_currency( saidaus.to_f, :format=>' %n ', :separeitor => "," )%></td>
+         <% else %>
+            <td colspan="8"></td>
+            <td width="50" align="right">  <%= number_to_currency(entradags.to_f, :format=>' %n ', :precision => 0 )%></td>
+            <td width="50" align="right">  <%= number_to_currency(saidags.to_f, :format=>' %n ', :precision => 0)%></td>
+         <% end %>
+      </tr>
+
+   </table>
+</div>

@@ -1,0 +1,143 @@
+<%= form_for(@venda) do |vdc| %>
+  <input type='hidden' name='_method' value='put'>
+  <%= hidden_field_tag :tela, params[:action] %>
+  <div class="row">
+    <div class="col-md-12" style="padding: 5px">
+      <%= vdc.radio_button :finalidade, 0 %> Venta
+      <%= vdc.radio_button :finalidade, 1 %> Presupesto |
+
+      Ctz: U$xG$: <b><%= format_int(@venda.cotacao) %></b> | G$xR$: <b><%= format_int(@venda.cotacao_real) %></b> | U$xR$: <b><%= format_decimal(@venda.cotacao_rs_us.to_f) %></b> | G$xP$: <b><%= format_decimal(@venda.cotacao_gs_ps) %></b>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-7" style="padding: 5px">
+      <label>
+        Cliente
+        <a href="#" target="popup" style="font-size: 12px;" onclick="window.open('/personas/new?layout=resumido','popup','width=600,height=600'); return false;"> Add
+        </a> |
+        <a href="#" title="Histórico Cliente" onclick="HistoricoCliente()" style="font-size: 12px;">Histórico</a>
+      </label>
+        <%= vdc.telephone_field :persona_nome, placeholder: 'Busca Cliente', style: 'width: 100%' %>
+        <%= image_tag("check.png", align: "absmiddle", border: 0, id: "check", width: 15, height: 15, style: "position: relative; left: 265px; top: -32px;" ) %>
+      <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "position: relative; left: 265px; top: -32px; display: none;") %>
+    </div>
+    <%= vdc.hidden_field :persona_id %>
+    <%= vdc.hidden_field :tabela_preco_id %>
+    <div class="col-md-5" style="padding: 5px">
+      <label>Vendedor</label>
+      <%= vdc.collection_select :vendedor_id, Persona.where(tipo_vendedor: 1).select('id,nome').order('2'), :id, :nome, { prompt: 'Selecione o Cliente' } %>
+    </div>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+
+  function HistoricoCliente(){
+        var deposito = document.getElementById('vendas_produto_deposito_id').value
+        var dt       = document.getElementById('vendas_produto_data').value
+      window.open('/personas/' + $("#venda_persona_id").val() + '/historico_vendas' , '', ' SCROLLBARS=YES, TOP=0, LEFT=50, WIDTH=2500, HEIGHT=600');
+  };
+
+
+
+  $("#venda_vendedor_id, #venda_obs, #venda_finalidade").change(function(){
+      $("#spinner").css({"position": "relative", "top": "-32px", "left": "265px"}).show("fast");
+      $.ajax({
+        type: 'PUT',
+        url:  '/vendas/'+ <%= @venda.id %>,
+        data: $('.edit_venda').serialize(),
+        dataType: "JSON",
+        success: function(data,textStatus,jqXHR) {
+          if (jqXHR.status == "204") {
+            $('#spinner').hide("slow");
+            $("#check").css({"position": "relative", "top": "-32px", "left": "265px"}).show("fast");
+          };
+        }
+    });
+  })
+
+
+  $("#venda_persona_nome").blur(function(){
+      $.ajax({
+        type: 'PUT',
+        url:  '/vendas/'+ <%= @venda.id %>,
+        data: $('.edit_venda').serialize(),
+        dataType: "JSON",
+        success: function(data,textStatus,jqXHR) {
+          if (jqXHR.status == "204") {
+            $('#spinner').hide("slow");
+
+            if ($("#tela").val() == 'vendas_financa'){
+              $('#edit_venda_<%= @venda.id %>').submit();
+            };
+
+            $("#check").css({"position": "relative", "top": "-32px", "left": "265px"}).show("fast");
+          };
+        }
+    });
+  })
+
+  $(document).ready(function(){
+    $.ajax({
+      type: 'GET',
+      url:  '/vendas/verifica_financas',
+      data: {
+        "venda_id": <%= @venda.id %>
+      },
+      success: function(data) {
+        if (data == 1) {
+          $("#venda_persona_nome").attr('disabled','disabled');
+        }
+      }
+    });
+  });
+
+  $('#venda_vendedor_id').selectize();
+    $(function() {
+      $( "#venda_persona_nome" ).autocomplete({
+          source: function( request, response ) {
+          $.ajax({
+            url: "/personas/busca?per=CLIENTE",
+            dataType: "json",
+            data: {
+              tipo: 'DESCRIPCION',
+              busca: request.term
+            },
+            beforeSend: function(){
+              $("#spinner").css({"position": "relative", "top": "-32px", "left": "265px"}).show("fast");
+              $("#check").css({"position": "relative", "top": "-32px", "left": "265px"}).hide("fast");
+            },
+
+            success: function( data ) {
+              response( data );
+            },
+          });
+        },
+        minLength: 2,
+        change: function( event, ui ) {
+          $("#venda_persona_id").val("");
+          $('#venda_persona_id').val(ui.item.id);
+          $('#venda_tabela_preco_id').val(ui.item.tabela_preco_id);
+
+          $.ajax({
+              type: 'PUT',
+              url:  '/vendas/'+ <%= @venda.id %>,
+              data: $('.edit_venda').serialize(),
+              dataType: "JSON",
+              success: function(data,textStatus,jqXHR) {
+                if (jqXHR.status == "204") {
+                  $('#spinner').hide("slow");
+                  $("#check").css({"position": "relative", "top": "-32px", "left": "265px"}).show("fast");
+                };
+              }
+          });
+
+        }
+      });
+      $( "#venda_persona_nome" ).change(function(){
+        if ($( "#venda_persona_id" ).val() == ''){
+          alert('Cliente nao Cadastrado!')
+        }
+      });
+    });
+</script>

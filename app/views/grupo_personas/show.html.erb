@@ -1,0 +1,32 @@
+<ul class="tabs">
+  <li><a href="#tab1"> Personas - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+
+  <div id="tab1" class="tab_content">
+    <table>
+			<tr>
+				<td>
+				  <div class="group">
+				  	Grupo: <%= @grupo_persona.nome %>
+				  </div>
+				</td>
+			</tr>
+      <tr>
+        <td>
+        	<div class="group">
+          	<%= render partial: "/grupo_personas_dts/index_per", locals: {grupo_personas_dts: @grupo_persona.grupo_personas_dts} %>
+          </div>
+          <div class="group">
+          	<%= render partial: "/grupo_personas_dts/new_per", locals: {grupo_personas_dt: GrupoPersonasDt.new(grupo_persona_id: @grupo_persona.id)} %>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="buttons">
+    <%= link_to t('BACK'), edit_grupo_persona_path(@grupo_persona), :class => "button back" %>
+    <%= link_to 'Finalizar', grupo_personas_path, :class => "button next" %>  
+  </div>
+</div>

@@ -1,0 +1,53 @@
+<%= form_for(@grupo_persona) do |f| %>
+  <% if @grupo_persona.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@grupo_persona.errors.count, "error") %> prohibited this grupo_persona from being saved:</h2>
+
+      <ul>
+      <% @grupo_persona.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> Grupo Personas - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                    <td align="right">Descripción:</td>                    
+                    <td><%= f.text_field :nome, size: 46 %></td>
+
+                  </tr>                    
+                  <tr>
+                    <td align="right"></td>                    
+                    <td><%= f.text_area :obs, cols: 45, rows: 10, placeholder: 'Concepto' %></td>
+                  </tr>
+                  <tr> 
+                    <td align="right">Status:</td>                    
+                    <td><%= f.check_box :status, checked: true %></td>
+                  </tr>
+
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit "Seguir", :class => "button next", :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %>
+        <%= link_to t('BACK'), grupo_personas_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

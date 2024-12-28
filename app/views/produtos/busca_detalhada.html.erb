@@ -1,0 +1,54 @@
+<h1 id="header">Actualiza Productos</h1>
+<body onload="CampoBuscaTipo()">
+   <div class="group">
+      <h2>
+        <table>
+         <%= form_tag resultado_busca_detalhada_produtos_path, :method => "get" do %>
+          <tr>
+            <td align="right">Marca:</td>
+            <td>
+              <%=   select("filtro", "clase", Clase.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },
+                                                                                          { :include_blank => true },{:style => "width:250px"})   %>
+            </td>
+            <td align="right">Grupo :</td>
+            <td>
+              <%=   select("filtro", "grupo", Grupo.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },
+                                                                                          { :include_blank => true },{:style => "width:250px"})   %>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="right">Sub-Grupo :</td>
+            <td>
+              <%=   select("filtro", "sub_grupo", SubGrupo.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },
+                                                                                          { :include_blank => true },{:style => "width:250px"})   %>
+            </td>
+          </tr>
+          <tr>
+            <td align="right">Filtro:</td>
+            <td>
+            <select name="tipo" id="tipo" style="width:250px;">
+               <option>DESCRIPCION</option>
+               <option>REFERENCIA</option>
+               <option>CODIGO</option>
+            </select>
+
+            </td>
+            <td></td>
+            <td><input id="busca" name="busca" type="text" onkeydown = "f(this)" onkeypress ="return bloqEnter(event)" size="43"  />
+            <%= submit_tag 'Filtrar', class: 'button' %>
+            <%= image_tag("load.gif",
+                          :align => "absmiddle",
+                          :border => 0,
+                          :id => "spinner",
+                          :width => 21,
+                          :height => 21,
+                          :style =>"display: none;" ) %></td>
+          </tr>
+
+
+         <% end %>
+        </table>
+      </h2> 
+   </div>
+</body>

@@ -1,0 +1,80 @@
+<%= form_for(@comissao) do |f| %>
+  <% if @comissao.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@comissao.errors.count, "error") %> prohibited this comissao from being saved:</h2>
+
+      <ul>
+      <% @comissao.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> comissaos - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right"><%= t('DATE') %> :</td>                    
+                      <td><%= f.date_select :data %></td>
+                                      
+                      <td align="right"><%= t('DATE') %>_lib :</td>                    
+                      <td><%= f.date_select :data_lib %></td>
+                                      
+                      <td align="right">vendedor_id :</td>                    
+                      <td><%= f.number_field :vendedor_id %></td>
+                                      
+                      <td align="right">vendedor_nome :</td>                    
+                      <td><%= f.text_field :vendedor_nome %></td>
+                                      
+                      <td align="right">persona_id :</td>                    
+                      <td><%= f.number_field :persona_id %></td>
+                                      
+                      <td align="right">persona_nome :</td>                    
+                      <td><%= f.text_field :persona_nome %></td>
+                                      
+                      <td align="right">valor_us :</td>                    
+                      <td><%= f.text_field :valor_us %></td>
+                                      
+                      <td align="right">valor_gs :</td>                    
+                      <td><%= f.text_field :valor_gs %></td>
+                                      
+                      <td align="right">valor_rs :</td>                    
+                      <td><%= f.text_field :valor_rs %></td>
+                                      
+                      <td align="right">comissao :</td>                    
+                      <td><%= f.text_field :comissao %></td>
+                                      
+                      <td align="right">valor_comi_us :</td>                    
+                      <td><%= f.text_field :valor_comi_us %></td>
+                                      
+                      <td align="right">valor_comi_gs :</td>                    
+                      <td><%= f.text_field :valor_comi_gs %></td>
+                                      
+                      <td align="right">valor_comi_rs :</td>                    
+                      <td><%= f.text_field :valor_comi_rs %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), comissaos_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

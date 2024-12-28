@@ -1,0 +1,186 @@
+<script>
+  
+function ajax(url){
+  $('#spinner').show();
+
+  req = null;
+
+  if (window.XMLHttpRequest) {
+
+    req = new XMLHttpRequest();
+    req.onreadystatechange = processReqChange;
+    req.open("GET",url,true);
+    req.send(null);
+
+
+  } else if (window.ActiveXObject) {
+
+    req = new ActiveXObject("Microsoft.XMLHTTP");
+
+    if (req){
+      req.onreadystatechange = processReqChange;
+      req.open("GET",url,true);
+      req.send();
+    }
+  }
+}
+
+function processReqChange(){
+  if (req.readyState == 4) {
+    if (req.status ==200) {
+        onSuccess:$('#spinner').hide();
+        document.getElementById('pagina').innerHTML = req.responseText;
+        
+
+        $(".acao").click(function() {
+          $('.seta-parcial').css("opacity","1");
+          $('.parcial-gs, .parcial-rs, .parcial-us, .next-partical').fadeOut('slow');
+          titulo = $(this).attr('data-titulo')
+          valor_gs = $(this).attr('data-gs')
+          valor_us = $(this).attr('data-us')
+          valor_rs = $(this).attr('data-rs')
+          moeda    = $(this).attr('data-moeda')
+
+          $('#myModal').modal('show');
+          $('#titulo').val(titulo);
+          $('#saldo_gs').text(valor_gs);
+          $('#saldo_rs').text(valor_rs);
+          $('#saldo_us').text(valor_us);
+
+          $('#moeda').val(moeda);
+
+         });
+
+
+( function($) {
+  
+function iframeModalOpen(){
+
+    // impostiamo gli attributi da aggiungere all'iframe es: data-src andrà ad impostare l'url dell'iframe
+    $('.modalButton-frma-edit').on('click', function(e) {
+      var id     = $("#titulo").val();
+      var valor_gs = $("#valor_gs").val().replace(/\./g, "").replace(",", ".");
+      var valor_us = $("#valor_us").val().replace(/\./g, "").replace(",", ".");
+      var valor_rs = $("#valor_rs").val().replace(/\./g, "").replace(",", ".");
+      var width  = $(this).attr('data-width') || 350; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 600; // altezza dell'iframe se non impostato usa 360
+
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+
+      // stampiamo i nostri dati nell'iframe
+      $("#myiframeedit iframe").attr({
+        'src': '/proveedores/' +  id + '/edit?proc=prov_gasto',
+        'height': height,
+        'width': width,
+        'allowfullscreen':''
+      });
+
+    });
+
+
+    // impostiamo gli attributi da aggiungere all'iframe es: data-src andrà ad impostare l'url dell'iframe
+    $('.modalButton-frma').on('click', function(e) {
+      var id     = $("#titulo").val();
+      var valor_gs = $("#valor_gs").val().replace(/\./g, "").replace(",", ".");
+      var valor_us = $("#valor_us").val().replace(/\./g, "").replace(",", ".");
+      var valor_rs = $("#valor_rs").val().replace(/\./g, "").replace(",", ".");
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+      
+      // stampiamo i nostri dati nell'iframe
+      $("#myiframeCobro iframe").attr({
+        'src': '/proveedores/cancelacao_titulo?titulo=' +  id,
+        'height': height,
+        'width': width,
+        'allowfullscreen':''
+      });
+
+    });
+
+    // impostiamo gli attributi da aggiungere all'iframe es: data-src andrà ad impostare l'url dell'iframe
+    $('.modalButton-frma-parcial').on('click', function(e) {
+      var id     = $("#titulo").val();
+      var valor_gs = $("#valor_gs").val().replace(/\./g, "").replace(",", ".");
+      var valor_us = $("#valor_us").val().replace(/\./g, "").replace(",", ".");
+      var valor_rs = $("#valor_rs").val().replace(/\./g, "").replace(",", ".");
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+      
+      // stampiamo i nostri dati nell'iframe
+      $("#myiframeCobroParcial iframe").attr({
+        'src': '/proveedores/baixa_parcial_titulo?valor_us='+ valor_us +'&valor_gs='+ valor_gs +'&valor_rs='+ valor_rs +'&titulo=' +  id,
+        'height': height,
+        'width': width,
+        'allowfullscreen':''
+      });
+
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#myiframeCobroParcial, #myiframeCobro, #myiframeedit').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+      url="/proveedores/painel_pagar_lancamento?" + $('form').serialize();
+      ajax(url);
+    });
+  }
+  
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+  
+  } ) ( jQuery );
+
+  moeda = $('#moeda').val();
+  $('#OpenValores').click(function(e){    
+      
+      if (moeda == '0') {
+        $('.parcial-gs, .parcial-rs').fadeOut('slow', function(){
+          $('.parcial-us').fadeIn('slow');
+          $('#valor_us').focus();
+        });
+
+      };
+      if (moeda == '1') {
+        $('.parcial-us, .parcial-rs').fadeOut('slow', function(){
+          $('.parcial-gs').fadeIn('slow');
+          $('#valor_gs').focus();
+        });
+        
+      };
+      if (moeda == '2') {
+        $('.parcial-us, .parcial-gs').fadeOut('slow', function(){
+          $('.parcial-rs').fadeIn('slow');
+          $('#valor_rs').focus();
+        });
+        
+      };
+
+      $('.next-partical').fadeIn('slow');
+      $(".modalButton-frma-parcial").prop("disabled", true);
+      $('.seta-parcial').css("opacity","0.6")
+  });
+
+  $('#valor_us, #valor_rs, #valor_gs').keyup(function(){
+    valor = parseFloat($(this).val().replace(/\./g, "").replace(",", "."))
+    saldo_us = parseFloat($("#saldo_us").text().replace(/\./g, "").replace(",", "."))
+    saldo_gs = parseFloat($("#saldo_gs").text().replace(/\./g, "").replace(",", "."))
+    saldo_rs = parseFloat($("#saldo_rs").text().replace(/\./g, "").replace(",", "."))
+      if ((valor == 0) || ((moeda == '0') && (valor > saldo_us)) || ((moeda == '1') && (valor > saldo_gs))  || ((moeda == '2') && (valor > saldo_rs))) {
+        $(".modalButton-frma-parcial").attr('disabled','disabled');
+      }else{
+        $(".modalButton-frma-parcial").removeAttr('disabled');
+      }
+  })
+
+    } else {
+        alert("Houve um problema ao obter os dados:n" + req.statusText);
+    }
+  }
+}
+
+</script>

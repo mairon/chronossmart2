@@ -1,0 +1,81 @@
+<% tot = 0 %>
+<table>
+  <% @nota_creditos.each do |nc|  %>
+    <tr class = "<%= cycle("cor1", "cor2") %> ">
+      <td width="60" align="center"><%= nc.id.to_s.rjust(6,'0') %></td>
+      <td width="60" align="center"><%= nc.data.strftime("%d/%m/%y") %></td>
+      <td width="300"><%= nc.persona_nome %></td>
+      <td width="100">
+        <% if nc.operacao.to_i == 0 %>
+          Devolución
+        <% else %>
+          Descuentos
+        <% end %>
+        </td>
+        <td width="70" align="right">
+          <% if params[:moeda] == '0' %>
+            <%= format_decimal(nc.tot_us) %>
+            <% tot += nc.tot_us.to_f %>
+          <% elsif params[:moeda] == '1' %>
+            <%= format_int(nc.tot_gs) %>
+            <% tot += nc.tot_gs.to_f %>
+          <% end %>
+        </td>
+    </tr>
+    <% if params[:detalhe] == '1' %>
+      <% if nc.operacao.to_i == 0 %>      
+        <tr>
+          <td></td>
+          <td colspan="5"><b>Productos</b></td>
+        </tr>
+        <% nc.nota_creditos_detalhes.each do |ncp| %>
+          <tr class = "<%= cycle("cor1", "cor2") %> ">
+            <td></td>
+            <td colspan="4">
+              <% if params[:moeda] == '0' %>
+                <%= ncp.produto.nome %> - qtd: <%= ncp.quantidade %> - Unit: <%= format_decimal(ncp.unitario_dolar) %> - Tot: 
+                <%= format_decimal(ncp.quantidade.to_f * ncp.unitario_dolar.to_f) %>
+              <% else %>
+                <%= ncp.produto.nome %> - qtd: <%= ncp.quantidade %> - Unit: <%= format_int(ncp.unitario_guarani) %> - Tot: 
+                <%= format_int(ncp.quantidade.to_f * ncp.unitario_guarani.to_f) %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+
+      <tr>
+        <td></td>
+        <td colspan="5"><b>Docs</b></td>
+      </tr>
+      <% nc.nota_creditos_docs.each do |ncd| %>
+      <tr class = "<%= cycle("cor1", "cor2") %> ">
+        <td></td>
+        <td colspan="4">
+          <% if params[:moeda] == '0' %>
+            <%= ncd.documento_numero_01 %>-<%= ncd.documento_numero_02 %>-<%= ncd.documento_numero %>
+            Cota: <%= ncd.cota %> - Monto: <%= format_decimal(ncd.valor_dolar) %>
+          <% else %>
+            <%= ncd.documento_numero_01 %>-<%= ncd.documento_numero_02 %>-<%= ncd.documento_numero %>
+            Cota: <%= ncd.cota %> - Monto: <%= format_int(ncd.valor_guarani) %>
+          <% end %>
+        </td>
+      </tr>
+      <% end %>    
+      <tr>
+        <td height="30" colspan="5" valign="top"><hr></td>
+      </tr>
+    <% end %>
+  <% end %>
+  <tr class="head">
+    <td colspan="4">
+      Total ==>
+    </td>
+    <td width="70" align="right">
+      <% if params[:moeda] == '0' %>
+        <%= format_decimal(tot) %>
+      <% elsif params[:moeda] == '1' %>
+        <%= format_int(tot) %>
+      <% end %>
+    </td>
+</table>

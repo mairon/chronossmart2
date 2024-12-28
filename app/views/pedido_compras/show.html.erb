@@ -1,0 +1,36 @@
+<ul class="tabs">
+	<li><a href="#tab1">Pedido Compras Productos - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+	<div id="tab1" class="tab_content">
+		<div class="group">
+			<%= t('DATE') %>: <%= @pedido_compra.data.strftime("%d/%m/%Y") %>
+			Proveedor : <%= @pedido_compra.persona_nome %>
+			Tipo:
+			<% if @pedido_compra.tipo_pedido == 0 %>
+				<span style="color:red"><b>PRESUPUESTO</b></span>
+			<% else %>
+				<span style="color:green"><b>PEDIDO</b></span>
+			<% end %>
+		</div>
+
+		<br/>
+		<div class="grid group">
+			 <%= render :partial=>"pedido_compra_produtos/index", :locals=>{:pedido_compra => @pedido_compra,:pedido_compra_produtos => @pedido_compra.pedido_compra_produtos} %>
+		</div>
+
+		<div class="grid group">
+			<%= render :partial=>"pedido_compra_produtos/new_produto" , :locals=>{:pedido_compra_produto=>PedidoCompraProduto.new(:pedido_compra_id=>@pedido_compra.id)}%>
+		</div>
+	</div>
+	<div class="buttons">
+		<%= link_to t('BACK'), "/pedido_compras/#{@pedido_compra.id}/edit", :class => "button back"%>
+		<%= link_to 'Genera Informe', "/pedido_compras/#{@pedido_compra.id}/print_pedido", :class => "button print" %>
+		<% if @pedido_compra.tipo_pedido == 0 %>
+			<%= link_to 'Finalizar', pedido_compras_path, :class => "button delete" %>
+		<% else %>
+			<%= link_to 'Seguir', financas_pedido_compra_path(@pedido_compra.id), :class => "button next" %>
+		<% end %>
+	</div>
+</div>

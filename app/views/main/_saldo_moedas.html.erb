@@ -1,0 +1,84 @@
+    <div class="panel">
+      <div class="panel-content dashboard-initial-page card-dashboard-money">
+        <div class="row">
+          <div class="col-md-10">
+            <h2>Saldo en <span class="us">U$</span> Cuenta Hoy: <label class="us" style="display: inline-table;"> <%= format_decimal(@saldo_us) %></label></h2>
+            <% unless Financa.where(moeda: 0).count(:id) == 0 %>
+              <div class="row">
+                <div class="col-md-6">
+                  <label class="us" style="font-size: 11px; margin-top: 0px">Caja</label>
+                  <span class="saldo-card-dash us" ><%= format_decimal(@saldo_caixa_us) %></span>
+                </div>
+                <div class="col-md-6">
+                  <label class="us" style="font-size: 11px; margin-top: 0px">Banco</label>
+                  <span class="saldo-card-dash us" ><%= format_decimal(@saldo_banco_us) %></span>
+                </div>
+              </div>
+
+            <% else %>
+              <%= link_to 'Add Saldo', ingressos_path, class: 'us' %>
+            <% end %>
+
+          </div>
+          <div class="badges-total col-md-2"><span class="badge badge-success-lighten dash-icons"><img src="assets/dollar-icon-default.7fd90469.svg" class="badge-icon-dash dollar-dash"></span></div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-content dashboard-initial-page card-dashboard-money">
+        <div class="row">
+          <div class="col-md-10">
+            <h2>
+              Saldo en <span class="gs">Gs.</span> Cuenta Hoy: <label class="gs" style="display: inline-table;"> <%= format_int(@saldo_gs) %></label>
+            </h2>
+
+            <% unless Financa.where(moeda: 1).count(:id) == 0 %>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label class="gs" style="font-size: 11px; margin-top: 0px">Caja</label>
+                <span class="saldo-card-dash gs" ><%= format_int(@saldo_caixa_gs) %></span>
+              </div>
+              <div class="col-md-6">
+                <label class="gs" style="font-size: 11px; margin-top: 0px">Banco</label>
+                <span class="saldo-card-dash gs" ><%= format_int(@saldo_banco_gs) %></span>
+              </div>
+            </div>
+
+            <% else %>
+              <%= link_to 'Add Saldo', ingressos_path, class: 'gs' %>
+            <% end %>
+
+          </div>
+          <div class="badges-total col-md-2"><span class="badge badge-success-lighten dash-icons"><img src="assets/dollar-icon-default.7fd90469.svg" class="badge-icon-dash dollar-dash"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-content dashboard-initial-page card-dashboard-money">
+        <div class="row">
+          <div class="col-md-10">
+            <h2>Saldo en <span class="rs">R$</span> Cuenta Hoy: <label class="rs" style="display: inline-table;"> <%= format_decimal(@saldo_rs) %></label></h2>
+            <% unless Financa.where(moeda: 2).count(:id) == 0 %>
+              <div class="row">
+                <div class="col-md-6">
+                  <label class="rs" style="font-size: 11px; margin-top: 0px">Caja</label>
+                  <span class="saldo-card-dash rs" ><%= format_decimal(@saldo_caixa_rs) %></span>
+                </div>
+                <div class="col-md-6">
+                  <label class="rs" style="font-size: 11px; margin-top: 0px">Banco</label>
+                  <span class="saldo-card-dash rs" ><%= format_decimal(@saldo_banco_rs) %></span>
+                </div>
+              </div>
+            <% else %>
+              <%= link_to 'Add Saldo', ingressos_path, class: 'rs' %>
+            <% end %>
+
+          </div>
+          <div class="badges-total col-md-2"><span class="badge badge-success-lighten dash-icons"><img src="assets/dollar-icon-default.7fd90469.svg" class="badge-icon-dash dollar-dash"></span></div>
+        </div>
+      </div>
+    </div>

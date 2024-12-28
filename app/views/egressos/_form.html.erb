@@ -1,0 +1,143 @@
+  <h1 id="header">Egresso - [Edición]</h1>
+    <div class="group">
+
+  <%= form_for(@egresso) do |f| %>
+    <% if @egresso.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@egresso.errors.count, "erros") %> encontrados:</h2>
+
+      <ul>
+        <% @egresso.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+      <table>
+        <tr>
+          <td> 
+            <label>Fecha</label>
+            <%= f.date_select :data %>
+          </td>
+          <td> 
+          <label>Cotización</label>
+          <%= text_field  :egresso,:cotacao , size: 10, value: @egresso.cotacao.to_i %>
+          </td>
+
+          <td>
+            <label>R$</label>
+            <%= text_field  :egresso, :cotacao_real , :size     => 10, :value    => @egresso.cotacao.to_i %>
+          </td>
+        </tr>
+        <tr>
+          <td  colspan="5">
+          <label>Cuenta</label>
+          <%= f.collection_select :conta_id, Conta.all( :select => ' id, nome',
+                                                            :conditions => ["unidade_id = #{current_unidade.id}"],
+                                                            :order  => '2' ), :id,
+                                                            :nome, {:prompt => "Seleccione caja/banco"} %></td>
+
+        </tr>
+
+        <tr>
+          <td  colspan="4"><%= f.check_box :cheque_status %> Cheque?</td>
+        </tr>
+
+        <tr>
+          <td hidden class="cheque">
+            <label>Cheque</label>
+              <%= f.text_field  :cheque, :size => 15 %>
+            </td>
+            <td hidden class="cheque">
+            Fecha Diferido
+            <%= f.date_select :diferido%>
+          </td>
+
+        </tr>
+
+        <tr>
+          <td hidden class="cheque">
+            <label>Titular</label>
+            <%= f.text_field  :titular, :size => 25 %>
+          </td>
+
+        </tr>
+        <tr>
+          <td colspan="3" hidden class="cheque">
+          <label>Banco</label>
+          <%= f.collection_select :banco_id, Persona.all( :select => ' id, nome', :conditions => ["tipo_banco = 1"], :order  => '2' ), :id, :nome, {:prompt => "Seleccione el Banco"} %>
+          </td>
+        </tr>
+
+        <tr>
+          <%= field_gs_label 'Valor Gs.:',f, :valor_guarani,
+            :onchange   => "GsToUsRs('egresso_cotacao','egresso_cotacao_real','egresso_valor_guarani','egresso_valor_dolar','egresso_valor_real')"  %>
+
+          <%= field_us_label 'Valor U$:',f, :valor_dolar,
+            :onchange   => "UsToGsRs('egresso_cotacao','egresso_cotacao_real','egresso_valor_dolar','egresso_valor_guarani','egresso_valor_real')" %>
+
+          <%= field_us_label 'Valor R$:',f, :valor_real,
+            :onchange   => "RsToUsGs('egresso_cotacao','egresso_cotacao_real','egresso_valor_guarani','egresso_valor_dolar','egresso_valor_real')" %>
+        </tr>
+        <tr>
+          <td  colspan="4">
+            <br>
+            <%= f.text_area :concepto, cols: '100%', rows: 5, placeholder: 'Concepto:' %>
+          </td>
+        </tr>
+      </table>
+      <div class="footer-buttons">
+        <%= f.submit "Grabar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+        <%= link_to 'Volver', egressos_path, :class => "btn btn-back" %>
+      </div>
+    </div>
+  <% end %>
+
+<% if params[:action] == 'new' %>
+  <script>
+    //cotacao
+    $(document).ready(function() {
+      $('#egresso_data_3i').focus();
+      $.ajax({url: '/buscas/cotz_us_compra',
+              type: 'POST',
+              beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+              data: 'data=' + $('#egresso_data_3i').val()+'/'+
+                              $('#egresso_data_2i').val()+'/'+
+                              $('#egresso_data_1i').val(),
+              success: function(data){
+              $('#egresso_cotacao').val(number_format(data, 0, ',', '.'));} });
+
+      $.ajax({url: '/buscas/cotz_rs_compra',
+              type: 'POST',
+              beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+              data: 'data=' + $('#egresso_data_3i').val()+'/'+
+                              $('#egresso_data_2i').val()+'/'+
+                              $('#egresso_data_1i').val(),
+              success: function(data){
+              $('#egresso_cotacao_real').val(number_format(data, 0, ',', '.'));} });
+    });    
+  </script>
+<% else %>
+  <script>
+    $(document).ready(function() {
+      $('#compra_data_3i').focus();
+    });
+  </script>
+<% end %>
+
+<script type="text/javascript">
+  $('#egresso_conta_id').selectize();
+  $('#egresso_banco_id').selectize();
+</script>
+
+<script>
+$("#egresso_cheque_status").click(function() {
+    if($(this).is(":checked")) {
+        $(".cheque").show(300);
+    } else {
+        $(".cheque").hide(200);
+    }
+});    
+</script>

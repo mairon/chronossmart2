@@ -1,0 +1,125 @@
+<div class="group">
+   <table class="head_grid">
+      <tr>
+        <td width="50" align="center"><%= t('CODE') %></td>
+        <td width="80" align="center"><%= t('DATE') %></td>
+        <td width="80" align="center">Lançado por.</td>
+        <td width="150"><%= t('ACCOUNT') %></td>
+        <td width="100">Cliente</td>
+        <td width="100">Obs</td>
+        <td width="70" align="right">Valor em U$ </td>
+        <td width="70" align="right">Cambio Banco </td>
+        <td width="70" align="right">Valor R$ Banco </td>
+        <td width="70" align="right">Cambio Modal </td>
+        <td width="70" align="right">Valor R$ Modal </td>
+        <td width="70" align="right">Cambio Cliente </td>
+        <td width="70" align="right">Valor R$ Cliente </td>
+
+        <td width="70" align="right">Pontos</td>
+        <td width="70" align="right">Resultado</td>
+        <td width="70" align="right">Valor IOF</td>
+        <td width="70" align="right">Nota</td>
+        <td width="30"></td>
+        <td width="30"></td>
+      </tr>
+   </table>
+   <div class="rolagem" id="div">
+      <table>
+        <% tot = 0 %>
+        <% iof = 0 %>
+        <% crt = 0 %>
+        <% tri = 0 %>
+        <% count = 0 %>
+        <% pont = 0 %>
+        <% @ingressos.each do |ingresso| %>
+          <tr class = "<%= cycle("cor1", "cor2") %>">
+            <td width="50" align="center"><%= ingresso.id.to_s.rjust(6,'0') %></td>
+            <td width="80" align="center"><%= ingresso.data.strftime("%d/%m/%y") %></td>
+            <td width="80" align="center"><small><%= ingresso.created_user %></small></td>
+            <td width="150"><small><%= ingresso.conta_nome %></small></td>
+            <td width="100"><small><%= ingresso.persona_nome %></small></td>
+            <td width="100"><small> <%= ingresso.concepto %></small></td>
+
+            <td width="70" align="right"><%= format_decimal(ingresso.valor_base_us )%></td>
+
+            <td width="70" align="right"><%= number_to_currency( ingresso.cambio_banco, format: '%n', precision: 4, separator: "," ) %></td>
+            <td width="70" align="right"><%= format_decimal( ingresso.valor_base_us.to_f * ingresso.cambio_banco.to_f ) %></td>
+
+            <td width="70" align="right"><%= number_to_currency( ingresso.cambio_modal, format: '%n', precision: 4, separator: "," ) %></td>
+            <td width="70" align="right"><%= format_decimal( ingresso.valor_base_us.to_f * ingresso.cambio_modal.to_f ) %></td>
+
+            <td width="70" align="right"><%= number_to_currency( (ingresso.cambio_comercial), format: '%n', precision: 4, separator: ",") %></td>
+
+            <td width="70" align="right"><%= number_to_currency( (ingresso.valor_real), format: '%n', precision: 2, separator: ",") %></td>
+
+
+            <td width="70" align="right"><%= number_to_currency( (ingresso.cambio_modal.to_f - ingresso.cambio_banco.to_f), format: '%n', precision: 4, separator: ",") %></td>
+
+
+
+            <td width="70" align="right"><%= format_decimal( (ingresso.valor_base_us.to_f * ingresso.cambio_modal.to_f) - (ingresso.valor_base_us.to_f * ingresso.cambio_banco.to_f) ) %></td>
+            <td width="70" align="right"><%= format_decimal(ingresso.valor_iof) %></td>
+
+            <td width="70" align="right">
+
+            <% if (ingresso.cambio_modal.to_f - ingresso.cambio_banco.to_f) > 0 %>
+              <% count += 1 %>
+              <% tri += (((ingresso.valor_base_us.to_f * ingresso.cambio_modal.to_f) - (ingresso.valor_base_us.to_f * ingresso.cambio_banco.to_f) - ingresso.valor_iof.to_f) * (16.33 / 100)) %>
+
+              <%= format_decimal( ((ingresso.valor_base_us.to_f * ingresso.cambio_modal.to_f) - (ingresso.valor_base_us.to_f * ingresso.cambio_banco.to_f) - ingresso.valor_iof.to_f) * (16.33 / 100) ) %>
+            <% else %>
+            0,00
+            <% end %>
+
+
+            </td>
+
+            <td width="30"><%= link_to '', edit_ingresso_path(ingresso), class: 'icon-pencil' %></td>
+            <td width="30"><%= link_to '', ingresso, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+
+            <% tot += (ingresso.valor_base_us.to_f * ingresso.cambio_modal.to_f) - (ingresso.valor_base_us.to_f * ingresso.cambio_banco.to_f) %>
+            <% iof += ingresso.valor_iof %>
+            <% crt += ingresso.taxa_contrato %>
+
+            <% pont += (ingresso.cambio_modal.to_f - ingresso.cambio_banco.to_f) %>
+
+          </tr>
+         <% end %>
+      </table>
+   </div>
+</div>
+
+<hr>
+
+<div class="group" style="background-color: #e6e6e6; padding: 5px">
+  <table class="head_grid">
+    <tr>
+      <td width="100" style="padding: 5px">TOTAL</td>
+      <td width="100" align="right" style="padding: 5px"><%= format_decimal(tot) %></td>
+    </tr>
+    <tr>
+      <td width="100" style="padding: 5px">CONTRATOS</td>
+      <td width="100" align="right" style="padding: 5px"><%= format_decimal(crt) %></td>
+    </tr>
+    <tr>
+      <td width="100" style="padding: 5px">IOF</td>
+      <td width="100" align="right" style="padding: 5px"><%= format_decimal(iof) %></td>
+    </tr>
+
+    <tr>
+      <td width="100" style="padding: 5px">TRIBUTOS</td>
+      <td width="100" align="right" style="padding: 5px"><%= format_decimal(tri) %></td>
+    </tr>
+
+    <tr>
+      <td width="100" style="padding: 5px">MÉDIA PONTOS</td>
+      <td width="100" align="right" style="padding: 5px"><%= number_to_currency((pont.to_f / count.to_f), format: '%n', precision: 4, separator: "," ) %></td>
+    </tr>
+
+    <tr>
+      <td width="100" style="padding: 5px">RESULTADO</td>
+      <td width="100" align="right" style="padding: 5px"><%= format_decimal( tot.to_f -  crt.to_f - iof.to_f - tri.to_f) %></td>
+    </tr>
+
+  </table>
+</div>

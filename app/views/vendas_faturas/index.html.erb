@@ -1,0 +1,43 @@
+<h1 id="header">vendas_faturas</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_vendas_fatura_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Venda</td>
+            <td>Status</td>
+            <td>Total dolar</td>
+            <td>Total guarani</td>
+            <td>Nome fatura</td>
+            <td>Ruc fatura</td>
+            <td>Quantidade</td>
+            <td>Documento numero 01</td>
+            <td>Documento numero 02</td>
+            <td>Documento numero</td>
+            <td>Tipo</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @vendas_faturas.each do |vendas_fatura| %>
+      <tr>
+                  <td><%= vendas_fatura.venda_id %></td>
+                  <td><%= vendas_fatura.status %></td>
+                  <td><%= vendas_fatura.total_dolar %></td>
+                  <td><%= vendas_fatura.total_guarani %></td>
+                  <td><%= vendas_fatura.nome_fatura %></td>
+                  <td><%= vendas_fatura.ruc_fatura %></td>
+                  <td><%= vendas_fatura.quantidade %></td>
+                  <td><%= vendas_fatura.documento_numero_01 %></td>
+                  <td><%= vendas_fatura.documento_numero_02 %></td>
+                  <td><%= vendas_fatura.documento_numero %></td>
+                  <td><%= vendas_fatura.tipo %></td>
+                <td><%= link_to 'Editar', edit_vendas_fatura_path(vendas_fatura) %></td>
+        <td><%= link_to t('DELETE'), vendas_fatura, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

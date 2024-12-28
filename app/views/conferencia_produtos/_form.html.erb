@@ -1,0 +1,134 @@
+<div class="row">
+<div class="col-md-12">
+  <div class="panel">
+    <header class="panel-heading link-prod">
+      Conferencia y Ajuste de Stock - [ Productos ]
+
+        <%= form_for(@conferencia_produto) do |f| %>
+        <% if @conferencia_produto.errors.any? %>
+          <div id="error_explanation">
+            <h2><%= pluralize(@conferencia_produto.errors.count, "error") %> prohibited this conferencia_produto from being saved:</h2>
+
+            <ul>
+            <% @conferencia_produto.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+            </ul>
+          </div>
+        <% end %>
+        <%= f.hidden_field :conferencia_id %>
+        <table>
+          <tr>
+              <td colspan="8" width="550">
+                <label>Producto</label>
+                <%= text_field :cod, :busca,
+                           :size        => 10,
+                           :placeholder => 'Codigo',
+                           :autofocus   => true %>
+                <%= f.text_field :produto_nome, size: 55 %>
+                <%= f.hidden_field :produto_id %>
+              </td>
+
+              <td width="125">
+                <label>Ctd. Anterior</label>
+                <%= f.text_field :saldo_anterior, :size => 10,:dir   => "rtl", readonly: 'readonly' %>
+              </td>
+
+              <td width="125">
+                <label>Ctd. Nueva</label>
+                <%= f.text_field :quantidade, :size => 10,:dir   => "rtl" %>
+              </td>
+              <% if @conferencia_produto.conferencia.moeda.to_i == 0 %>
+                <%= field_us_label 'Costo U$:', f, :custo_medio_us %>
+              <% else %>
+                <%= field_gs_label 'Costo G$:', f, :custo_medio_gs %>
+              <% end %>
+              <td style="padding-top: 25px; padding-left: 25px"><%= f.submit :value => t('SAVE'), :class => "btn btn-green", :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %></td>
+            </tr>
+        </table>
+        <% end %>
+
+        <script type="text/javascript">
+
+        $("#cod_busca").change(function(){
+        $.ajax({url: "/buscas/busca_conferencia_produto",
+                type: 'GET',
+                beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+                data: "cod=" + escape($("#cod_busca").val()) +
+                      "&deposito_id= <%= @conferencia_produto.conferencia.deposito_id %>" +
+                      "&dt= <%= @conferencia_produto.conferencia.data %>" +
+                      "&sub_grupo_id=<%= @conferencia_produto.conferencia.sub_grupo_id %>",
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        alert('Producto no Encontrado');
+                        $('#cod_busca').focus();
+                        $('#cod_busca').val('');
+                    },
+                success: function(grade){
+                $('#conferencia_produto_produto_nome').val(grade["produto"].produto_nome);
+                $('#conferencia_produto_produto_id').val(grade["produto"].produto_id);
+                $('#conferencia_produto_saldo_anterior').val((grade["produto"].saldo_atual).replace(".", ",") );
+                $('#conferencia_produto_custo_medio_gs').val(number_format((grade["produto"].custo_produto_guarani), 0, ',', '.'));
+
+                }
+            });
+        });
+
+
+        $(function() {
+        $( "#conferencia_produto_produto_nome" ).autocomplete({
+            source: function( request, response ) {
+            $.ajax({
+              url: "/buscas/search_all_produtos",
+              dataType: "json",
+              data: {
+                tipo: 'DESCRIPCION',
+                busca: request.term
+              },
+              success: function( data ) {
+                response( data );
+              },
+            });
+          },
+          minLength: 2,
+          select: function( event, ui ) {
+            $("#compras_produto_produto_id").val("");
+            $('#compras_produto_produto_id').val(ui.item.id);
+
+            $.ajax({url: "/buscas/busca_conferencia_produto",
+                      type: 'GET',
+                      beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+                      data: "cod=" + ui.item.id +
+                            "&deposito_id= <%= @conferencia_produto.conferencia.deposito_id %>" +
+                            "&dt= <%= @conferencia_produto.conferencia.data %>" +
+                            "&filtro=descr" +
+                            "&sub_grupo_id=<%= @conferencia_produto.conferencia.sub_grupo_id %>",
+                      error: function(XMLHttpRequest, textStatus, errorThrown) {
+                              alert('Producto no Encontrado');
+                              $('#cod_busca').focus();
+                              $('#cod_busca').val('');
+                          },
+                      success: function(grade){
+                      $('#conferencia_produto_produto_nome').val(grade["produto"].produto_nome);
+                      $('#conferencia_produto_produto_id').val(grade["produto"].produto_id);
+                      $('#conferencia_produto_saldo_anterior').val((grade["produto"].saldo_atual).replace(".", ",") );
+                      $('#conferencia_produto_custo_medio_gs').val(number_format((grade["produto"].custo_produto_guarani), 2, ',', '.'));
+
+                    }
+                  });
+            return false;
+
+          }
+        });
+        $( "#compras_produto_produto_nome" ).select(function(){
+          if ($( "#compras_produto_produto_id" ).val() == ''){
+            alert('Producto nao Cadastrado!')
+          }
+        });
+        });
+        </script>
+
+</header>
+</div>
+<%= link_to t('BACK'), conferencia_path(@conferencia_produto.conferencia.id), class: 'btn' %>
+</div>
+</div>

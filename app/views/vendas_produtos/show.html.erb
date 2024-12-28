@@ -1,0 +1,102 @@
+
+  <div id="error_explanation" style="display:none"></div>
+  <!-- form PDV ! -->
+  <style type="text/css">
+    input.produto{
+      height: 50px;
+      width: 97%;
+      margin: 5px;
+      font-size: 22px;
+      margin-bottom: 5px;
+      padding: 5px;
+    }
+
+    input.valores{
+      height: 50px;
+      width: 95%;
+      margin: 5px;
+      font-size: 22px;
+    }
+
+
+    .qtd{
+      padding: 10px;
+      font-size: 22px;
+      margin-left: 5px;
+    }
+
+    .add{
+      height: 50px;
+      width: 40%;
+      margin: 5px;
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .descp{
+      font-size: 22px;
+    }
+
+    .styled-select select {
+      width: 286px;
+      padding: 5px;
+      font-size: 16px;
+      border-radius: 0;
+      height: 48px;
+      -webkit-appearance: none;
+      margin-right: 5px;
+      margin-bottom: 4px;
+      margin-top: 1px;
+    }
+      .text_h1{
+        font-size: 26px;
+        padding: 10px 5px 10px 5px;
+        font-weight: bold;
+      }
+  </style>
+
+  <ul class="tabs">
+    <li>
+      <a href="#tab1">Autorizar Producto para Borrar</a>
+    </li>
+  </ul>
+  <div class="tab_container">
+    <div id="tab1" class="tab_content">
+      <fieldset>
+        <h1 class="descp" style="padding: 10px"><%= @vendas_produto.produto_nome %> - Ctd: <%= @vendas_produto.quantidade %></h1>
+      </fieldset>
+        <form>
+        <%= password_field_tag :senha_autorizacao, nil, placeholder: 'Digite la Contra-senha', class: 'produto', autofocus: true %>
+        <h1 id="status_auto" class="text_h1"></h1>
+
+        <p id="status_button" style="display:none"><%= link_to 'Borrar Producto', vendas_produto_path(@vendas_produto, usuario_auto: params[:senha_autorizacao] ), method: :delete, class: 'button qtd', id: 'bt-destroy' %></p>
+        <p style="padding: 5px; font-size: 16px"><%= link_to 'Volver', venda_path(@vendas_produto.venda_id) %></p>
+        </form>
+    </div>
+  </div>
+
+
+
+<script>
+
+  $("#senha_autorizacao").change(function(){
+    $.ajax({url: "/buscas/autoriza_acao_venda",
+        type: 'GET',
+        beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+        data: "cod=" + escape($("#senha_autorizacao").val()),
+        error: function(jqXHR, textStatus, errorThrown) {
+          alert('Usuario no Encontrado');
+          $('#senha_autorizacao').focus();
+          $("#status_auto").html('<p class="text_h1"></p>' )
+          $("#status_button").css('display','none');
+            },
+        success: function(params){
+          $("#status_auto").html('<p class="text_h1">Autorizar la eliminación por ' + params["us"].usuario_nome + '</p>' )
+          $("#status_button").css('display','block');
+          $("#bt-destroy").attr("href", "/vendas_produtos/<%= @vendas_produto.id %>?user_auto=" + params["us"].id);
+
+
+      }
+    });
+  });
+</script>

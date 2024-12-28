@@ -1,0 +1,30 @@
+<% @depreciacao = 0 %>
+<%
+sql = "SELECT CP.PRODUTO_NOME,
+			       CDP.VALOR_MENSAL_US,
+			       CDP.VALOR_MENSAL_GS,
+			       CDP.VALOR_MENSAL_RS 
+			FROM COMPRAS_DEPRE_APRES CDP 
+			INNER JOIN COMPRAS_PRODUTOS CP
+			ON CP.COMPRA_ID = CDP.COMPRA_ID
+			WHERE CDP.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'"
+
+		depreciacao =	Compra.find_by_sql(sql)
+%>
+<% depreciacao.each do |d| %>
+	<tr class="<%= cycle("cor1", "cor2") %>" >
+		<td>DEPRECIAÇÃO</td>
+		<td><%= d.produto_nome %></td>
+		<% if params[:moeda] == '1' %>
+			<td align="right"><b><%= format_decimal(d.valor_mensal_gs.to_f)%></b></td>
+			<% @depreciacao += d.valor_mensal_gs.to_f %>
+		<% elsif params[:moeda] == '0' %>
+			<td align="right"><b><%= format_decimal(d.valor_mensal_us.to_f)%></b></td>
+			<% @depreciacao += d.valor_mensal_us.to_f %>
+		<% else %>
+			<td align="right"><b><%= format_decimal(d.valor_mensal_rs.to_f)%></b></td>
+			<% @depreciacao += d.valor_mensal_rs.to_f %>
+		<% end %>
+		<td></td>
+	</tr>
+<% end %>

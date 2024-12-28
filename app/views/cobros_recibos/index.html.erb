@@ -1,0 +1,43 @@
+<h1 id="header"><%= t('CHARGE') %>s_recibos</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_cobros_recibo_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td><%= t('CHARGE') %></td>
+            <td><%= t('DATE') %></td>
+            <td>Documento numero 01</td>
+            <td>Documento numero 02</td>
+            <td>Documento numero</td>
+            <td>Valor us</td>
+            <td>Valor gs</td>
+            <td>Moeda</td>
+            <td>Persona</td>
+            <td>Persona <%= t('NAME') %></td>
+            <td>Tipo</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @cobros_recibos.each do |cobros_recibo| %>
+      <tr>
+                  <td><%= cobros_recibo.cobro_id %></td>
+                  <td><%= cobros_recibo.data %></td>
+                  <td><%= cobros_recibo.documento_numero_01 %></td>
+                  <td><%= cobros_recibo.documento_numero_02 %></td>
+                  <td><%= cobros_recibo.documento_numero %></td>
+                  <td><%= cobros_recibo.valor_us %></td>
+                  <td><%= cobros_recibo.valor_gs %></td>
+                  <td><%= cobros_recibo.moeda %></td>
+                  <td><%= cobros_recibo.persona_id %></td>
+                  <td><%= cobros_recibo.persona_nome %></td>
+                  <td><%= cobros_recibo.tipo %></td>
+                <td><%= link_to 'Editar', edit_cobros_recibo_path(cobros_recibo) %></td>
+        <td><%= link_to t('DELETE'), cobros_recibo, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

@@ -1,0 +1,30 @@
+<h1 id="header">Modelo Contratos</h1>
+<div class="group">
+  <%= form_for(@modelo_contrato) do |f| %>
+    <table>
+      <tr>
+                                        
+        <td>
+          <label>Nombre</label>
+          <%= f.text_field :nome %>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label>Proceso</label>
+          <%= f.text_field :processo %>
+        </td>
+      </tr>    
+      <tr>
+        <td>
+          <br>
+          <%= f.text_area :modelo, :class => 'ckeditor' %>
+        </td>
+      </tr>
+    </table>
+      <div class="footer-buttons">
+        <%= f.submit "Grabar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+        <%= link_to t('BACK'), modelo_contratos_path, :class => "btn btn-back" %>
+      </div>      
+  <% end %>
+</div>

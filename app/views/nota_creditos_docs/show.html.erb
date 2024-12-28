@@ -1,0 +1,23 @@
+<p>
+  <b>Nota credito:</b>
+  <%=h @nota_creditos_doc.nota_credito_id %>
+</p>
+
+<p>
+  <b><%= t('DATE') %>:</b>
+  <%=h @nota_creditos_doc.data %>
+</p>
+
+<p>
+  <b><%= t('PERSON') %>:</b>
+  <%=h @nota_creditos_doc.persona_id %>
+</p>
+
+<p>
+  <b>Persona <%= t('NAME') %>:</b>
+  <%=h @nota_creditos_doc.persona_nome %>
+</p>
+
+
+<%= link_to 'Edit', edit_nota_creditos_doc_path(@nota_creditos_doc) %> |
+<%= link_to 'Back', nota_creditos_docs_path %>

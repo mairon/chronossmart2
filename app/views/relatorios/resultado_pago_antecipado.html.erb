@@ -1,0 +1,24 @@
+<% saldo  = 0 %>
+<% quebra = '' %>
+
+<table>
+	<% @pagos.each do |p| %>
+    <% if quebra != p.persona_nome %>
+      <% if quebra != "" %>
+          <tr>
+            <td></td>
+          </tr>
+					<% saldo = 0 %>
+        <% end %>
+			<tr>
+        <td class="head" colspan="8"> <%= quebra = p.persona_nome %></td>				
+			</tr>
+     <% end %>
+		<tr class = "<%= cycle("cor1", "cor2") %>">
+			<td width="50" align="center"><%= p.data.to_date.strftime("%d/%m/%y")%></td>
+			<td width="70" align="right"><%= format_int(p.cobro_guarani) %></td>
+			<td width="70" align="right"><%= format_int(p.divida_guarani) %></td>
+			<td width="70" align="right"><%= format_int(saldo += (p.cobro_guarani.to_f - p.divida_guarani.to_f )) %></td>
+		</tr>	
+	<% end %>
+</table>

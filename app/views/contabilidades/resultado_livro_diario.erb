@@ -1,0 +1,128 @@
+
+<div class="group">
+  
+  <table>
+
+      <% qb_data       = "" %>
+      <% qb_lancamento = "" %>      
+      <% totdeb_us     = 0 %>
+      <% totdeb_gs     = 0 %>      
+      <% tothab_us     = 0 %>
+      <% tothab_gs     = 0 %>      
+      
+      <% @diario.each do |diario|%>
+
+        <!--QUEBRAS !-->
+        <% if ( qb_data != diario.data.to_s ) or ( qb_lancamento != diario.id.to_s )%>
+
+              <% if ( qb_lancamento != diario.id.to_s ) or ( qb_data != diario.data.to_s )  %>
+                    <% if qb_lancamento != "" %>
+                       
+                              <tr height="20">
+                                  <td></td>
+                              </tr>
+                    <% end %>
+              <% end %>
+
+              <% if ( qb_data != diario.data.to_s ) %>
+                    <% if qb_data != "" %>
+
+                          <tr class="head" height="20">
+                              <td>-----</td>
+                           </tr>
+
+                    <% end %>
+              <% end %>
+
+                <tr class="head">
+                  <td align="center">
+                    <% if qb_data != diario.data.to_s %>
+                          <% qb_data = diario.data.to_s  %>
+                          <%= diario.data.strftime("%d/%m/%Y")  %>
+                    <% end %>
+                  </td>
+                </tr>
+
+                    <% if qb_lancamento != diario.id.to_s %>
+                          <% qb_lancamento = diario.id.to_s  %>
+                    <% end %>
+          <% end %>
+
+          <tr class = "<%= cycle("cor1", "cor2") %>">            
+            <td width="0" align="center">     <%=  diario.data.strftime("%d/%m/%Y")%></td>          
+            <td width="30" align="center">     <%=  diario.tabela_id.to_s.rjust(8,'0') %></td>
+            <td width="30" align="center">     <%=  diario.id.to_s.rjust(8,'0') %></td>
+            <td width="10" align="center">      <%=  diario.sigla %></td>
+            <td width="90" align="center">       <%=  diario.documento_numero_01 %>-<%=  diario.documento_numero_02 %>-<%=  diario.documento_numero %></td>
+            <td width="60" align="left">       <%=  diario.contabilidade %></td>
+            <% if  diario.ordem.to_i == 2 %>
+
+              <td width="250" align="left" class="head">     <%=  diario.descripcion %></td>
+
+                <% if params[:moeda].to_s == '0' %>
+
+                  <td width="70" align="right" class="head">     <%=  number_to_currency(diario.debe_us , :format=>' %n ', :separeitor => ',') %></td>
+
+                  <td width="70" align="right" class="head">     <%=  number_to_currency(diario.haber_us , :format=>' %n ', :separeitor => ',') %></td>
+
+                  <% totdeb_us +=  diario.debe_us.to_f %>
+                  <% tothab_us +=  diario.haber_us.to_f %>
+
+                <% else %>
+
+                  <td width="50" align="right" class="head">      <%=  number_to_currency(diario.debe_gs , :format=>' %n ', :precision => 0) %></td>
+
+                  <td width="50" align="right" class="head">     <%=  number_to_currency(diario.haber_gs , :format=>' %n ', :precision => 0) %></td>
+
+                  <% totdeb_gs +=  diario.debe_gs.to_f %>
+                  <% tothab_gs +=  diario.haber_gs.to_f %>
+
+              <% end %>
+
+            <% else %>
+              <td width="250" align="left"> <%=  diario.descripcion %></td>
+
+                <% if params[:moeda].to_s == '0' %>
+
+                  <td width="50" align="right">     <%=  number_to_currency(diario.debe_us , :format=>' %n ', :separeitor => ',') %></td>
+
+                  <td width="50" align="right">     <%=  number_to_currency(diario.haber_us , :format=>' %n ', :separeitor => ',') %></td>
+
+                  <% totdeb_us +=  diario.debe_us.to_f %>
+                  <% tothab_us +=  diario.haber_us.to_f %>
+
+                <% else %>
+
+                  <td width="50" align="right">     <%=  number_to_currency(diario.debe_gs , :format=>' %n ', :precision => 0) %></td>
+
+                  <td width="50" align="right">     <%=  number_to_currency(diario.haber_gs , :format=>' %n ', :precision => 0) %></td>
+
+                  <% totdeb_gs +=  diario.debe_gs.to_f %>
+                  <% tothab_gs +=  diario.haber_gs.to_f %>
+
+              <% end %>
+
+            <% end %>
+          </tr>
+
+      <% end %>
+      <tr>
+        <td colspan="7"></td>
+        <% if params[:moeda].to_s == '0' %>
+          <td width="100" align="right">     <%=  number_to_currency(totdeb_us , :format=>' %n ', :separeitor => ',' ) %></td>
+          <td width="100" align="right">     <%=  number_to_currency(tothab_us , :format=>' %n ', :separeitor => ',' ) %></td>
+       <% else %>   
+          <td width="100" align="right">     <%=  number_to_currency(totdeb_gs , :format=>' %n ', :precision => 0 ) %></td>
+          <td width="100" align="right">     <%=  number_to_currency(tothab_gs , :format=>' %n ', :precision => 0 ) %></td>
+       <% end %>   
+          
+      </tr>
+          </table>
+</div>
+
+<style type="text/css">
+	table {
+		font-size: 9px
+	}
+</style>
+

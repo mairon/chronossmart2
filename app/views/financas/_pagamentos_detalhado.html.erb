@@ -1,0 +1,60 @@
+<table>
+  <% if params[:tipo] == '1' %>
+    <tr>
+      <td>Fecha</td>
+      <td>Proc.</td>
+      <td>CC.</td>
+      <td>Nombre</td>
+      <td>Clasificacion</td>
+      <td>Cuenta</td>
+      <td>Forma de Pago</td>
+      <td>Moneda</td>
+      <td align="right">U$</td>
+      <td align="right">Gs.</td>
+      <td align="right">R$</td>
+    </tr>
+  <% end %>
+  <% tot_us = 0 %>
+  <% tot_gs = 0 %>
+  <% tot_rs = 0 %>
+
+  <% tot = 0 %>
+  <% @financas.each do |p| %>
+    <tr class="<%= cycle("cor1", "cor2") %>" >
+      <td align="center" width="40"><%= p.data.to_date.strftime("%d/%m/%y") %></td>
+      <td width="50" align="center"><%= p.sigla_proc %><%= p.cod_proc.to_s.rjust(6,'0') %></td>
+      <td width="100"><small><%= p.centro_custo_nome %></small></td>
+      
+      <td width="150"><small><%= p.persona_nome %></small></td>
+      <td width="200"><small><%= p.plano_de_conta_nome %></small></td>
+      <td width="120"><small><%= p.conta_nome %></small></td>
+      <td width="120"><small><%= p.forma_pago_nome %></small></td>
+      <% if p.moeda.to_i == 0 %>
+        <td width="15">U$</td>
+        <td width="50" align="right"><%= format_decimal(p.saida_dolar) %></td>
+        <td width="50" align="right">0</td>
+        <td width="50" align="right">0</td>
+        <% tot_us += p.saida_dolar.to_f %>
+      <% elsif p.moeda.to_i == 1 %>
+        <td width="15">Gs.</td>
+        <td width="50" align="right">0</td>
+        <td width="50" align="right"><%= format_int(p.saida_guarani) %></td>
+        <td width="50" align="right">0</td>
+        <% tot_gs += p.saida_guarani.to_f %>
+      <% elsif p.moeda.to_i == 2 %>
+        <td width="15">R$</td>
+        <td width="50" align="right">0</td>
+        <td width="50" align="right">0</td>
+        <td width="50" align="right"><%= format_decimal(p.saida_real) %></td>
+        <% tot_rs += p.saida_real.to_f %>
+      <% end %>
+    </tr>
+  <% end %>
+
+  <tr class="head">
+    <td colspan="8"></td>
+    <td align="right"><%= format_decimal(tot_us) %></td>
+    <td align="right"><%= format_int(tot_gs) %></td>
+    <td align="right"><%= format_decimal(tot_rs) %></td>
+  </tr>
+</table>

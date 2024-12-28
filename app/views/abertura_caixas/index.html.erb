@@ -1,0 +1,41 @@
+<h1 id="header">Apertura de Caja</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_abertura_caixa_path, :class => "button add" %>
+</div>
+
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="55"><%= t('CODE') %></td>
+      <td width="80"><%= t('DATE') %></td>
+      <td width="150">Usuario</td>
+      <td width="150">Turno</td>
+      <td width="150">Terminal</td>
+      <td width="150">Status</td>
+    </tr>
+  </table>
+
+  <div class="rolagem" dir="div">
+    <table>
+      <% @abertura_caixas.each do |abertura_caixa| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="55" align="center"><%= abertura_caixa.id.to_s.rjust(6,'0') %></td>
+          <td width="80"><%= abertura_caixa.data.strftime("%d/%m/%y") %></td>
+          <td width="150"><%= abertura_caixa.usuario.usuario_nome %></td>
+          <td width="150"><%= abertura_caixa.turno.nome unless abertura_caixa.turno_id.blank? %></td>
+          <td width="150"><%= abertura_caixa.terminal.nome %></td>
+          <td width="150">
+            <% if abertura_caixa.status == true %>
+              Activo
+            <% else %>
+              Cerrado
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+<div class="head_grid">
+  <%= will_paginate @moedas %>
+</div>

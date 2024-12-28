@@ -1,0 +1,7 @@
+<% if @ft.sigla_proc == 'CB' %>
+	<%= render partial: '/form_fiscals/cps/modelo_fatura_config_cobro_crecer' %>
+<% elsif (@ft.sigla_proc == 'VTI' and @ft.sigla_proc != 'CB') or @ft.sigla_proc == nil %>
+	<%= render partial: '/form_fiscals/cps/modelo_fatura_ind_config' %>
+<% else %>
+	<%= render partial: '/form_fiscals/cps/modelo_fatura_config' %>
+<% end %>

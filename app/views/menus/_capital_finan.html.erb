@@ -1,0 +1,196 @@
+<style>
+	.grid td{
+		padding: 8px;
+	}
+</style>
+<% if current_unidade.moeda == 0 %>
+<div class="panel">
+	<h1 id="header">
+    <%= t('CAPITAL') %> <%= t('FINANCIAL') %> por <%= t('COIN') %>
+  </h1>		  	
+  
+  <div class="panel-body">
+  	<header class="panel-heading title-list us" align="center">
+    <%= t('DOLLARS') %>
+  </header>
+
+		<div class="row">
+			<div class="col-md-12">
+				<header>
+					<br>
+	        <strong style="color: #000"><%= t('CASHIER') %>s</strong>
+	      </header>
+	      <table style="font-size: 12px" class="grid">
+	      	<% @contas_cajas_us.each do |cus| %>
+	      	<tr class="<%= cycle("cor1", "cor2")%>">
+	      		<td style="width: 80%"><%= cus.conta_nome %></td>
+	      		<td align="right" width="60"><%= format_decimal(cus.saldo_us) %></td>
+	      	</tr>
+	      	<% end %>
+	      </table>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<header>
+					<br>
+	        <strong style="color: #000"><%= t('BANKS') %></strong>
+	      </header>
+	      <table style="font-size: 12px" class="grid">
+	      	<% @contas_bancos_us.each do |cus| %>
+	      	<tr class="<%= cycle("cor1", "cor2")%>">
+	      		<td style="width: 80%"><%= cus.conta_nome %></td>
+	      		<td align="right" width="60"><%= format_decimal(cus.saldo_us) %></td>
+	      	</tr>
+	      	<% end %>
+	      </table>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<header>
+					<br>
+	        <strong style="color: #000"><%= t('CHECKS') %>s <%= t('DEFERRED') %>s</strong>
+	      </header>
+	      <table style="font-size: 12px" class="grid">
+	      	<% @contas_cheque_dif_us.each do |cus| %>
+	      	<tr class="<%= cycle("cor1", "cor2")%>">
+	      		<td style="width: 80%"><%= cus.conta_nome %></td>
+	      		<td align="right" width="60"><%= format_decimal(cus.saldo_us) %></td>
+	      	</tr>
+	      	<% end %>
+	      </table>
+			</div>
+		</div>
+  </div>
+</div>
+<% end %>
+
+
+<% if current_unidade.moeda == 1 %>
+<div class="panel">
+	<h1 id="header">
+    <%= t('ACCOUNT') %>s
+  </h1>
+
+  <div class="panel-body">
+  	<header class="panel-heading title-list gs" align="center">
+    Guaranies
+  </header>
+
+		<div class="row">
+			<div class="col-md-12">
+				<header>
+					<br>
+	        <strong style="color: #000"><%= t('CASHIER') %>s</strong>
+	      </header>
+	      <table style="font-size: 12px" class="grid">
+	      	<% @contas_cajas_gs.each do |cus| %>
+	      	<tr class="<%= cycle("cor1", "cor2")%>">
+	      		<td style="width: 80%"><%= cus.conta_nome %></td>
+	      		<td align="right" width="60"><%= format_int(cus.saldo_gs) %></td>
+	      	</tr>
+	      	<% end %>
+	      </table>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<header>
+					<br>
+	        <strong style="color: #000"><%= t('BANKS') %></strong>
+	      </header>
+	      <table style="font-size: 12px" class="grid">
+	      	<% @contas_bancos_gs.each do |cus| %>
+	      	<tr class="<%= cycle("cor1", "cor2")%>">
+	      		<td style="width: 80%"><%= cus.conta_nome %></td>
+	      		<td align="right" width="60"><%= format_int(cus.saldo_gs) %></td>
+	      	</tr>
+	      	<% end %>
+	      </table>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<header>
+					<br>
+	        <strong style="color: #000"><%= t('CHECKS') %>s <%= t('DEFERRED') %>s</strong>
+	      </header>
+	      <table style="font-size: 12px" class="grid">
+	      	<% @contas_cheque_dif_gs.each do |cus| %>
+	      	<tr class="<%= cycle("cor1", "cor2")%>">
+	      		<td style="width: 80%"><%= cus.conta_nome %></td>
+	      		<td align="right" width="60"><%= format_int(cus.saldo_gs) %></td>
+	      	</tr>
+	      	<% end %>
+	      </table>
+			</div>
+		</div>
+  </div>
+</div>
+<% end %>
+
+<% if current_unidade.moeda == 2 %>
+	<div class="panel">
+	  <div class="panel-body">
+	  	<header class="panel-heading title-list rs" align="center">
+	    <%= t('REAIS') %>
+	  </header>
+
+			<div class="row">
+				<div class="col-md-12">
+					<header>
+						<br>
+		        <strong style="color: #000"><%= t('CASHIER') %>s</strong>
+		      </header>
+		      <table style="font-size: 12px" class="grid">
+		      	<% @contas_cajas_rs.each do |cus| %>
+		      	<tr class="<%= cycle("cor1", "cor2")%>">
+		      		<td style="width: 80%"><%= cus.conta_nome %></td>
+		      		<td align="right" width="60"><%= format_decimal(cus.saldo_rs) %></td>
+		      	</tr>
+		      	<% end %>
+		      </table>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<header>
+						<br>
+		        <strong style="color: #000"><%= t('BANKS') %></strong>
+		      </header>
+		      <table style="font-size: 12px" class="grid">
+		      	<% @contas_bancos_rs.each do |cus| %>
+		      	<tr class="<%= cycle("cor1", "cor2")%>">
+		      		<td style="width: 80%"><%= cus.conta_nome %></td>
+		      		<td align="right" width="60"><%= format_decimal(cus.saldo_rs) %></td>
+		      	</tr>
+		      	<% end %>
+		      </table>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<header>
+						<br>
+		        <strong style="color: #000"><%= t('CHECKS') %>s <%= t('DEFERRED') %>s</strong>
+		      </header>
+		      <table style="font-size: 12px" class="grid">
+		      	<% @contas_cheque_dif_rs.each do |cus| %>
+		      	<tr class="<%= cycle("cor1", "cor2")%>">
+		      		<td style="width: 80%"><%= cus.conta_nome %></td>
+		      		<td align="right" width="60"><%= format_decimal(cus.saldo_rs) %></td>
+		      	</tr>
+		      	<% end %>
+		      </table>
+				</div>
+			</div>
+	  </div>
+	</div>
+<% end %>

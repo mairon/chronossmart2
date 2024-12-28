@@ -1,0 +1,97 @@
+<h1 id="header">Ponto Empleado</h1>
+<div class="acessos">
+
+    <div class="row">
+      <div class="col-md-5" style="padding-top: 28px">
+        <a href="#" class="btn add"  data-toggle="modal" data-target="#modal-check"> Novo</a>
+      </div>
+    <%= form_tag import_point_check_points_path, multipart: true, class: 'form-default' do %>
+      <div class="col-md-5">
+        <label>Importar Arquivo</label>
+        <%= file_field_tag :file, class: 'btn btn-default import' %>
+        <%= hidden_field_tag :unidade_id, current_unidade.id %>
+      </div>
+      <div class="col-md-2"  style="padding-top: 28px">
+        <%= submit_tag "Importar", class: 'btn btn-blue', disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+      </div>
+    </div>
+  <% end %>
+  <br>
+</div>
+<div class="group">
+    <%= form_tag busca_cobros_path, :method => "get", id: 'busca_check' do %>
+      <table>
+        <tr>
+          <!--FILTRO_DATA!-->
+          <td><%= t('DATE') %></td>
+          <td colspan="2">
+            <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+            <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+            </div>
+          <td class="date-separ">
+            <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+            <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+            </div>
+          </td>
+          <td>
+            <%= select("busca", "empregado", Persona.all(:select => 'id,nome',:conditions =>["unidade_id = #{current_unidade.id} and tipo_funcionario = 1 AND ESTADO = 0"],:order => 'nome').collect {|p| [ p.nome, p.id ] }, { :include_blank => true }) %>
+          </td>
+          <td colspan="4">
+            <input type="button" class="btn btn-default" onclick="pesquisa()" value="Buscar"/>
+            <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;") %>
+
+          </td>
+         </tr>
+      </table>
+    <% end %>
+    <div id="pagina">
+    </div>
+</div>
+
+
+<script language="javascript">
+  function pesquisa(){
+    url="/check_points/busca?" + $('#busca_check').serialize();
+    ajax(url);
+  }
+</script>
+
+<%= javascript_include_tag 'busca_ajax' %>
+
+<script>
+
+
+    function AtualizaCancelaTitulo(titulo){
+      if (confirm('Cancelar esse Titulo ?')) {
+        $.ajax({
+            type: 'GET',
+            url:  '/check_points/atualiza_cancela_titulo?id=' + titulo,
+            dataType: "JSON",
+            success: function(data) {
+            $('#t-'+ titulo).hide();
+              console.log(data);
+            }
+        });
+      };
+    }
+
+</script>
+
+
+<div class="modal fade" id="modal-check" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="width: 418px">
+      <div class="modal-header btn-primary">
+        <h1 style="font-size: 16px; font-weight: bold; color: #fff">Novo Ponto</h1>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 5px 20px 20px 20px">
+        <%= render 'form' %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,60 @@
+<%= form_for(@cartao) do |f| %>
+  <% if @cartao.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@cartao.errors.count, "error") %> prohibited this cartao from being saved:</h2>
+
+      <ul>
+      <% @cartao.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> cartaos - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                    <td align="right">Mesa/Tarjeta:</td>
+                    <td><%= f.text_field :nome, size: 30, autofocus: true %></td>
+                  </tr>
+                  <tr>
+                    <td align="right">Codigo Barras:</td>
+                    <td><%= f.text_field :barra %></td>
+                  </tr>  
+                  <tr>
+                    <td align="right">:</td>
+                    <td><%= f.check_box :status, :Checked => 'True' %> Activo</td>
+                  </tr>
+
+                  <tr>
+                    <td align="right"></td>
+                    <td><%= f.check_box :status_op %> Status Venda</td>
+                  </tr>
+                  <tr>
+                    <td align="right">Venda ID:</td>
+                    <td><%= f.text_field :venda_id, size: 30 %></td>
+                  </tr>
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit "Grabar", :disable_with => "Aguarde...", :class => "button", "data-plus-as-tab" => "false" %> 
+        <%= link_to 'Volver', cartaos_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

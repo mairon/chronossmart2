@@ -1,0 +1,74 @@
+<%= form_for(@troca) do |f| %>
+	<% if @troca.errors.any? %>
+		<div id="error_explanation">
+			<h2><%= pluralize(@troca.errors.count, "error") %> prohibited this troca from being saved:</h2>
+
+			<ul>
+			<% @troca.errors.full_messages.each do |msg| %>
+				<li><%= msg %></li>
+			<% end %>
+			</ul>
+		</div>
+	<% end %>
+
+	<ul class="tabs">
+		<li><a href="#tab1"> Trocas - [<%= t('EDITION') %>]</a></li>
+	</ul>
+
+	<div class="tab_container">
+		<div id="tab1" class="tab_content">
+			<table>
+				<tr>
+					<td align="right"><%= t('DATE') %>:</td>
+					<td><%= f.date_select :data %></td>
+				</tr>
+				<tr>
+					<td align="right"><%= t('PERSON') %>:</td>
+					<td><%= text_field_tag :persona_nome, "#{@troca.persona.nome unless @troca.persona_id.nil?}", size: 70, autofocus: true,  placeholder: 'Nombre: ' %><%= f.hidden_field :persona_id %>
+				</tr>
+				<tr>
+					<td align="right">Vendedor:</td>
+					<td><%= f.collection_select :vendedor_id, Persona.all( select: 'id,nome, tipo_vendedor', :conditions => ["tipo_vendedor = 1"],
+						   :order => '2'), :id, :nome,{prompt: 'Selecione...', :selected => params[:vendedor_id] } %></td>
+				</tr>
+				<tr>
+					<td align="right"></td>
+					<td><%= f.text_area :observacao, rows: 5, cols:60, placeholder: 'Concepto: ' %></td>
+				</tr>
+			</table>
+		</div>
+
+		<div class="buttons">
+			<%= f.submit :value => t('SAVE'), :class => "button" %>
+			<%= link_to t('BACK'), trocas_path, :class => "button back" %>
+		</div>
+	</div>
+<% end %>
+
+<script type="text/javascript">
+	$( "#persona_nome" ).autocomplete({
+		source: function( request, response ) {
+			$.ajax({
+				url: "/personas/busca",
+				dataType: "json",
+				data: {
+					tipo: 'DESCRIPCION',
+					per:  'PROVEEDOR',
+					busca: request.term
+				},
+				success: function( data ) {
+					response( data );
+				},
+			});
+		},
+		minLength: 2,
+		change: function( event, ui ) {
+			if ($("#persona_nome").val() != "") {
+				$('#troca_persona_id').val(ui.item.id);
+			} else {
+				$('#troca_persona_id').val("");
+			}
+			return false;
+		}
+	});
+</script>

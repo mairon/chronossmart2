@@ -1,0 +1,44 @@
+<%= form_for(@ajuste_preco_detalhe) do |f| %>
+  <% if @ajuste_preco_detalhe.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@ajuste_preco_detalhe.errors.count, "error") %> prohibited this ajuste_preco_detalhe from being saved:</h2>
+
+      <ul>
+      <% @ajuste_preco_detalhe.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> ajuste_preco_detalhes - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">ajuste_preco_id :</td>                    
+                      <td><%= f.number_field :ajuste_preco_id %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), ajuste_preco_detalhes_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

@@ -1,0 +1,307 @@
+
+<table>
+   <tr>
+      <td valign="top">
+         <fieldset>
+         <table>
+            <tr>
+              
+              <%= field_text 'Producto :',2,f,:nome,100,'produto_tipo_produto_0' %>
+
+              <td colspan="2">
+                <table>
+                  <tr>
+                    <td><%= hidden_field :tipo_produto, :value => 0 %></td>
+                  </tr>
+                </table>
+             </td>
+            </tr>
+
+            <tr>
+               <td align="right">Clase :</td>
+               <td colspan="3"><%= f.collection_select :clase_id, Clase.all(:select => 'id,descricao',:order => '2'),:id,:descricao,{},{
+                                      :onkeyup    => "EnterTab(event,'produto_grupo_id')",
+                                        :onkeypress => "return bloqEnter(event)"} %>
+                 
+                  </td>
+
+            </tr>
+
+            <tr>
+               <td align="right">Concentracion. :</td>
+               <td><%= f.text_field :concentracao,
+                            :size       => 20,
+                            :onkeyup    => "EnterTab(event,'produto_stock_maximo')",
+                            :onkeypress => "return bloqEnter(event)" %>  </td>
+
+               <td align="right">Factor :</td>
+               <td><%= f.text_field :fator,
+                            :size       => 20,
+                            :onkeyup    => "EnterTab(event,'produto_data')",
+                            :onkeypress => "return bloqEnter(event)" %>  </td>
+
+            </tr>            
+
+            <tr>
+               <td align="right"><%= t('DATE') %> Fabric.:</td>
+               <td><%= f.date_select :data_fabric %>  </td>
+
+               <td align="right"><%= t('DATE') %> Valid.:</td>
+               <td><%= f.date_select :data_valid %>  </td>
+
+            </tr>            
+
+            <tr>
+               <td align="right">Volume Inicial. :</td>
+               <td><%= f.text_field :volume_inicial,
+                            :size       => 20,
+                            :onkeyup    => "EnterTab(event,'produto_stock_maximo')",
+                            :onkeypress => "return bloqEnter(event)" %>  </td>
+
+            </tr>            
+            <tr>
+              
+               <td align="right">Embalagem :</td>
+               <td><%= f.text_field :embalagem,
+                                    :size       => 20,
+                                    :onkeyup    => "EnterTab(event,'produto_montagem')",
+                            :onkeypress => "return bloqEnter(event)" %>
+                                    
+                   <%= f.check_box :montagem,
+                                    :onkeyup    => "EnterTab(event,'produto_referencia')",
+                            :onkeypress => "return bloqEnter(event)" %>Montagen</td>
+
+               <td align="right">Referencia :</td>
+               <td width="230"><%= f.select :embalagem,
+                    (
+                     [
+                        ["UN", "UN"],
+                        ["BL", "BL"],
+                        ["LT", "LT"],
+                        ["SC", "SC"],
+                        ["MT", "MT"],
+                        ["KG", "KG"],
+                        ["PQ", "PQ"],
+                        ["TON", "TON"]
+
+                     ]
+                  ),{},{:onkeyup    => "EnterTab(event,'produto_fabricante_id')",
+                      :onkeypress => "return bloqEnter(event)"} %>
+                  <a href="javascript:;" onmousedown="toggleDiv('mydiv');">Detalhes de Ref.</a>
+                  <div id="mydiv" style="display:none">
+                     <p>UN  = UNIDADE</p>
+                     <p>BL  = BOLSAS</p>
+                     <p>LT  = LITROS</p>
+                     <p>MT  = METROS</p>
+                     <p>KG  = KILOS</p>
+                     <p>PQ  = PAQUETE</p>
+                     <p>TON = TONELADA</p>
+
+                  </div>
+               </td>
+            </tr>
+
+            <tr >
+               <td align="right">Proveedor :</td>
+               <td><%= f.collection_select :fabricante_id, Persona.all(:select => 'id,nome',:conditions =>['tipo_fornecedor = 1'],:order => '2'),:id,:nome,
+                              {:include_blank => true },
+                              {:onkeyup    => "EnterTab(event,'produto_fabricante_cod')",
+                      :onkeypress => "return bloqEnter(event)"} %></td>
+
+               <td align="right">Cod. Fabricante :</td>
+               <td><%= f.text_field :fabricante_cod,
+                    :size => 20,:onkeyup    => "EnterTab(event,'produto_barra')",
+                          :onkeypress => "return bloqEnter(event)" %></td>
+            </tr>
+
+            <tr >
+               <td align="right">Barra :</td>
+               <td><%= f.text_field :barra,
+                            :size       => 20,
+                            :onkeyup    => "EnterTab(event,'produto_locacao')",
+                            :onkeypress => "return bloqEnter(event)" %></td>
+                    
+                    
+               <td align="right">Ubicacion :</td>
+               <td><%= f.text_field :locacao,
+                                    :size => 20,
+                            :onkeyup    => "EnterTab(event,'produto_taxa')",
+                            :onkeypress => "return bloqEnter(event)" %></td>
+                    
+            </tr>
+            <tr >
+
+               <td align="right">Peso Bruto :</td>
+               <td><%= f.text_field :peso_bruto,
+                            :size       => 20,
+                            :onkeyup    => "EnterTab(event,'produto_peso')",
+                            :onkeypress => "return bloqEnter(event)" %></td>
+
+               <td align="right">Peso Neto :</td>
+               <td><%= f.text_field :peso,
+                            :size       => 20,
+                            :onkeyup    => "EnterTab(event,'produto_stock_minimo')",
+                            :onkeypress => "return bloqEnter(event)" %></td>
+
+            </tr>
+            <tr>
+               <td align="right">Iva :</td>
+               <td width="230"><%= f.select :taxa,
+                    (
+                     [
+                        [0, 0],
+                        [5, 5],
+                        [10,10],
+                        [70,70],
+                        [80,80]
+                     ]
+                  ),{},{:onkeyup    => "EnterTab(event,'produto_peso_bruto')",
+                      :onkeypress => "return bloqEnter(event)"}%>
+               </td>          
+            </tr>
+
+            <tr>
+               <td align="right">Stock Min. :</td>
+               <td><%= f.text_field :stock_minimo,
+                            :size       => 20,
+                            :onkeyup    => "EnterTab(event,'produto_stock_maximo')",
+                            :onkeypress => "return bloqEnter(event)" %>  </td>
+
+               <td align="right">Stock Max. :</td>
+               <td><%= f.text_field :stock_maximo,
+                            :size       => 20,
+                            :onkeyup    => "EnterTab(event,'produto_data')",
+                            :onkeypress => "return bloqEnter(event)" %>  </td>
+
+            </tr>
+         </table>
+        </fieldset>
+      </td>
+
+
+      <td rowspan="4" valign="top">
+      <div id="sidebar">
+      <table>
+        <tr>
+           <td>
+              <div class="avatar">
+              <table>
+                 <tr>
+
+                    <td>
+                       <% if @produto.picture_content_type.present? %>
+                          <%= image_tag @produto.picture.url,:size => "240x210" %>
+                       <% else %>
+                          <%= image_tag ('../images/defalt.jpg') %>
+                       <% end %>
+                    </td>
+
+                 </tr>
+              </table>
+                 </div>
+           </td>
+        </tr>
+
+        <tr>
+           <td colspan="2"><%= f.file_field :picture,:size => 23 %><br/><hr/></td>
+        </tr>
+              <tr>
+                <td colspan="2">
+                  <fieldset>
+                     <table>
+                      <tr>
+                       <td>
+                          <div class="stock_atual">
+                                Stock Atual : <%= @quantidade %>  |
+                          </div>
+                       </td>
+                       <td align="right">
+                           <a href="javascript:void(0)" onClick="AbrirHistoricoPreco('<%= @produto.id.to_i %>')">Hist. Precio</a>
+                       </td>
+                      </tr>
+                    </table>
+                  </fieldset>
+                </td>
+              </tr>
+              <tr>
+                <td valign="top" colspan="2">
+                Obs.: <%= f.text_area :obs, :rows => 5, :cols => 25%>
+                </td>
+              </tr>
+         </table>
+        </div>
+      </td>
+   </tr>
+
+   <tr>
+      <td>
+         <table>
+           <tr>
+             <td valign="top">
+               <fieldset>
+                 <legend>Ult. <%= t('PURCHASE') %></legend>
+                 <table>
+                   <tr>
+                     <td><%= t('DATE') %> Ult. Compra :</td>
+                     <td><%= @produto.compras_produtos.last ? @produto.compras_produtos.last.data.strftime("%d/%m/%Y") : "00/00/0000" %></td>
+                   </tr>
+                   <tr>
+                     <td>Cantidad Compra :</td>
+                     <td><%= @produto.compras_produtos.last ? @produto.compras_produtos.last.quantidade : "0.000" %></td>
+                   </tr>
+                   <tr>
+                     <td>Unit. Gs.:</td>
+                     <td><%= @produto.compras_produtos.last ? @produto.compras_produtos.last.unitario_guarani : "0.000" %></td>
+
+                     <td>U$ :</td>
+                     <td><%= @produto.compras_produtos.last ? @produto.compras_produtos.last.unitario_dolar : "0.000" %></td>
+
+                   </tr>
+
+                   <tr>
+                     <td>Proveedor:</td>
+                     <td colspan="2"><%= @produto.vendas_produtos.last ? @produto.vendas_produtos.last.persona_nome : "----" %></td>
+                   </tr>
+
+                 </table>
+               </fieldset>
+             </td>
+
+             <!-- ULTIMA VENDA   ---------------------------------------------------- !-->
+             <td valign="top">
+               <fieldset>
+                 <legend>Ult. <%= t('SALES') %></legend>
+
+                 <table>
+                   <tr>
+                     <td><%= t('DATE') %> Ult. Venta :</td>
+                     <td><%= @produto.vendas_produtos.last ? @produto.vendas_produtos.last.data.strftime("%d/%m/%Y") : "00/00/0000" %></td>
+                   </tr>
+                   <tr>
+                     <td>Cantidad Venta :</td>
+                     <td><%= @produto.vendas_produtos.last ? @produto.vendas_produtos.last.quantidade : "0.000" %></td>
+                   </tr>
+                   <tr>
+                     <td>Unit. Gs.:</td>
+                     <td><%= @produto.vendas_produtos.last ? @produto.vendas_produtos.last.unitario_guarani : "0.000" %></td>
+
+                     <td>U$ :</td>
+                     <td><%= @produto.vendas_produtos.last ? @produto.vendas_produtos.last.unitario_dolar : "0.000" %></td>
+                   </tr>
+
+                   <tr>
+                     <td>Cliente:</td>
+                     <td colspan="2"><%= @produto.vendas_produtos.last ? @produto.vendas_produtos.last.persona_nome : "----" %></td>
+                   </tr>
+
+                 </table>
+               </fieldset>
+             </td>
+           </tr>
+         </table>
+      </td>
+   </tr>
+</table>
+
+
+

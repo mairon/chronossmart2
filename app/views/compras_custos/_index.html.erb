@@ -1,0 +1,52 @@
+<table class="head_grid">
+  <tr>
+  <td width="110" align="center">Compt.</td>
+  <td width="150"><%= t('UNIT') %></td>
+  <td width="150">Rodado</td>
+  <td width="150">Empleado</td>
+  <td width="350"><%= t('CLASSIFICATION') %></td>
+  <td width="100" align="right"><%= t('VALUE') %></td>
+  <td width="30"></td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div" style="height: 140px">
+  <% tot = 0 %>
+  <table>
+    <% compras_custos.each do |compras_custo| %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td width="110" align="center"><%= compras_custo.data.to_date.strftime("%d/%m/%y") %></td>
+        <td width="150"><%= compras_custo.unidade.unidade_nome %></td>
+        <td width="150"><%= compras_custo.rodado.placa unless compras_custo.rodado.blank? %></td>
+        <td width="150">
+          <% func = Persona.find_by_id(compras_custo.funcionario_id) %>
+          <%= func.nome unless func.blank? %>
+        </td>
+        <td width="350"><%= compras_custo.plano_de_conta.descricao unless compras_custo.plano_de_conta.nil? %></td>
+        <% if @compra.moeda == 0 %>
+          <td width="100" align="right"><%= format_decimal( compras_custo.valor_us )%></td>
+          <% tot += compras_custo.valor_us %>
+        <% elsif @compra.moeda == 2 %>
+          <td width="100" align="right"><%= format_decimal( compras_custo.valor_rs )%></td>
+          <% tot += compras_custo.valor_rs %>
+        <% else %>
+          <td width="100" align="right"><%= format_int( compras_custo.valor_gs )%></td>
+          <% tot += compras_custo.valor_gs %>
+        <% end %>
+        <td><%= link_to '', compras_custo, method: :delete, class: 'icon-trash', title: t('DELETE'), data: { confirm: 'Esta Seguro?' }  %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+<table class="head_grid">
+  <tr>
+    <td width="810"></td>
+    <% if @compra.moeda == 1 %>
+      <td width="100" align="right"> <b> <%= format_int( tot ) %></b></td>
+	  <% else %>
+      <td width="100" align="right"> <b> <%= format_decimal( tot )%></b></td>
+    <% end %>
+    <td width="30"></td>
+  </tr>
+</table>
+

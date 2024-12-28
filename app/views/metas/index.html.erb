@@ -1,0 +1,43 @@
+<body onload="ImputFocus('tipo')">
+<h1 align="right" id="header">Metas</h1>
+<div class="acessos">
+   <%= link_to t('NEW'), new_meta_path, :class => "button add" %>
+</div>
+
+<div class="group">
+  <table>
+    <tr>
+      <td width="100" align="center">Periodo Inicial</td>
+      <td width="100" align="center">Periodo Final</td>
+      <td width="100" align="center">Status</td>
+      <td width="100" align="center">Valor Min. U$</td>
+      <td width="100" align="center">Valor Max. U$</td>
+      <td width="100" align="center">Valor Min. G$</td>
+      <td width="100" align="center">Valor Max. G$</td>
+      <td width="100" align="center">Valor Min. R$</td>
+      <td width="100" align="center">Valor Max. R$</td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+
+
+    <table>
+      <% @metas.each do |meta| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="100"  align="center">    <%= h meta.periodo_inicio.strftime("%d/%m/%Y") %></td>
+          <td width="100" align="center">    <%= h meta.periodo_final.strftime("%d/%m/%Y") %></td>
+          <td width="100" align="left"  >    <%= h meta.status %></td>
+          <td width="100" align="left"  >    <%= h meta.valor_min_us %></td>
+          <td width="100"  align="center">    <%= h meta.valor_max_us %></td>
+          <td width="100"  align="center">    <%= h meta.valor_min_gs %></td>
+          <td width="100"  align="center">    <%= h meta.valor_max_gs %></td>
+          <td width="100"  align="center">    <%= h meta.valor_min_rs %></td>
+          <td width="100"  align="center">    <%= h meta.valor_max_rs %></td>
+
+          <td><%= link_to 'Editar', edit_meta_path(meta) %></td>
+          <td><%= link_to t('DELETE'), meta, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

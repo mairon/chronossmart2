@@ -1,0 +1,44 @@
+<table>
+
+  <tr>
+
+    <td width="50"align="center">Cod.</td>
+    <td width="300"align="center">Persona</td>
+    <td width="100"align="center">Ruc</td>
+    <td width="100"align="center">Clasificacion</td>
+    <td width="100"align="center">Tipo</td>
+    <td width="100"align="center">Estado</td>
+  </tr>
+
+</table>
+
+<div class="rolagem" id="div">
+
+  <table>
+
+    <% for persona in @personas %>
+
+       <tr class       = "<%= cycle("cor1", "cor2")%>"
+           onMouseOver = "javascript:this.style.backgroundColor='#949494'"
+           onMouseOut  = "javascript:this.style.backgroundColor=''"
+           onclick     = "Fecha('<%=h persona.nome %>')">
+
+                          <td width="50"  align="center">  <%=h persona.id %></td>
+                          <td width="400" align="left">    <%=h persona.nome %></td>
+                          <td width="100" align="center">  <%=h persona.ruc %></td>
+                          <td width="100" align="center">  <%=h persona.classificacao %></td>
+                          <td width="100" align="center">  <%=h persona.tipo %></td>
+                          <td width="100" align="center">  <%=h persona.estado %></td>
+
+       </tr>
+
+    <% end %>
+
+  </table>
+
+    <%= will_paginate @personas, :update     => 'pagina',
+                                 :prev_label => '<< Anterior',
+                                 :next_label => 'Próximo >>'%>
+  
+</div>
+

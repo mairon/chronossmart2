@@ -1,0 +1,59 @@
+<h1 align="right" id="header">Nota de Credito</h1>
+
+   <ul class="tabs">
+      <li><a href="#tab1">Nota de Credito - [Financas]</a></li>
+   </ul>
+
+   <div class="tab_container">
+      <div id="tab1" class="tab_content">
+
+           <%= form_for(@nota_credito) do |f| %>
+
+              <% if @nota_credito.tipo == 0 %>
+                 <fieldset> 
+                 <legend>Contado</legend>
+                   <table>
+                     <tr>
+                       <td align="right">Conta:</td>
+                       <td><%= f.collection_select :conta_id, Conta.all( :select => 'id,nome',
+                                                                          :conditions => ["unidade_id = #{current_unidade.id}"],
+                                                                         :order  => '1' ),:id,
+                                                                                          :nome %></td>
+                       <td align="right">Cheque :</td>
+                       <td><%= f.text_field :cheque,
+                                            :size => 15 %></td>
+                      </tr>
+                      <tr>
+                        <td>Diferido : </td>
+                        <td><%= f.date_select :diferido %></td>
+                      </tr>
+                      <tr>
+                         <td align="right"> Moneda :</td>
+                         <td>
+                            <fieldset>
+                               <%= f.radio_button :financa_moeda, 0,  :Checked => "True"  %> Dolar
+                               <%= f.radio_button :financa_moeda, 1 %> Gs.
+                            </fieldset>
+                         </td>
+                      </tr>
+
+                      <tr>
+                        <%= field_gs 'Valor Gs.:',f, :total_guarani %>
+                        <%= field_us 'Valor U$.:',f, :total_dolar %>
+                      </tr>
+                 </table>
+               </fieldset>
+              <% end %>
+
+   <%=  f.hidden_field :documento_id,     :value => '6' %>
+   <%=  f.hidden_field :documento_nome,   :value => 'NOTA DE CREDITO' %>
+   </div>
+
+<div class="buttons">
+     <a href="/nota_creditos/<%= @nota_credito.id.to_i %>" class="button back"><%= t('BACK') %> </a> 
+     <%= f.submit "Finalizar", :confirm => t('CONFIRMATION_MESSAGE'), :class => "button" %>
+</div>
+</div>
+
+<% end %>
+

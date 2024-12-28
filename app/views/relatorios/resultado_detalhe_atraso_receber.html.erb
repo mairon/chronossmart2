@@ -1,0 +1,27 @@
+
+<div class="group" style="width:600px">
+	<tr>
+		<td colspan='2'>
+			<p style="padding: 5px; font-size:16px">A receber</p>
+		</td>
+	</tr>
+	<table class="head_grid">
+		<tr>
+			<td width="320">Persona</td>
+			<td width="200" align="center"><%= t('EXPIRATION') %></td>
+			<td width="200" align="center"><%= t('VALUE') %></td>
+		</tr>
+	</table>
+
+	<div class="rolagem" dir="div" style="height:150px">
+		<table>
+			<% @acumulado_receber.each do |acumulado| %>
+				<tr>
+					<td width="320"><%= acumulado.persona_nome %></td>
+					<td width="200" align="center"><%= acumulado.vencimento.strftime("%d/%m/%Y") %></td>
+					<td width="200" align="center"><%= format_decimal(acumulado.divida_valor) %></td>
+				</tr>
+			<% end %>
+		</table>
+	</div>
+</div>

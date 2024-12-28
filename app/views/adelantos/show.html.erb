@@ -1,0 +1,123 @@
+  <div class="row">
+    <div class="col-md-8">
+      <div class="panel">
+        <div  class="panel-body">
+          <h1 id="header">
+						Cuotas - 
+						<% if @adelanto.tipo_adelanto.to_i == 0 %>
+						  Prestamo de Proveedor
+						<% elsif @adelanto.tipo_adelanto.to_i == 1 %>  
+						  Antecipo de Cliente
+						<% elsif @adelanto.tipo_adelanto.to_i == 2 %>  
+						  Antecipo a Empleado
+						<% elsif @adelanto.tipo_adelanto.to_i == 3 %>  
+						  Prestamo a Cliente
+						<% elsif @adelanto.tipo_adelanto.to_i == 4 %>  
+						  Antecipo Proveedor
+						<% end %>
+
+						 | <b> <%= @adelanto.persona_nome %></b> -
+						Total:
+						<b>
+							<% if @adelanto.moeda == 0 %>
+								U$. <%= number_to_currency( @adelanto.valor_dolar, :format=>' %n ', :separeitor => ',')  %>
+								<% else %>
+								Gs. <%= number_to_currency( @adelanto.valor_guarani, :format=>' %n ', :precision => 0)  %>
+							<% end %>
+						</b>
+					</h1>
+
+      		<%= render partial: "/adelanto_cotas/index", locals: {adelanto_cotas: @adelanto.adelanto_cotas} %>
+
+			  	<% if @adelanto.moeda == 0 %>
+			  		<% if  (@adelanto.valor_dolar.to_f - @adelanto.adelanto_cotas.sum(:valor_us)) == 0  %>
+					    <div class="alert alert-success" align="center" style="margin: 5px">
+					      <font color="green"><h1> <b><%= t('OPERATION_CONCLUDED') %></b></h1></font>
+					    </div>
+						<% else %>
+							<%= render partial: "/adelanto_cotas/new_cota", locals: {adelanto_cota: AdelantoCota.new(adelanto_id: @adelanto.id)} %>
+			  		<% end %>
+			  	<% elsif @adelanto.moeda == 1 %>
+			  		<% if  (@adelanto.valor_guarani.to_f - @adelanto.adelanto_cotas.sum(:valor_gs)) == 0  %>
+					    <div class="alert alert-success" align="center" style="margin: 5px">
+					      <font color="green"><h1> <b><%= t('OPERATION_CONCLUDED') %></b></h1></font>
+					    </div>
+
+						<% else %>
+							<%= render partial: "/adelanto_cotas/new_cota", locals: {adelanto_cota: AdelantoCota.new(adelanto_id: @adelanto.id)} %>
+			  		<% end %>
+			  	<% end %>
+					<div class="footer-buttons">
+						<%= link_to t('BACK'), edit_adelanto_path(@adelanto), :class => "btn btn-back" %>
+			    	<% if @adelanto.moeda == 0 %>
+			    		<% if  (@adelanto.valor_dolar.to_f - @adelanto.adelanto_cotas.sum(:valor_us)) == 0  %>
+								<%= link_to 'Finalizar', adelantos_path(tipo_adelanto: @adelanto.tipo_adelanto) , :class => "btn btn-green" %>
+								<a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"><%= image_tag('printer.png') %> <%= t('VOUCHER') %></a>
+			    		<% end %>
+			    	<% elsif @adelanto.moeda == 1 %>
+			    		<% if  (@adelanto.valor_guarani.to_f - @adelanto.adelanto_cotas.sum(:valor_gs)) == 0  %>
+								<%= link_to 'Finalizar', adelantos_path(tipo_adelanto: @adelanto.tipo_adelanto) , :class => "btn btn-green" %>
+								<a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"><%= image_tag('printer.png') %> <%= t('VOUCHER') %></a>
+								<%= link_to 'Liquidación', liquidacao_adelanto_path(@adelanto), target: '_blank', :class => "btn btn-blue" %>
+			    		<% end %>
+			    	<% end %>          
+						<%= hidden_field_tag :id, @adelanto.id %>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-4">
+			
+			  <div class="panel">
+			    <div  class="panel-body">
+			    	<% if @adelanto.tipo_adelanto.to_i == 1 %>
+			        <h1 id="header">Recibo de Dinero</h1>
+			        <table class="head_grid" style="font-size: 10px">
+			          <tr>
+			            <td width="80"><%= t('DOC') %></td>
+			            <td width="50" align="right"><%= t('VALUE') %></td>
+			          </tr>
+			        </table>
+
+			        <div class="rolagem" dir="div" style="height: 100px; font-size: 10px">
+			          <table>
+			            <% @rds.each do |cobros_nc| %>
+			            <% if cobros_nc.status == 2 %>
+			              <% color = 'background-color: #fa3e40; color: #fff' %>
+			            <% end %>
+
+			              <tr class = "<%= cycle("cor1", "cor2") %>">
+			                <td  width="100"  style="<%=color%>"><%= cobros_nc.doc_01 %>.<%= cobros_nc.doc_02 %>.<%= cobros_nc.doc %></td>
+			                <td  width="70"  align="right"  style="<%=color%>"><%= format_int(cobros_nc.tot_gs) %></td>
+			                <% if cobros_nc.status == 1 %>
+			                  <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(cobros_nc, status: '2'), style: 'text-decoration: underline' %></td>          
+			                  <td><%= link_to 'Impri.', "#",  :onclick => "ComprovanteRecibo()", style: 'text-decoration: underline' %></td>
+			                <% end %>
+			                <td  style="<%=color %>"><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(cobros_nc, status: '0'), style: "#{color}; text-decoration: underline" %></td>
+			              </tr>
+			            <% end %>
+			          </table>
+			        </div>
+			        <% if @rds.where("status = 1" ).size == 0  or  @rds.size == 0 %>
+			        	<%= render partial: "form_fiscals/attr_forms/adelanto_update_rd" %>
+			        <% end %>
+			        <% end %>
+			    </div>
+			  </div>
+		  
+
+
+
+		</div>
+	</div>
+
+<script>
+	function ComprovanteRecibo(){
+		window.open('/adelantos/' + document.getElementById('id').value+'/recibo', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	}
+
+	function Comprovante(){
+		window.open('/adelantos/' + document.getElementById('id').value+'/comprovante', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	}
+</script>

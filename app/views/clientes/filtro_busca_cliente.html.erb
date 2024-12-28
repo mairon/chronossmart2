@@ -1,0 +1,138 @@
+<h1 align="right" id="header"><%= t('CHARGE') %>s</h1>
+<br/>
+
+<div class="group">
+	<%if @cobro.moeda == 0 %>
+		<table>
+			<tr>
+				<td width="80" align="center"><%= t('DATE') %></td>
+				<td width="300" align="center">Cliente</td>
+				<td width="250" align="center"><%= t('DOC') %></td>
+				<td width="150" align="center">N. <%= t('DOC') %></td>
+				<td width="80" align="center"><%= t('SHARE') %></td>
+				<td width="80" align="center"><%= t('EXPIRATION') %></td>
+				<td width="100" align="center">Valor Dolar</td>
+				<td width="100" align="center">Anterior Dolar</td>
+				<td width="100" align="center">Saldo Dolar</td>
+			</tr>
+		</table>
+		<div class="rolagem" dir="div">
+			<table>
+				<% for cliente in @cliente %>
+					<%  anterior_dolar     = Cliente.sum(:cobro_dolar, :conditions => ['documento_numero = ? AND cota = ?',cliente.documento_numero,cliente.cota]) %>
+					<%  anterior_guarani   = Cliente.sum(:cobro_guarani, :conditions => ['documento_numero = ? AND cota = ?',cliente.documento_numero,cliente.cota]) %>
+					<%  saldo_dolar        = cliente.divida_dolar - anterior_dolar   %>
+					<%  saldo_guarani      = cliente.divida_guarani - anterior_guarani   %>
+					<tr class = "<%= cycle( "cor1", "cor2" )%>"
+							onMouseOver="javascript:this.style.backgroundColor='#e6ebf2'"
+							onMouseOut="javascript:this.style.backgroundColor=''"
+							onClick="Fecha( '<%= cliente.vencimento.strftime("%d") %>',
+															'<%= cliente.vencimento.strftime("%m") %>',
+															'<%= cliente.vencimento.strftime("%Y") %>',
+															'<%= cliente.documento_nome %>',
+															'<%= cliente.documento_numero_01 %>',
+															'<%= cliente.documento_numero_02 %>',
+															'<%= cliente.documento_numero %>',
+															'<%= cliente.cota %>',
+															'<%= format("%.2f",cliente.divida_dolar.to_f) %>',
+															'<%= cliente.divida_guarani %>',
+															'<%= format("%.2f",anterior_dolar.to_f) %>',
+															'<%= anterior_guarani %>',
+															'<%= format("%.2f",saldo_dolar.to_f) %>',
+															'<%= saldo_guarani %>',
+															'<%= cliente.venda_id %>')">
+
+						<td width="80"  align="center"><%= cliente.data.strftime("%d/%m/%Y")%></td>
+						<td width="300" align="left"><%= cliente.persona_nome %></td>
+						<td width="250" align="left"><%= cliente.descricao %></td>
+						<td width="150" align="center"><%= cliente.documento_numero_01%> - <%= cliente.documento_numero_02%> - <%= cliente.documento_numero%></td>
+						<td width="80"  align="center"><%= cliente.cota%></td>
+						<td width="80"  align="center"><%= cliente.vencimento.strftime("%d/%m/%Y")%></td>
+						<td width="100" align="right"><%= cliente.divida_dolar%></td>
+						<td width="100" align="right"><%= anterior_dolar%></td>
+						<td width="100" align="right"><%= saldo_dolar%></td>
+
+					</tr>
+				<% end %>
+			</table>
+		</div>
+	<% else %>
+		<table>
+			<tr>
+				<td width="80" align="center"><%= t('DATE') %></td>
+				<td width="300" align="center">Cliente</td>
+				<td width="250" align="center"><%= t('DOC') %></td>
+				<td width="150" align="center">N. <%= t('DOC') %></td>
+				<td width="80" align="center"><%= t('SHARE') %></td>
+				<td width="80" align="center"><%= t('EXPIRATION') %></td>
+				<td width="100" align="center">Valor Gs.</td>
+				<td width="100" align="center">Anterior Gs.</td>
+				<td width="100" align="center">Saldo Gs.</td>
+			</tr>
+		</table>
+		<div class="rolagem" dir="div">
+			<table>
+				<% for cliente in @cliente %>
+					<%  anterior_dolar     = Cliente.sum(:cobro_dolar, :conditions => ['documento_numero = ? AND cota = ?',cliente.documento_numero,cliente.cota]) %>
+					<%  anterior_guarani   = Cliente.sum(:cobro_guarani, :conditions => ['documento_numero = ? AND cota = ? AND liquidacao = 0',cliente.documento_numero,cliente.cota]) %>
+					<%  saldo_dolar        = cliente.divida_dolar - anterior_dolar   %>
+					<%  saldo_guarani      = cliente.divida_guarani - anterior_guarani   %>
+					<tr class = "<%= cycle( "cor1", "cor2" )%>"
+							onMouseOver="javascript:this.style.backgroundColor='#e6ebf2'"
+							onMouseOut="javascript:this.style.backgroundColor=''"
+							onClick="Fecha( '<%= cliente.vencimento.strftime("%d") %>',
+															'<%= cliente.vencimento.strftime("%m") %>',
+															'<%= cliente.vencimento.strftime("%Y") %>',
+															'<%= cliente.documento_nome %>',
+															'<%= cliente.documento_numero_01 %>',
+															'<%= cliente.documento_numero_02 %>',
+															'<%= cliente.documento_numero %>',
+															'<%= cliente.cota %>',
+															'<%= format("%.2f",cliente.divida_dolar.to_f) %>',
+															'<%= cliente.divida_guarani %>',
+															'<%= format("%.2f",anterior_dolar.to_f) %>',
+															'<%= anterior_guarani %>',
+															'<%= format("%.2f",saldo_dolar.to_f) %>',
+															'<%= saldo_guarani %>','<%= cliente.venda_id %>')">
+
+						<td width="80"  align="center"><%= cliente.data.strftime("%d/%m/%Y")%></td>
+						<td width="300" align="left"><%= cliente.persona_nome%></td>
+						<td width="250" align="left"><%= cliente.descricao %></td>
+						<td width="150" align="center"><%= cliente.documento_numero_01%> - <%= cliente.documento_numero_02%> - <%= cliente.documento_numero%></td>
+						<td width="80"  align="center"><%= cliente.cota%></td>
+						<td width="80"  align="center"><%= cliente.vencimento.strftime("%d/%m/%Y")%></td>
+						<td width="100" align="right"><%= number_to_currency(cliente.divida_guarani, :format=>' %n ', :precision => 0)%></td>
+						<td width="100" align="right"><%= number_to_currency(anterior_guarani, :format=>' %n ', :precision => 0)%></td>
+						<td width="100" align="right"><%= number_to_currency(saldo_guarani, :format=>' %n ', :precision => 0)%></td>
+
+					</tr>
+				<% end %>
+			</table>
+		</div>
+	<%end%>
+</div>
+
+<script>
+	function Fecha(vencimento3,vencimento2,vencimento1,documento_nome,documento_numero_01,documento_numero_02,documento_numero,cota,valor_dolar,valor_guarani,anterior_dolar,anterior_guarani,saldo_dolar,saldo_guarani,venda_id)
+	{
+		window.opener.document.getElementById('cobros_detalhe_vencimento_3i').value        = vencimento3;
+		window.opener.document.getElementById('cobros_detalhe_vencimento_2i').value        = vencimento2;
+		window.opener.document.getElementById('cobros_detalhe_vencimento_1i').value        = vencimento1;
+		window.opener.document.getElementById('cobros_detalhe_documento_nome').value       = documento_nome;
+		window.opener.document.getElementById('cobros_detalhe_documento_numero_01').value     = documento_numero_01;
+		window.opener.document.getElementById('cobros_detalhe_documento_numero_02').value     = documento_numero_02;
+		window.opener.document.getElementById('cobros_detalhe_documento_numero').value     = documento_numero;
+		window.opener.document.getElementById('cobros_detalhe_cota').value                 = cota;
+		window.opener.document.getElementById('cobros_detalhe_valor_dolar').value          = valor_dolar;
+		window.opener.document.getElementById('cobros_detalhe_valor_guarani').value        = valor_guarani;
+		window.opener.document.getElementById('cobros_detalhe_anterior_guarani').value     = anterior_dolar;
+		window.opener.document.getElementById('cobros_detalhe_anterior_guarani').value     = anterior_guarani;
+		window.opener.document.getElementById('cobros_detalhe_saldo_dolar').value          = saldo_dolar;
+		window.opener.document.getElementById('cobros_detalhe_saldo_guarani').value        = saldo_guarani;
+		window.opener.document.getElementById('cobros_detalhe_cobro_dolar').value          = saldo_dolar;
+		window.opener.document.getElementById('cobros_detalhe_cobro_guarani').value        = valor_guarani;
+		window.opener.document.getElementById('cobros_detalhe_venda_id').value             = venda_id;
+		window.opener.document.getElementById("cobros_detalhe_cobro_dolar").focus()
+		self.close();
+	}
+</script>

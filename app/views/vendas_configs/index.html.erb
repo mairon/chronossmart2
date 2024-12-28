@@ -1,0 +1,24 @@
+<h1 id="header">Vendas Config</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_vendas_config_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="150">Unidad</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @vendas_configs.each do |vendas_config| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="150"><%= vendas_config.unidade.unidade_nome %></td>
+        <td width="150"><%= vendas_config.persona_id %></td>
+        <td><%= link_to 'Editar', edit_vendas_config_path(vendas_config) %></td>
+        <td><%= link_to t('DELETE'), vendas_config, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

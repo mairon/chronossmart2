@@ -1,0 +1,26 @@
+<% unless @cashback_gs.to_f == 0 %>
+<div class="panel">
+  <div class="panel-content" align="center">
+    <h1>
+      <% if (@venda.moeda.to_i == 1 and @saldo_gs.to_i == 0) || (@venda.moeda.to_i == 0 and @saldo_us.to_i == 0) || (@venda.moeda.to_i == 2 and @saldo_rs.to_i == 0) %>
+
+        <% per_api = PersonaApi.where(ruc: @venda.persona.ruc).last %>
+        <% if per_api != nil %>
+          <% if MovVantagen.where(cod_proc: @venda.id, sigla_proc: 'VT', persona_id: per_api.id ).last == nil %>
+            <%= link_to gerar_cashback_vendas_path(id: @venda.id), class: 'btn btn-green', style: 'background-color: #000 !important' do %>
+              Generar CashBack: <%= format_int(@cashback_gs) %>              
+            <% end %>
+          <% else %>
+            Cashback en la Bilhetera Digial del Cliente!
+          <% end  %>
+        <% else %>
+            Cashback de Gs.<%= format_int(@cashback_gs) %>  disponible, habilite su APP!
+        <% end %>
+
+      <% else %>
+        Cashback Generado: <%= format_int(@cashback_gs) %>
+      <% end %>
+    </h1>
+  </div>
+</div>
+<% end %>

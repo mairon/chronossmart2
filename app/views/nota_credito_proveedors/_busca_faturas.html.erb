@@ -1,0 +1,37 @@
+<div class="group">
+    <table>
+       <%= form_tag "/nota_credito_proveedors/#{@nota_credito_proveedor.id}/add_docs" do %>
+    		<tr height="150" valign="top">
+	        <td width="1200">
+						<div class="groupvenda">
+						    <table>
+						      <tr>
+						        <td width="150" align="center">Cod.</td>
+						        <td width="150" align="center"><%= t('DATE') %></td>
+						        <td width="350" align="center"><%= t('DOC') %></td>
+						      </tr>
+						    </table>
+
+						    <div class="rolagem" dir="div">
+
+						      <table>
+						        <% @faturas.each do |ft| %>
+						           <tr class = "<%= cycle("cor1", "cor2") %>"
+						              onMouseOver="javascript:this.style.backgroundColor='#949494'"
+						              onMouseOut="javascript:this.style.backgroundColor=''">
+						             <td width="20" align="center"><%= check_box_tag "nota_credito_proveedors[ids][]", ft.id %>
+						             <td width="150" align="center"><%= ft.id %></td>                        
+						             <td width="150" align="center"><%= ft.data.strftime("%d/%m/%Y") %></td>                        
+						             <td width="350" align="center"><%= ft.documento_numero_01 %>-<%= ft.documento_numero_02 %>-<%= ft.documento_numero %></td>                        
+						           </tr>
+						        <% end %>
+						      </table>
+						    </div>
+						</div>
+          </td>
+        </tr>
+        <tr>
+        	<td colspan="5"><%= submit_tag " Add Docs ",:disable_with => "Aguarde...", :class => "button"  %></td>
+        </tr>
+      <% end %>
+    </table>

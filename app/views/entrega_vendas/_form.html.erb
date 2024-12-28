@@ -1,0 +1,50 @@
+<%= form_for(@entrega_venda) do |f| %>
+  <% if @entrega_venda.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@entrega_venda.errors.count, "error") %> prohibited this entrega_venda from being saved:</h2>
+
+      <ul>
+      <% @entrega_venda.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> entrega_vendas - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">entrega_id :</td>                    
+                      <td><%= f.number_field :entrega_id %></td>
+                                      
+                      <td align="right">venda_id :</td>                    
+                      <td><%= f.number_field :venda_id %></td>
+                                      
+                      <td align="right">status :</td>                    
+                      <td><%= f.check_box :status %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), entrega_vendas_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

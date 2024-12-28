@@ -1,0 +1,213 @@
+<style>
+  .panel-content td{
+    padding: 10px;
+    border-bottom: 1px solid #efefef !important;
+  }
+</style>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="group">
+        <h1 id="header">Consolidado</h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%
+         sql = "SELECT PERSONA_ID, MAX(PERSONA_NOME) AS PERSONA_NOME, SUM(ENTRADA_REAL) AS ENTRADA_REAL, SUM(SAIDA_REAL) AS SAIDA_REAL, SUM(ENTRADA_REAL_ANTERIOR) AS ENTRADA_REAL_ANTERIOR, SUM(SAIDA_REAL_ANTERIOR) AS SAIDA_REAL_ANTERIOR FROM (
+                  SELECT  F.PERSONA_ID,
+                          MAX(P.NOME) AS PERSONA_NOME,
+                          SUM(F.ENTRADA_REAL) AS ENTRADA_REAL,
+                          SUM(0) AS SAIDA_REAL,
+                          SUM(0) AS ENTRADA_REAL_ANTERIOR,
+                          SUM(0) AS SAIDA_REAL_ANTERIOR
+                  FROM FINANCAS F
+
+                  INNER JOIN CONTAS C
+                  ON C.ID = F.CONTA_ID
+
+                  INNER JOIN PERSONAS P
+                  ON P.ID = F.PERSONA_ID
+
+                  WHERE date_part('month', F.DATA_CONCILIACAO ) = '#{Time.now.strftime("%m")}'  AND  date_part('year', F.DATA_CONCILIACAO ) = '#{Time.now.strftime("%Y")}'
+                  AND F.TABELA = 'INGRESSOS'
+                  AND F.ENTRADA_REAL > 0
+                  AND F.SIGLA_PROC != 'IGM'
+                  AND P.CONSOLIDADO = TRUE
+                  GROUP BY 1
+
+                  UNION ALL
+
+                  SELECT F.PERSONA_ID,
+                         MAX(P.NOME) AS PERSONA_NOME,
+                         SUM(0) AS ENTRADA_REAL,
+                         SUM(F.SAIDA_REAL) AS SAIDA_REAL,
+                        SUM(0) AS ENTRADA_REAL_ANTERIOR,
+                        SUM(0) AS SAIDA_REAL_ANTERIOR
+
+                  FROM FINANCAS F
+
+                  INNER JOIN CONTAS C
+                  ON C.ID = F.CONTA_ID
+
+                  INNER JOIN PERSONAS P
+                  ON P.ID = F.PERSONA_ID
+
+                  WHERE date_part('month', F.DATA ) = '#{Time.now.strftime("%m")}'  AND  date_part('year', F.DATA ) = '#{Time.now.strftime("%Y")}'
+                  AND F.SIGLA_PROC IN ('PGR   ', 'EG    ', 'IGMC   ')
+                  AND P.CONSOLIDADO = TRUE
+
+                  GROUP BY 1
+
+
+                UNION ALL
+
+                    SELECT F.PERSONA_ID,
+                           MAX(P.NOME) AS PERSONA_NOME,
+                           SUM(0) AS ENTRADA_REAL,
+                           SUM(F.VALOR_REAL) AS SAIDA_REAL,
+                           SUM(0) AS ENTRADA_REAL_ANTERIOR,
+                           SUM(0) AS SAIDA_REAL_ANTERIOR
+                      FROM INGRESSOS F
+                      INNER JOIN CONTAS C
+                      ON C.ID = F.CONTA_ID
+
+                      INNER JOIN PERSONAS P
+                      ON P.ID = F.PERSONA_ID
+
+                      WHERE F.OPERACAO = 1
+                      AND P.CONSOLIDADO = TRUE
+
+                      AND date_part('month', F.DATA ) = '#{Time.now.strftime("%m")}'  AND  date_part('year', F.DATA ) = '#{Time.now.strftime("%Y")}'
+
+                  GROUP BY 1
+
+                UNION ALL
+
+                SELECT  F.PERSONA_ID,
+                          MAX(P.NOME) AS PERSONA_NOME,
+                          SUM(0) AS ENTRADA_REAL,
+                          SUM(0) AS SAIDA_REAL,
+                          SUM(F.ENTRADA_REAL) AS ENTRADA_REAL_ANTERIOR,
+                          SUM(0) AS SAIDA_REAL_ANTERIOR
+                  FROM FINANCAS F
+
+                  INNER JOIN CONTAS C
+                  ON C.ID = F.CONTA_ID
+
+                  INNER JOIN PERSONAS P
+                  ON P.ID = F.PERSONA_ID
+
+                  WHERE F.DATA_CONCILIACAO < '#{Time.now.strftime("%Y")}-#{Time.now.strftime("%m")}-01'
+                  AND F.TABELA = 'INGRESSOS'
+                  AND F.ENTRADA_REAL > 0
+                  AND F.SIGLA_PROC != 'IGM'
+                  AND P.CONSOLIDADO = TRUE
+                  GROUP BY 1
+
+                  UNION ALL
+
+                  SELECT F.PERSONA_ID,
+                         MAX(P.NOME) AS PERSONA_NOME,
+                         SUM(0) AS ENTRADA_REAL,
+                         SUM(0) AS SAIDA_REAL,
+                        SUM(0) AS ENTRADA_REAL_ANTERIOR,
+                        SUM(F.SAIDA_REAL) AS SAIDA_REAL_ANTERIOR
+
+                  FROM FINANCAS F
+
+                  INNER JOIN CONTAS C
+                  ON C.ID = F.CONTA_ID
+
+                  INNER JOIN PERSONAS P
+                  ON P.ID = F.PERSONA_ID
+
+                  WHERE F.DATA < '#{Time.now.strftime("%Y")}-#{Time.now.strftime("%m")}-01'
+                  AND F.SIGLA_PROC IN ('PGR   ', 'EG    ', 'IGMC   ')
+                  AND P.CONSOLIDADO = TRUE
+                  GROUP BY 1
+
+
+                  UNION ALL
+
+                        SELECT F.PERSONA_ID,
+                        MAX(P.NOME) AS PERSONA_NOME,
+                         SUM(0) AS ENTRADA_REAL,
+                         SUM(0) AS SAIDA_REAL,
+                         SUM(0) AS ENTRADA_REAL_ANTERIOR,
+                         SUM(F.VALOR_REAL) AS SAIDA_REAL_ANTERIOR
+
+                          FROM INGRESSOS F
+                          INNER JOIN CONTAS C
+                          ON C.ID = F.CONTA_ID
+
+                          INNER JOIN PERSONAS P
+                          ON P.ID = F.PERSONA_ID
+
+
+                          WHERE F.OPERACAO = 1 AND F.DATA < '#{Time.now.strftime("%Y")}-#{Time.now.strftime("%m")}-01'
+                            AND P.CONSOLIDADO = TRUE
+
+                  GROUP BY 1
+                  ) AS FOO
+                GROUP BY 1
+                ORDER BY 2"
+  prov  =  Financa.find_by_sql(sql)
+
+%>
+
+
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <header>
+
+            <nav class="navbar navbar-default">
+              <a href="javascript:void(0)" class="btn btn-blue" onClick="window.print();"  style="margin: 10px; float: right"><%= image_tag('printer.png') %> Imprimir</a>
+            </nav>
+          </header>
+
+          <div class="panel-content">
+            <table class="head_grid">
+              <tr>
+                <td width="200">Cliente</td>
+                <td width="100" align="right">Saldo Devedor</td>
+                <td width="100" align="right">Entrada</td>
+                <td width="100" align="right">Saida</td>
+                <td width="100" align="right">Resultado</td>
+              </tr>
+            </table>
+            <table>
+
+              <% tot = 0 %>
+              <% tot_ant = 0 %>
+              <% tot_entrada = 0 %>
+              <% tot_saida = 0 %>
+              <% prov.each do |f| %>
+                <tr class="<%= cycle("cor1", "cor2") %>">
+                  <td width="200"><%= f.persona_id.to_s.rjust(6,'0')%>-<%= f.persona_nome %></td>
+                <td width="100" align="right">0</td>
+                  <td width="100" align="right"><%= format_decimal(f.entrada_real) %></td>
+                  <td width="100" align="right"><%= format_decimal(f.saida_real) %></td>
+                  <td width="100" align="right"><%= format_decimal( f.entrada_real.to_f - f.saida_real.to_f ) %></td>
+                </tr>
+                <% tot_ant += 0 %>
+                <% tot_entrada += f.entrada_real.to_f %>
+                <% tot_saida += f.saida_real.to_f %>
+                <% tot += ( f.entrada_real.to_f - f.saida_real.to_f) %>
+              <% end %>
+              <tr class="head_grid">
+                <td>Total ==> </td>
+                <td align="right"></td>
+                <td align="right"><%= format_decimal(tot_entrada) %></td>
+                <td align="right"><%= format_decimal(tot_saida) %></td>
+                <td align="right"><%= format_decimal(tot) %></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>

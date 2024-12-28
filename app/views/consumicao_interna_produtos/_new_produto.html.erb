@@ -1,0 +1,113 @@
+
+<%= form_for [consumicao_interna,consumicao_interna_produto] do |f| %>
+	<% if consumicao_interna_produto.errors.any? %>
+		<div id="error_explanation">
+			<h2><%= pluralize(consumicao_interna_produto.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+			<ul>
+				<% consumicao_interna_produto.errors.full_messages.each do |msg| %>
+					<li>
+						<%= msg %>
+					</li>
+				<% end %>
+			</ul>
+		</div>
+	<% end %>
+
+	 <%= f.hidden_field :cotacao,:value =>   @consumicao_interna.cotacao.to_i %>
+	 <%= f.hidden_field :moeda,:value => @consumicao_interna.moeda  %>
+	 <%= f.hidden_field :data,:value => @consumicao_interna.data  %>
+
+	<div class="group">
+		<table>
+			<tr>
+				<td align="right">Deposito:</td>
+				<td >
+					<%= f.collection_select :deposito_id, Deposito.all(:select => 'id,nome',:conditions => ["unidade_id = #{@consumicao_interna.unidade_id}"], :order => '2'),:id, :nome %>
+				</td>
+        <td align="right">Producto:</td>
+        <td>
+          <%= f.text_field :produto_nome, size: 56, autofocus: true %>
+          <%= f.hidden_field :produto_id %>
+        </td>
+
+
+				<td align="right">Cantidad:</td>
+				<td>
+					<%= f.text_field :quantidade, size: 8, value: 1 %>
+          <%= f.submit t('SAVE'), :class => 'button add', :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %>
+				</td>
+			</tr>
+		</table>
+	</div>
+<% end %>
+
+<script type="text/javascript">
+
+  $("#busca_prod_cod").change(function(){
+
+      $.ajax({url: "/buscas/busca_compra_produto",
+          type: 'GET',
+          beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+          data: "cod=" + escape($("#busca_prod_cod").val()),
+          error: function(XMLHttpRequest, textStatus, errorThrown) {
+                  alert('Producto no Encontrado');
+                  $('#busca_prod_cod').focus();
+                  $('#busca_prod_cod').val('');
+              },
+          success: function(grade){
+            $('#consumicao_interna_produto_produto_nome').val(grade["produto"].nome);
+            $('#consumicao_interna_produto_produto_id').val(grade["produto"].produto_id);
+        }
+      });
+  });
+
+
+$(function() {
+  $( "#consumicao_interna_produto_produto_nome" ).autocomplete({
+      source: function( request, response ) {
+      $.ajax({
+        url: "/buscas/search_all_produtos",
+        dataType: "json",
+        data: {
+          tipo: 'DESCRIPCION',
+          busca: request.term
+        },
+        success: function( data ) {
+          response( data );
+        },
+      });
+    },
+    minLength: 2,
+    select: function( event, ui ) {
+      $("#consumicao_interna_produto_produto_id").val("");
+      $('#consumicao_interna_produto_produto_id').val(ui.item.id);
+      var deposito = $('#consumicao_interna_produto_deposito_id').val()
+
+      $.ajax({url: "/buscas/busca_conferencia_produto",
+                type: 'GET',
+                beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+                data: "cod=" + ui.item.id +
+                      "&deposito_id= " + deposito +
+                      "&dt=" + $('#consumicao_interna_produto_data').val() +
+                      "&filtro=descr",
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        alert('Producto no Encontrado');
+                        $('#cod_busca').focus();
+                        $('#cod_busca').val('');
+                    },
+                success: function(grade){
+                $('#consumicao_interna_produto_produto_nome').val(grade["produto"].produto_nome);
+                $('#consumicao_interna_produto_produto_id').val(grade["produto"].produto_id);
+                $('#saldo').val((grade["produto"].saldo_atual).replace(".", ",") );
+
+              }
+            });
+      return false;
+
+    }
+  });
+});
+
+</script>
+

@@ -1,0 +1,115 @@
+<div class="panel">
+	<div class="panel-body">
+		<div class="row">
+			<div class="col-md-5">
+				<h3>Login Cliente</h3>				
+			</div>
+
+      <div class="col-md-5">
+        <%= link_to envia_login_app_personas_path(id: @persona), class: 'panel-icon-right' do %>
+        <i class="icon-envelope"></i> Enviar E-mail
+        <% end %>        
+      </div>
+			<div class="col-md-2">
+  			<a class="modalButton-frma panel-icon-right" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-login">
+  				<%= image_tag("icon-edit.png", width: '13') %>
+  			</a>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+  /**
+   *
+   *  Password Generator
+   *  version 0.1
+   *
+   *  @author Rog�rio Alencar Lino Filho
+   *  @url http://rogeriolino.wordpress.com/
+   *  @date 04 de Setembro de 2007
+   *
+   */
+
+  var Password = function() {
+    this.pass = "";
+
+    this.generate = function(chars) {
+      for (var i= 0; i<chars; i++) {
+        this.pass += this.getRandomChar();
+      }
+      return this.pass;
+    }
+    this.getRandomChar = function() {
+      /*
+       *  matriz contendo em cada linha indices (inicial e final) da tabela ASCII para retornar alguns caracteres.
+       *  [48, 57] = numeros;
+       *  [64, 90] = "@" mais letras maiusculas;
+       *  [97, 122] = letras minusculas;
+       */
+      var ascii = [[48, 57],[64,90],[97,122]];
+      var i = Math.floor(Math.random()*ascii.length);
+      return String.fromCharCode(Math.floor(Math.random()*(ascii[i][1]-ascii[i][0]))+ascii[i][0]);
+    }
+  }
+  function showPass(alvo, pass) {
+    document.getElementById(alvo).value = pass;
+  }
+
+  function newPass() {
+    var pwd = new Password();
+    showPass("persona_senha", pwd.generate(6));
+  }
+
+  function toggleOption() {
+    var op = document.getElementById("options");
+    if ((op.getAttribute("class") == "off") || (op.className == "off")) {
+      op.className = "on";
+      op.setAttribute("class", "on");
+    } else {
+      op.className = "off";
+      op.setAttribute("class", "off");
+    }
+  }
+</script>
+<div class="modal fade" id="modal-login" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel">Login Cliente</h4>
+      </div>
+      <div class="modal-body panel-modal-body">
+				<%= form_for(@persona) do |ffpw| %>
+					<div class="row">
+            
+            <div class="col-md-12">
+              <label>E-mail</label>
+              <%= ffpw.email_field :email, class: 'panel-field' %>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-8">
+              <label>Generar Senha</label>
+              <%= ffpw.password_field :senha, class: 'panel-field' %>
+            </div>
+            <div class="col-md-4 padding-btn">
+
+              <input type="button" class="btn btn-blue" onclick="newPass();" value="Generate" />
+            </div>
+
+
+	          <div class="col-md-12">
+	            <%= ffpw.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+	          </div>
+
+					</div>
+
+      	<% end %>
+      </div>      
+    </div>
+  </div>
+</div>
+
+

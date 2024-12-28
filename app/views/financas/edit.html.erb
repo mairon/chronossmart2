@@ -1,0 +1,12 @@
+<h1>Editing financa</h1>
+
+<% form_for(@financa) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.submit "Update" %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @financa %> |
+<%= link_to 'Back', financas_path %>

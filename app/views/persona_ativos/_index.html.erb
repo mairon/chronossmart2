@@ -1,0 +1,28 @@
+<table class="head_grid">
+  <tr>
+    <td width="50">Moneda</td>
+    <td width="70" align="right">Monto</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% persona_ativos.each do |p| %>
+      <tr>
+
+        <% if p.moeda.to_i == 1 %>
+          <td width="50"  align="center"><span class="gs">Gs</span></td>
+          <td width="70" align="right"><%= format_int( p.valor) %></td>
+        <% elsif p.moeda.to_i == 0 %>
+          <td width="50"  align="center"><span class="us">U$</span></td>
+          <td width="70" align="right"><%= format_int( p.valor) %></td>
+        <% else %>
+          <td width="50"  align="center"><span class="rs">R$</span></td>
+          <td width="70" align="right"><%= format_decimal( p.valor) %></td>
+        <% end %>
+        <td><%= link_to '', edit_persona_ativo_path(p), class: 'icon-pencil' %></td>
+        <td><%= link_to '', p, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>

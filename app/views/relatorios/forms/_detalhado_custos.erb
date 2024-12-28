@@ -1,0 +1,32 @@
+<div class="group">
+   <table>
+      <% tot = 0 %>
+      <% @gastos.each do |gt| %>
+      	<tr class="<%= cycle("cor1", "cor2")%>">
+      		<td width="30"><%= gt.compra_id.to_s.rjust(4,'0')%></td>
+      		<td width="30"><%= gt.pago_id.to_s.rjust(4,'0')%></td>
+      		<td width="35"><%= gt.data.to_date.strftime("%d/%m/%y") unless gt.data.blank?  %></td>
+      		<td width="35"><%= gt.competencia.to_date.strftime("%m/%y") unless gt.competencia.blank? %></td>
+      		<td width="80"><%= truncate(gt.unidade_nome, length: 20) %></td>
+      		<td width="150"><%= truncate(gt.grupo_rubro, length: 25) %></td>
+      		<td width="220"><%= truncate(gt.rubro_nome, length: 50) %></td>
+      		<% if params[:moeda] == '0' %>
+      			<td width="60" align="right"><%= format_decimal(gt.valor_us) %></td>
+      		<% elsif params[:moeda] == '1' %>
+      			<td width="60" align="right"><%= format_int(gt.valor_gs) %></td>
+      		<% else %>
+      			<td width="60" align="right"><%= format_decimal(gt.valor_rs) %></td>
+      		<% end %>
+          <td width="40" align="right"><%= format_int(gt.cotacao) %></td>
+          <td width="40" align="right"><%= format_int(gt.cotacao_real) %></td>
+          <td width="40" align="right"><%= format_decimal(gt.cotacao_rs_us) %></td>
+          <% tot += gt.valor_gs.to_f %>
+      	</tr>
+      <% end %>
+      <tr>
+        <td colspan="7"></td>
+        <td width="40" align="right"><%= format_int(tot) %></td>
+      </tr>
+   </tr>
+   </table>
+</div>

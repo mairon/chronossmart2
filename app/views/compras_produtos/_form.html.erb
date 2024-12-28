@@ -1,0 +1,152 @@
+<%= form_for(@compras_produto) do |f| %>
+  <% if @compras_produto.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@compras_produto.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @compras_produto.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <ul class="tabs">
+  	<li><a href="#tab1">Compra Produto - [<%= t('EDITION') %>]</a></li>
+	</ul>
+	<div class="tab_container">
+
+      <%= f.hidden_field :compra_id %>
+          <table>
+            <tr>
+              <td align="right" width="70">Producto:</td>
+             <td colspan="8">
+               <%= f.text_field :produto_nome, :size => 97, class: 'autocomplete', required: true, autofocus: true %>
+               <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+               <%= f.hidden_field :produto_id %> 
+             </td>
+            </tr>
+            <tr>
+              <td align="right">Cantidad:</td>
+              <td><%= f.telephone_field :quantidade, size: 9 %></td>
+              <% if @compras_produto.compra.moeda.to_i == 0  %>           
+                <%= field_us 'Unit. U$:', f, :unitario_dolar %>
+                <%= field_us 'Desc. U$:', f, :desconto_dolar %>
+                <%= field_us 'Total U$:', f, :total_dolar %>
+              <% elsif @compras_produto.compra.moeda.to_i == 1 %>
+                <%= field_gs 'Unit. Gs:', f, :unitario_guarani %>
+                <%= field_gs 'Desc. Gs:', f, :desconto_guarani %>
+                <%= field_gs 'Total Gs:', f, :total_guarani %>
+              <% else %>
+                <%= field_us 'Unit. R$:', f, :unitario_real %>
+                <%= field_us 'Desc. R$:', f, :desconto_real %>
+                <%= field_us 'Total R$:', f, :total_real %>
+              <% end %>
+            </tr>
+            <tr>
+              <td align="right">Deposito:</td>
+              <td  colspan="2"><%= f.collection_select :deposito_id, Deposito.all(:select => 'id,nome',
+                                                                     :order => '2'),:id,
+                                                                     :nome %></td>
+              <td>
+                <%= f.submit t('SAVE'), :disable_with => "Aguarde...", :class => "button add", "data-plus-as-tab" => "false"   %>
+              </td>
+            </tr>
+          </table>
+
+    <script type="text/javascript">
+
+    $(function() {
+      $( "#compras_produto_produto_nome" ).autocomplete({
+          source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+          $.ajax({
+            url: "/buscas/search_all_produtos",
+            dataType: "json",
+            data: {
+              tipo: 'DESCRIPCION',
+              busca: request.term
+            },
+            success: function( data ) {
+              response( data );
+              $("#sppiner").removeClass("sppiner_show");
+            },
+          });
+        },
+        minLength: 2,
+        select: function( event, ui ) {
+          $("#compras_produto_produto_id").val("");
+          $( "#compras_produto_produto_nome" ).val(ui.item.label);
+          $('#compras_produto_produto_id').val(ui.item.id);
+          return false;
+        }
+      });
+    });
+
+      //calc valores gs
+      $( "#compras_produto_unitario_guarani, #compras_produto_desconto_guarani" ).blur(function() {  
+        var qtd = $('#compras_produto_quantidade').val();
+        var unit_gs = $('#compras_produto_unitario_guarani').val();
+        var desc_gs = $('#compras_produto_desconto_guarani').val();
+        var tot_gs = ( (parseFloat(unit_gs.replace(/\./g, "").replace(",", ".")) - parseFloat(desc_gs.replace(/\./g, "").replace(",", "."))) * parseFloat(qtd.replace(/\./g, "").replace(",", ".")) );
+        $('#compras_produto_total_guarani').val(number_format(tot_gs, 0, ',', '.'));
+      });
+
+      $( "#compras_produto_total_guarani" ).change(function() {
+        var qtd = $('#compras_produto_quantidade').val();
+        var tot_gs = $('#compras_produto_total_guarani').val();
+        var desc_gs = $('#compras_produto_desconto_guarani').val();
+        var tot_des_gs = (parseFloat(desc_gs.replace(/\./g, "").replace(",", ".")) * parseFloat(qtd.replace(/\./g, "").replace(",", ".")) );
+        var unit_gs = ((parseFloat(tot_gs.replace(/\./g, "").replace(",", ".")) + tot_des_gs  ) / parseFloat(qtd.replace(/\./g, "").replace(",", ".")) )
+
+        $('#compras_produto_unitario_guarani').val(number_format(unit_gs, 0, ',', '.'));
+      });
+
+      //calc valores us
+      $( "#compras_produto_unitario_dolar, #compras_produto_desconto_dolar" ).blur(function() {  
+        var qtd = $('#compras_produto_quantidade').val();
+        var unit_us = $('#compras_produto_unitario_dolar').val();
+        var desc_us = $('#compras_produto_desconto_dolar').val();
+        var tot_us = ( (parseFloat(unit_us.replace(/\./g, "").replace(",", ".")) - parseFloat(desc_us.replace(/\./g, "").replace(",", "."))) * parseFloat(qtd.replace(/\./g, "").replace(",", ".")) );
+        $('#compras_produto_total_dolar').val(number_format(tot_us, 2, ',', '.'));
+      });
+
+      $( "#compras_produto_total_dolar" ).change(function() {
+        var qtd = $('#compras_produto_quantidade').val();
+        var tot_us = $('#compras_produto_total_dolar').val();
+        var desc_us = $('#compras_produto_desconto_dolar').val();
+        var tot_des_us = (parseFloat(desc_us.replace(/\./g, "").replace(",", ".")) * parseFloat(qtd.replace(/\./g, "").replace(",", ".")) );
+        var unit_us = ((parseFloat(tot_us.replace(/\./g, "").replace(",", ".")) + tot_des_us  ) / parseFloat(qtd.replace(/\./g, "").replace(",", ".")) )
+
+        $('#compras_produto_unitario_dolar').val(number_format(unit_us, 2, ',', '.'));
+      });
+
+      //calc valores rs
+      $( "#compras_produto_unitario_real, #compras_produto_desconto_real" ).blur(function() {  
+        var qtd = $('#compras_produto_quantidade').val();
+        var unit_rs = $('#compras_produto_unitario_real').val();
+        var desc_rs = $('#compras_produto_desconto_real').val();
+        var tot_rs = ( (parseFloat(unit_rs.replace(/\./g, "").replace(",", ".")) - parseFloat(desc_rs.replace(/\./g, "").replace(",", "."))) * parseFloat(qtd.replace(/\./g, "").replace(",", ".")) );
+        $('#compras_produto_total_real').val(number_format(tot_rs, 2, ',', '.'));
+      });
+
+      $( "#compras_produto_total_real" ).change(function() {
+        var qtd = $('#compras_produto_quantidade').val();
+        var tot_rs = $('#compras_produto_total_real').val();
+        var desc_rs = $('#compras_produto_desconto_real').val();
+        var tot_des_rs = (parseFloat(desc_rs.replace(/\./g, "").replace(",", ".")) * parseFloat(qtd.replace(/\./g, "").replace(",", ".")) );
+        var unit_rs = ((parseFloat(tot_rs.replace(/\./g, "").replace(",", ".")) + tot_des_rs ) / parseFloat(qtd.replace(/\./g, "").replace(",", ".")) )
+
+        $('#compras_produto_unitario_real').val(number_format(unit_rs, 2, ',', '.'));
+      });
+
+
+    </script>
+
+  </div>
+  <div class="buttons">
+    <%= link_to t('BACK'), compra_path(@compras_produto.compra_id), class: 'btn btn-default' %>
+  </div>
+<% end %>

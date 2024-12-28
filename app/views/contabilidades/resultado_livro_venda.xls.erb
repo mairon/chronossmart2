@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <ss:Styles>
+    <ss:Style ss:ID="1">
+      <ss:Font ss:Bold="1"/>
+      <ss:Alignment ss:Horizontal="Center"/>
+      <ss:Interior ss:Pattern="Gray25"/>
+    </ss:Style>
+    <ss:Style ss:ID="2">
+      <ss:Alignment ss:Horizontal="Center"/>
+    </ss:Style>
+  </ss:Styles>
+  <Worksheet ss:Name="Sheet1">
+    <Table>
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String"><B>Libro de Venta - Ley 125/91</B></Data></Cell>
+      </Row>
+
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String"><B>Año: <%= params[:ano] %> - Mes: <%= params[:mes] %> </B></Data></Cell>
+      </Row>
+
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String"><B>Dia</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Numero</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Cotiz.</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B><%= t('DOC') %></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Tipo <%= t('DOC') %></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B><%= t('DATE') %></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Ruc/C.I.</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Clientes</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Exentas</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Gravadas 05%</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Impuestos 05%</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Gravadas 10%</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Impuestos 10%</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Total</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Timbrado</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B><%= t('SHARE') %></B></Data></Cell>
+      </Row>
+
+      <% sub_exentas     = 0 %>
+      <% sub_gravada_05  = 0 %>
+      <% sub_imposto_05  = 0 %>
+      <% sub_gravada_10  = 0 %>
+      <% sub_imposto_10  = 0 %>
+      <% sub_total_guarani = 0 %>
+
+      <% @venda.each do |venda| %>
+    		<% if venda.def.to_i == 0 %>
+        <% cotiz = Moeda.find_by_data(venda.data,:select =>'id,data,cotacao_oficial_compra')%>      
+        <% per = Persona.find_by_id(venda.persona_id,:select =>'id,ruc' )%>
+      
+        <Row>
+        	<Cell><Data ss:Type="String"><%= venda.data.strftime("%d") %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= venda.id %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= number_to_currency(cotiz.cotacao_oficial_compra.to_f, :format=>' %n ', :precision => 2) unless cotiz.nil? %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= venda.documento_numero_01 %>-<%= venda.documento_numero_02 %>-<%= venda.documento_numero %> </Data></Cell>
+          <% if venda.tipo == 0 %>
+          	<Cell><Data ss:Type="String">FC</Data></Cell>
+          <% else %>
+          	<Cell><Data ss:Type="String">FCR</Data></Cell>
+          <% end %>
+          <Cell><Data ss:Type="String"><%= venda.data.strftime("%d/%m/%Y") %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= venda.ruc %></Data></Cell>
+          
+      			<Cell><Data ss:Type="String"><%= venda.persona_nome %></Data></Cell>
+            <% if venda.moeda == 0 %>
+      				<Cell><Data ss:Type="String"><%= number_to_currency( ex  = venda.exentas_dolar.to_f * cotiz.cotacao_oficial_compra.to_f,    :format=>' %n ', :precision => 0) %></Data></Cell>
+               <Cell><Data ss:Type="String"><%= number_to_currency( g05 =( (  venda.gravadas_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f) - (venda.imposto_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f ) ), :format=>' %n ', :precision => 0) %></Data></Cell>
+               <Cell><Data ss:Type="String"><%= number_to_currency( i05 = venda.imposto_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f, :format=>' %n ', :precision => 0) %></Data></Cell>
+               <Cell><Data ss:Type="String"><%= number_to_currency( g10 =( ( venda.gravadas_10_dolar.to_f - ( venda.gravadas_10_dolar.to_f  / 11 ) )  * cotiz.cotacao_oficial_compra.to_f ), :format=>' %n ', :precision => 0) %></Data></Cell>
+               <Cell><Data ss:Type="String"><%= number_to_currency( i10 = ( ( venda.gravadas_10_dolar.to_f  / 11 ) * cotiz.cotacao_oficial_compra.to_f ), :format=>' %n ', :precision => 0) %></Data></Cell>
+               <Cell><Data ss:Type="String"><%= number_to_currency( tot = ( ex.to_f + g05.to_f + i05.to_f + g10 + i10.to_f ), :format=>' %n ', :precision => 0) %></Data></Cell>
+          <% else %>
+          		<Cell><Data ss:Type="String"><%= number_to_currency( ex = venda.exentas_guarani.to_f,    :format=>' %n ', :precision => 0) %></Data></Cell>
+          		<Cell><Data ss:Type="String"><%= number_to_currency( g05 = (venda.gravadas_05_guarani.to_f - venda.imposto_05_guarani.to_f), :format=>' %n ', :precision => 0) %></Data></Cell>
+          		<Cell><Data ss:Type="String"><%= number_to_currency( i05 = venda.imposto_05_guarani.to_f, :format=>' %n ', :precision => 0) %></Data></Cell>
+
+							<Cell><Data ss:Type="String"><%= number_to_currency( g10 = venda.gravadas_10_guarani.to_f - ( venda.gravadas_10_guarani.to_f / 11 ), :format=>' %n ', :precision => 0) %></Data></Cell>
+
+							<Cell><Data ss:Type="String"><%= number_to_currency( i10 = venda.gravadas_10_guarani.to_f / 11, :format=>' %n ', :precision => 0) %></Data></Cell>
+
+							<Cell><Data ss:Type="String"><B><%= number_to_currency( tot = ( ex.to_f + g05.to_f + i05.to_f + g10.to_f + i10.to_f ), :format=>' %n ', :precision => 0) %></B></Data></Cell>
+            
+            <% end %>
+          <Cell><Data ss:Type="String"><%= venda.timbrado %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= venda.cotas %></Data></Cell>
+        </Row>
+
+        <% sub_exentas       += ex.to_f  %>
+        <% sub_gravada_05    += g05.to_f %>
+        <% sub_imposto_05    += i05.to_f %>
+        <% sub_gravada_10    += g10.to_f %>
+        <% sub_imposto_10    += i10.to_f %>
+        <% sub_total_guarani += tot.to_f %>
+      <% end %>
+     <% end %>
+      <Row>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"><%= number_to_currency(sub_exentas, :format=>' %n ', :precision => 0) %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= number_to_currency(sub_gravada_05, :format=>' %n ', :precision => 0) %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= number_to_currency(sub_imposto_05, :format=>' %n ', :precision => 0) %></Data></Cell>
+       	<Cell><Data ss:Type="String"><%= number_to_currency(sub_gravada_10, :format=>' %n ', :precision => 0) %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= number_to_currency(sub_imposto_10, :format=>' %n ', :precision => 0) %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= number_to_currency(sub_total_guarani, :format=>' %n ', :precision => 0) %></Data></Cell>
+      </Row>
+    </Table>
+  </Worksheet>
+</Workbook>

@@ -1,0 +1,66 @@
+<style>
+  table .frozer {
+  position: sticky;
+  left: 0;
+  background-color: #ddd;
+}
+</style>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <h1 id="header">
+          Flujo de Caja
+      </h1>
+    <div class="panel">
+      <div class="panel-content">
+        <div class="rolagem" dir="div" style="height: 600px">
+        <table class="table table-bordered tree-basic">
+          <thead>
+            <th>
+              <td rowspan="2" class="frozer" width="800">Plan de Cuenta</td>
+              <% meses = 1 %>
+              <% 12.times do |s| %>
+                <td width="200" align="center" colspan="2"><b><%= Date::MONTHNAMES[meses.to_i].to_s %></b></td>
+                <% meses += 1 %>
+              <% end %>
+            </th>
+            <th>
+              <% 12.times do |s| %>
+                <td>Provisionado</td>
+                <td>Realizado</td>
+              <% end %>
+            </th>
+          </thead>
+          <tbody>
+            <% @plano_contas.each do |pc| %>
+            <tr class="treegrid-<%= pc.codigo %> expanded">
+              <td class="frozer" width="800"><%= pc.codigo %>-<%= pc.descricao %></td>
+              <% meses = 1 %>
+              <% 12.times do |s| %>
+                <td width="200" align="center">
+                  <%= Cliente.joins(:rubro).where("SUBSTRING(RUBROS.codigo,0 ,9 ) = '#{pc.codigo}' and date_part('month', CLIENTES.VENCIMENTO) = '#{meses}'  AND  date_part('year', CLIENTES.VENCIMENTO) = '2021'").sum(:divida_guarani) %>
+                </td>
+                <td width="200" align="center">
+                  <%= Cliente.joins(:rubro).where("SUBSTRING(RUBROS.codigo,0 ,9 ) = '#{pc.codigo}' and date_part('month', DATA) = '#{meses}'  AND  date_part('year', DATA) = '2021'").sum(:divida_guarani) %>
+                </td>
+
+                <% meses += 1 %>
+              <% end %>
+            </tr>
+            <% end %>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('.tree-basic').treegrid();
+  });
+</script>

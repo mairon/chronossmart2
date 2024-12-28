@@ -1,0 +1,18 @@
+<table>
+	<% @faturas.each do |fatura| %>
+	<tr class = "<%= cycle("cor1", "cor2") %>">
+		<td width="80" align="center"> <%= h fatura.id%></td>
+		<td width="80" align="center"> <%= h fatura.data.strftime("%d/%m/%Y")%></td>
+		<%if fatura.status == 0%>
+		<td width="20" align="left" >A</td>
+        <%else%>
+		<td width="20" align="left" >C</td>
+        <%end%>
+		<td width="150" align="left" > <%= h fatura.documento_numero_01%>-<%= h fatura.documento_numero_02%>-<%= h fatura.documento_numero%></td>
+		<td width="400" align="left" > <%= h fatura.persona_nome%></td>
+		<td width="100" align="right"> <%= h number_to_currency(fatura.total_dolar, :format=>' %n ', :separator => "," )  %></td>
+		<td width="100" align="right"> <%= h number_to_currency(fatura.total_guarani, :format=>' %n ', :precision => 0 )  %></td>
+		<td width="50" align="center"> <%= h fatura.tipo  %></td>
+	</tr>
+	<% end %>
+</table>

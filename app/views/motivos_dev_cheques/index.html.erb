@@ -1,0 +1,26 @@
+<h1 id="header">motivos_dev_cheques</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_motivos_dev_cheque_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td><%= t('NAME') %></td>
+            <td>Deb cli prov</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @motivos_dev_cheques.each do |motivos_dev_cheque| %>
+      <tr>
+        <td><%= motivos_dev_cheque.id %></td>
+                  <td><%= motivos_dev_cheque.nome %></td>
+                  <td><%= motivos_dev_cheque.deb_cli_prov %></td>
+                <td><%= link_to 'Editar', edit_motivos_dev_cheque_path(motivos_dev_cheque) %></td>
+        <td><%= link_to t('DELETE'), motivos_dev_cheque, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

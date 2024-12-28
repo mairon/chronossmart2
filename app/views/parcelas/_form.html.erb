@@ -1,0 +1,50 @@
+<%= form_for(@parcela) do |f| %>
+  <% if @parcela.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@parcela.errors.count, "error") %> prohibited this parcela from being saved:</h2>
+
+      <ul>
+      <% @parcela.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> parcelas - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">nome :</td>                    
+                      <td><%= f.text_field :nome %></td>
+                                      
+                      <td align="right">status :</td>                    
+                      <td><%= f.check_box :status %></td>
+                                      
+                      <td align="right">obs :</td>                    
+                      <td><%= f.text_area :obs %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', parcelas_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

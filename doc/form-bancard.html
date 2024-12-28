@@ -1,0 +1,65 @@
+
+
+<%= Digest::MD5.hexdigest("+$QbID5YF2UQgt(j$IOZ,oQgaXXmbP.Kf5dcFgul47149230000.00PYG") %>
+<br>
+cod <%= cod_proc = rand(988297) %>
+<%
+data = {
+    public_key: "T3wdH8H5Dyg7UTjgLIsPRpFE5xFXpneB",
+    operation: {
+        token: "#{Digest::MD5.hexdigest("+$QbID5YF2UQgt(j$IOZ,oQgaXXmbP.Kf5dcFgul#{cod_proc}30000.00PYG")}",
+        shop_process_id: cod_proc,
+        amount: "30000.00",
+        currency: "PYG",
+        additional_data: "",
+        description: "Produto teste",
+        return_url: "http://localhost:3000/contas?#{cod_proc}",
+        cancel_url: "http://localhost:3000/contas?#{cod_proc}"
+    },
+    test_client: true
+}
+
+
+                url = URI("https://vpos.infonet.com.py:8888/vpos/api/0.3/single_buy")
+
+                http = Net::HTTP.new(url.host, url.port)
+                http.use_ssl = true
+                http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+                request = Net::HTTP::Post.new(url)
+                request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+                request["content-type"] = 'application/json'
+                # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
+                puts data.to_json
+                request.body = data.to_json
+                puts '----------------------------------------------------------------------'
+                response = http.request(request)
+                puts get_resp = JSON.parse(response.body)
+
+
+%>
+<html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>iFrame</title>
+<script src="https://vpos.infonet.com.py:8888/checkout/javascript/dist/bancard-checkout-4.0.0.js"></script>
+</head>
+<script type="application/javascript"> styles = {
+"form-background-color": "#001b60",
+"button-background-color": "#4faed1",
+"button-text-color": "#fcfcfc",
+"button-border-color": "#dddddd",
+"input-background-color": "#fcfcfc",
+"input-text-color": "#111111",
+"input-placeholder-color": "#111111"
+};
+window. onload = function () {
+  Bancard.Checkout.createForm ('iframe-container', '<%= get_resp["process_id"] %>', styles);
+};
+</script>
+<div id="iframe-container"></div>
+
+<%= get_resp["process_id"] %>
+<%= get_resp %>
+</html>

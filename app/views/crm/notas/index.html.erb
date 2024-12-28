@@ -1,0 +1,27 @@
+<h1 id="header">notas</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_nota_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Descricao</t>
+            <td>Usuario</t>
+            <td>Negocio</t>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @notas.each do |nota| %>
+      <tr>
+                  <td><%= nota.descricao %></td>
+                  <td><%= nota.usuario_id %></td>
+                  <td><%= nota.negocio_id %></td>
+                <td><%= link_to 'Editar', edit_nota_path(nota) %></td>
+        <td><%= link_to 'Borrar', nota, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

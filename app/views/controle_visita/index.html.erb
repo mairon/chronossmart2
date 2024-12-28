@@ -1,0 +1,32 @@
+<body onload="ImputFocus('tipo')">
+<h1 align="right" id="header">Controle de Visita</h1>
+<div class="acessos">
+   <%= link_to t('NEW'), new_controle_visitum_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+          <tr>
+            <td width="50" align="center"><%= t('DATE') %></td>
+            <td width="350" align="center">Persona</td>
+            <td width="350" align="center">Consultor</td>
+            <td width="250" align="center">Servico</td>
+          </tr>
+</table>
+
+<div class="rolagem" dir="div">
+
+<table>
+<% @controle_visita.each do |cv| %>
+  <tr class = "<%= cycle("cor1", "cor2") %>">
+    <td width="80" align="center"><%= cv.data.strftime("%d/%m/%Y") %></td>
+    <td width="350" align="left"><%= cv.persona_nome %></td>
+    <td width="350" align="left"><%= cv.consultor_nome %></td>
+    <td width="235" align="center"><%= cv.servico_nome %></td>
+    
+      <td><%= link_to 'Editar', edit_controle_visitum_path(cv) %></td>
+      <td><%= link_to 'Destroy', cv, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>    
+
+</div>

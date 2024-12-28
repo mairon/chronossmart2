@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <ss:Styles>
+    <ss:Style ss:ID="1">
+      <ss:Font ss:Bold="1"/>
+      <ss:Alignment ss:Horizontal="Center"/>
+      <ss:Interior ss:Pattern="Gray25"/>
+    </ss:Style>
+    <ss:Style ss:ID="2">
+      <ss:Alignment ss:Horizontal="Center"/>
+    </ss:Style>
+  </ss:Styles>
+  <Worksheet ss:Name="Sheet1">
+    <Table>
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String"><B>Control</B></Data></Cell>
+        <Cell><Data ss:Type="String">Empresa</Data></Cell>
+        <Cell><Data ss:Type="String">Solicitante</Data></Cell>
+        <Cell><Data ss:Type="String">Muestra</Data></Cell>
+        <Cell><Data ss:Type="String">P</Data></Cell>
+        <Cell><Data ss:Type="String">N</Data></Cell>
+        <Cell><Data ss:Type="String">Ca</Data></Cell>
+        <Cell><Data ss:Type="String">Mg</Data></Cell>
+        <Cell><Data ss:Type="String">S</Data></Cell>
+        <Cell><Data ss:Type="String">Cu</Data></Cell>
+        <Cell><Data ss:Type="String">Zn</Data></Cell>
+        <Cell><Data ss:Type="String">Mn</Data></Cell>
+        <Cell><Data ss:Type="String">B</Data></Cell>
+        <Cell><Data ss:Type="String">Fe</Data></Cell>
+      </Row>
+    <% quebra = "" %>
+    <% @amostras.each do |a| %>
+      <% if a.solicitante == '' %>
+        <% soli = a.empresa_nome %>
+      <% else %>
+        <% soli = a.solicitante %>
+      <% end %>
+
+      <% if quebra != soli %>
+        <% if quebra != "" %>
+          <Row>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+            <Cell><Data ss:Type="String"></Data></Cell>
+          </Row>
+        <% end %>
+        <%= quebra = soli %>
+      <% end %>
+      <Row>
+        <Cell ss:StyleID="1"><Data ss:Type="String"><%= a.amostra.to_s.rjust(6,'0') %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= a.empresa_nome %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= a.solicitante %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= a.detalhe_amostra %></Data></Cell>
+        <% fosforo = AmostraEnsaio.find_by_metodo_id( 67, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= fosforo.resultado.to_f.round(2) %></Data></Cell>
+        <% nitrogeno = AmostraEnsaio.find_by_metodo_id( 70, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= nitrogeno.resultado.to_f.round(2) %></Data></Cell>
+        <% potasio   = AmostraEnsaio.find_by_metodo_id( 61, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= potasio.resultado.to_f.round(2) %></Data></Cell>
+        <% calcio    = AmostraEnsaio.find_by_metodo_id( 59, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= calcio.resultado.to_f.round(2) %></Data></Cell>
+        <% magnesio  = AmostraEnsaio.find_by_metodo_id( 60, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= magnesio.resultado.to_f.round(2) %></Data></Cell>
+        <% azufre    = AmostraEnsaio.find_by_metodo_id( 63, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= azufre.resultado.to_f.round(2) %></Data></Cell>
+        <% cobre     = AmostraEnsaio.find_by_metodo_id( 54, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= cobre.resultado.to_f.round(2) %></Data></Cell>
+        <% zinco     = AmostraEnsaio.find_by_metodo_id( 55, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= zinco.resultado.to_f.round(2) %></Data></Cell>
+        <% manganeso = AmostraEnsaio.find_by_metodo_id( 56, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= manganeso.resultado.to_f.round(2) %></Data></Cell>
+        <% boro      = AmostraEnsaio.find_by_metodo_id( 64, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= boro.resultado.to_f.round(2) %></Data></Cell>
+        <% ferro     = AmostraEnsaio.find_by_metodo_id( 57, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+        <Cell ss:StyleID="2"><Data ss:Type="String"><%= ferro.resultado.to_f.round(2) %></Data></Cell>
+
+      </Row>
+    <% end %>
+    </Table>
+  </Worksheet>
+</Workbook>

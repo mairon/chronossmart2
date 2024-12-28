@@ -1,0 +1,29 @@
+<div class="modal fade" id="modal-dados-contrato" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content ">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel">Dados Contrato</h4>
+      </div>
+      <div class="modal-body">
+        <%= form_for(@venda) do |f| %>
+          <div class="row panel-modal-body">
+            <div class="col-md-12">
+            	<% unless @venda.plano_venda_id.blank? %>
+            		<%= f.text_area :dados_contrato, :class => 'ckeditor' %>
+            	<% end %>
+            </div>
+
+           <div class="col-md-12">
+              <br>
+              <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+              <%= link_to 'Imprimir Contrato', print_contrato_venda_path(@venda), target: '_blank?', class: 'btn btn-blue'  %>
+           </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

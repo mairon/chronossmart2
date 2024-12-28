@@ -1,0 +1,17 @@
+<%= form_tag agregar_produtos_compras_path, :method => "post" do %>
+	<input name="compra_id" id="compra_id"  size="10" value="<%= @compra.id %>"/>
+	<input name="data" id="data"  size="10" value="<%= @compra.data %>"/>
+	<input name="persona_id" id="persona_id"  size="10" value="<%= @compra.persona_id %>"/>
+	<input name="cotacao" id="cotacao"  size="10" value="<%= @compra.cotacao %>"/>
+	<input name="deposito_id" id="deposito_id"  size="10" value="3"/>
+	<input name="moeda" id="moeda"  size="10" value="<%= @compra.moeda %>"/>
+	<br>
+	<textarea name="codigo" id="codigo" cols="150" rows="10"></textarea>
+	<br>
+	<input  id      ="button"
+	      type    ="submit"
+	      class   = "button_info"
+	      value   ="Agregar Codigo"
+	      onclick = "Tipo('0')"/>
+
+<% end %>

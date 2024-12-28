@@ -1,0 +1,186 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-md-2">
+          <%= image_tag @produto.picture, class: 'img-thumbnail' %>
+        </div>
+        <div class="col-md-9">
+          <label><i class="icon-tag"></i> 
+            <b><%= @produto.id.to_s.rjust(6,'0')%>-<%= @produto.nome %></b> 
+            <% if Empresa.last.segmento.to_i == 2 %>
+              Color: <%= @produto.cor %> | Año: <%= @produto.ano %> | Chasis: <%= @produto.chassi %> | Tipo: <%= @produto.referencia %>
+
+            <% else %>
+              Barra: <%= @produto.barra %> | Cod. Fabricante: <%= @produto.fabricante_cod %>
+            <% end %>
+          </label>
+        </div>
+        <div class="col-md-1" align="right">
+          <%= link_to image_tag("icon-edit.png", width: '13'), edit_produto_path(@produto), class: 'btn btn-default' %>
+
+          <%= link_to  produto_path(:id => @produto.id), :confirm => 'Estas Seguro?', :method => :delete, :class => "btn btn-danger", style:"margin-top: 5px" do %>
+            <i class="icon-white icon-trash"></i>
+          <% end %>
+
+          <%= link_to  galeria_produto_path(:id => @produto.id), :class => "btn btn-blue", style:"margin-top: 5px" do %>
+            <i class="icon-white icon-camera"></i>
+          <% end %>
+
+
+          <%= link_to  produtos_path, :class => "btn btn-blue", style:"margin-top: 5px" do %>
+            <i class="icon-white icon-chevron-right"></i>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <%= link_to produto_path(@produto.id) do %>
+    <div class="panel">
+      <header class="panel-heading link-prod">
+        <div class="row">
+          <div class="col-md-2">
+            <div class="tag-volante">
+              <%= image_tag "lista.png", height: '20' %>
+            </div>
+          </div>
+          <div class="col-md-10">
+            <p><b><%= t('PRECISION_TABLE') %></b></p>
+          </div>
+        </div>
+      </header>
+    </div>
+    <% end %>
+  </div>
+
+  <div class="col-md-6">
+    <div class="panel">
+      <%= link_to composicao_produto_path(@produto.id) do %>
+      <header class="panel-heading link-prod">
+        <div class="row">
+          <div class="col-md-2">
+            <div class="tag-capacidade">
+              <%= image_tag "formula.png", height: '25' %>
+            </div>
+          </div>
+          <div class="col-md-10">
+            <p><b><%= t('PRODUCT') %> <%= t('COMPOUND') %> / Formula</b></p>
+          </div>
+        </div>
+      </header>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <%= form_tag update_individual_produtos_path :method => :put do %>
+      <div class="panel-body">
+        <table class="head_grid">
+          <tr>
+            <td width="200"><%= t('UNIT') %></td>
+            <td width="150"><%= t('PRECISION_TABLE') %></td>
+            <td width="150" align="right">%</td>
+            <td width="160" align="right"><%= t('PRICE') %></td>
+            <td width="5"></td>
+          </tr>
+        </table>
+
+        <table>
+          <%= hidden_field_tag :id, @produto.id %>
+          <% @unidades_tabelas.each do |up| %>
+            <% for_tabela = @produto.id %>
+            <%= fields_for "products[]", up do |f| %>
+              <tr class = "<%= cycle("cor1", "cor2") %>">
+                <% for_tabela += 1 %>
+                <td width="200"><b><%= up.unidade.unidade_nome %></b></td>
+                <td width="150"><%= up.tabela_preco.nome %></td>
+                <td width="150" align="right"><%= f.telephone_field :margem, size: 10, class: "money_gs", precision: 0, dir: "rtl", step: "any", onblur: "Calc#{up.id}(#{up.id})" %></td>
+
+                <script>
+                  function Calc<%= up.id %>(id){
+                    var custo_base =  parseFloat($("#custo_base_gs").val().replace(/\./g, "").replace(",", "."))
+                    var margem =  parseFloat($("#products_<%= up.id %>_margem").val().replace(/\./g, "").replace(",", "."))
+
+                    var result = (custo_base + (custo_base * (margem / 100 )))
+
+                      $('#products_<%= up.id %>_preco_1_gs').val(number_format( result, 0, ',', '.'))
+                  }
+
+                </script>
+
+                <% if current_unidade.moeda.to_i == 0 %>
+                  <%= field_us '', f, :preco_1_us %>
+                <% elsif current_unidade.moeda.to_i == 1 %>
+                  <td width="150" align="right"><%= f.telephone_field :preco_1_gs, size: 10, class: "money_gs", precision: 0, dir: "rtl", step: "any", onchange: "CalcInver#{up.id}(#{up.id})" %></td>
+
+                    <script>
+                      function CalcInver<%= up.id %>(id){
+                        var custo_base =  parseFloat($("#custo_base_gs").val().replace(/\./g, "").replace(",", "."))
+                        var valor  =  parseFloat($("#products_<%= up.id %>_preco_1_gs").val().replace(/\./g, "").replace(",", "."))
+
+                        var result = (((valor - custo_base) / custo_base) * 100)
+
+                          $('#products_<%= up.id %>_margem').val(number_format( result, 0, ',', '.'))
+                      }
+
+                    </script>
+
+                <% elsif  current_unidade.moeda.to_i == 2 %>
+                  <%= field_us '', f, :preco_1_rs %>
+                <% end %>
+              </tr>
+            <% end %>
+          <% end %>
+        </table>
+        <br>
+        <%= submit_tag "#{t('TO_UPDATE')} #{t('PRICE')}s" , :class => "btn btn-green", :disable_with => "Aguarde..." %>
+        <%= link_to 'Finalizar', produtos_path , :class => "btn btn-blue" %>
+        <%= link_to "#{t('NEW')}", new_produto_path , :class => "btn btn-green" %>
+        <a href="javascript:void(0)" class="btn btn-blue" onClick="Etiquetas(<%= @produto.id %>)"><%= image_tag('printer.png') %> Etiqueta</a>
+        <%= link_to 'Mult Barras', cod_barra_produto_path(@produto) , :class => "btn btn-blue" %>
+
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style type="text/css">
+  .link-prod:hover{
+    background-color: #e6ebf2 !important;
+  }
+  .panel-heading{
+    padding: 10px;
+  }
+  .tag-volante{
+    background-color: #2abb9b; 
+    padding: 0px 25px;
+    border-radius: 100px;
+    display: table;
+  }
+
+  .tag-capacidade{
+    background-color: #f2b968; 
+    padding: 0px 25px;
+    border-radius: 100px;
+    display: table;
+  }
+</style>
+
+<script>
+  function Etiquetas(id){
+  window.open('/produtos/etiquetas?id='+ id, 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+</script>

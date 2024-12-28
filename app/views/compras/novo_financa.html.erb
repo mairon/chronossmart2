@@ -1,0 +1,3 @@
+
+  <h1 align="right" id="header"><%= t('PURCHASE') %></h1>
+  <%= render :partial=>"new_financa", :locals=>{:compras_financa=>ComprasFinanca.new(:compra_id=>@compra.id)} %>

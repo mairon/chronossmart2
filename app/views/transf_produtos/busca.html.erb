@@ -1,0 +1,37 @@
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="80" align="center"><%= t('CODE') %></td>
+      <td width="80" align="center"><%= t('DATE') %></td>
+      <td width="250">Producto Origen</td>
+      <td width="70" align="right">Ctd Origen</td>
+      <td width="250">Producto Destino</td>
+      <td width="70" align="right">Ctd Destino</td>
+      <td width="250" >Obs</td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+
+    <table>
+      <tr>
+      </tr>
+
+      <% @trans_produtos.each do |c| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="80" align="center"> <%= c.id.to_s.rjust(6,'0') %></td>
+        <td width="80" align="center"> <%= c.data.strftime("%d/%m/%y")%></td>
+        <td width="250"> <%= c.produto_origem %></td>
+        <td width="70" align="right"> <%=  c.qtd_origem %></td>
+        <td width="250"> <%=  c.produto_destino %></td>        
+        <td width="70" align="right"> <%=  c.qtd_destino %></td>
+        <td width="250"> <%=  c.obs %></td>
+        <td><%= link_to '', edit_transf_produto_path(c), class: 'icon-pencil' %></td>        
+        <td width="30">
+          <%= link_to '', c, :confirm => 'Estas Seguro?', :method => :delete , class: 'icon-trash' %>
+        </td>       
+            
+      </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

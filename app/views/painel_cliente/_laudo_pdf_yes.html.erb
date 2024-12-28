@@ -1,0 +1,229 @@
+<style>
+	.page-break { display:block; clear:both; page-break-after:always; }
+table {
+		font-family:Lucida Console;
+		font-size:10px;
+		border-collapse: collapse;
+	}
+	table td{
+		height:20px;
+
+	}
+	.header{
+		font-size: 12px;
+		border:1px solid black;
+	  -moz-border-radius:8px;
+	  -webkit-border-radius:8px;
+	  padding:10px;
+
+
+	}
+	.obs{
+		font-size: 7px;
+	}
+
+tr.cor2 {
+    background: #c0d9c0;
+}
+
+tr.cor1 {
+    background: white;
+}
+
+</style>
+<body>
+<% @amostras.each do |a| %>
+<div class="page-break">
+
+	<table>
+		<tr>
+			<td colspan="5">
+				<div >
+					<table>
+				    <tr>
+				    	<td colspan="2"><%= wicked_pdf_image_tag('logo_biosollo.png', :width => 150, :height => 80) %></td>
+				    	<td width="700" align="center" valign="bottom">
+				    		<p>Km 4 Super Carretera - Teléfono: (061) 573 616</p>
+				    		<p>www.biosollo.com.py - biosollo@biosollo.com.py - Ciudad del Este - Paraguay</p>
+				    	</td>
+				    </tr>
+			    </table>
+			    </div>
+	  	</td>
+		</tr>
+
+    <tr>
+    	<td heigth="80">
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    	</td>
+    </tr>
+
+		<tr>
+			<td width="1500" colspan='2'>
+				<div class="header">
+					<table>
+				    <tr height="20">
+				    	<td>Solicitante:</td>
+				    	<td  width="400"><%= a.empresa_nome %></td>
+
+				    	<td>Control:</td>
+				    	<td><%= a.amostra.to_s.rjust(6,'0') %></td>
+
+				    </tr>
+
+				    <tr height="20">
+				    	<td>Proprietário:</td>
+				    	<td><%= a.solicitante %></td>
+				    	<td><%= t('DATE') %>:</td>
+				    	<td><%= a.data.to_date.strftime("%d/%m/%Y") %></td>
+				    </tr>
+
+				    <tr height="20">
+				    	<td>Dirección:</td>
+				    	<td><%= a.local_coleta %></td>
+
+				    	<td></td>
+				    	<td></td>
+
+				    </tr>
+
+						<tr height="20">
+				    	<td>Ident. Muestra:</td>
+				    	<td>LT: <%= a.lote %> - PT: <%= a.detalhe_amostra %></td>
+				    </tr>
+
+						<tr height="20">
+				    	<td>Análisis:</td>
+				    	<td>YESO</td>
+				    </tr>
+
+					</table>
+				</div>
+
+			</td>
+		</tr>
+
+    <tr>
+    	<td heigth="80">
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    	</td>
+    </tr>
+
+		<tr>
+			<td width="1500" colspan='5' align="center">
+				<div class="header">
+						<h2>Resultado de Análisis de Correctivo - Yeso</h2>
+				</div>
+			</td>
+		</tr>
+    <tr>
+    	<td heigth="80">
+    	</td>
+    </tr>
+
+    <tr>
+	    	<td valign="top">
+	    		<div class="header">
+	    		<table>
+	    			<tr style="border-bottom: 1px solid black">
+	    				<td width="400" align="center"><b>Determinación</b></td>
+	    				<td width="400" align="center"><b>Resultado (%)</b></td>
+	    			</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td align="center">Calcio </td>
+	    				<td align="center">
+	    					<% calcio = AmostraEnsaio.find_by_metodo_id( 50, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    					<%= number_to_currency( calcio.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    				</td>
+		    		</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td align="center">Azufre</td>
+	    				<td align="center">
+	    					<% azufre = AmostraEnsaio.find_by_metodo_id( 52, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    					<%= number_to_currency( azufre.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    				</td>
+		    		</tr>
+	    		</table>
+	    		</div>
+	    	</td>
+    	</td>
+    </tr>
+    <tr>
+    	<td heigth="120">
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    	</td>
+    </tr>
+    <tr>
+    	<td>
+    		<table>
+    			<tr>
+	    			<td width="300"></td>
+	    			<td width="600">
+	    				<div class="header">
+		    				<table>
+		    					<td>
+		    						Ciudad del Este,  <%= Time.now.strftime("%d/%m/%Y") %>
+
+		    					</td>
+		    				</table>
+		    			</div>
+	    			</td>
+    			</tr>
+			    <tr>
+			    	<td heigth="150">
+			    	</td>
+			    </tr>
+
+    			<tr>
+	    			<td width="300"></td>
+	    			<td width="600"  align="center">
+	    				<div class="header">
+		    				<table>
+		    					<td  align="center">
+		    					 <p> <%= wicked_pdf_image_tag('firma_alex.png', :width => 50, :height => 50) %></p>
+		    					 <p>____________________________________</p>
+		    					 <p>Alexson Bobato</p>
+		    					 <p>Gerente Comercial</p>
+		    					</td>
+		    				</table>
+		    			</div>
+	    			</td>
+    			</tr>
+			    <tr>
+			    	<td heigth="120"></td>
+			    </tr>
+
+
+    		</table>
+    	</td>
+    </tr>
+	</table>
+</div>
+<% end %>
+</body>
+
+

@@ -1,0 +1,65 @@
+<h1 id="header"><%= t('ACCOUNT') %>s (<%= t('CASHIER') %>/Bancos)</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_conta_path, :class => 'button add' %>
+
+</div>
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="110" align="center"><%= t('CODE') %></td>
+      <td width="50">Tipo</td>
+      <td width="250"><%= t('UNIT') %></td>
+      <td width="300"><%= t('ACCOUNT') %></td>
+      <td width="150">Numero</td>
+      <td width="150">FG PDV</td>
+      <td width="150">Terminal</td>
+      <td width="80" align="center">Status</td>
+      <td width="53"></td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+    <table>
+      <% @contas.each do |conta| %>
+        
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="110" align="center"><%= conta.id.to_s.rjust(6,'0') %></td>
+          <td width="50">
+            <b>
+            <% if conta.tipo == 0 %>
+              Caja
+            <% else %>
+             Banco
+            <% end %>
+            </b>
+          </td>          
+          <td width="250"><%= conta.unidade.unidade_nome %></td>
+          <td width="300"><%= conta.nome %></td>
+          <td width="150"><%= conta.numero %></td>
+          <td width="150">
+            <small>
+              <%= raw conta.forma_pagos.map { |t| "<span class='badge badge-primary'> #{t.nome} </span>" }.join(', ') unless conta.forma_pagos.nil? %>
+            </small>
+          </td>          
+          <td width="150"><%= conta.terminal.nome unless conta.terminal.nil? %></td>
+
+          <td width="80"align="center">
+            <% if conta.status == true %>
+              <span class="btn-success"><%= t('ACTIVE_S') %></span>
+            <% else %>
+              <span class="btn-danger">Bloqueado</span>
+            <% end %>
+          </td>
+
+          <td><%= link_to '', edit_conta_path(conta), class: "icon-pencil" %></td>
+          <% if conta.tipo == 1 %>
+            <td><%= link_to '', conta_path(conta), class: "icon-list" %></td>
+          <% end %>
+          
+          <td>            
+            <%= link_to '', conta, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: "icon-trash" %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,218 @@
+<div class="row">
+  <div class="col-md-7">
+  	<div class="row">
+  		<div class="col-md-12">
+		    <div class="panel">
+		    	<header class="panel-heading" style="font-family: 'prox'; font-size: 18px; padding-bottom: 10px;">
+		    		Factura
+		    		<div style="float: right">
+		    		</div>
+		    	</header>
+
+		      <table class="head_grid">
+		        <tr>
+		          <td width="70">Lanz.</td>
+		          <td width="100">Factura</td>
+              <td width="60">CDC</td>
+              <td width="100">Estado SET</td>
+		        </tr>
+		      </table>
+
+		      <div class="rolagem" dir="div" style="height: 180px">
+		        <table>
+		          <% @fts.each do |ft| %>
+		          <% if ft.status == 2 %>
+		            <% anulada  = 'li-ft' %>
+
+		          <% end %>
+
+		            <tr class = "<%= cycle("cor1", "cor2") %> <%= raw anulada %>">
+
+  		            <td  width="70">
+                    <%= link_to  "#detalhe-doc-#{ft.id}", "data-toggle" => "modal", "data-target" =>"#detalhe-doc-#{ft.id}", "data-id" => "#{ft.id}" do %>
+                      <%= ft.id %>
+                    <% end %>
+                  </td>
+		              <td  width="100"><%= ft.doc_01 %>.<%= ft.doc_02 %>.<%= ft.doc %></td>
+                  <%
+
+                    data = {
+                        cdcList: [{
+                            cdc: "#{ft.cdc}"
+                        }]
+                    };
+
+                   url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/de/estado")
+
+                              http = Net::HTTP.new(url.host, url.port)
+                              http.use_ssl = true
+                              http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+                              request = Net::HTTP::Post.new(url)
+                              request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+                              request["content-type"] = 'application/json'
+                              request.body = data.to_json
+                              response = http.request(request)
+                              puts get_resp = JSON.parse(response.body)
+
+                  %>
+
+
+                  <td  width="60" title="<%= ft.cdc %>"><small><%= ft.cdc[38..44] %></small></td>
+                  <td class="bold"><%= get_resp["deList"][0]["respuesta_mensaje"] %></td>
+		              <% if ft.status == 1 %>
+                    <td><span class="btn-success">Activo</span></td>
+		                <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(ft, status: '2', modal: 'true') %></td>		                
+		                <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>                    
+                    <% if ft.tipo_emissao.to_i == 0 %>
+                      <td><%= link_to 'Re-imprimir', "#",  :onclick => "MultiplaFaturaVenda(#{ft.id})" %></td>
+                    <% else %>
+                      <td><%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: ft.cdc, id: ft.id) %></td>
+                     
+                    <% end %>
+		              <% else %>
+		                <td><span class="btn-danger">Anulado</span></td>
+		                <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>
+                    <% if ft.tipo_emissao.to_i == 1 %>
+                      <td><%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: ft.cdc, id: ft.id) %></td>
+                    <% end %>                    
+		              <% end %>
+		            </tr>
+
+
+                  <div class="modal fade" id="detalhe-doc-<%= ft.id %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content modal-sm">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                          <h4 class="modal-title" id="myModalLabel">Resumen Factura</h4>
+                        </div>
+                        <div class="modal-body" style="padding: 5px 20px 20px 20px">
+                          <div class="group" >
+                            <div class="row">
+                              <div class="col-md-12">
+                                <label>RUC/CI</label>
+                                <%= ft.ruc %>
+                              </div>
+
+                              <div class="col-md-12">
+                                <label>Nombre</label>
+                                <%= ft.persona_nome %>
+                              </div>
+
+                              <div class="col-md-12">
+                                <label>CDC</label>
+                                <%= ft.cdc %>
+                              </div>
+                              <div class="col-md-12">
+                                <label>Nº</label>
+                                <%= get_resp["deList"][0]["numero"] %>
+                              </div>
+                              <div class="col-md-12">
+                                <label>Status</label>
+                                <% if ft.status == 1 %>
+                                  <span class="btn-success">Activo</span>
+                                <% else %>
+                                  <span class="btn-danger">Anulado</span>
+                                <% end %>
+                              </div>
+                              <div class="col-md-12">
+                                <label class="bold">Estado SET</label>
+                                <%= get_resp["deList"][0]["respuesta_codigo"] %>-<%= get_resp["deList"][0]["respuesta_mensaje"] %>
+                              </div>
+                              <div class="col-md-12">
+                                <label class="bold">Situacion SET</label>
+                                <% case get_resp["deList"][0]["situacion"].to_s %>
+                                <% when '-1' %>
+                                  -1 = Borrador
+                                <% when '0' %>
+                                  0 = Generado DE
+                                <% when '1' %>
+                                  1 = Enviado en un Lote
+                                <% when '2' %>
+                                  2 = Aprobado (Caso sea sincrono es inmediato)
+                                <% when '3' %>
+                                  3 = Aprobado con observacion
+                                <% when '4' %>
+                                  4 = Rechazado
+                                <% when '98' %>
+                                  98 = Inexistente
+                                <% when '99' %>
+                                  99 = Cancelado
+                                <% else %>
+                                  --
+                                <% end %>                                                            
+                              </div>
+
+
+
+
+
+                            </div>
+                          </div>
+                        </div>                        
+                      </div>
+                    </div>
+                  </div>
+
+		          <% end %>
+		        </table>
+		      </div>
+		    </div>
+  		</div>
+
+  		<div class="col-md-12">
+				<div class="panel">
+         <% unless @fts.present? %>
+            <div class="group">
+               <div class="alert alert-danger" role="alert">
+                  Atualize a Cidade do Cadastro <%= link_to 'Aqui', edit_persona_path(@compra.persona_id), target: '_blank' %>
+               </div>
+              <%= render partial: "form_fiscals/attr_forms/compra_update_af" %>
+            </div>
+          <% else %>
+            <div class="group">
+            <% if @fts.first.status.to_i != 1 %>
+              <%= render partial: "form_fiscals/attr_forms/compra_update_af" %>
+            <% end %>
+            </div>
+
+            <!-- controle de impressao !-->
+            <% if @fts.first.status.to_i == 1 and  @fts.first.impressao.to_i == 0 %>
+              <script type="text/javascript">
+                function MultiplaFaturaVenda(){
+                  window.open('/form_fiscals/' + <%= @fts.first.id %> +'/impressao_ft', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+
+                    $.ajax({
+                        type: "POST",
+                        url: '/form_fiscals/'+ <%= @fts.first.id %> +'/update_impressao',
+                        data: 'id=' + <%= @fts.first.id %>,
+                        dataType: 'script'
+                    })
+
+                }
+                window.onload = MultiplaFaturaVenda;
+              </script>
+            <% else %>
+              <script type="text/javascript">
+                function MultiplaFaturaVenda(id){
+                  window.open('/form_fiscals/' + id +'/impressao_ft', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+                    $.ajax({
+                        type: "POST",
+                        url: '/form_fiscals/'+ id +'/update_impressao',
+                        data: 'id=' + id,
+                        dataType: 'script'
+                    })
+                }
+              </script>
+            <% end %>
+            <% end %>
+				</div>
+  		</div>
+  	</div>
+  </div>
+
+
+</div>

@@ -1,0 +1,18 @@
+<div class="panel-content">
+	<%= form_for(@contrato) do |f| %>
+	<div class="row">
+		<div class="col-md-3" style="padding: 8px 5px 0px 25px">
+			<a class="modalButton-frma" data-toggle="modal" data-src="<%= @contrato.attachment.url%>" data-width="500" data-height="781" data-target="#myiframe">
+				<%= image_tag 'contrato.png' %> Anexo
+			</a>
+		</div>
+
+		<div class="col-md-5" style="padding-top: 10px">
+			<%= f.file_field :attachment, style: 'width: 150px' %>    				
+		</div>
+		<div class="col-md-3" align="right">
+			<%= f.submit t('SAVE'), :class => "button add", :disable_with => "Aguarde...", "data-plus-as-tab" => "false"   %>
+		</div>
+	</div>
+<% end %>	    		
+</div>

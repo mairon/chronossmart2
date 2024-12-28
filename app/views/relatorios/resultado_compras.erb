@@ -1,0 +1,166 @@
+<div class="group">
+   <table>
+      <% tot_gs  = 0 %>
+      <% tot_us  = 0 %>
+      <% tot_rs  = 0 %>
+
+      <% tot_dt_gs  = 0 %>
+      <% tot_dt_us  = 0 %>
+      <% tot_dt_rs  = 0 %>
+      <% qtd_dt     = 0 %>
+
+      <% contado_tot_gs  = 0 %>
+      <% contado_tot_us  = 0 %>
+      <% contado_tot_rs  = 0 %>
+
+      <% credito_tot_gs  = 0 %>
+      <% credito_tot_us  = 0 %>
+      <% credito_tot_rs  = 0 %>
+      <% qtd = 0 %>
+      <% pe  = 0 %>
+      <% dt_prod = '' %>
+
+      <% @compras.each do |cp| %>
+
+         <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="50"  align="center"> <%=  cp.id.to_s.rjust(6,'0') %></td>
+            <td width="50"  align="center"> <%=  cp.data.strftime("%d/%m/%y") %></td>
+            <td width="50" align="left">
+              <% if cp.tipo_compra == 0 %>
+                CM
+                <% elsif cp.tipo_compra == 2 %>
+                CI
+                <% else %>
+                CB
+              <% end %>
+            </td>
+            <td width="50" align="left">
+              <% if cp.tipo.to_i == 0 %>
+                CT
+                <% contado_tot_us  += cp.total_dolar %>
+                <% contado_tot_gs  += cp.total_guarani %>
+                <% contado_tot_rs  += cp.total_real %>
+              <% else %>
+                CR
+                <% credito_tot_us  += cp.total_dolar %>
+                <% credito_tot_gs  += cp.total_guarani %>
+                <% credito_tot_rs  += cp.total_real %>
+              <% end %>
+            </td>
+            <td width="275" align="left"> <%= truncate(cp.persona_nome, :length => 30) %></td>
+            <td width="100"><%=  cp.doc %></td>
+            <td width="60" align="right"><b><%= format_int(cp.qtd.to_i) %></b></td>
+            <% qtd += cp.qtd.to_i %>
+            <% if params["moeda"].to_s  == '0' %>
+               <td width="70" align="right">    <%=  format_decimal( cp.total_dolar) %></td>
+            <% elsif params["moeda"].to_s  == '1' %>
+               <td width="70" align="right">    <%=  format_int( cp.total_guarani ) %></td>
+            <% else %>
+               <td width="70" align="right">    <%=  format_decimal( cp.total_real ) %></td>
+            <% end %>
+            <td></td>
+          </tr>
+
+          <% tot_gs += cp.total_guarani %>
+          <% tot_us += cp.total_dolar %>
+          <% tot_rs += cp.total_real %>
+          <% if params[:detalhe].to_s == "1" %>
+          <% prod = "AND CP.PRODUTO_ID = #{params[:busca]["produto"]}" unless params[:busca]["produto"].blank? %>
+            <%  sql = " SELECT CP.ID,
+                               CP.CLASE_ID,
+                               CP.GRUPO_ID,
+                               CP.PRODUTO_ID,
+                               CP.PRODUTO_NOME,
+                               CP.FABRICANTE_COD,
+                               CP.UNITARIO_DOLAR,
+                               CP.UNITARIO_GUARANI,
+                               CP.UNITARIO_REAL,
+                               CP.TOTAL_DOLAR,
+                               CP.TOTAL_GUARANI,
+                               CP.TOTAL_REAL,
+                               CP.QUANTIDADE,
+                               COALESCE((SELECT SUM(P.QUANTIDADE) FROM PRESUPUESTO_PRODUTOS P WHERE P.PRODUTO_ID = CP.PRODUTO_ID ),0) AS PEDIDO
+                               FROM COMPRAS_PRODUTOS CP
+                        WHERE CP.COMPRA_ID = #{cp.id} #{prod}"
+
+             %>
+            <% produtos = ComprasProduto.find_by_sql(sql) %>
+            <tr class= "<%= cycle( "cor1", "cor2" )%>" style="padding:0;margin:0;">
+              <td></td>
+              <td colspan="8">
+                <table>
+                  <% produtos.each do |p| %>
+                  <tr class = "<%= cycle("cor1", "cor2") %>">
+                    <td width="80"><%= p.clase_id.to_s.rjust(2,'0') <<'.'<< p.grupo_id.to_s.rjust(4,'0') <<'.'<< p.produto_id.to_s.rjust(6,'0') %></td>
+                    <td width="454">
+                      <%= truncate(p.produto_nome, :length => 55) %>
+                      <% dt_prod = truncate(p.produto_nome, :length => 55) %>
+                        Precio =>                       
+                        <% if params["moeda"].to_s  == '0' %>
+                          <%= format_decimal( p.unitario_dolar ) %>
+                        <% elsif params["moeda"].to_s  == '1' %>
+                          <%= format_int( p.unitario_guarani ) %>
+                        <% else %>
+                          <%= format_decimal( p.unitario_real ) %>
+                        <% end %>
+                    </td>
+                    <td width="60" align="right">  <%=  format_int( p.quantidade.to_f) %> </td>
+                    <% qtd += p.quantidade.to_f %>
+                    <% pe  += p.pedido.to_f %>
+                    <% if current_user.tipo.to_i == 0 %>
+                      <% if params["moeda"].to_s  == '0' %>
+                        <td width="70" align="right"><%= number_to_currency( p.total_dolar, :format =>' %n ', :separeitor => ',' ) %> </td>
+                        <% tot_dt_us  += p.total_dolar %>
+                      <% elsif params["moeda"].to_s  == '1' %>
+                        <td width="70" align="right"><%= number_to_currency( p.total_guarani, :format =>' %n ', :precision => 0 ) %> </td>
+                        <% tot_dt_gs  += p.total_guarani %>
+                      <% else %>
+                        <td width="70" align="right"><%= number_to_currency( p.total_real, :format =>' %n ', :separeitor => ',' ) %> </td>
+                        <% tot_dt_rs  += p.total_real %>
+                      <% end %>
+                    <% end %>
+                  </tr>
+                  <% qtd_dt     += p.quantidade.to_f %>
+
+                  <% end %>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td height="10"></td>
+            </tr>
+          <% end %>
+
+      <% end %>
+
+      <!--TOTAL!-->
+      <tr class="head" height="30"  align="right">
+         <td colspan="6">Total del Documentos ==> </td>
+         <td align="right"> <%= format_int(qtd.to_i) %> </td>
+         <% if params["moeda"].to_s  == '0' %>
+            <td align="right">    <%=  number_to_currency( tot_us, :format =>' %n ', :separeitor => ',' ) %> </td>
+         <% elsif params["moeda"].to_s  == '1' %>
+            <td align="right">    <%=  number_to_currency( tot_gs, :format =>' %n ', :precision => 0 ) %> </td>
+         <% else %>
+            <td align="right">    <%=  number_to_currency( tot_rs, :format =>' %n ', :separeitor => ',' ) %> </td>
+         <% end %>
+      </tr>
+      <% if params[:detalhe].to_s == "1"  and params[:busca]["produto"] != '' %>
+        <tr>
+          <td height="5"></td>
+        </tr>
+
+        <tr class="head" height="30">
+           <td colspan="6" align="right">Total del iten Selecionado: <%= dt_prod %> ==> </td>
+           <td align="right"> <%= format_int(qtd_dt.to_i) %> </td>
+           <% if params["moeda"].to_s  == '0' %>
+              <td align="right">    <%=  number_to_currency( tot_dt_us, :format =>' %n ', :separeitor => ',' ) %> </td>
+           <% elsif params["moeda"].to_s  == '1' %>
+              <td align="right">    <%=  number_to_currency( tot_dt_gs, :format =>' %n ', :precision => 0 ) %> </td>
+           <% else %>
+              <td align="right">    <%=  number_to_currency( tot_dt_rs, :format =>' %n ', :separeitor => ',' ) %> </td>
+           <% end %>
+        </tr>
+      <% end %>
+   </table>
+</div>

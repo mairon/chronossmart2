@@ -1,0 +1,47 @@
+<table class="head_grid">
+  <tr>
+    <td width="75" align="center"></td>
+    <td width="55" align="center"><%= t('CODE') %></td>
+    <td width="150">Telefono</td>
+    <td width="100">RUC/CI</td>
+    <td width="300">Fantasia</td>
+    <td width="300">Razao Social</td>
+    <td width="300">Direción</td>
+  </tr>
+</table>
+
+<div class="rolagem" id="div">
+   <table>
+    <% count = 0 %>
+      <% for persona in @personas %>
+         <tr class       ="<%= cycle("cor1", "cor2")%>"
+             onclick     ="Fecha( '<%= persona.id %>',
+                                  '<%= persona.nome %>',
+                                  '<%= persona.ruc %>',
+                                  '<%= persona.nome_fatura %>',
+
+
+                                   )" data-plus-as-tab="false" >
+
+            <td  width="25" class="<%= count %>"><input type="text" id="<%= count %>" value="<%= count %>" size="1" style="border: none; height: 3px !important"
+                onkeypress="Fecha(  '<%= persona.id %>',
+                                    '<%= persona.nome %>',
+                                    '<%= persona.ruc %>',
+                                    '<%= persona.nome_fatura %>',
+                                  )">
+            </td>
+            <td width="55"align="center" class="<%= count %>"><%= persona.id.to_s.rjust(6,'0') %></td>
+            <td width="150" class="<%= count %>"><b><%= persona.telefone %></b></td>
+            <td width="100" class="<%= count %>"><%= persona.ruc %></td>
+            <td width="300" class="<%= count %>"><%= persona.nome %></td>
+            <td width="300" class="<%= count %>"><%= persona.nome_fatura %></td>
+            <td width="300" class="<%= count %>"><%= persona.direcao %></td>
+         </tr>
+         <% count += 1 %>
+      <% end %>
+      <input type="hidden" id="foco" value="-1">
+   </table>
+
+   <%= will_paginate @personas, :update => 'pagina',:prev_label => '<< Anterior',:next_label => 'Próximo >>'%>
+
+</div>

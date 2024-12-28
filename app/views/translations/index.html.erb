@@ -1,0 +1,63 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-md-12">
+        </div>
+        <div class="col-md-12">
+			    Switch to:
+			    <ul class="list-group">
+			      <% all_locales.each do |al| %>
+			          <li class="list-group-item"><%= link_to al.locale, locale_translations_url(al.locale) %></li>
+			      <% end %>
+			    </ul>
+
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+	    <div class="panel-body">
+	    		<br>
+		      <%= link_to new_locale_translation_url(@locale, key: @key), class: "btn btn-success" do %>
+		          Traduzir para <%= @locale %>
+		      <% end %>
+		      <br>
+
+		    <table class="table table-striped">
+		      <thead>
+		      <tr>
+		        <th>Translation Key</th>
+		        <th>Setting</th>
+		        <th>Actions</th>
+		      </tr>
+		      </thead>
+		      <tbody>
+		      <% translation_keys.each do |key| %>
+		          <% translation = translation_for_key(@translations, key.key) %>
+		          <tr id="<%= key %>">
+		            <td><%= key.key %></td>
+		            <td><%= translation.nil? ? I18n.t(key.key, locale: @locale) : translation.value %></td>
+		            <td>
+		              <% if translation.nil? %>
+		                  <%= link_to "New", new_locale_translation_url(@locale, key: key.key) %>
+		              <% else %>
+		                  <%= link_to "Edit", edit_locale_translation_url(@locale, translation) %>
+		                  <%= link_to "Delete", locale_translation_url(@locale, translation), method: :delete, data: {confirm: "Are you sure?"} %>
+		              <% end %>
+		            </td>
+		          </tr>
+		      <% end %>
+		      </tbody>
+		    </table>
+
+	    </div>
+  	</div>
+	</div>
+</div>

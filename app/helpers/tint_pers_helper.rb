@@ -1,0 +1,2 @@
+module TintPersHelper
+end

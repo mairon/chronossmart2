@@ -1,0 +1,272 @@
+<%= form_for(vendas_produto, remote: true) do |f| %>
+<%= f.hidden_field :venda_id %>
+  <div id="error_explanation" style="display:none"></div>
+  <div class="group">
+    <% if @venda_config.busca_barra == true %>
+      <div class="row">
+        <div class="col-md-12">
+            <%= text_field_tag :cod_busca, nil, style: 'width: 100%', class: 'first', placeholder: 'Barra', autocapitalize: "off", autocomplete:"off", autocorrect:"off" %>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label></label>
+        <%= f.text_field :produto_nome, style: 'width: 100%', placeholder: 'Producto' %>
+      </div>
+    </div>
+
+    <% if @venda.moeda.to_i == 1 %>
+
+      <%= f.hidden_field :preco_guarani %>
+      <div class="row">
+        <div class="col-md-4">
+          <label>Ctd.</label>
+          <%= f.telephone_field :quantidade, class: 'panel-field qtd', dir: "rtl", value: '1', onblur: "CalcQtd('vendas_produto_unitario_guarani','vendas_produto_quantidade','vendas_produto_total_guarani')", autocomplete:"off" %>
+        </div>
+        <div class="col-md-4">
+          <label>Unit.</label>
+          <%= f.telephone_field :unitario_guarani, class: 'panel-field money_gs', precision: 0, dir: "rtl",  onchange: "CalcQtd('vendas_produto_unitario_guarani','vendas_produto_quantidade','vendas_produto_total_guarani') " %>
+        </div>
+        <div class="col-md-4" >
+          <label>Sub-Total.</label>
+          <%= f.telephone_field :total_guarani, class: 'panel-field money_gs', dir: "rtl", precision: 0 %>
+        </div>
+      </div>
+
+    <% elsif @venda.moeda.to_i == 0 %>
+      <%= f.hidden_field :preco_dolar %>
+      <div class="row">
+        <div class="col-md-4">
+          <label>Ctd.</label>
+          <%= f.telephone_field :quantidade, class: 'panel-field qtd', dir: "rtl", value: '1', onblur: "CalcQtdDescimal('vendas_produto_quantidade','vendas_produto_unitario_dolar','vendas_produto_total_dolar')", autocomplete:"off" %>
+        </div>
+        <div class="col-md-4">
+          <label>Unit.</label>
+          <%= f.telephone_field :unitario_dolar, class: "panel-field money_#{@venda_config.unit_us_decimal.to_i}", precision: @venda_config.unit_us_decimal.to_i, dir: "rtl", onblur: "CalcQtdDescimal('vendas_produto_quantidade','vendas_produto_unitario_dolar','vendas_produto_total_dolar')" %>
+        </div>
+        <div class="col-md-4">
+          <label>Sub-Total.</label>
+          <%= f.telephone_field :total_dolar, class: 'panel-field money_us', dir: "rtl", readonly: 'readonly', size: 70 %>
+        </div>
+      </div>
+    <% elsif @venda.moeda.to_i == 2 %>
+      <%= f.hidden_field :preco_dolar %>
+      <div class="row">
+        <div class="col-md-4">
+          <label>Ctd.</label>
+          <%= f.telephone_field :quantidade, class: 'panel-field qtd', dir: "rtl", value: '1', onblur: "CalcQtdDescimal('vendas_produto_quantidade','vendas_produto_unitario_real','vendas_produto_total_real')" %>
+        </div>
+        <div class="col-md-4">
+          <label>Unit.</label>
+          <%= f.telephone_field :unitario_real, class: 'panel-field money_rs', precision: 2, dir: "rtl", onblur: "CalcQtdDescimal('vendas_produto_quantidade','vendas_produto_unitario_real','vendas_produto_total_real')" %>
+        </div>
+        <div class="col-md-4">
+          <label>Sub-Total.</label>
+          <%= f.telephone_field :total_real, class: 'panel-field money_rs', dir: "rtl", readonly: 'readonly', size: 70 %>
+        </div>
+      </div>
+
+    <% end %>
+    <div class="row">
+      <div class="col-md-12">
+        <label></label>
+        <%= f.submit "AGREGAR", :class => "btn btn-green", "data-plus-as-tab" => "false", style: 'width: 100%' %>
+        <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner-add-prod", width: 21, height: 21, style: "position: relative; left: 300px; top: -34px; display: none;") %>
+      </div>
+    </div>
+
+
+  </div>
+
+<%= f.hidden_field :deposito_id, value: Deposito.where(unidade_id: @venda.unidade_id, seta_produto: 1).first.id %>
+<%= f.hidden_field :produto_id %>
+<%= f.hidden_field :data, value: @venda.data %>
+<%= f.hidden_field :moeda, value: @venda.moeda %>
+
+<%= hidden_field_tag :unidade, nil, value: current_unidade.unidade_tabela_preco_id %>
+<%= hidden_field_tag :tipo_venda, nil, value: @venda.tipo_venda %>
+<%= hidden_field_tag :tabela_preco_id, nil, value: @venda.tabela_preco_id %>
+<%= hidden_field_tag :persona_id, nil, value: @venda.persona_id %>
+
+<% end %>
+<script type="text/javascript">
+
+  $("#vendas_produto_quantidade").blur(function(){
+    $('#new_vendas_produto').submit();
+  });
+
+    $("<%= @venda_config.focus_first %>").focus();
+
+    jQuery('#new_vendas_produto').submit( function(e){
+      e.preventDefault();
+      $("#spinner-add-prod").show("fast");
+    });
+
+    $("#cod_busca").change(function(){
+        $.ajax({url: "/buscas/busca_venda_produto",
+          type: 'GET',
+          beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+          data: 'cod=' + $('#cod_busca').val() +
+            "&unidade=" + $("#unidade").val() +
+            "&data=" + $("#vendas_produto_data").val() +
+            "&deposito=" + $("#vendas_produto_deposito_id").val() +
+            "&barra_balanca=<%= @venda_config.barra_balanca %>" +
+            "&persona_id=" + $("#venda_persona_id").val() +
+            "&tabela_preco=" + $("#tabela_preco_id").val(),
+          success: function(grade){
+          $('#vendas_produto_produto_nome').val(grade["produto"].nome);
+          $('#vendas_produto_produto_id').val(grade["produto"].produto_id);
+          $('#vendas_produto_quantidade').val( number_format( grade["produto"].qtd, 3, ',', '.'));
+          //tabela de preco
+          if ($('#vendas_produto_moeda').val() == '0'){
+            $('#vendas_produto_unitario_dolar').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
+            $('#vendas_produto_total_dolar').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
+            $('#vendas_produto_preco_dolar').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
+          }if ($('#vendas_produto_moeda').val() == '1'){
+            $('#vendas_produto_unitario_guarani').val(number_format( grade["produto"].preco_1_gs, 0, ',', '.'));
+            $('#vendas_produto_preco_guarani').val(number_format( grade["produto"].preco_1_gs, 0, ',', '.'));
+            $('#vendas_produto_total_guarani').val( number_format( parseFloat(grade["produto"].preco_1_gs) * parseFloat(grade["produto"].qtd), 0, ',', '.') );
+          }if ($('#vendas_produto_moeda').val() == '2'){
+
+            $('#vendas_produto_unitario_real').val(number_format( grade["produto"].preco_1_rs, 2, ',', '.'));
+            $('#vendas_produto_preco_real').val(number_format( grade["produto"].preco_1_rs, 2, ',', '.'));
+            $('#vendas_produto_total_real').val( number_format( parseFloat(grade["produto"].preco_1_rs) * parseFloat(grade["produto"].qtd), 2, ',', '.') );
+          }
+
+          <% if @venda_config.add_produto_direto == true %>
+            $('#new_vendas_produto').submit();
+          <% end %>
+        }
+      });
+
+        
+    });
+
+    //busca por descricao produto
+      $(function() {
+        $( "#vendas_produto_produto_nome" ).autocomplete({
+            source: function( request, response ) {
+            $("#sppiner").addClass("sppiner_show");
+            $.ajax({
+              url: "/buscas/search_all_produtos",
+              dataType: "json",
+              data: {
+                tipo: 'DESCRIPCION',
+                busca: request.term
+              },
+              success: function( data ) {
+                response( data );
+                $("#sppiner").removeClass("sppiner_show");
+              },
+            });
+          },
+          minLength: 2,
+          select: function( event, ui ) {
+            $("#vendas_produto_produto_id").val("");
+            $( "#vendas_produto_produto_nome" ).val(ui.item.label);
+            $('#vendas_produto_produto_id').val(ui.item.id);
+            return false;
+          }
+        });
+      });
+
+      $("#vendas_produto_produto_nome").change(function(){
+        if ($('#vendas_produto_produto_id').val().length != 0) {
+          $.ajax({url: "/buscas/busca_venda_produto",
+            type: 'GET',
+            beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+            data:
+              'cod=' + $('#vendas_produto_produto_id').val() +
+              "&unidade=" + $("#unidade").val() +
+              "&tipo_busca=" + 'ID' +
+              "&data=" + $("#vendas_produto_data").val() +
+              "&deposito=" + $("#vendas_produto_deposito_id").val() +
+              "&barra_balanca=false" +
+              "&persona_id=" + $("#venda_persona_id").val() +
+              "&tabela_preco=" + $("#tabela_preco_id").val(),
+            success: function(grade){
+            $('#vendas_produto_produto_nome').val(grade["produto"].nome);
+            $('#vendas_produto_produto_id').val(grade["produto"].produto_id);
+            //tabela de preco
+            if ($('#vendas_produto_moeda').val() == '0'){
+              $('#vendas_produto_unitario_dolar').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
+              $('#vendas_produto_total_dolar').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
+              $('#vendas_produto_preco_dolar').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
+            }if ($('#vendas_produto_moeda').val() == '1'){
+              $('#vendas_produto_unitario_guarani').val(number_format( grade["produto"].preco_1_gs, 0, ',', '.'));
+              $('#vendas_produto_preco_guarani').val(number_format( grade["produto"].preco_1_gs, 0, ',', '.'));
+              $('#vendas_produto_total_guarani').val( number_format( parseFloat(grade["produto"].preco_1_gs) * parseFloat(grade["produto"].qtd), 0, ',', '.') );
+            }if ($('#vendas_produto_moeda').val() == '2'){
+
+              $('#vendas_produto_unitario_real').val(number_format( grade["produto"].preco_1_rs, 2, ',', '.'));
+              $('#vendas_produto_preco_real').val(number_format( grade["produto"].preco_1_rs, 2, ',', '.'));
+              $('#vendas_produto_total_real').val( number_format( parseFloat(grade["produto"].preco_1_rs) * parseFloat(grade["produto"].qtd), 2, ',', '.') );
+            }
+
+            <% if @venda_config.add_produto_direto == true %>
+              $('#new_vendas_produto').submit();
+            <% end %>
+          }
+        });
+        };
+      });
+
+    function CalcResultQtd(unit,qtd,tot)                                      //
+    {
+        var result_qtd = eval( parseFloat( document.getElementById(tot).value.replace(/\./g, "").replace(",", ".") ) / parseFloat( document.getElementById(unit).value.replace(/\./g, "").replace(",", ".") ) )  ;
+        $("#vendas_produto_quantidade").val(number_format(result_qtd,3, ',', '.'));
+    }
+
+
+    function CalcQtdDescimal(unit,qtd,tot)                                      //
+    {
+        var total = eval( parseFloat( document.getElementById(unit).value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById(qtd).value.replace(/\./g, "").replace(",", ".") ) )  ;
+        document.getElementById(tot).value = ( number_format(total,2, ',', '.') );
+    }
+
+    function CalcQtd(unit,qtd,tot)                                      //
+    {
+        var total = eval( parseFloat( document.getElementById(unit).value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById(qtd).value.replace(/\./g, "").replace(",", ".") ) )  ;
+        document.getElementById(tot).value = ( number_format(total,0, ',', '.') );
+    }
+
+
+  document.onkeydown= function(e) {
+    //LISTA DE PRODUTOS
+
+    if(e.which == 113){ //F2
+      window.open('/produtos/busca_venda_produto?tipo_venda=<%= @venda.tipo_venda %>&data=<%= @venda.data %>&moeda=<%= @venda.moeda %>&cliente='+ $("#tabela_preco_id").val() +'&deposito_id='+$("#vendas_produto_deposito_id").val()+'&unidade='+<%= current_unidade.unidade_tabela_preco_id %>+'', 'Pagina', ' SCROLLBARS=YES, TOP=0, LEFT=50, WIDTH=1000, HEIGHT=650');
+    };
+
+    if(e.which == 115){ //F4
+      window.open('/vendas/tabela_preco_produto?id=' + $("#vendas_produto_produto_id").val() + '&persona_tabela_preco_id=' +  $("#tabela_preco_id").val() + '', 'Pagina', ' SCROLLBARS=YES, TOP=200, LEFT=450, WIDTH=500, HEIGHT=700');
+    }
+
+    <% if @venda_config.caixa_separado.to_i == 1 #venda balcao caixa separado %>
+      if(e.which == 118){ //F7
+        //window.open('/vendas/' + <%= @venda.id %> + '/comprovante', '', ' SCROLLBARS=YES, TOP=150, LEFT=100, WIDTH=300, HEIGHT=500');
+          window.location.href='/vendas/new?tipo_venda=0'
+      }
+
+    <% else %>
+      if(e.which == 118){ //F7
+        window.location.href = "/vendas/<%= @venda.id %>/financas";
+      }
+    <% end %>
+
+    if(e.which == 120){ //F9
+        window.open('/personas/persona_venda?tela=PDV', '', ' SCROLLBARS=YES, TOP=0, LEFT=50, WIDTH=1000, HEIGHT=450');
+    };
+
+
+    if(e.which == 17){
+        $("#vendas_produto_quantidade").focus()
+    }
+    if(e.which == 27){
+      self.close();
+    }
+  }
+
+</script>

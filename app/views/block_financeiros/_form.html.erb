@@ -1,0 +1,33 @@
+<h1 id="header">Bloquear Financiero - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+<%= form_for(@block_financeiro) do |f| %>
+  <% if @block_financeiro.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@block_financeiro.errors.count, "error") %> prohibited this block_financeiro from being saved:</h2>
+
+      <ul>
+      <% @block_financeiro.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Periodo</label>
+      <%= f.date_select :periodo, :discard_day => true %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <br>
+      <%= f.check_box :status, checked: true %> Bloquear
+    </div>
+  </div>
+    <div>
+      <br>
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+      <%= link_to t('BACK'), block_financeiros_path, :class => "btn btn-back" %>
+    </div>
+  <% end %>
+</div>

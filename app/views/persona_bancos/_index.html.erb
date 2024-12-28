@@ -1,0 +1,28 @@
+<table class="head_grid">
+  <tr>
+    <td>Persona</t>
+    <td>Banco</t>
+    <td>Conta</t>
+    <td>Ahorro avista</t>
+    <td>Cda</t>
+    <td>Oficial conta</t>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% persona_bancos.each do |persona_banco| %>
+      <tr>
+                  <td><%= persona_banco.persona_id %></td>
+                  <td><%= persona_banco.banco_id %></td>
+                  <td><%= persona_banco.conta %></td>
+                  <td><%= persona_banco.ahorro_avista %></td>
+                  <td><%= persona_banco.cda %></td>
+                  <td><%= persona_banco.oficial_conta %></td>
+                <td><%= link_to 'Editar', edit_persona_banco_path(persona_banco) %></td>
+        <td><%= link_to 'Borrar', persona_banco, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

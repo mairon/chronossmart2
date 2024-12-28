@@ -1,0 +1,37 @@
+<h1 id="header">provi_detalhes</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_provi_detalhe_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Provi</td>
+            <td><%= t('DATE') %></td>
+            <td>Centro custo</td>
+            <td>Rubro</td>
+            <td>Valor us</td>
+            <td>Valor gs</td>
+            <td>Valor rs</td>
+            <td>Moeda</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @provi_detalhes.each do |provi_detalhe| %>
+      <tr>
+                  <td><%= provi_detalhe.provi_id %></td>
+                  <td><%= provi_detalhe.data %></td>
+                  <td><%= provi_detalhe.centro_custo_id %></td>
+                  <td><%= provi_detalhe.rubro_id %></td>
+                  <td><%= provi_detalhe.valor_us %></td>
+                  <td><%= provi_detalhe.valor_gs %></td>
+                  <td><%= provi_detalhe.valor_rs %></td>
+                  <td><%= provi_detalhe.moeda %></td>
+                <td><%= link_to 'Editar', edit_provi_detalhe_path(provi_detalhe) %></td>
+        <td><%= link_to t('DELETE'), provi_detalhe, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

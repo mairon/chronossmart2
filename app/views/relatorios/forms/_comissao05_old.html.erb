@@ -1,0 +1,43 @@
+<% quebra = '' %>
+<% sub_tot = 0 %>
+<% sub_cs  = 0 %>
+<table>
+	<% @comissaos.each do |c| %>	
+   	<% if quebra != c.vendedor_nome %>
+
+      <% if quebra != "" %>
+
+        <tr class="head" height="25" valign="top">
+          <td colspan="1"></td>
+		   		<td>Saldo ==> </td>
+          <td align="right"><%= format_int(sub_tot) %></td>
+        </tr>
+				<% sub_tot = 0 %>
+        <tr>
+          <td></td>
+        </tr>
+      <% end %>
+			<tr>
+				<td colspan="4"><b><%= c.vendedor_id %> - <%= quebra = c.vendedor_nome %>(<%= c.comissao.to_f %>)</b></td>
+			</tr>
+   	<% end %>
+		<tr class="<%= cycle("cor1", "cor2")%>">
+			<td width="50" align="center"><%= c.data.strftime("%d/%m/%y") %></td>
+      <td width="300"><%= c.persona_nome %></td>
+			<td width="70" align="right"><%= format_int(c.total_gs) %></td>
+      <td width="70" align="right"><%= format_int(c.comissao_gs) %></td>
+			<% sub_tot += c.total_gs.to_f %>
+      <% sub_cs  += c.comissao_gs.to_f %>
+		</tr>
+	<% end %>
+
+  <tr class="head" height="25" valign="top">
+    <td colspan="1"></td>
+    <td>Saldo ==> </td>
+    <td align="right"><%= format_int(sub_tot) %></td>
+    <td align="right"><%= format_int(sub_cs) %></td>
+  </tr>
+
+</table>
+
+

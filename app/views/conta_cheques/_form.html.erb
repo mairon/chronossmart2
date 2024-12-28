@@ -1,0 +1,49 @@
+<%= form_for(@conta_cheque) do |f| %>
+  <% if @conta_cheque.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@conta_cheque.errors.count, "error") %> prohibited this conta_cheque from being saved:</h2>
+
+      <ul>
+      <% @conta_cheque.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel">
+        <h1 id="header">Cheque: <%= @conta_cheque.numero %></h1>
+        <div class="panel-body">
+        <div class="row">
+          <div class="col-md-12">
+
+            <label>Status</label>
+            <%= f.select :status, [["Pendente", 0],
+            ["Ativo",1],
+            ["Cancelado",2],
+            ["Devolvido",3]],
+            {prompt: "Selecione"}, required: true %> 
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <label></label>
+            <%= f.text_area :obs, class: 'panel-field', rows: '5' %>
+          </div>
+        </div>
+        <div class="footer-buttons">
+          <%= f.submit "Actualizar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+          <%= link_to t('BACK'), conta_path(@conta_cheque.conta_id), :class => "btn btn-back" %>
+        </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<script>
+$('#conta_cheque_status').selectize();  
+</script>

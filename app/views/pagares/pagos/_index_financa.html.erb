@@ -1,0 +1,50 @@
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="80" align="center"><%= t('DATE') %></td>
+      <td width="150" align="center"><%= t('ACCOUNT') %></td>
+      <td width="300" align="center">Descripcion</td>
+      <td width="150" align="center"><%= t('DOC') %></td>
+      <td width="100" align="center"><%= t('CHECKS') %></td>
+      <td width="80" align="center">Dif.</td>
+      <td width="80" align="right">U$</td>
+      <td width="80" align="right">G$</td>
+      <td width="80" align="right">R$</td>
+    </tr>
+  </table>
+  <div class="rolagem_cobro" dir="div">
+    <table>
+      <% tot_us = 0 %>
+      <% tot_gs = 0 %>
+      <% tot_rs = 0 %>
+      <% pagos_financas.each do |pagos_financa| %>
+        <tr class = "<%= cycle( "cor1", "cor2" )%>">
+          <td width="80"  align="center"><%= pagos_financa.data.strftime("%d/%m/%y")%></td>
+          <td width="150" align="left"><%= pagos_financa.conta_nome%></td>
+          <td width="300" align="left"><%= truncate(pagos_financa.descricao, :leght => 200)%></td>
+          <td width="150" align="left"><%= pagos_financa.documento_nome %></td>
+          <td width="100" align="center"><%= pagos_financa.cheque%></td>
+          <td width="80"  align="center"><%= pagos_financa.diferido.strftime("%d/%m/%y")%></td>
+
+          <td width="80" align="right"><%= number_to_currency( pagos_financa.valor_dolar,      :format =>' %n ', :separator => ',' )%></td>
+          <% tot_us += pagos_financa.valor_dolar %>
+          <td width="80" align="right"><%= number_to_currency( pagos_financa.valor_guarani,      :format =>' %n ', :precision => 0 )%></td>
+          <% tot_gs += pagos_financa.valor_guarani %>
+           <td width="80" align="right"><%= number_to_currency( pagos_financa.valor_real,      :format =>' %n ', :separator => ',' )%></td>
+          <% tot_rs += pagos_financa.valor_real %>
+          <td><%= link_to 'Editar', edit_pagos_financa_path(pagos_financa) %></td>
+          <td><%= link_to t('DELETE'), pagos_financa, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+
+  <table class="head_grid">
+    <tr>
+      <td width="875"></td>
+        <td width="80" align="right"><%= number_to_currency( tot_us,      :format =>' %n ', :separator => ',' )%></td>
+        <td width="80" align="right"><%= number_to_currency( tot_gs,      :format =>' %n ', :precision => 0 )%></td>
+        <td width="80" align="right"><%= number_to_currency( tot_rs,      :format =>' %n ', :separator => ',' )%></td>
+    </tr>
+  </table>
+</div>

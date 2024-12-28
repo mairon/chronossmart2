@@ -1,0 +1,63 @@
+
+<table>
+  <tr>
+    <td align="right">Clase :</td>
+    <td colspan="3"><%= f.collection_select :clase_id, Clase.all(:select => 'id,descricao',:order => '1'),:id,:descricao %>
+      Grupo :
+      <%= f.collection_select :grupo_id, Grupo.all(:select => 'id,descricao',:order => '1'),:id,:descricao %></td>
+
+  </tr>
+
+  <tr >
+    <td align="right">Producto :</td>
+    <td colspan="1"><%= f.text_field :nome, :size      => 40,
+                                     :onkeydown => "f(this)",
+                                     :onkeyup   => "f(this)" %>*</td>
+
+    <td align="right">Cod :</td>
+    <td colspan="3"><%= f.text_field :cod_velho, :size      => 10 %></td>
+
+
+  </tr>
+
+  <tr >
+    <td align="right">Proveedor :</td>
+    <td><%= f.collection_select :fabricante_id, Persona.all(:select => 'id,nome',:conditions =>['tipo_fornecedor = 1'],:order => '1'),:id,:nome %></td>
+
+    <td align="right">Cod. Fabricante :</td>
+    <td><%= f.text_field :fabricante_cod,
+                         :size => 20 %></td>
+  </tr>
+
+  <tr >
+    <td align="right">Barra :</td>
+    <td><%= f.text_field :barra,
+                         :size => 20 %></td>
+  </tr>
+  <tr >
+    <td align="right">Taxa :</td>
+    <td><%= f.text_field :taxa,
+                         :size => 20,
+                         :value => 10%> % </td>
+
+    <td align="right">Peso Neto :</td>
+    <td><%= f.text_field :peso,
+                         :size => 20 %></td>
+
+  </tr>
+  <tr >
+    <td align="right">Stock Min. :</td>
+    <td><%= f.text_field :stock_minimo,
+                         :size => 20 %>  </td>
+
+    <td align="right">Stock Max. :</td>
+    <td><%= f.text_field :stock_maximo,
+                         :size => 20 %>  </td>
+
+  </tr>
+</table>
+
+
+
+
+

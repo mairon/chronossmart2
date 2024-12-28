@@ -1,0 +1,28 @@
+<h1 id="header"><%= t('SEGMENT') %> - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+  <%= form_for(@seguimento) do |f| %>
+    <% if @seguimento.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@seguimento.errors.count, "error") %> prohibited this seguimento from being saved:</h2>
+
+        <ul>
+        <% @seguimento.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <table>
+      <tr>
+        <td>
+          <label><%= t('DESCRIPTION') %></label>
+          <%= f.text_field :nome, autofocus: true %>
+        </td>
+      </tr>
+    </table>
+   <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), seguimentos_path, :class => "btn btn-back" %>
+   </div>
+<% end %>
+</div>

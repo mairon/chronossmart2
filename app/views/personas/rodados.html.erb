@@ -1,0 +1,47 @@
+   <div>
+      <ul class="tabs">
+        <li><a href="#tab1">Rodaoos</a></li>
+        <li><a href="/personas/<%= @persona.id%>">Contatos</a></li>
+        <li><a href="#tab2">Tabla Descuentos</a></li>
+      </ul>
+
+      <div class="tab_container">
+
+            <div id="tab1" class="tab_content">
+              <table>
+                <tr>
+                    <td>
+                      <div>
+                        <table>
+                          <tr>
+                            <td>
+                              <div class="group">
+                                <%= render :partial=>"/persona_rodados/index", :locals=>{:persona_rodados => @persona.persona_rodados} %>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="group">
+                              <%= render :partial=>"/persona_rodados/new_rodado", :locals=>{:persona_rodado=>PersonaRodado.new(:persona_id=>@persona.id)} %>
+                              </div>
+                            </td>
+                          </tr>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+              </table>
+            </div>
+            <div id="tab2" class="tab_content">
+              <iframe name="I2" width="770" height="350" src="/personas/<%= @persona.id %>/descontos" scrolling="no" border="0" frameborder="0" style="border: 1px dotted #CCCCCC; padding-left: 1px; padding-right: 1px; padding-top: 1px; padding-bottom: 1">
+              </iframe>
+            </div>
+
+   </div>
+   <div class="buttons">
+     <%= link_to 'Editar', edit_persona_path(@persona), :class => "button back" %> 
+     <%= link_to 'Finalizar', personas_path, :class => "button delete" %>
+   </div>
+
+

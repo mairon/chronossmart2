@@ -1,0 +1,63 @@
+<div class="group">
+   <table class="head_grid">
+      <tr>
+         <td width="45" align="center"><%= t('CODE') %></td>
+         <td width="40" align="center">LC</td>
+         <td width="40" align="center">Origin</td>
+         <td width="60" align="center"><%= t('DATE') %></td>
+         <td width="100">Status</td>
+         <td width="80">Tabla Precio</td>
+         <td width="150">Vendedor</td>
+         <td width="280">Cliente</td>
+         <td width="70" align="right">Tot. Gs</td>
+         <td width="30" align="right">Cant.</td>
+         <td width="30" align="right">Fact.</td>
+         <td width="30" align="right">Dispo.</td>
+      </tr>
+   </table>
+   <div class="rolagem" dir="div">
+      <table>
+         <tr>
+          <% @presupuestos.each do |presupuesto| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="45" align="center"><%= presupuesto.id.to_s.rjust(6,'0') %></td>
+              <td width="45" align="center"><%= presupuesto.lista_carga_id.to_s.rjust(6,'0') %></td>
+              <td width="40" align="center" height="20">
+                <% if presupuesto.origem != nil %>
+                  <span style="background:green; color: #fff; border-radius: 4px;padding:4px;">EXT</span>
+                <% else %>
+                  <span style="background:#ffb600; color: #fff; border-radius: 4px;padding:4px;">INT</span>
+                <% end %>
+              </td>
+              <td width="60" align="center"><%= presupuesto.data.strftime("%d/%m/%y") %></td>
+              <td width="100" align="left">
+                <% if presupuesto.status == 0 %>
+                  PENDENTE
+                <% elsif presupuesto.status == 1 %>
+                  EN SEPARACIÓN
+                <% elsif presupuesto.status == 2 %>
+                  CARGANDO
+                <% elsif presupuesto.status == 3 %>
+                  FINALIZADO
+                <% end %>
+              </td>
+              <td width="80" align="left"><%= presupuesto.tabela_preco_nome %></td>
+              <td width="150" align="left"><%= truncate(presupuesto.vendedor, length: 16) %></td>
+              <td width="280" align="left"><%= truncate(presupuesto.persona_nome, length: 38) %></td>
+              <td width="70" align="right"><b><%= format_int(presupuesto.total_gs.to_f) %></b></td>
+              <td width="30" align="right"><b><%= presupuesto.qtd.to_i %></b></td>
+              <td width="30" align="right"><b><%= presupuesto.fact.to_i %></b></td>
+              <td width="30" align="right"><b><%= presupuesto.disp.to_i %></b></td>
+              <td>
+                <% if presupuesto.status == 0 %>
+                  <%= link_to 'Separar', '#', onclick: "Separacao('#{presupuesto.id}')" %>
+                <% elsif presupuesto.status == 1 %>
+                  <%= link_to 'Cargar', '#', onclick: "Carregar('#{presupuesto.venda_id}')" %>
+                <% end %>
+              </td>
+              <td><%= link_to 'CV', "#", onclick: "Comprovante(#{presupuesto.id})" %></td>
+            </tr>
+          <% end %>
+      </table>
+   </div>
+</div>

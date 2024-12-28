@@ -1,0 +1,28 @@
+<% count = 0 %>
+<% sum_saldo   = 0 %>
+<table class="head_grid">
+  <tr>
+    <td width="50"><%= t('CODE') %></td>
+    <td width="650">Producto</td>
+    <td width="100" align="right">Atual</td>
+  </tr>
+</table>
+<div class="rolagem" dir="div" style="height: 150px">
+  <table>
+    <% @stock_atual.each do |s| %>
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td width="50" ><%= s.produto_id.to_s.rjust(6,'0') %></td>
+      <td width="650" ><%= s.produto_nome %></td>
+      <td width="100" align="right"><%= format_decimal(s.saldo_atual) %></td>
+    </tr>
+    <% count += 1 %>
+    <% sum_saldo   += s.saldo_atual.to_f %>
+    <% end %>
+  </table>
+</div>
+<table>
+  <tr>
+    <td width="705"><b>Cantidad Registros: <%= count %></b></td>
+    <td width="100" align="right"><b><%= sum_saldo %></b></td>
+  </tr>
+</table>

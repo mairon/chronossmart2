@@ -1,0 +1,19 @@
+<h1>Listing diario_habers</h1>
+
+<table>
+  <tr>
+  </tr>
+
+<% @diario_habers.each do |diario_haber| %>
+  <% diario_haber.update_attribute :data, diario_haber.diario.data %>
+  <tr>
+    <td><%= link_to 'Show', diario_haber %></td>
+    <td><%= link_to 'Edit', edit_diario_haber_path(diario_haber) %></td>
+    <td><%= link_to 'Destroy', diario_haber, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New diario_haber', new_diario_haber_path %>

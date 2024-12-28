@@ -1,0 +1,28 @@
+<h1 id="header"><%= t('COUNTRIES') %></h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_paise_path, class: "button add" %>
+</div>
+
+<div class="group">
+<table class="head_grid">
+  <tr>
+    <td width="110"align="center"><%= t('CODE') %></td>
+    <td width="300"><%= t('COUNTRY') %></td>
+    <td width="50"></td>
+  </tr>
+</table>
+<div class="rolagem" id="div">
+<table>
+  <% for paise in @paises %>
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td width="110" align="center"><%= paise.id.to_s.rjust(6,'0') %></td>
+      <td width="300"><%= paise.nome %></td>      
+      <td><%= link_to '', edit_paise_path(paise), class: 'icon-pencil' %></td>
+      <td><%= link_to '', paise, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>
+    </tr>
+  <% end %>
+</table>
+
+
+</div>
+</div>

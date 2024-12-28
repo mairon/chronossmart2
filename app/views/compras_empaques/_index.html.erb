@@ -1,0 +1,35 @@
+
+<table class="head_grid">
+  <tr>
+    <td width="80" align="center">Ref.</td>
+    <td width="55">Tamanho</td>
+    <td width="230">Color</td>
+    <td width="350" >Producto</td>
+    <td width="200" >Barra</td>
+    <td width="70" align="right">Costo</td>
+    <td width="70" align="right">Precio Corri.</td>
+    <td width="70" align="right">Precio</td>
+    <td width="40" align="right">Cant.</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% compras_empaques.each do |compras_empaque| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="80"><%= compras_empaque.produtos_grade.produto.fabricante_cod %></td>
+        <td width="55"><%= compras_empaque.produtos_grade.tamanho.nome %></td>
+        <td width="230"><%= compras_empaque.produtos_grade.cor.nome %></td>
+        <td width="350"><%= compras_empaque.produtos_grade.produto.nome %></td>
+        <td width="200"><%= compras_empaque.barra %></td>
+        <td width="70" align="right"><%= number_to_currency(compras_empaque.custo_gs , :format=>' %n ', :precision => 0) %></td>
+
+        <td width="70" align="right"><%= number_to_currency(compras_empaque.preco_alterado_gs , :format=>' %n ', :precision => 0) %></td>
+        <td width="70" align="right"><%= number_to_currency(compras_empaque.preco_gs , :format=>' %n ', :precision => 0) %></td>
+        <td width="40" align="right"><%= compras_empaque.quantidade.to_i %></td>
+        <td><%= link_to t('DELETE'), compras_empaque, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

@@ -1,0 +1,44 @@
+<table>
+	<% tot_hr  = 0 %>
+	<% tot_min = 0 %>
+<% @dias_trabalhos.each do |dt| %>
+		<% if dt.entrada_turno_01.to_s != '' %>
+			<% et = dt.entrada_turno_01 %>
+			<% sd = dt.saida_turno_01 %>
+
+		<% else %>
+			<% et = '2001-01-01' %>
+			<% sd = '2001-01-01' %>
+		<% end %>
+
+		<% if dt.entrada_turno_02.to_s != '' %>
+			<% et_02 = dt.entrada_turno_02 %>
+			<% sd_02 = dt.saida_turno_02 %>
+
+		<% else %>
+			<% et_02 = '2001-01-01' %>
+			<% sd_02 = '2001-01-01' %>
+		<% end %>
+
+			<tr class = "<%= cycle("cor1", "cor2") %>">
+				<td width="80" align="center"><%= dt.data.strftime("%d/%m/%y") %></td>
+				<td width="60" align="center"><%= dt.entrada_turno_01.to_datetime.strftime("%H:%M") unless dt.entrada_turno_01.blank? %></td>
+				<td width="60" align="center"><%= dt.saida_turno_01.to_datetime.strftime("%H:%M") unless dt.saida_turno_01.blank? %></td>
+				<td width="60" align="center"><%= dt.entrada_turno_02.to_datetime.strftime("%H:%M") unless dt.entrada_turno_02.blank? %></td>
+				<td width="60" align="center"><%= dt.saida_turno_02.to_datetime.strftime("%H:%M") unless dt.saida_turno_02.blank? %></td>
+
+				<% if dt.entrada_turno_01.to_s != '' and   dt.saida_turno_01.to_s != '' %>
+					<td width="100" align="center"><%= Time.at((sd.to_time - et.to_time) + (sd_02.to_time - et_02.to_time) ).utc.strftime("%H:%M")  unless dt.entrada_turno_01.blank? %></td>	
+					<% tot_hr += (60 * Time.at((sd.to_time - et.to_time) + (sd_02.to_time - et_02.to_time) ).utc.strftime("%H").to_i) %>
+					<% tot_min += (Time.at((sd.to_time - et.to_time) + (sd_02.to_time - et_02.to_time) ).utc.strftime("%M").to_i) %>
+				<% else %>
+					<td width="100" align="center"></td>	
+				<% end %>
+			</tr>
+<% end %>
+			<tr class="head">
+				<td colspan="5"></td>
+					<% hm = (tot_hr + tot_min).divmod(60) %>
+				<td align="center"><%= hm.join(':') %></td>
+			</tr>
+</table>

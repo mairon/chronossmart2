@@ -1,0 +1,36 @@
+<h1 id="header">Unidades</h1>
+<div class="acessos">
+<%= link_to t('NEW'), new_unidade_path, class: 'button add' %>
+</div>
+
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="110" align="center"><%= t('CODE') %></td>
+      <td width="150" align="center">Logo</td>
+      <td width="300">Nombre</td>
+      <td width="300">Titulo Sistema</td>
+      <td width="79"></td>
+    </tr>
+    <tr>
+  </table>
+
+
+  <div class="rolagem" id="div">
+    <table  border="0"z>
+      <% @unidades.each do |unidade| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">        	
+          <td width="110"  align="center"><%=h unidade.id.to_s.rjust(6,'0') %></td>
+          <td width="150" align="center"><%= image_tag(unidade.avatar.url(:thumb), width: 50) %></td>
+          <td width="300"><%=h unidade.unidade_nome %></td>
+          <td width="300"><%=h unidade.nome_sys %></td>
+          <td><%= link_to '', edit_unidade_path(unidade), class: 'icon-pencil' %></td>
+          <td><%= link_to '', unidade, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+
+
+

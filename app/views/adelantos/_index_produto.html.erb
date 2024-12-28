@@ -1,0 +1,97 @@
+
+
+<table class="head_grid">
+   <tr>
+         <td width="30" align="center"></td>
+         <td width="80" align="center">Cod</td>
+         <td width="350" align="center">Producto</td>
+         <td width="100" align="center">Deposito</td>
+         <td width="80" align="center">Cantidad</td>
+         <td width="80" align="center">Unid. </td>
+         <td width="80" align="center">Total</td>
+         <td width="60" align="center"> % </td>
+         <td width="80" align="center"> Desc. </td>
+         <td width="80" align="center"> Costo </td>
+         <td width="80" align="center"> Precio Venta </td>
+   </tr>
+</table>
+
+<div class="rolagem" dir="div">
+
+   <table>
+      <% indice          = 1  %>
+      <% quantidade      = 0  %>
+      <% total_dolar     = 0  %>
+      <% total_guarani   = 0  %>
+      <% porcen          = 0  %>
+      <% desc_dolar      = 0  %>
+      <% desc_guarani    = 0  %>
+      <% for compras_produto in compras_produtos %>
+      
+         <tr class = "<%= cycle("cor1", "cor2") %>">
+               <!--COMPRA !-->
+                  <td width="30" align="center">   <%=  indice %></td>
+                  <td width="80" align="center">   <%=  compras_produto.id %></td>
+                  <% end %>
+                  <td width="350" align="left">    <%= compras_produto.produto_nome%></td>
+                  <td width="100" align="left">    <%= compras_produto.deposito_nome%></td>
+                  <td width="80" align="center">   <%= compras_produto.quantidade%></td>
+               <% if @compra.moeda == 0%>
+
+                  <td width="80" align="right">   <%= number_to_currency( compras_produto.unitario_dolar,       :format =>' %n ', :separator => "," )  %></td>
+                  <td width="80" align="right">   <%= number_to_currency( compras_produto.total_dolar,          :format =>' %n ', :separator => "," )  %></td>
+                  <td width="60" align="center">  <%= compras_produto.porcentagem_produto%></td>
+                  <td width="80" align="right">   <%= number_to_currency( compras_produto.desconto_dolar,          :format =>' %n ', :separator => "," )  %></td>
+                  <td width="80" align="right">   <%= number_to_currency( compras_produto.custo_contabil_dolar,          :format =>' %n ', :separator => "," )  %></td>
+                  <td width="80" align="right">   <%= number_to_currency( compras_produto.preco_venda_dolar,          :format =>' %n ', :separator => "," )  %></td>
+
+                  <% desc_dolar     = desc_dolar  +  compras_produto.desconto_dolar %>
+                  
+               <% else %>
+
+                  <td width="80" align="right">   <%= number_to_currency( compras_produto.unitario_guarani,       :format =>' %n ',:precision => 0 )  %></td>
+                  <td width="80" align="right">   <%= number_to_currency( compras_produto.total_guarani,          :format =>' %n ',:precision => 0 )  %></td>
+                  <td width="60" align="center">  <%= compras_produto.porcentagem_produto%></td>
+                  <td width="80" align="right">   <%= number_to_currency( compras_produto.desconto_guarani,          :format =>' %n ',:precision => 0 ) %></td>
+                  <td width="80" align="right">   <%= number_to_currency( compras_produto.custo_contabil_guarani,    :format =>' %n ',:precision => 0 )%></td>
+                  <td width="80" align="right">   <%= number_to_currency( compras_produto.preco_venda_guarani,    :format =>' %n ',:precision => 0 )%></td>
+
+                  <% desc_guarani   = desc_guarani +  compras_produto.desconto_guarani %>
+
+               <% end %>
+                                                
+            <td><a href="/compras_produtos/<%=compras_produto.id%>/edit" >Editar</a> </td>
+            <td><%= link_to t('DELETE'), compras_produto, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+         </tr>
+
+         <% indice         = indice + 1 %>
+         <% total_guarani  = total_guarani +  compras_produto.total_guarani %>
+         <% total_dolar    = total_dolar +  compras_produto.total_dolar %>
+         <% quantidade     = quantidade +  compras_produto.quantidade %>
+         <% porcen         = porcen +  compras_produto.porcentagem_produto %>
+
+      <% end %>
+         
+   </table>
+</div>
+
+<!-- RESULTDOS!-->
+<table>
+      <tr>
+         <td width="600"></td>
+         <td width="80"><%=quantidade%></td>
+         <td width="40"></td>
+         <% if @compra.moeda == 0  %>
+            <td width="80" align="right"><%=  number_to_currency( total_dolar,       :format =>' %n ', :separator => "," )%></td>
+         <% else %>
+            <td width="80" align="right"><%=number_to_currency( total_guarani,       :format =>' %n ', :precision => 0 )%></td>
+         <% end %>
+         <td width="70" align="center"><%=porcen%></td>
+         <% if @compra.moeda == 0  %>
+            <td width="70" align="right"><%=  number_to_currency( desc_dolar,       :format =>' %n ', :separator => "," )%></td>
+         <% else %>
+            <td width="70" align="right"><%=number_to_currency( desc_guarani,       :format =>' %n ', :precision => 0 )%></td>
+         <% end %>
+      </tr>
+</table>
+

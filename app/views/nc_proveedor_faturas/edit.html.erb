@@ -1,0 +1,44 @@
+<h1>Editing nc_proveedor_fatura</h1>
+
+<% form_for(@nc_proveedor_fatura) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :nc_proveedor_id %><br />
+    <%= f.text_field :nc_proveedor_id %>
+  </p>
+  <p>
+    <%= f.label :persona_id %><br />
+    <%= f.text_field :persona_id %>
+  </p>
+  <p>
+    <%= f.label :persona_nome %><br />
+    <%= f.text_field :persona_nome %>
+  </p>
+  <p>
+    <%= f.label :documento_numero_01 %><br />
+    <%= f.text_field :documento_numero_01 %>
+  </p>
+  <p>
+    <%= f.label :documento_numero_02 %><br />
+    <%= f.text_field :documento_numero_02 %>
+  </p>
+  <p>
+    <%= f.label :documento_numero %><br />
+    <%= f.text_field :documento_numero %>
+  </p>
+  <p>
+    <%= f.label :status %><br />
+    <%= f.text_field :status %>
+  </p>
+  <p>
+    <%= f.label :data %><br />
+    <%= f.date_select :data %>
+  </p>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @nc_proveedor_fatura %> |
+<%= link_to 'Back', nc_proveedor_faturas_path %>

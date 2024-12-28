@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<title>Chronos BI - Login</title>
+  		<%= stylesheet_link_tag 'logins' %>
+  		<%= javascript_include_tag 'logins' %>
+  		<%= csrf_meta_tag %>
+    <link rel="shortcut icon" href="/assets/icon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+	</head>
+
+	<body class="loginpage">
+			<section class="loginbox">
+				<section class="content-loginbox">
+					<h1 align="center"><%= image_tag "logo-bi-b.png", width: '190' %></h1>
+	    		<%= yield %>
+	    	</section>
+    	</section>
+
+		<div class="flash_notice">
+			<p align="center">
+				<%= flash[:notice] %></br>
+		  </p> 
+		</div>
+	</body>
+</html>

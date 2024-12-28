@@ -1,0 +1,88 @@
+<%= form_for(@meta_detalhe) do |f| %>
+  <% if @meta_detalhe.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@meta_detalhe.errors.count, "error") %> prohibited this meta_detalhe from being saved:</h2>
+
+      <ul>
+      <% @meta_detalhe.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %><%= f.hidden_field :persona_id %>
+  <%= f.hidden_field :meta_id %>
+  <%= f.hidden_field :setor_id %>
+
+  <div class="tab_container">
+    <div id="tab1" class="tab_content">
+
+      <table>
+        <tr>
+          <td width="1000">
+            <fieldset>
+                <table>
+                  <tr> 
+                    <td align="right">Empleado :</td>
+                    <td ><%= f.collection_select :persona_id, Persona.where("tipo_funcionario = 1", :select => ' id,nome',
+                             :order  => '2' ), :id,
+                             :nome %></td>                      
+                  </tr>
+
+                  <tr>
+                    <td align="right">Setor :</td>
+                      <td colspan="1"><%= f.collection_select :setor_id, Setor.all( :select => ' id,nome',
+                                          :order  => '2' ), :id,
+                                          :nome %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Valor Minimo U$ :</td>
+                    <td colspan="1"><%= f.text_field :valor_min_us, :size => 15 %></td>
+                    
+                    <td align="right">Valor Maximo U$ :</td>
+                    <td colspan="1"><%= f.text_field :valor_max_us, :size => 15 %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Valor Minimo G$ :</td>
+                    <td colspan="1"><%= f.text_field :valor_min_gs, :size => 15 %></td>
+            
+                    <td align="right">Valor Maximo G$ :</td>
+                    <td colspan="1"><%= f.text_field :valor_max_gs, :size => 15 %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Valor Minimo R$ :</td>
+                    <td colspan="1"><%= f.text_field :valor_min_rs, :size => 15 %></td>
+                  
+                    <td align="right">Valor Maximo R$ :</td>
+                    <td colspan="1"><%= f.text_field :valor_max_rs, :size => 15 %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Comisión Minimo :</td>
+                    <td colspan="1"><%= f.text_field :comicao_min, :size => 15 %></td>
+                  
+                    <td align="right">Comisión Maximo :</td>
+                    <td colspan="1"><%= f.text_field :comicao_max, :size => 15 %></td>
+                  </tr>
+
+                  <table>
+                  <tr>
+                    <td align="right">Descricao :</td>
+                    <td colspan="1"><%= f.text_area :descricao,
+                                          :cols => 80, :rows => 4 %></td>
+                  </tr>
+                  </table>
+
+                  <tr>
+                    <td><%= f.submit :value => t('SAVE'), :class => "button" %></td>
+                  </tr>
+                </table>
+              </fieldset>                    
+            </td>
+          </tr>
+        </table>
+
+<% end %>
+</div>

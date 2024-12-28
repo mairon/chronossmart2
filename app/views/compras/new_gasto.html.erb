@@ -1,0 +1,10 @@
+<% if params[:fiscal] == 'true' %>
+	<%= render :partial => "/compras/eps/form_gasto_fiscal" %>
+<% else %>
+	<% if params[:prov_gasto] == 'true' %>
+		<%= render :partial => "/compras/eps/modal_form_gasto" %>
+	<% else %>
+		<%= render :partial => "/compras/eps/form_gasto" %>	
+	<% end %>
+	
+<% end %>

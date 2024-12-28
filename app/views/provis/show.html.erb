@@ -1,0 +1,110 @@
+<ul class="tabs">
+  <li><a href="#tab1">Provisionamento de costos Detalhe</a></li>
+</ul>
+<div class="tab_container">
+<br/>
+<table>
+
+    <tr>
+      <td>
+        <div class="group">
+        <table>
+          <tr>
+            <td align="right">Centro de Costo:</td>
+            <td><b><%= @provi.centro_custo.nome %></b></td>
+          </tr>
+          <tr>
+            <td align="right">Clasificación:</td>
+            <td><b><%= @provi.rubro.descricao %></b></td>
+          </tr>
+          <tr>
+            <td align="right">Total:</td>
+            <td align="right">
+              <b>
+                <% if @provi.moeda == 0 %>
+                  U$. <%= format_decimal( @provi.valor_us)  %>
+                  <% elsif @provi.moeda == 1  %>
+                  G$. <%= format_int( @provi.valor_gs)  %>
+                  <% else  %>
+                  R$. <%= format_decimal( @provi.valor_gs)  %>
+                <% end %>
+              </b>
+            </td>
+          </tr>
+        </table>
+        </div>
+
+
+      </td>
+    </tr>
+    <tr>
+    <td>
+      <div class="group">
+
+        <div class="grid">
+          <table class="head_grid">
+            <tr>
+              <td width="60">Periodo</td>
+              <td width="80" align="center"><%= t('DATE') %></td>
+              <td width="70" align="right"><%= t('VALUE') %></td>
+            </tr>
+          </table>
+
+          <div class="rolagem" dir="div">
+            <table>
+              <% tot = 0 %>
+              <% @provi_detalhes.each do |ac| %>
+                <tr class="<%= cycle("cor1", "cor2")%>">
+                  <td width="60"><%= ac.periodo %></td>
+                  <td width="80" align="center"><%= ac.data.strftime("%d/%m/%y") %></td>
+                  <td width="70" align="right">
+                    <% if ac.moeda == 0 %>
+                      <%= ac.valor_us %>
+                      <% tot += ac.valor_us %>
+                    <% elsif ac.moeda == 2 %>
+                      <%= ac.valor_rs %>
+                      <% tot += ac.valor_rs %>
+                    <% else %>
+                      <%= ac.valor_gs %>
+                      <% tot += ac.valor_gs %>
+                    <% end %>
+                  </td>
+                  <td><%= link_to 'Editar', edit_adelanto_cota_path(ac) %></td>
+                  <td><%= link_to t('DELETE'), ac, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+                </tr>
+              <% end %>
+            </table>
+          </div>
+        </div>
+      </div>
+          <div class="buttons">
+
+            <%= link_to t('BACK'), edit_provi_path(@provi), :class => "button back" %>
+            <%= link_to 'Finalizar', "#" , :class => "button delete", :onclick => "ValidCompra()" %>
+            <%= link_to t('NEW'), new_provi_path, :class => "button add" %>
+          </div>
+          <script>
+            function ComprovanteRecibo(){
+              window.open('/provis/' + document.getElementById('id').value+'/recibo', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+            }
+
+            function Comprovante(){
+              window.open('/provis/' + document.getElementById('id').value+'/comprovante', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+            }
+
+            function ValidCompra(){
+              var saldo = parseFloat( document.getElementById("fac").value.replace(/\./g, "").replace(",", "."))
+              var sum   = parseFloat( document.getElementById("sum").value.replace(/\./g, "").replace(",", ".") )
+              if (saldo != sum){
+                alert('La suma nos igual de lo documento');
+              }
+              else{
+                location.href="/provis"
+              }
+            }
+
+          </script>
+    </td>
+  </tr>
+</table>
+</div>

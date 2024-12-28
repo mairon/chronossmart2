@@ -1,0 +1,184 @@
+<style>
+  td{
+    padding: 2px;
+    border-bottom: 1px solid #efefef !important;
+  }
+</style>
+
+<table class="head_grid">
+  <tr>
+    <td width="40"></td>
+    <td width="20"></td>
+    <td width="20"></td>
+    <td width="60" align="center">Titulo</td>
+    <td width="60" align="center">Venc.</td>
+    <td width="150">Cliente</td>
+    <td width="150">Descrição</td>
+    <td width="180">Favorecido</td>
+    <td width="100">CPF/CNPJ</td>
+    <td width="250">Banco</td>
+    <td width="25"></td>
+    <td width="70" align="right">Saldo</td>
+    <td width="100"></td>
+  </tr>
+</table>
+<div>
+  <table>
+    <% @saldo_us = 0 %>
+    <% @saldo_gs = 0 %>
+    <% @saldo_rs = 0 %>
+    <% @hoje_us = 0 %>
+    <% @hoje_gs = 0 %>
+    <% @hoje_rs = 0 %>
+
+    <% divida_us = 0 %>
+    <% divida_gs = 0 %>
+    <% divida_rs = 0 %>
+
+    <% cobro_us = 0 %>
+    <% cobro_gs = 0 %>
+    <% cobro_rs = 0 %>
+
+<style>
+  .hoje{
+    border-left: 6px solid #f2b835;
+  }
+
+  .venc{
+    border-left: 6px solid #e33d43;
+  }
+</style>
+    <% @proveedores.each do |f| %>
+      <% if Time.now.strftime("%d/%m/%y") == f.vencimento.to_date.strftime("%d/%m/%y") %>
+        <% h = "hoje" %>
+        <% if f.moeda.to_i == 0 %>
+          <% @hoje_us += (f.divida_dolar.to_f ) %>
+        <% elsif f.moeda.to_i == 1 %>
+          <% @hoje_gs += (f.divida_guarani.to_f) %>
+        <% else %>
+          <% @hoje_rs += (f.divida_real.to_f) %>
+        <% end %>
+      <% elsif Time.now.strftime("%d/%m/%y") > f.vencimento.to_date.strftime("%d/%m/%y") %>
+        <% v = "venc" %>
+      <% end %>
+      <tr class="acao <%= cycle("cor1", "cor2") %> <%= raw h %> <%= raw v %>" id="t-<%= f.titulo %>">
+        <td width="30">
+          <% if params[:usuario_id].blank? %>
+            <%= link_to "#separa-titulo", onclick:"AtualizaPagoPor(#{f.titulo})" do %>
+              <span><%= image_tag('separacao.png', height: '25px', title: 'Separar para Pagamento')%></span>
+            <% end %>
+          <% else %>
+            <td width="30">
+              <%= link_to "#separa-titulo", onclick:"AtualizaVoltarPagoPor(#{f.titulo})" do %>
+                <span><%= image_tag('back.png', height: '20px')%></span>
+              <% end %>
+            </td>
+          <% end %>
+        </td>
+
+        <td width="30">
+          <% if f.count_mov.to_i == 1 %>
+            <% if params[:status] != 'cancelado' %>
+              <%= link_to "#cancela-titulo", onclick:"AtualizaCancelaTitulo(#{f.titulo}, false)" do %>
+                <span><%= image_tag('multiply.png', height: '25px', title: 'Cancelar Titulo')%></span>
+              <% end %>
+
+            <% else %>
+
+              <%= link_to "#cancela-titulo", onclick:"AtualizaCancelaTitulo(#{f.titulo}, true)" do %>
+                <span><%= image_tag('back.png', height: '20px')%></span>
+              <% end %>
+
+            <% end %>
+          <% end %>
+        </td>
+
+        <td width="60">
+
+          <%= link_to  '#titulo-historico', "data-toggle" => "modal", "data-target" => "#titulo-historico", "data-id" => "#{f.id}", "data-id" => "#{f.id}",
+          "data-moeda" => "#{f.moeda}",
+          "data-cota" => "#{f.cota}",
+          "data-documento-numero-01" => "#{f.documento_numero_01}",
+          "data-documento-numero-02" => "#{f.documento_numero_02}",
+          "data-documento-numero" => "#{f.documento_numero}",
+          "data-titulo" => "#{f.titulo}",
+          "data-titulo-descr" => "#{f.titulo.to_s.rjust(6,'0')}",
+          "data-persona-id" => "#{f.persona_id}" do %>
+            <%= f.titulo.to_s.rjust(6,'0') %>
+          <% end %>
+
+        </td>
+
+        <td width="60" align="center"><b><%= f.vencimento.strftime("%d/%m/%y") %></b></td>
+        <td width="150"><%= f.persona_nome %></td>
+        <td width="150"><small><%= f.descricao %></small></td>
+        <td width="180"><small><%= f.favorecido %></small></td>
+        <td width="100"><small><%= f.ruc %></small></td>
+        <td width="250">
+          <small><%= f.banco_nome %></small><br>
+          Ag: <small><%= f.bc_agencia %></small> <br>
+          CC: <small><%= f.bc_conta %></small><br>
+          Tipo <small><%= f.tipo_conta %></small>
+        </td>
+
+        <% if f.moeda.to_i == 0 %>
+          <td width="25" align="center" class="us">U$</td>
+          <td width="70" align="right"><b><%= format_decimal(f.divida_dolar) %></b></td>
+          <% @saldo_us += f.divida_dolar.to_f %>
+          <% divida_us += f.divida_dolar.to_f %>
+          <% cobro_us += 0 %>
+        <% elsif f.moeda.to_i == 1 %>
+          <td width="25" align="center" class="gs">Gs.</td>
+          <td width="70" align="right"><b><%= format_int(f.divida_guarani) %></b></td>
+          <% divida_gs += f.divida_guarani.to_f %>
+          <% cobro_gs += 0 %>
+          <% @saldo_gs += f.divida_guarani.to_f %>
+        <% else %>
+          <td width="25" align="center" class="rs">R$</td>
+          <td width="70" align="right"><b> <%= format_decimal(f.divida_real) %></b></td>
+          <% divida_rs += f.divida_real.to_f %>
+          <% cobro_rs += 0 %>
+          <% @saldo_rs += f.divida_real.to_f %>
+        <% end %>
+        <td width="50">
+          <%= link_to  '#modal-efetivar-pg', class: 'bt-list btn-success', "data-toggle" => "modal",
+          "data-target" => "#modal-efetivar-pg", "data-id" => "#{f.id}",
+          "data-moeda" => "#{f.moeda}",
+          "data-saldo-us" => "#{format_decimal(f.divida_dolar) }",
+          "data-saldo-gs" => "#{format_int(f.divida_guarani) }",
+          "data-saldo-rs" => "#{format_decimal(f.divida_real)}",
+          "data-cota" => "#{f.cota}",
+          "data-documento-numero-01" => "#{f.documento_numero_01}",
+          "data-documento-numero-02" => "#{f.documento_numero_02}",
+          "data-documento-numero" => "#{f.documento_numero}",
+          "data-rubro-id" => "#{f.rubro_id.to_i}",
+          "data-tot-cotas" => "#{f.tot_cotas.to_i}",
+          "data-descricao" => "#{f.descricao}",
+          "data-titulo" => "#{f.titulo}",
+          "data-persona-id" => "#{f.persona_id}",
+          "data-favorecido" => "#{f.favorecido}",
+          "data-banco-nome"=> "#{f.banco_nome}",
+          "data-bc-agencia"=> "#{f.bc_agencia}",
+          "data-bc-conta"=> "#{f.bc_conta}",
+          "data-tipo-conta"=> "#{f.tipo_conta}" do %>
+            <img src="/assets/dollar-currency-symbol.png"> Pagar
+          <% end %>
+
+        </td>
+        <td width="30">
+          <%= link_to '', edit_proveedore_path(f.id), class: "icon-pencil", target: '_blank' %>
+          <% if current_user.tipo.to_i <= 1 %>
+            <% if f.count_mov.to_i == 1 %>
+              <%= link_to '', f, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %>
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+      <tr>
+        <td colspan="10"></td>
+        <td class='bold' align="right"><%= format_decimal(@saldo_rs) %></td>
+      </tr>
+
+  </table>
+</div>

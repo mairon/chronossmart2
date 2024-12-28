@@ -1,0 +1,5 @@
+<% if params[:status] == '0' %>
+	<%= render :partial => "ficha_stock_resumido"  %>
+<% else %>
+	<%= render :partial => "ficha_stock_detalhado"  %>
+<% end %>

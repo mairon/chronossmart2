@@ -1,0 +1,217 @@
+   <table>
+      <% quebra       = "" %>
+      <% subdivida    = 0 %>
+      <% subcobro     = 0 %>
+      <% subsaldo     = 0 %>
+      <% totdivida    = 0 %>
+      <% subint       = 0 %>
+      <% totdividaint = 0 %>
+      <% totint       = 0 %>
+      <% subdividaint = 0 %>
+      <% totcobro     = 0 %>
+      <% count        = 0 %>
+	  <% empresa = Empresa.last(:select => "taxa_interes") %>
+      <% @clientes.each do |cliente|%>
+         <% pp = VendasProduto.all(:select=> 'id,produto_id,produto_nome,persona_nome,quantidade,unitario_real,total_real',:conditions => ["persona_id = ? AND venda_id = ?",cliente.persona_id.to_i,cliente.venda_id.to_i]) if params[:detalhe] == "2"%>
+
+         <%if quebra != cliente.persona_nome  %>
+
+            <%if quebra != "" %>
+
+               <%subsaldo = subdivida.to_f - subcobro.to_f %>
+               <tr class="head">
+                  <td colspan="9"></td>
+
+            		<% if params[:int] == "0" %>            
+                  		<td align="right"><%= number_to_currency(subint, :format=>' %n ', :separeitor => ',') %></td>
+                  		<td align="right"><%= number_to_currency(subdividaint, :format=>' %n ', :separeitor => ',') %></td>
+               			<% subint       = 0 %>               
+               			<% subdividaint = 0 %>
+            		<% elsif params[:int] == "1" %>            
+                  		<td align="right"><%= number_to_currency(subdivida, :format=>' %n ', :separeitor => ',') %></td>
+               			<% subdivida    = 0 %>
+                  	<% else %>
+                  		<td align="right"><%= number_to_currency(subint, :format=>' %n ', :separeitor => ',') %></td>
+                  		<td align="right"><%= number_to_currency(subdividaint, :format=>' %n ', :separeitor => ',') %></td>
+                  		<td align="right"><%= number_to_currency(subdivida, :format=>' %n ', :separeitor => ',') %></td>
+
+               			<% subint       = 0 %>               
+               			<% subdividaint = 0 %>
+               			<% subdivida    = 0 %>
+
+                  	<% end %>
+                  		<td align="right"><%= number_to_currency(subcobro, :format=>' %n ', :separeitor => ',') %></td>
+                  		<td align="right"><%= number_to_currency(subsaldo, :format=>' %n ', :separeitor => ',') %></td>
+        		        
+        		        <% subcobro     = 0 %>
+		                <% subsaldo     = 0 %>
+              
+               </tr>
+
+               <tr>
+                  <td></td>
+               </tr>
+              
+            <%end%>
+
+            <td colspan="1"></td>
+            <td class="head" colspan="10"><%= cliente.persona_id %> - <%= quebra = cliente.persona_nome %>  - Ruc/CI <%= cliente.ruc %> - Tel.: <%= cliente.telefone %>  </td>
+
+         <% end %>
+         <% if cliente.cobro_real.to_f > 0 %>
+            <% status = " - PG" %>
+         <% end %>
+
+         <% if  cliente.documento_nome == "COMPROBANTE VENTA"%>
+            <% comprovante = "CV" %>
+
+         <% elsif cliente.documento_nome == "CANCELACION ANTICIPO" %>
+            <% comprovante = "CAT" %>
+         <% elsif cliente.documento_nome == "NOTA DE CREDITO" %>
+            <% comprovante = "NC" %>
+            
+         <% elsif cliente.documento_nome == "ANTICIPO" %>
+            <% comprovante = "AT" %>
+         <% else %>
+         
+            <% comprovante = "FV" %>
+         <% end %>
+
+         <% if params[:detalhe] == "2" %>
+            <tr class = "head" height="20">
+            <% else %>
+            <tr>
+            <% end %>
+            <td width="60" align="center">  <%=h cliente.data.strftime("%d/%m/%Y")%> </td>
+            <td width="30" align="center">  <%=h cliente.persona_id%> </td>
+            <td width="100" align="left">   <%=h truncate( cliente.vendedor_nome, :length => 15 ) %> </td>
+            <td width="60" align="left">    <%=h comprovante %> <%= status %></td>
+            <td width="150" align="center"> <%=h cliente.documento_numero_01%> - <%=h cliente.documento_numero_02%> - <%=h cliente.documento_numero%> </td>
+            <td width="5" align="center">   <%=h cliente.cota %> </td>
+            <td width="5" align="center">   <%=h cliente.local_pago %> </td>
+            <td width="60" align="center">  <%=h cliente.vencimento.strftime("%d/%m/%Y")%> </td>
+            
+            <td width="5" align="center">   <%= dias = Date.today - cliente.vencimento.to_date if cliente.liquidacao == 0 && (Date.today - cliente.vencimento.to_date) >= 0 %> </td>          
+            <%  interes = ( ( dias.to_i * empresa.taxa_interes.to_f ) * cliente.divida_real.to_f) / 100  %>
+            
+            <% if params[:int] == "0" %>            
+            	<td width="40" align="right"><%= number_to_currency(interes.to_f, :format=>' %n ', :separeitor => ',' )%> </td>
+            	<td width="70" align="right">   <%=h number_to_currency(coninteres = ( interes.to_f + cliente.divida_real ), :format=>' %n ', :separeitor => ',' )%> </td>
+	
+         		<%  subdividaint += coninteres.to_f %>
+         		<%  totdividaint += coninteres.to_f %>
+
+            <% elsif params[:int] == "1" %> 	
+            	<td width="70" align="right">   <%=h number_to_currency(cliente.divida_real, :format=>' %n ', :separeitor => ',' )%> </td>
+	            <%  subdivida    += cliente.divida_real.to_f %>
+	            <%  totdivida    += cliente.divida_real.to_f %>
+
+            <% else %>
+            	<td width="40" align="right"> <%= number_to_currency(interes.to_f, :format=>' %n ', :separeitor => ',' )%> </td>
+            	<td width="70" align="right">   <%=h number_to_currency(coninteres = ( interes.to_f + cliente.divida_real ), :format=>' %n ', :separeitor => ',' )%> </td>
+            	<td width="70" align="right">   <%=h number_to_currency(cliente.divida_real, :format=>' %n ', :separeitor => ',' )%> </td>
+
+		        <%  subdividaint += coninteres.to_f %>
+	            <%  totdividaint += coninteres.to_f %>
+	            <%  subdivida    += cliente.divida_real.to_f %>
+	            <%  totdivida    += cliente.divida_real.to_f %>
+
+            <% end %>
+            
+            <td width="70" align="right">   <%=h number_to_currency(cliente.cobro_real,  :format=>' %n ', :separeitor => ',' )%> </td>
+            <td width="70" align="right"></td>
+         </tr>
+         
+         <%  subint       += interes.to_f%>
+         <%  totint       += interes.to_f%>
+         <%  subcobro     += cliente.cobro_real.to_f %>
+         <%  totcobro     += cliente.cobro_real.to_f %>
+         <%  count        += 1 %>
+
+         <% if params[:detalhe].to_s == "2" and ( cliente.divida_guarani + cliente.divida_real ) > 0%>
+               <tr>
+                  <td></td>
+                  <td align="center">Cod.</td>
+                  <td align="left" colspan="7">Descricao</td>
+                  <td align="right">Cantidad</td>
+                  <td align="right">Unit.</td>
+                  <td align="right">Tot.</td>
+               </tr>
+               <tr>
+                  <td></td>
+                  <td colspan="11">---------------------------------------------------------------------------------------------------------------</td>
+               </tr>
+
+            <% pp.each do |produto| %>
+               <%cod = Produto.find_by_id(produto.produto_id)%>
+               <tr class = "<%= cycle( "cor1", "cor2" )%>">
+                  <td></td>
+                  <td align="center">  <%=h cod.id %> </td>
+                  <td align="left" colspan="7">  <%=h produto.produto_nome %> </td>
+                  <td align="right">  <%=h produto.quantidade %> </td>
+                  <td align="right">  <%=h number_to_currency(produto.unitario_real, :format=>' %n ', :separeitor => ',') %> </td>
+                  <td align="right">  <%=h number_to_currency(produto.total_real, :format=>' %n ',  :separeitor => ',') %> </td>
+               </tr>
+
+            <% end %>
+         <% end %>
+
+      <% end %>
+
+      <% subsaldo = subdivida.to_f- subcobro.to_f %>
+
+      <tr class="head" >
+         <td colspan="9"></td>
+            		<% if params[:int] == "0" %>            
+                  		<td align="right"><%= number_to_currency(subint, :format=>' %n ', :separeitor => ',') %></td>
+                  		<td align="right"><%= number_to_currency(subdividaint, :format=>' %n ', :separeitor => ',') %></td>
+               			<% subint       = 0 %>               
+               			<% subdividaint = 0 %>
+            		<% elsif params[:int] == "1" %>            
+                  		<td align="right"><%= number_to_currency(subdivida, :format=>' %n ', :separeitor => ',') %></td>
+               			<% subdivida    = 0 %>
+                  	<% else %>
+                  		<td align="right"><%= number_to_currency(subint, :format=>' %n ', :separeitor => ',') %></td>
+                  		<td align="right"><%= number_to_currency(subdividaint, :format=>' %n ', :separeitor => ',') %></td>
+                  		<td align="right"><%= number_to_currency(subdivida, :format=>' %n ', :separeitor => ',') %></td>
+
+               			<% subint       = 0 %>               
+               			<% subdividaint = 0 %>
+               			<% subdivida    = 0 %>
+
+                  	<% end %>
+                  		<td align="right"><%= number_to_currency(subcobro, :format=>' %n ', :separeitor => ',') %></td>
+                  		<td align="right"><%= number_to_currency(subsaldo, :format=>' %n ', :separeitor => ',') %></td>
+        		        
+        		        <% subcobro     = 0 %>
+		                <% subsaldo     = 0 %>
+      </tr>
+      
+      <%  totsaldo = totdivida - totcobro %>
+
+      <tr class="head"   height="50" >
+         <td colspan="8">Anteriro : <%= number_to_currency( @saldo_anterior, :format=>' %n ', :separeitor => ',') %></td>      
+         <td>Total:</td>
+            <% if params[:int] == "0" %>            
+		         <td align="right"><%= number_to_currency(totint, :format=>' %n ', :separeitor => ',') %></td>
+        		 <td align="right"><%= number_to_currency(totdividaint, :format=>' %n ', :separeitor => ',') %></td>
+            <% elsif params[:int] == "1" %>            
+         		 <td align="right"><%= number_to_currency(totdivida, :format=>' %n ', :separeitor => ',') %></td>
+			<% else %>
+		         <td align="right"><%= number_to_currency(totint, :format=>' %n ', :separeitor => ',') %></td>
+        		 <td align="right"><%= number_to_currency(totdividaint, :format=>' %n ', :separeitor => ',') %></td>
+         		 <td align="right"><%= number_to_currency(totdivida, :format=>' %n ', :separeitor => ',') %></td>
+			<% end %>
+         		 <td align="right"><%= number_to_currency(totcobro, :format=>' %n ', :separeitor => ',') %></td>
+         		 <td align="right"><%= number_to_currency(totsaldo.to_f + @saldo_anterior.to_f, :format=>' %n ', :separeitor => ',') %></td>
+      </tr>
+      
+   </table>
+
+
+
+
+
+
+
+

@@ -1,0 +1,90 @@
+<style type="text/css">
+  .rolagem td, .head_grid td{
+    cursor:pointer;
+    color: #000 !important;
+    font-size: 14px;
+  }
+</style>
+
+
+
+  <h1 id="header"><%= t('SALES') %></h1>
+  <div class="acessos">
+
+    <% if VendasConfig.last.pdv_popup == true %>
+      <a href="#" onclick="openPopup()" class="button add">Nuevo</a>
+      <script>
+      function openPopup()//w  w  w.  j  a  v a  2s .com
+      {
+         var popup = window.open("/vendas/new?tipo_venda=0", "popup", "fullscreen");
+        if (popup.outerWidth < screen.availWidth || popup.outerHeight < screen.availHeight)
+        {
+           popup.moveTo(0,0);
+           popup.resizeTo(screen.availWidth, screen.availHeight);
+        }
+      }
+
+      </script>
+    <% else %>
+      <a href="/vendas/new?tipo_venda=0" class="button add">Nuevo</a>
+    <% end %>
+
+  </div>
+  <div class="group">
+    <form>
+      <input type="hidden" id="processo" name="processo" value="<%= params[:processo] %>" size="5">
+        <table>
+          <tr>
+            <!--FILTRO_DATA!-->
+            <td align="right">De:</td>
+            <td colspan="2">
+              <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+              <div class="input-group-addon-f">
+                <span class="icon-calendar"></span>
+              </div>
+            <td style="padding-left: 10px"><%= t('TO') %></td>
+            <td>
+              <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+              <div class="input-group-addon-f">
+                <span class="icon-calendar"></span>
+              </div>
+            </td>
+            <td>
+              <select name="tipo" id="tipo">
+                <option>CLIENTE</option>
+                <option>CODIGO</option>
+                <option><%= t('DOC').upcase %></option>
+                <option selected>COMANDA</option>
+              </select>
+            </td>
+            <td colspan="4">
+              <input id="busca" name="busca" type="text" onkeyup = "pesquisa(this.value),f(this)"onkeydown = "f(this)" size="35" autocomplete="off"/>
+            </td>
+            <td>
+              <select name="finalidade" id="finalidade">
+                <option>VENTA </option>
+                <option>PRESUPUESTO</option>
+              </select>
+            </td>
+            <td>
+              <input type="button" class="btn btn-blue" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar" />
+
+              <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;") %>
+
+            </td>
+          </tr>
+        </table>
+        <% abertura = AberturaCaixa.last(:conditions => ["status = true and usuario_id = #{current_user.id} and unidade_id = #{current_unidade.id}"]) %>
+        <input type="hidden" id="caixa" value="<%= abertura.id unless abertura.nil? %>">
+
+      </form>
+   	</div>
+
+   	<div id="pagina"></div>
+<script language="javascript">
+  function pesquisa(valor){
+    url="/vendas/busca_vendas?" + $('form').serialize();
+    ajax(url);
+  }
+</script>
+<%= javascript_include_tag 'busca_ajax' %>

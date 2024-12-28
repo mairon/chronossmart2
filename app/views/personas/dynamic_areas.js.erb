@@ -1,0 +1,5 @@
+$('#persona_cidade_area_id').empty();
+$('#persona_cidade_area_id').append('<option value="">Selecione a Área</option>');
+<% for ne in @areas %>
+  $('#persona_cidade_area_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+<% end %>

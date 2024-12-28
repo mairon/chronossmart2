@@ -1,0 +1,83 @@
+<div class="group">
+  <%= form_for(sueldos_detalhe) do |f| %>
+  <%= f.hidden_field :sueldo_id %>
+  <%= f.hidden_field :persona_id, :value => @sueldo.persona_id %>
+  <%= f.hidden_field :persona_nome, :value => @sueldo.persona_nome %>
+  <%= f.hidden_field :vencimento, :value => Time.now.strftime("%Y-%m-%d") %>
+    <table>
+        <tr>
+          <td>
+            <label><%= t('DATE') %></label>
+            <%= f.date_select :data %>
+          </td>
+          <td>
+            <fieldset>
+              <legend><%= t('COIN') %></legend>
+              <%= f.radio_button :moeda, 1,  :Checked => "True" %> Gs.
+              <%= f.radio_button :moeda, 0 %> Dolar
+              <%= f.radio_button :moeda, 2 %> Real
+            </fieldset>
+          </td>
+        </tr>
+        <tr>
+        <td>
+          <label>Tipo</label>
+          <%= f.select :tipo,
+            ([["SUELDO", "SUELDO"],
+              ["BONIFICACION", "BONIFICACION"],
+              ["EXTRA", "EXTRA"],
+              ["ADELANTO", "ADELANTO"],
+              ["COMISION", "COMISION"],
+              ["VACACIONES", "VACACIONES"],
+              ["AGUINALDO", "AGUINALDO"],
+              ["IPS", "IPS"],
+              ["OTROS", "OTROS"]
+              ]) %>
+        </td>
+      <td>
+        <label>Doc</label>
+        <%= f.text_field :documento_numero_01, :value => '000', size: 5 %>
+        <%= f.text_field :documento_numero_02, :value => '000', size: 5 %>
+        <%= f.text_field :documento_numero, :value => SueldosDetalhe.maximum(:id) + 1, size: 15 %>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="3">
+        <fieldset>
+          <legend>Liquidación</legend>
+          <%= f.radio_button :estado,0 %> Parte
+          <%= f.radio_button :estado,1, :Checked => "True"  %> Cancelacion
+        </fieldset>
+        </td>
+    </tr>
+
+    <tr>
+      <%= field_us_label 'Credito U$:',f,:credito_us %>
+      <%= field_us_label 'Debito U$:',f,:debito_us %>
+    </tr>
+
+    <tr>
+      <%= field_gs_label 'Credito G$:',f,:credito_gs %>
+      <%= field_gs_label 'Debito G$:',f,:debito_gs %>
+    </tr>
+    <tr>
+      <%= field_us_label 'Credito R$:',f,:credito_rs %>
+      <%= field_us_label 'Debito R$:',f,:debito_rs %>
+    </tr>
+
+      <tr>
+        <td colspan="3">
+          <label>Obs.</label>
+          <%= f.text_area :descricao, class: 'panel-field', rows: 3 %></td>
+
+      </tr>
+
+    </table>
+
+    <div class="footer-buttons">
+      <%= f.submit t('SAVE'),:disable_with => "Aguarde...", :class => "btn btn-green"  %>
+      <%= link_to t('BACK'), @sueldo, :class => "btn btn-back" %>
+    </div>
+  <% end %>
+</div>
+

@@ -1,0 +1,24 @@
+<%= form_for(terminal_conta) do |f| %>
+  <%= f.hidden_field :terminal_id %>
+  <div class="row">
+    <div class="col-md-4">
+      <label>Forma de Pago</label>
+      <%= f.collection_select :forma_pago_id, FormaPago.all(:conditions => "venda = true", :select     =>' id,nome', :order      => '1'), :id,:nome,{prompt: 'Selecione'},{onchange: "fp(this.options[this.selectedIndex].value)", autofocus: true, required: true} %>
+    </div>
+    <div class="col-md-4">
+      <label><%= t('ACCOUNT') %></label>
+      <%= f.collection_select :conta_id, Conta.all(:conditions => "unidade_id = #{current_unidade.id} and tipo = 0", :select     =>' id,nome', :order      => '1'), :id,:nome,{prompt: 'Selecione'}, {style: "width: 100%", required: true} %>
+      
+    </div>
+    <div class="col-md-2">
+      <label>.</label>
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+      
+    </div>
+  </div>
+<% end %>
+
+<script>
+  $('#terminal_conta_forma_pago_id').selectize();
+  $('#terminal_conta_conta_id').selectize();
+</script>

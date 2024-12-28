@@ -1,0 +1,37 @@
+<%= form_for(@persona_doc) do |f| %>
+  <% if @persona_doc.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@persona_doc.errors.count, "error") %> prohibited this persona_doc from being saved:</h2>
+
+      <ul>
+      <% @persona_doc.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="row panel-modal-body">
+    <div class="col-md-12">
+      <label>Vencimento</label>
+      <%= f.date_select :vencimento, end_year: (Date.today.year + 15) %>
+    </div>
+    <div class="col-md-12">
+      <label><%= t('DOC') %></label>
+      <%= f.collection_select :documento_id, Documento.where(folha: true),:id,:nome,{:prompt => 'Selecione '} %>
+    </div>
+    <div class="col-md-6">
+      <label>Imagem</label>
+      <%= f.file_field :doc_attach %>
+    </div>
+    <div class="col-md-12">
+      <label>Obs.</label>
+      <%= f.text_area :obs, class: "panel-field", rows: 5 %>
+    </div>
+    <div class="col-md-12">
+      <br>
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+    </div>
+  </div>
+
+<% end %>

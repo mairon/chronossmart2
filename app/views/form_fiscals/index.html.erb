@@ -1,0 +1,93 @@
+<h1 id="header">Formularios Fiscales</h1>
+<div class="acessos">
+  <% if current_user.tipo == 0 %>
+    <%= link_to 'Gerar Docs', gerador_form_fiscals_path, :class => "button add" %>
+  <% end %>
+  <%= link_to 'Factura Independete', fatura_independente_form_fiscals_path, :class => "button add" %>
+</div>
+   <div class="group">
+      <h2>
+         <%= form_tag busca_form_fiscals_path, :method => "get" do %>
+            <table>
+              <tr>
+                <td><%= t('DATE') %></td>
+                <td>Tipo Emisión</td>
+                <td>Tipo Doc.</td>
+                <td>Status</td>
+              </tr>
+               <tr>
+
+                <td>
+                  <input name="inicio" id="inicio" type="text" size="10" value="<%= Time.now.strftime("%d/%m/%Y") %>" onkeyup="Formatadata(this,event),EnterTab(event,'final')" />
+                   até
+                  <input name="final" id="final" type="text" size="10" value="<%= Time.now.strftime("%d/%m/%Y") %>" onkeyup="Formatadata(this,event)"/>
+                </td>
+                <td>
+                  <select name="tipo_emissao" id="tipo_emissao">
+                    <option value="0">Impreso</option>
+                    <option value="1">Eletronica</option>
+
+                  </select>
+                </td>                
+                <td>
+                  <select name="e_tipo" id="e_tipo">
+                    <option value="1">Factura</option>
+                    <option value="2">Nota de débito</option>
+                    <option value="3">Nota de crédito</option>
+                    <option value="4">Despacho</option>
+                    <option value="5">Auto Factura</option>
+                    <option value="7">Pasaje Aérea</option>
+                    <option value="8">Factura del Exterior</option>
+                    <option value="9">Planilla de Sueldos</option>
+                    <option value="10">Comprobante de Ingresos</option>
+                    <option value="11">Retención Absorbida</option>
+                    <option value="13">Pasaje Aérea Electronica</option>
+                    <option value="14">Nota de Retención</option>
+                    <option value="15">Recibo de Dinero</option>
+                  </select>
+                </td>
+                <td>
+                  <input id="busca" name="busca" type="text"  onkeydown = "f(this)" onkeypress ="return bloqEnter(event)" size="20"
+                </td>
+
+                <td>
+                  <select name="status" id="status">
+                    <option value="">Todos</option>
+                    <option value="0">Pendentes</option>
+                    <option value="1">Activos</option>
+                    <option value="2">Cancelados</option>
+                  </select>
+                <td>
+                  
+                <td>
+                  <select name="status_set" id="status_set">
+                    <option value="">Todos</option>
+                    <option value="0">Aprobado</option>
+                    <option value="1">Rechazado</option>
+                  </select>
+                <td>
+
+                <td>
+                  <input type="button" class="btn btn-green" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar"/>
+                  <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinner", :width => 21, :height => 21, :style =>"display: none;" ) %>
+
+                </td>
+               </tr>
+            </table>
+         <% end %>
+      </h2>
+   </div>
+	<div id="pagina"></div>
+
+
+
+<script language="javascript">
+  function pesquisa(lista_carga){
+    url="/form_fiscals/busca?" + $('form').serialize();
+    ajax(url);
+  }
+</script>
+
+<%= javascript_include_tag 'busca_ajax' %>
+
+

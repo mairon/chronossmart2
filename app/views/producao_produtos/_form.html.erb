@@ -1,0 +1,91 @@
+<body onload="ImputFocus('producao_produto_data_3i')">
+   <h1 align="right" id="header">Produción</h1>
+
+   <% form_for [ @producao, @producao_produto ] do |f| %>
+      <%= f.error_messages %>
+      <%= f.hidden_field :produto_id  %>
+      <%= f.hidden_field :cotacao, :value => @producao.cotacao  %>
+      <%= f.hidden_field :clase_id  %>
+      <%= f.hidden_field :grupo_id  %>
+      <%= f.hidden_field :sub_grupo_id  %>
+      <div class="group">
+         <table>
+
+            <tr>
+
+               <td align="right"><%= t('DATE') %> :</td>
+               <td><%= f.date_select :data %></td>
+
+               <td align="right">Responsable :</td>
+               <td colspan="4"><%= f.collection_select :responsavel_id, Persona.all( :select     => ' id,nome',
+                     :conditions => ['tipo_funcionario = 1'],
+                     :order      => '2' ), :id,
+                    :nome %></td>
+               <td></td>
+               <td>
+                  <fieldset>
+                     <%= f.radio_button :status, 0,  :Checked => "True"%> Requisitado
+                     <%= f.radio_button :status, 1%> Devolución
+                  </fieldset>
+               </td>
+
+
+            </tr>
+
+            <tr>
+               <td align="right">Producto :</td>
+
+
+               <td colspan="8">
+
+                  <%= text_field_tag( 'codigo',
+                     nil,
+                     :id     => "codigo",
+                     :onchange => remote_function( :update     => "codigo",
+                        :url        => { :action     => :get_codigo_barra_produto },
+                        :with       => "'codigo='+this.value"),
+                     :size       => 5,
+                     :onkeyup    => "f(this),EnterTab(event,'vendas_produto_quantidade')",
+                     :onkeypress => "return bloqEnter(event)"
+
+                  ) %>
+                  <%= f.text_field  :produto_nome,
+                    :size     => 50 %>
+               </td>
+            </tr>
+
+
+            <tr>
+               <td align="right">Cantidad :</td>
+               <td><%= f.text_field  :quantidade,
+                    :size     => 10 ,
+                    :dir      => "rtl"%></td>
+               <td align="right">Saldo : <font color="red"><SPAN id="red"></SPAN> </font>
+                  <font color="green"><SPAN id="green"></SPAN> </font>
+               </td>
+
+            </tr>
+
+            <tr>               
+               <td align="right">Deposito :</td>
+               <td colspan="4"><%= f.collection_select :deposito_id, Deposito.all( :select => ' id,nome',
+                                                                                 :order  => '2' ), :id,
+                                                                                                   :nome %></td>                             
+            </tr>
+
+            <tr>
+               <%= field_us 'Costo U$ :',f,:custo_dolar,:readonly => "readonly"%>
+
+               <%= field_gs ' Gs.:',f,:custo_guarani,:readonly => "readonly" %>
+               <td>
+                  <%= f.submit t('SAVE') %>
+               </td>
+
+            </tr>
+
+         </table>
+
+      </div>
+
+   <% end %>
+</body>

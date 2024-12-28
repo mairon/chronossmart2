@@ -1,0 +1,58 @@
+<h1 align="right" id="header">Soporte</h1>
+poner el comando aquí:
+<%= form_tag consulta_suportes_path, :method => "get" do %>
+   <%= text_area_tag :consulta, nil, :rows => 20, :cols => 100 %>
+   <br/>
+   <%= submit_tag '      Enviar      ' %>
+<% end %>
+
+
+<%
+
+datas = [ '3f',
+'agro_cordillera',
+'baby_shop',
+'beux',
+'carlos_bambu',
+'casa_blanca',
+'casa_moeda',
+'cec',
+'chronos_adm',
+'copassam',
+'crescer',
+'dasilva',
+'datasafer',
+'davila',
+'ddn',
+'distriagro',
+'doria',
+'ducampo',
+'impactus',
+'jk_service',
+'labcopassam',
+'labortest',
+'maxshop',
+'megacenter',
+'muffatao',
+'planner',
+'pointer',
+'santa_catalina',
+'santacatalinamt',
+'srvtecnet',
+'tecno_tierra',
+'theboss'
+]
+
+
+datas.each do |db|
+   postgres = PG.connect :host => 'db-postgresql-chronos2-do-user-6983944-0.b.db.ondigitalocean.com', :port => 25060, :dbname => db, :user => 'doadmin', :password => 'AVNS_fJ3ugqAKe6m7keYRk-w'
+
+
+   tables = postgres.exec('')
+
+   puts "Gerado #{db}"
+
+   puts postgres.close
+
+end
+%>

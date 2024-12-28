@@ -1,0 +1,102 @@
+  <h1 id="header">Resumen de Depósito</h1>
+  <style type="text/css">
+    select {
+      width: 300px;
+    }
+  </style>
+  <div class="group">
+    <h2>
+      <%= form_tag resultado_resumo_deposito_stocks_path, :method => "get" do %>
+        <table>
+          <tr>
+            <td align="right"> Hasta:</td>
+            <td>
+                <input name       = "final"
+                       id         = "final"
+                       size       = "10"
+                       type       = "text" /></td>
+          </tr>
+
+          <tr>
+            <td align="right">Depósito:</td>
+
+            <td>
+              <%= select("busca", "deposito", @depositos.collect {|p| [ p.nome, p.id ] }, {prompt: 'Seleccione el Deposito'}) %></td>
+          </tr>
+
+
+          <tr>
+            <td></td>
+            <td>
+              <input  id      ="button"
+                      type    ="submit"
+                      class="btn btn-default"
+                      value   ="Informe"
+                      onclick = "Tipo('0')"/>
+
+              <input type     = "submit"
+                     class="btn btn-default"
+                     value    = "Excel"
+                     onclick  = "Tipo('1')"/>
+            </td>
+          </tr>
+
+          <input type  = "hidden"
+                 name  = "tipo"
+                 id    = "tipo"
+                 size  = "5"
+                 value = "0"/>
+        </table>
+      <% end %>
+
+    </h2>
+  </div>
+</body>
+
+
+<script>
+    $("#busca_clase").change(function() {
+
+      var data=$('#busca_clase').val();
+      $.ajax({
+
+        type: "POST",
+         url: "/dynamic_marca/"+data,
+        data: data,
+
+        beforeSend: function()
+        {
+            $('#spinner').show();
+        },
+
+        success: function(response)
+        {
+          $('#spinner').hide();
+        }
+
+      });
+  });
+
+    $("#busca_sub_grupo").change(function() {
+
+      var data=$('#busca_sub_grupo').val();
+      $.ajax({
+
+        type: "POST",
+         url: "/dynamic_col/"+data,
+        data: data,
+
+        beforeSend: function()
+        {
+            $('#spinner2').show();
+        },
+
+        success: function(response)
+        {
+          $('#spinner2').hide();
+        }
+
+      });
+  });
+</script>
+

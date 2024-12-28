@@ -1,0 +1,58 @@
+<table class="head_grid">
+  <tr>
+    <td width="80">Cod</td>
+    <td width="150">Empleado</td>
+    <td width="150">Fecha Soli.</td>
+    <td width="150">Quando</td>
+    <td width="250">Motivo</td>
+    <td width="120" align="center">Status</td>
+    <td width="180">Status obs</td>
+    <td width="50">Anexo</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @solicitudes.each do |solicitude| %>
+      <tr>
+        <td width="80"><%= link_to solicitude.id.to_s.rjust(6,'0'), edit_solicitude_path(solicitude)  %></td>
+        <td width="150"><%= solicitude.usuario.usuario_nome unless solicitude.usuario.nil? %></td>
+        <td width="150"><%= solicitude.created_at.strftime("%d/%m/%y - %H:%M") %></td>
+        <td width="150"><%= solicitude.data.strftime("%d/%m/%y") unless solicitude.data.blank? %> - <%= solicitude.time.strftime("%H:%M")  unless solicitude.data.blank? %></td>
+        <td width="250"><small> <%= solicitude.motivo.nome %></small></td>
+        <td width="120" align="center">
+          <small>
+            <% if solicitude.status == 'NEGADO' %>
+              <span style="background-color: #D80027;" class="panel-tag"><%= solicitude.status %></span>
+            <% elsif solicitude.status == 'AUTORIZADO'%>
+              <span style="background-color: #91DC5A;" class="panel-tag"><%= solicitude.status %></span>
+            <% else %>
+              <span style="background-color: #FFDA44;" class="panel-tag"><%= solicitude.status %></span>
+            <% end %>
+          </small>
+        </td>
+        <td width="180"><%= solicitude.status_obs %></td>
+        <td width="50">
+
+        <%= link_to(solicitude.anexo.url, target: '_blank') do %>
+        <% if solicitude.anexo_content_type == 'application/pdf' %>
+            <%= image_tag 'ficheiro-pdf.png', class: 'img-thumbnail', style: 'height: 50px !important' %>
+          <% else %>
+            <%= image_tag solicitude.anexo, class: 'img-thumbnail', style: 'height: 50px !important' %>
+          <% end %>
+        <% end %>
+        </td>
+
+        <td width="30"><%= link_to 'Add Anexo', add_anexo_solicitude_path(solicitude) %></td>
+        <td width="30"><%= link_to 'Comprovante', comprovante_solicitude_path(solicitude), target: '_blank' %></td>
+        <td><%= link_to '', solicitude, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+
+      </tr>
+    <% end %>
+  </table>
+</div>
+
+<div class="head_grid">
+  <%= will_paginate @solicitudes %>
+</div>
+

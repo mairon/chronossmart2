@@ -1,0 +1,32 @@
+<%= form_for(pedido_compra_financa) do |f| %>
+  <% if pedido_compra_financa.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(pedido_compra_financa.errors.count, "error") %> prohibited this pedido_compra_financa from being saved:</h2>
+
+      <ul>
+      <% pedido_compra_financa.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= f.hidden_field :pedido_compra_id %>
+  <table>
+    <tr>                                      
+      <td align="right">Cuota:</td>              
+      <td><%= f.text_field :cota, size: 5, value: PedidoCompraFinanca.where(pedido_compra_id: @pedido_compra.id).size.to_i + 1, autofocus: true %></td>
+      <% if @pedido_compra.moeda == 1 %>
+        <%= field_us 'Valor',f,:valor_gs, value: format_int(@saldo_gs) %>
+      <% elsif @pedido_compra.moeda == 0 %>
+        <%= field_us 'Valor',f,:valor_us, value: format_decimal(@saldo_us) %>
+      <% elsif @pedido_compra.moeda == 2 %>
+        <%= field_us 'Valor',f,:valor_rs, value: format_decimal(@saldo_rs) %>
+      <% end %>        
+      </td>
+
+      <td align="right">Venci.:</td>                    
+      <td><%= f.date_select :vencimento %></td>
+      <td><%= f.submit :value => t('SAVE'), :disable_with => "Aguarde...", :class => "button", "data-plus-as-tab" => "false" %></td>
+    </tr>                 
+  </table>      
+<% end %>

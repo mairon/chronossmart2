@@ -1,0 +1,211 @@
+<% ep = Empresa.last %>
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <header class="panel-heading" style="font-family: 'prox'; font-size: 18px; padding-bottom: 10px;">
+        Contrato #<%= @contrato.id.to_s.rjust(6,'0') %> - <%= @contrato.documento_numero %> Status: <%= @contrato.status %>
+
+				<span class="resultado" style="float: right">
+			 <%= link_to 'Gerar Titulos', gera_titulos_contratos_path(id: @contrato.id)%>
+				</span>
+
+      </header>
+	    <div class="panel-content">
+	      <i class="icon-user"></i> Cliente: <%= @contrato.persona.nome unless  @contrato.persona_id.blank? %> |
+        <%= t("DATE") %>: <b> <%= @contrato.data.to_date.strftime("%d/%m/%y") unless  @contrato.data.blank? %></b>|
+        <%= t("DATE") %> Final: <b><%= @contrato.data_final.to_date.strftime("%d/%m/%y") unless  @contrato.data_final.blank? %></b> |
+        Obs.: <%= @contrato.obs %>
+        <% if ep.segmento.to_i == 1 %>
+          Presupuesto: <%= link_to @contrato.presupuesto_id, presupuesto_path(@contrato.presupuesto_id), target: '_blank?' %>
+        <% end %>
+	    </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-7">
+    <div class="panel">
+	    <div class="panel-content">
+        <% if ep.segmento.to_i == 1 %>
+          <%= render 'titulo_educacao' %>
+        <% else %>
+          <%= render 'titulos' %>
+        <% end %>
+	    </div>
+    </div>
+
+    <% unless @contrato.data_final.blank? %>
+      <div class="panel">
+        <% if @contrato.tipo == 1 %>
+          <%= render 'indicadores_custos' %>
+        <% else %>
+          <%= render 'prov_gastos_parcelas' %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="row">
+      <div class="col-md-12" style="margin-top: 5px">
+        <a class="btn btn-blue" data-toggle="modal" data-width="800" data-height="781" data-target="#modal-item">Nuevo</a>        
+        <%= link_to  edit_contrato_path(:id => @contrato.id), :class => "btn btn-default " do %>
+          <i class="icon-pencil"></i> Editar
+        <% end %>
+
+
+        <% if @faturado.to_i == 0 %>
+          <% if @pago.to_i == 0 %>
+            <%= link_to contrato_path(:id => @contrato.id), :confirm => 'Estas Seguro?', :method => :delete, :class => "btn btn-danger" do %>
+              <i class="icon-white" style="background-position: -456px 0;"></i> <%= t('DELETE') %>
+            <% end %>
+          <% end %>
+        <% end %>
+
+        <%= link_to comprovante_contrato_path(:id => @contrato.id), :class => "btn btn-blue ", target: '_blank' do %>
+          <%= image_tag('printer.png') %> Comprovante
+        <% end %>
+
+        <%= link_to comprovante_contrato_path(:id => @contrato.id, tipo: '1'), :class => "btn btn-green ", target: '_blank' do %>
+          Excel
+        <% end %>
+
+        <% if @contrato.gerar_financas == true %>
+          <a class="btn btn-default" data-toggle="modal" data-width="500" data-height="781" data-target="#myiframecrm">
+            Terminal
+          </a>
+        <% end %>
+        
+        <%= link_to 'Cancelar Contrato', cancelar_contrato_path(@contrato.id), class: 'btn btn-danger', :confirm => 'Esta acción es única, Estas Seguro?' %>
+
+        <%= link_to 'Finalizar', contratos_url, class: 'btn btn-info next' %>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="myiframecrm" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="close-button">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <h4 class="modal-title" id="myModalLabel">Terminal</h4>
+        </div>
+        <div class="modal-body">
+          <%= form_for(@contrato) do |f| %>
+            <div class="row panel-modal-body">
+              <div class="col-md-12">
+                <%= f.collection_select :terminal_id, Terminal.select('id,nome').order('nome'), :id, :nome %>
+                <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-5">
+    <div class="panel">
+      
+		</div>
+
+    <div class="panel">
+      <%= render partial: 'produtos' %>
+    </div>
+
+    <div class="panel">
+      <%= render partial: 'despesas_relacionadas' %>
+    </div>
+
+    <div class="panel">
+      <%= render partial: 'produtos_uso' %>
+    </div>
+  </div>
+</div>
+
+<%= render partial: 'gera_titulos' %>
+
+<script>
+  $(".next").focus()
+</script>
+
+<style type="text/css" media="screen">
+.modalButton {
+  display: block;
+  margin: 5px auto;
+  padding: 5px 15px;
+}
+
+.modal-dialog .close-button {
+  overflow: hidden;
+}
+
+.modal-dialog .close-button button.close span {
+  display: block;
+}
+
+.modal-dialog .modal-content iframe {
+  display: block;
+  margin: 0 auto;
+}
+.embed-responsive{
+	height: 900px !important;
+}
+</style>
+
+<div class="modal fade" id="myiframe">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-body">
+
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="embed-responsive embed-responsive-16by9" >
+          <iframe class="embed-responsive-item" frameborder="0"></iframe>
+        </div>
+      </div>
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+
+( function($) {
+
+function iframeModalOpen(){
+
+    // impostiamo gli attributi da aggiungere all'iframe es: data-src andrà ad impostare l'url dell'iframe
+    $('.modalButton-frma').on('click', function(e) {
+      var src = $(this).attr('data-src');
+      var width = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 960; // altezza dell'iframe se non impostato usa 360
+
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+
+      // stampiamo i nostri dati nell'iframe
+      $("#myiframe iframe").attr({
+        'src': src,
+        'height': height,
+        'width': width,
+        'allowfullscreen':''
+      });
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#myiframe').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+    });
+  }
+
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+
+  } ) ( jQuery );
+
+</script>

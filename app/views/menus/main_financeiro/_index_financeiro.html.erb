@@ -1,0 +1,53 @@
+<% if current_user.dash_finac == true %>
+  <div class="row">
+    <div class="col-md-8">
+      <div class="row">
+        <div class="col-md-6">
+          <%= render 'menus/receber' %>
+        </div>
+
+        <div class="col-md-6">
+          <%= render 'menus/pagar' %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <%= render 'menus/contas_pagar' %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <%= render 'menus/contas_receber' %>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <%= render 'menus/chart_gastos' %>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="row">
+        <div class="col-md-12">
+          <%= render 'menus/aniversarios' %>
+          <%= render 'menus/capital_finan' %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% else %> 
+ <div class="row">
+    
+    <div class="col-md-6">
+      <div class="row">
+        <div class="col-md-12">
+          <%= render 'menus/aniversarios' %>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+

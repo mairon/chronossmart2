@@ -1,0 +1,108 @@
+<% tot_us = 0 %>
+<% tot_gs = 0 %>
+<% tot_rs = 0 %>
+<% quebra = '' %>
+<% subdivida_us = 0 %>
+<% subcobro_us  = 0 %>
+<% subdivida_gs = 0 %>
+<% subcobro_gs  = 0 %>
+
+
+<% totdivida_us = 0 %>
+<% totcobro_us  = 0 %>
+<% totdivida_gs = 0 %>
+<% totcobro_gs  = 0 %>
+
+<table>
+    <thead class="report-header">
+      <tr>
+        <td colspan="10" class="title" align="center">
+          <%= current_unidade.nome_sys %> <br>
+          Cuentas a Receber Por Cliente
+        </td>
+      </tr>
+      <tr>
+        <td colspan="10">Fecha: <%= params[:inicio] %> hasta <%= params[:final] %></td>
+      </tr>
+
+      <%
+
+          if params[:filtro].to_s == '0'
+            filtro = 'En Abertas'
+          elsif params[:filtro].to_s == '1'
+            filtro = 'Canceladas'
+          else
+            filtro = 'Todos'
+          end
+
+          if params[:moeda].to_s == '0'
+            moeda = 'Dolar'
+          elsif params[:moeda].to_s == '1'
+            moeda = 'Guaranies'
+          else
+            moeda = 'Reales'
+          end
+      %>
+      <tr>
+        <td colspan="10">Filtro: <%= filtro %></td>
+      </tr>
+
+      <tr>
+        <td colspan="10">Moneda: <%= moeda %></td>
+      </tr>
+
+      <tr class="td-header">
+        <td align="center" width="40">Cod.</td>
+        <td width="550">Cliente</td>
+        <td width="100" align="right">Divida</td>
+        <td width="100" align="right">Cobrado</td>
+        <td width="100" align="right">Saldo</td>
+        <td width="80" align="center">Ultimo Venc.</td>
+      </tr>
+    </thead>
+
+	<% @resumo.each do |rs| %>
+	 <tr class="<%= cycle("cor1", "cor2") %>" >
+		<td width="40" align="center"><%= rs.persona_id.to_s.rjust(6,'0') %></td>
+        <td width="550" align="left">   <%= rs.nome %> - Tel.: <%= rs.telefone %></td>
+		<% if params[:moeda].to_s == "0" %>
+			<td width="100" align="right"><%= number_to_currency( rs.div_us.to_f, :format=>' %n ', :separeitor => ",")%></td>
+			<td width="100" align="right"><%= number_to_currency( rs.cob_us.to_f, :format=>' %n ', :separeitor => ",")%></td>
+			<td width="100" align="right"><%= number_to_currency( rs.div_us.to_f - rs.cob_us.to_f, :format=>' %n ', :separeitor => ",")%></td>	
+			<% tot_us += rs.div_us.to_f - rs.cob_us.to_f %>
+			<% subdivida_us += rs.div_us.to_f %>
+			<% subcobro_us  += rs.cob_us.to_f %>
+
+			<% totdivida_us += rs.div_us.to_f %>
+			<% totcobro_us  += rs.cob_us.to_f %>
+
+		<% elsif params[:moeda].to_s == "1" %>
+			<td width="100" align="right"><%= number_to_currency( rs.div_gs, :format=>' %n ', :precision => 0 )%></td>
+			<td width="100" align="right"><%= number_to_currency( rs.cob_gs, :format=>' %n ', :precision => 0 )%></td>
+			<td width="100" align="right"><%= number_to_currency( rs.div_gs.to_f - rs.cob_gs.to_f, :format=>' %n ', :precision => 0 )%></td>
+			<% tot_gs += rs.div_gs.to_f - rs.cob_gs.to_f %>
+			<% totdivida_gs += rs.div_gs.to_f %>
+			<% totcobro_gs  += rs.cob_gs.to_f %>
+		<% else %>
+			<td width="100" align="right"><%= number_to_currency( rs.div_rs.to_f, :format=>' %n ', :separeitor => ",")%></td>
+			<td width="100" align="right"><%= number_to_currency( rs.cob_rs.to_f, :format=>' %n ', :separeitor => ",")%></td>
+			<td width="100" align="right"><%= number_to_currency( rs.div_rs.to_f - rs.cob_rs.to_f, :format=>' %n ', :separeitor => ",")%></td>
+			<% tot_rs += rs.div_rs.to_f - rs.cob_rs.to_f %>
+		<% end %>
+		<td width="80" align="center"><%= rs.venci.to_date.strftime("%d/%m/%y") %></td>
+	</tr>
+	<% end %>
+	<tr class="head">
+		<% if params[:moeda].to_s == "0" %>
+			<td colspan="3" width="100" align="right"><%= number_to_currency( totdivida_us, :format=>' %n ', :separeitor => "," ) %></td>
+			<td width="100" align="right"><%= number_to_currency( totcobro_us, :format=>' %n ', :separeitor => "," ) %></td>
+			<td width="100" align="right"><%= number_to_currency( totdivida_us.to_f - totcobro_us.to_f, :format=>' %n ', :separeitor => "," ) %></td>
+		<% elsif params[:moeda].to_s == "1" %>
+			<td colspan="3" width="100" align="right"><%= number_to_currency( totdivida_gs, :format=>' %n ', :precision => 0 ) %></td>
+			<td width="100" align="right"><%= number_to_currency( totcobro_gs, :format=>' %n ', :precision => 0 ) %></td>
+			<td width="100" align="right"><%= number_to_currency( totdivida_gs.to_f - totcobro_gs.to_f, :format=>' %n ', :precision => 0 ) %></td>
+		<% else %>
+		<td colspan="5" width="100" align="right"><%= number_to_currency( tot_rs, :format=>' %n ', :separeitor => "," ) %></td>
+		<% end %>
+	</tr>
+</table>

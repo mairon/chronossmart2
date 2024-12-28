@@ -1,0 +1,53 @@
+<%= form_for(@pedido_compra_financa) do |f| %>
+  <% if @pedido_compra_financa.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@pedido_compra_financa.errors.count, "error") %> prohibited this pedido_compra_financa from being saved:</h2>
+
+      <ul>
+      <% @pedido_compra_financa.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> pedido_compra_financas - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">pedido_compra_id :</td>                    
+                      <td><%= f.number_field :pedido_compra_id %></td>
+                                      
+                      <td align="right">vencimento :</td>                    
+                      <td><%= f.date_select :vencimento %></td>
+                                      
+                      <td align="right">cota :</td>                    
+                      <td><%= f.number_field :cota %></td>
+                                      
+                      <td align="right">documento_numero :</td>                    
+                      <td><%= f.text_field :documento_numero %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), pedido_compra_financas_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

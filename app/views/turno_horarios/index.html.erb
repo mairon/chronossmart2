@@ -1,0 +1,33 @@
+<h1 id="header">turno_horarios</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_turno_horario_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Turno</t>
+            <td>Dia semana</t>
+            <td>Entrada 01</t>
+            <td>Saida 01</t>
+            <td>Entrada 02</t>
+            <td>Saida 02</t>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @turno_horarios.each do |turno_horario| %>
+      <tr>
+                  <td><%= turno_horario.turno_id %></td>
+                  <td><%= turno_horario.dia_semana %></td>
+                  <td><%= turno_horario.entrada_01 %></td>
+                  <td><%= turno_horario.saida_01 %></td>
+                  <td><%= turno_horario.entrada_02 %></td>
+                  <td><%= turno_horario.saida_02 %></td>
+                <td><%= link_to 'Editar', edit_turno_horario_path(turno_horario) %></td>
+        <td><%= link_to 'Borrar', turno_horario, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

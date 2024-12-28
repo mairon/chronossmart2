@@ -1,0 +1,132 @@
+<div class="panel">
+  <%= form_tag "/form_fiscals/gera_docs" do %>
+
+  <header class="panel-heading">
+    Gerar Doc
+  </header>
+  <div class="panel-content">
+    <div class="row">
+      <div class="col-md-12">
+        <label>Tipo Doc.</label>
+        <select name="e_tipo" id="e_tipo" autofocus>
+          <option value="">Selecione o tipo de Doc</option>
+          <option value="1">Factura</option>
+          <option value="2">Nota de débito</option>
+          <option value="3">Nota de crédito</option>
+          <option value="4">Despacho</option>
+          <option value="5">Auto Factura</option>
+          <option value="7">Pasaje Aérea</option>
+          <option value="8">Factura del Exterior</option>
+          <option value="9">Planilla de Sueldos</option>
+          <option value="10">Comprobante de Ingresos</option>
+          <option value="11">Retención Absorbida</option>
+          <option value="13">Pasaje Aérea Electronica</option>
+          <option value="14">Nota de Retención</option>
+          <option value="15">Recibo de Dinero</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label>Tipo Emissión</label>
+        <select name="tipo_emissao" id="tipo_emissao">
+          <option value="">Selecione o Tipo Emissión</option>
+          <option value="0">Impreso</option>
+          <option value="1">Eletronica</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <label>Unidad</label>
+        <%= text_field_tag :unidade_id, current_unidade.id, size: 5 %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <label>Terminal</label>
+        <%= select("busca", "terminal", Terminal.all(:conditions => ["unidade_id = #{current_unidade.id}"],:order => 'nome').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Todos...' })  %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <label>Timbrado</label>
+        <%= number_field_tag :timbrado %>
+      </div>
+      <div class="col-md-6">
+        <label>Vencimento/Vigencia</label>
+        <%= text_field_tag :vencimento, nil, class: 'date' %>
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <label>Unidad</label>
+        <%= text_field_tag :doc_01, nil, size: 5, placeholder: '001' %>
+      </div>
+
+      <div class="col-md-6">
+        <label>Ponto Expedición</label>
+        <%= text_field_tag :doc_02, nil, size: 5, placeholder: '001' %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <label>Doc Inicio</label>
+        <%= number_field_tag :doc_inicio, placeholder: '1' %>
+      </div>
+
+      <div class="col-md-6">
+        <label>Doc Final</label>
+        <%= number_field_tag :doc_final, placeholder: '1000' %>
+      </div>
+
+    </div>
+    <div class="footer-buttons">
+      <%= submit_tag " Generar Docs ", :disable_with => "Aguarde...", :class => "btn btn-green"  %>
+    </div>
+  </div>
+  <% end %>
+</div>
+
+
+<script>
+  $().ready(function() {
+    // validate signup form on keyup and submit
+    $("form").validate({
+      rules: {
+        e_tipo: "required",
+        doc_01: "required",
+        doc_02: "required",
+        doc_inicio: "required",
+        doc_final: "required",
+        timbrado: {
+          required: true,
+          minlength: 8
+        },
+      },
+      messages: {
+        timbrado: {
+          required: "Adicione lo Timbrado",
+          minlength: "minimo 8 digitos"
+        },
+      }
+    });
+  });
+  </script>
+
+<script>
+  $('#e_tipo, #busca_terminal, #tipo_emissao ').selectize();
+</script>
+
+
+  <style>
+  label.error {
+    margin: 0px 10px 0px 10px;
+    width: auto;
+    color: red;
+  }
+  </style>

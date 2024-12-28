@@ -1,0 +1,218 @@
+<body onload="window.print()">
+<style type="text/css">
+td{font-size: 10px}
+@font-face {
+  font-family: 'prox';
+	src: url("/assets/fonts/proxima-nova.otf") format("opentype");  
+}
+
+	body {
+		font-family: 'prox';
+
+	}
+
+	table {border-collapse: collapse;}
+	.page-break { display:block; clear:both; page-break-after:always;  }
+
+</style>
+<% count_credito = VendasFinanca.where("venda_id = #{@venda.id} and forma_pago_id = 2").count(:id) %>
+<% ind  = 1 %>
+<% @venda.vendas_financas(forma_pago_id: 2).each do |vf| %>
+<% if vf.forma_pago_id.to_i == 2 %>
+<% if ind % 2 === 0 %>
+<div class="page-break">
+<% else %>
+	<div>
+<% end %>
+
+<table><h3 align="center">PAGARE A LA ORDEN</h3></table>
+<table>
+	<tr> 
+		<td>
+			<div class="border" border='1'>
+				<table height="20">
+
+					<tr>
+						<td style="font-size: 18px" width="300">Cuota: <b> <%= ind %>/<%= count_credito %> </b></td>
+						<td style="font-size: 18px" align="center" width="300"><b>Vencimiento: <%= vf.vencimento.strftime("%d/%m/%Y") %></b></td>
+						<td style="font-size: 18px" align="right" width="300">
+							<b>
+								<% if vf.moeda.to_i == 1 %>
+									Gs. <%= format_int(vf.valor_guarani )%>
+								<% else %>
+									USD. <%= format_decimal(vf.valor_dolar )%>
+								<% end %>
+							</b>
+						</td>
+					</tr>
+					<tr>
+						<td>Ciudad del Este, <%=l @venda.data.to_date, :format => :long %> </td>
+					</tr>
+					<tr>
+						<td colspan="3">
+
+
+						
+El día <%=l vf.vencimento.to_date, :format => :long %>, Pagare/mos a la orden de <%= current_unidade.nome_sys %> o						
+JULIO CESAR DA SILVA la suma de 								
+								<% if vf.moeda.to_i == 1 %>
+									Gs. <%= format_int(vf.valor_guarani )%>
+								<% else %>
+									USD. <%= format_decimal(vf.valor_dolar )%>
+								<% end %> (				<% if  vf.moeda.to_i == 0 %>
+										<% real,cents=("%.2f" % vf.valor_dolar.to_f).split(/\./).map{ |m| m.to_i}
+									      valor_cents=Extenso.por_extenso(cents%100)
+									      valor_cents+= case cents.to_i%100
+									      when 0 then ""
+									      when 1 then " "
+									      when 2..99 then " "
+									      end %>
+									      <% if vf.valor_dolar.to_i == 1000 %>
+									      UN
+									      <% end %>
+										<%= I18n.with_locale(:es) { (vf.valor_dolar.to_f).to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s + '/100 DOLARES AMERICANOS' %>
+									<% else %>
+										<%= I18n.with_locale(:es) { (vf.valor_guarani.to_f).to_i.to_words.upcase }%>
+									<% end %>)						
+en su domicilio comercial sito Supercarretera frente al Area 1 de Ciudad del Este, o en su 						
+domicilio real en la Ciudad de Hernandarias, por igual valor recibido en ………………………………						
+………………………………………………………………………………………………………………….													
+
+						</td>
+					</tr>
+				
+				</table>
+			</div>
+		</td>
+	</tr>
+	
+	<tr>
+		<td height="10"></td>
+	</tr>
+</table>
+  
+<div class="border">
+	<table>
+		<tr>
+			<td colspan="4" style="text-align: justify; font-size: 8px; border: 1px solid #000; padding: 5px"> 
+				<br>
+				Queda expresamente convenido que la falta de pago de una cuota (pagaré) consecutiva producirá la caducidad de los plazos de los de más documentos, y que si por cualquier circunstancia no fuera abonado este documento a su vencimiento  devengará un interés						
+  moratorio de 1,5% mensual mas el interes compensatorio del 2% mensual durante el tiempo de la mora,  sin que ello implique prórroga del plazo de la obligación. El simple vencimiento establecerá la mora. Toda persona interviniente en este documento se somete						
+ a la jurisdicción competencia de los jueces y tribunales del Alto Paraná y Canindeyú.---------------- 
+ <br>					
+Mandato: Por el presente instrumento les autorizo/amos  en forma expresa e irrevocable, otorgando suficiente mandato en los terminos Art. 917  Inc.a del C.C.P, a que, por propia cuenta o atraves de empresas  especializadas de nuestros medios puedan, recabar 						
+ información de los registros de caracter Publicos o Privados en esta plaza o en otro, referente a mi/nuestra situación patrimonial,  solvencia económica, o el cumplimiento de mi/nuestras obligaciones comerciales. Asimismo, le autorizo/mos a que procesen a la veri						
+ficacion  y/o certificación de los datos mi/nosotros de nosotros declarados ya sea por procedimiento telefónico o por medio de visitas a los domicilios particulares y/o laborales proveidos a fin de que puedan contar con elementos de juicios y análisis necesarios para 						
+  la concesión del crédito. Por otra parte, y en forma irrevocable,  les autorizo/amos además en caso de un atraso superior a los 90 dias en el pago del presente credito o cualquier otra deuda pendiente que mantengamos con la empresa a que incluyan mi/nuestros						
+nombres/es personal/es o Razon social que representamos en el Registro de Morosos de cualquier registro Oficial o Privada en agencia de datos o de cualquier base datos  o  empresa  divulgadora de información.  Asimismo autorizo/amos  irrevocablemente a 						
+ suministar informacion sobre mi/nuestra situación patrimonial solvencia economica el cumplimiento de mi/nuestra obligaciones comerciales a su casa matriz,    subsidiaria ,sucursales y las demas entidades del sistema financiero, conforme.----------------------						
+			</td>
+		</tr>
+		<tr>
+			<td height="20"></td>
+		</tr>
+	</table>
+	
+
+	<% if @venda.persona.tipo.to_i  == 0 %>
+	<table style="font-family: arial;font-size: 10px;">
+		<br>
+	<br>
+	<br>	
+		<tr>
+			<td width="600">Firma:____________________________________________________________</td>
+			<% unless @venda.persona.persona_contatos.blank? %>
+			<td>Firma:____________________________________________________________</td> 
+			<% end %>
+		</tr>
+		
+			<tr>
+				<td>Deudor: <%= @venda.persona.nome %></td>
+				<% unless @venda.persona.persona_contatos.blank? %>
+					<td>Co-Deudor: <%= @venda.persona.persona_contatos.last.nome %></td>
+				<% end %>
+			</tr>
+			<tr>
+			<td>RUC/CI: <%= @venda.persona.ruc %> </td>
+			<% unless @venda.persona.persona_contatos.blank? %>
+				<td>RUC/CI: <%= @venda.persona.persona_contatos.last.ramal_01 %> </td>
+				<% end %>
+			</tr> 
+		
+		<tr>
+			<td height="20"></td>
+		</tr>
+	</table>
+	<br>
+	<br>
+	<br>
+	
+	<table style="font-family: arial; font-size: 10px;">
+		<tr>
+			<td width="600">Firma:____________________________________________________________</td> 
+			<td>Firma:____________________________________________________________</td> 
+		</tr>
+
+		<tr>
+			<td>Co-Deudor: <%= @venda.plano_venda.solicitude_creditos.last.garantia_01_nome %></td>
+			<td>Co-Deudor: <%= @venda.plano_venda.solicitude_creditos.last.garantia_02_nome %></td>
+		</tr>
+		<tr>
+			<td>RUC/CI: <%= @venda.plano_venda.solicitude_creditos.last.garantia_01_documento %> </td>
+			<td>RUC/CI: <%= @venda.plano_venda.solicitude_creditos.last.garantia_02_documento %> </td>
+		</tr> 
+	<% @venda.vendas_produtos.each do |vp| %>
+		<tr>
+			<td colspan="2"><br><%= "MARCA: #{vp.produto.clase.descricao} MODELO: #{vp.produto.nome} COLOR: #{vp.produto.cor} AÑO: #{vp.produto.ano} CHASIS N: #{vp.produto.chassi}" %></td>
+		</tr>
+		<% end %>		
+		<tr>
+			<td height="20"></td>
+		</tr>
+	</table>	
+	<% else %>
+		<table style="font-family: arial; font-size: 10px;">
+			<tr>
+				<td width="600">Firma:____________________________________________________________</td> 
+				<td>Firma:____________________________________________________________</td> 
+			</tr>
+
+			<tr>
+				<td>Deudor: <%= @venda.persona.nome_fatura %></td>
+				<td>Co-Deudor: <%= @venda.plano_venda.solicitude_creditos.last.garantia_02_nome %></td>
+			</tr>
+			<tr>
+				<td>RUC/CI: <%= @venda.persona.ruc %> </td>
+				<td>RUC/CI: <%= @venda.plano_venda.solicitude_creditos.last.garantia_02_documento %> </td>
+			</tr> 		
+		</table>
+		<br>
+		<table style="font-family: arial; font-size: 10px;">
+		<tr>
+			<td width="600">Firma:____________________________________________________________</td> 
+		</tr>
+
+		<tr>
+			<td>Co-Deudor: <%= @venda.plano_venda.solicitude_creditos.last.garantia_01_nome %></td>			
+		</tr>
+		<tr>
+			<td>RUC/CI: <%= @venda.plano_venda.solicitude_creditos.last.garantia_01_documento %> </td>
+		</tr> 
+		<% @venda.vendas_produtos.each do |vp| %>
+		<tr>
+			<td colspan="2"><br><%= "MARCA: #{vp.produto.clase.descricao} MODELO: #{vp.produto.nome} COLOR: #{vp.produto.cor} AÑO: #{vp.produto.ano} CHASIS N: #{vp.produto.chassi}" %></td>
+		</tr>
+		<% end %>		
+		<tr>
+			<td height="20"></td>
+		</tr>
+	</table>
+	<% end %>
+<br>
+<br>
+<br>
+<br>
+
+<% ind  += 1 %>
+<% end %>
+<% end %>

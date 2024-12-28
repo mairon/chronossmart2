@@ -1,0 +1,397 @@
+<%= form_for(compras_documento) do |f| %>
+  <% if compras_documento.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(compras_documento.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% compras_documento.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= f.hidden_field :compra_id %>
+  <%= f.hidden_field :data,    :value => @compra.data %>
+  <%= f.hidden_field :cotacao, :value => @compra.cotacao %>
+  <%= f.hidden_field :tipo_compra, :value => @compra.tipo_compra%>
+  <%= f.hidden_field :clase_produto, :value => @compra.clase_produto%>
+
+<!--DADOS PROVEEDORE   !-->
+          <table>
+            <tr>
+              <td colspan="10">
+                <fieldset>
+                  <table>
+                    <tr>
+                      <td align="right">Proveedor:</td>
+                      <td colspan="3">
+                        <%= f.text_field :persona_nome, size: 64, autofocus: true %>
+                        <%= image_tag("load.gif", align: "absmiddle", border: 0,
+                              id: "spinner", width: 21, height: 21, style:" display: none;") %>
+
+                        <%= f.hidden_field :persona_id %></td>
+                      </td>
+                    </tr>
+                  </table>
+                </fieldset>
+              </td>
+            </tr>
+            <tr>
+            <!--DOCUMENTOS   !-->
+              <td>
+                <table>
+                  <tr>
+                     <td>
+                        <fieldset>
+                           <legend>Tipo :</legend>
+                           <table>
+                              <tr>
+                                 <td>
+                                  <%= f.radio_button :tipo, 0,  :Checked => "True",  :onblur => "TipoCompra('0'),TipoDocumentoCompra()"%> Contado
+                                 </td>
+                              </tr>
+
+                              <tr>
+                                <td>
+                                 <%= f.radio_button :tipo, 1,  :onblur => "TipoCompra('1'),TipoDocumentoCompra()" %> Credito
+                                </td>
+                                <input type="hidden" id="tipo" value="<%= @compra.tipo %>"/>
+
+                              </tr>
+                           </table>
+                        </fieldset>
+                     </td>
+                  </tr>
+           </table>
+            </td>
+              <td>
+                <fieldset>
+                  <table>
+
+                    <tr>
+                      <td align="right">Documento:</td>
+                      <td><%= f.collection_select :documento_id, Documento.all( conditions: ['compra = 1'], select: 'id,nome',
+                                     order: '2' ), :id, :nome,{prompt: 'Selecionte o Documento'} %></td>
+                      <td align="right">Tipo Doc. :</td>
+                      <td><%= f.select :tipo_documento,
+                              (
+                              [
+                                ["Selecione lo Tipo", ""],
+                                ["DESPACHO", "DESPACHO"],
+                                ["FLETES", "FLETES"],
+                                ["SEGUROS", "SEGUROS"],
+                                ["OUTROS", "OUTROS"]
+
+                              ]
+                              )%>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td align="right">Numero:</td>
+                      <td><%= f.text_field :documento_numero_01,
+                                           :size   => 5, :maxlength => 3 %>-
+                          <%= f.text_field :documento_numero_02,
+                                           :size => 5, :maxlength => 3 %>-
+
+                          <%= f.text_field :documento_numero,
+                                           :size => 15, :maxlength => 20 %></td>
+
+                      <td align="right">Timbrado:</td>
+                      <td><%= f.text_field :persona_timbrado,
+                                           :size => 15, :maxlength => 8 %></td>
+
+                    </tr>
+                  </table>
+                </fieldset>
+              </td>
+              <td>
+                <fieldset>
+                  <legend><%= t('COIN') %></legend>
+                  <%= f.radio_button :moeda, 0, :Checked => "True", :onfocus => "DocTipoCompra('0'),ExibeDivCompra()" %> U$ <br>
+                  <%= f.radio_button :moeda, 1, :onfocus  => "DocTipoCompra('1'),ExibeDivCompra()"%> Gs.  <br>
+                  <%= f.radio_button :moeda, 2, :onfocus  => "DocTipoCompra('2'),ExibeDivCompra()"%> R$ <br>
+                  <input type="hidden" id="tipomoeda" name="tipomoeda"/>
+                </fieldset>
+              </td>
+
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <!--DETALHES DOLAR -------------------------------------------------------------!-->
+
+
+    <div id="DOLAR" style="display: none;">
+
+      <table>
+        <tr>
+
+          <td>
+            <fieldset>
+
+              <table>
+                <tr>
+                  <%= field_us 'Exentas US$ :',f,:exentas_dolar%>
+
+                  <%= field_us 'Gravadas 5% US$ :',f,:gravadas_05_dolar,:onblur   => "CompraDocGravada05Dolar()"%>
+
+                  <%= field_us 'Gravadas 10% US$ :',f,:gravadas_10_dolar,:onblur   => "CompraDocGravada10Dolar()"%>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <%= field_us 'Impuestos 5% US$ :',f,:imposto_05_dolar%>
+
+                  <%= field_us 'Impuestos 10% US$ :',f,:imposto_10_dolar%>
+                </tr>
+
+                <tr>
+                  <td colspan="4"></td>
+                  <%= field_us 'Total US$ :',f,:total_dolar %>
+                </tr>
+              </table>
+            </fieldset>
+          </td>
+        </tr>
+      </table>
+
+    </div>
+
+          <!--DETALHES GUARANI------------------------------------------------------------ !-->
+
+
+    <div id="GUARANI" style="display: none;">
+      <table>
+        <tr>
+          <td>
+            <fieldset>
+              <table>
+                <tr>
+                  <%= field_gs 'Exentas Gs.:',f,:exentas_guarani %>
+
+                  <%= field_gs 'Gravadas 5% Gs.:',f,:gravadas_05_guarani,:onblur   => "CompraDocGravada05Gs()" %>
+
+                  <%= field_gs 'Gravadas 10% Gs.:',f,:gravadas_10_guarani,:onblur   => "CompraDocGravada10Gs()" %>
+                </tr>
+
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <%= field_gs 'Impuestos 5% Gs.:',f,:imposto_05_guarani %>
+
+                  <%= field_gs 'Impuestos 10% Gs.:',f,:imposto_10_guarani %>
+                </tr>
+
+                <tr>
+                   <td colspan="4"></td>
+                  <%= field_gs 'Total Gs.:',f,:total_guarani %>
+                </tr>
+              </table>
+            </fieldset>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div id="REAL" style="display: none;">
+
+      <table>
+        <tr>
+
+          <td>
+            <fieldset>
+
+              <table>
+                <tr>
+                  <%= field_us 'Exentas R$ :',f,:exentas_real %>
+
+                  <%= field_us 'Gravadas 5% R$ :',f,:gravadas_05_real,:onblur   => "CompraDocGravada05Real()"%>
+
+                  <%= field_us 'Gravadas 10% R$ :',f,:gravadas_10_real,:onblur   => "CompraDocGravada10Real()"%>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <%= field_us 'Impuestos 5% R$ :',f,:imposto_05_real%>
+
+                  <%= field_us 'Impuestos 10% R$ :',f,:imposto_10_real%>
+                </tr>
+
+                <tr>
+                  <td colspan="4"></td>
+                  <%= field_us 'Total R$ :',f,:total_real %>
+                </tr>
+              </table>
+            </fieldset>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <%= f.submit t('SAVE'), :class => "button", :disable_with => "Aguarde...", "data-plus-as-tab" => "false"  %>
+<% end %>
+<script type="text/javascript">
+  
+    $(function() {
+      $( "#compras_documento_persona_nome" ).autocomplete({
+          source: function( request, response ) {
+          $.ajax({
+            url: "/personas/busca?per=PROVEEDOR",
+            dataType: "json",
+
+            data: {
+              tipo: 'DESCRIPCION',
+              busca: request.term
+            },
+            beforeSend: function(){
+            $("#spinner").show("fast");
+            },
+
+            success: function( data ) {
+              response( data );
+              $('#spinner').hide("slow");
+              $("#pagina").html(retorno).fadeIn( "slow" );              
+            },
+          });
+        },
+        minLength: 2,
+        change: function( event, ui ) {
+          $("#compras_documento_persona_id").val("");
+          $('#compras_documento_persona_id').val(ui.item.id);
+          return false;
+        }
+      });
+      $( "#compras_documento_persona_nome" ).change(function(){
+        if ($( "#compras_documento_persona_id" ).val() == ''){
+          alert('Cliente nao Cadastrado!')
+        }
+      });
+    });
+
+</script>
+<script type="text/javascript">
+  function TipoCompra(d){
+    $('#tipo').val(d)
+  }
+  
+
+  function CampoCompraDoc(id){
+    document.getElementById("compras_documento_persona_id").value = id;
+    document.getElementById("compras_documento_persona_id").focus();
+}
+function DocTipoCompra  (d){
+    document.getElementById('tipomoeda').value = d
+}
+
+function TipoDocumentoCompra(){
+    if ( document.getElementById('tipo').value == '0'){
+      document.getElementById('compras_documento_documento_id').value   = '2'
+    }
+
+    else{
+      document.getElementById('compras_documento_documento_id').value   = '3'
+    }
+}
+
+
+function ExibeDivCompra(){
+
+    if ( document.getElementById('tipomoeda').value == '0' ){
+        document.getElementById('DOLAR').style.display = "inline";
+        document.getElementById('GUARANI').style.display = "none";
+        document.getElementById('real').style.display = "none";
+    }
+
+    if ( document.getElementById('tipomoeda').value == '1' ){
+        document.getElementById('GUARANI').style.display = "inline";
+        document.getElementById('DOLAR').style.display = "none";
+        document.getElementById('REAL').style.display = "none";
+    }
+    if ( document.getElementById('tipomoeda').value == '2' ){
+        document.getElementById('GUARANI').style.display = "none";
+        document.getElementById('DOLAR').style.display = "none";
+        document.getElementById('REAL').style.display = "inline";
+    }
+
+}
+
+//COMPRAS_DOCUMENTOS============================================================//
+function CompraDocGravada05Gs(){
+  var total = eval( parseFloat( document.getElementById( 'compras_documento_gravadas_05_guarani' ).value.replace(/\./g, "").replace(",", ".") ) / 1.05 );
+  document.getElementById( 'compras_documento_imposto_05_guarani' ).value = ( number_format( total * 0.05,0, ',', '.') )
+}
+
+function CompraDocGravada05Dolar(){
+  var total = ( parseFloat( document.getElementById( 'compras_documento_gravadas_05_dolar' ).value.replace(/\./g, "").replace(",", ".") ) / 1.05 );
+  document.getElementById( 'compras_documento_imposto_05_dolar' ).value = ( number_format( total * 0.05,2, ',', '.') )
+}
+
+function CompraDocGravada05Real(){
+  var total = ( parseFloat( document.getElementById( 'compras_documento_gravadas_05_real' ).value.replace(/\./g, "").replace(",", ".") ) / 1.05 );
+  document.getElementById( 'compras_documento_imposto_05_real' ).value = ( number_format( total * 0.05,2, ',', '.') )
+}
+
+function CompraDocGravada10Gs()                                         //
+{
+    var total = eval( parseFloat( document.getElementById( 'compras_documento_gravadas_10_guarani' ).value.replace(/\./g, "").replace(",", ".") ) / 1.1 );
+    document.getElementById( 'compras_documento_imposto_10_guarani' ).value = ( number_format( total * 0.10,0, ',', '.') )
+
+    var gr10Gs  = parseFloat( document.getElementById('compras_documento_gravadas_10_guarani').value.replace(/\./g, "").replace(",", ".") )
+    var imp10Gs = parseFloat( document.getElementById('compras_documento_imposto_10_guarani').value.replace(/\./g, "").replace(",", ".") )
+    var gr05Gs  = parseFloat( document.getElementById('compras_documento_gravadas_05_guarani').value.replace(/\./g, "").replace(",", ".") )
+    var imp05Gs = parseFloat( document.getElementById('compras_documento_imposto_05_guarani').value.replace(/\./g, "").replace(",", ".") )
+    var exentas = parseFloat( document.getElementById('compras_documento_exentas_guarani').value.replace(/\./g, "").replace(",", ".") )
+    var totalgs = document.getElementById( 'compras_documento_total_guarani' ).value = ( number_format( gr10Gs + gr05Gs + exentas,0, ',', '.') )
+
+    var cotacao = document.getElementById( 'compras_documento_cotacao' ).value
+
+    document.getElementById( 'compras_documento_total_dolar' ).value       = ( number_format( (totalgs.replace(/\./g, "").replace(",", ".") / cotacao),2, ',', '.') )
+    document.getElementById( 'compras_documento_exentas_dolar' ).value     = ( number_format( (exentas / cotacao),2, ',', '.') )
+    document.getElementById( 'compras_documento_gravadas_10_dolar' ).value = ( number_format( (gr10Gs / cotacao),2, ',', '.') )
+    document.getElementById( 'compras_documento_imposto_10_dolar' ).value  = ( number_format( (imp10Gs / cotacao),2, ',', '.') )
+    document.getElemenCompraDocGravada10DolartById( 'compras_documento_gravadas_05_dolar' ).value = ( number_format( (gr05Gs / cotacao),2, ',', '.') )
+    document.getElementById( 'compras_documento_imposto_05_dolar' ).value  = ( number_format( (imp05Gs / cotacao),2, ',', '.') )
+
+
+}
+
+function CompraDocGravada10Dolar(){
+    var total = ( parseFloat( document.getElementById( 'compras_documento_gravadas_10_dolar' ).value.replace(/\./g, "").replace(",", ".") ) / 1.1 );
+    document.getElementById( 'compras_documento_imposto_10_dolar' ).value = ( number_format( total * 0.10,2, ',', '.') )
+
+    var gr10Dolar  = parseFloat( document.getElementById('compras_documento_gravadas_10_dolar').value.replace(/\./g, "").replace(",", ".") )
+    var imp10Dolar = parseFloat( document.getElementById('compras_documento_imposto_10_dolar').value.replace(/\./g, "").replace(",", ".") )
+    var gr05Dolar  = parseFloat( document.getElementById('compras_documento_gravadas_05_dolar').value.replace(/\./g, "").replace(",", ".") )
+    var imp05Dolar = parseFloat( document.getElementById('compras_documento_imposto_05_dolar').value.replace(/\./g, "").replace(",", ".") )
+    var exentas    = parseFloat( document.getElementById('compras_documento_exentas_dolar').value.replace(/\./g, "").replace(",", ".") )
+    var totalus    = document.getElementById( 'compras_documento_total_dolar' ).value = ( number_format( gr10Dolar + gr05Dolar + exentas,2, ',', '.') )
+
+    var cotacao = document.getElementById( 'compras_documento_cotacao' ).value
+
+    document.getElementById( 'compras_documento_total_guarani' ).value       = ( number_format( (totalus.replace(/\./g, "").replace(",", ".") * cotacao),0, ',', '.') )
+    document.getElementById( 'compras_documento_exentas_guarani' ).value     = ( number_format( (exentas * cotacao),0, ',', '.') )
+    document.getElementById( 'compras_documento_gravadas_10_guarani' ).value = ( number_format( (gr10Dolar * cotacao),0, ',', '.') )
+    document.getElementById( 'compras_documento_imposto_10_guarani' ).value  = ( number_format( (imp10Dolar * cotacao),0, ',', '.') )
+    document.getElementById( 'compras_documento_gravadas_05_guarani' ).value = ( number_format( (gr05Dolar * cotacao),0, ',', '.') )
+    document.getElementById( 'compras_documento_imposto_05_guarani' ).value  = ( number_format( (imp05Dolar * cotacao),0, ',', '.') )
+}
+
+
+function CompraDocGravada10Real(){
+    var total = ( parseFloat( document.getElementById( 'compras_documento_gravadas_10_real' ).value.replace(/\./g, "").replace(",", ".") ) / 1.1 );
+    document.getElementById( 'compras_documento_imposto_10_real' ).value = ( number_format( total * 0.10,2, ',', '.') )
+
+    var gr10Dolar  = parseFloat( document.getElementById('compras_documento_gravadas_10_real').value.replace(/\./g, "").replace(",", ".") )
+    var imp10Dolar = parseFloat( document.getElementById('compras_documento_imposto_10_real').value.replace(/\./g, "").replace(",", ".") )
+    var gr05Dolar  = parseFloat( document.getElementById('compras_documento_gravadas_05_real').value.replace(/\./g, "").replace(",", ".") )
+    var imp05Dolar = parseFloat( document.getElementById('compras_documento_imposto_05_real').value.replace(/\./g, "").replace(",", ".") )
+    var exentas    = parseFloat( document.getElementById('compras_documento_exentas_real').value.replace(/\./g, "").replace(",", ".") )
+    var totalus    = document.getElementById( 'compras_documento_total_real' ).value = ( number_format( gr10Dolar + gr05Dolar + exentas,2, ',', '.') )
+
+    var cotacao = document.getElementById( 'compras_documento_cotacao' ).value
+}
+</script>
+

@@ -1,0 +1,35 @@
+<h1 id="header">contrato_custo_dts</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_contrato_custo_dt_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Contrato</td>
+            <td><%= t('DATE') %></td>
+            <td>Persona</td>
+            <td>Valor rs</td>
+            <td>Valor us</td>
+            <td>Valor gs</td>
+            <td>Contrato custo</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @contrato_custo_dts.each do |contrato_custo_dt| %>
+      <tr>
+                  <td><%= contrato_custo_dt.contrato_id %></td>
+                  <td><%= contrato_custo_dt.data %></td>
+                  <td><%= contrato_custo_dt.persona_id %></td>
+                  <td><%= contrato_custo_dt.valor_rs %></td>
+                  <td><%= contrato_custo_dt.valor_us %></td>
+                  <td><%= contrato_custo_dt.valor_gs %></td>
+                  <td><%= contrato_custo_dt.contrato_custo_id %></td>
+                <td><%= link_to 'Editar', edit_contrato_custo_dt_path(contrato_custo_dt) %></td>
+        <td><%= link_to t('DELETE'), contrato_custo_dt, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

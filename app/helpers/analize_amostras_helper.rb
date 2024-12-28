@@ -1,0 +1,2 @@
+module AnalizeAmostrasHelper
+end

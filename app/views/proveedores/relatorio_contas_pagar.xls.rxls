@@ -1,0 +1,152 @@
+sheet = workbook.create_worksheet
+sheet.name = "Relatorio de Stock"
+
+format  = Spreadsheet::Format.new( :color => "white", :weight => "bold", :pattern_fg_color => "gray", :pattern => 1, :align => :center)
+bold    = Spreadsheet::Format.new :weight => :bold, :align => :right
+left    = Spreadsheet::Format.new :align => :left
+right   = Spreadsheet::Format.new :align => :right
+center  = Spreadsheet::Format.new :align => :center
+sheet.row(00).default_format = format
+
+sheet[00,00]  = 'Fecha'
+sheet[00,01]  = 'Codigo'
+sheet[00,02]  = 'Cliente'
+sheet[00,03]  = 'Documento'
+sheet[00,04]  = 'Numero'
+sheet[00,05]  = 'Cuotas'
+sheet[00,06]  = 'Vencimento'
+sheet[00,07]  = 'Deuda'
+sheet[00,8]  = 'Pago'
+
+indice    = 1
+quebra    = ""
+subdivida = 0
+subpago  = 0
+totdivida = 0
+totpago  = 0
+totsaldo  = 0
+
+@proveedores.each do |lancamento|
+
+
+          if quebra != lancamento.persona_nome
+
+             if quebra != ""
+
+                row = sheet.row(indice)
+                row.push  ""
+                row.push  ""
+                row.push  ""
+                row.push  ""
+                row.push  ""
+                row.push  ""
+                row.push  ""
+                row.push  format( "%.2f",subdivida )
+                row.push  format( "%.2f",subpago  )
+                row.push  format( "%.2f",subdivida - subpago )
+
+                sheet.row(indice).set_format(0,  center)
+                sheet.row(indice).set_format(1,  right)
+                sheet.row(indice).set_format(2,  left)
+                sheet.row(indice).set_format(3,  left)
+                sheet.row(indice).set_format(4,  center)
+                sheet.row(indice).set_format(5,  center)
+                sheet.row(indice).set_format(6,  bold)
+                sheet.row(indice).set_format(7,  bold)
+                sheet.row(indice).set_format(8,  bold)
+
+                indice = indice + 1
+                indice = indice + 1
+
+                subdivida = 0
+                subpago  = 0
+
+             end
+
+             quebra = lancamento.persona_nome
+
+          end
+
+          row = sheet.row(indice)
+          row.push  lancamento.data.strftime("%d/%m/%Y")
+          row.push  lancamento.persona_id
+          row.push  lancamento.persona_nome
+          row.push  lancamento.documento_nome
+          row.push  lancamento.documento_numero_01 + "-" + lancamento.documento_numero_02 + "-" + lancamento.documento_numero
+          row.push  lancamento.cota
+          row.push  lancamento.vencimento.strftime("%d/%m/%Y")
+          row.push  number_to_currency(lancamento.divida_guarani.to_f, :format=>' %n ', :precision => 0)
+          row.push  number_to_currency(lancamento.pago_guarani.to_f, :format=>' %n ', :precision => 0)
+
+
+          sheet.row(indice).set_format(0,  center)
+          sheet.row(indice).set_format(1,  right)
+          sheet.row(indice).set_format(2,  left)
+          sheet.row(indice).set_format(3,  left)
+          sheet.row(indice).set_format(4,  center)
+          sheet.row(indice).set_format(5,  center)
+          sheet.row(indice).set_format(6,  right)
+          sheet.row(indice).set_format(7,  right)
+          sheet.row(indice).set_format(8,  right)
+
+          indice    = indice + 1
+
+
+          subdivida = subdivida + lancamento.divida_guarani
+          subpago  = subpago  + lancamento.pago_guarani
+
+          totdivida = totdivida + lancamento.divida_guarani
+          totpago  = totpago  + lancamento.pago_guarani
+
+
+end
+
+row = sheet.row(indice)
+row.push  ""
+row.push  ""
+row.push  ""
+row.push  ""
+row.push  ""
+row.push  ""
+row.push  ""
+row.push  number_to_currency(subdivida , :format=>' %n ', :precision => 0)
+row.push  number_to_currency(subpago , :format=>' %n ', :precision => 0)
+row.push  number_to_currency(subdivida , :format=>' %n ', :precision => 0)
+
+sheet.row(indice).set_format(0,  center)
+sheet.row(indice).set_format(1,  right)
+sheet.row(indice).set_format(2,  left)
+sheet.row(indice).set_format(3,  left)
+sheet.row(indice).set_format(4,  center)
+sheet.row(indice).set_format(5,  center)
+sheet.row(indice).set_format(6,  bold)
+sheet.row(indice).set_format(7,  bold)
+sheet.row(indice).set_format(8,  bold)
+
+
+indice = indice + 1
+indice = indice + 1
+
+row = sheet.row(indice)
+row.push  ""
+row.push  ""
+row.push  ""
+row.push  ""
+row.push  ""
+row.push  ""
+row.push  ""
+row.push  number_to_currency(totdivida  , :format=>' %n ', :precision => 0)
+row.push  number_to_currency(totpago  , :format=>' %n ', :precision => 0)
+row.push  number_to_currency(totdivida  , :format=>' %n ', :precision => 0)
+
+sheet.row(indice).set_format(0,  center)
+sheet.row(indice).set_format(1,  right)
+sheet.row(indice).set_format(2,  left)
+sheet.row(indice).set_format(3,  left)
+sheet.row(indice).set_format(4,  center)
+sheet.row(indice).set_format(5,  center)
+sheet.row(indice).set_format(6,  bold)
+sheet.row(indice).set_format(7,  bold)
+sheet.row(indice).set_format(8,  bold)
+
+

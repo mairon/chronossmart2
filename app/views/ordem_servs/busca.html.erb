@@ -1,0 +1,83 @@
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="80" align="center"><%= t('CODE') %></td>
+      <td width="100" align="center">R.T.</td>
+      <td width="40" align="center">US</td>
+      <td width="80" align="center"><%= t('DATE') %></td>
+      <td width="80" align="center">Garantia</td>
+      <td width="315">Clientes</td>
+      <td width="115">Responsável</td>
+      <td width="60" align="right">Qtd</td>
+      <td width="50" align="center"></td>
+      <td width="80" align="right">Monto</td>
+      <td width="120" align="center">Checklist</td>
+      <td width="120" align=" ">Status</td>
+
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+    <table>
+      <% @ordem_servs.each do |os| %>
+        <tr class= "<%= cycle( "cor1", "cor2" )%>">
+          <td width="80"  align="center"><%= os.id.to_s.rjust(6,'0') %></td>
+          <td width="100"  align="center"><%= os.rt.to_s.rjust(4,'0') %></td>
+          <td width="40" align="center" title="<%= os.usuario_nome %>"><%= os.usuario_created.to_s.rjust(3,'0')  %></td>
+          <td width="80"  align="center"><%= os.data.strftime("%d/%m/%y")%></td>
+          <td width="80" align="center">
+            <% if os.garantia == true %>
+              <b>SI</b>
+            <% else %>
+              <b>NO</b>
+            <% end %>
+          </td>
+          <td width="315" align="left"><%= os.persona_nome %></td>
+          <td width="115" align="left"><%= os.responsavel_nome[0..12] %></td>
+          <td width="60" align="right"><%= format_int(os.qtd) %></td>
+          <% if os.moeda.to_i == 1 %>
+            <td width="50"  align="center"><span class="gs">Gs</span></td>
+            <td width="80" align="right"><%= format_int(os.tot_gs) %></td>
+          <% elsif os.moeda.to_i == 0 %>
+            <td width="50"  align="center"><span class="us">U$</span></td>
+            <td width="80" align="right"><%= format_decimal(os.tot_us) %></td>
+          <% else %>
+            <td width="50"  align="center"><span class="rs">R$</span></td>
+          <% end %>
+          <td width="120"  align="center">
+            <% unless os.luz_display.nil? %>
+              <span class="btn-success">SI</span>
+            <% else %>
+              <span class="btn-danger">NO</span>
+            <% end %>
+          </td>
+          <td width="120" align="center">
+            <% if os.status == 'PENDIENTE' %>
+              <span class="btn-primary"><%= os.status %></span>
+            <% elsif os.status == 'BAJADO' %>
+              <span class="btn-success"><%= os.status %></span>
+            <% elsif os.status == 'CANCELADO' %>
+              <span class="btn-warning"><%= os.status %></span>
+            <% end %>
+          </td>
+          <td><%= link_to '', checklist_ordem_serv_path(os), class: 'icon-list' %></td>
+          <td><%= link_to '', edit_ordem_serv_path(os), class: 'icon-pencil' %></td>
+          <td><%= link_to '', os, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+<div class="head_grid">
+  <%= will_paginate @ordem_servs, "data-remote" => "true" %>
+</div>
+
+
+
+
+<style>
+  span.btn-primary{
+    padding: 5px;
+    border-radius: 4px;
+
+  }
+</style>

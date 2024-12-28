@@ -1,0 +1,152 @@
+
+<div class="group">
+  
+  <table>
+
+      <% quebra          = ""%>
+      <% subdebe_us      = 0 %>
+      <% subhaber_us     = 0 %>
+      <% subdebe_gs      = 0 %>
+      <% subhaber_gs     = 0 %>
+      <% totdebe_us      = 0 %>
+      <% tothaber_us     = 0 %>
+      <% totdebe_gs      = 0 %>
+      <% tothaber_gs     = 0 %>
+      <% cond            = " AND produto_id  = #{params[:busca]["produto"]}"  unless params[:busca]["produto"].blank? %>
+      <% ant_debe_us     = DiarioDebe.sum(:valor_dolar, :conditions => ["data < '#{params[:inicio]}' and contabilidade = '#{params[:codigo_inicio]}' #{cond}"]) %>
+      <% ant_haber_us    = DiarioHaber.sum(:valor_dolar, :conditions => ["data < '#{params[:inicio]}' and contabilidade = '#{params[:codigo_inicio]}' #{cond}"]) %>
+      <% ant_debe_gs     = DiarioDebe.sum(:valor_guarani, :conditions => ["data < '#{params[:inicio]}' and contabilidade = '#{params[:codigo_inicio]}' #{cond}"]) %>
+      <% ant_haber_gs    = DiarioHaber.sum(:valor_guarani, :conditions => ["data < '#{params[:inicio]}' and contabilidade = '#{params[:codigo_inicio]}' #{cond}"]) %>            
+   	  <% ant_us          = ant_debe_us.to_f - ant_haber_us.to_f %>
+   	  <% ant_gs          = ant_debe_gs.to_f - ant_haber_gs.to_f %>
+
+      <% @diario.each do |diario|%>
+
+         <% if quebra != diario.data.strftime("%d/%m/%Y")  %>
+            <%if quebra != "" %>
+              <% if quebra == "" %>
+                  <% quebra = params["inicio"] %>
+                <% end %>
+                 <tr height="10" class="head" >
+	               <% condante = "data < '#{quebra}' and contabilidade = '#{params[:codigo_inicio]}' #{cond}" %>
+                 
+                   <% if params[:moeda].to_s == '0' %>
+      	             <% antdebeus = DiarioDebe.sum(:valor_dolar, :conditions => condante) %>
+      	             <% anthaberus = DiarioHaber.sum(:valor_dolar, :conditions => condante) %>
+                     <td align="right" colspan="2"><%= number_to_currency( antdebeus.to_f - anthaberus.to_f , :format=>' %n ', :separeitor => ',') %></td>
+                     <td colspan="6" align="right"><%= number_to_currency( subdebe_us , :format=>' %n ', :separeitor => ',') %></td>
+                     <td align="right"><%= number_to_currency( subhaber_us , :format=>' %n ', :separeitor => ',') %></td>
+                     <td align="right"><%= number_to_currency( ( ( ( antdebeus.to_f - anthaberus.to_f) + subdebe_us ) - subhaber_us ) , :format=>' %n ', :separeitor => ',') %></td>
+                     <% subdebe_us  = 0 %>
+                     <% subhaber_us = 0 %>
+
+                   <% else %>
+
+      	             <% antdebegs = DiarioDebe.sum(:valor_guarani, :conditions => condante) %>
+      	             <% anthabergs = DiarioHaber.sum(:valor_guarani, :conditions => condante) %>
+
+                     <td align="right" colspan="2"><%= number_to_currency( antdebegs.to_f - anthabergs.to_f , :format=>' %n ', :separeitor => ',') %></td>
+                     <td colspan="6" align="right"><%= number_to_currency( subdebe_gs , :format=>' %n ', :precision => 0) %></td>
+                     <td align="right"><%= number_to_currency( subhaber_gs , :format=>' %n ', :precision => 0) %></td>
+                     <td align="right"><%= number_to_currency( ( ( ( antdebegs.to_f - anthabergs.to_f) + subdebe_gs ) - subhaber_gs ) , :format=>' %n ', :precision => 0) %></td>
+                     <% subdebe_gs  = 0 %>
+                     <% subhaber_gs = 0 %>
+                   <% end %>
+                 </tr>
+            <% end %>
+                 <tr class="head">
+                   <td colspan="1"></td>
+                   <td colspan="3" align="left" ><%= quebra = diario.data.strftime("%d/%m/%Y") %> </td>
+                 </tr>
+
+         <% end %>
+
+          <tr class = "<%= cycle("corb1", "corb2") %>">
+            <td width="50" align="center">    <%= diario.diario_id%></td>
+            <td width="50" align="center">    <%= diario.data.strftime("%d/%m/%Y")%></td>
+            <td width="150" align="left">     <%= truncate( diario.tabela_nome, :length => 25 ) %></td>
+            <td width="30" align="center">    <%= diario.proceso_numero %></td>
+            <td width="50" align="center">    <%= diario.documento_numero %></td>
+            <td width="50" align="center">    <%= diario.produto_id %></td>
+            <td width="350" align="left">     <%= truncate( diario.produto_nome, :length => 35 ) %></td>
+            <% if params[:moeda].to_s == '0' %>
+              <% ant_us +=   diario.debe_us.to_f - diario.haber_us.to_f %>
+              <% subdebe_us   +=  diario.debe_us.to_f %>
+              <% subhaber_us  +=  diario.haber_us.to_f %>
+              <% totdebe_us   +=  diario.debe_us.to_f %>
+              <% tothaber_us  +=  diario.haber_us.to_f %>
+              
+              <td width="100" align="right">    <%=  number_to_currency(diario.debe_us , :format=>' %n ', :separeitor => ',') %></td>
+              <td width="100" align="right">    <%=  number_to_currency(diario.haber_us , :format=>' %n ', :separeitor => ',') %></td>
+              <td width="100" align="right">    <%=  number_to_currency( ant_us.to_f, :format=>' %n ', :separeitor => ',') %></td>
+
+            <% else %>   
+              <% ant_gs +=   diario.debe_gs.to_f - diario.haber_gs.to_f %>
+              <% subdebe_gs   +=  diario.debe_gs.to_f %>
+              <% subhaber_gs  +=  diario.haber_gs.to_f %>
+              <% totdebe_gs   +=  diario.debe_gs.to_f %>
+              <% tothaber_gs  +=  diario.haber_gs.to_f %>
+
+              <td width="100" align="right">    <%=  number_to_currency(diario.debe_gs , :format=>' %n ', :precision => 0) %></td>
+              <td width="100" align="right">    <%=  number_to_currency(diario.haber_gs , :format=>' %n ', :precision => 0) %></td>
+              <td width="100" align="right">    <%=  number_to_currency( ant_gs.to_f, :format=>' %n ', :precision => 0) %></td>
+
+            <% end %>  
+          </tr>
+      <% end %>
+      
+                 <% if quebra == "" %>
+                  <% quebra = params["inicio"] %>
+                <% end %>
+
+                 <tr height="10" class="head" >
+	               <% condante = "data < '#{quebra}'  and contabilidade = '#{params[:codigo_inicio]}' #{cond}" %>
+                 
+                   <% if params[:moeda].to_s == '0' %>
+      	             <% antdebeus = DiarioDebe.sum(:valor_dolar, :conditions => condante) %>
+      	             <% anthaberus = DiarioHaber.sum(:valor_dolar, :conditions => condante) %>
+                     <td align="right" colspan="2"><%= number_to_currency( antdebeus.to_f - anthaberus.to_f , :format=>' %n ', :separeitor => ',') %></td>
+                     <td colspan="6" align="right"><%= number_to_currency( subdebe_us , :format=>' %n ', :separeitor => ',') %></td>
+                     <td align="right"><%= number_to_currency( subhaber_us , :format=>' %n ', :separeitor => ',') %></td>
+                     <td align="right"><%= number_to_currency( ( ( ( antdebeus.to_f - anthaberus.to_f) + subdebe_us ) - subhaber_us ) , :format=>' %n ', :separeitor => ',') %></td>
+                     <% subdebe_us  = 0 %>
+                     <% subhaber_us = 0 %>
+
+                   <% else %>
+
+      	             <% antdebegs = DiarioDebe.sum(:valor_guarani, :conditions => condante) %>
+      	             <% anthabergs = DiarioHaber.sum(:valor_guarani, :conditions => condante) %>
+
+                     <td align="right" colspan="2"><%= number_to_currency( antdebegs.to_f - anthabergs.to_f , :format=>' %n ', :separeitor => ',') %></td>
+                     <td colspan="6" align="right"><%= number_to_currency( subdebe_gs , :format=>' %n ', :precision => 0) %></td>
+                     <td align="right"><%= number_to_currency( subhaber_gs , :format=>' %n ', :precision => 0) %></td>
+                     <td align="right"><%= number_to_currency( ( ( ( antdebegs.to_f - anthabergs.to_f) + subdebe_gs ) - subhaber_gs ) , :format=>' %n ', :precision => 0 ) %></td>
+                     <% subdebe_gs  = 0 %>
+                     <% subhaber_gs = 0 %>
+                   <% end %>
+                 </tr>
+
+      
+                 <tr height="10" class="head" >
+                   <% if params[:moeda].to_s == '0' %>
+                     <td align="right" colspan="2"><%= number_to_currency( ant_debe_us.to_f - ant_haber_us.to_f , :format=>' %n ', :precision => 0) %></td>
+                     <td colspan="6" align="right"><%= number_to_currency( totdebe_us , :format=>' %n ', :separeitor => ',') %></td>
+                     <td align="right"><%= number_to_currency( subhaber_us , :format=>' %n ', :separeitor => ',') %></td>
+                     <td align="right"><%= number_to_currency( ( ( ( ant_debe_us.to_f - ant_haber_us.to_f ) + totdebe_us ) - tothaber_us ) , :format=>' %n ', :separeitor => ',') %></td>
+
+                   <% else %>
+                     <td align="right" colspan="2"><%= number_to_currency( ant_debe_gs.to_f - ant_haber_gs.to_f , :format=>' %n ', :precision => 0) %></td>
+                     <td colspan="6" align="right"><%= number_to_currency( totdebe_gs , :format=>' %n ', :precision => 0) %></td>
+                     <td align="right"><%= number_to_currency( tothaber_gs , :format=>' %n ', :precision => 0) %></td>
+                     <td align="right"><%= number_to_currency( ( ( ( ant_debe_gs.to_f - ant_haber_gs.to_f ) + totdebe_gs ) - tothaber_gs ) , :format=>' %n ', :precision => 0) %></td>
+                   <% end %>
+                 </tr>
+
+  </table>
+</div>
+<style type="text/css">
+	table {
+		font-size: 9px
+	}
+</style>
+

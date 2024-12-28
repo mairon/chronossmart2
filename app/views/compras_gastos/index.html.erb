@@ -1,0 +1,18 @@
+<h1>Listing compras_gastos</h1>
+
+<table>
+  <tr>
+  </tr>
+
+<% @compras_gastos.each do |compras_gasto| %>
+  <tr>
+    <td><%= link_to 'Show', compras_gasto %></td>
+    <td><%= link_to 'Edit', edit_compras_gasto_path(compras_gasto) %></td>
+    <td><%= link_to 'Destroy', compras_gasto, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New compras_gasto', new_compras_gasto_path %>

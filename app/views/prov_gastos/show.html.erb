@@ -1,0 +1,75 @@
+<ul class="tabs">
+  <li><a href="#tab1">Prov. Gasto - [<%= t('EDITION') %>]</a>
+  </li>
+</ul>
+
+<div class="tab_container">
+  <div class="group" style="padding: 5px">
+    <h2>
+      <i class="icon-user"></i> <%= t('PROVIDER') %>: <%= @prov_gasto.persona.nome %> | Competencia: <%= @prov_gasto.competencia %> |
+      Dia Venc.: <%= @prov_gasto.dia_venc %> |
+      <%= t('CLASSIFICATION') %>: <%= @prov_gasto.plano_de_conta_id %>- <%= @prov_gasto.plano_de_conta.descricao %>
+    </h2>
+  </div>
+    <table>
+      <tr>
+        <td>
+          <table>
+            <tr>
+              <td>
+                <table class="head_grid">
+                   <tr>
+                      <td width="105"><%= t('CODE') %></td>
+                      <td width="200"><%= t('DOC') %></td>
+                      <td width="50" align="center"><%= t('QUOTA') %></td>
+                      <td width="55"></td>
+                      <td width="70" align="right"><%= t('VALUE') %></td>
+                      <td width="80" align="center">Venc.</td>
+                      <td width="50"></td>
+                   </tr>
+                </table>
+                <div class="rolagem" dir="div" style="height: 320px">
+                   <table>
+                      <% @cotas_prov.each do |cf| %>
+                        <tr class = "<%= cycle("cor1", "cor2") %>">
+                          <td width="105"><%= cf.id %>-<%= cf.titulo %></td>
+                          <td width="200"><%= cf.documento_numero %></td>
+                          <td width="50"><%= cf.cota %></td>
+                          <% if cf.moeda.to_i == 0 %>
+                            <td width="55" align="center"><span style="color:green">U$</span></td>
+                            <td width="70" align="right"><b><span style="color:green"><%= format_decimal(cf.divida_dolar) %></span></b></td>
+                          <% elsif cf.moeda.to_i == 1 %>
+                            <td width="55" align="center"><span style="color:red">Gs</span></td>
+                            <td width="70" align="right"><b><span style="color:red"><%= format_int(cf.divida_guarani) %></span></b></td>
+                          <% elsif cf.moeda.to_i == 2 %>
+                            <td width="55" align="center"><span style="color:blue">R$</span></td>
+                            <td width="70" align="right"><b><span style="color:blue"><%= format_decimal(cf.divida_real) %></span></b></td>
+                          <% end %>
+                          <td width="80" align="center"><%= cf.vencimento.to_date.strftime("%d/%m/%y") %></td>
+								          <td><%= link_to '', edit_proveedore_path(cf, proc: 'prov_gasto'), class: 'icon-pencil' %></td>
+								          <td><%= link_to '', proveedore_path(:id => cf.id, :proc => 'prov_gasto', id_proc: cf.cod_proc), :confirm => 'Estas Seguro?', :method => :delete, :class => "icon-trash" %></td>
+
+                        </tr>
+                      <% end %>
+                   </table>
+                </div>
+              </td>
+            </tr>
+           </table>
+        </div>
+       </td>
+     </tr>
+   </table>
+
+  <div class="buttons">
+    <%= link_to 'Finalizar', prov_gastos_url, class: 'btn btn-info next' %>
+    <%= link_to  edit_prov_gasto_path(:id => @prov_gasto.id), :class => "btn btn-default " do %>
+      <i class="icon-pencil"></i> Editar
+    <% end %>
+
+  </div>
+</div>
+<script>
+  $(".next").focus()
+</script>
+

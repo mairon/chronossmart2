@@ -1,0 +1,135 @@
+<body onload="window.print()">
+<style type="text/css">
+
+	body {
+		font-family: verdana;
+	}
+</style>
+<style type="text/css">
+  table {
+    border-collapse: collapse;
+    font-size: 10px
+  }
+  td{
+    padding:  10px;
+  }
+
+  .grid-prod td{
+    padding: 10px;
+  }
+  .cor2 {
+  background-color: #fff;
+}
+.cor1 {
+  background-color: #ccc;
+}
+.head{
+  font-weight: bold;
+}
+</style>
+
+
+<table border="1" width="800">
+    <tr>
+     <td rowspan="2">
+      <% if current_unidade.avatar.url.present?  %>
+        <%= image_tag(current_unidade.avatar.url, width: 200) %>
+      <% else %>
+        <h2><%= current_unidade.nome_sys %></h2>
+      <% end %>
+      </td>
+       <td style="width:320px"><%= @ordem_serv.data.strftime("%d")%> de <%= @ordem_serv.data.strftime("%B")%> de <%= @ordem_serv.data.strftime("%Y")%>
+       </td>
+        <td align="right">
+        	<%= t('VOUCHER') %> de Retirada R.T:
+          <b> <%= @ordem_serv.rt.to_s.rjust(4,'0') %></b>
+        </td>
+    </tr>
+
+    <tr>
+      <td colspan="2">
+      	Cliente: <b><%= @ordem_serv.persona.nome %></b> <br>
+      	<% vend = Persona.find_by_id(@ordem_serv.responsavel_id) %>
+      	Responsable: <b><%= vend.nome unless vend.nil? %></b> <br>
+        Acopio del Cliente: <b><%= @ordem_serv.acopio %></b> <br>
+        Tipo: <b><%= @ordem_serv.tipo %></b> <br>
+        Modelo: <b><%= @ordem_serv.modelo %> </b><br>
+        Uso: <b><%= @ordem_serv.uso %></b> <br>
+        Plataforma: <b><%= @ordem_serv.plataforma %></b> <br>
+        Cabezal Electronico: <b><%= @ordem_serv.cabeca %></b> <br>
+        Celda de Carga: <b><%= @ordem_serv.celda %></b> <br>
+        Obs.: <%= @ordem_serv.obs %><br>
+      </td>
+    </tr>
+
+    <tr>
+        <td colspan="3" align="center"><font size="3">Itens</font></td>
+    </tr>
+
+    <tr>
+       <td colspan="3">
+        <table class="head">
+          <tr>
+            <td width="580">Producto</td>
+            <td width="70" align="right">Ctd</td>
+            <% if params[:interno] == 'interno' %>
+              <td width="70" align="right">Monto</td>
+            <% end %>
+          </tr>
+        </table>
+        <table>
+            <% rt = 0 %>
+            <% vt = 0 %>
+            <% @ordem_serv.ordem_serv_prods.where(status: true).each do |os| %>
+              <tr class = "<%= cycle("cor1", "cor2") %>" >
+                <td width="580">
+                  <%= os.produto.nome %>
+                </td>
+
+                  <td width="70" align="right"><%= os.quantidade %></td>
+                  <% if params[:interno] == 'interno' %>
+                  <% if @ordem_serv.moeda.to_i == 0 %>
+                    <td width="70" align="right"><%= format_decimal(os.valor_us) %></td>
+                    <% vt += (os.valor_us.to_f * os.quantidade.to_f) %>
+                  <% elsif @ordem_serv.moeda.to_i == 1 %>
+                    <td width="70" align="right"><%= format_int(os.valor_gs) %></td>
+                    <% vt += (os.valor_gs.to_f * os.quantidade.to_f) %>
+                  <% elsif @ordem_serv.moeda.to_i == 2 %>
+                    <td width="70" align="right"><%= format_decimal(os.valor_rs) %></td>
+                    <% vt += (os.valor_rs.to_f * os.quantidade.to_f) %>
+                  <% end %>
+                </tr>
+              <% end %>
+              <% rt += os.quantidade.to_f %>
+            <% end %>
+            <% if params[:interno] == 'interno' %>
+              <tr>
+                <td></td>
+                <td align="right"><b>Total => <%= rt.to_i %></b></td>
+                <% if @ordem_serv.moeda.to_i == 1 %>
+                  <td align="right"><b><%= format_int(vt.to_i) %></td>
+                <% else %>
+                  <td align="right"><b><%= format_decimal(vt.to_f) %></td>
+                <% end %>
+              </tr>
+            <% end %>
+        </table>
+       </td>
+    </tr>
+
+    <tr>
+     <td colspan="3" style="padding: 15px">Concepto : <%= @ordem_serv.obs %> </td>
+    </tr>
+
+    <tr>
+     <td colspan="3">
+       <br>
+       <br>
+       <br>
+       ________________________________________ <br>
+        <%= vend.nome unless vend.nil? %>
+     </td>
+    </tr>
+
+</table>
+

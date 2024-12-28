@@ -1,0 +1,228 @@
+<% if params[:filtro] == '0' %>
+<table>
+  <% quebra       = ""%>
+  <% totentrada   = 0 %>
+  <% totsaida     = 0 %>
+  <% subentrada   = 0 %>
+  <% subsaida     = 0 %>
+  <% subsaldo     = 0 %>
+  <% ant          = @financas_anterior.to_f %>
+  <% anterior     = 0 %>
+  <tr class="head">
+    <td colspan="6" align="right">Saldo</td>
+    <td align="right">
+      <% if params[:moeda] == '1' %>
+        <%= format_int(@financas_anterior.to_f) %>
+      <% else %>
+        <%= format_decimal(@financas_anterior.to_f) %>
+      <% end %>
+    </td>
+  </tr>
+
+    <% @financas.each do |fin|  %>
+
+      <% if params[:moeda] == "0" %>
+        <% entrada        = fin.entrada_dolar %>
+        <% saida          = fin.saida_dolar %>
+        <% valor_sum      = 'coalesce(entrada_dolar,0) - coalesce(saida_dolar,0)' %>
+        <% consulta_maior = 'coalesce(entrada_dolar,0) + coalesce(saida_dolar,0)' %>
+
+      <% elsif params[:moeda] == "1" %>
+        <% entrada        = fin.entrada_guarani %>
+        <% saida          = fin.saida_guarani %>
+        <% valor_sum      = 'coalesce(entrada_guarani,0) - coalesce(saida_guarani,0)' %>
+        <% consulta_maior = 'coalesce(entrada_guarani,0) + coalesce(saida_guarani,0)' %>
+      <% else %>
+        <% entrada        = fin.entrada_real %>
+        <% saida          = fin.saida_real %>
+        <% valor_sum      = 'coalesce(entrada_real,0) - coalesce(saida_real,0)' %>
+        <% consulta_maior = 'coalesce(entrada_real,0) + coalesce(saida_real,0)' %>
+      <% end %>
+
+      <% if quebra != fin.data.strftime("%Y-%m-%d")  %>
+        <% if quebra != "" %>
+          <tr height="15">
+            <td></td>
+          </tr>
+        <% end %>
+        <tr>
+          <td class="head"  align="center"><%= fin.data.strftime("%d/%m/%y") %><% quebra = fin.data.strftime("%Y-%m-%d") %></td>
+        </tr>
+      <% end %>
+
+      <% ant += (entrada.to_f - saida.to_f) %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td width="80" align="center"> <%= fin.data.strftime("%d/%m/%y")%> </td>
+        <td width="250">
+          <%= fin.persona_nome ? truncate(fin.persona_nome.to_s, :length => 26) : "Operación Financiera" %>
+        </td>
+
+      <% if fin.tabela == "VENDAS_FINANCAS" %>
+        <td width="640" align="left">
+          <%= fin.concepto %> Nr.: <%= fin.documento_numero %>
+          <%= '- Banco :' + fin.banco.to_s + '- Titular :' + fin.titular.to_s if fin.cheque_status.to_i != 0 %>
+        </td>
+      <% else %>
+        <td width="690" align="left">
+          <%= fin.concepto %> - <%= fin.documento_numero %>
+          <% if fin.compra_id != nil %>
+            <% cp = Compra.find_by_id(fin.compra_id, :select => "id,rubro_descricao")%>
+            <%= ' - Rb.:' << cp.rubro_descricao.to_s %>
+          <% end %>
+          <%= '- Banco :' + fin.banco.to_s + '- Titular :' + fin.titular.to_s if fin.cheque_status.to_i != 0 %>
+      <% end %>
+
+      <% if fin.diferido > fin.data %>
+        <td width="100" align="center"> <%= fin.cheque %> D </td>
+      <% else %>
+        <td width="100" align="center"> <%= fin.cheque %> </td>
+      <% end %>
+      <% if params[:moeda].to_s == '1'%>
+        <td width="80" align="right"> <%= format_int( entrada ) %> </td>
+        <td width="80" align="right"> <%= format_int( saida ) %> </td>
+        <td width="80" align="right"> <%= format_int( ant ) %> </td>
+      <% else %>
+        <td width="80" align="right"> <%= format_decimal( entrada ) %> </td>
+        <td width="80" align="right"> <%= format_decimal( saida ) %> </td>
+        <td width="80" align="right"> <%= format_decimal( ant ) %> </td>
+      <% end %>
+    </tr>
+
+    <% totentrada   += entrada.to_f %>
+    <% totsaida     += saida.to_f %>
+    <% subentrada   += entrada.to_f%>
+    <% subsaida     += saida.to_f %>
+    <% end %>
+
+    <tr height="15">
+      <td></td>
+    </tr>
+
+    <% subsaida    = 0 %>
+    <% subentrada  = 0 %>
+    <% subsaldo    = 0 %>
+  </table>
+
+  <% if params[:filtro] == '1' and params[:futuros] == 'true' %>
+    <%= render 'lanz_futuros_extrac_bc'%>
+  <% end %>
+
+
+<% else %>
+
+<style type="text/css">
+  table {
+    border-collapse: collapse;
+    font-size: 9px
+  }
+  .titulo {
+    font-size: 22px
+  }
+  td, tr {
+    border: 1px solid black;
+  }
+</style>
+
+<% saldo_anterior = @financas_anterior %>
+
+<% conta = Conta.find_by_id(params[:busca]["conta"]) %>
+<table>
+
+  <% tot_ingresso = 0 %>
+  <% @financas.each do |i| %>
+    <% tot_ingresso += i.entrada_real.to_f %>
+  <% end %>
+
+  <% tot_saida = 0 %>
+  <% @financas.each do |i| %>
+    <% tot_saida += i.saida_real.to_f %>
+  <% end %>
+
+  <%
+    per = Persona.find_by_id(params[:persona_id])
+  %>
+
+  <tr>
+    <td colspan="4">
+
+      <table>
+        <tr>
+          <td width="53"><%= conta.nome %></td>
+          <td width="115">ENTRADAS</td>
+          <td width="70" align="right"><b> <%= format_decimal( tot_ingresso ) %></b></td>
+          <td width="265"></td>
+          <td width="60" align="center"><b> SALDO </b></td>
+          <td width="60" align="right"><%= format_decimal(saldo_anterior.to_f +  (tot_ingresso.to_f - tot_saida.to_f )) %></td>
+          <td width="218"></td>
+          <td width="103">SAÍDAS</td>
+          <td width="60" align="right"><b> <%= format_decimal( tot_saida ) %></b></td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td valign="top">
+      <table>
+        <tr>
+          <td width="center" height="30">Data Confir. Cliente</td>
+          <td>Banco Empresa</td>
+          <td align="right">Valor</td>
+          <td>Descrição</td>
+          <td align="center">Data Entrada Banco</td>
+        </tr>
+
+        <% @financas.each do |i| %>
+        <% if i.entrada_real.to_f > 0 %>
+          <tr class = "<%= cycle("cor1", "cor2") %>">
+            <td width="40" align="center"><%= i.data.strftime("%d/%m/%y") %></td>
+            <td width="100"><%= i.persona_nome.to_s %></td>
+            <td width="60" align="right"><%= format_decimal(i.entrada_real) %></td>
+            <td width="170"><%= i.id.to_s.rjust(6,'0')%>-<%= i.concepto %></td>
+            <td width="40" align="center"><%= i.data.strftime("%d/%m/%y") unless i.data.nil? %></td>
+          </tr>
+          <% end %>
+        <% end %>
+        <tr class="head">
+          <td></td>
+          <td></td>
+          <td align="right"><%= format_decimal(tot_ingresso) %></td>
+        </tr>
+      </table>
+    </td>
+    <td width="60" valign="top" style="padding-top: 20px; font-size: 8px;"> Valor anterior</td>
+    <td width="60" valign="top" style="padding-top: 20px; font-size: 8px;" align="right"><b><%= format_decimal(saldo_anterior) %></b></td>
+    <td valign="top">
+
+      <table>
+          <tr>
+            <td height="40">Data Pagamento</td>
+            <td>Descrição</td>
+            <td>Banco Empresa</td>
+            <td align="right">Valor</td>
+          </tr>
+
+          <% @financas.each do |i| %>
+            <% if i.saida_real.to_f > 0 %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="40" align="center"><%= i.data.strftime("%d/%m/%y") %></td>
+              <td width="150"><%= i.concepto %></td>
+              <td width="100"><%= i.persona_nome.to_s %></td>
+              <td width="60" align="right"><%= format_decimal(i.saida_real) %></td>
+            </tr>
+            <% end %>
+          <% end %>
+          <tr class="head">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td align="right"><%= format_decimal(tot_saida) %></td>
+          </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+
+<% end %>

@@ -1,0 +1,35 @@
+<div class="group">
+   <table>
+      <tr>
+         <td width="50" align="center"><%= t('SHARE') %></td>
+         <td width="80" align="center"><%= t('EXPIRATION') %></td>
+         <td width="100" align="right">Us.</td>
+         <td width="100" align="right">Gs.</td>
+      </tr>
+   </table>
+   <div class="rolagem" dir="div">
+      <table>
+        <% tot_us = 0 %>
+        <% tot_gs = 0 %>
+        <% pagares_detalhes.each do |pagares_detalhe| %>
+          <tr class = "<%= cycle("cor1", "cor2") %>">
+            <td width="50" align="center"><%=h pagares_detalhe.cota %></td>
+            <td width="80" align="center"><%=h pagares_detalhe.vencimento.strftime("%d/%m/%Y") %></td>
+            <td width="100" align="right"><%=number_to_currency(  pagares_detalhe.valor_dolar, :format =>' %n ', :separeitor => ',' )%></td>
+            <td width="100" align="right"><%=number_to_currency(  pagares_detalhe.valor_guarani, :format =>' %n ', :precision => 0)%></td>            
+            <td><%= link_to 'Editar', edit_pagares_detalhe_path(pagares_detalhe) %></td>
+          </tr>
+          <% tot_us += pagares_detalhe.valor_dolar.to_f %>
+          <% tot_gs += pagares_detalhe.valor_guarani.to_f %>
+        <% end %>
+       </table>
+     </div>  
+     <table>
+     	<tr>
+            <td width="130">Total de las Cuotas => </td>            
+            <td width="100" align="right"><%=number_to_currency(  tot_us, :format =>' %n ', :separeitor => ',')%></td>            
+            <td width="100" align="right"><%=number_to_currency(  tot_gs, :format =>' %n ', :precision => 0)%></td>            
+     	</tr>
+     </table>
+   </div>  
+

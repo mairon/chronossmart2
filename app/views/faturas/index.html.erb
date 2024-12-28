@@ -1,0 +1,235 @@
+<body onload="VendaCampoFiltro()">
+   <h1 align="right" id="header">Vendas</h1>
+   <%= link_to t('NEW'), new_fatura_path,:id =>'novo' %> | 
+<a href="#" onclick="GeraPdf()" >Gerar Pdf</a>
+
+   <div class="group">
+      <h2>
+         <%= form_tag busca_vendas_vendas_path, :method => "get" do%>
+            <table>
+               <tr>
+                  <!--FILTRO_DATA!-->
+                  <td><input   id         = "filtro"
+                               name       = "filtro"
+                               type       = "radio"
+                               value      = "0"
+                               checked
+                               onfocus="SetaFiltro('0')"/>
+
+                  </td>
+
+                  <td align="right"> De:</td>
+                  <td><input name       = "inicio"
+                             id         = "inicio"
+                             size       = "10"
+                             onkeyup    = "Formatadata(this,event),EnterTab(event,'final')" />
+                     Hasta
+
+                     <input name       = "final"
+                            id         = "final"
+                            size       = "10"
+                            onkeyup    = "Formatadata(this,event)"/></td>
+               </tr>
+               <!--FILTRO_CLIENTE!-->
+               <tr>
+                  <td><input   id         = "filtro"
+                               name       = "filtro"
+                               type       = "radio"
+                               value      = "1"
+                               onfocus     = "SetaFiltro('1')" />
+
+                  </td>
+
+                  <td>
+                     <select name="tipo" id="tipo">
+                       <option>CODIGO</option>
+                       <option>CLIENTE</option>
+                       <option><%= t('DOC').upcase %></option>
+                    </select>
+                  </td>
+
+                  <td>
+                     <input id="busca" name="busca" type="text" onkeyup = "pesquisa(this.value),f(this)"onkeydown = "f(this)" onkeypress ="return bloqEnter(event)" size="29"  />                    
+                  </td>
+                  <td>
+
+                     <input type="button" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar"/>
+                  </td>
+               </tr>
+            </table>
+            <input type="hidden" id="seta" value="0"/>
+         <% end %>
+      </h2>
+   </div>
+
+   <div id="pagina">
+   </div>
+</body>
+<script language="javascript">
+
+         function GeraPdf(){
+         	
+         	
+         	
+      filtro = document.getElementById('filtro').value
+      inicio = document.getElementById('inicio').value
+      finala = document.getElementById('final').value
+      tipo   = document.getElementById('tipo').value
+      busca  = document.getElementById('busca').value
+      seta   = document.getElementById('seta').value
+      //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+      if( seta == '0')
+      {
+         location.href="/faturas/print_busca?filtro="+filtro+"&inicio="+inicio+"&final="+finala+"&tipo="+tipo+"&busca="+busca+"&commit=buscar";
+      }
+      else
+      {
+         location.href="/faturas/print_busca?inicio="+inicio+"&final="+finala+"&filtro="+filtro+"&tipo="+tipo+"&busca="+busca+"&commit=buscar";
+      }
+                 
+ }
+
+
+
+   function VendaCampoFiltro()              //
+   {
+      document.getElementById("filtro").focus();
+   }
+
+   function SetaFiltro(d)                 //
+   {
+      document.getElementById('seta').value = d
+      if(document.getElementById('seta').value == '0')
+      {
+         document.getElementById('busca').value = ''
+      }
+      else
+      {
+         document.getElementById('inicio').value = ''
+         document.getElementById('final').value = ''
+      }
+
+   }
+
+   function pesquisa(valor)
+
+   {
+      filtro = document.getElementById('filtro').value
+      inicio = document.getElementById('inicio').value
+      finala = document.getElementById('final').value
+      tipo   = document.getElementById('tipo').value
+      busca  = document.getElementById('busca').value
+      seta   = document.getElementById('seta').value
+      //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+      if( seta == '0')
+      {
+         url="/faturas/busca?filtro="+filtro+"&inicio="+inicio+"&final="+finala+"&tipo="+tipo+"&busca="+valor+"&commit=buscar";
+      }
+      else
+      {
+         url="/faturas/busca?inicio="+inicio+"&final="+finala+"&filtro="+filtro+"&tipo="+tipo+"&busca="+valor+"&commit=buscar";
+      }
+        
+
+      ajax(url);
+
+   }
+
+
+   function ajax(url)
+
+   {
+
+
+
+      //alert(nick);
+
+      //alert(dest);
+
+      //alert(msg);
+
+
+
+      req = null;
+
+      // Procura por um objeto nativo (Mozilla/Safari)
+
+      if (window.XMLHttpRequest) {
+
+         req = new XMLHttpRequest();
+
+         req.onreadystatechange = processReqChange;
+
+         req.open("GET",url,true);
+
+         req.send(null);
+
+         // Procura por uma versão ActiveX (IE)
+
+      } else if (window.ActiveXObject) {
+
+         req = new ActiveXObject("Microsoft.XMLHTTP");
+
+         if (req) {
+
+
+
+            req.onreadystatechange = processReqChange;
+
+            req.open("GET",url,true);
+
+
+
+            req.send();
+
+         }
+
+      }
+
+   }
+
+
+
+   function processReqChange()
+
+   {
+
+
+
+      // apenas quando o estado for "completado"
+
+      if (req.readyState == 4) {
+
+
+
+         // apenas se o servidor retornar "OK"
+
+
+
+         if (req.status ==200) {
+
+
+
+            // procura pela div id="pagina" e insere o conteudo
+
+            // retornado nela, como texto HTML
+
+
+
+            document.getElementById('pagina').innerHTML = req.responseText;
+
+
+
+         } else {
+
+            alert("Houve um problema ao obter os dados:n" + req.statusText);
+
+         }
+
+      }
+
+   }
+</script>
+

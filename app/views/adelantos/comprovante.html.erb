@@ -1,0 +1,268 @@
+<!-- MEDITER SRL -->
+<body  >
+<% if @adelanto.moeda == 0
+    d = "DOLAR"
+   else
+    d = "GUARANIES"
+   end
+ %>
+
+<style type="text/css">
+  table {
+    font-family:arial ;font-size:10px;
+
+  } 
+
+  .grid {
+    border-collapse: collapse;
+    
+  }
+  .header {
+    border-collapse: collapse;
+    border: 2px solid black;
+  }
+
+  #totales {
+    border-collapse: collapse;
+    border-left: 2px solid #fff;
+    border-right: 2px solid #fff;
+  }
+
+  .cond {
+    font-family:arial ;font-size:7px;
+  }
+
+  
+
+
+</style>
+
+<table>
+  <tr>
+    <td>
+
+      <table  border="1" style="border-collapse: collapse;">            
+      <tr>
+        <td style="padding: 5px">
+          <%= image_tag(current_unidade.avatar.url, :height => 60) %><br>
+        </td>
+        <td align="left" colspan="3"  width="350" style="padding: 5px">           
+          <b><%= current_unidade.nome_sys %></b><br>
+          <b>RUC:</b><%= current_unidade.ruc %><br>
+          <b>Direcíon:</b><%= current_unidade.direcao %><br>
+          <b>Ciudad:</b><%= current_unidade.cidade.nome%><br>
+          <b>Teléfono:</b><%= current_unidade.telefone%><br>          
+        </td>
+        <td width="335" colspan="2" align="center">
+          <h1><b>RECIBO DE DINERO</b><br></h1>
+          <h2><b>001-001-<%= @adelanto.documento_numero %></b></h2>  
+        </td>
+      </tr>
+      </table>
+      
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      
+        <table border="1" style="border-collapse: collapse;">
+          <tr>
+            <td>
+
+          <table>
+            <tr>
+              <td  width="700" align="left"><b>Lugar y Fecha:</b>Ciudad del Este - <%=l @adelanto.data.to_date.to_date %></td>
+
+              
+            </tr>
+
+
+            <tr>
+              <% per = Persona.find_by_id(@adelanto.persona_id)%>
+              <td align="left"><b>Recibi(mos) de:</b> <%= per.nome %></td>
+
+              
+            </tr>
+
+            <tr>
+              <td align="left"><b>RUC/CI :</b> <%= per.ruc %></td>
+            </tr>
+
+            <tr>
+              <td align="left"><b>Valor Total:</b> 
+                <% if @adelanto.moeda == 0 %>
+                  U$ 4.000,00
+                <% else %>
+                  G$ <%= format_int( @tot_adelanto_gs.to_f - @tot_des_gs.to_f ) %>
+                <% end %>
+
+              </td>
+            </tr>
+
+            <tr>
+          <td valign="bottom">
+            <b>La cantidad de:</b>
+            <% if @adelanto.moeda == 0 %>
+            <% real,cents=("%.2f" % 40000.to_f).split(/\./).map{ |m| m.to_i}
+                valor_cents=Extenso.por_extenso(cents%100)
+                valor_cents+= case cents.to_i%100
+                when 0 then ""
+                when 1 then " "
+                when 2..99 then " "
+                end %>
+              <%= I18n.with_locale(:es) { 4000.to_i.to_words.upcase } %> <%= 'CON 00/100 DOLARES AMERICANOS' %>              
+            <% else %>
+              <%= I18n.with_locale(:es) { ( @tot_adelanto_gs.to_f - @tot_des_gs.to_f ).to_i.to_words.upcase } %>
+            <% end %>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><br><b><h2>DETALLES DE FACTURAS </h2></b><br></td>
+  </tr>
+  <tr>
+    <td>
+      
+      <table>
+          <tr>
+            <td align="center" width="150"><b><b>N<sup>o</sup> FACTURA</b></td>
+            <td align="center" width="200"><b>EMISIÓN</b></td>
+            <td align="center" width="230"><b>VENCIMIENTO</b></td>
+            <td align="right" width="250"><b>IMPORTE</b></td>
+          </tr>
+
+        
+
+          <tr >
+            <td align="center">001-001-000004</td>
+            <td align="center">22/10/2024</td>
+            <td align="center">22/10/2024</td>
+              <td align="right">4.000,00</td>
+          
+          </tr>
+          <% lines = 45  %>
+            <% lines.times do |l| %>
+            <tr height="10">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            </tr>
+          <% end %>     
+      </table>
+
+    </td>
+  </tr>
+  <tr>
+    <td>
+
+      <table>
+                <tr>
+                  <td>
+                <table border="1" style="border-collapse: collapse;">
+
+
+                  <% efe_g = 0 %>
+                  <% efe_u = 0 %>
+                  <% che_g = 0 %>
+                  <% che_u = 0 %>
+                  <% tar_g = 0 %>
+                  <% tra_g = 0 %>
+                  <% tra_u = 0 %>
+
+
+                    <tr>
+                      <td colspan="2"><b>FORMA DE PAGO</b></td>
+                    </tr>
+                    <tr>
+                      <td width="175" align="left">Efectivo G$</td>
+                      <td width="75" align="right"><%= number_to_currency(efe_g.to_i, :format =>' %n ', :precision =>0) %></td>
+                    </tr>
+                    <tr>
+                      <td width="175" align="left">Efectivo U$</td>
+                      <td width="75" align="right">4.000,00</td>
+                    </tr>
+                    <tr>
+                      <td width="175" align="left">Cheques G$</td>
+                      <td width="75" align="right"><%= number_to_currency(che_g.to_i, :format =>' %n ', :precision =>0)  %></td>
+                    </tr>
+                    <tr>
+                      <td width="175" align="left">Cheques U$</td>
+                      <td width="75" align="right"><%= number_to_currency(che_u.to_f,      :format =>' %n ', :separeitor => "," ) %></td>
+                    </tr>
+                    <tr>
+                      <td width="175" align="left">Tarjetas G$</td>
+                      <td width="75" align="right"><%= number_to_currency(tar_g.to_i, :format =>' %n ', :precision =>0 ) %></td>
+                    </tr>
+                    
+                    <tr>
+                      <td width="175" align="left">Transferencia Bancaria G$</td>
+                      <td width="75" align="right"><%= number_to_currency(tra_g.to_i, :format =>' %n ', :precision =>0 ) %></td>
+                    </tr>
+                    <tr>
+                      <td width="175" align="left">Transferencia Bancaria U$</td>
+                      <td width="75" align="right"><%= number_to_currency(tra_u.to_f,      :format =>' %n ', :separeitor => "," ) %></td>
+                    </tr>
+                  
+                </table>
+
+                
+
+                  </td>
+
+                  <td>
+                    <table border="1" style="border-collapse: collapse;">
+                  <tr>
+                    <td colspan="5" align="center" width="420"><b>CHEQUES</b></td>
+                  </tr>
+                  <tr>
+                    <td width="80"><b>CHEQUE N</b></td>
+                    <td width="100"><b>BANCO</b></td>
+                    <td width="80"><b>EMISIÓN</b></td>
+                    <td width="80"><b>VENCIMIENTO</b></td>
+                    <td width="80"><b>MONTO</b></td>
+                  </tr>
+                  <% linha = 0 %>
+                  
+                <tr>
+                <td height="10"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                </tr>
+
+
+
+                </table>      
+    </td>
+  </tr>
+</table>
+
+<br>
+<br>
+
+<table>
+  <tr>
+    <td width="840" align="center">
+      <table>
+
+        <tr>
+          <td colspan="2" align="center">
+            
+            
+          
+        </td>
+        </tr>
+        <tr>
+          <p>__________________________________________</p>
+          <td align="center">Firma y Aclaración</td>
+        </tr>
+
+      </table>      
+    </td>
+  </tr>
+</table>

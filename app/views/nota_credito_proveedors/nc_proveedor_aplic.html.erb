@@ -1,0 +1,84 @@
+<ul class="tabs">
+  <li><a href="#tab1">N.C. Proveedor - [Aplicacion]</a></li>
+</ul>
+<div class="tab_container">
+  <table class="head_grid">
+    <tr>
+      <td width="150" align="center"><%= t('CODE') %></td>
+      <td width="100" align="center">Laz.</td>
+      <td width="100" align="center">Vencimiento</td>
+      <td width="250"><%= t('DOC') %></td>
+      <td width="50" align="center">Cota</td>
+      <td width="100" align="right">Divida</td>
+			<td width="100" align="right">Pago</td>
+      <td width="100" align="right">Saldo</td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div" style="height: 160px">
+  	<table>
+      <% @dividas.each do |ft| %>
+        <tr class = "<%= cycle("cor1", "cor2") %> "
+			              onMouseOver="javascript:this.style.backgroundColor='#e6ebf2'"
+		                  onMouseOut="javascript:this.style.backgroundColor=''"
+        						  onClick="Fecha( 
+                        '<%= ft.vencimento %>',
+                        '<%= ft.documento_numero_01 %>',
+                        '<%= ft.documento_numero_02 %>',
+                        '<%= ft.documento_numero %>',
+                        '<%= format_decimal(ft.divida_dolar) %>',
+                        '<%= format_int(ft.divida_guarani) %>',
+                        '<%= format_decimal(ft.divida_real) %>',
+                        '<%= ft.cota %>')">
+          <td width="150" align="center"><%= ft.id%></td>
+          <td width="100" align="center"><%= ft.data.strftime("%d/%m/%y") %></td>
+          <td width="100" align="center"><%= ft.vencimento.strftime("%d/%m/%y") %></td>
+          <td width="250"><%= ft.documento_numero_01 %>-<%= ft.documento_numero_02 %>-<%= ft.documento_numero %></td>
+          <td width="50" align="center"><%= ft.cota %></td>
+
+ 					<% if @nota_credito_proveedor.moeda.to_f == 0 %>
+						<td width="100" align="right"><%= format_decimal( ft.divida_dolar) %></td>
+            <td width="100" align="right"><%= format_decimal( ft.anterior_us) %></td>
+            <td width="100" align="right"><%= format_decimal( ft.divida_dolar.to_f - ft.anterior_us.to_f) %></td>
+					<% elsif @nota_credito_proveedor.moeda.to_f == 1 %>
+						<td width="100" align="right"><%= format_int( ft.divida_guarani ) %></td>
+            <td width="100" align="right"><%= format_int( ft.anterior_gs ) %></td>
+            <td width="100" align="right"><%= format_int( ft.divida_guarani.to_f - ft.anterior_gs.to_f) %></td>
+          <% else %>
+            <td width="100" align="right"><%= format_decimal( ft.divida_real) %></td>
+            <td width="100" align="right"><%= format_decimal( ft.anterior_rs) %></td>
+            <td width="100" align="right"><%= format_decimal( ft.divida_real.to_f - ft.anterior_rs.to_f) %></td>
+					<% end %>
+        </tr>
+      <% end %>
+	  </table>
+	</div>
+  <div class="group">
+    <%= render :partial=>"/nota_credito_proveedor_aplics/new_aplic", :locals=>{:nota_credito_proveedor_aplic=>NotaCreditoProveedorAplic.new(:nota_credito_proveedor_id=>@nota_credito_proveedor.id)} %> 
+  </div>
+  <%= render :partial=>"/nota_credito_proveedor_aplics/index_aplic", :locals=>{:nota_credito_proveedor_aplics => @nota_credito_proveedor.nota_credito_proveedor_aplics} %>
+	<div class="buttons">
+	 	<% if @nota_credito_proveedor.operacao == 0 %>	
+	  	<%= link_to t('BACK'), "/nota_credito_proveedors/#{@nota_credito_proveedor.id}" , :class => 'button back' %>          
+	  <% else %>
+	      <%= link_to t('BACK'), edit_nota_credito_proveedor_path(@nota_credito_proveedor),:class => 'button back' %>
+	  <% end %>
+	  <%= link_to "Comprovante", "/nota_credito_proveedors/#{@nota_credito_proveedor.id}/comprovante" ,:class => 'button print' %>
+	  <%= link_to "Finalizar", "/nota_credito_proveedors" ,:class => 'button next' %>
+	</div>
+</div>
+
+<script>
+      function Fecha(vencimento,documento_numero_01,documento_numero_02,documento_numero,divida_us,divida_gs,divida_rs,cota)
+  {
+    document.getElementById('nota_credito_proveedor_aplic_vencimento').value          = vencimento;
+    document.getElementById('nota_credito_proveedor_aplic_documento_numero_01').value = documento_numero_01;
+    document.getElementById('nota_credito_proveedor_aplic_documento_numero_02').value = documento_numero_02;
+    document.getElementById('nota_credito_proveedor_aplic_documento_numero').value    = documento_numero;
+    document.getElementById('nota_credito_proveedor_aplic_documento_numero').value    = documento_numero;
+    document.getElementById('nota_credito_proveedor_aplic_valor_dolar').value    = divida_us;
+    document.getElementById('nota_credito_proveedor_aplic_valor_guarani').value    = divida_gs;
+    document.getElementById('nota_credito_proveedor_aplic_valor_real').value    = divida_rs;
+    document.getElementById('nota_credito_proveedor_aplic_cota').value                = cota;    
+    document.getElementById("nota_credito_proveedor_aplic_valor_dolar").focus()
+  }
+</script>

@@ -1,0 +1,157 @@
+<%= form_tag "/sueldos/#{@sueldo.id}/baixa_divida" do %>
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="20" align="center"><input type="checkbox" id="selectAllM" value="selectAllM"></td>
+      <td width="80" align="center"><%= t('DATE') %></td>
+      <td width="80" align="center">Vencimiento</td>
+      <td width="400" align="center">Concepto</td>
+      <td width="120" align="center"><%= t('DOC') %></td>
+      <td width="30" align="center"><%= t('SHARE') %></td>
+      <td width="100" align="center">Divida</td>
+      <td width="100" align="center">Pago</td>
+      <td width="100" align="center">Saldo</td>
+
+    </tr>
+  </table>
+  <div class="rolagem" dir="div" style="height: 150px">
+
+
+    <table>
+      <% div = 0 %>
+      <% cob = 0 %>
+      <% @pendentes.each do |p| %>
+          <%  anterior_dolar     = Cliente.sum(:cobro_dolar, :conditions => ["persona_id = ? AND documento_numero_01 = ? AND documento_numero_02 = ? AND documento_numero = ? AND cota = ? ",p.persona_id,p.documento_numero_01,p.documento_numero_02,p.documento_numero,p.cota]) %>
+          <%  anterior_guarani   = Cliente.sum(:cobro_guarani, :conditions => ["persona_id = ? AND documento_numero_01 = ? AND documento_numero_02 = ? AND documento_numero = ? AND cota = ?",p.persona_id,p.documento_numero_01,p.documento_numero_02,p.documento_numero,p.cota]) %>
+
+          <%  anterior_real   = Cliente.sum(:cobro_real, :conditions => ["persona_id = ? AND documento_numero_01 = ? AND documento_numero_02 = ? AND documento_numero = ? AND cota = ?",p.persona_id,p.documento_numero_01,p.documento_numero_02,p.documento_numero,p.cota]) %>
+
+          <%  saldo_dolar   = p.divida_dolar - anterior_dolar %>
+          <%  saldo_guarani = p.divida_guarani - anterior_guarani %>
+          <%  saldo_real = p.divida_real - anterior_real %>
+
+        <tr class = "<%= cycle( "cor1", "cor2" )%>"
+              onClick="Fecha( '<%= p.vencimento %>',
+                              '<%= p.documento_numero_01 %>',
+                              '<%= p.documento_numero_02 %>',
+                              '<%= p.documento_numero %>',
+                              '<%= p.cota %>',
+                              '<%= p.data %>',
+                              '<%= p.descricao.to_s %>',
+                              '<%= number_to_currency( saldo_dolar.to_f, :format=>' %n ', :separator => ',') %>',
+                              '<%= number_to_currency( saldo_guarani, :format=>' %n ', :precision => 0) %>',
+                              '<%= number_to_currency( saldo_real.to_f, :format=>' %n ', :separator => ',') %>'
+                              )">
+          <td width="20" align="center"><%= check_box_tag "cobro[dividas_ids][]", p.id, false, { :class => 'm', onclick: "soma(this)" }  %>
+          <input type="hidden" name="valor_<%= p.id %>" id="valor_<%= p.id %>" value="<%= format_decimal(saldo_guarani) %>" />
+          <td data-toggle="modal" data-target="#myModal" class="acao" width="90" align="center"> <%= p.data.strftime("%d/%m/%y")%></td>
+          <td data-toggle="modal" data-target="#myModal" class="acao" width="80" align="center"> <%= p.vencimento.strftime("%d/%m/%y")%></td>
+          <td data-toggle="modal" data-target="#myModal" class="acao" width="400" align="left"> <%= p.descricao %></td>
+          <td data-toggle="modal" data-target="#myModal" class="acao" width="120" align="center"> <%= p.documento_numero_01 %>-<%= p.documento_numero_02 %>-<%= p.documento_numero %></td>
+          <td data-toggle="modal" data-target="#myModal" class="acao" width="30" align="center"> <%= p.cota %></td>
+          <% if @sueldo.moeda == 0 %>
+            <td data-toggle="modal" data-target="#myModal" class="acao" width="100" align="right">   <%=h number_to_currency(p.divida_dolar, :format=>' %n ', :separeitor => ',') %></td>
+            <td data-toggle="modal" data-target="#myModal" class="acao" width="100" align="right">   <%=h number_to_currency(anterior_dolar, :format=>' %n ', :separeitor => ',') %></td>
+            <td data-toggle="modal" data-target="#myModal" class="acao" width="100" align="right">   <%=h number_to_currency(saldo_dolar, :format=>' %n ', :separeitor => ',')  %></td>
+            <% div += p.divida_dolar %>
+            <% cob += anterior_dolar %>
+
+          <% elsif @sueldo.moeda == 1 %>
+            <td data-toggle="modal" data-target="#myModal" class="acao" width="100" align="right">   <%=h number_to_currency(p.divida_guarani, :format=>' %n ', :precision => 0) %></td>
+            <td data-toggle="modal" data-target="#myModal" class="acao" width="100" align="right">   <%=h number_to_currency(anterior_guarani, :format=>' %n ', :precision => 0) %></td>
+            <td data-toggle="modal" data-target="#myModal"  class="acao"width="100" align="right">   <%=h number_to_currency(saldo_guarani, :format=>' %n ', :precision => 0)  %></td>
+            <% div += p.divida_guarani %>
+            <% cob += anterior_guarani %>
+
+          <% else %>
+            <td data-toggle="modal" data-target="#myModal" class="acao" width="100" align="right">   <%=h number_to_currency(p.divida_real, :format=>' %n ', :separeitor => ',') %></td>
+            <td data-toggle="modal" data-target="#myModal" class="acao" width="100" align="right">   <%=h number_to_currency(anterior_real, :format=>' %n ', :separeitor => ',') %></td>
+            <td data-toggle="modal" data-target="#myModal" class="acao" width="100" align="right">   <%=h number_to_currency(saldo_real, :format=>' %n ', :separeitor => ',')  %></td>
+            <% div += p.divida_real %>
+            <% cob += anterior_real %>
+          <% end %>
+        </tr>
+      <% end %>      
+    </table>
+  </div>
+  <table class="head_grid">
+    <tr>
+      <td width="770">
+        <%= submit_tag "Aplicar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %><input type="text" name="valor" id="valor" value="0" size="11" style="border: none; font-size: 12px; padding:0px">
+      </td>
+      <% if @sueldo.moeda == 1 %>
+        <td width="100" align="right"><%=h number_to_currency(div, :format=>' %n ', :precision => 0) %></td>
+        <td width="100" align="right"><%=h number_to_currency(cob, :format=>' %n ', :precision => 0) %></td>
+        <td width="100" align="right"><%=h number_to_currency(div.to_f - cob.to_f, :format=>' %n ', :precision => 0) %></td>
+      <% else %>
+        <td width="100" align="right"><%=h number_to_currency(div, :format=>' %n ', :separeitor => ',') %></td>
+        <td width="100" align="right"><%=h number_to_currency(cob, :format=>' %n ', :separeitor => ',') %></td>
+        <td width="100" align="right"><%=h number_to_currency(div.to_f-cob.to_f, :format=>' %n ', :separeitor => ',') %></td>        
+      <% end %>
+    </tr>
+  </table>
+</div>
+
+<% end %>
+<script type="text/javascript">
+$('#selectAllM').click(function() {
+   if (this.checked) {
+       $('.m').each(function() {
+           this.checked = true;
+       });
+   } else {
+      $('.m').each(function() {
+           this.checked = false;
+       });
+   } 
+});
+</script>
+
+<script LANGUAGE="JavaScript">  
+ <!--  
+ var total     = 0;  
+ function soma(campo) { 
+  var valor = document.getElementById( 'valor_' + campo.value).value;
+
+  if (campo.checked)  {
+    total     += eval( valor.replace(/\./g, "").replace(",", ".") );
+    
+  } else {
+    total     -= eval( valor.replace(/\./g, "").replace(",", ".") );
+  }
+  document.getElementById('valor').value = ( number_format( total,2, ',', '.') );
+ }  
+ //-->  
+ </SCRIPT>
+
+<script type="text/javascript">
+
+function Fecha(vencimento,documento_numero_01,documento_numero_02,documento_numero,cota, data,descricao,saldo_dolar,saldo_guarani,saldo_real){
+    document.getElementById('sueldos_detalhe_vencimento').value           = vencimento;
+    document.getElementById('sueldos_detalhe_documento_numero_01').value  = documento_numero_01;
+    document.getElementById('sueldos_detalhe_documento_numero_02').value  = documento_numero_02;
+    document.getElementById('sueldos_detalhe_documento_numero').value     = documento_numero;
+    document.getElementById('sueldos_detalhe_cota').value                 = cota;
+    document.getElementById('sueldos_detalhe_data_emissao').value         = data;
+    document.getElementById('sueldos_detalhe_descricao').value            = descricao;
+    document.getElementById('sueldos_detalhe_debito_us').value          = saldo_dolar;
+    document.getElementById('sueldos_detalhe_debito_gs').value          = saldo_guarani;
+    document.getElementById('sueldos_detalhe_debito_rs').value          = saldo_real;
+  }
+</script>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="myModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel" align="center">Titulo</h4>
+      </div>
+      <div class="modal-body" align="center" style="padding: 10px 0px 25px 0px">
+        <%= render :partial=>"/sueldos_detalhes/new_saldo_liquiq", :locals=>{:sueldos_detalhe=>SueldosDetalhe.new(:sueldo_id=>@sueldo.id)} %>
+      </div>
+    </div>
+  </div>
+</div>

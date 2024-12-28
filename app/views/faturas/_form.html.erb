@@ -1,0 +1,205 @@
+<body onload="ExibeDivCompraDetalheFatura(),CompraTipoDocumento()">
+<h1 align="right" id="header">Facturas</h1>
+<%= form_for(@fatura) do |f| %>
+<% if @fatura.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@fatura.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @fatura.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+	<li>
+		<a href="#tab1">Facturas - [<%= t('EDITION') %>]</a>
+	</li>
+</ul>
+
+<div class="tab_container">
+	<div id="tab1" class="tab_content">
+
+		<table>
+			<tr>
+				<td>
+				<fieldset>
+					<table>
+						<tr>
+							<td align="right"><%= t('DATE') %> :</td>
+							<td colspan="3"><%= f.date_select :data,{},{:onblur => "DataCotacao('fatura_data_3i','fatura_data_2i','fatura_data_1i')"}  %></td>
+							<%= hidden_field_tag( 'key' ) %>
+						</tr>
+
+						<tr>
+							<td align="right">Cotización :</td>
+							<td> <%= text_field :fatura,
+							:cotacao ,
+							{ :size     => 10,
+							:value    => @fatura.cotacao.to_i,
+							:onfocus  => {:remote => true,
+								            :update => "key",
+							:url    => { :action => :get_moeda},
+							:with   => "'key='+ key.value "} } %></td>
+
+						</tr>
+
+						<tr>
+							<td></td>
+							<td>
+							<table>
+								<tr>
+									<td>
+									<fieldset>
+										<legend>
+											Moneda
+										</legend>
+										<%= f.radio_button :moeda, 1,  :Checked => "True",  :onblur => "MoedaCompra('1')" %> Gs.
+										<%= f.radio_button :moeda, 0,:onblur => "MoedaCompra('0')"%> Dolar
+
+										<input type="hidden" id="moeda" value="<%= @fatura.moeda %>"/>
+									</fieldset>
+									</td>
+
+									<td width="200">
+									<fieldset>
+										<legend>
+											Tipo
+										</legend>
+										<%= f.radio_button :tipo, 0,
+                      :Checked => "True",
+                      :onblur  => "TipoCompra('0'),
+										ExibeDivCompraDetalheFatura(),CompraTipoDocumento()"%> Contado
+										<%= f.radio_button :tipo, 1,
+                      :onblur => "TipoCompra('1'),
+										ExibeDivCompraDetalheFatura(),CompraTipoDocumento()" %> Credito
+
+										<input type="hidden" id="tipo" value="<%= @fatura.tipo %>"/>
+									</fieldset>
+									</td>
+								</tr>
+							</table>
+							</td>
+
+							<td>
+							<table>
+								<tr>
+									<td>
+									<fieldset>
+										<legend>
+											Status
+										</legend>
+										<%= f.radio_button :status, 0,  :Checked => "True"%>Activo
+										<%= f.radio_button :status, 1  %> Cancelado
+									</fieldset>
+									</td>
+								</tr>
+							</table>
+							</td>
+						</tr>
+						<tr>
+							<td align="right">Proveedor :</td>
+							<td colspan="3"><%= f.collection_select :persona_id, Persona.all(:select => 'id,nome',:order => '2'),:id,:nome %></td>
+						</tr>
+						<tr>
+							<td align="right">Numero:</td>
+							<td><%= f.text_field :documento_numero_01,:size => 3%>-
+							<%= f.text_field :documento_numero_02,:size => 3%>-
+							<%= f.text_field :documento_numero,   :size => 15 %></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+
+			<!--VALORES!-->
+			<tr>
+				<td>
+				<table>
+					<tr>
+						<td colspan="4">
+						<div id="MOEDA_FATURA_DOLAR" style="display:none;">
+							<fieldset>
+								<table>
+									<tr>
+										<%= field_us 'Exentas U$ :',f,:exentas_dolar %>
+
+										<%= field_us 'Gravadas 5% U$ :',f,:gravadas_05_dolar,:onblur  => "FaturaGravada05Dolar()" %>
+
+										<%= field_us 'Gravadas 10% U$ :',f,:gravadas_10_dolar,:onblur  => "FaturaGravada10Dolar()" %>
+									</tr>
+
+									<tr>
+										<td></td>
+										<td></td>
+										<%= field_us 'Impuestos 5% U$ :',f,:imposto_05_dolar %>
+
+										<%= field_us 'Impuestos 10% U$ :',f,:imposto_10_dolar %>
+									</tr>
+
+									<tr>
+										<td colspan="4"></td>
+										<%= field_us 'Total U$ :',f,:total_dolar %>
+									</tr>
+
+								</table>
+							</fieldset>
+						</div>
+						</td>
+					</tr>
+
+					<tr>
+						<td colspan="4">
+						<div id="MOEDA_FATURA_GUARANI" style="display:none;">
+							<fieldset>
+								<table>
+									<tr>
+										<td>
+										<table>
+											<tr>
+												<%= field_gs 'Exentas Gs.:',f,:exentas_guarani %>
+
+												<%= field_gs 'Gravadas 5% Gs.:',f,:gravadas_05_guarani,:onblur  => "FaturaGravada05Gs()" %>
+
+												<%= field_gs 'Gravadas 10% Gs.:',f,:gravadas_10_guarani,:onblur => "FaturaGravada10Gs()" %>
+											</tr>
+
+											<tr>
+												<td></td>
+												<td></td>
+												<%= field_gs 'Impuestos 5% Gs.:',f,:imposto_05_guarani%>
+
+												<%= field_gs 'Impuestos 10% Gs.:',f,:imposto_10_guarani%>
+											</tr>
+
+											<tr>
+												<td colspan="4"></td>
+												<%= field_gs 'Total Gs.:',f,:total_guarani%>
+											</tr>
+
+										</table>
+										</td>
+									</tr>
+								</table>
+							</fieldset>
+						</div>
+						</td>
+					</tr>
+				</table>
+
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
+
+<div class="button">
+	<%= f.submit t('SAVE'),:disable_with => "Aguarde..."  , :class => "links"%> |
+	<%= link_to t('BACK'), faturas_path , :class => "enviar"%>
+</div>
+<% end %>
+
+</body>

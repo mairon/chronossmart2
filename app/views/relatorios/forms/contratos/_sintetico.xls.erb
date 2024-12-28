@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <ss:Styles>
+    <ss:Style ss:ID="1">
+      <ss:Font ss:Bold="1"/>
+      <ss:Alignment ss:Horizontal="Center"/>
+      <ss:Interior ss:Pattern="Gray25"/>
+    </ss:Style>
+    <ss:Style ss:ID="2">
+      <ss:Alignment ss:Horizontal="Center"/>
+    </ss:Style>
+  </ss:Styles>
+  <Worksheet ss:Name="Sheet1">
+
+    <Table>
+      <Row>
+        <Cell><Data ss:Type="String">Cod.</Data></Cell>
+        <Cell><Data ss:Type="String">Doc.</Data></Cell>
+        <Cell><Data ss:Type="String">Status</Data></Cell>
+        <Cell><Data ss:Type="String"><%= t('DATE') %></Data></Cell>
+        <Cell><Data ss:Type="String">Final</Data></Cell>
+        <Cell><Data ss:Type="String">CC</Data></Cell>
+        <Cell><Data ss:Type="String">Cliente</Data></Cell>
+        <Cell><Data ss:Type="String">Tipo </Data></Cell>
+        <Cell><Data ss:Type="String">Venc.</Data></Cell>
+        <Cell><Data ss:Type="String">Comp.</Data></Cell>
+        <Cell><Data ss:Type="String">Obs.</Data></Cell>
+        <Cell><Data ss:Type="String">Valor</Data></Cell>
+      </Row>
+
+      <% tot      = 0 %>
+      <% tot_fix  = 0 %>
+      <% tot_reco = 0 %>
+
+      <% @contratos.each do |c| %>
+        <Row>
+          <Cell><Data ss:Type="String"><%= c.id.to_s.rjust(6,'0') %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= c.documento_numero %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= c.status %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= c.data.to_date.strftime("%d/%m/%Y") unless c.data.blank? %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= c.data_final.to_date.strftime("%d/%m/%y") unless c.data_final.blank? %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= c.centro_custo_nome %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= c.persona_nome %></Data></Cell>
+          <% if c.tipo.to_i == 0 %>
+            <Cell><Data ss:Type="String">Mensal</Data></Cell>
+          <% else %>
+            <Cell><Data ss:Type="String">Valor Fixo</Data></Cell>
+          <% end %>
+          <Cell><Data ss:Type="String"><%= c.dia_venc %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= c.competencia %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= c.obs %></Data></Cell>
+          <% if c.moeda.to_i == 0 %>
+            <Cell><Data ss:Type="Number"><%= (c.valor_us.to_f) %></Data></Cell>
+            <% tot += c.valor_us.to_f %>
+          <% elsif c.moeda.to_i == 1 %>
+            <Cell><Data ss:Type="Number"><%= (c.valor_gs.to_f) %></Data></Cell>
+            <% tot += c.valor_gs.to_f %>
+          <% else %>
+            <Cell><Data ss:Type="Number"><%= (c.valor_rs.to_f) %></Data></Cell>
+            <% tot += c.valor_rs.to_f %>
+          <% end %>
+        </Row>
+      <% end %>
+    </Table>
+  </Worksheet>
+</Workbook>

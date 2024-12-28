@@ -1,0 +1,93 @@
+<p>
+  <b>Pedido compra:</b>
+  <%=h @pedido_compra_produto.pedido_compra_id %>
+</p>
+
+<p>
+  <b><%= t('DATE') %>:</b>
+  <%=h @pedido_compra_produto.data %>
+</p>
+
+<p>
+  <b>Moeda:</b>
+  <%=h @pedido_compra_produto.moeda %>
+</p>
+
+<p>
+  <b>Cotacao:</b>
+  <%=h @pedido_compra_produto.cotacao %>
+</p>
+
+<p>
+  <b>Clase produto:</b>
+  <%=h @pedido_compra_produto.clase_produto %>
+</p>
+
+<p>
+  <b>Produto:</b>
+  <%=h @pedido_compra_produto.produto_id %>
+</p>
+
+<p>
+  <b>Produto <%= t('NAME') %>:</b>
+  <%=h @pedido_compra_produto.produto_nome %>
+</p>
+
+<p>
+  <b>Quantidade:</b>
+  <%=h @pedido_compra_produto.quantidade %>
+</p>
+
+<p>
+  <b>Unitario dolar:</b>
+  <%=h @pedido_compra_produto.unitario_dolar %>
+</p>
+
+<p>
+  <b>Unitario guarani:</b>
+  <%=h @pedido_compra_produto.unitario_guarani %>
+</p>
+
+<p>
+  <b>Total dolar:</b>
+  <%=h @pedido_compra_produto.total_dolar %>
+</p>
+
+<p>
+  <b>Total guarani:</b>
+  <%=h @pedido_compra_produto.total_guarani %>
+</p>
+
+<p>
+  <b>Deposito:</b>
+  <%=h @pedido_compra_produto.deposito_id %>
+</p>
+
+<p>
+  <b>Deposito <%= t('NAME') %>:</b>
+  <%=h @pedido_compra_produto.deposito_nome %>
+</p>
+
+<p>
+  <b>Unidade created:</b>
+  <%=h @pedido_compra_produto.unidade_created %>
+</p>
+
+<p>
+  <b>Usuario created:</b>
+  <%=h @pedido_compra_produto.usuario_created %>
+</p>
+
+<p>
+  <b>Unidade updated:</b>
+  <%=h @pedido_compra_produto.unidade_updated %>
+</p>
+
+<p>
+  <b>Usuario updated:</b>
+  <%=h @pedido_compra_produto.usuario_updated %>
+</p>
+
+
+<%= link_to 'Edit', edit_pedido_compra_produto_path(@pedido_compra_produto) %> |
+<%= link_to 'Back', pedido_compra_produtos_path %>

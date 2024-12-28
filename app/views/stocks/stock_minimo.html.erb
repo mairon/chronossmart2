@@ -1,0 +1,152 @@
+<body onload="DataFinal(),CampoInicio()">
+  <h1 id="header">Stock Minimo Y Maximo</h1>
+  
+  <style type="text/css">
+    select {
+      width: 600px;
+    }
+  </style>
+  <div class="group">
+    <h2>
+      <%= form_tag resultado_stock_minimo_stocks_path, :method => "get" do%>
+        <table>          
+          <tr>
+            <td align="right">Clase :</td>
+            <td>
+              <%= text_field_tag( 'campo_clase',
+                                   nil,
+                                   :id       => "campo_clase",
+                                   
+                                                                 :size       => 5,
+                                                                 :onkeypress => "return bloqEnter(event)",
+                                                                 :onkeyup    => "EnterTab(event,'busca_clase')"
+                                                              ) %>
+
+              <%=   select("busca", "clase", Clase.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },                 
+                                                                                          { :include_blank => true },
+                                                                                          { :onkeypress    => "return bloqEnter(event)",
+                                                                                            :onkeyup       => "EnterTab(event,'campo_grupo')" })   %></td>
+          </tr>
+
+          <tr>
+            <td align="right">Grupo :</td>
+
+            <td>
+              <%= text_field_tag( 'campo_grupo',
+                                   nil,
+                                   :id       => "campo_grupo",
+                                                                 :onkeypress => "return bloqEnter(event)",
+                                                                 :onkeyup    => "EnterTab(event,'busca_grupo')",
+                                                                 :size       => 5
+                              ) %>
+
+              <%=   select("busca", "grupo", Grupo.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] }, 
+                                                                                          { :include_blank => true },
+                                                                                          { :onkeypress    => "return bloqEnter(event)",
+                                                                                            :onkeyup       => "EnterTab(event,'campo_produto')" })   %></td>
+          </tr>
+
+
+          <tr>
+            <td align="right">Producto :</td>
+
+            <td>
+              <%= text_field_tag( 'campo_produto',
+                                   nil,
+                                  :id       => "campo_produto",
+                                                                :size       => 5,
+                                                                :onkeypress => "return bloqEnter(event)",
+                                                                :onkeyup    => "EnterTab(event,'busca_produto')"
+
+                                ) %>
+
+
+              <%=   select("busca", "produto", Produto.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] }, 
+                                                                                                          { :include_blank => true },
+                                                                                                          { :onkeypress    => "return bloqEnter(event)",
+                                                                                                            :onkeyup       => "EnterTab(event,'busca_deposito')" })   %></td>
+          </tr>
+
+          <tr>
+            <td align="right">Deposito :</td>
+
+            <td>
+              <%=   select("busca", "deposito", Deposito.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] }, 
+                                                                                                            { :include_blank => true },
+                                                                                                            { :onkeypress    => "return bloqEnter(event)",
+                                                                                                              :onkeyup       => "EnterTab(event,'filtro')" })   %></td>
+          </tr>
+
+          <tr>
+            <td></td>
+            <td>
+              <fieldset>
+                <legend>Filtros</legend>
+
+                <input id         = "filtro"
+                       name       = "filtro"
+                       type       = "radio"
+                       value      = "0"
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Todos
+
+
+                <input id    ="filtro"
+                       name  ="filtro"
+                       type  ="radio"
+                       value ="1"
+                       checked
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Con Stock Minimo
+
+
+                <input id    ="filtro"
+                       name  ="filtro"
+                       type  ="radio"
+                       value ="2"
+                       checked
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Con Stock Maximo
+
+              </fieldset>
+            </td>
+          </tr>
+
+
+          <tr>
+            <td></td>
+            <td>
+              <input  id      ="button"
+                      type    ="submit"
+                      class   = "button_info"
+                      value   ="Informe"
+                      onclick = "Tipo('0')"/>
+
+              <input type     = "submit"
+                     class   = "button_info"
+                     value    = "Excel"
+                     onclick  = "Tipo('1')"/>
+
+
+            <input  id      ="button"            
+                    type    ="submit"
+                    class   = "button_info"
+                    value   ="Planilha"
+                    onclick = "Tipo('2')"/>
+            </td>
+
+          </tr>
+
+          <input type  = "hidden"
+                 name  = "tipo"
+                 id    = "tipo"
+                 size  = "5"
+                 value = "0"/>
+        </table>
+      <% end %>
+
+    </h2>
+  </div>
+</body>
+
+

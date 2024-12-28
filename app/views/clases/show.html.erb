@@ -1,0 +1,49 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-body">
+        <h3>
+          Clase/Marca: <strong><%= @clase.id.to_s.rjust(6,'0') %>-<%= @clase.descricao %></strong>
+        </h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%= form_tag update_individual_clases_path :method => :put do %>
+<div class="row">
+  <div class="col-md-12">    
+    <div class="panel">      
+      <div class="panel-body">
+        <h3>Percentual para la <%= t('SALE') %></h3>
+        <table class="head_grid">
+          <tr>
+            <td width="200"><%= t('UNIT') %></td>
+            <td width="150">Tabla</td>
+            <td width="150" align="right">%</td>
+          </tr>
+        </table>
+
+        <table>
+          <%= hidden_field_tag :id, @clase.id %>
+          <% @unidades_tabelas.each do |up| %>
+            <% for_tabela = @clase.id %>
+            <%= fields_for "products[]", up do |f| %>
+              <tr class = "<%= cycle("cor1", "cor2") %>">
+                <% for_tabela += 1 %>
+                <td width="200"><b><%= up.unidade.unidade_nome %></b</td>
+                <td width="150"><%= up.tabela_preco.nome %></td>
+                <%= field_us '', f, :perc %>
+              </tr>
+            <% end %>
+          <% end %>
+        </table>
+        <br>
+        <%= submit_tag "Actulizar Percentual", :class => "btn btn-green", :disable_with => "Aguarde..." %>
+        <%= link_to 'Finalizar', clases_path , :class => "btn btn-blue" %>
+        
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>

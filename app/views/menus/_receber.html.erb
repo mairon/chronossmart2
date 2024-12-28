@@ -1,0 +1,107 @@
+<% aut_hoje_saldo_us = 0 %>
+<% aut_hoje_saldo_gs = 0 %>
+
+<% aut_frente_saldo_us = 0 %>
+<% aut_frente_saldo_gs = 0 %>
+
+<div class="panel">
+	<h1 id="header">
+    <%= image_tag('001-download.png', height: '14px',style: "margin-top: -3px") %>
+			<%= t('ACCOUNT') %>s a <%= t('RECEIVE') %>
+			<div class="pull-right">	        
+	        <% if current_unidade.moeda == 0 %>
+		        <p style="font-size: 19px">
+		        	<small style="color: #000"><%= t('TODAY') %></small>
+		        	<a href="#">
+	        			<span class="us">U$ <b class="us"><%= format_decimal(@saldo_receber_hoje_us.to_f) %></b></span>
+		        	</a>
+		        </p>
+	        <% elsif current_unidade.moeda == 1 %>
+		        <p style="font-size: 19px">
+		        	<small style="color: #000"><%= t('TODAY') %></small>
+		        	<a href="#">
+	        			<span class="gs">GS <b class="gs"><%= format_int(@saldo_receber_hoje_gs.to_f) %></b></span>
+		        	</a>
+		        </p>
+	        <% elsif current_unidade.moeda == 2 %>
+		        <p style="font-size: 19px">
+		        	<small style="color: #000"><%= t('TODAY') %></small>
+		        	<a href="#">
+	        			<span class="rs">R$ <b class="rs"><%= format_decimal(@saldo_receber_hoje_rs.to_f) %></b></span>
+		        	</a>
+		        </p>
+	        <% end %>				
+			</div>
+  </h1>
+  <div class="panel-body">
+		<div class="row">
+			<div class="col-md-6">
+				<header>
+	        <strong><small style="color: #000">En Atraso</small></strong>
+	        <% if current_unidade.moeda == 0 %>
+		        <p style="font-size: 19px">
+		        	<a href="#">
+	        			<span class="us">U$ <b class="us"><%= format_decimal(@saldo_receber_atraso_us.to_f) %></b></span>
+		        	</a>
+		        </p>
+	        <% elsif current_unidade.moeda == 1 %>
+		        <p style="font-size: 19px">
+		        	<a href="#">
+	        			<span class="gs">GS <b class="gs"><%= format_int(@saldo_receber_atraso_gs.to_f) %></b></span>
+		        	</a>
+		        </p>
+	        <% elsif current_unidade.moeda == 2 %>
+		        <p style="font-size: 19px">
+		        	<a href="#">
+	        			<span class="rs">R$ <b class="rs"><%= format_decimal(@saldo_receber_atraso_rs.to_f) %></b></span>
+		        	</a>
+		        </p>
+
+	        <% end %>
+	      </header>
+			</div>
+
+			<div class="col-md-6">
+				<header>
+	        <strong><small style="color: #000"><%= t('REMAINING') %> <%= t('OF') %> <%= t('MONTH') %></small></strong>
+	        <% if current_unidade.moeda == 0 %>
+
+		        <p style="font-size: 19px">
+		        	<a href="#">
+		        		<span class="us">
+		        			U$ <b class="us"><%= format_decimal(@saldo_receber_mes_us.to_f) %></b>
+		        	</span>
+		        	</a>
+		        </p>
+
+	        <% elsif current_unidade.moeda == 1 %>
+
+		        <p style="font-size: 19px">
+		        	<a href="#">
+        				<span class="gs">
+        					GS <b class="gs"><%= format_int(@saldo_receber_mes_gs.to_f) %></b>
+        				</span>
+		        	</a>
+		        </p>
+
+	        <% elsif current_unidade.moeda == 2 %>
+
+		        <p style="font-size: 19px">
+		        	<a href="#">
+		        		<span class="rs">
+		        			R$ <b class="rs"><%= format_decimal(@saldo_receber_mes_rs.to_f) %></b>
+		        		</span>
+		        	</a>
+		        </p>
+	        <% end %>
+	      </header>		  									
+			</div>
+		</div>
+  </div>
+</div>
+
+<script>
+	function ComprovanteReceber(){
+		window.open('/clientes/painel_receber?lp=consulta', '', ' SCROLLBARS=YES, TOP=150, LEFT=300, WIDTH=750, HEIGHT=700');
+	}
+</script>

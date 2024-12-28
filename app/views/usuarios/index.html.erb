@@ -1,0 +1,26 @@
+<h1 id="header">Usuários</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_usuario_path, :class => 'button add' %>
+</div>
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="110" align="center"><%= t('CODE') %></td>
+      <td width="400"><%= t('NAME') %></td>
+      <td width="80"></td>
+    </tr>
+  </table>
+  <div class="rolagem" id="div">
+    <table>
+      <% @usuarios.each do |usuario| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="110"  align="center"><%=h usuario.id.to_s.rjust(6,'0') %></td>
+          <td width="400" align="left"><%=h usuario.usuario_nome %></td>
+          <td><%= link_to '', edit_usuario_path(usuario), class: 'icon-pencil', title: 'Modificar' %></td>
+          <td><%= link_to '', usuario, confirm: 'Estas Seguro?', method: :delete, class: 'icon-trash', title: t('DELETE') %></td>
+          <td><%= link_to '', usuario_path(usuario), class: 'icon-user', title: 'Perfil do Usuario' %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

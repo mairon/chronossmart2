@@ -1,0 +1,112 @@
+
+<div class="c-entity-detail-tab">
+  <div class="c-entity-timeline-form__header">
+     <div class="c-entity-timeline-form__containers">
+        <div class="c-entity-timeline-form__header__tabs">
+
+           <div class="c-button-mds c-button-mds--flat c-button-mds--primary c-entity-timeline-form__header__tab c-entity-timeline-form__header__tab--note">
+              <button type="button" class="c-button-mds__button c-button-mds__button--flat c-button-mds__button--primary">
+                 <span class="c-text c-texts">Nota</span><!---->
+              </button>
+           </div>
+
+           <div class="c-button-mds c-button-mds--flat c-button-mds--primary c-entity-timeline-form__header__tab c-entity-timeline-form__header__tab--activity">
+              <button type="button" class="c-button-mds__button c-button-mds__button--flat c-button-mds__button--primary">
+                 <span class="c-text c-texts">Actividades</span><!---->
+              </button>
+           </div>
+           <span class="c-entity-timeline-form__header__tabs__indicator"></span>
+        </div>
+     </div>
+  </div>
+
+  <div class="tab-tasks" style="display: none;">
+		<%= render "tasks" %>
+	</div>
+	<div class="tab-notes">
+		<%= render "notes" %>
+	</div>
+
+</div>
+
+<script>
+	
+	$(".c-entity-timeline-form__header__tab--activity").click(function(){
+		$('.c-entity-timeline-form__header__tabs').removeClass('c-entity-timeline-form__header__tabs--selected-0'); 
+		$('.c-entity-timeline-form__header__tabs').addClass('c-entity-timeline-form__header__tabs--selected-1');
+		$('.tab-tasks').show();
+		$('.tab-notes').hide();
+
+	});
+
+
+	$(".c-entity-timeline-form__header__tab--note").click(function(){
+		$('.c-entity-timeline-form__header__tabs').removeClass('c-entity-timeline-form__header__tabs--selected-1'); 
+		$('.c-entity-timeline-form__header__tabs').addClass('c-entity-timeline-form__header__tabs--selected-0'); 
+		$('.tab-notes').show();
+		$('.tab-tasks').hide();
+
+	});
+
+	$('.btn-group').on('click', '.btn', function() {
+	  $(this).addClass('active').siblings().removeClass('active');
+	});
+
+</script>
+
+<style>
+/****  magic trick  *****/
+
+.btn .btn-secondary, .active {
+  background-color: #5788fd !important;
+  border-color: #eef3ff !important;
+  color: #fff !important;
+}
+
+.active svg path{
+  fill: currentcolor;
+}
+
+.btn .btn-secondary, .active:hover {
+  background-color: #5788fd !important;
+  border-color: #5788fd !important;
+  color: white !important;
+}
+
+.c-entity-timeline-form__body .panel-body{
+	padding-left: 20px;
+}
+
+.tipo-tasks .c-breadcrumb__funnel{
+	line-height: 35px;
+	font-size: 12px;
+	color: #6d758d;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.tipo-tasks .c-breadcrumb__funnel a{
+	color: #6d758d;
+
+}
+
+.c-entity-timeline-form__footer .btn-blue{
+	margin: 12px;
+}
+
+button {
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.c-texts{
+	font-size: 14px !important;
+}
+
+.c-entity-timeline-form__body__note{
+	margin-left: 8px;
+	margin-right: 8px;
+}
+
+</style>

@@ -1,0 +1,159 @@
+<table>
+  <tr>
+    <td align="left"></td>
+  </tr>
+</table>
+<h1 align="center"><%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 60) %></h1>
+<h1 align="center">PRESUPUESTO</h1>
+
+<style>
+  .border1{
+    border: 2px solid #000;
+    border-radius: 4px;   
+  }
+
+  .border1 table{
+    margin: 15px;
+  }
+
+  .border1 td{
+    font-size: 14px;
+  }
+
+  .border1 label{
+    color: #999;
+    font-size: 14px;
+  }
+
+  h2{
+    color: #000;
+  }
+
+  .grid td {
+    padding: 10px;
+    border-bottom: 1px solid #efefef !important;
+  }
+  .grid .cor1 {
+    background-color: #f9f9f9 !important;
+  }
+
+  .grid {
+    border-radius: 2px;
+  }
+</style>
+<div class="border1">
+  <table>
+    <tr>
+      <td width="600" colspan="3">
+        <label>Cliente</label><br>
+        <%= @presupuesto.persona.nome %>
+      </td>
+
+      <td>
+        <label>Nº Contacto</label><br>
+        <%= @presupuesto.persona.telefone %>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="2">
+        <label>Vendedor</label><br>
+        <% vd = Persona.find(@presupuesto.vendedor_id)%>
+        <%= vd.nome %>
+      </td>
+      <td>
+        <label>Condición de Pago</label><br>
+        <%= @presupuesto.plano.condicao unless @presupuesto.plano_id.blank? %>
+      </td>
+
+      <td>
+        <label>Control</label><br>
+        <b><%= @presupuesto.id.to_s.rjust(6,'0') %></b>
+      </td>
+
+    </tr>    
+  </table>
+</div>
+
+<br>
+<h2 align="center">Itens</h2>
+<div class="border1" style="min-height:600px;">
+  
+  
+<table class="grid"> 
+  <tr style="font-weight: bold;background-color: #999;">
+    <td align="center" width="30">#</td>
+    <td align="center" width="100">Referencia</td>
+    <td width="555">Producto</td>
+    <td align="right" width="50">Cantidad</td>
+    <td align="right" width="70">Unit.</td>
+    <td align="right" width="70">Tot.</td>
+  </tr>
+      <% qtd    = 0 %>
+      <% tot    = 0 %>
+      <% indice = 1 %>
+      <% @presupuesto_produto.each do |pc|%>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td align="center" width="30"><%= indice %></td>
+        <td align="center" width="100"><%= pc.produto.fabricante_cod %></td>
+        <td align="left" width="555"><%= pc.produto_id.to_s.rjust(6,'0') %>-<%= pc.produto.nome %></td>
+        <td align="right" width="50"><%= pc.quantidade %></td>
+        <% if @presupuesto.moeda.to_i == 0 %>
+          <td align="right" width="70"><%= format_decimal(pc.unitario_dolar) %></td>
+          <td align="right" width="70"><%= format_decimal(pc.total_dolar) %></td>
+          <% tot    += pc.total_dolar %>
+        <% else %>
+          <td align="right" width="70"><%= format_int(pc.unitario_guarani) %></td>
+          <td align="right" width="70"><%= format_int(pc.total_guarani) %></td>
+          <% tot    += pc.total_guarani %>
+        <% end %>
+      </tr>
+      <% qtd    += pc.quantidade %>
+      <% indice + 1 %>
+     <% end %>
+     <tr class="head">
+      <td colspan="3" align="right">Total</td>
+      <td align="right"> <%= qtd.to_f %></td>
+      <td></td>
+      <% if @presupuesto.moeda.to_i == 0 %>
+        <td align="right" width="70"><%= format_decimal(tot) %></td>
+      <% else %>
+        <td align="right" width="70"><%= format_int(tot) %></td>
+      <% end %>
+
+     </tr>
+   </table>
+
+
+
+  <br>
+
+  <table>
+    <tr>
+      <td width="600">
+        <label>Obs</label><br>
+        <%= @presupuesto.obs %>
+      </td>
+    </tr>
+    
+  </table>
+</div>
+
+  <br>
+  <br>
+  <br>
+
+  <table style="font-size: 14px;">
+    <tr>
+      <td width="300" align="center">
+        __________________________________________ <br>
+        Firma 
+      </td>
+      <td width="300"></td>
+
+      <td width="300" align="center">
+        
+      </td>     
+    </tr>
+  </table>
+

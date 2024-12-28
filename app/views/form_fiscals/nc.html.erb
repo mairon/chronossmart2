@@ -1,0 +1,544 @@
+<body  onload="print()">
+<style>
+	div, table{
+		font-family: arial;
+		font-size: 12 ;
+	}
+</style>
+<% nt = NotaCredito.find_by_id(@nc.cod_proc) %>
+<% space_1 = 400 %>
+<% space_2 = 800 %>
+<!-- primeira via -->
+<div style="position: absolute;top:70px;left:585px;">
+	<small><%= @nc.doc %></small>
+</div>
+
+<div style="position: absolute;top:80px;left:150px;">
+	<%=l @nc.data.to_date.to_date %>
+</div>
+
+<div style="position: absolute;top:95px;left:500px;">
+	<%= @nc.ruc %>
+</div>
+
+<div style="position: absolute;top:95px;left:110px;">
+	<%= @nc.persona_nome %>
+</div>
+
+<div style="position: absolute;top:110px;left:95px;">
+	<%= @nc.persona.direcao %>
+</div>
+
+<div style="position: absolute;top:115px;left:505px;">
+	<%= @nc.persona.telefone %>
+</div>
+
+<div style="position: absolute;top:130px;left:100px;">
+	<% if nt.operacao == 0 #devolução de produtos %>
+		001-001-<%= nt.nota_creditos_detalhes.last.documento_numero.to_s.rjust(6,'0') %>
+	<% else %>
+		001-001-<%= nt.nota_creditos_docs.last.documento_numero.to_s.rjust(6,'0') %>
+	<% end %>
+</div>
+
+
+
+			<% tot = 0 %>
+			<% tot_ex = 0 %>
+			<% tot_05 = 0 %>
+			<% tot_10 = 0 %>
+
+<div style="position: absolute;top:180px;left:70px;">
+	<table>
+	
+	<% if nt.operacao == 0 #devolução de produtos %>
+		<% produtos = NotaCreditosDetalhe.where("nota_credito_id = #{@nc.cod_proc}")%>
+		<% produtos.each do |p| %>
+
+
+			<tr>
+				<td width="32" align="center"><%= p.quantidade %></td>
+				<td width="305"><%= p.produto.nome %> </td>
+
+				<% if nt.moeda.to_i == 0 %>
+					<!-- Dolar !-->
+					<td width="70" align="right"><%= format_decimal(p.unitario_dolar.to_f) %></td>
+
+					<% if p.produto.taxa.to_i == 0 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_decimal(p.total_dolar.to_f)%></td>
+						<% tot_ex += p.total_dolar.to_f %>
+
+					<% elsif p.produto.taxa.to_i == 5 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_decimal(p.total_dolar.to_f)%></td>
+						<td width="70" align="right">0</td>
+						<% tot_05 += p.total_dolar.to_f %>
+						
+					<% elsif p.produto.taxa.to_i == 10 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_decimal(p.total_dolar.to_f)%></td>
+						<% tot_10 += p.total_dolar.to_f %>					
+					<% end %>
+
+					<% tot += p.total_dolar.to_f %>
+
+				<% else %>
+
+					<!-- Guarani !-->
+					<td width="70" align="right"><%= format_int(p.unitario_guarani.to_f) %></td>
+					<% if p.produto.taxa.to_i == 0 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_int(p.total_guarani.to_f)%></td>
+						<% tot_ex += p.total_guarani.to_f %>
+
+					<% elsif p.produto.taxa.to_i == 5 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_int(p.total_guarani.to_f)%></td>
+						<td width="70" align="right">0</td>
+						<% tot_05 += p.total_guarani.to_f %>
+						
+					<% elsif p.produto.taxa.to_i == 10 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_int(p.total_guarani.to_f)%></td>
+						<% tot_10 += p.total_guarani.to_f %>
+					<% end %>
+					<% tot += p.total_guarani.to_f %>
+				<% end %>
+			</tr>
+		<% end %>		
+
+	<% else #desconto sem produto %>
+
+		<tr>
+			<td width="32" align="center">1</td>
+			<td width="280">DESCUENTOS CLIENTES </td>
+			<td width="70" align="right"><%= format_decimal(nt.nota_creditos_docs.sum(:valor_dolar) ) %></td>
+
+			<% if nt.moeda.to_i == 0 %>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right"><%= format_decimal(nt.nota_creditos_docs.sum(:valor_dolar) ) %></td>
+				<% tot_10 += nt.nota_creditos_docs.sum(:valor_dolar).to_f %>
+				<% tot += nt.nota_creditos_docs.sum(:valor_dolar).to_f %>
+			<% else %>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right"><%= format_int(nt.nota_creditos_docs.sum(:valor_guarani) ) %></td>
+			<% end %>			
+		</tr>		
+	<% end %>
+	</table>
+</div>
+
+
+<div style="position: absolute;top:335px;left:140px;">
+	<% if nt.moeda.to_i == 0 %>
+		<!-- em letras dolar !-->
+		<% real,cents=("%.2f" % tot.to_f).split(/\./).map{ |m| m.to_i}
+		    valor_cents=Extenso.por_extenso(cents%100)
+		    valor_cents+= case cents.to_i%100
+		    when 0 then ""
+		    when 1 then " "
+		    when 2..99 then " "
+		    end %>
+		<%=  em_letras_us = (I18n.with_locale(:es) { tot.to_i.to_words.upcase } + ' CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS') %>
+				
+		<% else %>
+			<%= I18n.with_locale(:es) { @nc.tot_gs.to_i.to_words.upcase } %>
+	<% end %>
+</div>
+
+<!-- SUB TOTAIS !-->
+<div style="position: absolute;top:320px;left:550px;">
+   <%= format_decimal(tot_ex.to_f) %>
+</div>
+
+<div style="position: absolute;top:320px;left:600px;">
+	<%= format_decimal(tot_05.to_f) %>
+</div>
+
+<div style="position: absolute;top:320px;left:680px;">
+	<%= format_decimal(tot_10.to_f) %>
+</div>
+
+<div style="position: absolute;top:350px;left:680px;">
+	<%= format_decimal(tot.to_f) %>
+</div>
+
+
+<!-- imposto !-->
+
+<div style="position: absolute;top:355px;left:200px;">
+	<%= format_decimal(tot_05.to_f / 21) %>
+</div>
+
+<div style="position: absolute;top:355px;left:320px;">
+	<%= format_decimal(tot_10.to_f / 11) %>
+</div>
+
+<div style="position: absolute;top:355px;left:500px;">
+	<%= format_decimal(  (tot_10.to_f / 11) ) %>
+</div>
+
+
+
+
+<!-- segunda via -->
+<div style="position: absolute;top: <%= space_1.to_i + 70 %>px;left:585px;">
+	<small><%= @nc.doc %></small>
+</div>
+
+<div style="position: absolute;top:<%= space_1.to_i + 80 %>px;left:150px;">
+	<%=l @nc.data.to_date.to_date %>
+</div>
+
+<div style="position: absolute;top:<%= space_1.to_i + 95 %>;left:500px;">
+	<%= @nc.ruc %>
+</div>
+
+<div style="position: absolute;top:<%= space_1.to_i + 95 %>px;left:110px;">
+	<%= @nc.persona_nome %>
+</div>
+
+<div style="position: absolute;top:<%= space_1.to_i + 110 %>px;left:95px;">
+	<%= @nc.persona.direcao %>
+</div>
+
+<div style="position: absolute;top:<%= space_1.to_i + 115 %>px;left:505px;">
+	<%= @nc.persona.telefone %>
+</div>
+
+<div style="position: absolute;top:<%= space_1.to_i + 130 %>px;left:100px;">
+	<% if nt.operacao == 0 #devolução de produtos %>
+		001-001-<%= nt.nota_creditos_detalhes.last.documento_numero.to_s.rjust(6,'0') %>
+	<% else %>
+		001-001-<%= nt.nota_creditos_docs.last.documento_numero.to_s.rjust(6,'0') %>
+	<% end %>
+</div>
+
+
+
+			<% tot = 0 %>
+			<% tot_ex = 0 %>
+			<% tot_05 = 0 %>
+			<% tot_10 = 0 %>
+
+<div style="position: absolute;top:<%= space_1.to_i + 180 %>px;left:70px;">
+	<table>
+	
+	<% if nt.operacao == 0 #devolução de produtos %>
+		<% produtos = NotaCreditosDetalhe.where("nota_credito_id = #{@nc.cod_proc}")%>
+		<% produtos.each do |p| %>
+
+
+			<tr>
+				<td width="32" align="center"><%= p.quantidade %></td>
+				<td width="305"><%= p.produto.nome %> </td>
+
+				<% if nt.moeda.to_i == 0 %>
+					<!-- Dolar !-->
+					<td width="70" align="right"><%= format_decimal(p.unitario_dolar.to_f) %></td>
+
+					<% if p.produto.taxa.to_i == 0 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_decimal(p.total_dolar.to_f)%></td>
+						<% tot_ex += p.total_dolar.to_f %>
+
+					<% elsif p.produto.taxa.to_i == 5 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_decimal(p.total_dolar.to_f)%></td>
+						<td width="70" align="right">0</td>
+						<% tot_05 += p.total_dolar.to_f %>
+						
+					<% elsif p.produto.taxa.to_i == 10 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_decimal(p.total_dolar.to_f)%></td>
+						<% tot_10 += p.total_dolar.to_f %>					
+					<% end %>
+
+					<% tot += p.total_dolar.to_f %>
+
+				<% else %>
+
+					<!-- Guarani !-->
+					<td width="70" align="right"><%= format_int(p.unitario_guarani.to_f) %></td>
+					<% if p.produto.taxa.to_i == 0 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_int(p.total_guarani.to_f)%></td>
+						<% tot_ex += p.total_guarani.to_f %>
+
+					<% elsif p.produto.taxa.to_i == 5 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_int(p.total_guarani.to_f)%></td>
+						<td width="70" align="right">0</td>
+						<% tot_05 += p.total_guarani.to_f %>
+						
+					<% elsif p.produto.taxa.to_i == 10 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_int(p.total_guarani.to_f)%></td>
+						<% tot_10 += p.total_guarani.to_f %>
+					<% end %>
+					<% tot += p.total_guarani.to_f %>
+				<% end %>
+			</tr>
+		<% end %>		
+
+	<% else #desconto sem produto %>
+
+		<tr>
+			<td width="32" align="center">1</td>
+			<td width="280">DESCUENTOS CLIENTES </td>
+			<td width="70" align="right"><%= format_decimal(nt.nota_creditos_docs.sum(:valor_dolar) ) %></td>
+
+			<% if nt.moeda.to_i == 0 %>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right"><%= format_decimal(nt.nota_creditos_docs.sum(:valor_dolar) ) %></td>
+				<% tot_10 += nt.nota_creditos_docs.sum(:valor_dolar).to_f %>
+				<% tot += nt.nota_creditos_docs.sum(:valor_dolar).to_f %>
+			<% else %>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right"><%= format_int(nt.nota_creditos_docs.sum(:valor_guarani) ) %></td>
+			<% end %>			
+		</tr>		
+	<% end %>
+	</table>
+</div>
+
+
+<div style="position: absolute;top:<%= space_1.to_i + 335 %>px;left:140px;">
+	<% if nt.moeda.to_i == 0 %>
+		<!-- em letras dolar !-->
+		<% real,cents=("%.2f" % tot.to_f).split(/\./).map{ |m| m.to_i}
+		    valor_cents=Extenso.por_extenso(cents%100)
+		    valor_cents+= case cents.to_i%100
+		    when 0 then ""
+		    when 1 then " "
+		    when 2..99 then " "
+		    end %>
+		<%=  em_letras_us = (I18n.with_locale(:es) { tot.to_i.to_words.upcase } + ' CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS') %>
+				
+		<% else %>
+			<%= I18n.with_locale(:es) { @nc.tot_gs.to_i.to_words.upcase } %>
+	<% end %>
+</div>
+
+<!-- SUB TOTAIS !-->
+<div style="position: absolute;top:<%= space_1.to_i + 320 %>px;left:550px;">
+   <%= format_decimal(tot_ex.to_f) %>
+</div>
+
+<div style="position: absolute;top:<%= space_1.to_i + 320 %>px;left:600px;">
+	<%= format_decimal(tot_05.to_f) %>
+</div>
+
+<div style="position: absolute;top:<%= space_1.to_i + 320 %>px;left:680px;">
+	<%= format_decimal(tot_10.to_f) %>
+</div>
+
+<div style="position: absolute;top:<%= space_1.to_i + 350 %>px;left:680px;">
+	<%= format_decimal(tot.to_f) %>
+</div>
+
+
+<!-- imposto !-->
+
+<div style="position: absolute;top:<%= space_1.to_i + 355 %>px;left:200px;">
+	<%= format_decimal(tot_05.to_f / 21) %>
+</div>
+
+<div style="position: absolute;top:<%= space_1.to_i + 355 %>px;left:320px;">
+	<%= format_decimal(tot_10.to_f / 11) %>
+</div>
+
+<div style="position: absolute;top:<%= space_1.to_i + 355 %>px;left:500px;">
+	<%= format_decimal(  (tot_10.to_f / 11) ) %>
+</div>
+
+
+<!-- terceira via  -->
+<div style="position: absolute;top: <%= space_2.to_i + 70 %>px;left:585px;">
+	<small><%= @nc.doc %></small>
+</div>
+
+<div style="position: absolute;top:<%= space_2.to_i + 80 %>px;left:150px;">
+	<%=l @nc.data.to_date.to_date %>
+</div>
+
+<div style="position: absolute;top:<%= space_2.to_i + 95 %>;left:500px;">
+	<%= @nc.ruc %>
+</div>
+
+<div style="position: absolute;top:<%= space_2.to_i + 95 %>px;left:110px;">
+	<%= @nc.persona_nome %>
+</div>
+
+<div style="position: absolute;top:<%= space_2.to_i + 110 %>px;left:95px;">
+	<%= @nc.persona.direcao %>
+</div>
+
+<div style="position: absolute;top:<%= space_2.to_i + 115 %>px;left:505px;">
+	<%= @nc.persona.telefone %>
+</div>
+
+<div style="position: absolute;top:<%= space_2.to_i + 130 %>px;left:100px;">
+	<% if nt.operacao == 0 #devolução de produtos %>
+		001-001-<%= nt.nota_creditos_detalhes.last.documento_numero.to_s.rjust(6,'0') %>
+	<% else %>
+		001-001-<%= nt.nota_creditos_docs.last.documento_numero.to_s.rjust(6,'0') %>
+	<% end %>
+</div>
+
+
+
+			<% tot = 0 %>
+			<% tot_ex = 0 %>
+			<% tot_05 = 0 %>
+			<% tot_10 = 0 %>
+
+<div style="position: absolute;top:<%= space_2.to_i + 180 %>px;left:70px;">
+	<table>
+	
+	<% if nt.operacao == 0 #devolução de produtos %>
+		<% produtos = NotaCreditosDetalhe.where("nota_credito_id = #{@nc.cod_proc}")%>
+		<% produtos.each do |p| %>
+
+
+			<tr>
+				<td width="32" align="center"><%= p.quantidade %></td>
+				<td width="305"><%= p.produto.nome %> </td>
+
+				<% if nt.moeda.to_i == 0 %>
+					<!-- Dolar !-->
+					<td width="70" align="right"><%= format_decimal(p.unitario_dolar.to_f) %></td>
+
+					<% if p.produto.taxa.to_i == 0 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_decimal(p.total_dolar.to_f)%></td>
+						<% tot_ex += p.total_dolar.to_f %>
+
+					<% elsif p.produto.taxa.to_i == 5 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_decimal(p.total_dolar.to_f)%></td>
+						<td width="70" align="right">0</td>
+						<% tot_05 += p.total_dolar.to_f %>
+						
+					<% elsif p.produto.taxa.to_i == 10 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_decimal(p.total_dolar.to_f)%></td>
+						<% tot_10 += p.total_dolar.to_f %>					
+					<% end %>
+
+					<% tot += p.total_dolar.to_f %>
+
+				<% else %>
+
+					<!-- Guarani !-->
+					<td width="70" align="right"><%= format_int(p.unitario_guarani.to_f) %></td>
+					<% if p.produto.taxa.to_i == 0 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_int(p.total_guarani.to_f)%></td>
+						<% tot_ex += p.total_guarani.to_f %>
+
+					<% elsif p.produto.taxa.to_i == 5 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_int(p.total_guarani.to_f)%></td>
+						<td width="70" align="right">0</td>
+						<% tot_05 += p.total_guarani.to_f %>
+						
+					<% elsif p.produto.taxa.to_i == 10 %>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right">0</td>
+						<td width="70" align="right"><%= format_int(p.total_guarani.to_f)%></td>
+						<% tot_10 += p.total_guarani.to_f %>
+					<% end %>
+					<% tot += p.total_guarani.to_f %>
+				<% end %>
+			</tr>
+		<% end %>		
+
+	<% else #desconto sem produto %>
+
+		<tr>
+			<td width="32" align="center">1</td>
+			<td width="280">DESCUENTOS CLIENTES </td>
+			<td width="70" align="right"><%= format_decimal(nt.nota_creditos_docs.sum(:valor_dolar) ) %></td>
+
+			<% if nt.moeda.to_i == 0 %>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right"><%= format_decimal(nt.nota_creditos_docs.sum(:valor_dolar) ) %></td>
+				<% tot_10 += nt.nota_creditos_docs.sum(:valor_dolar).to_f %>
+				<% tot += nt.nota_creditos_docs.sum(:valor_dolar).to_f %>
+			<% else %>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right"><%= format_int(nt.nota_creditos_docs.sum(:valor_guarani) ) %></td>
+			<% end %>			
+		</tr>		
+	<% end %>
+	</table>
+</div>
+
+
+<div style="position: absolute;top:<%= space_2.to_i + 335 %>px;left:140px;">
+	<% if nt.moeda.to_i == 0 %>
+		<!-- em letras dolar !-->
+		<% real,cents=("%.2f" % tot.to_f).split(/\./).map{ |m| m.to_i}
+		    valor_cents=Extenso.por_extenso(cents%100)
+		    valor_cents+= case cents.to_i%100
+		    when 0 then ""
+		    when 1 then " "
+		    when 2..99 then " "
+		    end %>
+		<%=  em_letras_us = (I18n.with_locale(:es) { tot.to_i.to_words.upcase } + ' CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS') %>
+				
+		<% else %>
+			<%= I18n.with_locale(:es) { @nc.tot_gs.to_i.to_words.upcase } %>
+	<% end %>
+</div>
+
+<!-- SUB TOTAIS !-->
+<div style="position: absolute;top:<%= space_2.to_i + 320 %>px;left:550px;">
+   <%= format_decimal(tot_ex.to_f) %>
+</div>
+
+<div style="position: absolute;top:<%= space_2.to_i + 320 %>px;left:600px;">
+	<%= format_decimal(tot_05.to_f) %>
+</div>
+
+<div style="position: absolute;top:<%= space_2.to_i + 320 %>px;left:680px;">
+	<%= format_decimal(tot_10.to_f) %>
+</div>
+
+<div style="position: absolute;top:<%= space_2.to_i + 350 %>px;left:680px;">
+	<%= format_decimal(tot.to_f) %>
+</div>
+
+
+<!-- imposto !-->
+
+<div style="position: absolute;top:<%= space_2.to_i + 355 %>px;left:200px;">
+	<%= format_decimal(tot_05.to_f / 21) %>
+</div>
+
+<div style="position: absolute;top:<%= space_2.to_i + 355 %>px;left:320px;">
+	<%= format_decimal(tot_10.to_f / 11) %>
+</div>
+
+<div style="position: absolute;top:<%= space_2.to_i + 355 %>px;left:500px;">
+	<%= format_decimal(  (tot_10.to_f / 11) ) %>
+</div>

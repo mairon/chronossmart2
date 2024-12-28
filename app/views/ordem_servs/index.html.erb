@@ -1,0 +1,61 @@
+<h1 id="header">Orden de Servicio </h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_ordem_serv_path, :class => "button add" %>
+</div>
+ <div class="group">
+     <%= form_tag busca_ordem_servs_path, :method => "get" do%>
+      <table>
+        <tr>
+          <!--FILTRO_DATA!-->
+          <td><%= t('DATE') %></td>
+          <td colspan="2"> 
+            <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+            <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+            </div>
+            <div class="date-separ" style="margin-top: 10px"><%= t('TO') %></div>
+          <td class="date-separ">
+            <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+            <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+            </div>
+          </td>
+          <td>
+              Status
+             <select name="status" id="status">
+                <option>TODOS</option>
+                <option>PENDIENTE</option>
+                <option>CANCELADO</option>
+                <option>BAJADO</option>
+            </select>
+          </td>
+
+
+          <td>
+             <select name="tipo" id="tipo">
+               <option>CLIENTE</option>
+               <option>RT</option>
+               <option>CODIGO</option>
+               <option>RESPONSAVEL</option>
+            </select>
+          </td>
+
+          <td colspan="4">
+            <input id="busca" name="busca" type="text" onkeyup = "pesquisa(this.value)"size="32"/>
+            <input type="button" class="btn btn-default" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar"/>
+            <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;") %>
+          </td>
+         </tr>
+      </table>
+      <input type="hidden" id="seta" value="0"/>
+     <% end %>
+    <div id="pagina">
+    </div>     
+ </div>
+<script language="javascript">
+  function pesquisa(valor){
+    url="/ordem_servs/busca?" + $('form').serialize();
+    ajax(url);
+  }
+</script>
+<%= javascript_include_tag 'busca_ajax' %>

@@ -1,0 +1,62 @@
+<%= form_for(@controle_km) do |f| %>
+  <% if @controle_km.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@controle_km.errors.count, "error") %> prohibited this controle_km from being saved:</h2>
+
+      <ul>
+      <% @controle_km.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> controle_kms - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">rodado_id :</td>                    
+                      <td><%= f.number_field :rodado_id %></td>
+                                      
+                      <td align="right">km :</td>                    
+                      <td><%= f.number_field :km %></td>
+                                      
+                      <td align="right">tabela :</td>                    
+                      <td><%= f.text_field :tabela %></td>
+                                      
+                      <td align="right">tabela_id :</td>                    
+                      <td><%= f.number_field :tabela_id %></td>
+                                      
+                      <td align="right">cod_proc :</td>                    
+                      <td><%= f.number_field :cod_proc %></td>
+                                      
+                      <td align="right">sigla_proc :</td>                    
+                      <td><%= f.text_field :sigla_proc %></td>
+                                      
+                      <td align="right"><%= t('DATE') %> :</td>                    
+                      <td><%= f.date_select :data %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), controle_kms_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

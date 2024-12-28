@@ -1,0 +1,27 @@
+<h1 id="header">solicitude_credito_autorizacoes</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_solicitude_credito_autorizacao_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Solicitude credio</t>
+            <td>Status</t>
+            <td>Obs</t>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @solicitude_credito_autorizacoes.each do |solicitude_credito_autorizacao| %>
+      <tr>
+                  <td><%= solicitude_credito_autorizacao.solicitude_credio_id %></td>
+                  <td><%= solicitude_credito_autorizacao.status %></td>
+                  <td><%= solicitude_credito_autorizacao.obs %></td>
+                <td><%= link_to 'Editar', edit_solicitude_credito_autorizacao_path(solicitude_credito_autorizacao) %></td>
+        <td><%= link_to 'Borrar', solicitude_credito_autorizacao, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

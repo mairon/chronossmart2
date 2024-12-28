@@ -1,0 +1,156 @@
+<div class="row">
+  <div class="col-md-6">
+    <div class="panel">
+      <h1 id="header">
+        Autorización Gerencial
+        <div class="pull-right">
+          <a class="modalButton-frma btn btn-blue" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-autorizacao-gerencial"><i class="icon-white icon-refresh"></i></a>
+        </div>        
+      </h1>
+
+      <div class="panel-body">
+        <table class="list">
+          
+        
+        <% @solicitude_credito.solicitude_credito_autorizacoes.where(tipo: 0).order("id desc").each do |s| %>
+          <tr>
+            <td><%= s.created_at.strftime("%d/%m/%y - %H:%M") %></td>
+            <td>
+              <% if s.status.to_i == 0 %>
+                <span class="rs">Pendiente</span>
+              <% elsif s.status.to_i == 1 %>
+                <span class="us">Autorizado</span>
+              <% elsif s.status.to_i == 2 %>
+                <span class="gs">Rezachado</span>
+              <% end %>
+            </td>
+            <td><%= s.usuario.usuario_nome %></td>
+            <td><%= s.obs %></td>
+            <td><%= link_to '', s, confirm: 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+
+          </tr>
+        <% end %>
+        </table>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="panel">
+      <h1 id="header">
+        Autorización Juridica
+        <div class="pull-right">
+          <a class="modalButton-frma btn btn-blue" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-autorizacao-juridica"><i class="icon-white icon-refresh"></i></a>
+        </div>        
+
+      </h1>
+
+      <div class="panel-body">
+        <table class="list">
+        <% @solicitude_credito.solicitude_credito_autorizacoes.where(tipo: 1).order("id desc").each do |s| %>
+          <tr>
+            <td><%= s.created_at.strftime("%d/%m/%y - %H:%M") %></td>
+            <td>
+              <% if s.status.to_i == 0 %>
+                <span class="rs">Pendiente</span>
+              <% elsif s.status.to_i == 1 %>
+                <span class="us">Autorizado</span>
+              <% elsif s.status.to_i == 2 %>
+                <span class="gs">Rezachado</span>
+              <% end %>
+            </td>
+            <td><%= s.usuario.usuario_nome %></td>
+            <td><%= s.obs %></td>
+            <td><%= link_to '', s, confirm: 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>            
+          </tr>
+        <% end %>
+        </table>
+      </div>
+    </div>
+  </div>      
+</div>
+
+
+<div class="modal fade" id="modal-autorizacao-juridica" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel">Autorización</h4>
+      </div>
+      <div class="modal-body">
+        <%= form_for(SolicitudeCreditoAutorizacao.new) do |f| %>
+          <%= f.hidden_field :tipo, value: 1 %>
+          <%= f.hidden_field :solicitude_credito_id, value: @solicitude_credito.id %>
+          <div class="row panel-modal-body">
+            <div class="col-md-12">
+              <label>Status</label>
+              <%= f.select :status, [['Pendiente', 0], ['Autorizado', 1], ['Rezachado', 2]] %>
+            </div>
+            <div class="col-md-6">
+              <label>Aprovado por</label>
+                <%= f.hidden_field :usuario_id, value: current_user.id %>
+                <%= current_user.usuario_nome %>
+            </div>
+            <div class="col-md-12">
+            <label>Modelo Contrato</label>
+            <%= f.collection_select :modelo_contrato_id, ModeloContrato.select('id,nome').order('nome'), :id, :nome %>
+              
+            </div>
+            <div class="col-md-12">
+              <label>Obs.</label>
+              <%= f.text_area :obs, class: "panel-field", rows: 5, required: true %>
+            </div>
+
+           <div class="col-md-12">
+              <br>
+              <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+           </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modal-autorizacao-gerencial" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel">Autorización</h4>
+      </div>
+      <div class="modal-body">
+        <%= form_for(SolicitudeCreditoAutorizacao.new) do |f| %>
+          <%= f.hidden_field :tipo, value: 0 %>
+          <%= f.hidden_field :solicitude_credito_id, value: @solicitude_credito.id %>
+          <div class="row panel-modal-body">
+            <div class="col-md-12">
+              <label>Status</label>
+              <%= f.select :status, [['Pendiente', 0], ['Aprovado', 1], ['Rezachado', 2]] %>
+            </div>
+            <div class="col-md-6">
+              <label>Aprovado por</label>
+                <%= f.hidden_field :usuario_id, value: current_user.id %>
+                <%= current_user.usuario_nome %>
+            </div>
+            <div class="col-md-12">
+              <label>Obs.</label>
+              <%= f.text_area :obs, class: "panel-field", rows: 5, required: true %>
+            </div>
+
+           <div class="col-md-12">
+              <br>
+              <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+           </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

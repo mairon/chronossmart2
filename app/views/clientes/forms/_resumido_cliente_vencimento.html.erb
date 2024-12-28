@@ -1,0 +1,86 @@
+<table>
+	<% empresa = Empresa.last(:select => "taxa_interes") %>
+    <% tot_venc   = 0 %>
+    <% tot_a_venc = 0 %>
+
+	<% @clientes.each do |cl|%>
+		<tr>
+		<td width="20" align="center"><%= cl.id %></td>
+		<td width="550" align="left"><%= cl.nome %> - Tel. <%= cl.telefone %></td>
+		<td width="80" align="left"><%= cl.vencido_desde.to_date.strftime("%d/%m/%Y") if cl.vencida_us.to_f  > 0 %></td>
+        <td width="5" align="center">   <%= dias = Date.today - cl.vencido_desde.to_date if cl.vencida_us.to_f  > 0 %> </td>          		
+
+		<% if params[:moeda].to_s == "0" %>
+		  <% if params[:int].to_s == "0"%> <!-- COM INTERES!-->
+		    		  		   
+            <% interes = ( ( dias.to_i * empresa.taxa_interes.to_f ) * cl.vencida_us.to_f) / 100 %>
+            <td width="100" align="right"> <%= number_to_currency( interes.to_f + cl.vencida_us.to_f, :format=>' %n ', :separeitor => ',' )%> </td>
+			<td width="100" align="right"><%= number_to_currency( cl.a_vencer_us.to_f, :format=>' %n ', :separeitor => ",")%></td>
+			<td width="100" align="right"><%= number_to_currency( ( interes.to_f + cl.vencida_us.to_f ) + cl.a_vencer_us.to_f, :format=>' %n ', :separeitor => ",")%></td>
+		    <% tot_venc   += (interes.to_f + cl.vencida_us.to_f) %>
+		    <% tot_a_venc += cl.a_vencer_us.to_f %>
+            
+	      <% else%> <!-- SEM INTERES!-->
+			<td width="100" align="right"><%= number_to_currency( cl.vencida_us.to_f, :format=>' %n ', :separeitor => ",")%></td>
+			<td width="100" align="right"><%= number_to_currency( cl.a_vencer_us.to_f, :format=>' %n ', :separeitor => ",")%></td>
+			<td width="100" align="right"><%= number_to_currency( cl.vencida_us.to_f + cl.a_vencer_us.to_f, :format=>' %n ', :separeitor => ",")%></td>
+		    <% tot_venc   += interes.to_f + cl.vencida_us.to_f %>
+		    <% tot_a_venc += cl.a_vencer_us.to_f %>
+
+		  <% end %>
+		  			 		
+	   <% elsif params[:moeda].to_s == "1" %> <!--GUARANIES!-->
+	   
+		  <% if params[:int].to_s == "0"%> <!-- COM INTERES!-->
+
+            <% interes = ( ( dias.to_i * empresa.taxa_interes.to_f ) * cl.vencida_gs.to_f) / 100 %>        	   
+            <td width="100" align="right"> <%= number_to_currency(interes.to_f + cl.vencida_gs.to_f, :format=>' %n ', :separeitor => ',' )%> </td>
+			<td width="100" align="right"><%= number_to_currency( cl.a_vencer_gs.to_f, :format=>' %n ', :precision => 0)%></td>
+			<td width="100" align="right"><%= number_to_currency( (interes.to_f + cl.vencida_gs.to_f) + cl.a_vencer_gs.to_f, :format=>' %n ', :precision => 0)%></td>
+		    <% tot_venc   += interes.to_f + cl.vencida_gs.to_f %>
+		    <% tot_a_venc += cl.a_vencer_gs.to_f %>
+			
+		  <% else %>
+		  
+			<td width="100" align="right"><%= number_to_currency( cl.vencida_gs.to_f, :format=>' %n ', :precision => 0)%></td>
+			<td width="100" align="right"><%= number_to_currency( cl.a_vencer_gs.to_f, :format=>' %n ', :precision => 0)%></td>
+			<td width="100" align="right"><%= number_to_currency( cl.vencida_gs.to_f + cl.a_vencer_gs.to_f, :format=>' %n ', :precision => 0)%></td>
+		    <% tot_venc   += interes.to_f + cl.vencida_gs.to_f %>
+		    <% tot_a_venc += cl.a_vencer_gs.to_f %>
+					  
+		  <% end %>
+		<% else %>		  			
+		  <% if params[:int].to_s == "0"%> <!-- COM INTERES!-->
+		    		  		   
+            <% interes = ( ( dias.to_i * empresa.taxa_interes.to_f ) * cl.vencida_rs.to_f) / 100 %>
+            <td width="100" align="right"> <%= number_to_currency( interes.to_f + cl.vencida_rs.to_f, :format=>' %n ', :separeitor => ',' )%> </td>
+			<td width="100" align="right"><%= number_to_currency( cl.a_vencer_rs.to_f, :format=>' %n ', :separeitor => ",")%></td>
+			<td width="100" align="right"><%= number_to_currency( ( interes.to_f + cl.vencida_rs.to_f ) + cl.a_vencer_rs.to_f, :format=>' %n ', :separeitor => ",") %></td>
+		    <% tot_venc   += (interes.to_f + cl.vencida_rs.to_f) %>
+		    <% tot_a_venc += cl.a_vencer_rs.to_f %>
+            
+	      <% else%> <!-- SEM INTERES!-->
+			<td width="100" align="right"><%= number_to_currency( cl.vencida_rs.to_f, :format=>' %n ', :separeitor => ",")%></td>
+			<td width="100" align="right"><%= number_to_currency( cl.a_vencer_rs.to_f, :format=>' %n ', :separeitor => ",")%></td>
+			<td width="100" align="right"><%= number_to_currency( cl.vencida_rs.to_f + cl.a_vencer_rs.to_f, :format=>' %n ', :separeitor => ",")%></td>
+		    <% tot_venc   += interes.to_f + cl.vencida_rs.to_f %>
+		    <% tot_a_venc += cl.a_vencer_rs.to_f %>
+
+		  <% end %>
+
+	   <% end %>
+		</tr>
+	<% end %>	    
+	<tr class="head">	
+		<td colspan="4"></td>
+		<% if params[:moeda].to_s == "1" %>	
+		    <td width="100" align="right"><%= number_to_currency( tot_venc, :format=>' %n ', :precision => 0 )%></td>
+		    <td width="100" align="right"><%= number_to_currency( tot_a_venc, :format=>' %n ', :precision => 0)%></td>
+		    <td width="100" align="right"><%= number_to_currency( tot_venc.to_f + tot_a_venc.to_f, :format=>' %n ', :precision => 0 )%></td>
+		<% else %>
+			<td width="100" align="right"><%= number_to_currency( tot_venc, :format=>' %n ', :separeitor => ",")%></td>
+			<td width="100" align="right"><%= number_to_currency( tot_a_venc, :format=>' %n ', :separeitor => ",")%></td>
+			<td width="100" align="right"><%= number_to_currency( tot_venc.to_f + tot_a_venc.to_f, :format=>' %n ', :separeitor => ",")%></td>		
+		<% end %>
+	</tr>	
+</table>

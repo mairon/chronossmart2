@@ -1,0 +1,108 @@
+<style type="text/css">
+  table, .head_grid{
+    font-size: 10px;
+  }
+</style>
+
+  <table class="head_grid">
+    <tr>
+      <td width="15" >DP</td>
+      <td width="350">Producto</td>
+      <td width="46" align="right"> % </td>
+      <td width="40" align="right">Cant.</td>
+      <td width="70" align="right">Unid.</td>
+      <td width="70" align="right">Total s/ Rat</td>
+      <td width="70" align="right">Flete <br>(<b><%= format_decimal(@compra.frete_euro.to_f) %></b>)</td>
+      <td width="70" align="right">Seguro <br>(<b><%= format_decimal(@compra.seguro_euro.to_f) %></b>)</td>
+      <td width="70" align="right">Despacho <br> (<b><%= format_decimal(@compra.despacho_euro.to_f) %></b>)</td>
+      <td width="70" align="right">Outros <br> (<b><%= format_decimal(@compra.outros_euro.to_f) %></b>)</td>
+      <td width="70" align="right">Costo Rateado</td>
+      <td width="70" align="right">Total Rateado</td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+     <table>
+        <% porcentagem       = 0 %>
+        <% qtd       = 0 %>
+        <% cust      = 0 %>
+        <% unit      = 0 %>
+        <% desc      = 0 %>
+        <% tot       = 0 %>
+        <% tot_rat   = 0 %>
+        <% tot_ps    = 0 %>
+        <% porc      = 0 %>
+        <% tot_frete = 0 %>
+        <% tot_desp  = 0 %>
+        <% tot_seg   = 0 %>
+
+
+        <% @compras_produto.each do |cp| %>
+            <% if params[:rateio] == 'true' %>
+            
+              <% sum            = ComprasProduto.where(compra_id: @compra.id).sum("quantidade") %>
+              <% porcentagem    = ( ( (cp.quantidade ) * 100 ) / sum.to_f ) %>
+
+              <!-- Frete !-->
+              <% frete_euro       = ( ( ( @compra.frete_euro.to_f * porcentagem ) / 100 ) / cp.quantidade ) %>
+              <% cp.update_attribute :frete_euro, frete_euro.to_f %>
+
+              <!-- Despacho !-->
+              <% despacho_euro       = ( ( ( @compra.despacho_euro.to_f * porcentagem ) / 100 ) / cp.quantidade ) %>
+              <% cp.update_attribute :despacho_euro, despacho_euro.to_f %>
+
+              <!-- Seguro !-->
+              <% seguro_euro       = ( ( ( @compra.seguro_euro.to_f * porcentagem ) / 100 ) / cp.quantidade ) %>
+              <% cp.update_attribute :seguro_euro, seguro_euro.to_f %>
+
+              <!-- Outros !-->
+              <% outros_euro       = ( ( ( @compra.outros_euro.to_f * porcentagem ) / 100 ) / cp.quantidade ) %>
+              <% cp.update_attribute :outros_euro, outros_euro.to_f %>
+
+            <% end %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="33" align="center" ><%= cp.deposito_id %></td>
+              <td width="350"><a href="#" onclick="AtulizadaPreco(<%= cp.produto_id %>)" ><%= cp.produto_nome %></a></td>
+              <td width="46" align="right">   <%= format( "%.3f",porcentagem.to_f ) %></td>
+              <td width="45" align="right">   <%= format( "%.2f",cp.quantidade.to_f ) %></td>
+              <td width="70" align="right">   <%= format_decimal( cp.unitario_euro )  %></td>
+              <td width="70" align="right">   <%= format_decimal( cp.total_euro )  %></td>
+              <td width="70" align="right">   <%= format_decimal( cp.frete_euro ) %></td>
+              <td width="70" align="right">   <%= format_decimal( cp.seguro_euro ) %></td>
+              <td width="70" align="right">   <%= format_decimal( cp.despacho_euro ) %></td>
+              <td width="70" align="right">   <%= format_decimal( cp.outros_euro ) %></td>
+              <td width="70" align="right">   <%= format_decimal( cp.unitario_euro.to_f + cp.frete_euro.to_f + cp.despacho_euro.to_f + cp.seguro_euro.to_f + cp.outros_euro.to_f)  %></td>
+
+              <td width="70" align="right"><b><%= format_decimal( (cp.unitario_euro.to_f + cp.frete_euro.to_f + cp.despacho_euro.to_f + cp.seguro_euro.to_f + cp.outros_euro.to_f) * cp.quantidade.to_f )  %></b></td>              
+
+              <td><a href="/compras_produtos/<%= cp.id %>/edit" >Editar</a> </td>
+              <td><%= link_to t('DELETE'), cp, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+            </tr>
+          <% qtd       += cp.quantidade.to_f %>
+          <% porc      += porcentagem.to_f %>
+          <% tot       += cp.total_euro %>
+          <% tot_frete += cp.frete_euro * cp.quantidade %>
+          <% tot_desp  += cp.despacho_euro * cp.quantidade %>
+          <% tot_seg   += cp.seguro_euro * cp.quantidade %>
+          <% tot_rat   += ((cp.unitario_euro.to_f + cp.frete_euro.to_f + cp.despacho_euro.to_f + cp.seguro_euro.to_f + cp.outros_euro.to_f) * cp.quantidade.to_f) %>
+
+        <% end %>
+
+     </table>
+  </div>
+  <!-- RESULTDOS!-->
+  <table  class="head_grid">
+     <tr>
+        <td width="265"><%= link_to 'Proratear', compra_path(@compra, rateio: 'true' ), class: 'btn btn-blue' %></td>
+        <td width="57" align="right"><b><%= number_to_currency(porc, format:'%n', precision: 3 ) %></b></td>
+        <td width="72"></td>
+        <td width="43" align="right"><b><%= qtd %></b></td>
+        <td width="70"></td>
+        <td width="55" align="right"><b><%=format_decimal(tot) %></b></td>
+        <td width="55" align="right"><b><%=format_decimal(tot_frete) %></b></td>
+        <td width="55" align="right"><b><%=format_decimal(tot_seg) %></b></td>
+        <td width="55" align="right"><b><%=format_decimal(tot_desp) %></b></td>
+        <td width="122"></td>
+        <td width="55" align="right"><b><%=format_decimal(tot_rat)%></b></td>
+     </tr>
+  </table>
+

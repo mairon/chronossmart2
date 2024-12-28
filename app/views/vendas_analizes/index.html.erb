@@ -1,0 +1,41 @@
+<h1 id="header">vendas_analizes</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_vendas_analize_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Venda</td>
+            <td>Persona</td>
+            <td><%= t('DATE') %></td>
+            <td>Valor us</td>
+            <td>Analize</td>
+            <td>Solicitude</td>
+            <td>Status</td>
+            <td>Porce</td>
+            <td>Valor gs</td>
+            <td>Valor rs</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @vendas_analizes.each do |vendas_analize| %>
+      <tr>
+                  <td><%= vendas_analize.venda_id %></td>
+                  <td><%= vendas_analize.persona_id %></td>
+                  <td><%= vendas_analize.data %></td>
+                  <td><%= vendas_analize.valor_us %></td>
+                  <td><%= vendas_analize.analize_id %></td>
+                  <td><%= vendas_analize.solicitude %></td>
+                  <td><%= vendas_analize.status %></td>
+                  <td><%= vendas_analize.porce %></td>
+                  <td><%= vendas_analize.valor_gs %></td>
+                  <td><%= vendas_analize.valor_rs %></td>
+                <td><%= link_to 'Editar', edit_vendas_analize_path(vendas_analize) %></td>
+        <td><%= link_to t('DELETE'), vendas_analize, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

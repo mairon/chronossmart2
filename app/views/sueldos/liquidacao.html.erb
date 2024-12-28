@@ -1,0 +1,301 @@
+<br>
+<br>
+<br>
+<br>
+<br>
+
+  <table>
+    <tr>
+      <td align="left"><%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 60) %></td>
+      <td width="350">
+        <h3 align="center">
+          <% if @sueldo.tipo_liquidacao == 0 %>
+            LIQUIDACIÓN DE SALARIO
+          <% elsif @sueldo.tipo_liquidacao == 1 %>
+            LIQUIDACIÓN DE VACACIONES
+          <% elsif @sueldo.tipo_liquidacao == 2 %>
+            LIQUIDACIÓN DE AGUINALDO
+          <% end %>
+        </h3>
+      </td>
+    </tr>
+  </table>
+<div class="group" align="center">
+  <table class="bord">
+    <tr>
+      <td width="200">EMPLEADOR:</td>
+      <td width="300"><%= current_unidade.nome_sys %></td>
+      <td width="150">HOJA:</td>
+      <td width="100"><b><%= @sueldo.id.to_s.rjust(6,'0') %></b></td>
+    </tr>
+
+    <tr>
+      <td>NOMBRE:</td>
+      <td><%= @sueldo.persona.nome %></td>
+      <td>C.I.:</td>
+      <td><%= @sueldo.persona.ruc %></td>
+    </tr>
+
+    <tr>
+      <td>CARGO:</td>
+      <td><%= @sueldo.persona.cargo.nome %></td>
+      <td>MÊS DE PAGO:</td>
+      <td><%= l @sueldo.data_inicio, :format => :mes  %>/<%= @sueldo.data_inicio.strftime("%Y")  %></td>
+    </tr>
+  </table>
+  <br>
+  <table class="bord">
+    <tr>
+      <td width="150">SALARIO BASE:</td>
+      <td width="300" align="right"><%= format_int(@sueldo.salario) %></td>
+    </tr>
+    <tr>
+      <td width="150">JORNAL DIARIO:</td>
+      <td width="300" align="right"><%= format_int( @sueldo.salario.to_f / 30 ) %></td>
+    </tr>
+
+  </table>
+
+  <br>
+
+  <table class="bord">
+    <tr>
+      <td width="460"><b>HABERES</b></td>
+      <td width="80" align="center"><b>CANT</b></td>
+      <td width="200" align="right"><b>IMPORTE</b></td>
+    </tr>
+    <% credito_gs = 0 %>
+    <% @sueldo.sueldos_detalhes.where("credito_gs > 0").each do |sd| %>
+      <tr>
+        <td><%= sd.descricao %></td>
+        <td align="center"><%= sd.dias %></td>
+        <td align="right"><%= format_int(sd.credito_gs) %></td>
+      </tr>
+      <% credito_gs += sd.credito_gs.to_f %>
+    <% end %>
+
+    <tr class="head">
+      <td colspan="2" align="right">TOTAL HABERES:</td>
+      <td align="right"><%= format_int(credito_gs) %></td>
+    </tr>
+  </table>
+
+
+  <table class="bord">
+    <tr>
+      <td width="460"><b>DEDUCCIONES</b></td>
+      <td width="80"><b>CANT</b></td>
+      <td width="200" align="right"><b>IMPORTE</b></td>
+    </tr>
+    <% debito_gs = 0 %>
+    <% @sueldo.sueldos_detalhes.where("debito_gs > 0").each do |sd| %>
+      <tr>
+        <td><%= sd.descricao %></td>
+        <td></td>
+        <td align="right"><%= format_int(sd.debito_gs)%></td>
+      </tr>
+      <% debito_gs += sd.debito_gs.to_f %>
+    <% end %>
+
+    <tr class="head">
+      <td colspan="2" align="right">TOTAL DEDUCCIONES:</td>
+      <td align="right"><%= format_int(debito_gs) %></td>
+    </tr>
+  </table>
+  <p style="font-size:10px">Recibi conforme de la Empresa, el importe neto de la presente liquidación.-</p>
+  <table class="bord">
+    <tr class="head">
+      <td width="540" align="right">NETO A COBRAR:</td>
+      <td width="200" align="right"><%= format_int(credito_gs.to_f - debito_gs.to_f) %></td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table>
+    <tr>
+      <td align="center">________________________________________________</td>
+      <td align="center" width="350"></td>
+      <td align="center"><%= current_unidade.nome_sys %> - <%= @sueldo.sueldo_pagos.last.data.strftime("%d/%m/%Y") unless @sueldo.sueldo_pagos.last.nil? %></td>
+    </tr>
+   <tr>
+      <td align="center">Firma del Empleado</td>
+      <td align="center"></td>
+      <td align="center">Lugar y Fecha</td>
+    </tr>
+
+  </table>
+
+</div>
+
+< /** SEGUNDA VIA  **/>
+<p align="center">
+  <hr>
+</p>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<table>
+  <tr>
+    <td align="left"><%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 60) %></td>
+    <td width="350">
+      <h3 align="center">
+        <% if @sueldo.tipo_liquidacao == 0 %>
+          LIQUIDACIÓN DE SALARIO
+        <% elsif @sueldo.tipo_liquidacao == 1 %>
+          LIQUIDACIÓN DE VACACIONES
+        <% elsif @sueldo.tipo_liquidacao == 2 %>
+          LIQUIDACIÓN DE AGUINALDO
+        <% end %>
+      </h3>
+    </td>
+
+  </tr>
+</table>
+
+<div class="group" align="center">
+  <table class="bord">
+    <tr>
+      <td width="200">EMPLEADOR:</td>
+      <td width="300"><%= current_unidade.nome_sys %></td>
+      <td width="150">HOJA:</td>
+      <td width="100"><b><%= @sueldo.id.to_s.rjust(6,'0') %></b></td>
+    </tr>
+
+    <tr>
+      <td>NOMBRE:</td>
+      <td><%= @sueldo.persona.nome %></td>
+      <td>C.I.:</td>
+      <td><%= @sueldo.persona.ruc %></td>
+    </tr>
+
+    <tr>
+      <td>CARGO:</td>
+      <td><%= @sueldo.persona.cargo.nome %></td>
+      <td>MÊS DE PAGO:</td>
+      <td><%= l @sueldo.data_inicio, :format => :mes  %>/<%= @sueldo.data_inicio.strftime("%Y")  %></td>
+    </tr>
+  </table>
+  <br>
+  <table class="bord">
+    <tr>
+      <td width="150">SALARIO BASE:</td>
+      <td width="300" align="right"><%= format_int(@sueldo.salario) %></td>
+    </tr>
+    <tr>
+      <td width="150">JORNAL DIARIO:</td>
+      <td width="300" align="right"><%= format_int( @sueldo.salario.to_f / 30 ) %></td>
+    </tr>
+
+  </table>
+
+  <br>
+
+  <table class="bord">
+    <tr>
+      <td width="460"><b>HABERES</b></td>
+      <td width="80" align="center"><b>CANT</b></td>
+      <td width="200" align="right"><b>IMPORTE</b></td>
+    </tr>
+    <% credito_gs = 0 %>
+    <% @sueldo.sueldos_detalhes.where("credito_gs > 0").each do |sd| %>
+      <tr>
+        <td><%= sd.descricao %></td>
+        <td align="center"><%= sd.dias %></td>
+        <td align="right"><%= format_int(sd.credito_gs) %></td>
+      </tr>
+      <% credito_gs += sd.credito_gs.to_f %>
+    <% end %>
+
+    <tr class="head">
+      <td colspan="2" align="right">TOTAL HABERES:</td>
+      <td align="right"><%= format_int(credito_gs) %></td>
+    </tr>
+  </table>
+
+
+  <br>
+
+  <table class="bord">
+    <tr>
+      <td width="460"><b>DEDUCCIONES</b></td>
+      <td width="80"><b>CANT</b></td>
+      <td width="200" align="right"><b>IMPORTE</b></td>
+    </tr>
+    <% debito_gs = 0 %>
+    <% @sueldo.sueldos_detalhes.where("debito_gs > 0").each do |sd| %>
+      <tr>
+        <td><%= sd.descricao %></td>
+        <td></td>
+        <td align="right"><%= format_int(sd.debito_gs)%></td>
+      </tr>
+      <% debito_gs += sd.debito_gs.to_f %>
+    <% end %>
+
+    <tr class="head">
+      <td colspan="2" align="right">TOTAL DEDUCCIONES:</td>
+      <td align="right"><%= format_int(debito_gs) %></td>
+    </tr>
+  </table>
+  <p style="font-size:10px">Recibi conforme de la Empresa, el importe neto de la presente liquidación.-</p>
+  <table class="bord">
+    <tr class="head">
+      <td width="540" align="right">NETO A COBRAR:</td>
+      <td width="200" align="right"><%= format_int(credito_gs.to_f - debito_gs.to_f) %></td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table>
+    <tr>
+      <td align="center">________________________________________________</td>
+      <td align="center" width="350"></td>
+      <td align="center"><%= current_unidade.nome_sys %> - <%= @sueldo.sueldo_pagos.last.data.strftime("%d/%m/%Y") unless @sueldo.sueldo_pagos.last.nil? %></td>
+    </tr>
+   <tr>
+      <td align="center">Firma del Empleado</td>
+      <td align="center"></td>
+      <td align="center">Lugar y Fecha</td>
+    </tr>
+
+  </table>
+
+</div>
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+  .bord {
+    border-collapse: collapse;
+    font-size: 9px
+  }
+   .bord td, .bord tr {
+    border: 1px solid black;
+  }
+  td{font-size: 9px}
+@font-face {
+  font-family: 'prox';
+  src: url("/assets/fonts/proxima-nova.otf") format("opentype");
+}
+
+  body {
+    font-family: 'prox';
+
+  }
+
+
+</style>
+

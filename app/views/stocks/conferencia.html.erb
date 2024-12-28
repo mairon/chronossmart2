@@ -1,0 +1,100 @@
+  <h1 id="header">Conferencia Stock</h1>
+  <style type="text/css">
+    select {
+      width: 350px;
+    }
+  </style>
+  <div class="group">
+    <h2>
+      <%= form_tag resultado_conferencia_stocks_path, :method => "get" do %>
+        <table>
+          <tr>
+            <td align="right"> Hasta:</td>
+            <td>
+                <input name       = "final"
+                       id         = "final"
+                       size       = "10"
+                       type       = "text"
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'campo_clase')"
+                       value = "<%= Time.now.strftime("%d/%m/%Y")%>"
+                       autofocus
+                       required="required" 
+                       /></td>
+          </tr>
+
+          <tr>
+            <td align="right">Clase:</td>
+            <td>
+              <%=   select("busca", "clase", Clase.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },
+                                                                                          { :include_blank => true },
+                                                                                          { :onkeypress    => "return bloqEnter(event)",
+                                                                                            :onkeyup       => "EnterTab(event,'campo_grupo')" })   %></td>
+          </tr>
+
+          <tr>
+            <td align="right">Grupo:</td>
+
+            <td>
+              <%=   select("busca", "grupo", Grupo.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },
+                                                                                          { :include_blank => true },
+                                                                                          { :onkeypress    => "return bloqEnter(event)",
+                                                                                            :onkeyup       => "EnterTab(event,'campo_produto')" })   %></td>
+          </tr>
+
+          <tr>
+            <td align="right">Sub-Grupo:</td>
+
+            <td>
+
+              <%=   select("busca", "sub_grupo", SubGrupo.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },
+                                                                                          { :include_blank => true },
+                                                                                          { :onkeypress    => "return bloqEnter(event)",
+                                                                                            :onkeyup       => "EnterTab(event,'campo_produto')" })   %></td>
+          </tr>
+
+
+          <tr>
+            <td align="right">Deposito :</td>
+
+            <td>
+              <%=   select("busca", "deposito", Deposito.all(:select => 'id,nome', :conditions => ["unidade_id = #{current_unidade.id}"],:order => 'nome').collect {|p| [ p.nome, p.id ] }) %></td>
+          </tr>
+     
+          <tr>
+              <td align="right">Agrupar por:</td>
+              <td>
+                <fieldset>
+                  <%= radio_button_tag 'agrupar', 'clase' %> Clase
+                  <%= radio_button_tag 'agrupar', 'grupo' %> Grupo
+                  <%= radio_button_tag 'agrupar', 'subgrupo', Checked: 'true' %> Sub-Grupo
+                </fieldset>
+              </td>
+          </tr>
+
+          <tr>
+            <td></td>
+            <td>
+              <input type="submit" value="Informe" onclick="Tipo('0')" class="btn btn-green" target="_blank?"/>
+              <input  id="button" type="submit" class="btn btn-blue" value="Excel" onclick = "Tipo('1')"/>
+            </td>
+          </tr>
+        </table>
+        <input type="hidden" name="tipo" id="tipo"  size="5" value="0"/>
+      <% end %>
+
+    </h2>
+  </div>
+
+
+<script>
+  function Tipo(d){
+    document.getElementById('tipo').value = d
+  }
+
+
+  $('#busca_clase').selectize();
+  $('#busca_grupo').selectize();
+  $('#busca_sub_grupo').selectize();
+  $('#busca_produto').selectize();
+</script>

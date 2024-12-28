@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <title>MercoSys Enterprise</title>
+    <%= stylesheet_link_tag 'scaffold','button' %>
+    <%= javascript_include_tag :defaults,'vendas','jquery','abas','jquery.maskMoney','masks' %>
+  </head>
+  <body>
+    <div class="cabeca">
+      <span class="style1">MercoSys Enterprise</span>
+      <span class="style2">        
+        Unidade : <%= current_unidade.unidade_nome %> |
+        Usuario : <%= current_user.usuario_nome%> |
+        <% if session[:logged] %>
+          <%= link_to "logout", login_path(1) ,:method => :delete %>
+        <% end %>
+      </span>
+    </div>
+
+
+    <div class="Mensagem" id="observacao">
+      <%= flash[:observacao] %>
+      <%= flash[:notice] %>
+    </div>
+    <div id="contents">
+      <%= yield :layout %>
+    </div>
+  </body>
+</html>

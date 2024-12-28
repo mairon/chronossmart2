@@ -1,0 +1,37 @@
+<div class="panel">
+  <h1 id="header">
+    Romaneios
+    <div class="pull-right">
+      <%= link_to t('NEW'), new_romaneio_path, :class => 'button add' %>
+    </div>
+  </h1>
+</div>
+
+
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="60" align="center">Cod.</td>
+      <td width="80" align="center"><%= t('DATE') %></td>
+      <td width="100" align="center">Doc.</td>
+      <td width="250">Cliente</td>
+      <td width="100">Contrato</td>
+    </tr>
+   </table>
+   <div class="rolagem" id="div">
+      <table>
+         <% @romaneios.each do |nota| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="60" align="center"> <%= link_to nota.id.to_s.rjust(6,'0'), romaneio_path(nota) %></td>
+              <td width="80" align="center"> <%= nota.data.strftime("%d/%m/%y") unless nota.data.blank? %></td>
+              <td width="80" align="left"> <%= nota.documento_numero %></td>
+              <td width="250" align="left"> <small><%= nota.persona_nome %></small></td>
+              <td width="100" align="left"> <%= nota.contrato.documento_numero unless nota.contrato.nil? %></td>
+              
+              <td><%= link_to '', edit_romaneio_path(nota), class: 'icon-pencil' %></td>
+              <td><%= link_to '', nota, confirm: 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+            </tr>
+         <% end %>
+      </table>
+   </div>  
+</div>

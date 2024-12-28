@@ -1,0 +1,137 @@
+<body onload="CampoBusca()">
+  <h1 align="right" id="header">Productos</h1>
+  <div class="group">
+    <br/>
+    <%form_tag dinamic_busca_venda_produto_produtos_path, :method => "get" do%>
+      <input id="busca" name="busca" type="text" onKeyUp="pesquisa(this.value)"/>
+
+    <% end %>
+
+
+    <div id="pagina">
+    </div>
+
+
+
+    <script language="javascript">
+  
+      function Fecha(produto_nome,id,codigo,fabricante_cod)  //
+      {
+        window.opener.document.getElementById('ordem_servicos_produto_produto_nome').value       = produto_nome;
+        window.opener.document.getElementById('ordem_servicos_produto_produto_id').value         = id;
+        window.opener.document.getElementById('ordem_servicos_produto_codigo').value             = codigo;
+        window.opener.document.getElementById('ordem_servicos_produto_fabricante_cod').value     = fabricante_cod;
+        window.opener.document.getElementById('ordem_servicos_produto_quantidade').value         = '';
+        window.opener.document.getElementById("ordem_servicos_produto_quantidade").focus()
+        self.close();
+      }
+      
+
+      function pesquisa(valor)                               //
+
+      {
+        tipo = document.getElementById('tipo').value
+        //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+        url="/produtos/dinamic_busca_venda_produto?busca="+valor+"&commit=Buscar";
+
+        ajax(url);
+
+      }
+
+
+      function ajax(url)                                     //
+
+      {
+
+
+
+        //alert(nick);
+
+        //alert(dest);
+
+        //alert(msg);
+
+
+
+        req = null;
+
+        // Procura por um objeto nativo (Mozilla/Safari)
+
+        if (window.XMLHttpRequest) {
+
+          req = new XMLHttpRequest();
+
+          req.onreadystatechange = processReqChange;
+
+          req.open("GET",url,true);
+
+          req.send(null);
+
+          // Procura por uma versão ActiveX (IE)
+
+        } else if (window.ActiveXObject) {
+
+          req = new ActiveXObject("Microsoft.XMLHTTP");
+
+          if (req) {
+
+
+
+            req.onreadystatechange = processReqChange;
+
+            req.open("GET",url,true);
+
+
+
+            req.send();
+
+          }
+
+        }
+
+      }
+
+
+      function processReqChange()                            //
+
+      {
+
+
+
+        // apenas quando o estado for "completado"
+
+        if (req.readyState == 4) {
+
+
+
+          // apenas se o servidor retornar "OK"
+
+
+
+          if (req.status ==200) {
+
+
+
+            // procura pela div id="pagina" e insere o conteudo
+
+            // retornado nela, como texto HTML
+
+
+
+            document.getElementById('pagina').innerHTML = req.responseText;
+
+
+
+          } else {
+
+            alert("Houve um problema ao obter os dados:n" + req.statusText);
+
+          }
+
+        }
+
+      }
+    </script>
+  </div>
+</body>

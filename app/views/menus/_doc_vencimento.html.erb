@@ -1,0 +1,31 @@
+<% if current_user.tipo.to_i > 1 %>
+  <% us = "and personas.id = #{current_user.persona_id}" %>
+<% else %>
+  <% us = "" %>
+<% end %>
+
+<% per_doc = PersonaDoc.joins(:persona).where("personas.estado = 0  #{us} and persona_docs.sem_venc = false and persona_docs.status = true and date_part('month', persona_docs.vencimento) <= '#{Time.now.to_date.strftime("%m")}'  AND  date_part('year', persona_docs.vencimento) <= '#{Time.now.to_date.strftime("%Y")}'").order('persona_docs.vencimento desc') %>
+<div class="panel">
+  <h1 id="header">
+    Documentos Vencidos(<%= per_doc.count %>)
+  </h1>
+  <div class="panel-body">
+    <div class="rolagem" dir="div" style="height: 150px">
+      <table>
+        <% per_doc.includes(:persona).includes(:documento).each do |pd| %>
+          <tr class = "<%= cycle("cor1", "cor2") %>">
+            <td width="250"><%= link_to pd.persona.nome, edit_persona_doc_path(pd.id) unless pd.persona.nil? %></td>
+            <td width="300"><%= pd.documento.nome %></td>
+            <td width="80" align="center">
+              <% if  pd.vencimento.to_date <= Time.now.to_date %>
+                <span class="gs"> <%= pd.vencimento.strftime("%d/%m/%Y") %></span>
+              <% else %>
+                <span class="us"> <%= pd.vencimento.strftime("%d/%m/%Y") %></span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  </div>
+</div>

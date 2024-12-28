@@ -1,0 +1,147 @@
+<%= f.hidden_field :tipo_produto, :value => 0 %>
+<table>
+   <tr>
+      <td valign="top">
+         <fieldset>
+         <table>
+            <tr>
+
+              <td align="right">Referencia :</td>
+              <td><%= f.text_field :fabricante_cod, :size => 20, :readonly => true %></td>
+
+              <%= field_text 'Producto :',4,f,:nome,100,'produto_tipo_produto_0', :readonly => true %>
+            </tr>
+            <tr>
+              <td align="right">Clase :</td>
+              <td>
+                <%= f.collection_select :clase_id, Clase.all(:select => 'id,descricao',:order => '2'),:id,:descricao,{:include_blank => true}, {style: "width:200px", :disabled => true} %>
+              </td>
+              <td  align="right">Grupo :</td>
+              <td>
+                <%= f.collection_select :grupo_id, Grupo.all(:select => 'id,descricao',:order => '2'),:id,:descricao,{:include_blank => true}, {style: "width:200px", :disabled => true} %>
+              </td>
+              <td align="right"> Marca :</td>
+              <td>
+                <%= f.collection_select :sub_grupo_id, SubGrupo.all(:select => 'id,descricao',:order => '2'),:id,:descricao,{:include_blank => true}, {style: "width:200px", :disabled => true} %>
+              </td>
+            </tr>
+
+            <tr>
+              <td align="right">Proveedor :</td>
+              <td><%= f.collection_select :fabricante_id, Persona.all(:select => 'id,nome',:conditions =>['tipo_fornecedor = 1'],:order => '2'),:id,:nome,{:include_blank => true}, {style: "width:200px", :disabled => true} %>
+              </td>
+              <td align="right">Colección:</td>
+              <td>
+                <%= f.collection_select :colecao_id, Colecao.all(:select => 'id,nome',:order => '2'),:id,:nome,{:include_blank => true},{:disabled => true} %>
+
+                <%= image_tag("load.gif",
+                  :align => "absmiddle",
+                  :border => 0,
+                  :id => "spinner",
+                  :width => 21,
+                  :height => 21,
+                  :style =>"display: none;" ) %>
+              </td>
+            </tr>
+
+            <tr>
+               <td align="right">Iva :</td>
+               <% if @produto.taxa == 0 %>
+               <td width="230"><%= f.text_field :taxa, :value => 10, :size => 15, :readonly => true %>
+                <% else %>
+                <td width="230"><%= f.text_field :taxa, :size => 15, :readonly => true %>
+                <% end %>
+               </td>
+              <td align="right" width="80">Ubicacion :</td>
+               <td><%= f.text_field :locacao,
+                                    :size => 20,:readonly => true %></td>
+              <td colspan="2">
+              </td>
+            </tr>
+         </table>
+        </fieldset>
+      </td>
+
+
+      <td rowspan="4" valign="top">
+      <div id="sidebar">
+      <table>
+        <tr>
+           <td>
+              <div class="avatar">
+              <table>
+                 <tr>
+
+                    <td>
+                       <% if @produto.picture_content_type.present? %>
+                          <%= image_tag @produto.picture.url,:size => "240x210" %>
+                       <% else %>
+                          <%= image_tag ('../images/defalt.jpg') %>
+                       <% end %>
+                    </td>
+
+                 </tr>
+              </table>
+                 </div>
+           </td>
+        </tr>
+
+        <tr>
+           <td colspan="2"><%= f.file_field :picture,:size => 23 %><br/><hr/></td>
+        </tr>
+              <tr>
+                <td colspan="2">
+                  <fieldset>
+                     <table>
+                      <tr>
+                       <td>
+                          <div class="stock_atual">
+                                Stock Atual : <%= @quantidade %>  |
+                          </div>
+                       </td>
+                       <td align="right">
+                           <a href="javascript:void(0)" onClick="AbrirHistoricoPreco('<%= @produto.id.to_i %>')">Hist. Precio</a>
+                       </td>
+                      </tr>
+                    </table>
+                  </fieldset>
+                </td>
+              </tr>
+              <tr>
+                <td valign="top" colspan="2">
+                Obs.: <%= f.text_area :obs, :rows => 5, :cols => 25, :readonly => true %>
+                </td>
+              </tr>
+         </table>
+        </div>
+      </td>
+   </tr>
+  </table>
+
+<script>
+  $("#produto_fabricante_cod").focus();
+
+$("#produto_sub_grupo_id").change(function() {
+
+      var data=$('#produto_sub_grupo_id').val();
+      $.ajax({
+
+        type: "POST",
+         url: "/dynamic_colecao/"+data,
+        data: data,
+
+        beforeSend: function()
+        {
+            $('#spinner').show();
+        },
+
+        success: function(response)
+        {
+          $('#spinner').hide();
+        }
+
+      });
+  });
+</script>
+
+

@@ -1,0 +1,2 @@
+module CobrosFaturasHelper
+end

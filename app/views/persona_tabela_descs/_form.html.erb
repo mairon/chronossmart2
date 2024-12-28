@@ -1,0 +1,59 @@
+<%= form_for(@persona_tabela_desc) do |f| %>
+  <% if @persona_tabela_desc.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@persona_tabela_desc.errors.count, "error") %> prohibited this persona_tabela_desc from being saved:</h2>
+
+      <ul>
+      <% @persona_tabela_desc.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> persona_tabela_descs - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">persona_id :</td>                    
+                      <td><%= f.number_field :persona_id %></td>
+                                      
+                      <td align="right"><%= t('DATE') %> :</td>                    
+                      <td><%= f.date_select :data %></td>
+                                      
+                      <td align="right">conj_ensaio_id :</td>                    
+                      <td><%= f.number_field :conj_ensaio_id %></td>
+                                      
+                      <td align="right">desc_us :</td>                    
+                      <td><%= f.text_field :desc_us %></td>
+                                      
+                      <td align="right">desc_gs :</td>                    
+                      <td><%= f.text_field :desc_gs %></td>
+                                      
+                      <td align="right">desc_rs :</td>                    
+                      <td><%= f.text_field :desc_rs %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), persona_tabela_descs_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

@@ -1,0 +1,28 @@
+<h1 id="header">Devices</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_device_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="150">Nome</td>
+    <td width="250">Host</td>
+    <td width="250">Token</td>
+    <td width="350">Webhook</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @devices.each do |device| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="150"><%= link_to device.nome, device_path(device) %></td>
+        <td width="250"><%= device.host %></td>
+        <td width="250"><%= device.token %></td>
+        <td width="350"><%= device.webhook %></td>
+        <td><%= link_to '', edit_device_path(device), class: 'icon-pencil' %></td>
+        <td><%= link_to '', device, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>

@@ -1,0 +1,110 @@
+<h1 id="header"><%= t('TRANSFER') %> de <%= t('DEPOSIT') %>s [<%= t('EDITION') %>]</h1>
+<div class="group">
+<%= form_for(@transferencia_deposito) do |f| %>
+ <table>
+ 	<tr>
+ 	  <td>
+    	<label><%= t('DATE') %></label>
+    	<%= f.date_select :data %>				   
+	  </td>
+	 	<td>
+	 		<label><%= t('CODE') %> <%= t('PURCHASE') %></label>
+	 		<%= f.text_field :compra_id %>
+	 	</td>				  
+	 </tr>
+	 <tr>
+	 	<td>
+	 		<fieldset>
+	      <table>
+	          <tr>
+	            <td>
+	            	<label><%= t('DEPOSIT') %> <%= t('SOURCE_S') %></label>
+	            	<%= f.collection_select :unidade_origem_id, Unidade.all( :select => ' id, unidade_nome',:order  => '2' ), :id, :unidade_nome, {prompt: 'Seleccione la Unidad'} %>
+	              <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinnero", width: 21, height: 21, style: "display: none;" ) %>
+	            </td>
+	           	</tr>
+	          <tr>
+	            <td><%= f.collection_select :deposito_origem_id, Deposito.all( :select => ' id, nome',:order  => '2' ), :id, :nome, {prompt: 'Seleccione lo Deposito'} %></td>
+	           	</tr>
+	      </table>
+      </fieldset>		 		
+	 	</td>
+	 	<td>
+	 		<fieldset>
+	  		<table>
+	          <tr>
+	            <td>
+	            	<label><%= t('DEPOSIT') %> <%= t('SOURCE_S') %></label>
+	            	<%= f.collection_select :unidade_destino_id, Unidade.all( :select => ' id, unidade_nome',:order  => '2' ), :id, :unidade_nome, {prompt: 'Seleccione la Unidad'} %>
+	            	<%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinnerd", width: 21, height: 21, style: "display: none;" ) %>
+	            </td>
+	           	</tr>
+	      		<tr>
+	          	<td><%= f.collection_select :deposito_destino_id, Deposito.all( :select => ' id, nome', :order  => '2' ), :id, :nome, {prompt: 'Seleccione lo Deposito'} %></td>
+	      		</tr>
+				</table>
+			</fieldset>		 		
+	 	</td>
+	 </tr>
+	 <tr>
+	 	<td colspan="2">
+	 		<br>
+	 		<%= f.text_area :concepto, :size => '70x4', placeholder: 'Obs.'%>
+	 	</td>
+	 </tr>
+	</table>
+
+  <div class="footer-buttons">
+    <%= f.submit "Seguir", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    <%= link_to t('BACK'), transferencia_depositos_path, :class => "btn btn-back" %>
+  </div>
+<% end %>
+</div>
+
+<script type="text/javascript">
+	$('#transferencia_deposito_unidade_origem_id, #transferencia_deposito_unidade_destino_id').selectize();
+
+  $("#transferencia_deposito_unidade_origem_id").change(function() {
+    var data=$('#transferencia_deposito_unidade_origem_id').val();
+    $.ajax({
+
+      type: "POST",
+      url: "/transf_deposito_origem/"+data+"?tela=form",
+      data: data,
+
+      beforeSend: function()
+      {
+          $('#spinnero').show();
+      },
+
+      success: function(response)
+      {
+        $('#spinnero').hide();
+      }
+
+    });
+  });
+
+
+  $("#transferencia_deposito_unidade_destino_id").change(function() {
+    var data=$('#transferencia_deposito_unidade_destino_id').val();
+    $.ajax({
+
+      type: "POST",
+      url: "/transf_deposito_destino/"+data+"?tela=form",
+      data: data,
+
+      beforeSend: function()
+      {
+          $('#spinnerd').show();
+      },
+
+      success: function(response)
+      {
+        $('#spinnerd').hide();
+      }
+
+    });
+  });
+
+</script>

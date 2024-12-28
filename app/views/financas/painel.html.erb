@@ -1,0 +1,233 @@
+  <div class="row">        
+    <div class="col-md-12">
+			<div class="panel">
+				<h1 id="header">
+			    <label>Clientes</label>
+			    <%= select("busca", "persona_id", Persona.all(:select => 'id,nome',:conditions => ["tipo_cliente = 1"],:order => 'nome').collect {|p| [ p.nome, p.id ] }, {:selected => params[:persona_id], :prompt => 'Todos'}) %>
+
+			    <div class="pull-right">
+			    	<a href="#" class="btn btn-green" id="bt">Add Registro</a>
+			    </div>
+			  </h1>
+
+					<script type="text/javascript">
+					  $(document).ready(function() {
+					    $('#busca_persona_id').change(function() {
+					        window.location.href = "/financas/painel?persona_id="+ $('#busca_persona_id').val();
+					    });
+					  });
+					</script>			  
+			  
+			  <div class="panel-body">
+			  	<table class="head_grid">
+			  		<tr>
+			  			<td width="50">.</td>
+			  			<td width="70" align="center">Fecha</td>
+			  			<td width="70" align="center">Moeda Origem</td>
+			  			<td width="70" align="center">Monto</td>
+			  			<td width="70" align="center">Cambio</td>
+			  			<td width="450">Nota</td>
+			  			<td width="70" align="right" class="us">Crédito</td>
+			  			<td width="70" align="right" class="gs">Débito</td>
+			  			<td width="70" align="right">Saldo</td>
+			  		</tr>
+			  	</table>
+			  	<div class="rolagem" id="div">
+			  	<table>
+			  		<% unless params[:persona_id].blank? %>
+
+							<tr class="<%= cycle("cor1", "cor2")%>">
+				  			<td width="40"></td>
+				  			<td width="70" align="center"></td>
+				  			<td width="70" align="center">
+				  			</td>
+				  			<td width="70" align="center"></td>
+				  			<td width="70" align="center"></td>
+				  			<td width="450">Anterior</td>
+				  			<td width="70" align="right" class="us"><%= format_decimal(0) %></td>
+				  			<td width="70" align="right" class="gs"><%= format_decimal(0) %></td>
+				  			<td width="70" align="right"><%= format_decimal(0)%></td>
+				  		</tr>										  		  		
+
+			  		<% fi = Financa.where("persona_id = #{ params[:persona_id]} and data > '2022-01-01'")%>
+			  		<% ct = 1 %>
+			  		<% saldo = 0 %>
+			  		<% debito = 0 %>
+			  		<% credito = 0 %>
+				  		<% fi.each do |f| %>
+							<tr class="<%= cycle("cor1", "cor2")%>">
+				  			<td width="40"><%= ct %></td>
+				  			<td width="70" align="center"><%= f.data.strftime("%d/%m/%y") %></td>
+				  			<td width="70" align="center">
+				  				<% if f.moeda.to_i == 0 %>
+				  					<label class="us">U$</label>
+				  				<% elsif f.moeda.to_i == 1 %>
+				  					<label class="gs">Gs.</label>
+				  				<% elsif f.moeda.to_i == 2 %>
+				  					<label class="rs">R$</label>
+				  				<% end %>
+				  			</td>
+				  			<td width="70" align="center"><%= format_decimal(f.valor_origem) %></td>
+				  			<td width="70" align="center"><%= format_decimal(f.cambio) %></td>
+				  			<td width="450"><%= f.concepto %></td>
+				  			<td width="70" align="right" class="us"><%= format_decimal(f.entrada_dolar) %></td>
+				  			<td width="70" align="right" class="gs"><%= format_decimal(f.saida_dolar) %></td>
+				  			<td width="70" align="right"><%= format_decimal(saldo += (f.entrada_dolar.to_f - f.saida_dolar.to_f))%></td>
+				  		</tr>										  		  		
+				  		<% credito += f.entrada_dolar %>
+				  		<% debito += f.saida_dolar %>
+							
+				  		<% ct += 1 %>
+				  		<% end %>
+			  		<% end %>				  		
+			  	</table>
+
+			  </div>
+			  </div>
+			</div>
+		</div> 
+  </div>
+<% unless params[:persona_id].blank? %>
+  <div class="row">        
+    <div class="col-md-12">
+			<div class="panel">
+			  <div class="panel-body" align="center">
+			  	<table class="head_grid" border='1'>
+			  		<tr>
+			  			<td width="100" class="us">Crédito Total</td>
+			  			<td width="100" align="right"><%= format_decimal(credito)%></td>
+			  		</tr>
+
+			  		<tr>
+			  			<td width="100" class="gs">Débito Total</td>
+			  			<td width="100" align="right"><%= format_decimal(debito)%></td>
+			  		</tr>
+
+			  		<tr>
+			  			<td width="100">Saldo</td>
+			  			<td width="100" align="right"><%= format_decimal(credito.to_f - debito.to_f)%></td>
+			  		</tr>
+			  		<tr>
+			  			<td width="100">Saldo Anterior</td>
+			  			<td width="100" align="right"><%= format_decimal(0)%></td>
+			  		</tr>
+
+			  		<tr>
+			  			<td width="100">Saldo</td>
+			  			<td width="100" align="right"><%= format_decimal( (credito.to_f - debito.to_f) )%></td>
+			  		</tr>
+
+			  	</table>					  
+
+			  </div>
+			  </div>
+			</div>
+		</div> 
+	<% end %>
+  </div>
+
+</div>
+
+<script>
+$("#bt").click(function() {
+  $('#ModalFiltroData').modal('show');
+});
+
+</script>
+
+<div class="modal fade" id="ModalFiltroData" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal-dialog" role="document">
+<div class="modal-content" style="width:450px ">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 class="modal-title" id="myModalLabel">Add Registro</h4>
+  </div>
+  <div class="modal-body" style="padding: 5px 20px 20px 20px" >
+  	<%= form_for(Financa.new) do |f| %>
+    	<div class="group" >
+    		<div class="row">
+    			<div class="col-md-12">
+    				<label>Fecha</label>
+    				<%= f.date_select :data %>
+    				<%= f.hidden_field :persona_id, value: params[:persona_id] %>
+  				</div>
+    		</div>
+    		<div class="row">
+    			<div class="col-md-12">
+    				<label>Nota</label>
+    				<%= f.text_area :concepto, rows: 5 %>
+  				</div>
+    		</div>
+				<div class="row">
+    			<div class="col-md-4">
+          	<legend><%= t('COIN') %> Origen</legend>
+          	<%= f.select :moeda, options_for_select([['Dolar', 0], ['Guaranies', 1], ['Reales', 2]]), {}, {class: 'panel-field, rece-moeda pg_cliente_moeda'} %>
+  				</div>
+
+    			<div class="col-md-4">
+          	<legend>Tipo</legend>
+          	<%= select_tag "tipo", options_for_select([['Credito', 0], ['Debito', 1]]) %>
+  				</div>
+
+    		</div>
+    		<div class="row">
+    			<div class="col-md-4">
+							<%= field_us_label 'Monto Origen:',f,:valor_origem %>    				
+    			</div>
+    			<div class="col-md-4">
+							<%= field_us_label 'Cambio:',f,:cambio %>    				
+    			</div>
+
+    			<div class="col-md-4">
+    				<div class="valor-cred" hidden>
+    					<%= field_us_label 'Credito U$:',f,:entrada_dolar %>
+    				</div>
+    				<div class="valor-debit" hidden>
+    					<%= field_us_label 'Debito U$:',f,:saida_dolar %>
+    				</div>
+  				</div>
+    		</div>
+				<div class="row">
+          <div class="col-md-12 footer-buttons" >
+            <%= f.submit "Grabar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+          </div>
+        </div>    		
+    	</div>
+  	<% end %>
+  </div>
+</div>
+
+
+
+<script>
+
+
+	$("#tipo").on('blur', function(){
+		if ($("#tipo").val() == '0') {
+	    $(".valor-cred").show();
+	    $(".valor-debit").hide();
+	    $("#financa_saida_dolar").val(0)
+
+   	} else if ($("#tipo").val() == '1') {
+	    $(".valor-cred").hide();
+	    $(".valor-debit").show();
+	    $("#financa_entrada_dolar").val(0)
+   	};
+	});
+
+
+	$("#financa_cambio").on('blur', function(){
+		if ($("#financa_moeda").val() == '2') {			
+			calc = eval( parseFloat( $("#financa_valor_origem").val().replace(/\./g, "").replace(",", ".")) / parseFloat( $("#financa_cambio").val().replace(/\./g, "").replace(",", ".")));
+
+			if ($("#tipo").val() == '0') {
+				$("#financa_entrada_dolar").val(number_format( calc,2, ',', '.'))
+			} else if ($("#tipo").val() == '1') {
+				$("#financa_saida_dolar").val(number_format( calc,2, ',', '.'))
+			};
+		};
+
+	});
+</script>

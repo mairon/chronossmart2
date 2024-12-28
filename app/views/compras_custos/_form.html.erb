@@ -1,0 +1,85 @@
+<div class="group">
+  <%= form_for(@compras_custo) do |f| %>
+        <%= f.hidden_field :compra_id %>
+    <% if @compras_custo.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@compras_custo.errors.count, "error") %> prohibited this compras_custo from being saved:</h2>
+
+        <ul>
+        <% @compras_custo.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <table>
+      <tr>
+         <td align="right">Centro de Costo:</td>
+         <td><%= f.collection_select :centro_custo_id, 
+                    CentroCusto.all( :conditions => ["active = true"],
+                                 :select => 'id,nome',
+                                 :order  => '1' ),:id,
+                                 :nome, { :prompt => 'Selecione lo centro de costo' },{autofocus: true} %>
+          </td>
+         <td align="right">Cuenta:</td>
+         <td><%= f.collection_select :rubro_grupo_id, 
+                   PlanoDeConta.all( :select => 'id,descricao',
+                              :conditions => ["length(codigo) = 8"],
+                              :order  => '2' ),:id,
+                              :descricao,{:prompt => 'Selecione lo Grupo'} %>
+            <%= image_tag("load.gif",
+                            :align => "absmiddle",
+                            :border => 0,
+                            :id => "spinner",
+                            :width => 21,
+                            :height => 21,
+                            :style =>"display: none;" ) %>
+
+
+                                 </td>
+
+        <td align="right">Clasificación:</td>
+        <td><%= f.collection_select :rubro_id, 
+                   Rubro.all( :select => 'id,descricao',
+                              :order  => '2' ),:id,
+                              :descricao,{:prompt => 'Selecione lo Rubro'} %>
+        </td>
+        <td>
+        <% if @compras_custo.compra.moeda == 0 %>
+          <%= field_us 'U$:', f, :valor_us, value: format_decimal((@compras_custo.compra.total_dolar.to_f - @compras_custo.compra.retencao_us.to_f) - @compras_custo.compra.compras_custos.sum(:valor_us).to_f) %>
+        <% else %>
+          <%= field_gs 'G$:', f, :valor_gs, value: format_int((@compras_custo.compra.total_guarani.to_f - @compras_custo.compra.retencao_gs.to_f) - @compras_custo.compra.compras_custos.sum(:valor_gs).to_f) %>
+        <% end %>
+        </td>
+        <td><%= f.submit :value => t('SAVE'), :class => "button", :disable_with => "Aguarde..."  %></td>
+      </tr>
+    </table> 
+  <% end %>
+</div>
+
+<script type="text/javascript">
+  
+ $(document).ready(function() {
+      $("#compras_custo_rubro_grupo_id").change(function() {
+        var data=$('#compras_custo_rubro_grupo_id').val();
+        $.ajax({
+          type: "GET",
+           url: "/compras/dynamic_rubro_grupo/"+data,
+          data: data,
+          beforeSend: function()
+          {
+              $('#spinner').show();
+          },
+
+          success: function(response)
+          {
+            $('#spinner').hide();
+          }
+
+        });
+    });
+
+  });
+
+
+</script>

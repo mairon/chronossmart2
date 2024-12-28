@@ -1,0 +1,50 @@
+<h1 id="header">produtos_grades</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_produtos_grade_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Produto</td>
+            <td>Fabricante</td>
+            <td>Barra</td>
+            <td>Cor</td>
+            <td>Tamanho</td>
+            <td>Preco 1 us</td>
+            <td>Preco 1 gs</td>
+            <td>Preco 1 rs</td>
+            <td>Preco 2 us</td>
+            <td>Preco 2 gs</td>
+            <td>Preco 2 rs</td>
+            <td>Preco 3 us</td>
+            <td>Preco 3 gs</td>
+            <td>Preco 3 rs</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @produtos_grades.each do |produtos_grade| %>
+      <tr>
+        <% produtos_grade.update_attribute :updated_at, '2014-08-06 11:15:25.27769' %>
+                  <td><%= produtos_grade.produto_id %></td>
+                  <td><%= produtos_grade.fabricante_id %></td>
+                  <td><%= produtos_grade.barra %></td>
+                  <td><%= produtos_grade.cor_id %></td>
+                  <td><%= produtos_grade.tamanho_id %></td>
+                  <td><%= produtos_grade.preco_1_us %></td>
+                  <td><%= produtos_grade.preco_1_gs %></td>
+                  <td><%= produtos_grade.preco_1_rs %></td>
+                  <td><%= produtos_grade.preco_2_us %></td>
+                  <td><%= produtos_grade.preco_2_gs %></td>
+                  <td><%= produtos_grade.preco_2_rs %></td>
+                  <td><%= produtos_grade.preco_3_us %></td>
+                  <td><%= produtos_grade.preco_3_gs %></td>
+                  <td><%= produtos_grade.preco_3_rs %></td>
+                <td><%= link_to 'Editar', edit_produtos_grade_path(produtos_grade) %></td>
+        <td><%= link_to t('DELETE'), produtos_grade, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

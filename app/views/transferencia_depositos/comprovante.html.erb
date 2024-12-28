@@ -1,0 +1,89 @@
+<body onload="window.print()">
+  <style type="text/css">
+  table {
+    font-family:Lucida Console, Courier ;font-size:10px;
+  }
+</style>
+<table>  
+  <tr>
+    <td width="1200">Transferencia Entre Depositos</td>
+  </tr>
+</table>
+
+<br>
+<hr>
+<br>
+
+<table>  
+  <tr>
+    <td>Fecha: <b><%= @transferencia_deposito.data.strftime("%d/%m/%Y")  %></b> </td>
+  </tr>
+
+  <tr>
+    <td>Transf. Nr. :<%= @transferencia_deposito.id.to_s.rjust(6,'0') %></td>
+  </tr>
+
+  <tr>
+    <td><b>---------Origen---------</b></td>
+  </tr>
+
+  <tr>
+    <% unid_oridem =  Unidade.find_by_id( @transferencia_deposito.unidade_origem_id)%>
+    <% unid_dest   =  Unidade.find_by_id( @transferencia_deposito.unidade_destino_id)%>
+    <% dp_oridem =  Deposito.find_by_id( @transferencia_deposito.deposito_origem_id)%>
+    <% dp_dest   =  Deposito.find_by_id( @transferencia_deposito.deposito_destino_id)%>
+
+    <td>Unidad: <%= unid_oridem.unidade_nome %></td>
+  </tr>
+
+  <tr>
+    <td>Deposito : <%= dp_oridem.nome %></td>
+  </tr>
+
+  <tr>
+    <td><b>--------Destino--------</b></td>
+  </tr>
+
+  <tr>
+    <td>Unidad : <%= unid_dest.unidade_nome %></td>
+  </tr>  
+
+  <tr>
+    <td>Deposito : <%= dp_dest.nome %></td>
+  </tr>  
+
+</table>
+
+<br>
+<hr>
+<br>
+<table>
+    <tr>
+       <td colspan="3">
+         <table>
+            <tr class="head">
+              <td width="120">Producto</td>
+              <td align="right" width="60">Cantidad</td>
+            </tr>
+            <% qtd = 0 %>
+            <% @detalhe_produtos.each do |pc|%>
+            <tr>
+              <td align="left" ><%= pc.produto_nome %></td>
+              <td align="center"><%= pc.quantidade %></td>
+            </tr>
+            <% qtd    += pc.quantidade %>
+           <% end %>
+           <tr class="head">
+         <td colspan="2" align="right">Totales</td>
+               <td align="center"> <%= qtd %></td>
+           </tr>
+         </table>
+       </td>
+    </tr>
+ 
+    <tr>
+     <td colspan="3">Concepto : <%= @transferencia_deposito.concepto %> </td>
+    </tr>
+
+</table>
+<hr>

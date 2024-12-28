@@ -1,0 +1,74 @@
+<div class="group">
+<%= form_for [:crm, NegocioProduto.new] do |f| %>
+<%= f.hidden_field :negocio_id, value: @negocio.id %>
+  
+  <div class="row">
+    <div class="col-md-12">
+      <label>Producto</label>
+      <%= f.collection_select :produto_id, Produto.where(status: true), :id, :nome, {:include_blank => true}, {required: true} %>
+    </div>
+  </div>
+
+  <% if @negocio.moeda.to_i == 1 %>
+
+    <div class="row">
+      <div class="col-md-4">
+        <label>Qtd</label>
+        <%= f.text_field :quantidade, class: 'panel-field', value: 1 %>
+      </div>
+
+      <div class="col-md-4">
+        <%= panel_field_gs_label 'Unit.',f,:unit_gs %>
+      </div>
+
+      <div class="col-md-4">
+         <%= panel_field_gs_label 'Total',f,:tot_gs %>
+      </div>
+    </div>
+
+    <script>
+      $('#negocio_produto_quantidade, #negocio_produto_unit_gs').change( function(){
+
+      
+      tot_gs = parseFloat($('#negocio_produto_unit_gs').val().replace(/\./g, "")) * parseFloat($('#negocio_produto_quantidade').val().replace(/\./g, ""));
+
+        $('#negocio_produto_tot_gs').val(number_format( tot_gs,0, ',', '.'))
+      });
+
+    </script>    
+  <% else %>
+  
+    <div class="row">
+      <div class="col-md-4">
+        <label>Qtd</label>
+        <%= f.text_field :quantidade, class: 'panel-field', value: 1 %>
+      </div>
+      <div class="col-md-4">
+        <%= panel_field_us_label 'Unit.',f,:unit_us %>
+      </div>
+      <div class="col-md-4">
+         <%= panel_field_us_label 'Total',f,:tot_us %>
+      </div>
+    </div>
+
+    <script>
+      $('#negocio_produto_quantidade, #negocio_produto_unit_us').change( function(){
+
+      
+      tot_gs = parseFloat($('#negocio_produto_unit_us').val().replace(/\./g, "")) * parseFloat($('#negocio_produto_quantidade').val().replace(/\./g, ""));
+
+        $('#negocio_produto_tot_us').val(number_format( tot_gs,2, ',', '.'))
+      });
+
+    </script>    
+  <% end %>
+  <div class="footer-buttons">
+    <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+  </div>
+
+<% end %>
+</div>
+
+<script>
+  $('#negocio_produto_produto_id').selectize();
+</script>

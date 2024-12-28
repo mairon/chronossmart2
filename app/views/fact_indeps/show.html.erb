@@ -1,0 +1,18 @@
+<div class="row">
+  <div class="col-md-8">
+    <div class="group">
+    <h1 id="header">Factura Independente - [<%= t('EDITION') %>]</h1>
+      <h2>Cliente: <%= @fact_indep.persona_nome %></h2>
+      <div class="group">
+        <%= render "produtos_pendetes" %>
+        <%= render "produtos_faturados" %>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="group">
+      <h1 id="header">Factura</h1>
+      <%= render "faturamento" %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,114 @@
+<table>
+
+	<% tot_int_us = 0 %>
+	<% tot_saldo_us = 0 %>
+	<% tot_us = 200.00 %>
+
+	<% tot_int_gs = 0 %>
+	<% tot_saldo_gs = 0 %>
+	<% tot_gs = 0 %>
+	<tr>
+		<td colspan="7">Transporte Caja</td>
+		<td width="70" align="right"><%= format_decimal(200.00) %></td>
+	</tr>
+
+	<% @cobros.each do |c|%>
+	<tr class="<%= cycle("cor1", "cor2")%>">
+		<td width="50" align="center"><%= c.data.strftime("%d/%m/%y") %></td>
+		<td width="200"><%= c.persona_nome %></td>
+		<td width="30" align="center"><%= c.cota %>/<%= c.tot_cotas %></td>
+		<td width="50" align="center">
+			<% if c.estado.to_i == 1 %>
+				<%= c.vencimento.to_date.strftime("%d/%m/%y") %>
+			<% else %>
+				A CTA.			
+			<% end %>
+		</td>
+		<% if c.moeda == 0 %>
+			<td width="40" align="center"><span class="us">USD</span></td>			
+			<td width="70" align="right"><%= format_decimal(c.cobro_dolar.to_f) %></td>
+			<td width="70" align="right"><%= format_decimal(c.interes_dolar.to_f) %></td>
+			<td width="70" align="right"><%= format_decimal(c.cobro_dolar.to_f + c.interes_dolar.to_f) %></td>
+			<td width="70" align="right">0</td>
+			<td width="70" align="right">0</td>
+			<td width="70" align="right">0</td>
+
+			<% tot_int_us += c.interes_dolar.to_f %>
+			<% tot_saldo_us += c.cobro_dolar.to_f %>
+			<% tot_us += (c.cobro_dolar.to_f + c.interes_dolar.to_f) %>
+
+			<% elsif c.moeda == 1 %>
+				<td width="40" align="center"><span class="gs">Gs.</span></td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right">0</td>
+				<td width="70" align="right"><%= format_int(c.cobro_guarani) %></td>
+				<td width="70" align="right"><%= format_int(c.interes_guarani) %></td>
+				<td width="70" align="right"><%= format_int(c.cobro_guarani.to_f + c.interes_guarani.to_f) %></td>
+
+				<% tot_int_gs += c.interes_guarani.to_f %>
+				<% tot_saldo_gs += c.cobro_guarani.to_f %>
+				<% tot_gs += (c.cobro_guarani.to_f + c.interes_guarani.to_f) %>
+
+			<% elsif c.moeda == 2 %>
+				<td width="40" align="center"><span class="rs">R$</span></td>
+				<td width="70" align="right"><%= format_decimal(c.interes_dolar) %></td>
+				<td width="70" align="right"><%= format_decimal(c.cobro_dolar) %></td>
+				<td width="70" align="right"><%= format_decimal(c.cobro_dolar.to_f + c.interes_dolar.to_f) %></td>
+			<% end %>
+		</td>		
+		<td width="50" align="center"><%= c.recibo.to_s.rjust(6,'0') %></td>
+	</tr>
+	<% end %>
+	<tr class="head">
+		<td colspan="5"></td>
+		
+		<td width="70" align="right"><%= format_decimal(tot_saldo_us) %></td>
+		<td width="70" align="right"><%= format_decimal(tot_int_us) %></td>
+		<td width="70" align="right"><%= format_decimal(tot_us) %></td>
+		<td width="70" align="right"><%= format_int(tot_saldo_gs) %></td>
+		<td width="70" align="right"><%= format_int(tot_int_gs) %></td>
+		<td width="70" align="right"><%= format_int(tot_gs) %></td>
+	</tr>
+</table>
+<br>
+<br>
+<table>
+	<tr style="background-color: #999;">
+		<td colspan="6">A DESCONTAR</td>
+	</tr>
+
+	<tr style="background-color: #999;">
+		<td width="200">Titulo</td>
+		<td width="150">Comprobante</td>
+		<td width="150">Banco</td>
+		<td width="50" align="center">Vto.</td>
+		<td width="70" align="right">USD</td>
+		<td width="70" align="right">Gs.</td>
+	</tr>
+</table>
+
+
+<br>
+<br>
+
+<% md = Moeda.where("data <= '#{params[:inicio].split("/").reverse.join("-")}'").last %>
+
+<table>
+	<tr style="background-color: #999;">
+		<td colspan="4">Resumen</td>
+	</tr>
+	<tr style="background-color: #999;">
+		<td width="200">Ctz. </td>
+		<td width="70" align="right">Transporte Caja</td>
+		<td width="70" align="right">USD</td>
+		<td width="70" align="right">Gs.</td>
+	</tr>
+
+	<tr class="head cor2">
+		<td width="70" align="right"><%= format_int(md.dolar_compra) unless md.blank? %></td>
+		<td width="70" align="right">200</td>
+		<td width="70" align="right"><%= format_decimal(tot_us.to_f - 200) %></td>
+		<td width="70" align="right"><%= format_decimal(tot_gs) %></td>
+	</tr>
+</table>

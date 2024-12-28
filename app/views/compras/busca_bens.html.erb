@@ -1,0 +1,68 @@
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="50" align="center"><%= t('CODE') %></td>
+      <% if current_user.tipo == 0 %>
+        <td width="25" align="center">US</td>
+        <td width="50" align="center">Horas</td>
+      <% end %>
+      <td width="50" align="center"><%= t('DATE') %></td>
+      <td width="330">Proveedor</td>
+      <td width="40">Tipo</td>
+      <td width="120"><%= t('DOC') %></td>
+      <td width="20"></td>
+      <td width="70" align="right">Total</td>
+      <td width="95"></td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+
+    <table>
+      <tr>
+      </tr>
+
+      <% @compras.each do |c| %>
+      <% if c.financeiro.to_i == 0 %>
+        <% color = '#f2dede' %>
+      <% end %>
+
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="50" align="center" bgcolor="<%= color%>"> <%= c.id.to_s.rjust(6,'0') %></td>
+        <% if current_user.tipo == 0 %>
+          <td width="25" align="center" bgcolor="<%= color%>" title="<%= c.usuario_nome %>"> <%= c.usuario_created %></td>
+          <td width="50" align="center" bgcolor="<%= color%>"> <%= c.created_at.strftime("%H:%M") %></td>
+        <% end %>
+        <td width="50" align="center" bgcolor="<%= color%>"> <%= c.data.strftime("%d/%m/%y")%></td>
+        <td width="330" align="left"   bgcolor="<%= color%>"> <%= truncate( c.persona_nome, :legth => 90) %></td>
+        <% if c.tipo.to_i == 0 %>
+          <td width="40" align="left"   bgcolor="<%= color%>">CO</td>
+        <% else %>
+          <td width="40" align="left"   bgcolor="<%= color%>">CR</td>
+        <% end %>
+
+        <td width="120" align="left"   bgcolor="<%= color%>"> <%= c.documento_numero_01%>-<%= c.documento_numero_02%>-<%= c.documento_numero%></td>
+        <% if c.moeda == 0 %>
+          <td width="20" align="center" bgcolor="<%= color%>">U$</td>
+          <td bgcolor="<%= color%>" width="70" align="right" > <%= number_to_currency( c.total_dolar, :format=>'%n', :separator => ",")  %></td>
+        <% elsif c.moeda == 1 %>
+          <td width="20" align="center" bgcolor="<%= color%>">G$</td>
+          <td bgcolor="<%= color%>" width="70" align="right" > <%= number_to_currency( c.total_guarani, :format=>'%n', :precision => 0)  %></td>
+        <% else %>
+          <td width="20" align="center" bgcolor="<%= color%>">R$</td>
+          <td bgcolor="<%= color%>" width="70" align="right" > <%= number_to_currency( c.total_real, :format=>'%n', :separator => ",")  %></td>
+        <% end %>
+        <td bgcolor="<%= color%>"><%= link_to '', edit_bens_compra_path(c), class: 'icon-pencil' %></td>        
+        <td bgcolor="<%= color%>" width=="30">
+          <% if (c.financeiro.to_i == 0) %>
+            <%= link_to '', c, :confirm => 'Estas Seguro?', :method => :delete , class: 'icon-trash'%>
+          <% end %>
+        </td>
+        <td title="Visualizar" bgcolor="<%= color%>"><a target="_blank" href="/compras/<%= c.id %>/comprovante" class='icon-fullscreen'></a></td>
+      </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+<div class="head_grid">
+  <%= will_paginate @compras %>
+</div>

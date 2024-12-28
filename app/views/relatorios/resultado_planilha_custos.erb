@@ -1,0 +1,405 @@
+<% tot_f_us = 0 %>
+<% tot_v_us = 0 %>
+
+<% tot_f_gs = 0 %>
+<% tot_v_gs = 0 %>
+
+<% tot_f_rs = 0 %>
+<% tot_v_rs = 0 %>
+
+<% fat_us = 0 %>
+<% fat_gs = 0 %>
+<% fat_rs = 0 %>
+
+
+
+
+<% @faturamento.each do |fat| %>
+	<% fat_us += fat.fat_us.to_f %>
+	<% fat_gs += fat.fat_gs.to_f %>
+	<% fat_rs += fat.fat_rs.to_f %>
+<% end %>
+
+<% @contratos_recorrentes.each do |fat| %>
+	<% fat_us += fat.divida_dolar.to_f %>
+	<% fat_gs += fat.divida_guarani.to_f %>
+	<% fat_rs += fat.divida_real.to_f %>
+<% end %>
+
+<% @contratos_fixos.each do |cf| %>
+	<% fat_us += cf.valor_us.to_f %>
+	<% fat_gs += cf.valor_gs.to_f %>
+	<% fat_rs += cf.valor_rs.to_f %>
+<% end %>
+
+<% @contratos_recorrentes_pg.each do |cr| %>
+	<% fat_us += cr.divida_dolar.to_f %>
+	<% fat_gs += cr.divida_guarani.to_f %>
+	<% fat_rs += cr.divida_real.to_f %>
+<% end %>
+
+<table>
+
+	<tr>
+		<td colspan="4" style="background-color: #999"><b>Custos Fixos (CF)</b></td>
+	</tr>
+
+	<% @fixos.each do |f| %>
+
+		<tr class="<%= cycle("cor1", "cor2") %>" >
+			<td width="100" ><%= f.cod %></td>
+			<td width="400" ><%= f.grupo_custo_nome %> - <%= f.desc %></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(f.valor_us) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( ( f.valor_us.to_f / fat_us.to_f ) * 100 ) ) %> % </td>
+				<% tot_f_us += f.valor_us.to_f %>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(f.valor_gs) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( ( f.valor_gs.to_f / fat_gs.to_f ) * 100 ) ) %> % </td>
+				<% tot_f_gs += f.valor_gs.to_f %>
+			<% else %>
+				<td width="70" align="right"><b><%= format_decimal(f.valor_rs) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( ( f.valor_rs.to_f / fat_rs.to_f ) * 100 ) ) %> % </td>
+				<% tot_f_rs += f.valor_rs.to_f %>
+			<% end %>
+		</tr>
+	<% end %>
+
+	<% if (@uso_e_consumo_us_fixo.to_f + @uso_e_consumo_gs_fixo.to_f ) > 0 %>
+		<tr class="<%= cycle("cor1", "cor2") %>" >
+			<td></td>
+			<td>Uso y Consumo Fixo</td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(@uso_e_consumo_us_fixo.to_f) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( (@uso_e_consumo_us_fixo.to_f / fat_us.to_f ) * 100 ) ) %> % </td>
+				<% tot_f_us += @uso_e_consumo_us_fixo.to_f %>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(@uso_e_consumo_gs_fixo.to_f) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( (@uso_e_consumo_gs_fixo.to_f / fat_gs.to_f ) * 100 ) ) %> % </td>
+				<% tot_f_gs += @uso_e_consumo_gs_fixo.to_f %>
+			<% else %>
+				<td width="70" align="right"><b>0,00</b></td>
+				<td width="70" align="right"></td>
+			<% end %>
+		</tr>
+	<% end %>
+
+
+	<%= render '/relatorios/forms/planilha_custo/depreciacao' %>
+	<%= render '/relatorios/forms/fopag_planilha_custo_py' %>
+
+	<tr class="header">
+		<td width="100" >FOPAG</td>
+		<td width="400">PROVISIONAMENTOS</td>
+		<td width="70" align="right"><b><%= format_int(@tot_fopag.to_f ) %></b></td>
+		<td width="70" align="right"><%= format_decimal( ((@tot_fopag.to_f / fat_rs.to_f ) * 100 ) ) %> %</td>
+	</tr>
+
+	<tr style="background-color: #999">
+		<td colspan="2"><b>Total Custos Fixos (CF)</b></td>
+		<% if params[:moeda] == '0' %>
+			<td width="70" align="right"><b><%= format_decimal(@tot_fopag.to_f + @depreciacao.to_f + tot_f_us) %></b></td>
+			<td width="70" align="right"><%= format_decimal( ( ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_us) / fat_us.to_f ) * 100 ) ) %> % </td>
+		<% elsif params[:moeda] == '1' %>
+			<td width="70" align="right"><b><%= format_int(@tot_fopag.to_f + @depreciacao.to_f + tot_f_gs) %></b></td>
+			<td width="70" align="right"><%= format_decimal( ( ( (@tot_fopag.to_f + @depreciacao.to_f + tot_f_gs) / fat_gs.to_f ) * 100 ) ) %> % </td>
+		<% else %>
+			<td width="70" align="right"><b><%= format_decimal(@tot_fopag.to_f + @depreciacao.to_f + tot_f_rs) %></b></td>
+			<td width="70" align="right"><%= format_decimal( ( ( (@tot_fopag.to_f + @depreciacao.to_f + tot_f_rs) / fat_rs.to_f ) * 100 ) ) %> % </td>
+		<% end %>
+	</tr>
+</table>
+
+<br>
+<br>
+
+<table>
+	<tr>
+		<td colspan="4" style="background-color: #999"><b>Custos Variaveis (CV)</b></td>
+	</tr>
+	<% if (@cmv_rs.to_f + @cmv_us.to_f + @cmv_gs.to_f) > 0 %>
+		<tr class="<%= cycle("cor1", "cor2") %>" >
+			<td width="100" ></td>
+			<td width="400" >CMV</td>
+			<% if params[:moeda] == '0' %>
+
+				<td width="70" align="right"><b><%= format_decimal(@cmv_us.to_f) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( ( @cmv_us.to_f / fat_us.to_f ) * 100 ) ) %> % </td>
+				<% tot_v_us += @cmv_us.to_f %>
+
+			<% elsif params[:moeda] == '1' %>
+
+				<td width="70" align="right"><b><%= format_int(@cmv_gs.to_f) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( ( @cmv_gs.to_f / fat_gs.to_f ) * 100 ) ) %> % </td>
+				<% tot_v_gs += @cmv_gs.to_f %>
+			<% else %>
+				<% if @cmv_rs != nil %>
+					<td width="70" align="right"><b><%= format_decimal(@cmv_rs.to_f) %></b></td>
+					<td width="70" align="right"><%= format_decimal( ( (@cmv_rs.to_f / fat_rs.to_f ) * 100 ) ) %> % </td>
+				<% else %>
+					<td width="70" align="right"><b>0</b></td>
+					<td width="70" align="right">0 % </td>
+				<% end %>
+			<% end %>
+		</tr>
+	<% end %>
+
+	<% if (@uso_e_consumo_us_variavel.to_f + @uso_e_consumo_gs_variavel.to_f) > 0 %>
+		<tr class="<%= cycle("cor1", "cor2") %>" >
+			<td></td>
+			<td>Uso e Consumo Variavel</td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(@uso_e_consumo_us_variavel.to_f) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( (@uso_e_consumo_us_variavel.to_f / fat_us.to_f ) * 100 ) ) %> % </td>
+				<% tot_v_us += @uso_e_consumo_us_variavel.to_f %>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(@uso_e_consumo_gs_variavel.to_f) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( (@uso_e_consumo_gs_variavel.to_f / fat_gs.to_f ) * 100 ) ) %> % </td>
+				<% tot_v_gs += @uso_e_consumo_gs_variavel.to_f %>
+			<% else %>
+				<td width="70" align="right"><b>0,00</b></td>
+				<td width="70" align="right"></td>
+			<% end %>
+		</tr>
+	<% end %>
+
+	<% if (@comissao_us.to_f + @comissao_gs.to_f) > 0 %>
+		<tr class="<%= cycle("cor1", "cor2") %>" >
+			<td></td>
+			<td>Comissão Vendedor</td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(@comissao_us.to_f) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( (@comissao_us.to_f / fat_us.to_f ) * 100 ) ) %> % </td>
+				<% tot_v_us += @comissao_us.to_f %>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(@comissao_gs.to_f) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( (@comissao_gs.to_f / fat_gs.to_f ) * 100 ) ) %> % </td>
+				<% tot_v_gs += @comissao_gs.to_f %>
+			<% else %>
+				<td width="70" align="right"><b>0,00</b></td>
+				<td width="70" align="right"></td>
+			<% end %>
+		</tr>
+	<% end %>
+
+	<% if (@bonificacao_us.to_f + @bonificacao_gs.to_f) > 0 %>
+		<tr class="<%= cycle("cor1", "cor2") %>" >
+			<td></td>
+			<td>Bonificação Funcionário</td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(@bonificacao_us.to_f) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( (@bonificacao_us.to_f / fat_us.to_f ) * 100 ) ) %> % </td>
+				<% tot_v_us += @uso_e_consumo_us_variavel.to_f %>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(@bonificacao_gs.to_f) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( (@bonificacao_gs.to_f / fat_gs.to_f ) * 100 ) ) %> % </td>
+				<% tot_v_gs += @bonificacao_gs.to_f %>
+			<% else %>
+				<td width="70" align="right"><b>0,00</b></td>
+				<td width="70" align="right"></td>
+			<% end %>
+		</tr>
+	<% end %>
+
+	<% if (@extra_us.to_f + @extra_gs.to_f) > 0 %>
+		<tr class="<%= cycle("cor1", "cor2") %>" >
+			<td></td>
+			<td>Hora Extra Funcionário</td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(@extra_us.to_f) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( (@extra_us.to_f / fat_us.to_f ) * 100 ) ) %> % </td>
+				<% tot_v_us += @extra_us.to_f %>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(@extra_gs.to_f) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( (@extra_gs.to_f / fat_gs.to_f ) * 100 ) ) %> % </td>
+				<% tot_v_gs += @extra_gs.to_f %>
+			<% else %>
+				<td width="70" align="right"><b>0,00</b></td>
+				<td width="70" align="right"></td>
+			<% end %>
+		</tr>
+	<% end %>
+
+	<% @variaveis.each do |f| %>
+
+		<tr class="<%= cycle("cor1", "cor2") %>" >
+			<td width="100" ><%= f.cod %></td>
+			<td width="400" ><%= f.grupo_custo_nome %> - <%= f.desc %></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(f.valor_us) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( ( f.valor_us.to_f / fat_us.to_f ) * 100 ) ) %> % </td>
+				<% tot_v_us += f.valor_us.to_f %>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(f.valor_gs) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( ( f.valor_gs.to_f / fat_gs.to_f ) * 100 ) ) %> % </td>
+				<% tot_v_gs += f.valor_gs.to_f %>
+			<% else %>
+				<td width="70" align="right"><b><%= format_decimal(f.valor_rs) %></b></td>
+				<td width="70" align="right"><%= format_decimal( ( ( f.valor_rs.to_f / fat_rs.to_f ) * 100 ) ) %> % </td>
+				<% tot_v_rs += f.valor_rs.to_f %>
+			<% end %>
+		</tr>
+	<% end %>
+
+	<tr style="background-color: #999">
+		<td colspan="2" ><b>Total Custo Variavel (CV)</b></td>
+		<% if params[:moeda] == '0' %>
+			<td width="70" align="right"><b><%= format_decimal(tot_v_us) %></b></td>
+			<td width="70" align="right"><%= format_decimal( ( ( tot_v_us.to_f / fat_us.to_f ) * 100 ) ) %> % </td>
+		<% elsif params[:moeda] == '1' %>
+			<td width="70" align="right"><b><%= format_int(tot_v_gs) %></b></td>
+			<td width="70" align="right"><%= format_decimal( ( ( tot_v_gs.to_f / fat_gs.to_f ) * 100 ) ) %> % </td>
+		<% else %>
+			<td width="70" align="right"><b><%= format_decimal(tot_v_rs) %></b></td>
+			<td width="70" align="right"><%= format_decimal( ( ( tot_v_rs.to_f / fat_rs.to_f ) * 100 ) ) %> % </td>
+		<% end %>
+	</tr>
+
+	<tr style="background-color: #999">
+		<td colspan="2"><b>Total Custos (CT = CF + CV)</b></td>
+		<% if params[:moeda] == '0' %>
+			<td width="70" align="right"><b><%= format_decimal((@tot_fopag.to_f + @depreciacao.to_f + tot_f_us) + tot_v_us.to_f) %></b></td>
+			<td width="70" align="right"><%= format_decimal( ( ( ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_us) + tot_v_us.to_f) / fat_us.to_f ) * 100 ) ) %> % </td>
+		<% elsif params[:moeda] == '1' %>
+			<td width="70" align="right"><b><%= format_int(tot_f_gs.to_f + tot_v_gs.to_f) %></b></td>
+			<td width="70" align="right"><%= format_decimal( ( ( (tot_f_gs.to_f + tot_v_gs.to_f) / fat_gs.to_f ) * 100 ) ) %> % </td>
+		<% else %>
+			<td width="70" align="right"><b><%= format_decimal((@tot_fopag.to_f + @depreciacao.to_f + tot_f_rs.to_f) + tot_v_rs.to_f) %></b></td>
+			<td width="70" align="right"><%= format_decimal( ( ( ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_rs.to_f) + tot_v_rs.to_f) / fat_rs.to_f ) * 100 ) ) %> % </td>
+		<% end %>
+	</tr>
+</table>
+
+<br>
+<br>
+<!-- Faturamento !-->
+<!-- Contratos !-->
+
+<table>
+
+	<tr>
+		<td colspan="4" style="background-color: #999"><b>Faturamento</b></td>
+	</tr>
+
+	<% @contratos_recorrentes.each do |cr| %>
+		<tr class="<%= cycle("cor1", "cor2") %>">
+				<td width="100">Contrato Recorrentes</td>
+				<td width="400"><%= cr.centro_custo_nome %></td>
+				<% if params[:moeda] == '0' %>
+					<td width="70" align="right"><b><%= format_decimal(cr.divida_dolar.to_f) %></b></td>
+					<td width="70" align="right"><%= format_decimal( ( ( (cr.divida_dolar.to_f) / fat_us.to_f ) * 100 ) ) %> % </td>
+				<% elsif params[:moeda] == '1' %>
+					<td width="70" align="right"><b><%= format_int(cr.divida_guarani.to_f) %></b></td>
+					<td width="70" align="right"><%= format_decimal( ( ( (cr.divida_guarani.to_f) / fat_us.to_f ) * 100 ) ) %> % </td>
+				<% else %>
+					<td width="70" align="right"><b><%= format_decimal(cr.divida_real.to_f) %></b></td>
+					<td width="70" align="right"><%= format_decimal( ( ( (cr.divida_real.to_f) / fat_rs.to_f ) * 100 ) ) %> % </td>
+				<% end %>
+		</tr>
+	<% end %>
+
+
+
+	<% @contratos_recorrentes_pg.each do |cr| %>
+		<tr class="<%= cycle("cor1", "cor2") %>">
+				<td width="100">Contrato Recorrentes</td>
+				<td width="400"><%= cr.centro_custo_nome %></td>
+				<% if params[:moeda] == '0' %>
+					<td width="70" align="right"><b><%= format_decimal(cr.divida_dolar.to_f) %></b></td>
+					<td width="70" align="right"><%= format_decimal( ( ( (cr.divida_dolar.to_f) / fat_us.to_f ) * 100 ) ) %> % </td>
+				<% elsif params[:moeda] == '1' %>
+					<td width="70" align="right"><b><%= format_int(cr.divida_guarani.to_f) %></b></td>
+					<td width="70" align="right"><%= format_decimal( ( ( (cr.divida_guarani.to_f) / fat_us.to_f ) * 100 ) ) %> % </td>
+				<% else %>
+					<td width="70" align="right"><b><%= format_decimal(cr.divida_real.to_f) %></b></td>
+					<td width="70" align="right"><%= format_decimal( ( ( (cr.divida_real.to_f) / fat_rs.to_f ) * 100 ) ) %> % </td>
+				<% end %>
+		</tr>
+	<% end %>
+
+	<% @contratos_fixos.each do |c| %>
+		<tr class="<%= cycle("cor1", "cor2") %>" >
+				<td>Contratos Fixos</td>
+				<td><%= c.centro_custo_nome %></td>
+				<% if params[:moeda] == '0' %>
+					<td width="70" align="right"><b><%= format_decimal(c.valor_us.to_f) %></b></td>
+				<% elsif params[:moeda] == '1' %>
+					<td width="70" align="right"><b><%= format_int(c.valor_gs.to_f) %></b></td>
+				<% else %>
+					<td width="70" align="right"><b><%= format_decimal(c.valor_rs.to_f) %></b></td>
+					<td width="70" align="right"><%= format_decimal( ( ( (c.valor_rs.to_f) / fat_rs.to_f ) * 100 ) ) %> % </td>
+				<% end %>
+		</tr>
+	<% end %>
+
+	<tr>
+		<td colspan="2"  width="500"><b>Faturamento</b></td>
+			<% if params[:moeda] == '0' %>
+				<td width="70" align="right"><b><%= format_decimal(fat_us.to_f) %></b></td>
+			<% elsif params[:moeda] == '1' %>
+				<td width="70" align="right"><b><%= format_int(fat_gs.to_f) %></b></td>
+			<% else %>
+				<td width="70" align="right"><b><%= format_decimal(fat_rs.to_f) %></b></td>
+			<% end %>
+	</tr>
+	<!-- Lucro !-->
+	<tr>
+		<td colspan="2" width="500"><b>Lucro</b></td>
+		<% lc = 0 %>
+		<% if params[:moeda] == '0' %>
+			<td width="70" align="right"><b><%= format_decimal(lc = (fat_us.to_f - ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_us) + tot_v_us.to_f))) %></b></td>
+			<td width="70" align="right"><b><%= format_decimal( ( (fat_us.to_f - ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_us) + tot_v_us.to_f)) / fat_us.to_f ) * 100 ) %>%</b></td>
+		<% elsif params[:moeda] == '1' %>
+			<td width="70" align="right"><b><%= format_int(lc = (fat_gs.to_f - ( tot_f_gs.to_f + tot_v_gs.to_f )) ) %></b></td>
+			<td width="70" align="right"><b><%= format_decimal( ( (fat_gs.to_f - ( tot_f_gs.to_f + tot_v_gs.to_f )) / fat_gs.to_f ) * 100 ) %>%</b></td>
+		<% else %>
+			<td width="70" align="right"><b><%= format_decimal(lc = (fat_rs.to_f - ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_rs) + tot_v_rs.to_f )) ) %></b></td>
+			<td width="70" align="right"><b><%= format_decimal( ( (fat_rs.to_f - ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_rs) + tot_v_rs.to_f )) / fat_rs.to_f ) * 100 ) %>%</b></td>
+		<% end %>
+	</tr>
+
+	<!-- Ponto de Equilibrio !-->
+	<tr>
+		<td colspan="2"><b>Ponto de Equilibrio</b></td>
+			<% if params[:moeda] == '0' %>
+
+				<% pe = ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_us) /  (1 - (( tot_v_us.to_f / fat_us.to_f )))) %>
+				<% if lc > 0 %>
+				<td width="70" align="right"><b><%= format_decimal(pe) %></b></td>
+				<% else %>
+					<td width="70" align="right"><b>NA</b></td>
+				<% end %>
+
+			<% elsif params[:moeda] == '1' %>
+
+				<% pe = ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_gs) / (1 - (( tot_v_gs.to_f / fat_gs.to_f )))) %>
+				<% if lc > 0 %>
+					<td width="70" align="right"><b><%= format_int(pe) %></b></td>
+				<% else %>
+					<td width="70" align="right"><b>NA</b></td>
+				<% end %>
+
+			<% else %>
+
+				<% pe = ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_rs) / (1 - (( tot_v_rs.to_f / fat_rs.to_f )))) %>
+				<% if lc > 0 %>
+					<td width="70" align="right"><b><%= format_decimal(pe) %></b></td>
+				<% else %>
+					<td width="70" align="right"><b>NA</b></td>
+				<% end %>
+
+			<% end %>
+	</tr>
+</table>
+
+<style type="text/css">
+  table {
+    border-collapse: collapse;
+    font-size: 10px
+  }
+  .titulo {
+    font-size: 22px
+  }
+  td, tr {
+  }
+</style>

@@ -1,0 +1,40 @@
+.horizontal-scrollable-tabs {
+}
+
+.horizontal-scrollable-tabs .arrow-right {
+  float: right;
+  cursor:pointer;
+  box-shadow: 0 2px 5px 0 rgb(0 0 0 / 20%), 0 2px 10px 0 rgb(0 0 0 / 10%);
+}
+.horizontal-scrollable-tabs .arrow-left {
+  float: left;
+  cursor:pointer;
+  box-shadow: 0 2px 5px 0 rgb(0 0 0 / 20%), 0 2px 10px 0 rgb(0 0 0 / 10%);
+}
+/* Customize your arrows here */
+.horizontal-scrollable-tabs .scroller {
+  padding: 10px 10px; 
+  border-radius: 4px;
+  display: none;
+  border:1px solid #ccc;
+}
+.horizontal-scrollable-tabs .scroller.disabled {
+  color: gray;
+}
+.horizontal-scrollable-tabs .horizontal-tabs .nav-tabs-horizontal {
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: -webkit-box;
+  display: -moz-box;
+  padding: 0px;
+}
+/* As it has a mobile focus the scrollbar is removed */
+.horizontal-scrollable-tabs .horizontal-tabs .nav-tabs-horizontal::-webkit-scrollbar {
+  width: 0 !important;
+}
+/* It's good to add a min-width so that the items have the same width */
+.horizontal-scrollable-tabs .horizontal-tabs .nav-tabs-horizontal > li {
+  float: none;
+  text-align: center;
+  color: #000;
+}

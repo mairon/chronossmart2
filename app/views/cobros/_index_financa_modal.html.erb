@@ -1,0 +1,73 @@
+  <table class="head_grid">
+    <tr>
+      <td width="120"><%= t('FORM_OF_PAYMENT') %></td>
+      <td width="120"><%= t('ACCOUNT') %></td>
+      <td width="100" align="center"><%= t('CHECKS') %></td>
+      <td width="80" align="center">Dif.</td>
+      <td width="80" align="right"><%= t('VALUE') %></td>
+      <td width="50" align="right"></td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div" style="height: 70px">
+    <table>
+    <% tot = 0 %>      
+    <% cobros_financas.each do |cf| %>
+      <tr class = "<%= cycle( "cor1", "cor2" )%>">        
+         <td width="120" align="left"><%= cf.forma_pago.nome %></td>
+         <td width="120" align="left"><%= cf.conta_nome %></td>
+         <td width="100" align="center"><%= cf.cheque %></td>
+         <td width="80"  align="center"><%= cf.diferido.strftime("%d/%m/%y")%></td>
+          <% if @cobro.moeda == 0 %>
+            <% if cf.cred_deb.to_i == 1 %>
+               <% sinal = "-" %>
+               <% color = 'red' %>
+               <% tot -= cf.valor_dolar.to_f %>
+            <% else %>
+               <% sinal = "+" %>
+               <% color = 'green' %>
+               <% tot += cf.valor_dolar.to_f %>
+            <% end %>
+            <td width="80" align="right" style="color: <%= color %>"><b><%= format_decimal( cf.valor_dolar ) %></b></td>            
+
+          <% elsif @cobro.moeda == 1 %>
+            <% if cf.cred_deb.to_i == 1 %>
+               <% sinal = "-" %>
+               <% color = 'red' %>
+               <% tot -= cf.valor_guarani.to_f %>
+            <% else %>
+               <% sinal = "+" %>
+               <% color = 'green' %>
+               <% tot += cf.valor_guarani.to_f %>
+            <% end %>
+            <td width="80" align="right" style="color: <%= color %>"><b><%= format_int( cf.valor_guarani ) %></b></td>
+            
+          <% else %>
+            <% if cf.cred_deb.to_i == 1 %>
+               <% sinal = "-" %>
+               <% color = 'red' %>
+               <% tot -= cf.valor_real.to_f %>
+            <% else %>
+               <% sinal = "+" %>
+               <% color = 'green' %>
+               <% tot += cf.valor_real.to_f %>
+            <% end %>
+
+            <td width="80" align="right" style="color: <%= color %>"><b><%= format_decimal( cf.valor_real ) %></b></td>
+          <% end %>        
+          <td align="center" style="color: <%= color %>"><b><%= sinal %></b></td>
+          <td><%= link_to '', cf, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+      </tr>
+    <% end %>
+    </table>
+  </div>
+
+  <table class="head_grid">
+    <tr>
+      <td width="420"></td>
+      <% if @cobro.moeda == 1 %>
+        <td width="80" align="right"><b><%= format_int( tot ) %></b></td>
+      <% else %>
+        <td width="80" align="right"><b><%= format_decimal( tot ) %></b></td>
+      <% end %>
+    </tr>
+  </table>

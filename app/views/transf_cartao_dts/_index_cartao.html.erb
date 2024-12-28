@@ -1,0 +1,40 @@
+<% t_valor = 0 %>
+<% t_taxa  = 0 %>
+<% t_saldo = 0 %>
+
+<table class="head_grid">
+  <tr>
+     <td width="332">Bandeira</td>
+     <td width="50">Nº</td>
+     <td width="80" align="right"><%= t('VALUE') %></td>
+     <td width="80" align="right">Tasa</td>
+     <td width="80" align="right">Saldo Transf.</td>
+  </tr>
+</table>  
+<div class="rolagem" id="div">
+  <table>
+    <% transf_cartao_dts.each do |c| %>
+    <tr class="<%= cycle("cor1", "cor2")%>">
+      <td width="332"><%= c.cartao_bandeira.nome unless c.cartao_bandeira_id.blank?  %></td>
+      <td width="50"><%= c.nr_comprovante %></td>
+      <td width="80" align="right"><%= format_int(c.valor_gs) %></td>
+      <td width="80" align="right"><%= format_int(c.taxa_gs) %></td>
+      <td width="80" align="right"><%= format_int(c.saldo_gs) %></td>
+      <td><%= link_to t('DELETE'), c, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      <% t_valor += c.valor_gs.to_f %>
+      <% t_taxa  += c.taxa_gs.to_f %>
+      <% t_saldo += c.saldo_gs.to_f %>
+
+    </tr>            
+  <% end %>
+  </table>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="388"></td>
+    <td width="80" align="right"><b><%= format_int(t_valor) %></b></td>
+    <td width="80" align="right"><b><%= format_int(t_taxa) %></b></td>
+    <td width="80" align="right"><b><%= format_int(t_saldo) %></b></td>
+  </tr>
+</table>

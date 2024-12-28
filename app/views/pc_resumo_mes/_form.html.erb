@@ -1,0 +1,53 @@
+<%= form_for(@pc_resumo_me) do |f| %>
+  <% if @pc_resumo_me.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@pc_resumo_me.errors.count, "error") %> prohibited this pc_resumo_me from being saved:</h2>
+
+      <ul>
+      <% @pc_resumo_me.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> pc_resumo_mes - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">data :</td>                    
+                      <td><%= f.date_select :data %></td>
+                                      
+                      <td align="right">custo_fixo_gs :</td>                    
+                      <td><%= f.text_field :custo_fixo_gs %></td>
+                                      
+                      <td align="right">custo_variavel_gs :</td>                    
+                      <td><%= f.text_field :custo_variavel_gs %></td>
+                                      
+                      <td align="right">faturamento :</td>                    
+                      <td><%= f.text_field :faturamento %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', pc_resumo_mes_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

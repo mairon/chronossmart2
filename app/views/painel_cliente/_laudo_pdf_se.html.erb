@@ -1,0 +1,572 @@
+
+<body>
+<% if params[:tipo_list] == '0' ||  params[:tipo_list] == '2' %>
+<style>
+	.page-break { display:block; clear:both; page-break-after:always; }
+table {
+		font-family:Lucida Console;
+		font-size:10px;
+		border-collapse: collapse;
+	}
+	table td{
+		height:20px;
+
+	}
+	.header{
+		font-size: 10px;
+		border:1px solid black;
+	}
+
+	.destaque{
+		font-size: 12px;
+		border:1px solid black;
+	  -moz-border-radius:8px;
+	  -webkit-border-radius:8px;
+	  padding:10px;
+	  margin:10px 0 10px 0;
+	}
+
+	.obs{
+		font-size: 7px;
+	}
+
+tr.cor2 {
+    background: #c0d9c0;
+}
+
+tr.cor1 {
+    background: white;
+}
+
+</style><div class="page-break">
+	<table>
+		<tr>
+			<td colspan="5">
+				<div >
+					<table>
+				    <tr>
+				    	<td colspan="2"><%= wicked_pdf_image_tag('logo_biosollo.png', :width => 150, :height => 80) %></td>
+				    	<td width="700" align="center" valign="bottom">
+				    		<p>Km 4 Super Carretera - Teléfono: (061) 573 616</p>
+				    		<p>www.biosollo.com.py - biosollo@biosollo.com.py - Ciudad del Este - Paraguay</p>
+				    	</td>
+				    </tr>
+			    </table>
+			    </div>
+	  	</td>
+		</tr>
+
+    <tr>
+    	<td heigth="100"></td>
+    </tr>
+
+    <tr>
+    	<td heigth="100"></td>
+    </tr>
+
+    <tr>
+	    	<td valign="top">
+	    		<div>
+	    			<table>
+	    				<tr height="520">
+	    					<td valign="top">
+
+			    		<table>
+								<% quebra   = "" %>
+								<% @amostras.each do |a| %>
+
+										<% if a.solicitante == '' %>
+		                  <% soli = a.empresa_nome %>
+		                <% else %>
+		                  <% soli = a.solicitante %>
+		                <% end %>
+
+		                <% if quebra != soli %>
+		                  <% if quebra != "" %>
+		                    <tr height="50">
+		                      <td colspan="6">
+		                      </td>
+		                    </tr>
+		                  <% end %>
+
+		                  <tr>
+		                  	<% quebra = soli %>
+		                    <td colspan="7" style="font-size:12px;"><b>Solicitante:</b> <%= a.empresa_nome %></td>
+		                    <td  colspan="5" style="font-size:12px;"><b>Especie:</b><%= a.cientifico %>(<%= a.cultura %>)</td>
+
+		                  </tr>
+		                  <tr>
+		                    <td colspan="7" style="font-size:12px;"><b>Propietario:</b> <%= a.solicitante %></td>
+		                    <td colspan="5" style="font-size:12px;"><b><%= t('DATE') %> de Ingreso: </b> <%= a.data.to_date.strftime("%d/%m/%Y") %></td>
+		                  </tr>
+
+											<tr>
+													<td width="1500" colspan='13' align="center">
+														<div class="destaque">
+																<h2>Informe de Análisis de Semillas</h2>
+														</div>
+													</td>
+												</tr>
+
+						    			<tr class="header">
+						    				<td class="header" colspan="3"  align="center"><b>Identificación de la Muestra </b></td>
+						    				<td class="header" align="center" colspan="10"><b>Determinación</b></td>
+						    			</tr>
+
+						    			<tr class="header">
+						    				<td class="header" align="center" rowspan="2" width="40"><b>Nº Control </b></td>
+						    				<td class="header" align="center" rowspan="2" width="100"><b>Cultivo </b></td>
+						    				<td class="header" align="center" rowspan="2" width="100"><b>Lote Nº </b></td>
+						    				<td class="header" align="center" rowspan="2" width="70"><b>Germinación (RP) %</b></td>
+						    				<td class="header" align="center" rowspan="2" width="85"><b>Vigor (RP) %</b></td>
+						    				<td class="header" align="center" rowspan="2" width="85"><b>Vigor (EP) %</b></td>
+						    				<td class="header" align="center" rowspan="2" width="85"><b>PMS (gr.)</b></td>
+						    				<td class="header" align="center" colspan="7"><b>Test de Tetrazólio</b></td>
+						    			</tr>
+						    			<tr class="header">
+						    				<td class="header" align="center" width="70"><b>P.G (%)</b></td>
+						    				<td class="header" align="center" width="70"><b>P.V (%)</b></td>
+						    				<td class="header" align="center" width="70"><b>D.M (%) Nível 6-8</b></td>
+						    				<td class="header" align="center" width="70"><b>D.H (%) Nível 6-8</b></td>
+						    				<td class="header" align="center" width="70"><b>D.C (%) Nível 6-8</b></td>
+						    				<td class="header" align="center" width="70"><b>S.D (%)</b></td>
+						    			</tr>
+
+		              <% end %>
+			    			<tr class="header">
+			    				<td class="header" align="center"><%= a.amostra %></td>
+			    				<td class="header" align="center"  width="100"><%= a.variedad %></td>
+			    				<td class="header" align="center"  width="100"><%= a.lote %></td>
+			    				<td class="header" align="center">
+				    				<% germ_rp = EntradaResultEnsaio.find_by_metodo_id( 169, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if germ_rp != nil %>
+				    					<%= number_to_currency(germ_rp.se_ger_poder_germi.to_f + germ_rp.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 0) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+			    				<td class="header" align="center">
+				    				<% vig = EntradaResultEnsaio.find_by_metodo_id( 172, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if vig != nil %>
+				    					<%= number_to_currency(vig.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 0) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+									<td class="header" align="center">
+				    				<% vig = EntradaResultEnsaio.find_by_metodo_id( 124, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if vig != nil %>
+				    					<%= number_to_currency(vig.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 0) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+
+									<td class="header" align="center">
+				    				<% pms = EntradaResultEnsaio.find_by_metodo_id( 126, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if pms != nil %>
+				    					<%= number_to_currency( pms.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 0) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+
+			    				<td class="header" align="center">
+				    				<% pg = EntradaResultEnsaio.find_by_metodo_id( 173, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if pg != nil %>
+				    					<%= number_to_currency(pg.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 0) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+			    				<td class="header" align="center">
+				    				<% pv = EntradaResultEnsaio.find_by_metodo_id( 174, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if pv != nil %>
+				    					<%= number_to_currency(pv.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 0) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+			    				<td class="header" align="center">
+				    				<% dm = EntradaResultEnsaio.find_by_metodo_id( 175, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if dm != nil %>
+				    					<%= number_to_currency(dm.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 0) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+			    				<td class="header" align="center">
+				    				<% dh = EntradaResultEnsaio.find_by_metodo_id( 176, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if dh != nil %>
+				    					<%= number_to_currency(dh.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 0) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+			    				<td class="header" align="center">
+				    				<% dc = EntradaResultEnsaio.find_by_metodo_id( 177, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if dc != nil %>
+				    					<%= number_to_currency(dc.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 0) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+			    				<td class="header" align="center">
+				    				<% sd = EntradaResultEnsaio.find_by_metodo_id( 178, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if sd != nil %>
+				    					<%= number_to_currency(sd.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 0) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+			    			</tr>
+
+				    		<% end %>
+			    		</table>
+
+					</td>
+				</tr>
+			</table>
+
+	    		</div>
+					<table>
+						<tr>
+							<td colspan="3">
+								<% if @revisao_result.obs != '' %>
+									Observación: <%= @revisao_result.obs %>
+								<% end %>
+							</td>
+						</tr>
+		    		<tr>
+		    			<td>
+		    				<p>Metodologia: Regras para Análises de Sementes, 2009.</p>
+		    				<p>LEGENDA:</p>
+		    				<p>RP - Rollo de Papel</p>
+		    				<p>PMS - Peso de Mil Semillas</p>
+		    				<p>P.G - Potencial de Germinación</p>
+		    				<p>P.V - Potencial de Vigor</p>
+		    				<p>D.M - Daño Mecánico</p>
+		    				<p>D.H - Daño por Humedad</p>
+		    				<p>D.C - Daño por Chinche</p>
+		    				<p>E.P - Envejecimiento Precoz</p>
+		    				<p>S.D - Semilla Dura</p>
+		    				<p>N.S - No Solicitado</p>
+		    				<p>Obs.: El análisis se restringe a la muestra recibida en el laboratorio - El Laboratorio no se responsabiliza por la colecta/muestreo del material.</p>
+		    			</td>
+		    		</tr>
+		    		<tr>
+		    			<td width="1200"><hr></td>
+		    		</tr>
+					</table>
+
+					<table>
+    			<tr>
+	    			
+	    			<td width="1200" align="right">
+	    				<div>
+		    				<table>
+		    					<td style="font-size: 14px">
+		    						Ciudad del Este, <%= @revisao_result.data.strftime("%d") %>/<%= @revisao_result.data.strftime("%m") %>/<%= @revisao_result.data.strftime("%Y") %>
+
+		    					</td>
+		    				</table>
+		    			</div>
+	    			</td>
+    			</tr>
+			    <tr>
+			    	<td heigth="150">
+			    	</td>
+			    </tr>
+
+    			<tr>
+	    			<td width="300"></td>
+	    			<td width="600"  align="right">
+	    				<div>
+		    				<table>
+		    					<td  align="center">
+		    					 <p> <%= wicked_pdf_image_tag('firma_maria.png', :width => 150, :height => 70) %></p>
+		    					 <p valign="top">---------------------------------------</p>
+		    					 <p>Ing. Maria Elisa Cuevas</p>
+		    					 <p>Reg. Nº 2941</p>
+		    					</td>
+		    				</table>
+		    			</div>
+	    			</td>
+    			</tr>
+			    <tr>
+			    	<td heigth="120"></td>
+			    </tr>
+
+
+    		</table>
+	    	</td>
+    	</td>
+    </tr>
+	</table>
+</div>
+<% end %>
+
+<% if params[:tipo_list] == '1' ||  params[:tipo_list] == '2' %>
+<style>
+	.page-break { display:block; clear:both; page-break-after:always; }
+table {
+		font-family:Lucida Console;
+		font-size:10px;
+		border-collapse: collapse;
+	}
+	table td{
+		height:20px;
+
+	}
+	.header{
+		font-size: 10px;
+		border:1px solid black;
+	}
+
+	.destaque{
+		font-size: 12px;
+		border:1px solid black;
+	  -moz-border-radius:8px;
+	  -webkit-border-radius:8px;
+	  padding:10px;
+	  margin:10px 0 10px 0;
+	}
+
+	.obs{
+		font-size: 7px;
+	}
+
+tr.cor2 {
+    background: #c0d9c0;
+}
+
+tr.cor1 {
+    background: white;
+}
+
+</style>
+	<div class="page-break">
+	<table>
+		<tr>
+			<td colspan="5">
+				<div >
+					<table>
+				    <tr height="100">
+				    	<td colspan="2"><%= wicked_pdf_image_tag('logo_biosollo.png', :width => 150, :height => 80) %></td>
+				    	<td width="700" align="center" valign="bottom">
+				    		<p>Km 4 Super Carretera - Teléfono: (061) 573 616</p>
+				    		<p>www.biosollo.com.py - biosollo@biosollo.com.py - Ciudad del Este - Paraguay</p>
+				    	</td>
+				    </tr>
+			    </table>
+			    </div>
+	  	</td>
+		</tr>
+
+    <tr>
+    	<td>
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    	</td>
+    </tr>
+
+    <tr>
+	    	<td valign="top">
+	    		<div>
+	    			<table>
+	    				<tr height="520">
+	    					<td valign="top">
+
+			    		<table>
+								<% quebra   = "" %>
+								<% @amostras.each do |a| %>
+									<% if a.solicitante == '' %>
+		                  <% soli = a.empresa_nome %>
+		                <% else %>
+		                  <% soli = a.solicitante %>
+		                <% end %>
+
+		                <% if quebra != soli %>
+		                  <% if quebra != "" %>
+		                    <tr height="50">
+		                      <td colspan="6">
+		                      </td>
+		                    </tr>
+		                  <% end %>
+
+		                  <tr>
+		                  	<% quebra = soli %>
+		                    <td colspan="5" style="font-size:12px;"><b>Solicitante:</b> <%= a.empresa_nome %></td>
+		                  </tr>
+		                  <tr>
+		                    <td colspan="5" style="font-size:12px;"><b>Propietario:</b> <%= a.solicitante %></td>
+		                    <td  width="240" style="font-size:12px;"><b><%= t('DATE') %> de Ingreso:</b></td>
+									    	<td style="font-size:12px;"><%= a.data.to_date.strftime("%d/%m/%Y") %></td>
+		                  </tr>
+
+											<tr>
+													<td width="1500" colspan='12' align="center">
+														<div class="destaque">
+																<h2>Informe de Análisis de Semillas</h2>
+														</div>
+													</td>
+												</tr>
+
+						    			<tr class="header">
+						    				<td class="header" colspan="5"  align="center"><b>Identificación de la Muestra </b></td>
+						    				<td class="header" align="center" colspan="2"><b>Tetrazolio</b></td>
+						    				<td class="header" align="center" colspan="3"><b>Determinación</b></td>
+						    			</tr>
+
+						    			<tr class="header">
+						    				<td class="header" align="center" rowspan="2" width="40"><b>Nº Control </b></td>
+						    				<td class="header" align="center" rowspan="2" width="80"><b>Cultivo </b></td>
+						    				<td class="header" align="center" rowspan="2" width="150"><b>Espécie </b></td>
+						    				<td class="header" align="center" rowspan="2" width="150"><b>Variedad </b></td>
+						    				<td class="header" align="center" rowspan="2" width="150"><b> Lote </b></td>
+						    				<td class="header" align="center" rowspan="2" width="5"><b>Viable %</b></td>
+						    				<td class="header" align="center" rowspan="2" width="110"><b>No Viable %</b></td>
+						    				<td class="header" align="center" colspan="6"><b>Test de Pureza</b></td>
+						    			</tr>
+						    			<tr class="header">
+						    				<td class="header" align="center" width="70"><b>S.P (%)</b></td>
+						    				<td class="header" align="center" width="70"><b>M.I (%)</b></td>
+						    				<td class="header" align="center" width="70"><b>O.S (%)</b></td>
+						    			</tr>
+
+		              <% end %>
+			    			<tr class="header">
+			    				<td class="header" align="center"><%= a.amostra %></td>
+			    				<td class="header" align="center"><%= a.cultura %></td>
+			    				<td class="header" align="center"><%= a.cientifico %></td>
+			    				<td class="header" align="center"><%= a.variedad %></td>
+			    				<td class="header" align="center"><%= a.lote %></td>
+			    				<td class="header" align="center">
+				    				<% germ_rp = EntradaResultEnsaio.find_by_metodo_id( 190, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if germ_rp != nil %>
+				    					<%= number_to_currency(germ_rp.se_ger_poder_germi.to_f + germ_rp.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 0) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+			    				<td class="header" align="center">
+				    				<% vig = EntradaResultEnsaio.find_by_metodo_id( 191, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if vig != nil %>
+				    					<%= number_to_currency(vig.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 0) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+			    				<td class="header" align="center">
+				    				<% pg = EntradaResultEnsaio.find_by_metodo_id( 192, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if pg != nil %>
+				    					<%= number_to_currency(pg.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 0) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+			    				<td class="header" align="center">
+				    				<% pv = EntradaResultEnsaio.find_by_metodo_id( 193, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if pv != nil %>
+				    					<%= number_to_currency(pv.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 0) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+			    				<td class="header" align="center">
+				    				<% dm = EntradaResultEnsaio.find_by_metodo_id( 194, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if dm != nil %>
+				    					<%= number_to_currency(dm.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 0) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+			    			</tr>
+
+				    		<% end %>
+			    		</table>
+
+					</td>
+				</tr>
+			</table>
+
+	    		</div>
+					<table>
+						<tr>
+							<td colspan="3">
+								<% if @revisao_result.obs != '' %>
+									Observación: <%= @revisao_result.obs %>
+								<% end %>
+							</td>
+						</tr>
+		    		<tr>
+		    			<td>
+		    				<p>Metodologia: Regras para Análises de Sementes, 2009.</p>
+		    				<p><b>Leyenda:</b></p>
+		    				<p>S.P - Semilla Pura</p>
+		    				<p>M.I - Material Inerte</p>
+		    				<p>O.S - Otras Semillas</p>
+		    				<p>N.S - No Solicitado</p>
+		    				<p>El análisis se restringe a la muestra  recibida en el laboratorio - El laboratorio no se responsabiliza por la colecta/muetras del material.</p>
+		    			</td>
+		    		</tr>
+		    		<tr>
+		    			<td width="1200"><hr></td>
+		    		</tr>
+					</table>
+
+					<table>
+    			<tr>
+	    			
+	    			<td width="1200" align="right">
+	    				<div>
+		    				<table>
+		    					<td style="font-size: 14px">
+		    						Ciudad del Este
+
+		    					</td>
+		    				</table>
+		    			</div>
+	    			</td>
+    			</tr>
+			    <tr>
+			    	<td heigth="150">
+			    	</td>
+			    </tr>
+
+    			<tr>
+	    			<td width="300"></td>
+	    			<td width="600"  align="right">
+	    				<div>
+		    				<table>
+		    					<td  align="center">
+		    					 <p> <%= wicked_pdf_image_tag('firma_maria.png', :width => 150, :height => 70) %></p>
+		    					 <p valign="top">---------------------------------------</p>
+		    					 <p>Ing. Maria Elisa Cuevas</p>
+		    					 <p>Reg. Nº 2941</p>
+		    					</td>
+		    				</table>
+		    			</div>
+	    			</td>
+    			</tr>
+			    <tr>
+			    	<td heigth="120"></td>
+			    </tr>
+
+
+    		</table>
+	    	</td>
+    	</td>
+    </tr>
+	</table>
+	</div>
+<% end %>
+<% if params[:tipo_list] == '3' || params[:tipo_list] == '4' %>
+	<%= render 'laudo_pdf_se_eb' %>
+<% end %>
+
+</body>
+
+

@@ -1,0 +1,81 @@
+<div class="panel">
+  <header class="panel-heading">
+    <b>Cierre Dolares</b>
+    <div style="float:right">
+	  	<% cred = @fechamento_caixa.fechamento_caixa_dts.where(forma_pago_id: 1, moeda: 0).sum(:valor)  %>
+	  	<% deb = @fechamento_caixa.fechamento_caixa_dts.where("forma_pago_id in (15,17, 18) and moeda = 0").sum(:valor)  %>
+	  	Saldo Efetivo: <b><%= format_decimal((@fechamento_caixa.abertura_caixa.saldo_us.to_f + cred.to_f) - deb.to_f) %></b>
+  	</div>
+
+  </header>
+
+
+	<table class="head_grid">
+	  <tr>
+	    <td width="200"><%= t('FORM_OF_PAYMENT') %></td>
+	    <td width="200">Bandeira</td>
+	    <td width="70" align="right"><%= t('VALUE') %></td>
+	    <td width="70" align="right">Registrado</td>
+	    <td width="70" align="right">Dif.</td>
+	    <td width="80"></td>
+	  </tr>
+	</table>
+	<div class="rolagem" dir="div" style="height: 140px">
+	  <table>
+			<tr class = "<%= cycle("cor1", "cor2") %>">
+				<td width="200">SALDO INICIAL</td>
+				<td width="200"></td>
+				<td width="70" align="right"><%= format_decimal(@fechamento_caixa.abertura_caixa.saldo_us.to_f) %></td>
+				<td width="70" align="right"><%= format_decimal(@fechamento_caixa.abertura_caixa.saldo_us.to_f) %></td>
+				<td width="70" align="right">0</td>
+				<td><font color="green"><span class="save"></span></font></td>
+			</tr>	  	
+	    <% @fechamento_caixa_dts_us.each do |fc| %>
+	      <tr class = "<%= cycle("cor1", "cor2") %>">
+	        <td width="200">
+	          <%= link_to "#{fc.forma_pago_id.to_s.rjust(3,'0')}-#{fc.forma_pago.nome}", fechamento_caixa_dt_path(fc), :target => "_blank" %> 
+	        	<% if fc.cred_deb.to_i == 2 %>
+	        		<font color="red"> (-)</font>
+	        	<% else %>
+	        		<font color="green"> (+) </font>
+	        	<% end %>
+	        </td>
+	        <td width="200">
+	        <% if fc.forma_pago_id == 4 or fc.forma_pago_id == 3 %>   
+	        <% unless fc.cartao_bandeira.nil? %>
+	          <%= fc.cartao_bandeira.nome  %>
+	        <% else %>
+	            <font color="red">BANDEIRA NO INFORMADA </font>
+	          <% end %>
+	        <% end %>
+	        </td>
+	        <% if fc.moeda.to_i == 0 %>
+	          <td width="70" align="right"><%= format_decimal(fc.valor) %></td>
+	          <td width="70" align="right"><%= format_decimal(fc.valor_sis) %></td>
+	          <td width="70" align="right"><%= format_decimal(fc.valor.to_f - fc.valor_sis.to_f) %></td>
+	        <% elsif fc.moeda.to_i == 1 %>
+	          <td width="70" align="right"><%= format_int(fc.valor) %></td>
+	          <td width="70" align="right"><%= format_int(fc.valor_sis) %></td>
+	          <td width="70" align="right"><%= format_int(fc.valor.to_f - fc.valor_sis.to_f) %></td>
+	        <% elsif fc.moeda.to_i == 2 %>
+	          <td width="70" align="right"><%= format_decimal(fc.valor) %></td>
+	          <td width="70" align="right"><%= format_decimal(fc.valor_sis) %></td>
+	          <td width="70" align="right"><%= format_decimal(fc.valor.to_f - fc.valor_sis.to_f) %></td>
+	        <% elsif fc.moeda.to_i == 3 %>
+	          <td width="70" align="right"><%= format_int(fc.valor) %></td>
+	          <td width="70" align  ="right"><%= format_int(fc.valor_sis) %></td>
+	          <td width="70" align="right"><%= format_int(fc.valor.to_f - fc.valor_sis.to_f) %></td>
+	        <% end %>
+	        <% if fc.valor.to_f !=  fc.valor_sis.to_f %>
+	          <td><font color="red"><span class="delete"></span></font></td>
+	        <% else %>
+	          <td><font color="green"><span class="save"></span></font></td>
+	        <% end %>
+	        <% if @fechamento_caixa.status != 1 %>
+	          <td><%= link_to 'Lanzar', edit_fechamento_caixa_dt_path(fc) %></td>
+	        <% end %>
+	      </tr>
+	    <% end %>
+	  </table>
+	</div>
+</div>

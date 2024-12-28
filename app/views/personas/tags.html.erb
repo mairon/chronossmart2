@@ -1,0 +1,65 @@
+<div class="acessos">
+	<%= link_to t('NEW'), new_persona_path, :class => "button add" %>
+	<%= link_to t('LISTING'), '#', :class => "button print", :onclick => 'SeguirCobros()' %>
+</div>
+
+<div class="group">
+	<%= form_tag("/personas/tags", :method => "get") do %>
+		<%= text_field_tag :tag_list, params[:tag_list], class: "tags col-md-6" %>
+		<%= submit_tag "Buscar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+	<% end %>
+</div>
+
+
+<table class="head_grid">
+  	<th>
+      <td width="150" align="center">Código</td>
+      <td width="200" align="center">Fantasia</td>
+      <td width="150" align="center">Razão Social</td>
+      <td width="150" align="center">Ruc/CI</td>
+      <td width="150" align="center">Estado</td>
+    </th>
+</table>
+<% if @persona %>
+<div class="rolagem" dir="div">
+  <table>
+    <% @persona.each do |persona| %>
+      <tr style="color:#333" data-link="<%= persona_path(persona.id) %>" class="hover">
+                  <td width="150" align="center"><%= persona.id %></td>
+                  <td width="200" align="center"><%= persona.nome %></td>
+                  <td width="150" align="center"></td>
+                  <td width="150" align="center"><%= persona.ruc %></td>
+                  <td width="150" align="center"></td>
+       </tr>
+    <% end %>
+  </table>
+	<% else %>
+	<span></span>
+	<% end %>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+
+		$('.tags').select2({
+			tags:[<%= raw ActsAsTaggableOn::Tag.all.map {|x| "\"#{x}\""}.join(',')%>]
+		});
+
+		$("tr[data-link]").click(function() {
+  		window.location = $(this).data("link")
+		});
+
+});
+
+</script>
+
+<style media="screen">
+.hover:hover {
+	background-color: lightgray;
+}
+
+.hover:hover td {
+	background-color: transparent; /* or #000 */
+}
+</style>

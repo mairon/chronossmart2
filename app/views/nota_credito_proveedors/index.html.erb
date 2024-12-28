@@ -1,0 +1,38 @@
+<h1 id="header">Nota Credito Proveedores</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_nota_credito_proveedor_path, :class => "button add" %>
+</div>
+
+<div class="group">
+   <table class="head_grid">
+      <tr>
+         <td width="60" align="center">Cod.</td>
+         <td width="80" align="center"><%= t('DATE') %></td>
+         <td width="100">Operación</td>
+         <td width="400">Proveedor</td>
+      </tr>
+   </table>
+
+   <div class="rolagem" dir="div">
+      <table>
+        <% @nota_credito_proveedors.each do |n| %>
+          <tr class = "<%= cycle("cor1", "cor2") %>">
+            <td width="60" align="center"> <%= n.id.to_s.rjust(6,'0') %></td>
+            <td width="80" align="center"> <%= n.data.strftime("%d/%m/%y")%></td>
+            <td width="100">
+            	<b>
+	            	<% if n.operacao.to_i == 0 %>
+	            		Devolución
+	            	<% else %>
+	            		Descuento
+	            	<% end %>
+            	</b>
+            </td>
+            <td width="400"> <%= n.persona_nome%></td>
+            <td><%= link_to '', edit_nota_credito_proveedor_path(n), class: 'icon-pencil' %></td>
+            <td><%= link_to '', n, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+</div>

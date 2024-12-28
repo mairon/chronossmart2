@@ -1,0 +1,171 @@
+    <div class="group">
+      <%if @cobro.moeda == 0 %>
+        <table>
+          <tr>
+            <td width="85" align="center"><%= t('DATE') %></td>
+            <td width="300" align="center">Proveedor</td>
+            <td width="250" align="center"><%= t('DOC') %></td>
+            <td width="150" align="center">N. <%= t('DOC') %></td>
+            <td width="80" align="center"><%= t('SHARE') %></td>
+            <td width="80" align="center"><%= t('EXPIRATION') %></td>
+            <td width="100" align="center">Valor Dolar</td>
+            <td width="100" align="center">Anter. Dolar</td>
+            <td width="100" align="center">Saldo Dolar</td>
+
+          </tr>
+        </table>
+        <div class="rolagem" dir="div">
+
+          <table>
+
+            <% for cliente in @adelantos %>
+              <%  anterior_dolar     = Cliente.sum(:divida_dolar, :conditions => ["persona_id = ? AND documento_numero = ? AND cota = ?",cliente.persona_id,cliente.documento_numero,cliente.cota]) %>
+              <%  anterior_guarani   = Cliente.sum(:divida_guarani, :conditions => ["persona_id = ? AND documento_numero = ? AND cota = ?",cliente.persona_id,cliente.documento_numero,cliente.cota]) %>
+              <%  anterior_real   = Cliente.sum(:divida_real, :conditions => ["persona_id = ? AND documento_numero = ? AND cota = ?",cliente.persona_id,cliente.documento_numero,cliente.cota]) %>
+                <%  saldo_guarani      = cliente.cobro_guarani - anterior_guarani %>
+                <%  saldo_real         = cliente.cobro_real - anterior_real %>
+
+                <% if cliente.moeda.to_i != @cobro.moeda.to_i  %>
+                  <% saldo_dolar = (cliente.cobro_guarani - anterior_guarani).to_f / @cobro.cotacao.to_f %>
+                <% else %>
+                  <%  saldo_dolar        = cliente.cobro_dolar - anterior_dolar %>
+                <% end %>
+              <tr class = "<%= cycle( "cor1", "cor2" )%>"
+                  onMouseOver="javascript:this.style.backgroundColor='#949494'"
+                  onMouseOut="javascript:this.style.backgroundColor=''"
+                  onClick="Fecha(
+                                  '<%= cliente.documento_numero_01 %>',
+                                  '<%= cliente.documento_numero_02 %>',
+                                  '<%= cliente.documento_numero %>',
+                                  '<%= cliente.cota %>',
+                                  '<%= number_to_currency( saldo_real.to_f, :format =>' %n ', :precision => 2) %>',
+                                  '<%= number_to_currency( saldo_dolar.to_f, :format =>' %n ', :precision => 2) %>',
+                                  '<%= number_to_currency( saldo_guarani, :format =>' %n ', :precision => 0) %>')">
+
+                <td width="85"  align="center"><%= cliente.data.strftime("%d/%m/%Y")%></td>
+                <td width="300" align="left"><%= cliente.persona_nome%></td>
+                <td width="250" align="left"><%= cliente.documento_nome%></td>
+                <td width="150" align="center"><%= cliente.documento_numero_01%>-<%= cliente.documento_numero_02%>-<%= cliente.documento_numero%></td>
+                <td width="80"  align="center"><%= cliente.cota%></td>
+                <td width="80"  align="center"><%= cliente.vencimento.strftime("%d/%m/%Y")%></td>
+                <td width="100" align="right">    <%= number_to_currency( cliente.cobro_dolar, :format =>' %n ', :separator => ",")%></td>
+                <td width="100" align="right">    <%= number_to_currency( anterior_dolar, :format =>' %n ', :separator => ",")%></td>
+                <td width="100" align="right">    <%= number_to_currency( saldo_dolar, :format =>' %n ', :separator => ",")%></td>
+
+              </tr>
+            <% end %>
+          </table>
+        </div>
+      <% elsif @cobro.moeda == 1 %>
+
+        <table>
+          <tr class="head_grid">
+            <td width="80" align="center"><%= t('DATE') %></td>
+            <td width="150">N. <%= t('DOC') %></td>
+            <td width="80" align="center"><%= t('SHARE') %></td>
+            <td width="80" align="center"><%= t('EXPIRATION') %></td>
+            <td width="100" align="center">Valor Gs.</td>
+            <td width="100" align="center">Anter. Gs.</td>
+            <td width="100" align="center">Saldo Gs.</td>
+
+          </tr>
+        </table>
+        <div class="rolagem" dir="div" style="height: 100px">
+
+          <table>
+
+            <% for cliente in @adelantos %>
+              <%  anterior_dolar     = Cliente.sum(:divida_dolar, :conditions => ["persona_id = ? AND documento_numero = ? AND cota = ?",cliente.persona_id,cliente.documento_numero,cliente.cota]) %>
+              <%  anterior_guarani   = Cliente.sum(:divida_guarani, :conditions => ["persona_id = ? AND documento_numero = ? AND cota = ?",cliente.persona_id,cliente.documento_numero,cliente.cota]) %>
+              <%  anterior_real   = Cliente.sum(:divida_real, :conditions => ["persona_id = ? AND documento_numero = ? AND cota = ?",cliente.persona_id,cliente.documento_numero,cliente.cota]) %>
+              <%  saldo_dolar        = cliente.cobro_dolar - anterior_dolar %>
+              <%  saldo_guarani      = cliente.cobro_guarani - anterior_guarani %>
+              <%  saldo_real         = cliente.cobro_real - anterior_real %>
+              <tr class = "<%= cycle( "cor1", "cor2" )%>"
+                  onClick="Fecha(
+                                  '<%= cliente.documento_numero_01 %>',
+                                  '<%= cliente.documento_numero_02 %>',
+                                  '<%= cliente.documento_numero %>',
+                                  '<%= cliente.cota %>',
+                                  '<%= number_to_currency( saldo_guarani, :format =>' %n ', :precision => 0) %>')">
+
+                <td width="80"  align="center">   <%= cliente.data.strftime("%d/%m/%Y")%></td>
+                <td width="150" align="center">   <%= cliente.documento_numero_01%>-<%= cliente.documento_numero_02%>-<%= cliente.documento_numero%></td>
+                <td width="80"  align="center">   <%= cliente.cota%></td>
+                <td width="80"  align="center">   <%= cliente.vencimento.strftime("%d/%m/%Y")%></td>
+                <td width="100" align="right">    <%= number_to_currency( cliente.cobro_guarani, :format =>' %n ', :precision => 0) %></td>
+                <td width="100" align="right">    <%= number_to_currency( anterior_guarani, :format =>' %n ', :precision => 0) %></td>
+                <td width="100" align="right">    <%= number_to_currency( saldo_guarani, :format =>' %n ', :precision => 0) %></td>
+
+              </tr>
+              <% end %>
+              </table>
+
+
+
+      <% elsif @cobro.moeda == 2 %>
+        <table>
+          <tr>
+            <td width="85" align="center"><%= t('DATE') %></td>
+            <td width="300" align="center">Proveedor</td>
+            <td width="250" align="center"><%= t('DOC') %></td>
+            <td width="150" align="center">N. <%= t('DOC') %></td>
+            <td width="80" align="center"><%= t('SHARE') %></td>
+            <td width="80" align="center"><%= t('EXPIRATION') %></td>
+            <td width="100" align="center">Valor R$</td>
+            <td width="100" align="center">Anter. R$</td>
+            <td width="100" align="center">Saldo R$</td>
+
+          </tr>
+        </table>
+        <div class="rolagem" dir="div">
+
+          <table>
+
+            <% for cliente in @proveedor %>
+              <%  anterior_dolar     = Cliente.sum(:divida_dolar, :conditions => ["persona_id = ? AND documento_numero = ? AND cota = ?",cliente.persona_id,cliente.documento_numero,cliente.cota]) %>
+              <%  anterior_guarani   = Cliente.sum(:divida_guarani, :conditions => ["persona_id = ? AND documento_numero = ? AND cota = ?",cliente.persona_id,cliente.documento_numero,cliente.cota]) %>
+              <%  anterior_real   = Cliente.sum(:divida_real, :conditions => ["persona_id = ? AND documento_numero = ? AND cota = ?",cliente.persona_id,cliente.documento_numero,cliente.cota]) %>
+              <%  saldo_dolar        = cliente.cobro_dolar - anterior_dolar %>
+              <%  saldo_guarani      = cliente.cobro_guarani - anterior_guarani %>
+              <%  saldo_real         = cliente.cobro_real - anterior_real %>
+              <tr class = "<%= cycle( "cor1", "cor2" )%>"
+                  onMouseOver="javascript:this.style.backgroundColor='#949494'"
+                  onMouseOut="javascript:this.style.backgroundColor=''"
+                  onClick="Fecha(
+                                  '<%= cliente.documento_numero_01 %>',
+                                  '<%= cliente.documento_numero_02 %>',
+                                  '<%= cliente.documento_numero %>',
+                                  '<%= cliente.cota %>',
+                                  '<%= number_to_currency( saldo_real.to_f, :format =>' %n ', :precision => 2) %>',
+                                  '<%= number_to_currency( saldo_dolar.to_f, :format =>' %n ', :precision => 2) %>',
+                                  '<%= number_to_currency( saldo_guarani, :format =>' %n ', :precision => 0) %>')">
+
+                <td width="85"  align="center"><%= cliente.data.strftime("%d/%m/%Y")%></td>
+                <td width="300" align="left"><%= cliente.persona_nome%></td>
+                <td width="250" align="left"><%= cliente.documento_nome%></td>
+                <td width="150" align="center"><%= cliente.documento_numero_01%>-<%= cliente.documento_numero_02%>-<%= cliente.documento_numero%></td>
+                <td width="80"  align="center"><%= cliente.cota%></td>
+                <td width="80"  align="center"><%= cliente.vencimento.strftime("%d/%m/%Y")%></td>
+                <td width="100" align="right">    <%= number_to_currency( cliente.cobro_real, :format =>' %n ', :separator => ",")%></td>
+                <td width="100" align="right">    <%= number_to_currency( anterior_real, :format =>' %n ', :separator => ",")%></td>
+                <td width="100" align="right">    <%= number_to_currency( saldo_real, :format =>' %n ', :separator => ",")%></td>
+
+              </tr>
+            <% end %>
+          </table>
+        </div>
+      <%end%>
+      <input type="hidden" id="moeda" name="moeda" value="<%= @cobro.moeda %>"/>
+    </div>
+<script>
+  function Fecha(documento_numero_01,documento_numero_02,documento_numero,cota,saldo_guarani)
+  {
+    document.getElementById('cobros_adelanto_documento_numero_01').value   = documento_numero_01;
+    document.getElementById('cobros_adelanto_documento_numero_02').value   = documento_numero_02;
+    document.getElementById('cobros_adelanto_documento_numero').value      = documento_numero;
+    document.getElementById('cobros_adelanto_cota').value                  = cota;
+    document.getElementById('cobros_adelanto_valor_gs').value         = saldo_guarani;
+  }
+
+</script>

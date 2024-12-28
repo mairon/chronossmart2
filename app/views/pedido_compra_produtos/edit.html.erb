@@ -1,0 +1,160 @@
+<body onload="ImputFocus('codigo')">
+<%= form_for(@pedido_compra_produto) do |f| %>
+  <%= f.hidden_field :pedido_compra_id %>
+  <%= f.hidden_field :cotacao,   :value => @pedido_compra_produto.pedido_compra.cotacao.to_i %>
+  <%= f.hidden_field :moeda,     :value => @pedido_compra_produto.pedido_compra.moeda %>
+  <%= f.hidden_field :data,      :value => @pedido_compra_produto.pedido_compra.data %>
+  <%= f.hidden_field :persona_id, :value => @pedido_compra_produto.pedido_compra.persona_id %>
+  <%= f.hidden_field :persona_nome, :value => @pedido_compra_produto.pedido_compra.persona_nome %>
+  <!-- do produto -->
+  <%= f.hidden_field :produto_id %>
+  <%= f.hidden_field :produtos_grade_id %>
+  <%= f.hidden_field :tamanho_id %>
+  <%= f.hidden_field :cor_id %>
+  <%= f.hidden_field :colecao_id, :value => @pedido_compra_produto.pedido_compra.colecao_id %>
+  <%= f.hidden_field :fabricante_cod %>
+  <%= f.hidden_field :clase_id %>
+  <%= f.hidden_field :grupo_id %>
+  <%= f.hidden_field :sub_grupo_id %>
+
+
+      <table>
+        <tr>
+          <td align="right" width="70">Producto :</td>
+          <td colspan="8">
+            <select name="tipo" id="tipo" onKeyDown="EnterTab(event,'cod_busca')">
+              <option>REF</option>
+              <option>BARRA</option>
+            </select>
+
+            <%= text_field :cod, :busca,
+                       :onkeypress  => "return bloqEnter(event)",
+                       :size        => 30,
+                       :placeholder => 'Ref. / Cod. Barra' %>
+
+            <%= f.text_field :produto_nome,
+                             :size      => 60,
+                             :readonly => "readonly",
+                             :placeholder => 'Nome' %>
+
+            <%= f.text_field :cor_nome,
+                             :size      => 20,
+                             :readonly => "readonly",
+                             :placeholder => 'Color' %>
+
+            <%= f.text_field :tamanho_nome,
+                             :size      => 20,
+                             :readonly => "readonly",
+                             :placeholder => 'Tamanho' %>
+          </td>
+        </tr>
+
+        <tr>
+          <td align="right">Cantidad :</td>
+          <td width="180"><%= f.text_field :quantidade, :size => 9 %></td>
+          <% if @pedido_compra_produto.pedido_compra.moeda.to_i == 0  %>
+          <%= field_us 'Desc U$ :', f, :desconto_dolar, :onblur => "TotalUs()" %>
+            <%= field_us 'Unit U$ :', f, :unitario_dolar, :onblur => "TotalUs()" %>
+            <%= field_us 'Total U$ :', f, :total_dolar, :readonly => "readonly" %>
+          <% elsif @pedido_compra_produto.pedido_compra.moeda.to_i == 1 %>
+            <%= field_us 'Desc G$ :', f, :desconto_guarani, :onblur => "TotalUs()" %>
+            <%= field_us 'Unit. G$:', f, :unitario_guarani %>
+            <%= field_us 'Total G$:', f, :total_guarani, :readonly => "readonly" %>
+          <% else %>
+            <%= field_us 'Desc R$ :', f, :desconto_real, :onblur => "TotalUs()" %>
+            <%= field_us 'Unit. R$ :', f, :unitario_real %>
+            <%= field_us 'Total R$ :', f, :total_real, :readonly => "readonly" %>
+          <% end %>
+          <td>
+            <%= f.submit t('SAVE'),:disable_with => "Aguarde...", :class => "button"   %>
+          </td>
+
+        </tr>
+
+      </table>
+<% end %>
+
+<%= hidden_field_tag :pedido_copmra_id, @pedido_compra_produto.pedido_compra.id %>
+
+<script>
+$(document).ready(function() {
+
+   $('#tipo').focus();
+
+});
+
+$("#cod_busca").blur(function(){
+  if ($("#tipo").val() == 'REF'){
+      var moeda = document.getElementById('pedido_compra_produto_moeda').value
+      var pedido = document.getElementById('pedido_copmra_id').value
+      location.href=('/pedido_compras/'+pedido+'/resultado_grade?busca='+$("#cod_busca").val()+'&moeda='+moeda+'&colecao='+$("#pedido_compra_colecao_id").val()+'');
+  }else{
+
+  $.ajax({url: "/buscas/busca_compra_produto",
+          type: 'GET',
+          beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+          data: "cod=" + escape($("#cod_busca").val()) +
+                "&id="+ $("#id").val(),
+          success: function(grade){
+          $('#pedido_compra_produto_produto_nome').val(grade["produto"].nome);
+          $('#pedido_compra_produto_produto_id').val(grade["produto"].produto_id);
+          $('#pedido_compra_produto_produtos_grade_id').val(grade["produto"].produtos_grade_id);
+          $('#pedido_compra_produto_clase_id').val(grade["produto"].clase_id);
+          $('#pedido_compra_produto_grupo_id').val(grade["produto"].grupo_id);
+          $('#pedido_compra_produto_sub_grupo_id').val(grade["produto"].sub_grupo_id);
+          $('#pedido_compra_produto_cor_id').val(grade["produto"].cor_id);
+          $('#pedido_compra_produto_tamanho_id').val(grade["produto"].tamanho_id);
+          $('#pedido_compra_produto_fabricante_cod').val(grade["produto"].fabricante_cod);
+          $('#pedido_compra_produto_cor_nome').val(grade["produto"].cor_nome);
+          $('#pedido_compra_produto_tamanho_nome').val(grade["produto"].tamanho_nome);
+          $('#pedido_compra_produto_custo_dolar').val(number_format( grade["produto"].custo_base_us, 2, ',', '.'));
+          $('#pedido_compra_produto_custo_guarani').val(number_format( grade["produto"].custo_base_gs, 0, ',', '.'));
+          $('#pedido_compra_produto_custo_real').val(number_format( grade["produto"].custo_base_rs, 2, ',', '.'));
+
+          if ($('#pedido_compra_produto_moeda').val() == '0'){
+            $('#pedido_compra_produto_unitario_dolar').val(number_format( grade["produto"].custo_base_us, 2, ',', '.'));
+          }if ($('#pedido_compra_produto_moeda').val() == '1'){
+            $('#pedido_compra_produto_unitario_guarani').val(number_format( grade["produto"].custo_base_gs, 0, ',', '.'));
+          }if ($('#pedido_compra_produto_moeda').val() == '2'){
+            $('#pedido_compra_produto_unitario_real').val(number_format( grade["produto"].custo_base_rs, 2, ',', '.'));
+          }
+        }});
+    }
+});
+
+document.onkeydown=function(e){
+  if(e.which == 113)
+    window.open('/produtos/busca_compra_produto', 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=10, WIDTH=1000, HEIGHT=400');
+}
+
+function TotalUs(){
+  var unit  = $('#pedido_compra_produto_unitario_dolar').val().replace(/\./g, "").replace(",", ".");
+  var desc  = $('#pedido_compra_produto_desconto_dolar').val().replace(/\./g, "").replace(",", ".");
+  var qtd   = $('#pedido_compra_produto_quantidade').val().replace(/\./g, "").replace(",", ".");
+  //calcs
+  var aplic_desc = (unit * (desc / 100))
+  $('#pedido_compra_produto_unitario_dolar').val(number_format(( unit - aplic_desc ), 2, ',', '.'));
+  $('#pedido_compra_produto_total_dolar').val(number_format((( unit - aplic_desc ) * qtd), 2, ',', '.'));
+}
+
+function TotalGs(){
+  var unit  = $('#pedido_compra_produto_unitario_guarani').val().replace(/\./g, "").replace(",", ".");
+  var desc  = $('#pedido_compra_produto_desconto_guarani').val().replace(/\./g, "").replace(",", ".");
+  var qtd   = $('#pedido_compra_produto_quantidade').val().replace(/\./g, "").replace(",", ".");
+  //calcs
+  var aplic_desc = (unit * (desc / 100))
+  $('#pedido_compra_produto_unitario_guarani').val(number_format(( unit - aplic_desc ), 0, ',', '.'));
+  $('#pedido_compra_produto_total_guarani').val(number_format((( unit - aplic_desc ) * qtd), 0, ',', '.'));
+}
+
+function TotalRs(){
+  var unit  = $('#pedido_compra_produto_unitario_real').val().replace(/\./g, "").replace(",", ".");
+  var desc  = $('#pedido_compra_produto_desconto_real').val().replace(/\./g, "").replace(",", ".");
+  var qtd   = $('#pedido_compra_produto_quantidade').val().replace(/\./g, "").replace(",", ".");
+  //calcs
+  var aplic_desc = (unit * (desc / 100))
+  $('#pedido_compra_produto_unitario_real').val(number_format(( unit - aplic_desc ), 2, ',', '.'));
+  $('#pedido_compra_produto_total_real').val(number_format((( unit - aplic_desc ) * qtd), 2, ',', '.'));
+}
+
+</script>

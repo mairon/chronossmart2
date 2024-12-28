@@ -1,0 +1,50 @@
+<%= form_for(unidade) do |f| %>
+  <% if unidade.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(unidade.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% unidade.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  
+  <%= hidden_field_tag :pagina, 'start-guide' %>
+  <div class="tab_container">
+    <div id="tab1" class="tab_content">
+      <table>
+        <tr>
+          <td align="right">Nombre Fantásia:</td>
+          <td colspan="4"><%= f.text_field :nome_sys, size: 45, required: true %></td> 
+        </tr>
+
+        <tr>
+          <td align="right">Razón Social:</td>
+          <td colspan="4"><%= f.text_field :razao_social, size: 45 %></td> 
+        </tr>
+        <tr>
+          <td align="right">RUC:</td>
+          <td colspan="4"><%= f.text_field :ruc, size: 15 %></td> 
+        </tr>
+        <tr>
+          <td align="right">Telefono:</td>
+          <td colspan="4"><%= f.text_field :telefone, size: 15 %></td> 
+        </tr>
+        <tr height="35">
+          <td align="right">Direción:</td>
+          <td><%= f.text_field :direcao, :size => 43 %></td>
+          <td align="right">Barrio:</td>
+          <td><%= f.text_field :bairro, :size => 35 %></td>
+        </tr>
+      </table>
+    </div>
+  <div class="buttons">
+    <%= f.submit t('SAVE'), :class => "button add", :disable_with => "Aguarde...", "data-plus-as-tab" => "false"   %>
+    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>    
+  </div>
+</div>
+<% end %>

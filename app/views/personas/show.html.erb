@@ -1,0 +1,173 @@
+<% if params[:delete] == "true" %>
+<%
+    #deletar registro
+
+    url = URI("https://api.faceio.net/deletefacialid?fid=#{params[:token]}&key=bb3d880d80d445d671ddd34695709d08")
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+    request = Net::HTTP::Get.new(url)
+    request["authorization"] = 'Bearer bb3d880d80d445d671ddd34695709d08'
+    request["content-type"] = 'application/json'
+    # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
+    response = http.request(request)
+    get_resp = JSON.parse(response.body)
+
+%>
+<div class="panel">
+  <div class="panel-body">
+    <div class="row">
+    	<div class="col-md-12" align="center">
+    		<h1><%= get_resp %></h1>
+    		<%= link_to "Volver", persona_path(@persona), class: "btn btn-primary" %>
+    		<% @persona.update_attribute :facial_id, "" %>
+    	</div>
+    </div>
+  </div>
+</div>
+<% else %>
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel">
+	  <div class="panel-body">
+			<div class="row">
+			  <div class="col-md-2">
+	   			<%= image_tag @persona.picture, class: 'img-thumbnail', style: "margin-bottom: 10px" %>
+	   			<%= form_for(@persona) do |f| %>
+	   				<%= f.file_field :picture %>
+	   				<br>
+	   				<%= f.submit :value => " Grabar ", :class => "btn btn-green" %>
+	   			<% end %>
+	   		</div>
+	     	<div class="col-md-9">
+	     		<label><i class="icon-user"></i> <b><%= @persona.nome %></b> | <%= t('DOC_PER') %> <b><%= @persona.ruc %></b> | <%= t('SEGMENT') %> <b><%= @persona.seguimento.nome unless @persona.seguimento_id.blank? %></b></label>
+	     		<label><i class="icon-envelope"></i> <%= @persona.email %></label>
+	     		<label><%= image_tag 'phone.png', height: 14 %> <%= link_to  @persona.telefone, "https://api.whatsapp.com/send?phone=595#{@persona.telefone}", target: '_blank' %> <%= @persona.telefone2 %></label>
+	     		<label><i class="icon-tag"></i>
+	     			<% if @persona.tipo_cliente.to_i == 1 %>
+	     				<span style="background-color: #91DC5A;" class="panel-tag">Cliente</span>
+	     			<% end %>
+	     			<% if @persona.tipo_fornecedor.to_i == 1 %>
+	     				<span style="background-color: #933EC5;" class="panel-tag"><%= t('PROVIDER') %></span>
+     				<% end %>
+     				<% if @persona.tipo_banco.to_i == 1 %>
+	     				<span style="background-color: #006DF0;" class="panel-tag">Banco</span>
+     				<% end %>
+     				<% if @persona.tipo_funcionario.to_i == 1 %>
+     					<span style="background-color: #D80027;" class="panel-tag"><%= t('EMPLOYEE') %></span>
+	     			<% end %>
+     				<% if @persona.tipo_vendedor.to_i == 1 %>
+	     				<span style="background-color: #FFDA44;" class="panel-tag">Vendedor</span>
+	     			<% end %>
+	     			<% if @persona.tipo_indicador.to_i == 1 %>
+	     				<span style="background-color: #00CAD9;" class="panel-tag">Indicador</span>
+	     			<% end %>
+	     		</label>
+	     	</div>
+
+	     	<div class="col-md-1" align="right">
+			   	<%= link_to image_tag("icon-edit.png", width: '13'), edit_persona_path(@persona), class: 'btn btn-default' %>
+
+			    <%= link_to persona_path(:id => @persona.id), :confirm => 'Estas Seguro?', :method => :delete, :class => "btn btn-danger", style: 'margin-top: 5px' do %>
+			    	<i class="icon-white icon-trash"></i>
+			    <% end %>
+
+ 				  <%= link_to personas_path, :class => "btn btn-default", style: 'margin-top: 5px' do %>
+ 				  	<i class="icon-circle-arrow-right"></i>
+ 				  <% end %>
+
+	     	</div>
+	   	</div>
+	  </div>
+	  </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-4">
+
+		<div class="row">
+		  <div class="col-md-12">
+				<%= render "/personas/eps/crm" %>
+		  </div>
+		</div>
+
+		<div class="row">
+		  <div class="col-md-12">
+				<%= render "/personas/eps/endereco" %>
+		  </div>
+		</div>
+
+		<div class="row">
+		  <div class="col-md-12">
+				<%= render "/personas/eps/regra_negocio" %>
+		  </div>
+		</div>
+		<div class="row">
+		  <div class="col-md-12">
+				<%= render "/personas/eps/dados_bancarios" %>
+		  </div>
+		</div>
+
+		<div class="row">
+		  <div class="col-md-12">
+				<%= render "/personas/eps/ubicacion" %>
+		  </div>
+		</div>
+		
+
+		<% if @persona.tipo_funcionario.to_i == 1 %>
+			<div class="row">
+			  <div class="col-md-12">			  	
+					<%= render "/personas/eps/fopag" %>
+			  </div>
+			</div>
+
+		<div class="row">
+		  <div class="col-md-12">
+				<%= render "/personas/eps/faceid" %>
+		  </div>
+		</div>
+
+		<% end %>
+		<% if Empresa.last.mobile_integration == true %>
+		<div class="row">
+		  <div class="col-md-12">
+				<%= render "/personas/login_cliente" %>
+		  </div>
+		</div>
+		<% end %>
+  </div>
+
+  <div class="col-sm-8">
+  	<% if @persona.tipo_cliente.to_i == 1 %>
+			<div class="row">
+			  <div class="col-md-12">
+			  	<%= render "/personas/eps/linha_credito" %>
+			  </div>
+			</div>
+
+			<div class="row">
+			  <div class="col-md-12">
+			  	<% if Empresa.last.segmento.to_i == 1 %>
+			  		<% if @persona.tipo_aluno == 0 %>
+			  			<%= render "/personas/eps/dependentes" %>
+			  		<% end %>
+			  	<% else %>
+			  		<%= render "/personas/eps/persona_rodados" %>
+			  	<% end %>
+			  	
+			  </div>
+			</div>
+
+			<div class="row">
+			  <div class="col-md-12">
+			  	<%= render "/personas/contatos" %>
+			  </div>
+			</div>			
+		<% end %>
+  </div>
+</div>
+<% end %>

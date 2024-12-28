@@ -1,0 +1,135 @@
+
+<% quebra    = "" %>
+<% subdivida = 0 %>
+<% subpago   = 0 %>
+<% subsaldo  = 0 %>
+<% totdivida = 0 %>
+<% totpago   = 0 %>
+<table>
+<% if params[:tipo] == '1' %>
+  <tr>
+    <td><%= t('CODE') %></td>
+    <td>Proveedor</td>
+    <td>Banco</td>
+    <td><%= t('ACCOUNT') %></td>
+    <td>Oficial <%= t('ACCOUNT') %></td>
+    <td>Numero</td>
+    <td><%= t('COIN') %></td>
+    <td><%= t('DATE') %></td>
+    <td>Sigla</td>
+    <td><%= t('DOC') %></td>
+    <td><%= t('SHARE') %></td>
+    <td>Vencimiento</td>
+    <td>Divida</td>
+    <td>Pago</td>
+  </tr>
+<% end %>
+
+<% @proveedores.each do |proveedor|%>
+  <% if params[:tipo] == '0' %>
+
+    <% if quebra != proveedor.persona_nome %>
+
+       <% if quebra != "" %>
+
+          <% subsaldo = subdivida - subpago %>
+          <tr class="head">
+             <td colspan="6"></td>
+             <td align="right"><%= format_int(subdivida) %></td>
+             <td align="right"><%= format_int(subpago) %></td>
+             <td width="80" align="right"><%= format_int(subsaldo) %></td>
+          </tr>
+
+          <tr>
+             <td></td>
+          </tr>
+
+          <% subdivida = 0 %>
+          <% subpago   = 0 %>
+          <% subsaldo  = 0 %>
+
+       <% end %>
+
+       <td colspan="1"></td>
+       <td colspan="6" class="head"><%= proveedor.persona_id %> - <%= quebra = proveedor.persona_nome %></td>
+
+    <% end %>
+
+  <% end %>
+      <% if params[:detalhe] == "1" %>
+        <tr class = "head" height="20">
+     <% else %>
+        <tr class="<%= cycle("cor1", "cor2") %>" >
+      <% end %>
+      <% if params[:tipo] == '1' %>
+        <td><%= proveedor.persona_id %></td>
+        <td><%= proveedor.persona_nome %></td>
+        <td><%= proveedor.persona.banco %></td>
+        <td><%= proveedor.persona.conta %></td>
+        <td><%= proveedor.persona.oficial_conta %></td>
+        <td><%= proveedor.persona.conta_numero %></td>
+        <td><%= proveedor.persona.conta_moeda %></td>
+      <% end %>
+         <td width="60" align="center">  <%=h proveedor.data.strftime("%d/%m/%y")%> </td>
+         <td width="30" align="center">  <%=h proveedor.sigla %> </td>
+         <td width="100">  <%=h proveedor.documento_numero_01%>-<%=h proveedor.documento_numero_02%>-<%=h proveedor.documento_numero%> </td>
+         <td width="250">  <%=h proveedor.descricao %></td>
+         <td width="20" align="center">  <%=h proveedor.cota%> </td>
+         <td width="60" align="center">  <%=h proveedor.vencimento.strftime("%d/%m/%y")%> </td>
+         <% if params[:tipo] == '1' %>
+            <td width="80" align="right">   <%=h proveedor.divida_guarani.to_i %> </td>
+            <td width="80" align="right">   <%=h proveedor.pago_guarani.to_i %> </td>
+         <% else %>
+            <td width="80" align="right">   <%=h format_int(proveedor.divida_guarani) %> </td>
+            <td width="80" align="right">   <%=h format_int(proveedor.pago_guarani) %> </td>
+         <% end %>
+
+            <%  subdivida += proveedor.divida_guarani.to_f %>
+            <%  subpago   += proveedor.pago_guarani.to_f %>
+            <%  totdivida += proveedor.divida_guarani.to_f %>
+            <%  totpago   += proveedor.pago_guarani.to_f %>
+      </tr>
+
+
+
+   <% if params[:detalhe] == "1" %>
+      <% pp = ComprasProduto.all(:select=> 'id,produto_id,produto_nome,persona_nome,quantidade,unitario_guarani,unitario_real,total_guarani,total_real,compra_id',:conditions => ["persona_id = ? AND compra_id = ?",proveedor.persona_id.to_i,proveedor.compra_id.to_i])%>
+      <% pp.each do |produto| %>
+         <%cod = Produto.find_by_id(produto.produto_id)%>
+         <tr class = "<%= cycle( "cor1", "cor2" )%>">
+            <td align="center">  <%=h produto.quantidade %> </td>
+            <td align="left"  colspan="3">  <%=h produto.produto_nome %> </td>
+            <td align="right" colspan="2">  <%=h format_int(produto.unitario_guarani) %> </td>
+            <td align="right">  <%=h format_int(produto.total_guarani) %> </td>
+         </tr>
+
+      <% end %>
+   <% end %>
+<% end %>
+
+<%  subsaldo = subdivida - subpago %>
+
+<tr class="head">
+   <td colspan="6"></td>
+   <td align="right"><%= format_int(subdivida) %></td>
+   <td align="right"><%= format_int(subpago) %></td>
+   <td width="80" align="right"><%= format_int(subsaldo) %></td>
+</tr>
+
+<% subsaldo  = 0 %>
+
+<%  totsaldo = totdivida - totpago%>
+<% if params[:documento_numero] == "" %>
+   <tr class="head"  height="50">
+      <td>Anterior. <%= format_int(@saldo_anterior)%></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>Total:</td>
+      <td width="80" align="right"><%= format_int(totdivida) %></td>
+      <td width="80" align="right"><%= format_int(totpago) %></td>
+      <td width="80" align="right"><%= format_int((@saldo_anterior.to_f + totdivida.to_f  ) - totpago.to_f) %></td>
+   </tr>
+   </table>
+<% end %>

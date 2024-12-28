@@ -1,0 +1,23 @@
+<% quebra = '' %>
+<table>
+	<% @stocks.each do |s| %>
+		<% if quebra != s.unidade_id %>
+		  <% if quebra != "" %>
+		    <tr class="head">
+	        <td colspan="3" align="right"></td>
+	        <td align="right"></td>
+	        <td align="right"></td>
+		    </tr>
+		  <% end %>
+		  <tr>
+		  	<td class="head" colspan="5"><% quebra = s.unidade_id %><%= s.unidade_nome %></td> 	
+	    </tr>
+		<% end %>
+		<tr class="<%= cycle("cor1", "cor2")%>">
+			<td width="60"><%= s.deposito_id.to_s.rjust(6,'0') %></td>
+			<td width="200"><%= s.dp %></td>
+			<td width="200"><%= s.produto_nome %></td>
+			<td width="100" align="right"><%= s.saldo %></td>
+		</tr>
+	<% end %>
+</table>

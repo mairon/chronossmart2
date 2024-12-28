@@ -1,0 +1,55 @@
+<%= form_for(@grupo_personas_dt) do |f| %>
+  <% if @grupo_personas_dt.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@grupo_personas_dt.errors.count, "error") %> prohibited this grupo_personas_dt from being saved:</h2>
+
+      <ul>
+      <% @grupo_personas_dt.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> Persona - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+                <table>
+                  <tr>                        
+                    <td align="right"><%= t('PERSON') %>:</td>                    
+                    <td colspan="6"><%= f.collection_select :persona_id, Persona.all(select: 'id,nome', conditions: 'tipo_cliente = 1', order: '2'),:id,:nome,{prompt: 'Selecione la Persona'},{class: "selc_medium"}  %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="right">Activo:</td>
+                    <td><%= f.check_box :status %></td>
+                  </tr>
+                  <tr>
+                    <td align="right">Motivo</td>
+                    <td><%= f.text_area :motivo, rows: 5, cols: 80 %></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td align="right"><%= f.submit :value => t('SAVE'), :class => "button", :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %></td>
+                  </tr>
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), grupo_personas_dts_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

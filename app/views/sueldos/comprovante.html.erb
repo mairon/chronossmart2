@@ -1,0 +1,351 @@
+<body onload="window.print()">
+<style type="text/css">
+html body, tr td {
+  font-family:Courier;
+  font-size:10px;
+}
+.header{
+  font-size:16px;
+}
+.header_text{
+  font: bold;
+}
+
+
+tr.cor2 {
+    background: #edeff4;
+}
+
+tr.cor1 {
+    background: white;
+}
+
+</style>
+  <table align="left"  valign="top">
+    <tr>
+      <td >
+        <b class="header">
+          <%= $empresa_nome %>
+        </b>
+     </td>
+
+      <td align="right" >
+        <b class="header">
+          Hoja de Pago N.:<%=@sueldo.id.to_s.rjust(6,'0')%>
+        </b>
+     </td>
+    </tr>
+
+    <tr>
+      <td align="left" colspan="2">
+        <table>
+
+        <tr>
+          <td align="right">
+            Periodo :
+          </td>
+
+          <td><%= @sueldo.data_inicio.strftime("%m") %></td>
+        </tr>
+        <tr>
+            <td align="right">
+
+                Nombre :
+
+            </td>
+
+            <td  align="left">
+
+                  <%= @sueldo.persona.nome_fatura %>
+
+            </td>
+
+          </tr>
+        </table>
+      </td>
+
+    </tr>
+
+
+    <tr>
+      <td align="center" colspan="4">
+           -----------------------------------------------------------------------------------------------------------------
+      </td>
+    </tr>
+
+    <tr>
+      <td valign="top" colspan="4">
+        <table>
+          <tr>
+            <td width="30"align="center"><%= t('CODE') %></td>
+            <td width="100"align="center"><%= t('DATE') %></td>
+            <td width="450"align="center">Descpripcion</td>
+            <td width="100"align="center">Haber</td>
+            <td width="100"align="center">Debe</td>
+            <td width="100"align="center">Saldo</td>
+          </tr>
+          <tr>
+            <td align="center" colspan="7">
+            ------------------------------------------------------Dolares----------------------------------------------------
+            </td>
+          </tr>
+
+
+          <% cre = 0 %>
+          <% deb = 0 %>
+          <% @sueldos_detalhes.each do |sueldos_detalhe| %>
+          <% if sueldos_detalhe.moeda == 0 %>
+            <tr>
+              <td width="30" align="center"><%= sueldos_detalhe.id.to_s.rjust(6,'0') %></td>
+              <td width="100" align="center"><%= sueldos_detalhe.data_emissao.strftime("%d/%m/%Y") %></td>
+              <td width="450" align="left"><%= sueldos_detalhe.descricao %></td>
+              <% if sueldos_detalhe.moeda == 0 %>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.credito_us, :format=>' %n ', :separeitor => ',')   %></td>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.debito_us, :format=>' %n ', :separeitor => ',')   %></td>
+                <% cre += sueldos_detalhe.credito_us %>
+                <% deb += sueldos_detalhe.debito_us %>
+
+              <% elsif sueldos_detalhe.moeda == 1 %>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.credito_gs, :format=>' %n ', :precision => 0)   %></td>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.debito_gs, :format=>' %n ', :precision => 0)   %></td>
+
+                <% cre += sueldos_detalhe.credito_gs %>
+                <% deb += sueldos_detalhe.debito_gs %>
+
+              <% else %>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.credito_rs, :format=>' %n ', :separeitor => ',')   %></td>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.debito_rs, :format=>' %n ', :separeitor => ',')   %></td>
+                <% cre += sueldos_detalhe.credito_rs %>
+                <% deb += sueldos_detalhe.debito_rs %>
+
+              <% end %>
+              <td width="100"></td>
+              </tr>
+            <% end %>
+            <% end %>
+
+            <tr>
+              <td colspan="2"></td>
+              <td ><b  class="header_text">Totales U$.==> </b></td>
+                <td width="100" align="right"><b  class="header_text"><%=h number_to_currency(cre, :format=>' %n ', :separeitor => ',') %></b></td>
+                <td width="100" align="right"><b  class="header_text"><%=h number_to_currency(deb, :format=>' %n ', :separeitor => ',') %></b></td>
+                <td width="100" align="right"><b  class="header_text"><%=h number_to_currency(cre.to_f - deb.to_f, :format=>' %n ', :separeitor => ',') %></b></td>
+            </tr>
+        </table>
+      </td>
+    </tr>
+
+
+
+    <tr>
+      <td valign="top" colspan="4"  align="center">
+        <table>
+
+          <tr>
+            <td align="center"  colspan="7">
+            ------------------------------------------------------Guaranies----------------------------------------------------
+            </td>
+          </tr>
+
+
+          <% creg = 0 %>
+          <% debg = 0 %>
+          <% @sueldos_detalhes.each do |sueldos_detalhe| %>
+          <% if sueldos_detalhe.moeda == 1 %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="30" align="center"><%= sueldos_detalhe.id.to_s.rjust(6,'0') %></td>
+              <td width="100" align="center"><%= sueldos_detalhe.data_emissao.strftime("%d/%m/%Y") unless sueldos_detalhe.data_emissao.blank? %></td>
+              <td width="450" align="left"><%= sueldos_detalhe.descricao %></td>
+              <% if sueldos_detalhe.moeda == 0 %>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.credito_us, :format=>' %n ', :separeitor => ',')   %></td>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.debito_us, :format=>' %n ', :separeitor => ',')   %></td>
+                <% cre += sueldos_detalhe.credito_us %>
+                <% deb += sueldos_detalhe.debito_us %>
+
+              <% elsif sueldos_detalhe.moeda == 1 %>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.credito_gs, :format=>' %n ', :precision => 0)   %></td>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.debito_gs, :format=>' %n ', :precision => 0)   %></td>
+
+                <% creg += sueldos_detalhe.credito_gs %>
+                <% debg += sueldos_detalhe.debito_gs %>
+
+              <% else %>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.credito_rs, :format=>' %n ', :separeitor => ',')   %></td>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.debito_rs, :format=>' %n ', :separeitor => ',')   %></td>
+                <% creg += sueldos_detalhe.credito_rs %>
+                <% debg += sueldos_detalhe.debito_rs %>
+
+              <% end %>
+              <td width="100"></td>
+              </tr>
+            <% end %>
+            <% end %>
+
+            <tr>
+              <td colspan="2"></td>
+              <td ><b class="header_text">Totales Gs. ==> </b></td>
+                <td width="100" align="right"><b class="header_text"><%=h number_to_currency(creg, :format=>' %n ', :precision => 0) %></b></td>
+                <td width="100" align="right"><b class="header_text"><%=h number_to_currency(debg, :format=>' %n ', :precision => 0) %></b></td>
+                <td width="100" align="right"><b class="header_text"><%=h number_to_currency(creg.to_f - debg.to_f, :format=>' %n ', :precision => 0) %></b></td>
+            </tr>
+        </table>
+      </td>
+    </tr>
+
+  <% if @sueldo.moeda == 2 %>
+    <tr>
+      <td valign="top" colspan="4">
+        <table>
+          <tr>
+            <td width="30"align="center"><%= t('CODE') %></td>
+            <td width="100"align="center"><%= t('DATE') %></td>
+            <td width="450"align="center">Descpripcion</td>
+            <td width="100"align="center">Haber</td>
+            <td width="100"align="center">Debe</td>
+            <td width="100"align="center">Saldo</td>
+          </tr>
+          <tr>
+            <td align="center" colspan="7">
+            ------------------------------------------------------Reais----------------------------------------------------
+            </td>
+          </tr>
+
+
+          <% crer = 0 %>
+          <% debr = 0 %>
+          <% @sueldos_detalhes.each do |sueldos_detalhe| %>
+          <% if sueldos_detalhe.moeda == 2 %>
+            <tr>
+              <td width="30" align="center"><%= sueldos_detalhe.id.to_s.rjust(6,'0') %></td>
+              <td width="100" align="center"><%= sueldos_detalhe.data_emissao.strftime("%d/%m/%Y") %></td>
+              <td width="450" align="left"><%= sueldos_detalhe.descricao %></td>
+              <% if sueldos_detalhe.moeda == 0 %>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.credito_us, :format=>' %n ', :separeitor => ',')   %></td>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.debito_us, :format=>' %n ', :separeitor => ',')   %></td>
+                <% cre += sueldos_detalhe.credito_us %>
+                <% deb += sueldos_detalhe.debito_us %>
+
+              <% elsif sueldos_detalhe.moeda == 1 %>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.credito_gs, :format=>' %n ', :precision => 0)   %></td>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.debito_gs, :format=>' %n ', :precision => 0)   %></td>
+
+                <% cre += sueldos_detalhe.credito_gs %>
+                <% deb += sueldos_detalhe.debito_gs %>
+
+              <% else %>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.credito_rs, :format=>' %n ', :separeitor => ',')   %></td>
+                <td width="100" align="right"><%= number_to_currency(sueldos_detalhe.debito_rs, :format=>' %n ', :separeitor => ',')   %></td>
+                <% crer += sueldos_detalhe.credito_rs %>
+                <% debr += sueldos_detalhe.debito_rs %>
+
+              <% end %>
+              <td width="100"></td>
+              </tr>
+            <% end %>
+            <% end %>
+
+            <tr>
+              <td colspan="2"></td>
+              <td ><b  class="header_text">Totales U$.==> </b></td>
+                <td width="100" align="right"><b  class="header_text"><%=h number_to_currency(cre, :format=>' %n ', :separeitor => ',') %></b></td>
+                <td width="100" align="right"><b  class="header_text"><%=h number_to_currency(deb, :format=>' %n ', :separeitor => ',') %></b></td>
+                <td width="100" align="right"><b  class="header_text"><%=h number_to_currency(cre.to_f - deb.to_f, :format=>' %n ', :separeitor => ',') %></b></td>
+            </tr>
+        </table>
+      </td>
+    </tr>
+  <% end %>
+
+    <tr>
+      <td align="center" colspan="4">
+           -----------------------------------------------------------------------------------------------------------------
+      </td>
+    </tr>
+
+
+    <tr>
+      <td colspan="9">
+        <table>
+          <tr>
+            <td>Saldo Deudor Pendiente : </td>
+              <td width="100" align="right"><b class="header_text"><%=h number_to_currency(0, :format=>' %n ', :precision => 0) %></b></td>
+          </tr>
+
+          <tr>
+            <td>Importe de Sueldo U$...: </td>
+              <td width="100" align="right"><b class="header_text"><%= number_to_currency(cre.to_f - deb.to_f, :format=>' %n ', :separeitor => ',') %></b></td>
+              <td> <b class="header_text"> - (<%= (cre.to_f - deb.to_f).to_i.to_words.upcase %>) DOLARES AMERICANOS</b> </td>
+          </tr>
+
+          <tr>
+            <td>Importe de Sueldo Gs...: </td>
+              <td width="100" align="right"><b class="header_text"><%= number_to_currency( (creg.to_i - debg.to_i), :format=>' %n ', :precision => 0) %></b></td>
+              <td>
+                <b class="header_text"> - (<%= (creg.to_i - debg.to_i).to_i.to_words.upcase %> GUARANIES)</b>
+              </td>
+          </tr>
+          <% if @sueldo.moeda == 2 %>
+
+            <tr>
+              <td>Importe de Sueldo R$...: </td>
+                <td width="100" align="right"><b class="header_text"><%= number_to_currency(crer.to_f - debr.to_f, :format=>' %n ', :separeitor => ',') %></b></td>
+                <td> <b class="header_text"> - (<%= (crer.to_f - debr.to_f).to_i.to_words.upcase %>) REAIS</b> </td>
+            </tr>
+          <% end %>
+
+        </table>
+      </td>
+    </tr>
+
+    <tr>
+      <td align="center" colspan="4">
+           -----------------------------------------------------------------------------------------------------------------
+      </td>
+    </tr>
+
+
+    <tr height="80" valign="bottom">
+      <td>
+        ---------------------------------------
+      </td>
+
+      <td align="right">
+        ---------------------------------------
+
+      </td>
+
+    </tr>
+
+    <tr>
+      <td>
+        <%= $empresa_nome %>
+      </td>
+      <td   width="350" align="right">
+        <%= @sueldo.persona.nome_fatura %>
+      </td>
+
+    </tr>
+
+    <tr>
+      <td align="center" colspan="4">
+            -----------------------------------------------------------------------------------------------------------------
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="2">
+
+          Hecho por : <%=current_user.usuario_nome%>
+          Unidade : <%=current_unidade.unidade_nome%>
+
+      </td>
+    </tr>
+
+  </table>
+
+</body>
+
+
+
+
+

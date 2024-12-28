@@ -1,0 +1,23 @@
+<h1 id="header">ajuste_preco_detalhes</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_ajuste_preco_detalhe_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Ajuste preco</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% ajuste_preco_detalhes.each do |ajuste_preco_detalhe| %>
+      <tr>
+                  <td><%= ajuste_preco_detalhe.ajuste_preco_id %></td>
+                <td><%= link_to 'Editar', edit_ajuste_preco_detalhe_path(ajuste_preco_detalhe) %></td>
+        <td><%= link_to t('DELETE'), ajuste_preco_detalhe, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

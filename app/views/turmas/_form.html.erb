@@ -1,0 +1,30 @@
+<div class="group">
+  <%= form_for(@turma) do |f| %>
+    <% if @turma.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@turma.errors.count, "error") %> prohibited this turma from being saved:</h2>
+
+        <ul>
+        <% @turma.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+    
+      <div class="row">
+        <div class="col-md-6">
+          <label>Descripción</label>
+          <%= f.text_field :nome, class: 'panel-field' %>
+        </div>
+     
+        <div class="col-md-6">
+          <label>Status</label>
+          <%= f.check_box :status %>Activo
+        </div>
+      </div>
+      <div class="footer-buttons">
+        <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      </div>
+  <% end %>
+</div>

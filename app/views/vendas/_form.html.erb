@@ -1,0 +1,87 @@
+<%= form_for(@venda) do |f| %>      
+  <% if @venda.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@venda.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+      <ul>
+        <% @venda.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="group">
+    <h1 id="header"><%= t('SALES') %></h1>
+    <table>
+      <tr>
+        <td>
+          <label><%= t('DATE') %></label>
+          <%= f.date_select :data %>
+        </td>
+      </tr>
+      <%= f.hidden_field :tipo_venda, value: 0 %>
+      <%= f.hidden_field :cartao_id, value: params[:cartao_id] %>
+      <%= f.hidden_field :cartao_nome, value: params[:cartao_nome] %>
+      <%= f.hidden_field :status_op, value: params[:status_op] %>
+      <%= f.hidden_field :nome_ref, value: params[:nome_ref] %>
+      <%= f.hidden_field :moeda, value: current_unidade.moeda %>
+      <%= f.hidden_field :persona_nome, :value => @vendas_config.persona.nome, autofocus: true %>
+      <%= f.hidden_field :persona_id, :value => @vendas_config.persona_id %>
+      <%= f.hidden_field :vendedor_id, :value => @vendas_config.vendedor_id %>
+      <%= f.hidden_field :tabela_preco_id, :value => @vendas_config.persona.tabela_preco_id %>
+
+    <% if params[:action] == 'new' %>
+      <% if @vendas_config.caixa_separado.to_i == 1 %>
+        <% abertura = AberturaCaixa.last(:conditions => ["status = true and usuario_id = #{current_user.id} and unidade_id = #{current_unidade.id}"])%>
+        <%= f.hidden_field :usuario_id, value: current_user.id %>
+        <%= f.hidden_field :terminal_id, value: abertura.terminal_id %>
+        <%= f.hidden_field :centro_custo_id, value: current_user.centro_custo_id %>
+        <%= f.submit "   Seguir   ",:disable_with => "Aguarde..." , :class => "button" , :id => "btn", "data-plus-as-tab" => "false" %>
+        <script type="text/javascript">
+          $("form:first").submit();
+        </script>
+
+      <% else %>
+
+        <% abertura = AberturaCaixa.last(:conditions => ["status = true and usuario_id = #{current_user.id} and unidade_id = #{current_unidade.id}"])%>
+        <% if abertura %>
+          <%= f.hidden_field :usuario_id, value: abertura.usuario_id %>
+          <%= f.hidden_field :controle_caixa, value: abertura.id %>
+          <%= f.hidden_field :terminal_id, value: abertura.terminal_id %>
+          <%= f.hidden_field :centro_custo_id, value: current_user.centro_custo_id %>
+          <%= f.submit "   Seguir   ",:disable_with => "Aguarde..." , :class => "button" , :id => "btn", "data-plus-as-tab" => "false" %>
+          <script type="text/javascript">
+              $("form:first").submit();
+            </script>
+        <% else %>
+        <div class="Mensagem_error" id="observacao">
+         <h1> Es necesario acier la apertura de Caja para seguir!</h1>
+        </div>
+
+          <% if current_user.tipo == 0 %>
+            <tr>
+              <td>
+                <label>Caja</label>
+                <%= f.text_field :controle_caixa %>
+              </td>
+              <%= f.hidden_field :usuario_id, value: current_user.id %>
+            </tr>
+            <tr>
+              <td>
+                <div class="footer-buttons">
+                  <%= f.submit "Seguir", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+                  <%= link_to t('BACK'), cobros_path, :class => "btn btn-back" %>
+                  <br>
+                  <br>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </table>
+  </div>
+<% end %>

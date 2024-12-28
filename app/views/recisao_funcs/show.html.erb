@@ -1,0 +1,60 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <header class="panel-heading" style="font-family: 'prox'; font-size: 18px;
+    padding-bottom: 10px;">
+        Liquidación por
+        <% if @recisao_func.motivo.to_i == 0 %>
+          RENUNCIA
+        <% elsif @recisao_func.motivo.to_i == 1 %>
+          RETIRO JUSTIFICADO
+        <% elsif @recisao_func.motivo.to_i == 2 %>
+          DESPIDO JUSTIFICADO
+        <% elsif @recisao_func.motivo.to_i == 3 %>
+          DESPIDO INJUSTIFICADO
+        <% end %>
+
+        #<%= @recisao_func.id.to_s.rjust(6,'0') %>
+      </header>
+      <div class="panel-content">
+        <p>Empleado: <%= @recisao_func.persona_id.to_s.rjust(6,'0') %>-<%= @recisao_func.persona.nome %> - CI: <%= @recisao_func.persona.ruc %>  </p>
+        <p>Fecha Calculo: <%= @recisao_func.data_calculo.strftime('%d/%m/%y') %> </p>
+        <p>Fecha de Entrada: <%= @recisao_func.data_entrada.strftime('%d/%m/%y') %> </p>
+        <p>Fecha de Salida: <%= @recisao_func.data_saida.strftime('%d/%m/%y') %> </p>
+        <p>Antiguedad en Años: <%= @recisao_func.antiguedad_ano %></p>
+        <p>Antiguedad en Meses: <%= @recisao_func.antiguedad_meses %></p>
+        <p>Antiguedad en Días: <%= @recisao_func.antiguedad_dias %></p>
+        <p>Salario Base: <%= format_int(@recisao_func.salario_mensal) %></p>
+        <p>Salario Diario: <%= format_int(@recisao_func.salario_diario) %></p>
+        <hr>
+      </div>
+    </div>
+      <style>
+        table td{
+          padding: 10px 10px 10px 20px;
+          border-bottom: 1px solid;
+        }
+      </style>
+
+      <% if @recisao_func.motivo.to_i == 0 %>
+        <%= render 'renuncia' %>
+      <% elsif @recisao_func.motivo.to_i == 1 %>
+        RETIRO JUSTIFICADO
+      <% elsif @recisao_func.motivo.to_i == 2 %>
+        <%= render 'retiro_injustificado' %>
+      <% elsif @recisao_func.motivo.to_i == 3 %>
+        <%= render 'despito_injustificado' %>
+      <% end %>
+      <%= link_to edit_recisao_func_path(:id => @recisao_func.id), :class => "btn btn-default " do %>
+        <i class="icon-pencil"></i> Editar
+      <% end %>
+
+      <%= link_to recisao_funcs_url, :class => "btn btn-default " do %>
+        Salir
+      <% end %>
+      <%= link_to comprovante_recisao_func_path( @recisao_func.id), :class => "btn btn-default print", target: '_blank' do %>
+        Comprovante
+      <% end %>
+  </div>
+
+</div>

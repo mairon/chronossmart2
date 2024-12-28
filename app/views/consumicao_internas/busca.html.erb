@@ -1,0 +1,42 @@
+<div class="group">
+<table class="head_grid">
+	<tr>
+		<td width="50" align="center"><%= t('CODE') %></td>
+		<td width="80" align="center"><%= t('DATE') %></td>
+		<td width="80" align="center">Tipo Economico</td>
+		<td width="200">Persona</td>	
+		<td width="200">Motivo</td>	
+		<td width="250">Concepto</td>
+		<td width="70" align="right">Ctd</td>
+		<td width="85"></td>
+	</tr>
+</table>
+
+<div class="rolagem" id="div">
+	<table>
+		<% @consumicao_internas.each do |consumicao_interna| %>
+		<tr class = "<%= cycle("cor1", "cor2") %>" >
+			<td width="50" align="center"><%= link_to consumicao_interna.id.to_s.rjust(6,'0'), consumicao_interna_path(consumicao_interna.id) %></td>
+			<td width="80" align="center"><%= consumicao_interna.data.strftime("%d/%m/%y") %></td>
+			<td width="80" align="center">
+				<b>
+					<% if consumicao_interna.tipo_economico.to_i == 1 %>
+						Fijo
+					<% elsif consumicao_interna.tipo_economico.to_i == 2 %>
+						Variable
+					<% end %>
+				</b>
+			</td>
+			<td width="200"><%= consumicao_interna.persona_nome %></td>
+			<td width="200"><%= consumicao_interna.motivo_nome %></td>
+			<td width="250"	><%= consumicao_interna.concepto %></td>
+			<td width="70" align="right"><%= consumicao_interna.qtd %></td>
+      <td><%= link_to '', edit_consumicao_interna_path(consumicao_interna), class: 'icon-pencil' %></td>
+      <td><%= link_to '', consumicao_interna, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+
+		</tr>
+		<% end %>
+	</table>
+</div>
+</div>
+

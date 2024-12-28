@@ -1,0 +1,244 @@
+<body onload="window.print()">
+
+
+  <table align="left"  valign="top">
+    <tr>
+      <td colspan="4" align="center">
+        <FONT FACE="times new roman" size="3">
+          --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        </FONT>
+      </td>
+    </tr>
+
+    <tr>
+      <td >
+          <FONT FACE="times new roman" size="4">
+            <%= $empresa_nome %>
+          </FONT>
+     </td>
+      <td align="right">
+          <FONT FACE="times new roman" size="4">
+            Viatico N.:<%=@transferencia_conta.id%>
+          </FONT>
+     </td>
+    </tr>
+
+    <tr>       
+
+      <td align="left">
+          <FONT FACE="times new roman" size="3">
+            Ruc : <%= $ruc %>
+          </FONT>
+       </td>
+
+      <td align="right">
+          <FONT FACE="times new roman" size="3">
+             Fecha :<%= @transferencia_conta.data.strftime("%d/%m/%Y") %>
+          </FONT>
+       </td>
+    </tr>
+    <tr>
+
+      <td align="left">
+          <FONT FACE="times new roman" size="3">
+            Tel : <%= $tel %>
+          </FONT>
+       </td>
+
+
+      <td align="right">
+          <FONT FACE="times new roman" size="3">
+             Hora :<%=Time.now.strftime("%H:%M:%S")%>
+          </FONT>
+       </td>
+    </tr>
+
+    <tr>
+      <td colspan="4" align="center">
+        <FONT FACE="times new roman" size="3">
+          --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        </FONT>
+      </td>
+    </tr>
+
+    <tr>
+      <td align="left" colspan="2">
+        <table>
+          <tr>
+            <td>
+              <FONT FACE="times new roman" size="3">
+                Nombre :
+              </FONT>
+            </td>
+
+            <td  align="left">
+                <FONT FACE="times new roman" size="3">
+                  <%= @transferencia_conta.persona_nome %>
+                </FONT>
+            </td>
+
+          </tr>
+        </table>
+      </td>
+
+    </tr>
+
+    <tr>
+      <td align="left">
+        <table>
+          <tr>
+            <td>
+              <FONT FACE="times new roman" size="3">
+              </FONT>
+            </td>
+
+            <td  align="left">
+                <FONT FACE="times new roman" size="3">
+                </FONT>
+            </td>
+
+          </tr>
+        </table>
+      </td>
+
+    </tr>
+
+
+    <tr>
+      <td align="left" colspan="2">
+        <table>
+          <tr>
+            <td>
+              <FONT FACE="times new roman" size="3">
+          Importe :
+              </FONT>
+            </td>
+
+            <td  align="left">
+                <FONT FACE="times new roman" size="3">
+                    <% if @transferencia_conta.ingreso_moeda == 0  %>	
+                       <%=h number_to_currency(@transferencia_conta.valor_dolar, :format=>' %n ', :separeitor => ',')  %>
+                    <% else %>
+                       <%=h number_to_currency(@transferencia_conta.valor_guarani, :format=>' %n ', :precision => 0)  %>
+                    <% end %>   
+                </FONT>
+            </td>
+
+          </tr>
+        </table>
+      </td>
+   </tr>
+
+    <tr>
+      <td align="left">
+        <table>
+          <tr>
+            <td>
+              <FONT FACE="times new roman" size="3">
+          En Letras :
+              </FONT>
+            </td>
+
+            <td  align="left">
+                <FONT FACE="times new roman" size="3">
+                 <% if @transferencia_conta.ingreso_moeda == 0 %>
+                   <%=  @transferencia_conta.valor_dolar.to_f.por_extenso_em_dolares.upcase  %>
+                 <% else %>  
+                   <%=  @transferencia_conta.valor_guarani.to_f.por_extenso.upcase  %>
+                 <% end %>  
+                </FONT>
+            </td>
+
+          </tr>
+        </table>
+      </td>
+
+   </tr>
+
+    <tr>
+      <td align="center" colspan="4">
+        <FONT FACE="times new roman" size="3">
+          --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        </FONT>
+      </td>
+    </tr>
+
+    <tr height="220">
+      <td valign="top">
+        <FONT FACE="times new roman" size="3">
+        	Concepto : <%= @transferencia_conta.concepto%>
+        </FONT>
+      </td>
+    </tr>
+
+  
+    <tr>
+      <td>
+              <FONT FACE="times new roman" size="3">
+                -------------------------------------------
+              </FONT>
+            </td>
+
+            <td align="right">
+              <FONT FACE="times new roman" size="3">
+                     -------------------------------------------
+              </FONT>
+            </td>
+
+    </tr>
+
+    <tr>
+      <td>
+              <FONT FACE="times new roman" size="3">
+                <%=  $empresa_nome %>
+              </FONT>
+            </td>
+
+            <td   width="350" align="center">
+              <FONT FACE="times new roman" size="3">
+                     <%=@transferencia_conta.persona_nome%>
+              </FONT>
+            </td>
+
+    </tr>
+
+
+    <tr>
+      <td align="right">
+        <FONT FACE="times new roman" size="3">
+          <b>            
+          </b>
+        </FONT>
+      </td>
+    </tr>
+
+    <tr>
+      <td align="center" colspan="4">
+        <FONT FACE="times new roman" size="3">
+          --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        </FONT>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="2">
+        <FONT FACE="times new roman" size="3">
+          Hecho por : <%=current_user.usuario_nome%>
+          Unidade por : <%=current_unidade.unidade_nome%>
+        </FONT>
+      </td>
+    </tr>
+
+      <td align="center" colspan="4">
+        <FONT FACE="times new roman" size="3">
+        </FONT>
+      </td>
+
+  </table>
+
+</body>
+
+
+
+
+

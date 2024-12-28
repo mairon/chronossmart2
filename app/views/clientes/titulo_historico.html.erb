@@ -1,0 +1,66 @@
+<style>
+  td{
+    padding: 2px;
+    border-bottom: 1px solid #efefef !important;
+  }
+</style>
+
+<table class="head_grid">
+  <tr>
+    <td width="60" align="center">Código</td>
+    <td width="60" align="center">Fecha</td>
+    <td width="80">Criado por</td>
+    <td width="200">Cliente</td>
+    <td width="250">Descripción</td>
+    <td width="25"></td>
+    <td width="70" align="right">Movimiento</td>
+    <td width="70" align="right">Saldo</td>
+    <td width="50"></td>
+  </tr>
+</table>
+<div>
+  <% saldo_rs = 0 %>
+  <% saldo_us = 0 %>
+  <% saldo_gs = 0 %>
+  <table>
+    <% @clientes.each do |f| %>
+      <tr class="acao <%= cycle("cor1", "cor2") %>">
+        <td width="60" align="center"><b><%= f.id.to_s.rjust(6,'0') %></b></td>
+        <td width="60" align="center"><b><%= f.data.strftime("%d/%m/%y") %></b></td>
+        <td width="80"><span class="label label-success"><%= f.usuario_nome %></span></td>
+        <td width="200"><%= f.persona_nome %></td>
+        <td width="250">
+          <% if f.sigla_proc.to_s.strip == 'PGR' %>
+            <small>PG <%= f.conta_nome %></small>
+          <% elsif f.sigla_proc.to_s.strip == 'PGE' %>
+            <small>Extorno <%= f.descricao %></small>
+          <% else %>
+            <small><%= f.descricao %></small>
+          <% end %>
+        </td>
+        <% if f.moeda.to_i == 0 %>
+          <td width="25" align="center" class="us">U$</td>
+          <td width="70" align="right"><b><%= format_decimal(f.divida_dolar) %></b></td>
+          <td width="70" align="right"><b style="color: #000; font-family: 'prox-bold'"> <%= format_decimal(saldo_us += f.divida_dolar) %></b></td>
+        <% elsif f.moeda.to_i == 1 %>
+          <td width="25" align="center" class="gs">Gs.</td>
+          <td width="70" align="right"><b><%= format_int(f.divida_guarani) %></b></td>
+          <td width="70" align="right"><b style="color: #000; font-family: 'prox-bold'"> <%= format_int(saldo_gs += f.divida_guarani) %></b></td>
+        <% else %>
+          <td width="25" align="center" class="rs">R$</td>
+          <% if f.divida_real.to_f > 0 %>
+            <td width="70" align="right"><b class="us"> <%= format_decimal(f.divida_real) %></b></td>
+            <td width="70" align="right"><b style="color: #000; font-family: 'prox-bold'"> <%= format_decimal(saldo_rs += f.divida_real) %></b></td>
+          <% else %>
+            <td width="70" align="right"><b class="gs"> <%= format_decimal(f.divida_real) %></b></td>
+            <td width="70" align="right"><b style="color: #000; font-family: 'prox-bold'"> <%= format_decimal(saldo_rs += f.divida_real) %></b></td>
+          <% end %>
+        <% end %>
+        <td><%= link_to '', f, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %>
+      </tr>
+    <% end %>
+
+  </table>
+</div>
+
+

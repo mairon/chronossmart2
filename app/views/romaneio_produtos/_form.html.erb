@@ -1,0 +1,71 @@
+
+<%= form_for(@romaneio_produto) do |f| %>
+  <div class="box-panel" style="display: table; margin: 0 auto;">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Romaneio Productos
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="group">
+              <div class="row">
+                <div class="col-md-4">
+                  <label>Producto</label>
+                  <%= f.text_field :produto_nome, class: 'autocomplete panel-field', required: true, autofocus: true %>
+                  <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+                  <%= f.hidden_field :produto_id %>               
+                </div>
+                <div class="col-md-2">
+                  <label>Bruto</label>
+                  <%= f.telephone_field :bruto, size: 9, class: 'money_3' %>
+                </div>
+
+                <div class="col-md-2">
+                  <label>Tara</label>
+                  <%= f.telephone_field :tara, size: 9, class: 'money_3' %>
+                </div>
+
+                <div class="col-md-2">
+                  <label>Neto</label>
+                  <%= f.telephone_field :quantidade, size: 9, class: 'money_3' %>
+                </div>
+               
+              </div>
+              <div class="row">
+                <div class="col-md-3">
+                  <%= panel_field_gs_label 'Unit Gs.',f,:unit_guarani %>
+                </div>
+                <div class="col-md-3">
+                  <%= panel_field_gs_label 'Total Gs.',f,:total_guarani %>
+                </div>
+                <div class="col-md-2 padding-btn">
+                  <%= f.submit t('SAVE'), :disable_with => "Aguarde...", :class => "btn btn-green", "data-plus-as-tab" => "false" %>
+
+                </div>
+                <div class="col-md-2 padding-btn">
+                  <%= link_to 'Salir', romaneio_path(@romaneio_produto.romaneio_id), class: 'btn btn-blue' %>
+                </div>
+              </div>
+            </div> 
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<script>
+  
+//calc valores
+  $( "#romaneio_produto_unit_guarani" ).change(function() {
+    var qtd = $('#romaneio_produto_quantidade').val();
+    var unit = $('#romaneio_produto_unit_guarani').val();
+    var tot = $('#romaneio_produto_total_guarani').val();
+    var tot_gs = (parseFloat(qtd.replace(/\./g, "").replace(",", ".")) * parseFloat(unit.replace(/\./g, "").replace(",", ".")) );
+    $('#romaneio_produto_total_guarani').val(number_format(tot_gs, 0, ',', '.'));
+  });  
+</script>

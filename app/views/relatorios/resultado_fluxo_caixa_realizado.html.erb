@@ -1,0 +1,124 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content">
+      	<div class="modal-grid" style="padding: 10px; color: #444;font-family: 'prox-bold';">
+						<table>
+
+						<% saldo_ant = 0 %>
+						<% @saldo_cx.each do |sc| %>
+							<tr>
+								<td width="200"><%= sc.conta_nome %></td>
+								<td width="70" align="right"><%= format_decimal(sc.saldo_rs) %></td>
+								<% saldo_ant += sc.saldo_rs.to_f %>
+							</tr>
+						<% end %>
+
+						<% @saldo_bc.each do |sb| %>
+							<tr>
+								<td width="200"><%= sb.conta_nome %></td>
+								<td width="70" align="right"><%= format_decimal(sb.saldo_rs) %></td>
+								<% saldo_ant += sb.saldo_rs.to_f %>
+							</tr>
+						<% end %>
+							<tr>
+								<td width="200">Saldo Conciliado <small>(<%= Financa.where(conciliacao: true).last.updated_at.strftime("%d/%m/%y - %H:%M") %>)</small></td>
+								<td width="70" align="right"><%= format_decimal(saldo_ant) %></td>
+							</tr>
+
+						</table>
+      	</div>
+      </div>
+
+
+      <div class="panel-content">
+        <div class="modal-grid">
+
+					<div class="rolagem_rl" dir="div" style="hieght: 100% !important">
+					<table>
+						<% quebra = '' %>
+						<% sub_c = 0 %>
+						<% sub_d = 0 %>
+
+						<% tot_c = 0 %>
+						<% tot_d = 0 %>
+						<% saldo_rec = saldo_ant.to_f %>
+
+						<% @mov_fc.each do |mf| %>
+
+
+
+         	<% if quebra != mf.vencimento %>
+            <% if quebra != "" %>
+               <tr class="head_grid" style="background-color: #eeedff">
+               		<td><b>Saldo do dia</b></td>
+               		<td></td>
+               		<td></td>
+                  <td></td>
+                  <td></td>
+									<td width="70" align="right"><b class="us"><%= format_decimal(sub_c) %></b></td>
+									<td width="70" align="right"><b class="gs"><%= format_decimal(sub_d) %></b></td>
+									<td width="70" align="right"><b class="rs"><%= format_decimal( saldo_rec) %></b></td>
+
+									<% sub_c = 0 %>
+									<% sub_d = 0 %>
+               </tr>
+            	<% end %>
+							<tr>
+								<td colspan="6"><b><% quebra = mf.vencimento %> <%= Date::DAYNAMES[mf.vencimento.wday].to_s %> - <%= mf.vencimento.to_date.strftime("%d/%m/%y") %> </b></td>
+							</tr>
+
+            <% end %>
+
+							<tr class = "<%= cycle("cor1", "cor2") %>">
+								<td width="350"><%= mf.persona_nome %></td>
+                <td width="200"><%= mf.centro_custo_nome %></td>
+                <td width="200"><small><%= mf.rubro_nome %></small></td>
+								<td width="400"><small><%= mf.descricao %></small></td>
+								<td width="150"><%= mf.conta_nome %></td>
+								<td width="70" align="right"><b class="us"><%= format_decimal(mf.entrada_real) %></b></td>
+								<td width="70" align="right"><b class="gs"><%= format_decimal(mf.saida_real) %></b></td>
+								<td width="70" align="right"><b class="rs"><%= format_decimal( saldo_rec += (mf.entrada_real.to_f - mf.saida_real.to_f )) %></b></td>
+
+								<% sub_c += mf.entrada_real.to_f %>
+								<% sub_d += mf.saida_real.to_f %>
+							</tr>
+						<% end %>
+             <tr class="head_grid" style="background-color: #eeedff">
+             		<td><b>Saldo do dia</b></td>
+             		<td></td>
+             		<td></td>
+                <td></td>
+                <td></td>
+								<td width="70" align="right"><b class="us"><%= format_decimal(sub_c) %></b></td>
+								<td width="70" align="right"><b class="gs"><%= format_decimal(sub_d) %></b></td>
+								<td width="70" align="right"><b class="rs"><%= format_decimal(saldo_rec) %></b></td>
+
+								<% sub_c = 0 %>
+								<% sub_d = 0 %>
+             </tr>
+					</table>
+					</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<style>
+.us{
+    color: #56b349 !important;
+}
+
+.gs{
+    color: #e33d43 !important;
+}
+
+.rs{
+    color: #2546b1 !important;
+}
+
+</style>

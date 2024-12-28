@@ -1,0 +1,23 @@
+<style>
+  .group{font-family:Lucida Console, Courier, Monotype;
+        font-size:9px;}
+
+</style>
+
+<div class="group" style="border:1px solid; width:160px;">
+  <p>Producto : <%= @produto.nome %></p>
+<div class="group">
+      <table>
+        <tr>
+          <td>
+          <div class="group">
+              <%= image_tag('logo-realce.png', :width => 60, :height => 30) %>
+          <br />
+          Obs.: <%= @produto.obs %>
+          </div>
+          </td>
+              </tr>
+      </table>
+</div>
+
+</div>

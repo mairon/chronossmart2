@@ -1,0 +1,27 @@
+<h1 id="header">ordem_serv_files</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_ordem_serv_file_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Ordem serv</t>
+            <td>Nome</t>
+            <td>Picture</t>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @ordem_serv_files.each do |ordem_serv_file| %>
+      <tr>
+                  <td><%= ordem_serv_file.ordem_serv_id %></td>
+                  <td><%= ordem_serv_file.nome %></td>
+                  <td><%= ordem_serv_file.picture %></td>
+                <td><%= link_to 'Editar', edit_ordem_serv_file_path(ordem_serv_file) %></td>
+        <td><%= link_to 'Borrar', ordem_serv_file, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

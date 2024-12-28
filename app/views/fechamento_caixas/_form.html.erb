@@ -1,0 +1,38 @@
+<h1 id="header">Cierre de Caja</h1>
+<div class="group">
+<%= form_for(@fechamento_caixa) do |f| %>
+  <% if @fechamento_caixa.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@fechamento_caixa.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @fechamento_caixa.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+    
+      <div class="row">
+        <div class="col-md-12">
+          <label>Fecha</label>
+          <%= f.date_select :data %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <label><%= t('CASHIER') %></label>
+          <%= f.collection_select :abertura_caixa_id, @caixas,:id,:caixa %>
+        </div>
+      </div>
+      <div class="footer-buttons">
+        <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+        <%= link_to t('BACK'), fechamento_caixas_path, :class => 'btn' %>
+      </div>         
+      
+  
+<% end %>
+</div>

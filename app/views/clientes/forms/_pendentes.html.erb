@@ -1,0 +1,139 @@
+<style>
+  td{
+    padding: 2px;
+    border-bottom: 1px solid #efefef !important;
+  }
+</style>
+
+<table class="head_grid">
+  <tr>
+    <td width="50" align="center">Titulo</td>
+    <td width="80" align="center">Fecha Comp.</td>
+    <td width="80" align="center">Venc.</td>
+    <td width="150">Descripción</td>
+    <td width="150">Nombre</td>
+    <td width="250">Classificación</td>
+    <td width="120">Doc.</td>
+    <td width="50" align="center">Cuota</td>
+    <td width="15"></td>
+    <td width="70" align="right">Saldo</td>
+    <td width="90"></td>
+  </tr>
+</table>
+<div>
+  <table>
+    <% @saldo_us = 0 %>
+    <% @saldo_gs = 0 %>
+    <% @saldo_rs = 0 %>
+    <% @hoje_us = 0 %>
+    <% @hoje_gs = 0 %>
+    <% @hoje_rs = 0 %>
+
+    <% divida_us = 0 %>
+    <% divida_gs = 0 %>
+    <% divida_rs = 0 %>
+
+    <% cobro_us = 0 %>
+    <% cobro_gs = 0 %>
+    <% cobro_rs = 0 %>
+
+<style>
+  .hoje{
+    border-left: 6px solid #f2b835;
+  }
+
+  .venc{
+    border-left: 6px solid #e33d43;
+  }
+</style>
+    <% @clientes.each do |f| %>
+      <% if Time.now.strftime("%d/%m/%y") == f.vencimento.to_date.strftime("%d/%m/%y") %>
+        <% h = "hoje" %>
+        <% if f.moeda.to_i == 0 %>
+          <% @hoje_us += (f.divida_dolar.to_f ) %>
+        <% elsif f.moeda.to_i == 1 %>
+          <% @hoje_gs += (f.divida_guarani.to_f) %>
+        <% else %>
+          <% @hoje_rs += (f.divida_real.to_f) %>
+        <% end %>
+      <% elsif Time.now.strftime("%d/%m/%y") > f.vencimento.to_date.strftime("%d/%m/%y") %>
+        <% v = "venc" %>
+      <% end %>
+      <tr class="acao<%= f.id %> <%= cycle("cor1", "cor2") %> <%= raw h %> <%= raw v %>">
+        <td width="50">
+          <%= link_to  '#titulo-historico', "data-toggle": "modal", "data-target": "#titulo-historico", "data-id": "#{f.id}",
+          "data-moeda": "#{f.moeda}",
+          "data-cota": "#{f.cota}",
+          "data-documento-numero-01": "#{f.documento_numero_01}",
+          "data-documento-numero-02": "#{f.documento_numero_02}",
+          "data-documento-numero": "#{f.documento_numero}",
+          "data-titulo": "#{f.titulo}",
+          "data-titulo-descr": "#{f.titulo.to_s.rjust(6,'0')}",
+          "data-persona-id": "#{f.persona_id}" do %>
+            <%= f.titulo.to_s.rjust(6,'0') %>
+          <% end %>
+        </td>
+        <td width="80" align="center"><b><%= f.data.strftime("%d/%m/%y") %></b></td>
+        <td width="80" align="center"><b><%= f.vencimento.strftime("%d/%m/%y") %></b></td>
+        <td width="150"><small><%= f.descricao %></small></td>
+        <td width="150"><small><%= f.persona_nome %></small></td>
+        <td width="250"> <small> <%= f.rubro_nome %></small></td>
+        <td width="120">
+          <%= link_to "#{f.documento_numero}", '#modal-edit-doc', "data-toggle": "modal", "data-target": "#modal-edit-doc", "data-id": "#{f.id}",
+              "data-documento-numero-01": "#{f.documento_numero_01}",
+              "data-documento-numero-02": "#{f.documento_numero_02}",
+              "data-documento-numero": "#{f.documento_numero}",
+              "data-titulo": "#{f.titulo}" %>
+
+        </td>
+        <td width="50" align="center">
+          <div style="border: 1px solid #969696; border-radius: 3px; padding: 1px 0px 1px 0px;"><%= f.cota %>/<%= f.tot_cotas %></div>
+        </td>
+        <% if f.moeda.to_i == 0 %>
+          <td width="15" align="center" class="us">U$</td>
+          <td width="70" align="right"><b><%= format_decimal(f.divida_dolar) %></b></td>
+          <% @saldo_us += f.divida_dolar.to_f %>
+          <% divida_us += f.divida_dolar.to_f %>
+          <% cobro_us += 0 %>
+        <% elsif f.moeda.to_i == 1 %>
+          <td width="15" align="center" class="gs">Gs.</td>
+          <td width="70" align="right"><b><%= format_int(f.divida_guarani) %></b></td>
+          <% divida_gs += f.divida_guarani.to_f %>
+          <% cobro_gs += 0 %>
+          <% @saldo_gs += f.divida_guarani.to_f %>
+        <% else %>
+          <td width="15" align="center" class="rs">R$</td>
+          <td width="70" align="right"><b> <%= format_decimal(f.divida_real) %></b></td>
+          <% divida_rs += f.divida_real.to_f %>
+          <% cobro_rs += 0 %>
+          <% @saldo_rs += f.divida_real.to_f %>
+        <% end %>
+          <td width="50">
+            <%= link_to  '#modal-receber-pg', class: 'bt-list btn-success', "data-toggle": "modal",
+            "data-target": "#modal-receber-pg",
+            "data-pg-id": "#{f.id}",
+            "data-pg-conta-id": "#{f.conta_id}",
+            "data-pg-moeda": "#{f.moeda}",
+            "data-pg-saldo-us": "#{ format_decimal(f.divida_dolar) }",
+            "data-pg-saldo-gs": "#{format_int(f.divida_guarani) }",
+            "data-pg-saldo-rs": "#{ format_decimal(f.divida_real)}",
+            "data-pg-cota": "#{f.cota}",
+            "data-pg-documento-numero-01": "#{f.documento_numero_01}",
+            "data-pg-documento-numero-02": "#{f.documento_numero_02}",
+            "data-pg-documento-numero": "#{f.documento_numero}",
+            "data-pg-rubro-id": "#{f.rubro_id}",
+            "data-pg-tot-cotas": "#{f.tot_cotas}",
+            "data-pg-descricao": "#{f.descricao}",
+            "data-pg-titulo": "#{f.titulo}",
+            "data-pg-vencimento": "#{f.vencimento}",
+            "data-pg-persona-id": "#{f.persona_id}" do %>
+              <img src="/assets/dollar-currency-symbol.png"> Receber
+            <% end %>
+          </td>
+      </tr>
+    <% end %>
+
+  </table>
+</div>
+
+

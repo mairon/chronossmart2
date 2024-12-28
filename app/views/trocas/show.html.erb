@@ -1,0 +1,35 @@
+<ul class="tabs">
+	<li><a href="#tab1"> Troca Productos - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="group">
+	<h2>
+		<p></p>
+		  <strong><%= t('DATE') %>:</strong>
+		  <%= @troca.data.strftime("%d/%m/%Y") %>
+		</p>
+
+		<p>
+		  <strong><%= t('PERSON') %>:</strong>
+		  <%= @troca.persona.nome %>
+		</p>
+
+		<p>
+		  <strong>Vendedor:</strong>
+		  <%= @troca.usuario %>
+		</p>
+
+		<p>
+		  <strong>Observacion:</strong>
+		  <%= @troca.observacao %>
+		</p>
+	</h2>
+</div>
+
+<p>
+	<%= render partial: "/troca_produtos/index_trocas", locals: {troca_produtos: @troca.troca_produtos} %>
+</p>
+
+<p>
+	<%= render partial:  "/troca_produtos/form", locals: {troca_produtos: TrocaProduto.new(troca_id: @troca.id) } %>
+</p>

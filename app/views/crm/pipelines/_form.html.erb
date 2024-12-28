@@ -1,0 +1,14 @@
+<div class="group">
+  <%= form_for [:crm, Pipeline.new] do |f| %>  
+    <div class="row">
+      <div class="col-md-12">
+        <label>Nombre</label>
+        <%= f.text_field :nome, class: 'panel-field' %>
+      </div>
+    </div>
+    <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    </div>
+
+  <% end %>
+</div>

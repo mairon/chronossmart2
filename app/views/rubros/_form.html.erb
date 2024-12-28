@@ -1,0 +1,47 @@
+<h1 id="header"><%= t('CLASSIFICATION') %></h1>
+<div class="group">
+<%= form_for(@rubro) do |f| %>
+<% if @rubro.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@rubro.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @rubro.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+      <table>
+        <tr>
+          <td>
+            <label>Plano de Contas</label>
+            <%= f.collection_select :plano_de_conta_id, PlanoDeConta.all(:select => 'id,descricao',:order => '2'),:id,:descricao %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <label>Nome</label>
+            <%= f.text_field :descricao, siza: 50 %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <label>Regime de Competência</label>
+            <%= f.text_field :competencia, size: 15 %><small>meses</small>
+          </td>
+        </tr>
+        <tr>
+          <td><br><%= f.check_box :planilha %> <%= t('ACTIVE_S') %> Planilha de Custo</td>
+        </tr>        
+      </table>
+    <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), rubros_path, :class => "btn btn-back" %>
+    </div>
+<% end %>
+</div>

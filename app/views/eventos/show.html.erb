@@ -1,0 +1,122 @@
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel">
+        <h1 id="header">
+          Evento <%= @evento.nome %>
+          <small><%= @evento.obs %></small>
+          <div class="pull-right">
+            <%= @evento.id.to_s.rjust(6,'0') %>
+            <%= link_to 'Volver', eventos_path, :class => "btn btn-back" %>  
+          </div>
+        </h1>
+        <div class="panel-content">
+          Invitados <b><%= @evento.evento_convidados.count %></b> |
+          Confimados <b><%= @evento.evento_convidados.where(confirmado: true).count %></b> |
+          Presentes <b><%= @evento.evento_convidados.where(presente: true).count %></b>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel">
+        <div class="panel-content">
+            <%= form_for(EventoConvidado.new) do |f| %>
+            <%= f.hidden_field :evento_id, value: @evento.id %>
+            <div class="row">
+              <div class="col-md-3">
+                <label>Nombre</label>
+                <%= f.text_field :nome, required: true, class: 'panel-field' %>
+              </div>
+              <div class="col-md-2">
+                <label>Telefone</label>
+                <%= f.text_field :telefone, class: 'panel-field', placeholder: '+5959986287555' %>
+              </div>
+
+              <div class="col-md-2">
+                <label>Doc.</label>
+                <%= f.text_field :doc, class: 'panel-field' %>
+              </div>
+
+
+              <div class="col-md-2">
+                <label>Complemento.</label>
+                <%= f.text_field :comple, class: 'panel-field' %>
+              </div>
+
+              <div class="col-md-3 padding-btn">
+                <%= f.submit "Add", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+              </div>
+            </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel">
+        <div class="panel-content">
+          <table class="head_grid">
+            <tr>
+              <td width="50" align="center"></td>
+              <td width="250">Nombre</td>
+              <td width="100">Doc.</td>
+              <td width="100">Telefone.</td>
+              <td width="100" align="center">Confirmación(RSVP)</td>
+              <td width="100" align="center">Presente</td>
+            </tr>
+          </table> 
+          <style>
+            td{
+              padding: 12px 5px 12px 5px !important;
+              border-bottom: 1px solid #efefef !important;
+            }
+
+          </style>
+          <table>
+            <% count = 1 %>
+            <% @evento.evento_convidados.each do |ec| %>
+            <tr class="<%= cycle("cor1", "cor2")%>">
+              <td width="50"><%= count.to_s.rjust(2,'0') %></td>
+              <td width="250"><%= link_to ec.nome, evento_convidado_path(ec) %></td>
+              <td width="100"><%= ec.doc %></td>
+              <td width="100"><%= ec.telefone %></td>
+              <td width="100" align="center">
+                <% if ec.confirmado == true %>
+                  <span class="btn-success">SI</span><br>
+                  <small><%= ec.confirmado_data.strftime("%d/%m/%y") %></small>
+                <% else %>
+                  <span class="btn-danger">NO</span>
+                <% end %>
+              </td>
+              <td width="100" align="center">
+                <% if ec.presente == true %>
+                  <span class="btn-success">SI</span>
+                <% else %>
+                  <span class="btn-danger">NO</span>
+                <% end %>
+              </td>
+              <td width="50">
+                <%= link_to qrcode_evento_convidado_path(ec.id), class: 'bt-list btn-blue', target: '_blank' do %>
+                  <i class="icon-white icon-qrcode"></i> QR
+                <% end %>
+              </td>
+              <td width="50">
+                <%= link_to "https://api.whatsapp.com/send?phone=#{ec.telefone}&text=#{@evento.msg_confirm} http://#{request.subdomain}.chronos.com.py:4000/evento_convidados/#{ec.id}/confirm", class: 'bt-list btn-green', target: '_blank' do %>
+                  <i class="icon-whats icon-whats"></i> Whats
+                <% end %>
+              </td>
+              <td><%= link_to '', edit_evento_convidado_path(ec), class: 'icon-pencil' %></td>
+              <td><%= link_to '', ec, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>              
+
+            </tr>
+            <% count += 1 %>
+          <% end %>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>  

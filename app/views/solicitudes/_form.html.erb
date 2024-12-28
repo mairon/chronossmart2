@@ -1,0 +1,130 @@
+<h1 id="header">Solicitud/Registro de Faltas</h1>
+
+<div class="group">
+  <%= form_for(@solicitude) do |f| %>
+  <% if @solicitude.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@solicitude.errors.count, "error") %> prohibited this solicitude from being saved:</h2>
+
+      <ul>
+      <% @solicitude.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <table>
+
+    <% if params[:action] == 'edit' %>
+      <tr>
+        <td colspan="2">
+          <label>Empleado</label>
+          <b><%= @solicitude.usuario.usuario_nome unless @solicitude.usuario.nil? %></b>
+        </td>
+      </tr>
+    <% else %>
+
+      <% if current_user.tipo.to_i <= 1 %>
+        <tr>
+          <td colspan="2">
+            <label>Empleado</label>
+            <%= f.collection_select :usuario_id, Usuario.select('id,usuario_nome').order('usuario_nome'), :id, :usuario_nome, {prompt: 'Selecione'}, {required: true} %>
+          </td>
+        </tr>
+      <% else %>
+
+        <%= f.hidden_field :usuario_id, value: current_user.id %>
+
+      <% end %>
+
+    <% end %>
+
+    <tr>
+      <td>
+        <label>Quando</label>
+        <%= f.date_select :data %>
+      </td>
+      <td>
+        <label>Hora</label>
+        <%= f.time_select :time %>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <label>Motivo</label>
+        <%= f.collection_select :motivo_id, Motivo.select('id,nome').order('nome'), :id, :nome, {prompt: 'Selecione'}, {required: true} %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <label>Anexo</label>
+        <%= f.file_field :anexo %>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <label>Obs</label>
+        <%= f.text_area :obs, rows: 3, class: 'panel-field' %>
+      </td>
+    </tr>
+  </table>
+  <% if current_user.tipo.to_i == 0 %>
+    <hr>
+
+    <table>
+      <tr>
+        <td colspan="2">
+          <label>Status</label>
+          <%= f.select :status, [['PENDIENTE','PENDIENTE'],['AUTORIZADO','AUTORIZADO'],['NEGADO','NEGADO']], {prompt: 'Selecione'} %>
+        </td>
+      </tr>
+
+
+      <tr>
+        <td colspan="2">
+          <label>Autorizado por</label>
+          <% if @solicitude.autorizado_por.to_i == 0 %>
+            <%= f.text_field :autorizado_por, value: current_user.id %>
+            <%= f.text_field :autorizado_data, value: Time.now.strftime("%Y-%m-%d") %>
+            <% else %>
+              <%= @solicitude.autorizado_por %>
+          <% end %>
+        </td>
+      </tr>
+
+
+      <tr>
+        <td colspan="2">
+          <label>Descuento en Hoja de Pago</label>
+          <%= f.check_box :desc_folha %>
+        </td>
+      </tr>
+
+      <tr>
+        <td colspan="2">
+          <label>Hrs. Descontadas</label>
+          <%= f.text_field :hrs_desc %>
+        </td>
+      </tr>
+
+
+      <tr>
+        <td colspan="2">
+          <label>Justificativa</label>
+          <%= f.text_area :status_obs, rows: 3, class: 'panel-field', cols: 50 %>
+        </td>
+      </tr>
+    </table>
+  <% end %>
+  <div class="footer-buttons">
+    <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    <%= link_to t('BACK'), solicitudes_path, :class => "btn btn-back" %>
+  </div>
+<% end %>
+</div>
+
+<script type="text/javascript">
+  $('#solicitude_motivo_id, #solicitude_usuario_id').selectize();
+</script>
+

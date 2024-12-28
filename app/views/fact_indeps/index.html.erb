@@ -1,0 +1,36 @@
+<h1 id="header">Factura Independente </h1>
+<div class="acessos">
+  <%= link_to t('NEW'), {:action => 'new'}, :class => 'button add' %>    
+</div>
+<div class="group">
+
+  <table class="head_grid">
+    <tr>
+      <td width="110" align="center"><%= t('CODE') %></td>
+      <td width="300">Cliente</td>
+      <td width="70" align="right">Produtos</td>
+      <td width="55"></td>
+    </tr>
+  </table>
+  <div class="rolagem" id="div">
+    <table>
+      <% @fact_indeps.each do |c| %>
+        <tr class = "<%= cycle("cor1", "cor2")%>" >
+          <td width="110" align="center"><%= c.id.to_s.rjust(6,'0') %></td>
+          <td width="300"><%= c.persona_nome %></td>
+          <td width="70" align="right"><%= format_int(c.fact_indep_produtos.sum(:quantidade)) %></td>
+          <td><%= link_to '', edit_fact_indep_path(c), class: 'icon-pencil' %></td>
+          <td>
+            <% if (FormFiscal.where("sigla_proc = 'FI' AND cod_proc = #{c.id} AND STATUS = 1").count(:id)) == 0 %>
+              <%= link_to '', c, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+
+<div class="head_grid">
+  <%= will_paginate @fact_indeps, "data-remote" => "true" %>
+</div>

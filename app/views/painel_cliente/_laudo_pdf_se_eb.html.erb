@@ -1,0 +1,307 @@
+<style>
+	.page-break { display:block; clear:both; page-break-after:always; }
+.border {
+		font-family:Lucida Console;
+		font-size:10px;
+		border-collapse: collapse;
+	}
+	table td{
+		height:20px;
+
+	}
+	.header{
+		font-size: 12px;
+	  -moz-border-radius:8px;
+	  -webkit-border-radius:8px;
+	  padding:10px;
+
+
+	}
+	.obs{
+		font-size: 7px;
+	}
+
+tr.cor2 {
+    background: #c0d9c0;
+}
+
+tr.cor1 {
+    background: white;
+}
+
+</style>
+<body>
+<% @amostras.each do |a| %>
+<div class="page-break">
+
+	<table>
+		<tr>
+			<td colspan="5" >
+				<div >
+					<table>
+				    <tr>
+				    	<td colspan="2"><%= wicked_pdf_image_tag('logo_biosollo.png', :width => 150, :height => 80) %></td>
+				    	<td width="450" align="center" valign="bottom" class="header">
+				    		<p style="text-transform:uppercase;">biosollo laboratório s.r.l</p>
+				    		<p style="text-transform:uppercase;">laboratório de análisis de semillas</p>
+				    		<p>Habilitación SENAVE Nº 16/2007 (R.N.L.S)</p>
+				    	</td>
+				    </tr>
+			    </table>
+			    </div>
+	  	</td>
+		</tr>
+		<tr>
+			<td width="1500" colspan='5' align="center">
+				<div class="header">
+						<h3>CERTIFICADO DE ANALISIS
+							<% if params[:tipo_list] == '3' %>
+								DE MUESTRAS
+							<% else %>
+								DEL LOTE
+							<% end %>
+							DE SEMILLAS</h3>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td width="1500" colspan='2' align="center" valign="bottom">
+				<div class="header">
+					<h3>INFORMACIONES DEL SOLICITANTE</h3>
+					<table class="border" border="1" width="755" >
+				    <tr height="20">
+				    	<td align="center">Solicitante:</td>
+				    	<td align="center">Especie</td>
+				    	<td align="center">Cultivar (Variedad)</td>
+				    	<td align="center">Categoria</td>
+				    </tr>
+				    <tr height="20">
+				    	<td align="center"><%= a.empresa_nome %></td>
+				    	<td align="center"><%= a.cientifico %></td>
+				    	<td align="center"><%= a.variedad %></td>
+				    	<td align="center"><%= a.categoria %></td>
+				    </tr>
+
+				    <tr height="20">
+				    	<td colspan="4" align="center"><b>Peso del Lote</b> <%= number_to_currency(a.peso, :format=>' %n ', :separeitor => ",", :precision => 3) %> Kg.</td>
+				    </tr>
+				    <tr height="20">
+				    	<td colspan="4" align="center">La identificación del lote es de exclusiva responsabilidad del solicitante</td>
+				    </tr>
+					</table>
+					<table>
+						<tr>
+							<td height="40"></td>
+						</tr>
+						<tr>
+							<td><h3>INFORMACIONES GENERALES</h3></td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="header">
+					Código de Identificación del Lote: <%= a.lote %>
+					<table class="border" border="1" width="755">
+						<tr>
+							<td align="center">Nº y Tipo Envases</td>
+							<td align="center"><%= t('DATE') %> de Extracción de la Muestra</td>
+							<td align="center"><%= t('DATE') %> de Recepción de la Muestra</td>
+							<td align="center"><%= t('DATE') %> de Finalización del Análisis</td>
+							<td align="center">Nº de Análisis</td>
+						</tr>
+						<tr>
+							<td align="center"><%= a.envaze %></td>
+							<td align="center"><%= a.data_extracao.to_date.strftime("%d/%m/%Y") %></td>
+							<td align="center"><%= a.data.to_date.strftime("%d/%m/%Y") %></td>
+							<td align="center"><%= @revisao_result.data.to_date.strftime("%d/%m/%Y") %></td>
+							<td align="center"><%= a.amostra %></td>
+						</tr>
+					</table>
+			</td>
+			</div>
+		</tr>
+		<tr>
+			<td width="1500" colspan='2' valign="bottom">
+				<div class="header">
+					<h3   align="center" class="header">RESULTADO DE ANALISIS</h3>
+					<table class="border" border="1" width="755" >
+						<tr>
+							<td colspan="3">
+								Nombre Común : <%= a.cultura %>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3">
+								Nombre Científico : <%= a.cientifico %>
+							</td>
+						</tr>
+				    <tr height="20">
+				    	<td valign="top">
+				    		<table border="1" class="border">
+				    			<tr>
+				    				<td colspan="3" align="center"><b>Pureza %</b></td>
+				    			</tr>
+				    			<tr>
+				    				<% pureza = EntradaResultEnsaio.find_by_metodo_id( 171, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_pur_puras,se_pur_outras,se_pur_inert,se_pur_outras_sem,se_pur_natur_mat_inert') %>
+				    				<td align="center">Semilla Pura</td>
+				    				<td align="center">Otras Semillas</td>
+				    				<td align="center">Materia Inerte</td>
+				    			</tr>
+				    			<tr>
+				    				<td width="150" align="center"><%= number_to_currency(pureza.se_pur_puras, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+				    				<td width="150" align="center"><%= number_to_currency(pureza.se_pur_outras, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+				    				<td width="150" align="center"><%= number_to_currency(pureza.se_pur_inert, :format=>' %n ', :separeitor => ",", :precision => 2) %></td>
+				    			</tr>
+				    			<tr>
+				    				<td align="center">Otras Semillas</td>
+				    				<td align="center" colspan="2">Naturaleza del Material Inerte</td>
+				    			</tr>
+				    			<tr>
+				    				<td align="center"><%= pureza.se_pur_outras_sem %></td>
+				    				<td  align="center"colspan="2"><%= pureza.se_pur_natur_mat_inert %></td>
+				    			</tr>
+				    		</table>
+				    	</td>
+				    	<td>
+				    		<% ger = EntradaResultEnsaio.find_by_metodo_id( 169, :conditions => ["amostra = ?", a.amostra]) %>
+				    		<table border="1" class="border" style="border-right:none;">
+				    			<tr>
+				    				<td colspan="5" align="center"><b>Germinación %</b></td>
+				    				<td rowspan='2' align="center">Humedad %</td>
+				    			</tr>
+				    			<tr>
+				    				<td align="center">Nº de Dias</td>
+				    				<td align="center">Plántulas Normales</td>
+				    				<td align="center">Plántulas Anormales</td>
+				    				<td align="center">Semillas Frescas</td>
+				    				<td align="center">Semillas Muertas</td>
+				    			</tr>
+
+				    			<tr>
+				    				<td align="center"><%= ger.se_ger_dias %></td>
+				    				<td align="center"><%= ger.se_ger_plant_normal %></td>
+				    				<td align="center"><%= ger.se_ger_plant_anormal %></td>
+				    				<td align="center"><%= ger.se_ger_sem_frescas %></td>
+				    				<td align="center"><%= ger.se_ger_sem_mortas %></td>
+				    				<% humi = EntradaResultEnsaio.find_by_metodo_id( 169, :conditions => ["amostra = ?", a.amostra]) %>
+				    				<td align="center"><%= humi.resultado.to_f %></td>
+				    			</tr>
+
+				    			<tr>
+				    				<td colspan="6"><b>. Poder Germinativo <%= ger.se_ger_poder_germi %> %</b></td>
+				    			</tr>
+
+				    			<tr>
+				    				<td colspan="2" align="center">Sustrato</td>
+				    				<td colspan="2" align="center">Temperatura</td>
+				    				<td colspan="2" align="center">Tratamiento</td>
+				    			</tr>
+
+				    			<tr>
+				    				<td colspan="2" align="center">RP</td>
+				    				<td colspan="2" align="center"><%= ger.se_ger_temp %></td>
+				    				<td colspan="2" align="center"><%= ger.se_ger_tratamento %></td>
+				    			</tr>
+
+				    		</table>
+				    	</td>
+				    </tr>
+						<tr>
+							<td colspan="3">
+								Nombre científico: <%= a.cientifico %>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td width="1500" colspan='2' valign="bottom">
+				<div class="header">
+					<h3   align="center" class="header">OTRAS DETERMINACIONES</h3>
+					<table class="border" border="1" width="755" >
+						<tr>
+							<td colspan="3">
+								Método Utilizado : <%= @revisao_result.metodo %>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3">
+								Resultado : <%= @revisao_result.resultado %>
+							</td>
+						</tr>
+
+						<tr>
+							<td colspan="3">
+								Observación: <%= @revisao_result.obs %>
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+								Este Certificado de Análisis de Semillas ampara 
+								<% if params[:tipo_list] == '3' %>
+								la:  Muestra
+								<% else %>
+								al: Lote
+								<% end %>
+							</td>
+							<td align="center">
+								Certificado válido por 180 dias
+							</td>
+						</tr>
+
+						<tr>
+							<td colspan="3">
+								<% if params[:tipo_list] == '4' %>
+									El muetreo del lote es responsabilidad del Muestreador con RNMLS Nº <%= @revisao_result.rnmls %>
+								<% end %>
+							</td>
+						</tr>
+
+					</table>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<br>
+	<br>
+	<br>
+	<table valign="center" style="margin:0 auto;">
+		<tr  style="font-size: 12px;">
+			<td align="center" style="height:5px;" valign="bottom" width="150">Ciudad del Este/PY</td>
+			<td width="40" align="center" style="height:5px;"></td>
+			<td width="80" align="center" style="height:5px;" valign="bottom"><%= @revisao_result.data.to_date.strftime("%d/%m/%Y") %></td>
+			<td width="80" align="center" style="height:5px;"></td>
+			<td align="center" style="height:5px;" valign="bottom"  width="250">Ing. Agr. Maria Elisa Cuevas</td>
+			<td width="80" align="center" style="height:5px;"></td>
+			<td align="center" style="height:5px;" valign="bottom"><%= wicked_pdf_image_tag('firma_maria.png', :width => 150, :height => 70) %></td>
+		</tr>
+		<tr   style="font-size: 12px;">
+			<td style="height:0px;"><hr></td>
+			<td width="40" align="center" style="height:0px;"></td>
+			<td style="height:0px;"><hr></td>
+			<td width="80" align="center" style="height:0px;"></td>
+			<td style="height:0px;"><hr></td>
+			<td width="80" align="center" style="height:0px;"></td>
+			<td style="height:0px;"><hr></td>
+		</tr>
+		<tr   style="font-size: 12px;">
+			<td style="height:5px;" align="center">Ciudad/País</td>
+			<td width="40" align="center" style="height:5px;"></td>
+			<td align="center" style="height:5px;"></td>
+			<td width="80" align="center" style="height:5px;"></td>
+			<td style="height:5px;" align="center">Aclaración de Firma</td>
+			<td width="80" align="center" style="height:5px;"></td>
+			<td style="height:5px;" align="center">Firma</td>
+		</tr>
+	</table>
+</div>
+<% end %>
+</body>
+
+

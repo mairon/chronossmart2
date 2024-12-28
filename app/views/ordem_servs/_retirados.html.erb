@@ -1,0 +1,76 @@
+<h1 class="us">Productos Retirados</h1>
+          <table class="head_grid">
+            <tr>
+              <td width="200">Producto</td>
+              <td width="30" align="right">Ctd</td>
+              <td width="70" align="right">Monto</td>
+              <td></td>
+            </tr>
+          </table>
+          <div class="rolagem" dir="div" style="height: 250px;">
+             <table>
+                <% rt = 0 %>
+                <% vt = 0 %>
+                <% @ordem_serv.ordem_serv_prods.where(status: true).each do |os| %>
+                  <tr class = "<%= cycle("cor1", "cor2") %> dv<%= os.id %>">
+                    <td width="200">
+                      <small><%= os.data.strftime("%d/%m/%y") %></small><br>
+                      <small> <%= os.produto.nome %></small>
+                    </td>
+                    <td width="30" align="right"><%= os.quantidade %></td>
+                    <% if @ordem_serv.moeda.to_i == 0 %>
+                      <td width="70" align="right"><%= format_decimal(os.valor_us) %></td>
+                      <% vt += (os.valor_us.to_f * os.quantidade.to_f) %>
+                    <% elsif @ordem_serv.moeda.to_i == 1 %>
+                      <td width="70" align="right"><%= format_int(os.valor_gs) %></td>
+                      <% vt += (os.valor_gs.to_f * os.quantidade.to_f) %>
+                    <% elsif @ordem_serv.moeda.to_i == 2 %>
+                      <td width="70" align="right"><%= format_decimal(os.valor_rs) %></td>
+                      <% vt += (os.valor_rs.to_f * os.quantidade.to_f) %>
+                    <% end %>
+                    
+                    <td><%= link_to '', os, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+                  </tr>
+                  <% rt += os.quantidade.to_f %>
+
+
+
+                  <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="mddv<%= os.id %>">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <div class="close-button">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          </div>  
+                          <h4 class="modal-title gs" id="myModalLabel" align="center">Devolver Producto</h4>
+                        </div>
+                        <div class="modal-body" style="padding: 10px 30px 30px 25px">
+                          <% retirado =  OrdemServProd.where(status: false, ordem_serv_id: @ordem_serv.id, produto_id: os.produto_id).sum(:quantidade) %>
+                          <%= render partial: "/ordem_serv_prods/new_devolvidos", locals: {ordem_serv_prod_dv: OrdemServProd.new(ordem_serv_id: @ordem_serv.id, quantidade: (os.quantidade.to_f - retirado.to_f),  deposito_id: os.deposito_id, produto_id: os.produto_id)} %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <script>
+                    $(".dv<%= os.id %>").click(function() {
+                      $('#mddv<%= os.id %>').modal('show');
+                    });
+                  </script>
+                <% end %>
+             </table>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <a class="acao btn btn-green">Nuevo Producto</a>
+            </div>
+            <div class="col-md-6" align="right">
+              <b style="padding-right: 68px"><%= rt.to_i %></b>
+              <% if @ordem_serv.moeda.to_i == 1 %>
+                <b style="padding-right: 28px"><%= format_int(vt.to_i) %></b>
+              <% else %>
+                <b style="padding-right: 8px"><%= format_decimal(vt.to_f) %></b>
+              <% end %>
+              
+            </div>
+          </div>  

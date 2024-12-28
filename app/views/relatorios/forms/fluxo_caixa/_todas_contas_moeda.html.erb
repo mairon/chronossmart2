@@ -1,0 +1,271 @@
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">      
+      <div class="panel-content">
+      	<div class="modal-grid" style="padding: 10px; color: #444;font-family: 'prox-bold';">
+
+					<% if params[:moeda] == '0' %>
+						<!-- saldo !-->
+	      		<% saldo_efetivo_gs  = Financa.where("moeda = 1 and data <= '#{params[:inicio].split("/").reverse.join("-")}'").sum("coalesce(entrada_guarani,0) - coalesce(saida_guarani,0)") %>
+						<% convert_gs = saldo_efetivo_gs.to_f / params[:cotacao].to_f %>
+            
+	      		<% saldo_efetivo_rs  = Financa.where("moeda = 2 and data <= '#{params[:inicio].split("/").reverse.join("-")}'").sum("coalesce(entrada_real,0) - coalesce(saida_real,0)") %>
+						<% convert_rs = saldo_efetivo_rs.to_f / params[:cotacao_rs_us].gsub(',','.').to_f %>
+
+
+	      		<% saldo_efetivo  = Financa.where(" moeda = 0 and data <= '#{params[:inicio].split("/").reverse.join("-")}'").sum("coalesce(entrada_dolar,0) - coalesce(saida_dolar,0)") %>
+						
+						<% saldo_efetivo = (saldo_efetivo.to_f + convert_gs.to_f + convert_rs.to_f) %>
+
+						<!-- atrasado entrada !-->	
+						<% atraso_entrada_gs = Cliente.where("moeda = 1 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_guarani,0) - coalesce(cobro_guarani,0)') %>
+
+						<% convert_atraso_entrada_gs = atraso_entrada_gs.to_f / params[:cotacao].to_f %>
+						
+						<% atraso_entrada_rs = Cliente.where("moeda = 2 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_real,0) - coalesce(cobro_real,0)') %>
+
+						<% convert_atraso_entrada_rs = atraso_entrada_rs.to_f / params[:cotacao_rs_us].gsub(',','.').to_f %>
+
+						<% atraso_entrada = Cliente.where(" moeda = 0 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_dolar,0) - coalesce(cobro_dolar,0)') %>
+
+						<% atraso_entrada = (atraso_entrada.to_f + convert_atraso_entrada_gs.to_f + convert_atraso_entrada_rs.to_f)%>
+
+						<!-- atrasado entrada !-->	
+						<% atraso_saida_gs  = Proveedore.where(" moeda = 1 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_guarani,0) - coalesce(pago_guarani,0)') %>
+
+						<% convert_atraso_saida_gs = atraso_saida_gs.to_f / params[:cotacao].to_f %>
+
+						<% atraso_saida_rs  = Proveedore.where(" moeda = 2 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_real,0) - coalesce(pago_real,0)') %>
+
+						<% convert_atraso_saida_rs = atraso_saida_rs.to_f / params[:cotacao_rs_us].gsub(',','.').to_f %>
+
+
+						<% atraso_saida   = Proveedore.where(" moeda = 0 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_dolar,0) - coalesce(pago_dolar,0)') %>
+
+						<% atraso_saida = (atraso_saida.to_f + convert_atraso_saida_gs.to_f + convert_atraso_saida_rs.to_f) %>
+
+					<% elsif params[:moeda] == '1' %>
+
+						<!-- saldo !-->
+	      		<% saldo_efetivo_gs  = Financa.where("moeda = 1 and data <= '#{params[:inicio].split("/").reverse.join("-")}'").sum("coalesce(entrada_guarani,0) - coalesce(saida_guarani,0)") %>
+						<% convert_gs = saldo_efetivo_gs.to_f %>
+            
+	      		<% saldo_efetivo_rs  = Financa.where("moeda = 2 and data <= '#{params[:inicio].split("/").reverse.join("-")}'").sum("coalesce(entrada_real,0) - coalesce(saida_real,0)") %>
+						<% convert_rs = saldo_efetivo_rs.to_f * params[:cotacao_real].to_f %>
+
+
+	      		<% saldo_efetivo_us  = Financa.where(" moeda = 0 and data <= '#{params[:inicio].split("/").reverse.join("-")}'").sum("coalesce(entrada_dolar,0) - coalesce(saida_dolar,0)") %>
+						
+						<% saldo_efetivo = ((saldo_efetivo_us.to_f * params[:cotacao].to_f) + convert_gs.to_f + convert_rs.to_f) %>
+
+						<!-- atrasado entrada !-->	
+						<% atraso_entrada_gs = Cliente.where("moeda = 1 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_guarani,0) - coalesce(cobro_guarani,0)') %>
+
+						<% convert_atraso_entrada_gs = atraso_entrada_gs.to_f %>
+						
+						<% atraso_entrada_rs = Cliente.where("moeda = 2 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_real,0) - coalesce(cobro_real,0)') %>
+
+						<% convert_atraso_entrada_rs = atraso_entrada_rs.to_f * params[:cotacao_real].to_f %>
+
+						<% atraso_entrada_us = Cliente.where(" moeda = 0 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_dolar,0) - coalesce(cobro_dolar,0)') %>
+
+						<% atraso_entrada = ( (atraso_entrada_us.to_f * params[:cotacao].to_f) + convert_atraso_entrada_gs.to_f + convert_atraso_entrada_rs.to_f)%>
+
+						<!-- atrasado entrada !-->	
+						<% atraso_saida_gs  = Proveedore.where(" moeda = 1 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_guarani,0) - coalesce(pago_guarani,0)') %>
+
+						<% convert_atraso_saida_gs = atraso_saida_gs.to_f %>
+
+						<% atraso_saida_rs  = Proveedore.where(" moeda = 2 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_real,0) - coalesce(pago_real,0)') %>
+
+						<% convert_atraso_saida_rs = (atraso_saida_rs.to_f * params[:cotacao_real].to_f) %>
+
+
+						<% atraso_saida_us   = Proveedore.where(" moeda = 0 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_dolar,0) - coalesce(pago_dolar,0)') %>
+
+						<% atraso_saida = ( (atraso_saida_us.to_f * params[:cotacao].to_f) + convert_atraso_saida_gs.to_f + convert_atraso_saida_rs.to_f) %>
+
+					<% elsif params[:moeda] == '2' %>
+
+						<!-- saldo !-->
+	      		<% saldo_efetivo_gs  = Financa.where("moeda = 1 and data < '#{params[:inicio].split("/").reverse.join("-")}'").sum("coalesce(entrada_guarani,0) - coalesce(saida_guarani,0)") %>
+						<% convert_gs = saldo_efetivo_gs.to_f / params[:cotacao_real].to_f %>
+            
+	      		<% saldo_efetivo_rs  = Financa.where("moeda = 2 and data < '#{params[:inicio].split("/").reverse.join("-")}'").sum("coalesce(entrada_real,0) - coalesce(saida_real,0)") %>
+						<% convert_rs = saldo_efetivo_rs.to_f %>
+
+
+	      		<% saldo_efetivo_us  = Financa.where(" moeda = 0 and data < '#{params[:inicio].split("/").reverse.join("-")}'").sum("coalesce(entrada_dolar,0) - coalesce(saida_dolar,0)") %>
+						
+						<% saldo_efetivo = (( saldo_efetivo_us.to_f * params[:cotacao_rs_us].gsub(',','.').to_f )+ convert_gs.to_f + convert_rs.to_f) %>
+
+						<!-- atrasado entrada !-->	
+						<% atraso_entrada_gs = Cliente.where("moeda = 1 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_guarani,0) - coalesce(cobro_guarani,0)') %>
+
+						<% convert_atraso_entrada_gs = atraso_entrada_gs.to_f / params[:cotacao_real].to_f %>
+						
+						<% atraso_entrada_rs = Cliente.where("moeda = 2 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_real,0) - coalesce(cobro_real,0)') %>
+
+						<% convert_atraso_entrada_rs = atraso_entrada_rs.to_f %>
+
+						<% atraso_entrada_us = Cliente.where(" moeda = 0 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_dolar,0) - coalesce(cobro_dolar,0)') %>
+
+						<% atraso_entrada = ( (atraso_entrada_us.to_f * params[:cotacao_rs_us].gsub(',','.').to_f) + convert_atraso_entrada_gs.to_f + convert_atraso_entrada_rs.to_f)%>
+
+						<!-- atrasado entrada !-->	
+						<% atraso_saida_gs  = Proveedore.where(" moeda = 1 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_guarani,0) - coalesce(pago_guarani,0)') %>
+
+						<% convert_atraso_saida_gs = atraso_saida_gs.to_f / params[:cotacao_real].to_f %>
+
+						<% atraso_saida_rs  = Proveedore.where(" moeda = 2 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_real,0) - coalesce(pago_real,0)') %>
+
+						<% convert_atraso_saida_rs = atraso_saida_rs.to_f %>
+
+
+						<% atraso_saida_us   = Proveedore.where(" moeda = 0 and vencimento < '#{params[:inicio].split("/").reverse.join("-")}' and liquidacao = 0" ).sum('coalesce(divida_dolar,0) - coalesce(pago_dolar,0)') %>
+
+						<% atraso_saida = ( (atraso_saida_us.to_f * params[:cotacao_rs_us].gsub(',','.').to_f) + convert_atraso_saida_gs.to_f + convert_atraso_saida_rs.to_f) %>
+
+					<% end %>
+
+
+      		<% saldo_anteriro = 0 %>
+      		<% saldo          = saldo_efetivo.to_f %>
+      		<% h_entreda      = 0 %>
+      		<% h_saida        = 0 %>
+
+					<% if params[:moeda] == '0' %>
+	       		Saldo Anterior Efetivo: <span class="us"><%= format_decimal(saldo_efetivo.to_f) %></span> |
+	       		Saldo Receber Atrasado: <span class="us"><%= format_decimal(atraso_entrada.to_f) %></span> |
+	       		Saldo Pagar Atrasado:   <span class="us"><%= format_decimal(atraso_saida.to_f) %></span>
+
+	       	<% elsif params[:moeda] == '1' %>
+	       		Saldo Anterior Efetivo: <span class="gs"><%= format_int(saldo_efetivo.to_f) %></span> |
+	       		Saldo Receber Atrasado: <span class="gs"><%= format_int(atraso_entrada.to_f) %></span> |
+	       		Saldo Pagar Atrasado:   <span class="gs"><%= format_int(atraso_saida.to_f) %></span>
+					<% else %>
+	       		Saldo Anterior Efetivo: <span class="rs"><%= format_decimal(saldo_efetivo.to_f) %></span> |
+	       		Saldo Receber Atrasado: <span class="rs"><%= format_decimal(atraso_entrada.to_f) %></span> |
+	       		Saldo Pagar Atrasado:   <span class="rs"><%= format_decimal(atraso_saida.to_f) %></span>
+
+					<% end %>
+       	</div>
+      </div>
+      <div class="panel-content">
+        <div class="modal-grid">					
+					<table class="head_grid">
+					  <tr>
+					    <td width="150" align="center"><%= t('DATE') %></td>
+					    <td width="200" align="right">Entrada</td>
+					    <td width="200" align="right">Salida</td>
+					    <td width="200" align="right">Saldo</td>
+					  </tr>
+					</table>
+					<% d = params[:inicio].split("/").reverse.join("-").to_date %>
+					<div class="rolagem" dir="div">
+					<table> 
+						<% (params[:inicio].split("/").reverse.join("-").to_date..params[:final].split("/").reverse.join("-").to_date).each do |w| %>
+
+						<% if params[:moeda] == '0' %>
+
+							<% entrada_gs = Cliente.where(" moeda = 1 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_guarani,0) - coalesce(cobro_guarani,0)') %>
+							<% convert_entrada_gs = (entrada_gs.to_f / params[:cotacao].to_f) %>
+
+							<% entrada_rs = Cliente.where(" moeda = 2 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_real,0) - coalesce(cobro_real,0)') %>
+							<% convert_entrada_rs = (entrada_rs.to_f / params[:cotacao_rs_us].gsub(',','.').to_f) %>
+
+							<% entrada = Cliente.where(" moeda = 0 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_dolar,0) - coalesce(cobro_dolar,0)') %>
+
+							<% entrada = (entrada.to_f + convert_entrada_gs.to_f + convert_entrada_rs.to_f) %>
+
+
+							<% saida_gs = Proveedore.where(" moeda = 1 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_guarani,0) - coalesce(pago_guarani,0)') %>
+							<% convert_saida_gs = (saida_gs.to_f / params[:cotacao].to_f) %>
+
+							<% saida_rs = Proveedore.where(" moeda = 2 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_real,0) - coalesce(pago_real,0)') %>
+							<% convert_saida_rs = (saida_rs.to_f / params[:cotacao_rs_us].gsub(',','.').to_f) %>
+
+							<% saida = Proveedore.where(" moeda = 0 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_dolar,0) - coalesce(pago_dolar,0)') %>
+
+							<% saida = (saida.to_f + convert_saida_gs.to_f + convert_saida_rs.to_f) %>
+
+						<% elsif params[:moeda] == '1' %>
+
+							<% entrada_gs = Cliente.where(" moeda = 1 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_guarani,0) - coalesce(cobro_guarani,0)') %>
+							<% convert_entrada_gs = (entrada_gs.to_f) %>
+
+							<% entrada_rs = Cliente.where(" moeda = 2 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_real,0) - coalesce(cobro_real,0)') %>
+							<% convert_entrada_rs = (entrada_rs.to_f * params[:cotacao_real].to_f) %>
+
+							<% entrada_us = Cliente.where(" moeda = 0 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_dolar,0) - coalesce(cobro_dolar,0)') %>
+
+							<% entrada = ( (entrada_us.to_f * params[:cotacao].to_f) + convert_entrada_gs.to_f + convert_entrada_rs.to_f) %>
+
+
+							<% saida_gs = Proveedore.where(" moeda = 1 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_guarani,0) - coalesce(pago_guarani,0)') %>
+							<% convert_saida_gs = (saida_gs.to_f) %>
+
+							<% saida_rs = Proveedore.where(" moeda = 2 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_real,0) - coalesce(pago_real,0)') %>
+							<% convert_saida_rs = (saida_rs.to_f * params[:cotacao_real].to_f) %>
+
+							<% saida_us = Proveedore.where(" moeda = 0 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_dolar,0) - coalesce(pago_dolar,0)') %>
+
+							<% saida = ((saida_us.to_f * params[:cotacao].to_f) + convert_saida_gs.to_f + convert_saida_rs.to_f) %>
+
+						<% elsif params[:moeda] == '2' %>
+
+
+							<% entrada_gs = Cliente.where(" moeda = 1 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_guarani,0) - coalesce(cobro_guarani,0)') %>
+							<% convert_entrada_gs = (entrada_gs.to_f / params[:cotacao_real].to_f) %>
+
+							<% entrada_rs = Cliente.where(" moeda = 2 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_real,0) - coalesce(cobro_real,0)') %>
+							<% convert_entrada_rs = (entrada_rs.to_f) %>
+
+							<% entrada_us = Cliente.where(" moeda = 0 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_dolar,0) - coalesce(cobro_dolar,0)') %>
+
+							<% entrada = ( (entrada_us.to_f * params[:cotacao_rs_us].gsub(',','.').to_f) + convert_entrada_gs.to_f + convert_entrada_rs.to_f) %>
+
+
+							<% saida_gs = Proveedore.where(" moeda = 1 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_guarani,0) - coalesce(pago_guarani,0)') %>
+							<% convert_saida_gs = (saida_gs.to_f / params[:cotacao_real].to_f) %>
+
+							<% saida_rs = Proveedore.where(" moeda = 2 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_real,0) - coalesce(pago_real,0)') %>
+							<% convert_saida_rs = (saida_rs.to_f) %>
+
+							<% saida_us = Proveedore.where(" moeda = 0 and vencimento = '#{d}' and liquidacao = 0").sum('coalesce(divida_dolar,0) - coalesce(pago_dolar,0)') %>
+
+							<% saida = ((saida_us.to_f  * params[:cotacao_rs_us].gsub(',','.').to_f) + convert_saida_gs.to_f + convert_saida_rs.to_f) %>
+
+						<% end %>
+						<% saldo   += (saldo_anteriro.to_f + (entrada.to_f - saida.to_f)) %>
+
+							<tr>
+								<td width="150" align="center"><%= d.strftime("%d/%m/%y") %></td>
+								<% if params[:moeda] == '1' %>
+									<td width="200" align="right" onclick="OpenDt('<%= params[:cotacao] %>','<%= params[:cotacao_real] %>','<%= params[:cotacao_rs_us] %>','<%= params[:formato] %>', '<%= params[:moeda] %>', '0','<%= d.strftime("%Y-%m-%d") %>')"><%= format_int(entrada)%></td>
+									<td width="200" align="right" onclick="OpenDt('<%= params[:cotacao] %>','<%= params[:cotacao_real] %>','<%= params[:cotacao_rs_us] %>','<%= params[:formato] %>', '<%= params[:moeda] %>', '1','<%= d.strftime("%Y-%m-%d") %>')"><%= format_int(saida)%></td>
+									<td width="200" align="right"><%= format_int( saldo )%></td>
+								<% else %>
+
+									<td width="200" align="right" onclick="OpenDt('<%= params[:cotacao] %>','<%= params[:cotacao_real] %>','<%= params[:cotacao_rs_us] %>','<%= params[:formato] %>', '<%= params[:moeda] %>', '0','<%= d.strftime("%Y-%m-%d") %>')"><%= format_decimal(entrada)%></td>
+									<td width="200" align="right" onclick="OpenDt('<%= params[:cotacao] %>','<%= params[:cotacao_real] %>','<%= params[:cotacao_rs_us] %>','<%= params[:formato] %>', '<%= params[:moeda] %>', '1','<%= d.strftime("%Y-%m-%d") %>')"><%= format_decimal(saida)%></td>
+									<td width="200" align="right"><%= format_decimal( saldo )%></td>
+									
+								<% end %>
+								<% if d.strftime("%Y-%m-%d") == Time.now.strftime("%Y-%m-%d") %>
+				      		<% h_entreda = entrada.to_f %>
+				      		<% h_saida   = saida.to_f %>
+								<% end %>
+
+							</tr>
+							<% d += 1.days %>
+						<% end %>
+					</table>	
+					</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

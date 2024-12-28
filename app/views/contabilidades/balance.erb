@@ -1,0 +1,71 @@
+<h1 id="header">Balance de Suma y Sueldos</h1>
+<div class="group">
+  <h2>
+    <%= form_tag resultado_balance_contabilidades_path, :method => "get" do%>
+      <table>
+
+        <tr valign="top" height="35">
+          <td align="right"> De:</td>
+          <td>
+            <fieldset>
+              <table>
+                <tr>
+                  <td><input type       = "text"
+                             name       = "inicio"
+                             id         = "inicio"
+                             size       = "10"
+                             onkeypress = "return bloqEnter(event)"
+                             onkeyup    = "Formatadata(this,event),EnterTab(event,'final')" autofocus/>
+                      Hasta
+                      <input type       = "text"
+                             name       = "final"
+                             id         = "final"
+                             size       = "10"
+                             onkeypress = "return bloqEnter(event)"
+                             onkeyup    = "Formatadata(this,event),EnterTab(event,'codigo')" /></td>
+                </tr>
+              </table>
+            </fieldset>
+          </td>
+        </tr>
+
+        <tr>
+          <td align="right"><%= t('COIN') %> :</td>
+          <td>
+            <fieldset>
+              <input id         = "moeda"
+                     name       = "moeda"
+                     type       = "radio"
+                     value      = "0"
+                     checked
+                     onkeypress = "return bloqEnter(event)"
+                     onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Dolar
+
+              <input id    ="moeda"
+                     name  ="moeda"
+                     type  ="radio"
+                     value ="1"
+                     onkeypress = "return bloqEnter(event)"
+                     onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Guaranies
+
+            </fieldset>
+          </td>
+        </tr>
+
+        <input type="hidden" name="tipo" id="tipo"  size="5" value="0"/>
+
+        <tr>
+          <td></td>
+          <td>
+            <input type="submit" value="        Informe        " onclick="Tipo('0')"/>
+            <input type="submit" value="          Excel          " onclick="Tipo('1')"/>
+          </td>
+
+        </tr>
+
+      </table>
+    <% end %>
+  </h2>
+</div>
+
+

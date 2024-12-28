@@ -1,0 +1,164 @@
+<h1 id="header">Hoja de Pago</h1>
+  <div class="group">
+    <%= form_tag resultado_folha_de_pagamento_relatorios_path, :method => "get" do%>
+   
+    <div class="row">
+      <div class="col-md-3">
+        <label><label>Periodo</label></label>
+          <div class="input-group">
+            <%= text_field_tag :mes, nil, required: true, placeholder: 'Mês', class: 'panel-field', autofocus: true  %>
+          </div>
+      </div>
+
+      <div class="col-md-3">
+          <div class="input-group"  style="padding-top: 26px;">
+            <%= text_field_tag :ano, nil, required: true, placeholder: 'Año', class: 'panel-field'  %>
+          </div>
+      </div>
+      <div class="col-md-3">
+          <label>Dias</label>
+          <%= text_field_tag :dias, 30, required: true, placeholder: 'Dias', class: 'panel-field'  %>
+      </div>      
+      <div class="col-md-3">
+        <div class="input-group padding-btn">
+          <%= check_box_tag :moeda_gs, '1', checked: true %> Gs.
+          <%= check_box_tag :moeda_rs, '0', checked: true %> U$
+          <%= check_box_tag :moeda_us, '0', checked: true %> R$
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+          <fieldset>
+          <legend>Formato</legend>
+            <input id="tipo_listado" name="tipo_listado" type="radio" value="1"/>Padrão
+            <input id="tipo_listado" name="tipo_listado" type="radio" value="2" checked/>V2
+          </fieldset>
+      </div>
+      <div class="col-md-6">
+        <br>
+          <fieldset>
+            <%= check_box_tag :tipo_chofer, '1'%> Solo Choferes
+          </fieldset>
+      </div>
+    </div>    
+    <div class="row">
+      <div class="col-md-12">
+        <label>Unidade</label>
+          <%= select("busca", "unidade", Unidade.all(:select => 'id,unidade_nome',:order => 'unidade_nome').collect {|p| [ p.unidade_nome, p.id ] }, { prompt: 'Todos...'}) %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label>Empleado</label>
+          <%= select("busca", "empregado", Persona.all(:select => 'id,nome',:conditions => ["tipo_funcionario = 1"],:order => 'nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...'}) %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <br>
+        <input type="submit" class="btn btn-green" value="Informe"  style="cursor:pointer;" id="acao" data-toggle="modal" data-width="500" data-height="781" data-dismiss="modal" />
+        <a href="#" class="xls btn btn-blue">Excel</a>
+        <input type="hidden" name="tipo" id="tipo" size="5" value="0"/>
+
+      </div>
+    </div>
+   </div>
+ <% end %>
+
+
+<script>
+
+
+  $('.xls').click(function() {
+    window.location.href = '/relatorios/resultado_folha_de_pagamento.xls?' + $('form').serialize();
+  });
+
+
+  function Tipo(d){
+    document.getElementById('tipo').value = d
+  }
+
+  $('#busca_empregado').selectize();
+  $('#busca_unidade').selectize();
+
+</script>
+
+<script>
+      $(function() {
+      $( "#persona_nome" ).autocomplete({
+          source: function( request, response ) {
+          $.ajax({
+            url: "/personas/busca",
+            dataType: "json",
+            data: {
+              tipo: 'DESCRIPCION',
+              busca: request.term
+            },
+            success: function( data ) {
+              response( data );
+            },
+          });
+        },
+        minLength: 2,
+        change: function( event, ui ) {
+          $("#persona_id").val("");
+          $('#persona_id').val(ui.item.id);
+          return false;
+        }
+      });
+      $( "#cobro_persona_nome" ).change(function(){
+        if ($( "#persona_id" ).val() == ''){
+        }
+      });
+    });
+</script>
+
+<script>
+
+    $(document).on('submit', 'form', function(event) {
+      if ($("#tipo").val() == '0' ) {
+        event.preventDefault();
+        $('#myiframe').modal('show');
+        var width  = $(this).attr('data-width') || 640;
+        var height = $(this).attr('data-height') || 760;
+
+        var allowfullscreen = $(this).attr('data-video-fullscreen');
+
+        $("#myiframe iframe").attr({
+          'src': '/relatorios/resultado_folha_de_pagamento?' + $('form').serialize(),
+          'height': height,
+          'width': width,
+          'allowfullscreen':''
+        });
+
+        $('#myiframe').on('hidden.bs.modal', function(){
+          $(this).find('iframe').html("");
+          $(this).find('iframe').attr("src", "");
+        });
+      }
+    });
+
+
+</script>
+
+
+<div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 1100px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel">Hoja de Pago</h4>
+      </div>
+      <div class="modal-body" align="center">
+        <div class="embed-responsive embed-responsive-16by9" style="height: 460px">
+          <iframe class="embed-responsive-item" id="iframeModal" frameborder="0 " border="0"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

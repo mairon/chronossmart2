@@ -1,0 +1,181 @@
+<h1 id="header">Nota Credito - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+	<%= form_for(@nota_credito) do |f| %>
+	<% if @nota_credito.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@nota_credito.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @nota_credito.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+		<table>
+				<tr>
+					<td>
+          <label><%= t('DATE') %></label>
+            <%= f.date_select :data %>
+          </td>
+          <td>
+            <label><%= t('QUOTE') %> U$xG$</label>
+            <%= text_field :nota_credito, :cotacao, :size     => 10, :class => "money_gs", :dir   => "rtl", autofocus: true, :required => true, precision: 0 %>
+          </td>
+					<td>
+            <fieldset>
+              <legend><%= t('COIN') %></legend>
+              <% if current_unidade.moeda.to_i == 0 %>
+                <%= f.radio_button :moeda, 1 %> Guaranies
+                <%= f.radio_button :moeda, 0,  :Checked => "True" %> Dolar
+                <%= f.radio_button :moeda, 2 %> Real
+              <% elsif current_unidade.moeda.to_i == 1 %>
+                <%= f.radio_button :moeda, 1,  :Checked => "True" %> Guaranies
+                <%= f.radio_button :moeda, 0 %> Dolar
+                <%= f.radio_button :moeda, 2 %> Real
+                
+              <% elsif current_unidade.moeda.to_i == 2 %>
+                <%= f.radio_button :moeda, 1 %> Guaranies
+                <%= f.radio_button :moeda, 0 %> Dolar
+                <%= f.radio_button :moeda, 2,  :Checked => "True" %> Real
+              <% end %> 
+            </fieldset>            
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <label>Motivo</label>
+						<%= f.select :motivo, [["Devolución y Ajuste de precios",1],
+            ["Devolución",2],
+            ["Descuento",3],
+            ["Bonificación",4],
+            ["Crédito incobrable", 5],
+            ["Recupero de costo", 6],
+            ["Recupero de gasto", 7],
+            ["Ajuste de precio", 8] ], 
+            {prompt: "Selecione lo Motivo"}, required: true %> 
+          </td>
+          <td colspan="2"> 
+          	<fieldset>
+              <legend>Aplicación Financeira</legend>
+								<%= f.radio_button :tipo, 1,  :Checked => "True" %> Credito en cuenta
+								<%= f.radio_button :tipo, 0 %> Dev. de efetivo
+            </fieldset>
+          </td>
+				</tr>
+
+        <tr>
+          <td colspan="2">
+            <fieldset>
+              <legend>Origen del Proceso</legend>
+                <%= f.radio_button :origem_proc, 0 %> Ventas
+                <%= f.radio_button :origem_proc, 1,  :Checked => "True" %> Contratos
+            </fieldset>
+          </td>
+          <td colspan="2"> 
+            <fieldset>
+              <legend>Fiscal?</legend>
+                <%= f.radio_button :fiscal, 1,  :Checked => "True" %> SI
+                <%= f.radio_button :fiscal, 0 %> No
+            </fieldset>
+          </td>
+        </tr>        
+        
+        <tr>
+          <td colspan="3">
+            <label>Cliente</label>
+            <%= f.text_field :persona_nome, size: 83, required: true, class: 'autocomplete' %>
+             <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+            <%= f.hidden_field :persona_id %>
+          </td>
+        </tr>
+
+   		 	<tr>
+        	<td colspan="3">
+        		<label>Concepto</label>
+        		<%= f.text_area :concepto, rows: 3, placeholder: 'Concepto' %></td>
+        </tr>
+		</table>
+	    <div class="footer-buttons">
+      <%= f.submit "Seguir", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), nota_creditos_path, :class => "btn btn-back" %>
+    </div>
+    <% end %>
+  </div>
+<% if params[:action] == 'new' %>
+  <script type="text/javascript">
+    $("#nota_credito_cotacao").focus(function(){
+      $.ajax({url: '/buscas/cotz_us_compra',
+              type: 'POST',
+              beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+              data: 'data=' + $('#nota_credito_data_3i').val()+'/'+
+                              $('#nota_credito_data_2i').val()+'/'+
+                              $('#nota_credito_data_1i').val(),
+              success: function(data){
+              $('#nota_credito_cotacao').val(number_format( data,0, ',', '.') );} });
+
+      $.ajax({url: '/buscas/cotz_rs_compra',
+              type: 'POST',
+              beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+              data: 'data=' + $('#nota_credito_data_3i').val()+'/'+
+                              $('#nota_credito_data_2i').val()+'/'+
+                              $('#nota_credito_data_1i').val(),
+              success: function(data){
+              $('#nota_credito_cotacao_real').val(number_format( data,0, ',', '.'));} });
+
+      $.ajax({url: '/buscas/cotz_rs_us_compra',
+              type: 'POST',
+              beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+              data: 'data=' + $('#nota_credito_data_3i').val()+'/'+
+                              $('#nota_credito_data_2i').val()+'/'+
+                              $('#nota_credito_data_1i').val(),
+              success: function(data){
+              $('#nota_credito_cotacao_rs_us').val(number_format( data,2, ',', '.'));} });
+
+
+  });
+
+  </script>
+<% end %>
+
+<script type="text/javascript">
+  $('#nota_credito_terminal_id').selectize();
+  $('#nota_credito_contrato_id').selectize();
+  $(function() {
+    $( "#nota_credito_persona_nome" ).autocomplete({
+        source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+        $.ajax({
+          url: "/personas/busca?per=CLIENTE",
+          dataType: "json",
+
+          data: {
+            tipo: 'DESCRIPCION',
+            busca: request.term
+          },
+          beforeSend: function(){
+          $("#spinner").addClass("sppiner_show");
+          },
+
+          success: function( data ) {
+            $("#sppiner").removeClass("sppiner_show");
+            response( data );
+          },
+        });
+      },
+      minLength: 2,
+      change: function( event, ui ) {
+        $("#nota_credito_persona_id").val("");
+        $('#nota_credito_persona_id').val(ui.item.id);
+        return false;
+      }
+    });
+    $( "#nota_credito_persona_nome" ).change(function(){
+      if ($( "#nota_credito_persona_id" ).val() == ''){
+      }
+    });
+  });
+</script>

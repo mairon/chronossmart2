@@ -1,0 +1,81 @@
+<h1 id="header"><%= t('QUOTE') %> - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+
+  <%= form_for(@moeda) do |f| %>
+
+    <% if @moeda.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@moeda.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+        <ul>
+          <% @moeda.errors.full_messages.each do |msg| %>
+          <li>
+            <%= msg %>
+          </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <table>
+      <tr>
+        <td width="400">
+          <table>
+              <tr>
+                <td>
+                  <label><%= t('DATE') %></label>
+                  <%= f.date_select :data %>
+                </td>
+              </tr>
+              <tr>
+                <%= field_gs_label t('DOLLAR') + ' X ' + t('GUARANIS') +' '+ t('PURCHASE'),f, :dolar_compra, required: true, autofocus: true %>
+              </tr>
+              <tr>
+                <%= field_gs_label t('DOLLAR') + ' X ' + t('GUARANIS') +' '+ t('SALE'),f, :dolar_venda, required: true %>
+              </tr>
+
+              <tr>
+                <%= field_gs_label t('REAL') + ' X ' + t('GUARANIS') +' '+ t('PURCHASE'),f, :real_compra, required: true %>
+              </tr>
+              <tr>
+                <%= field_gs_label t('REAL') + ' X ' + t('GUARANIS') +' '+ t('SALE'),f, :real_venda, required: true %>
+              </tr>
+
+              <tr>
+                <%= field_us_label t('REAL') + ' X ' + t('DOLLAR') +' '+ t('PURCHASE'),f, :rs_us_compra, required: true %>
+              </tr>
+
+              <tr>
+                <%= field_us_label t('REAL') + ' X ' + t('DOLLAR') +' '+ t('SALE'),f, :rs_us_venda, required: true %>
+              </tr>
+
+              <tr>
+                <%= field_gs_label 'Peso X ' + t('GUARANIS') +' '+ t('PURCHASE'),f, :ps_gs_compra, required: true %>
+              </tr>
+
+              <tr>
+                <%= field_gs_label 'Peso X ' + t('GUARANIS') +' '+ t('SALE'),f, :ps_gs_venda, required: true %>
+              </tr>
+
+              <tr>
+                <%= field_gs_label t('QUOTE') + ' Oficial ' + t('PURCHASE'),f, :cotacao_oficial_compra %>
+              </tr>
+
+              <tr>
+                <%= field_gs_label t('QUOTE') + ' Oficial ' + t('SALE'),f, :cotacao_oficial_venda %>
+              </tr>
+          </table>
+        </td>
+
+        <td valign="top">
+          <iframe name="I2" width="300" height="780" src="http://www.cambioschaco.com.py/widgets/cotizacion/?lang=es" scrolling="no" border="0" frameborder="0" style="border: 1px dotted #CCCCCC; padding-left: 1px; padding-right: 1px; padding-top: 1px; padding-bottom: 1">
+          </iframe>
+
+        </td>
+      </tr>
+    </table>
+   <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), moedas_path , class: "btn-back" %>
+   </div> 
+  <% end %>
+</div>

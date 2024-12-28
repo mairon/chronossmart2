@@ -1,0 +1,23 @@
+<h1 id="header">Motivos Solicitudes</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_motivo_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="400">Description</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @motivos.each do |motivo| %>
+      <tr>
+        <td width="400"><%= motivo.nome %></td>
+        <td><%= link_to '', edit_motivo_path(motivo), class: 'icon-pencil' %></td>
+        <td><%= link_to '', motivo, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+
+      </tr>
+    <% end %>
+  </table>
+</div>

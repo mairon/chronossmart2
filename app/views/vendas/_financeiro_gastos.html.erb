@@ -1,0 +1,47 @@
+<div class="panel">
+  <header class="panel-heading">
+    Gastos 
+    <div class="pull-right">
+      <a href="#" data-toggle="modal" class="btn btn-green acao_vc"> + ADD</a>
+    </div>
+  </header>
+  <table class="head_grid">
+    <tr>
+      <td width="80">Cod.</td>
+      <td width="80">Doc.</td>
+      <td width="250">Proveedor</td>
+      <td width="250">Clasificación</td>
+      <td width="70" align="right">Monto</td>
+    </tr>
+  </table>
+  <div class="rolagem" style="height: 215px;">
+    <table>
+    <% @venda.venda_compras.each do |vp| %>
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td width="80"><%= vp.compra_id %></td>
+      <td width="80"><%= vp.compra.documento_numero %></td>
+      <td width="250"><small><%= vp.compra.persona.nome %></small></td>
+      <td width="250"><small><%= vp.compra.plano_de_conta.descricao %></small></td>
+      <td width="70" align="right"><%= format_int(vp.compra.total_guarani) %></td>
+      <td><%= link_to '', vp, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+    </tr>
+    <% end %>
+    </table>
+  </div>
+</div>
+
+  <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="modal-gastos">
+    <div class="modal-dialog" role="document" style="width: 850px;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="close-button">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <h4 class="modal-title us" id="myModalLabel" align="center">Add Gastos</h4>
+        </div>
+        <div class="modal-body" style="padding: 10px 0px 10px 0px">
+          <%= render partial: "/venda_compras/modal_gastos" %>
+        </div>
+      </div>
+    </div>
+  </div>

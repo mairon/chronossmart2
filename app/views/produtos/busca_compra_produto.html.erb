@@ -1,0 +1,150 @@
+  <div class="group" style="padding: 5px">
+      <select name="tipo" id="tipo">
+        <option>DESCRIPCION</option>
+        <option>REFERENCIA</option>
+      </select>
+
+      <input id         ="busca"
+             name       ="busca"
+             type       ="text"
+             value="<%= params[:busca]%>"
+             onKeyUp="pesquisa(document.getElementById('busca').value)"
+             size       ="60" autofocus/>
+
+      <%= image_tag("load.gif",
+              :align => "absmiddle",
+              :border => 0,
+              :id => "spinner",
+              :width => 21,
+              :height => 21,
+              :style =>"display: none;" ) %>
+  </div>
+<input type="hidden" id="moeda" value="<%= params[:moeda] %>">
+<input type="hidden" id="unidade" value="<%= current_unidade.id %>">
+<input type="hidden" id="pedidos" value="<%= params[:pedidos] %>">
+<div class="group">
+  <div id="pagina">
+  </div>
+</div>
+<script language="javascript">
+  var moeda   = document.getElementById('moeda').value
+  var unidade = document.getElementById('unidade').value
+  var pedidos = document.getElementById('pedidos').value
+
+   function Fecha(produto_nome,produto_id){
+      window.opener.document.getElementById('compras_produto_produto_nome').value      = produto_nome;
+      window.opener.document.getElementById('compras_produto_produto_id').value        = produto_id;
+      window.opener.document.getElementById("compras_produto_quantidade").focus()
+      self.close();
+   }
+
+   function pesquisa(valor)
+
+   {
+      tipo = document.getElementById('tipo').value
+      var pedidos = document.getElementById('pedidos').value
+      //var sub       = document.getElementById('filtro_sub_grupo').value
+      //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+      url="/produtos/dinamic_busca_compra_produto?pedidos="+pedidos+"&tipo="+tipo+"&busca="+valor;
+
+      ajax(url);
+
+   }
+
+
+   function ajax(url)
+
+   {
+
+
+
+      //alert(nick);
+
+      //alert(dest);
+
+      //alert(msg);
+
+      $('#spinner').show();
+
+      req = null;
+
+      // Procura por um objeto nativo (Mozilla/Safari)
+
+      if (window.XMLHttpRequest) {
+
+         req = new XMLHttpRequest();
+
+         req.onreadystatechange = processReqChange;
+
+         req.open("GET",url,true);
+
+         req.send(null);
+
+         // Procura por uma versão ActiveX (IE)
+
+      } else if (window.ActiveXObject) {
+
+         req = new ActiveXObject("Microsoft.XMLHTTP");
+
+         if (req) {
+
+
+
+            req.onreadystatechange = processReqChange;
+
+            req.open("GET",url,true);
+
+
+
+            req.send();
+
+         }
+
+      }
+
+   }
+
+
+
+   function processReqChange()
+
+   {
+
+
+
+      // apenas quando o estado for "completado"
+
+      if (req.readyState == 4) {
+
+
+
+         // apenas se o servidor retornar "OK"
+
+
+
+         if (req.status ==200) {
+
+
+
+            // procura pela div id="pagina" e insere o conteudo
+
+            // retornado nela, como texto HTML
+
+
+            onSuccess:$('#spinner').hide();
+            document.getElementById('pagina').innerHTML = req.responseText;
+
+
+
+         } else {
+
+            alert("Houve um problema ao obter os dados:n" + req.statusText);
+
+         }
+
+      }
+
+   }
+</script>
+</body>

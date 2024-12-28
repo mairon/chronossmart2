@@ -1,0 +1,32 @@
+
+<div class="modal-body" style="padding: 5px 20px 20px 20px">
+  <%= form_tag atualiza_registro_ingressos_path, :method => "get", id: 'FormAtualizaRegistro' do %>
+
+  <%= hidden_field_tag :confirmado, true %>
+  <%= hidden_field_tag :r_id %>
+  <%= hidden_field_tag :confirmado_por, current_user.id %>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Data</label>
+      <%= text_field_tag :data_conciliacao, Date.current.strftime("%d/%m/%Y"), class: 'date', size: '15' %>
+    </div>
+  </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label>Cliente</label>
+        <%= select("busca", "persona", Persona.where("tipo_cliente = 1").select('id,nome').order('nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Selecione o Cliente' }) %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12 footer-buttons" >
+        <%= link_to "#atualizaregistro", onclick:"AtualizaCancelaTitulo()", class: "btn btn-green" do %>
+          <span>Atualizar</span>
+        <% end %>
+        <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinner-form", :width => 21, :height => 21,
+            :style =>"display: none;" ) %>
+      </div>
+    </div>
+  <% end %>
+</div>

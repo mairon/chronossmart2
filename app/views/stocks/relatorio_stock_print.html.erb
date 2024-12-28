@@ -1,0 +1,42 @@
+
+<h2 align="right" id="header">Listado de Stock</h2>
+
+<br/>
+
+<table>
+  <tr>
+    <td width="120" align="center"><font size="1"> <b>Fecha</b></font></td>
+    <td width="120" align="center"><font size="1"> <b>Cod.</b></font></td>
+    <td width="400" align="center"><font size="1"> <b>Produto</b></font></td>
+    <td width="100" align="center"><font size="1"> <b>Entrada</b></font></td>
+    <td width="100" align="center"><font size="1"> <b>Salida</b></font></td>
+    <td width="100" align="center"><font size="1"> <b>Saldo</b></font></td>
+
+  </tr>
+  <tr>
+    <td colspan="6">
+      <hr/>
+    </td>
+  </tr>
+</table>
+<table>
+
+  <%= for produto in @stocks %>
+    <% entradas = Stock.sum( :entrada,:conditions => ['produto_id = ?',produto.id] ) %>
+    <% saidas   = Stock.sum( :saida  ,:conditions => ['produto_id = ?',produto.id] ) %>
+    <% stock    = entradas - saidas %>
+    <tr class = "<%= cycle( "cor1", "cor2" )%>"
+        onMouseOver="javascript:this.style.backgroundColor='#949494'"
+        onMouseOut="javascript:this.style.backgroundColor=''"          >
+      <td width="120" align="center"><font size="1"> <%=h produto.data.strftime("%d/%m/%Y")%></font> </td>
+      <td width="120" align="center"><font size="1"> <font size="1"><%=h produto.codigo%></font> </td>
+      <td width="400" align="left"> <font size="1">  <%=h produto.produto_nome%></font> </td>
+      <td width="100"  align="right"><font size="1"> <%=h format( "%.3f",produto.entrada.to_f ) %></font> </td>
+      <td width="100"  align="right"> <font size="1"><%=h format( "%.3f",produto.saida.to_f ) %></font> </td>
+      <td width="100"  align="right"> <font size="1"><%=h format( "%.3f",stock.to_f ) %></font> </td>
+    </tr>
+  <% end %>
+</table>
+
+
+

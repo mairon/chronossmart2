@@ -1,0 +1,12 @@
+<h1>Editing cheque_diferido</h1>
+
+<% form_for(@cheque_diferido) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @cheque_diferido %> |
+<%= link_to 'Back', cheque_diferidos_path %>

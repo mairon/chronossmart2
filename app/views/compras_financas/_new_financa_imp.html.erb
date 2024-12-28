@@ -1,0 +1,42 @@
+<body onload="ImputFocus('venci')">
+<%= form_tag gerar_cotas_credito_compras_path, :method => "get" do %>
+  <%= hidden_field_tag :id, @compra.id %>
+    <div id="tab1" class="tab_content group">
+      <table>
+        <tr>
+          <td>
+              <%= select("busca", "turno", ComprasDocumento.all(conditions: ["compra_id = #{@compra.id}"]).collect {|p| [ p.persona_nome, p.persona_id ] }, { :include_blank => true })   %></td>
+
+          <td align="right"> Primeiro Venc.:</td>
+          <td><input type="text" name="venci" id="venci" size="15" onkeyup="Formatadata(this,event)", value="<%= @compra.data.strftime("%d/%m/%Y")%>" />
+          </td>
+          <td align="right"> Doc.:</td>
+          <td>
+            <input  type="text"  name="documento_numero_01" id="documento_numero_01"  size="5" value="<%= @compra.documento_numero_01 %>" />-
+            <input  type="text"  name="documento_numero_02" id="documento_numero_02"  size="5" value="<%= @compra.documento_numero_02 %>" />
+            <input  type="text"  name="documento_numero" id="documento_numero"  size="10" value="<%= @compra.documento_numero %>" />
+          </td>
+          <td align="right"> Cuotas:</td>
+          <td><input  type="text"  name="cotas" id="cotas"  size="10" value="1" /></td>
+          <% if @compra.moeda == 0 %>
+            <td align="right"> Valor U$:</td>
+            <td>
+              <input  type="text"  name="valor_us" id="valor_us"  size="15" value="<%= number_to_currency((@compra.total_dolar.to_f - ( @compra.total_dolar.to_f * (@compra.desconto_dolar.to_f / 100 )) + @compra.ajuste_us.to_f).round(2), :format =>'%n', :separeitor => ",") %>" class = "money_us" dir   = "rtl" />
+            </td>
+          <% elsif @compra.moeda == 1 %>
+            <td align="right"> Gs.:</td>
+            <td>
+              <input  type="text"  name="valor_gs" id="valor_gs"  size="15" value="<%=  number_to_currency((@compra.total_guarani.to_f - ( @compra.total_guarani.to_f * (@compra.desconto_guarani.to_f / 100 )) + @compra.ajuste_gs.to_f), :format =>'%n', :precision => 0) %>" class = "money_gs" dir   = "rtl" />
+            </td>
+          <% else %>
+            <td align="right"> Valor R$: </td>
+            <td>
+              <input  type="text"  name="valor_rs" id="valor_rs"  size="15" value="<%=  number_to_currency((@compra.total_real.to_f - (@compra.total_real.to_f * (@compra.desconto_real.to_f / 100 )) + @compra.ajuste_rs.to_f ).round(2), :format =>'%n', :separeitor => ",") %>" class = "money_us" dir   = "rtl" /> <%=  %>
+            </td>
+          <% end %>
+          <td colspan='2' align="right"><%= submit_tag t('SAVE'), :class=>'button', :disable_with => "Aguarde..." %></td>
+        </tr>
+      </table>
+    </div>
+<% end %>
+

@@ -1,0 +1,73 @@
+<body onload="DiarioFocoData()">
+<h1 align="right" id="header">Acientos Contables</h1>
+
+<%= form_for(@diario) do |f| %>
+  <% if @diario.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@diario.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @diario.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  Acientos Edicion
+  <div class="group">
+    <table>
+      <tr>
+        <td align="right"><%= t('DATE') %> :</td>
+        <td><%= f.date_select :data ,{},{:onblur => "DiarioDataCotacao()"} %></td>
+        <%= hidden_field_tag( 'key' ) %>
+      </tr>
+
+      <tr>
+        <td align="right" valign="top">Lanz.:</td>
+        <td><%= f.text_field :tabela_id, :size => '15', :readonly => "readonly" %></td>
+      </tr>
+
+      <tr>
+        <td align="right" valign="top">Origen:</td>
+        <td><%= f.text_field :tabela_nome, :size => '15', :readonly => "readonly" %></td>
+      </tr>
+
+      <tr>
+        <td align="right" valign="top"><%= t('COIN') %> :</td>
+        <td><%= f.select :moeda,
+        ([["DOLAR", "0"],
+          ["GUARANIES", "1"]] )%>
+      </tr>
+
+
+      <tr>
+        <td align="right">Cotizacion :</td>
+        <td>             <%= text_field :diario,
+                                        :cotacao ,
+                                        { :size    => 15,                                          
+                                          :onfocus  => {:remote => true,
+                                                        :update => "key",
+                                                                      :url    => { :action => :get_moeda},
+                                                                                   :with   => "'key='+ key.value "} } %></td>
+      </tr>
+
+      <tr>
+        <td align="right">Documento :</td>
+        <td><%= f.collection_select :documento_id, Documento.all(:select => 'id,nome',:order => '2'),:id,:nome %></td>
+      </tr>
+
+      <tr>
+        <td align="right" valign="top">Descripcion :</td>
+        <td><%= f.text_area :descricao,:size => '45x5' %></td>
+      </tr>
+
+
+    </table>
+  </div>
+
+    <%= f.submit 'Seguir >>' %> <%= link_to t('BACK'), diarios_path %>
+<% end %>
+
+</body>

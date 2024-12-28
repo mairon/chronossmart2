@@ -1,0 +1,130 @@
+<%= form_tag "/form_fiscals/cliente_update_ft", remote: true do %>
+	<%= hidden_field_tag :cod_proc, @cliente.id %>
+	<%= hidden_field_tag :sigla_proc, 'CL' %>
+	<%= hidden_field_tag :data, Time.now %>
+	<%= hidden_field_tag :status, 1 %>
+	<%= hidden_field_tag :tipo, 0 %>
+	<%= hidden_field_tag :persona_id, @cliente.persona_id %>
+	<%= hidden_field_tag :tipo_op, 9 %>
+	<%= hidden_field_tag :moeda, @cliente.moeda %>
+	<table>
+
+	<% if @cliente.persona_nome != 'CONSUMIDOR FINAL' %>
+		<% ruc  = @cliente.persona.ruc %>
+		<% nome = @cliente.persona.nome_fatura %>
+	<% else %>
+		<% ruc = '' %>
+		<% nome = '' %>
+	<% end %>
+	<tr>
+		<td>
+			<label>Tipo</label>
+			<%= select_tag :tipo, options_for_select([['Contado','0'], ['Credito','1']]) %>
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			<label>RUC/CI</label>
+			<%= text_field_tag :ruc, ruc %>
+		</td>
+		<td>
+			<label>Nombre</label>
+			<%= text_field_tag :persona_nome, nome, size: 50 %>
+		</td>
+	</tr>
+
+		<tr>
+			<td>
+			<label>Factura</label>
+			<%= select("busca", "doc", FormFiscal.all(:select => 'id,doc,doc_01,doc_02',:conditions => ["tipo_doc = 1 and status = 0 and unidade_id = #{current_unidade.id} and terminal_id = #{params[:terminal_id]}"],limit: 40,:order => 'CAST(doc as integer)').collect {|p| [ p.doc_01 << '.' << p.doc_02 << '.' << p.doc, p.id ] }, {}, {:class => "panel-field"}) %></td></td>
+
+			<td>
+			<label>Monto</label>
+			<% if @cliente.moeda.to_i == 1 %>
+				<%= text_field_tag :tot_gs, format_int(@cliente.divida_guarani), readonly: 'readonly' %>
+			<% else %>
+				<%= text_field_tag :tot_us, format_int(@cliente.divida_dolar), readonly: 'readonly' %>
+			<% end %>
+			
+			<%= submit_tag " Facturar ", :class => "btn btn-green", "data-plus-as-tab" => "false", id: "submit_fatura"  %></td>
+		</tr>
+	</table>
+<% end %>          
+
+
+<div class="modal fade" id="ModalStatusFe" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="row" align="center" style="padding: 15px">
+        	<div class="col-md-12">
+	        	<h1 id="data-status">Verificando Datos</h1>
+            <div id="data-erro-status" class='alert alert-danger'  role='alert' hidden> <ul></ul></div>
+            <div id="data-success-status" class='alert alert-success'  role='alert' hidden> <ul></ul></div>
+	        	<div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+
+  $().ready(function() {
+    // validate signup form on keyup and submit
+    $("form").validate({
+      rules: {
+        ruc: "required",
+        persona_nome: "required"
+        }
+    });
+  });
+
+
+
+
+  $("#submit_fatura").click(function() {
+  	$('.lds-ring').show("slow");
+  	$("#ModalStatusFe").modal();
+    $.ajax({
+        type: 'GET',
+        url:  '/form_fiscals/cliente_update_ft?' + $('form').serialize(),
+        dataType: "JSON",
+        success: function(data) {
+        	if (data['fe']['success'] == false){
+            $("#data-erro-status").show();
+            $.each(data['fe']['errores'], function(i, error) {
+              $("#data-erro-status").append("<p>"+ data['fe']['errores'][i].error  +"</p>")
+            })
+        		$('.lds-ring').hide("slow");
+        	} else {
+ 						$("#data-success-status").show();
+            $.each(data['fe']["result"]['deList'], function(i, cdc) {
+              $("#data-success-status").append("<p>"+ data['fe']["result"]["deList"][i].cdc  +"</p>")
+            })
+
+        		location.reload();
+        	}
+
+          console.log(data);
+        }
+    });
+  });
+
+  </script>
+
+
+  <style>
+  label.error {
+    margin: 0px 10px 0px 10px;
+    width: auto;
+    color: red;
+  }
+  </style>
+
+
+
+

@@ -1,0 +1,29 @@
+<%= form_for(persona_rodado) do |f| %>
+  <% if persona_rodado.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(persona_rodado.errors.count, "error") %> prohibited this persona_rodado from being saved:</h2>
+
+      <ul>
+      <% persona_rodado.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+	<%= f.hidden_field :persona_id %>
+
+    <table>
+      <tr>
+        <td align="right">Chapa:</td>                    
+        <td><%= f.text_field :chapa, size: 15 %></td>
+                        
+        <td align="right">Responsable:</td>                    
+        <td><%= f.text_field :responsavel %></td>
+                        
+        <td align="right">km inicial:</td>                    
+        <td><%= f.number_field :km_inicial %><%= f.submit :value => t('SAVE'), :class => "button" %></td>
+       </tr>                 
+    </table>
+
+    </div>
+<% end %>

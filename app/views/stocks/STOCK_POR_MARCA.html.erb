@@ -1,0 +1,36 @@
+		<h1 id="header">STOCK POR MARCA</h1>
+	<style type="text/css">
+		select {
+			width: 350px;
+		}
+	</style>
+	<div class="group">
+		<h2>
+			<%= form_tag resultado_STOCK_POR_MARCA_stocks_path, :method => "get" do %>
+				<table>
+					<tr>
+						<td align="right">Marca:</td>
+						<td>
+							<%=   select("busca", "grupo", Grupo.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] },
+																																													{ :include_blank => true },
+																																													{ :onkeypress    => "return bloqEnter(event)",
+																																														:onkeyup       => "EnterTab(event,'campo_produto')" })   %></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>
+							<input type="submit" value="Informe" onclick="Tipo('0')" class="button_info"/>
+							<input type="submit" value="Excel" onclick="Tipo('1')" class="button_info"/>
+						</td>
+					</tr>
+				</table>
+			<% end %>
+		</h2>
+	</div>
+<input type="hidden" name="tipo" id="tipo"  size="5" value="0"/>
+
+<script>
+	function Tipo(d){
+		document.getElementById('tipo').value = d
+	}
+</script>

@@ -1,0 +1,30 @@
+<h1 id="header">Ingresso de Stock</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_stock_path, :class => "button add" %>
+</div>
+<div class="group">
+  <h2>
+    <%= form_tag dinamic_busca_stock_inicial_stocks_path, :method => "get" do%>
+       <select name="tipo" id="tipo">
+          <option>DESCRIPCION</option>
+          <option>CODIGO</option>
+       </select>
+
+       <input id="busca" name="busca" type="text" onKeyUp="f(this)"onkeydown = "f(this)" onkeypress ="return bloqEnter(event)"  />
+       <input type="button" class="btn btn-default" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar"/>
+
+    <% end %>    
+  </h2>
+
+  <div id="pagina">
+  </div>
+  
+</div>
+
+<script language="javascript">
+  function pesquisa(valor){
+    url="/stocks/dinamic_busca_stock_inicial?" + $('form').serialize();
+    ajax(url);
+  }
+</script>
+<%= javascript_include_tag 'busca_ajax' %>

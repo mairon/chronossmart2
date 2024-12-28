@@ -1,0 +1,36 @@
+<h1 id="header">Doc</h1>
+<div class="group">
+
+  <%= form_for(@documento) do |f| %>
+    <div class="row">
+      <div class="col-md-12">
+        <label>Descripción</label>
+        <%= f.text_field :nome, autofocus: true, required: true, class: 'panel-field' %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label>Sigla</label>
+        <%= f.text_field :sigla, class: 'panel-field' %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label>Proceso</label>
+        <%= f.radio_button :processo, 0 %> Fiscal
+        <%= f.radio_button :processo, 1 %> Hoja de Pago
+        <%= f.radio_button :processo, 2 %> Plan Venta Unipersonal
+        <%= f.radio_button :processo, 3 %> Plan Venta Empresas
+      </div>
+    </div>
+
+    <div class="footer-buttons">
+      <%= f.submit t('SAVE'), :class => "btn btn-green", :disable_with => "Aguarde...", "data-plus-as-tab" => "false"   %>
+      <%= link_to 'Voltar', documentos_path, :class => "button back" %>
+    </div>
+  <% end %>
+</div>
+
+

@@ -1,0 +1,61 @@
+<div class="row">
+  <div class="panel">
+  <h1 id="header">
+  	Conta cheques
+  	<div class="pull-right"><%= link_to 'Salir', contas_path, class: 'btn btn-blue'%></div>
+	</h1>
+  <div class="panel-body">
+      <div class="acessos">
+        <%= form_tag "/contas/gera_docs" do %> 
+	        <tr>
+	          <%= hidden_field_tag :conta_id, @conta.id %>          
+	          <td>obs :</td>                    
+	          <td><%= text_field_tag :obs%></td>
+	          <td >Doc Inicio:</td>
+	          <td><%= number_field_tag :doc_inicio %></td>
+	          <td >Final:</td>
+	          <td><%= number_field_tag :doc_final %></td>
+	          <td><%= submit_tag 'Grabar', :disable_with => "Aguarde...", :class => "button add" %><td></td>
+	        </tr>   
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="panel">
+    <table class="head_grid">
+      <tr>
+        <td width = "150">Conta</td>
+        <td width = "150" align="center">Numero</td>
+        <td width = "300" >Observacao</td>
+        <td width = "150" align="center">Status</td>
+      </tr>
+    </table>
+    
+    <div class="rolagem" dir="div">
+      <table>
+        <% @conta_cheques.each do |conta_cheque| %>
+          <tr>
+            <td width = "150"><%= conta_cheque.conta.nome %></td>
+            <td width = "150" align="center"><%= conta_cheque.numero %></td>
+            <td width = "300"><%= truncate(conta_cheque.obs, length: 30) %></td>
+            <% case conta_cheque.status %>
+              <% when 0 %>
+                <td width = "150" align="center"><span class='badge badge-primary'>Pendente</span></td>
+              <% when 1 %>
+                <td width = "150" align="center"><span class='badge badge-success'>Ativo</span></td>
+              <% when 2 %>
+                <td width = "150" align="center"><span class='badge badge-danger'>Cancelado</span></td>
+              <% when 3 %>
+                <td width = "150" align="center"><span class='badge badge-alert'>Devolvido</span></td>
+            <% end %>
+            <td><%= link_to '', edit_conta_cheque_path(conta_cheque), class: "icon-pencil" %></td>
+            <td><%= link_to '', conta_cheque, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: "icon-trash" %></td>
+          </tr>
+        <% end %>
+      </table>
+  </div>
+</div>
+

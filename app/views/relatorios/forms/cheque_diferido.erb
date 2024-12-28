@@ -1,0 +1,155 @@
+<body onload="DataInicio(),DataFinal(),CampoInicio()">
+  <h1 align="right" id="header">.</h1>
+  <%= t('LISTING') %> Cheque Diferido
+  <div class="group">
+    <h2>
+      <% form_tag resultado_cheque_diferido_relatorios_path, :method => "get" do%>
+        <table>
+          <tr>
+            <td>
+
+              <fieldset>
+                <legend>De :</legend>
+                <table>
+                  <tr>
+                     <td colspan="4">
+                      <input name="inicio" id="inicio"  size="10"  onkeyup="Formatadata(this,event)" />
+                      Hasta
+                      <input name="final"  id="final"   size="10" onkeyup="Formatadata(this,event)"/>
+                    </td>
+                  </tr>
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+
+          <tr>
+             <td>Numero: <input name="numero"  id="numero"   size="15"/></td>
+          </tr>
+
+          <tr>
+            <td>
+              <fieldset>
+                <legend>Cheque :</legend>
+                <input id         = "cheque"
+                       name       = "cheque"
+                       type       = "radio"
+                       value      = "0"
+                       checked
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />A Depositar
+
+                <input id    ="cheque"
+                       name  ="cheque"
+                       type  ="radio"
+                       value ="1"
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Depositado
+
+                <input id    ="cheque"
+                       name  ="cheque"
+                       type  ="radio"
+                       value ="2"
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Todos
+
+              </fieldset>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <fieldset>
+                <legend>Tipo :</legend>
+                <input id         = "tipodt"
+                       name       = "tipodt"
+                       type       = "radio"
+                       value      = "0"
+                       checked
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Emicion
+
+                <input id    ="tipodt"
+                       name  ="tipodt"
+                       type  ="radio"
+                       value ="1"
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Diferido
+
+                <input id    ="tipodt"
+                       name  ="tipodt"
+                       type  ="radio"
+                       value ="2"
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Deposito
+
+              </fieldset>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <fieldset>
+                <legend><%= t('COIN') %> :</legend>
+                <input id         = "moeda"
+                       name       = "moeda"
+                       type       = "radio"
+                       value      = "0"
+                       checked
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Dolar
+
+                <input id    ="moeda"
+                       name  ="moeda"
+                       type  ="radio"
+                       value ="1"
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" /><%= t('GUARANIS') %>
+
+              </fieldset>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <fieldset>
+                <legend>Tipo :</legend>
+                <input id         = "filtro"
+                       name       = "filtro"
+                       type       = "radio"
+                       value      = "0"
+                       checked
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Receber
+
+                <input id    ="filtro"
+                       name  ="filtro"
+                       type  ="radio"
+                       value ="1"
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Pagar
+
+              </fieldset>
+            </td>
+          </tr>
+
+
+        </table>
+
+        <table>
+          <tr>
+            <td>
+              <input type="submit" value="           Informe           " onclick="Tipo('0')"/>
+              <input type="submit" value="             Excel           " onclick="Tipo('1')"/>
+            </td>
+          </tr>
+
+          <input type="hidden" name="tipo" id="tipo"  size="5" value="0"/>
+
+        </table>
+      <% end %>
+    </h2>
+  </div>
+</body>
+
+

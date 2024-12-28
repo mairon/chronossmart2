@@ -1,0 +1,48 @@
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="80" align="center"><%= t('CODE') %></td>
+      <td width="80" align="center"><%= t('DATE') %></td>
+      <td width="250">Nombre</td>
+      <td width="250">Concepto</td>
+      <td width="35"></td>
+      <td width="70" align="right">Monto</td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+
+    <table>
+      <tr>
+      </tr>
+
+      <% @viaticos.each do |c| %>
+
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="80" align="center"> <%= c.id.to_s.rjust(6,'0') %></td>
+        <td width="80" align="center"> <%= c.data.strftime("%d/%m/%y")%></td>
+        <td width="250" align="left"  > <%= truncate( c.persona_nome, :legth => 90) %></td>
+        <td width="250" align="left"  > <%= truncate( c.obs, :legth => 90) %></td>
+        <% if c.moeda == 0 %>
+          <td width="20" align="center">U$</td>
+          <td width="70" align="right"> <%= format_decimal(c.valor_us) %></td>
+        <% elsif c.moeda == 1 %>
+          <td width="20" align="center">G$</td>
+          <td width="70" align="right" > <%= format_int(c.valor_gs) %></td>
+        <% else %>
+          <td width="20" align="center">R$</td>
+          <td width="70" align="right" > <%= format_decimal( c.valor_rs) %></td>
+        <% end %>
+        <td><%= link_to '', edit_viatico_path(c), class: 'icon-pencil' %></td>        
+        <td width="30">
+          <%= link_to '', c, :confirm => 'Estas Seguro?', :method => :delete , class: 'icon-trash' %>
+        </td>       
+      
+        <td title="Visualizar"><a target="_blank" href="/viaticos/<%= c.id %>/comprovante" class='icon-fullscreen'></a></td>
+      </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+<div class="head_grid">
+  <%= will_paginate @compras, "data-remote" => "true" %>
+</div>

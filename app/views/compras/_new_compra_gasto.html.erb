@@ -1,0 +1,233 @@
+
+
+<%= form_for(compras_gasto) do |f| %>
+   <%= f.hidden_field :compra_id%>
+
+
+   <ul class="tabs">
+      <li><a href="#tab1">Gastos</a></li>
+   </ul>
+   <div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+            <tr>
+               <td align="right">Rubro:</td>
+               <td><%= f.collection_select :rubro_id, Rubro.all( :select => 'id,descricao',
+                                                                 :order  => '1' ),:id,:descricao %></td>
+
+            </tr>
+            <% if @compra.moeda == 0 %>
+                <tr>
+                   <td colspan="4">
+                         <fieldset>
+                            <table>
+                               <tr>
+                                  <td align="right">Exentas U$ :</td>
+                                  <td><%= f.text_field :exentas_dolar,
+                                                       :size    => 10,
+                                                       :class => "money_us",
+                                                       :dir     =>"rtl"%></td>
+
+                                  <td align="right">Gravadas 5% U$ :</td>
+                                  <td><%= f.text_field :gravadas_05_dolar,
+                                                       :size    => 10,
+                                                       :class => "money_us",
+                                                       :dir     =>"rtl",
+                                                       :onblur  => "CompraGastoGravada05Dolar()" %></td>
+
+                                 <td align="right">Gravadas 10% U$ :</td>
+                                 <td><%= f.text_field :gravadas_10_dolar,
+                                                      :size    => 10,
+                                                      :class => "money_us",
+                                                      :dir     =>"rtl",
+                                                      :onblur  => "CompraGastoGravada10Dolar()" %></td>
+                              </tr>
+
+                              <tr>
+                                 <td></td>
+                                 <td></td>
+                                 <td align="right">Impuestos 5% U$ :</td>
+                                 <td><%= f.text_field :imposto_05_dolar,
+                                                      :class => "money_us",
+                                                      :dir     =>"rtl",
+                                                      :size    => 10%></td>
+
+                                 <td align="right">Impuestos 10% U$ :</td>
+                                 <td><%= f.text_field :imposto_10_dolar,
+                                                      :size    => 10,
+                                                      :class => "money_us",
+                                                      :dir     =>"rtl"%></td>
+                              </tr>
+
+                              <tr>
+
+                                 <td align="right" colspan="5">Total U$ :</td>
+                                 <td><%= f.text_field :total_dolar,
+                                                      :size    => 10,
+                                                      :class => "money_us",
+                                                      :dir     =>"rtl"%></td>
+
+                              </tr>
+
+                            </table>
+                         </fieldset>
+                   </td>
+                </tr>
+           <% elsif @compra.moeda == 1 %>
+                <tr>
+                   <td colspan="4">
+                         <fieldset>
+                            <table>
+                                 <tr>
+                                    <td>
+                                       <table>
+                                          <tr>
+                                             <td align="right">Exentas Gs.:</td>
+                                             <td><%= f.text_field :exentas_guarani,
+                                                                  :class => "money_us",
+                                                                  :dir     =>"rtl",
+                                                                  :size    => 10 %></td>
+
+                                             <td align="right">Gravadas 5% Gs.:</td>
+                                             <td><%= f.text_field :gravadas_05_guarani,
+                                                                  :class => "money_us",
+                                                                  :dir     =>"rtl",
+                                                                  :size    => 10,
+                                                                  :onblur  => "CompraGastoGravada05Gs()"%></td>
+
+                                             <td align="right">Gravadas 10% Gs.:</td>
+                                             <td><%= f.text_field :gravadas_10_guarani,
+                                                                  :class => "money_us",
+                                                                  :dir     =>"rtl",
+                                                                  :size    => 10,
+                                                                  :onblur  => "CompraGastoGravada10Gs()"%></td>
+                                          </tr>
+
+                                          <tr>
+                                             <td></td>
+                                             <td></td>
+                                             <td align="right">Impuestos 5% Gs.:</td>
+                                             <td><%= f.text_field :imposto_05_guarani,
+                                                                  :class => "money_us",
+                                                                  :dir     =>"rtl",
+                                                                  :size    =>10 %></td>
+
+                                             <td align="right">Impuestos 10% Gs.:</td>
+                                             <td><%= f.text_field :imposto_10_guarani,
+                                                                  :class => "money_us",
+                                                                  :dir     =>"rtl",
+                                                                  :size    => 10 %></td>
+                                          </tr>
+
+                                          <tr>
+
+                                             <td align="right" colspan="5">Total Gs.:</td>
+                                             <td><%= f.text_field :total_guarani,
+                                                                  :class => "money_us",
+                                                                  :dir     =>"rtl",
+                                                                  :size    => 10 %></td>
+                                          </tr>
+
+                                      </table>
+                                    </td>
+                                 </tr>
+                            </table>
+                         </fieldset>
+                   </td>
+                </tr>
+
+
+           <% else %>
+                <tr>
+                   <td colspan="4">
+                         <fieldset>
+                            <table>
+                                 <tr>
+                                    <td>
+                                       <table>
+                                          <tr>
+                                             <td align="right">Exentas R$.:</td>
+                                             <td><%= f.text_field :exentas_real,
+                                                                  :class => "money_us",
+                                                                  :dir     =>"rtl",
+                                                                  :size    => 10 %></td>
+
+                                             <td align="right">Gravadas 5% R$.:</td>
+                                             <td><%= f.text_field :gravadas_05_real,
+                                                                  :class => "money_us",
+                                                                  :dir     =>"rtl",
+                                                                  :size    => 10,
+                                                                  :onblur  => "CompraGastoGravada05Real()"%></td>
+
+                                             <td align="right">Gravadas 10% R$.:</td>
+                                             <td><%= f.text_field :gravadas_10_real,
+                                                                  :class => "money_us",
+                                                                  :dir     =>"rtl",
+                                                                  :size    => 10,
+                                                                  :onblur  => "CompraGastoGravada10Real()"%></td>
+                                          </tr>
+
+                                          <tr>
+                                             <td></td>
+                                             <td></td>
+                                             <td align="right">Impuestos 5% R$.:</td>
+                                             <td><%= f.text_field :imposto_05_real,
+                                                                  :class => "money_us",
+                                                                  :dir     =>"rtl",
+                                                                  :size    =>10 %></td>
+
+                                             <td align="right">Impuestos 10% R$.:</td>
+                                             <td><%= f.text_field :imposto_10_real,
+                                                                  :class => "money_us",
+                                                                  :dir     =>"rtl",
+                                                                  :size    => 10 %></td>
+                                          </tr>
+
+                                          <tr>
+
+                                             <td align="right" colspan="5">Total R$.:</td>
+                                             <td><%= f.text_field :total_real,
+                                                                  :class => "money_us",
+                                                                  :dir     =>"rtl",
+                                                                  :size    => 10 %></td>
+                                          </tr>
+
+                                      </table>
+                                    </td>
+                                 </tr>
+                            </table>
+                         </fieldset>
+                   </td>
+                </tr>
+           <% end %>
+        </table>
+      </div>
+   <div class="buttons">
+      <a class="button back" href="/compras/compras_gasto/<%=@compra.id%>" ><%= t('BACK') %></a>
+      <%= f.submit t('SAVE'),:disable_with => "Aguarde...", :class => "button"  %>
+   </div>
+   </div>
+
+<script>
+  function CompraGastoGravada05Real()     //
+{
+    var vartotal = eval( parseFloat( document.getElementById( 'compras_gasto_gravadas_05_real' ).value.replace(/\./g, "").replace(",", ".") ) / 1.05 );
+    document.getElementById( 'compras_gasto_imposto_05_real' ).value = ( number_format(vartotal * 0.05,2, ',', '.') );
+}
+function CompraGastoGravada10Real()     //
+{
+    var vartotal = eval( parseFloat( document.getElementById( 'compras_gasto_gravadas_10_real' ).value.replace(/\./g, "").replace(",", ".") ) / 1.1 );
+    document.getElementById( 'compras_gasto_imposto_10_real' ).value = ( number_format(vartotal * 0.10,2, ',', '.') );
+
+    var imposto10Dolar = parseFloat( document.getElementById('compras_gasto_gravadas_10_real').value.replace(/\./g, "").replace(",", ".") )
+    var imposto05Dolar = parseFloat( document.getElementById('compras_gasto_gravadas_05_real').value.replace(/\./g, "").replace(",", ".") )
+    var exentas        = parseFloat( document.getElementById('compras_gasto_exentas_real').value.replace(/\./g, "").replace(",", ".") )
+    var total          = eval( imposto10Dolar + imposto05Dolar + exentas )
+    document.getElementById( 'compras_gasto_total_real' ).value =  ( number_format(total,2, ',', '.') )
+
+}
+
+
+</script>
+
+<% end %>

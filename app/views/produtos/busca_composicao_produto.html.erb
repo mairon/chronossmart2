@@ -1,0 +1,162 @@
+<body onload="CampoTipo()">     
+  <div class="groupvenda">
+    <%form_tag dinamic_busca_composicao_produto_produtos_path, :method => "get" do%>
+    
+    <select name="tipo" id="tipo" onKeyUp    ="EnterTab(event,'busca')">
+       <option>DESCRIPCION</option>
+       <option>CODIGO</option>
+       <option>COD FABRICANTE</option>
+    </select>
+
+
+      <input id         ="busca"
+             name       ="busca"
+             type       ="text"
+             size       ="40"
+             onkeypress ="return bloqEnter(event)"
+             onKeyUp    ="EnterTab(event,'button')"
+             onkeydown  ="f(this)" />
+
+      <input type   ="button"
+             id     ="button"
+             onclick="pesquisa(document.getElementById('busca').value)"
+             value  ="Buscar..."/>
+
+    <% end %>
+    <hr/>
+    <div id="pagina">
+    </div>
+
+</div>
+
+
+
+    <%= hidden_field_tag :cliente, params[:cliente]%>
+    <script language="javascript">
+  
+      function Fecha(produto_id,produto_nome,clase_id,grupo_id,fabricante_cod,custo_us,custo_gs)
+      {
+        window.opener.document.getElementById('produto_composicao_componente_id').value          = produto_id;
+        window.opener.document.getElementById('produto_composicao_componente_nome').value        = produto_nome;
+        window.opener.document.getElementById('produto_composicao_clase_id').value            = clase_id;
+        window.opener.document.getElementById('produto_composicao_grupo_id').value            = grupo_id;
+        window.opener.document.getElementById('campo_produto').value                          = fabricante_cod;        
+        window.opener.document.getElementById('produto_composicao_ultimo_custo_dolar').value         = custo_us;
+        window.opener.document.getElementById('produto_composicao_ultimo_custo_guarani').value       = custo_gs;
+        window.opener.document.getElementById("produto_composicao_quantidade").focus();
+        self.close();
+      }
+      
+
+      function pesquisa(valor)
+
+      {
+
+            var tipo    = document.getElementById('tipo').value
+            var cliente = document.getElementById('cliente').value
+            //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+            url="/produtos/dinamic_busca_composicao_produto?tipo="+tipo+"&busca="+valor;
+
+        ajax(url);
+
+      }
+
+
+      function ajax(url)
+
+      {
+
+
+
+        //alert(nick);
+
+        //alert(dest);
+
+        //alert(msg);
+
+
+
+        req = null;
+
+        // Procura por um objeto nativo (Mozilla/Safari)
+
+        if (window.XMLHttpRequest) {
+
+          req = new XMLHttpRequest();
+
+          req.onreadystatechange = processReqChange;
+
+          req.open("GET",url,true);
+
+          req.send(null);
+
+          // Procura por uma versão ActiveX (IE)
+
+        } else if (window.ActiveXObject) {
+
+          req = new ActiveXObject("Microsoft.XMLHTTP");
+
+          if (req) {
+
+
+
+            req.onreadystatechange = processReqChange;
+
+            req.open("GET",url,true);
+
+
+
+            req.send();
+
+          }
+
+        }
+
+      }
+
+
+
+      function processReqChange()
+
+      {
+
+
+
+        // apenas quando o estado for "completado"
+
+        if (req.readyState == 4) {
+
+
+
+          // apenas se o servidor retornar "OK"
+
+
+
+          if (req.status ==200) {
+
+
+
+            // procura pela div id="pagina" e insere o conteudo
+
+            // retornado nela, como texto HTML
+
+
+
+            document.getElementById('pagina').innerHTML = req.responseText;
+
+
+
+          } else {
+
+            alert("Houve um problema ao obter os dados:n" + req.statusText);
+
+          }
+
+        }
+
+      }
+    </script>
+  
+</body>
+

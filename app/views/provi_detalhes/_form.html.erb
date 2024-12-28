@@ -1,0 +1,65 @@
+<%= form_for(@provi_detalhe) do |f| %>
+  <% if @provi_detalhe.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@provi_detalhe.errors.count, "error") %> prohibited this provi_detalhe from being saved:</h2>
+
+      <ul>
+      <% @provi_detalhe.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> provi_detalhes - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">provi_id :</td>                    
+                      <td><%= f.number_field :provi_id %></td>
+                                      
+                      <td align="right"><%= t('DATE') %> :</td>                    
+                      <td><%= f.date_select :data %></td>
+                                      
+                      <td align="right">centro_custo_id :</td>                    
+                      <td><%= f.number_field :centro_custo_id %></td>
+                                      
+                      <td align="right">rubro_id :</td>                    
+                      <td><%= f.number_field :rubro_id %></td>
+                                      
+                      <td align="right">valor_us :</td>                    
+                      <td><%= f.text_field :valor_us %></td>
+                                      
+                      <td align="right">valor_gs :</td>                    
+                      <td><%= f.text_field :valor_gs %></td>
+                                      
+                      <td align="right">valor_rs :</td>                    
+                      <td><%= f.text_field :valor_rs %></td>
+                                      
+                      <td align="right">moeda :</td>                    
+                      <td><%= f.number_field :moeda %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), provi_detalhes_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

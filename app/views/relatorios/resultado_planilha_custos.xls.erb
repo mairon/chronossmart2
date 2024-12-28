@@ -1,0 +1,346 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <ss:Styles>
+    <ss:Style ss:ID="1">
+      <ss:Font ss:Bold="1"/>
+      <ss:Interior  ss:Color="#969696" ss:Pattern="Solid"/>
+    </ss:Style>
+    <ss:Style ss:ID="2">
+      <ss:Alignment ss:Horizontal="Center"/>
+    </ss:Style>
+  </ss:Styles>
+  <Worksheet ss:Name="Sheet1">
+
+    <Table>
+			<% tot_f_us = 0 %>
+			<% tot_v_us = 0 %>
+
+			<% tot_f_gs = 0 %>
+			<% tot_v_gs = 0 %>
+
+			<% tot_f_rs = 0 %>
+			<% tot_v_rs = 0 %>
+
+			<% fat_us = 0 %>
+			<% fat_gs = 0 %>
+			<% fat_rs = 0 %>
+
+
+			<% @faturamento.each do |fat| %>
+				<% fat_us += fat.fat_us.to_f %>
+				<% fat_gs += fat.fat_gs.to_f %>
+				<% fat_rs += fat.fat_rs.to_f %>
+			<% end %>
+
+			<% @contratos_recorrentes.each do |fat| %>
+				<% fat_us += fat.divida_dolar.to_f %>
+				<% fat_gs += fat.divida_guarani.to_f %>
+				<% fat_rs += fat.divida_real.to_f %>
+			<% end %>
+
+			<% @contratos_fixos.each do |cf| %>
+				<% fat_us += cf.valor_us.to_f %>
+				<% fat_gs += cf.valor_gs.to_f %>
+				<% fat_rs += cf.valor_rs.to_f %>
+			<% end %>
+
+			<% @contratos_recorrentes_pg.each do |cr| %>
+				<% fat_us += cr.divida_dolar.to_f %>
+				<% fat_gs += cr.divida_guarani.to_f %>
+				<% fat_rs += cr.divida_real.to_f %>
+			<% end %>
+
+      <% @fixos.each do |f| %>
+        <Row>
+        	<Cell><Data ss:Type="String">Custos Fixos (CF)</Data></Cell>
+        	<Cell><Data ss:Type="String"><%= f.cod %></Data></Cell>
+        	<Cell><Data ss:Type="String"><%= f.grupo_custo_nome %></Data></Cell>
+        	<Cell><Data ss:Type="String"><%= f.desc %></Data></Cell>
+        	<% if params[:moeda] == '0' %>
+        		<Cell><Data ss:Type="Number"><%= f.valor_us.to_f %></Data></Cell>
+        		<Cell><Data ss:Type="Number"><%= ( ( f.valor_us.to_f / fat_us.to_f ) * 100 ) %></Data></Cell>
+        		<% tot_f_us += f.valor_us.to_f %>
+        	<% elsif params[:moeda] == '1' %>
+        		<Cell><Data ss:Type="Number"><%= f.valor_gs.to_f %></Data></Cell>
+        		<Cell><Data ss:Type="Number"><%= ( ( f.valor_gs.to_f / fat_gs.to_f ) * 100 ) %></Data></Cell>
+        		<% tot_f_gs += f.valor_gs.to_f %>
+        	<% else %>
+        		<Cell><Data ss:Type="Number"><%= f.valor_rs.to_f %></Data></Cell>
+        		<Cell><Data ss:Type="Number"><%= ( ( f.valor_rs.to_f / fat_rs.to_f ) * 100 ) %></Data></Cell>
+        		<% tot_f_rs += f.valor_rs.to_f %>
+        	<% end %>
+        </Row>
+      <% end %>
+
+
+			<% fopags = Relatorios.fopag(params) %>
+				<% tot_salario = 0 %>
+				<% tot_ips  = 0 %>
+				<% tot_prov = 0 %>
+				<% @tot_fopag = 0 %>
+				<% qtd_1  = 0 %>
+				<% qtd_5  = 0 %>
+				<% qtd_10 = 0 %>
+				<% qtd_11 = 0 %>
+
+				<% sal_1  = 0 %>
+				<% sal_5  = 0 %>
+				<% sal_10 = 0 %>
+				<% sal_11 = 0 %>
+				<% calc_tempo = 0 %>
+
+
+				<% ferias_um_terco = 0 %>
+				<% ferias = 0 %>
+				<% fgts_ferias = 0 %>
+				<% fgts_decimo = 0 %>
+				<% calc_tempo = 0 %>
+				<% multa_fgts = 0  %>
+				<% fopags.each do |f| %>
+							<% calc_tempo = (( ("#{params[:inicio]}").to_date - f.data_entrada.to_date) / 30 ).round %>
+							<% if calc_tempo.to_i < 0 %>
+								<% tempo = 0 %>
+							<% else %>
+								<% tempo = calc_tempo %>
+							<% end %>
+							<% if tempo.to_i < 12 %>
+								<% qtd_1  += 1 %>
+								<% sal_1  += f.salario.to_f %>
+							<% end %>
+							<% if tempo.to_i >= 12 and tempo.to_i < 60 %>
+								<% qtd_5  += 1 %>
+								<% sal_5  += f.salario.to_f %>
+							<% end %>
+							<% if tempo.to_i >= 60 and tempo.to_i < 120 %>
+								<% qtd_10 += 1 %>
+								<% sal_10 += f.salario.to_f %>
+							<% end %>
+							<% if tempo.to_i >= 120 %>
+								<% qtd_11 += 1 %>
+								<% sal_11 += f.salario.to_f %>
+							<% end %>
+				<% end %>
+
+				<% tot_salario = sal_1.to_f + sal_5.to_f + sal_11.to_f + sal_11.to_f %>
+				<% tot_ips = ((sal_1.to_f + sal_5.to_f + sal_11.to_f + sal_11.to_f) * 0.08) %>
+				<% agui = (sal_1.to_f + sal_5.to_f + sal_11.to_f + sal_11.to_f) / 12 %>
+				<% fgts_decimo = (agui.to_f * 0.08)  %><
+
+				<% fer_5 = ( (sal_1.to_f + sal_5.to_f)) / 12 %>
+				<% fer_10 = ( (sal_1.to_f + sal_5.to_f)) / 12 %>
+				<% fer_11 = ( (sal_1.to_f + sal_5.to_f)) / 12 %>
+				<% agui  %>
+				<% ferias_um_terco =  (tot_salario.to_f / 3 / 12 ) %>
+				<% ferias = (tot_salario.to_f / 12 )  %>
+				<% fgts_ferias = ( (ferias_um_terco.to_f + ferias.to_f) * 0.08) %>
+				<% multa_fgts =  (fgts_ferias.to_f + tot_ips.to_f + fgts_decimo.to_f) * 0.4 %>
+				<% @tot_fopag = ( tot_ips.to_f + fgts_decimo.to_f + agui.to_f + ferias_um_terco.to_f + ferias.to_f + fgts_ferias.to_f + multa_fgts.to_f ) %>
+
+      <Row>
+      	<Cell><Data ss:Type="String">Custos Fixos (CF)</Data></Cell>
+      	<Cell><Data ss:Type="String">FOPAG</Data></Cell>
+      	<Cell><Data ss:Type="String">PROVISIONAMENTOS</Data></Cell>
+      	<Cell><Data ss:Type="String">PROVISIONAMENTOS</Data></Cell>
+      	<Cell><Data ss:Type="Number"><%= @tot_fopag.to_f  %></Data></Cell>
+      	<Cell><Data ss:Type="Number"><%= ((@tot_fopag.to_f / fat_rs.to_f ) * 100 ) %></Data></Cell>
+      </Row>
+
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String">Total Custos Fixos (CF)</Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <% if params[:moeda] == '0' %>
+          <Cell><Data ss:Type="Number"><%= @tot_fopag.to_f + @depreciacao.to_f + tot_f_us %></Data></Cell>
+          <Cell><Data ss:Type="Number"><%= ( ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_us) / fat_us.to_f ) * 100 ) %></Data></Cell>
+        <% elsif params[:moeda] == '1' %>
+          <Cell><Data ss:Type="Number"><%= @tot_fopag.to_f + @depreciacao.to_f + tot_f_gs %></Data></Cell>
+          <Cell><Data ss:Type="Number"><%= ( ( (@tot_fopag.to_f + @depreciacao.to_f + tot_f_gs) / fat_gs.to_f ) * 100 ) %></Data></Cell>
+        <% else %>
+          <Cell><Data ss:Type="Number"><%= @tot_fopag.to_f + @depreciacao.to_f + tot_f_rs %></Data></Cell>
+          <Cell><Data ss:Type="Number"><%= ( ( (@tot_fopag.to_f + @depreciacao.to_f + tot_f_rs) / fat_rs.to_f ) * 100 ) %></Data></Cell>
+        <% end %>
+      </Row>
+
+      <% @variaveis.each do |f| %>
+        <Row>
+        	<Cell><Data ss:Type="String">Custos Variaveis (CV)</Data></Cell>
+        	<Cell><Data ss:Type="String"><%= f.cod %></Data></Cell>
+        	<Cell><Data ss:Type="String"><%= f.grupo_custo_nome %></Data></Cell>
+        	<Cell><Data ss:Type="String"><%= f.desc %></Data></Cell>
+        	<% if params[:moeda] == '0' %>
+        		<Cell><Data ss:Type="Number"><%= f.valor_us.to_f %></Data></Cell>
+        		<Cell><Data ss:Type="Number"><%= ( ( f.valor_us.to_f / fat_us.to_f ) * 100 ) %></Data></Cell>
+        		<% tot_v_us += f.valor_us.to_f %>
+        	<% elsif params[:moeda] == '1' %>
+        		<Cell><Data ss:Type="Number"><%= f.valor_gs.to_f %></Data></Cell>
+        		<Cell><Data ss:Type="Number"><%= ( ( f.valor_gs.to_f / fat_gs.to_f ) * 100 ) %></Data></Cell>
+        		<% tot_v_gs += f.valor_gs.to_f %>
+        	<% else %>
+        		<Cell><Data ss:Type="Number"><%= f.valor_rs.to_f %></Data></Cell>
+        		<Cell><Data ss:Type="Number"><%= ( ( f.valor_rs.to_f / fat_rs.to_f ) * 100 ) %></Data></Cell>
+        		<% tot_v_rs += f.valor_rs.to_f %>
+        	<% end %>
+        </Row>
+      <% end %>
+
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String">Total Custo Variavel (CV)</Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <% if params[:moeda] == '0' %>
+          <Cell><Data ss:Type="Number"><%= tot_v_us %></Data></Cell>
+          <Cell><Data ss:Type="Number"><%= ( ( tot_v_us.to_f / fat_us.to_f ) * 100 ) %></Data></Cell>
+        <% elsif params[:moeda] == '1' %>
+          <Cell><Data ss:Type="Number"><%= tot_v_gs %></Data></Cell>
+          <Cell><Data ss:Type="Number"><%= ( ( tot_v_gs.to_f / fat_gs.to_f ) * 100 ) %></Data></Cell>
+        <% else %>
+          <Cell><Data ss:Type="Number"><%= tot_v_rs %></Data></Cell>
+          <Cell><Data ss:Type="Number"><%= ( ( tot_v_rs.to_f / fat_rs.to_f ) * 100 ) %></Data></Cell>
+        <% end %>
+      </Row>
+
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String">Total Custos (CT = CF + CV)</Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <% if params[:moeda] == '0' %>
+          <Cell><Data ss:Type="Number"><%= (@tot_fopag.to_f + @depreciacao.to_f + tot_f_us) + tot_v_us.to_f %></Data></Cell>
+          <Cell><Data ss:Type="Number"><%= ( ( ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_us) + tot_v_us.to_f) / fat_us.to_f ) * 100 ) %></Data></Cell>
+        <% elsif params[:moeda] == '1' %>
+          <Cell><Data ss:Type="Number"><%= tot_f_gs.to_f + tot_v_gs.to_f %></Data></Cell>
+          <Cell><Data ss:Type="Number"><%= ( ( (tot_f_gs.to_f + tot_v_gs.to_f) / fat_gs.to_f ) * 100 ) %></Data></Cell>
+        <% else %>
+          <Cell><Data ss:Type="Number"><%= (@tot_fopag.to_f + @depreciacao.to_f + tot_f_rs.to_f) + tot_v_rs.to_f %></Data></Cell>
+          <Cell><Data ss:Type="Number"><%= ( ( ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_rs.to_f) + tot_v_rs.to_f) / fat_rs.to_f ) * 100 ) %></Data></Cell>
+        <% end %>
+      </Row>
+
+      <% @contratos_recorrentes.each do |cr| %>
+        <Row>
+        	<Cell><Data ss:Type="String">Faturamento</Data></Cell>
+        	<Cell><Data ss:Type="String"></Data></Cell>
+        	<Cell><Data ss:Type="String">Contrato Recorrentes</Data></Cell>
+        	<Cell><Data ss:Type="String"><%= cr.centro_custo_nome %></Data></Cell>
+        	<% if params[:moeda] == '0' %>
+        		<Cell><Data ss:Type="Number"><%= cr.divida_dolar.to_f %></Data></Cell>
+        		<Cell><Data ss:Type="Number"><%= ( ( cr.divida_dolar.to_f / fat_us.to_f ) * 100 ) %></Data></Cell>
+        	<% elsif params[:moeda] == '1' %>
+        		<Cell><Data ss:Type="Number"><%= cr.divida_guarani.to_f %></Data></Cell>
+        		<Cell><Data ss:Type="Number"><%= ( ( cr.divida_guarani.to_f / fat_gs.to_f ) * 100 ) %></Data></Cell>
+        	<% else %>
+        		<Cell><Data ss:Type="Number"><%= cr.divida_real.to_f %></Data></Cell>
+        		<Cell><Data ss:Type="Number"><%= ( ( cr.divida_real.to_f / fat_rs.to_f ) * 100 ) %></Data></Cell>
+        	<% end %>
+        </Row>
+      <% end %>
+
+      <% @contratos_recorrentes_pg.each do |cr| %>
+        <Row>
+        	<Cell><Data ss:Type="String">Faturamento</Data></Cell>
+        	<Cell><Data ss:Type="String"></Data></Cell>
+        	<Cell><Data ss:Type="String">Contrato Recorrentes</Data></Cell>
+        	<Cell><Data ss:Type="String"><%= cr.centro_custo_nome %></Data></Cell>
+        	<% if params[:moeda] == '0' %>
+        		<Cell><Data ss:Type="Number"><%= cr.divida_dolar.to_f %></Data></Cell>
+        		<Cell><Data ss:Type="Number"><%= ( ( cr.divida_dolar.to_f / fat_us.to_f ) * 100 ) %></Data></Cell>
+        	<% elsif params[:moeda] == '1' %>
+        		<Cell><Data ss:Type="Number"><%= cr.divida_guarani.to_f %></Data></Cell>
+        		<Cell><Data ss:Type="Number"><%= ( ( cr.divida_guarani.to_f / fat_gs.to_f ) * 100 ) %></Data></Cell>
+        	<% else %>
+        		<Cell><Data ss:Type="Number"><%= cr.divida_real.to_f %></Data></Cell>
+        		<Cell><Data ss:Type="Number"><%= ( ( cr.divida_real.to_f / fat_rs.to_f ) * 100 ) %></Data></Cell>
+        	<% end %>
+        </Row>
+      <% end %>
+
+      <% @contratos_fixos.each do |cr| %>
+        <Row>
+        	<Cell><Data ss:Type="String">Faturamento</Data></Cell>
+        	<Cell><Data ss:Type="String"></Data></Cell>
+        	<Cell><Data ss:Type="String">Contratos Fixos</Data></Cell>
+        	<Cell><Data ss:Type="String"><%= cr.centro_custo_nome %></Data></Cell>
+        	<% if params[:moeda] == '0' %>
+        		<Cell><Data ss:Type="Number"><%= cr.valor_us.to_f %></Data></Cell>
+        		<Cell><Data ss:Type="Number"><%= ( ( cr.valor_us.to_f / fat_us.to_f ) * 100 ) %></Data></Cell>
+        	<% elsif params[:moeda] == '1' %>
+        		<Cell><Data ss:Type="Number"><%= cr.valor_gs.to_f %></Data></Cell>
+        		<Cell><Data ss:Type="Number"><%= ( ( cr.valor_gs.to_f / fat_gs.to_f ) * 100 ) %></Data></Cell>
+        	<% else %>
+        		<Cell><Data ss:Type="Number"><%= cr.valor_rs.to_f %></Data></Cell>
+        		<Cell><Data ss:Type="Number"><%= ( ( cr.valor_rs.to_f / fat_rs.to_f ) * 100 ) %></Data></Cell>
+        	<% end %>
+        </Row>
+      <% end %>
+
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String">Faturamento</Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <% if params[:moeda] == '0' %>
+          <Cell><Data ss:Type="Number"><%= fat_us %></Data></Cell>
+          <Cell><Data ss:Type="Number"></Data></Cell>
+        <% elsif params[:moeda] == '1' %>
+          <Cell><Data ss:Type="Number"><%= fat_gs %></Data></Cell>
+          <Cell><Data ss:Type="Number"></Data></Cell>
+        <% else %>
+          <Cell><Data ss:Type="Number"><%= fat_rs %></Data></Cell>
+          <Cell><Data ss:Type="Number"></Data></Cell>
+        <% end %>
+      </Row>
+
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String">Lucro</Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <% if params[:moeda] == '0' %>
+          <Cell><Data ss:Type="Number"><%= lc = (fat_us.to_f - ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_us) + tot_v_us.to_f)) %></Data></Cell>
+          <Cell><Data ss:Type="Number"><%= ( (fat_us.to_f - ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_us) + tot_v_us.to_f)) / fat_us.to_f ) * 100 %> </Data></Cell>
+        <% elsif params[:moeda] == '1' %>
+          <Cell><Data ss:Type="Number"><%= lc = (fat_gs.to_f - ( tot_f_gs.to_f + tot_v_gs.to_f )) %></Data></Cell>
+          <Cell><Data ss:Type="Number"><% ( (fat_gs.to_f - ( tot_f_gs.to_f + tot_v_gs.to_f )) / fat_gs.to_f ) * 100 %></Data></Cell>
+        <% else %>
+          <Cell><Data ss:Type="Number"><%= lc = (fat_rs.to_f - ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_rs) + tot_v_rs.to_f )) %></Data></Cell>
+          <Cell><Data ss:Type="Number"><%= ( (fat_rs.to_f - ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_rs) + tot_v_rs.to_f )) / fat_rs.to_f ) * 100 %></Data></Cell>
+        <% end %>
+      </Row>
+
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String">Ponto de Equilibrio</Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <% if params[:moeda] == '0' %>
+          <% pe = ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_us) /  (1 - (( tot_v_us.to_f / fat_us.to_f )))) %>
+          <% if lc > 0 %>
+            <Cell><Data ss:Type="Number"><%= pe %></Data></Cell>
+          <% else %>
+            <Cell><Data ss:Type="Number">NA</Data></Cell>
+          <% end %>
+        <% elsif params[:moeda] == '1' %>
+          <% pe = ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_gs) / (1 - (( tot_v_gs.to_f / fat_gs.to_f )))) %>
+          <% if lc > 0 %>
+            <Cell><Data ss:Type="Number"><%= pe %></Data></Cell>
+          <% else %>
+            <Cell><Data ss:Type="Number">NA</Data></Cell>
+          <% end %>
+        <% else %>
+          <% pe = ((@tot_fopag.to_f + @depreciacao.to_f + tot_f_rs) / (1 - (( tot_v_rs.to_f / fat_rs.to_f )))) %>
+          <% if lc > 0 %>
+            <Cell><Data ss:Type="Number"><%= pe %></Data></Cell>
+          <% else %>
+            <Cell><Data ss:Type="Number">NA</Data></Cell>
+          <% end %>
+        <% end %>
+      </Row>
+    </Table>
+  </Worksheet>
+</Workbook>

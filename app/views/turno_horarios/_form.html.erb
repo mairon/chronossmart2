@@ -1,0 +1,59 @@
+<%= form_for(@turno_horario) do |f| %>
+  <% if @turno_horario.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@turno_horario.errors.count, "error") %> prohibited this turno_horario from being saved:</h2>
+
+      <ul>
+      <% @turno_horario.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> turno_horarios - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">turno_id :</td>                    
+                      <td><%= f.number_field :turno_id %></td>
+                                      
+                      <td align="right">dia_semana :</td>                    
+                      <td><%= f.text_field :dia_semana %></td>
+                                      
+                      <td align="right">entrada_01 :</td>                    
+                      <td><%= f.time_select :entrada_01 %></td>
+                                      
+                      <td align="right">saida_01 :</td>                    
+                      <td><%= f.time_select :saida_01 %></td>
+                                      
+                      <td align="right">entrada_02 :</td>                    
+                      <td><%= f.time_select :entrada_02 %></td>
+                                      
+                      <td align="right">saida_02 :</td>                    
+                      <td><%= f.time_select :saida_02 %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', turno_horarios_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

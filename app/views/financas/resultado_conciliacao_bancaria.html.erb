@@ -1,0 +1,332 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+     <header class="panel-heading link-prod">
+      Conciliação Bancaria
+
+     </header>
+      <div class="panel-content">
+         <%= form_tag resultado_conciliacao_bancaria_financas_path, :method => :get do %>
+            <table>
+							<tr>
+                <td>
+                  <label>Filtro Data</label>
+                  <% if params[:filtro_data] == 'data' %>
+	                    <%= radio_button_tag :filtro_data, 'data', checked: true %> Data Lanç.
+	                    <%= radio_button_tag :filtro_data, 'data_conciliacao' %> Data Conf. Cliente
+                    <% else %>
+	                    <%= radio_button_tag :filtro_data, 'data' %> Data Lanç.
+	                    <%= radio_button_tag :filtro_data, 'data_conciliacao', checked: true %> Data Conf. Cliente
+                    <% end %>
+                </td>
+                <td colspan="4">
+                  <label>Periodo</label>
+                  <%= text_field_tag :inicio, params[:inicio], size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+                  <div class="input-group-addon-f">
+                    <span class="icon-calendar"></span>
+                  </div>
+                  <div class="date-separ"><%= t('TO') %></div>
+                  <%= text_field_tag :final, params[:final], size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+                  <div class="input-group-addon-f">
+                  <span class="icon-calendar"></span>
+                  </div>
+                </td>
+							</tr>
+              <tr>
+                <input name="filtro"  id="filtro"   size="10" type="hidden" value="0"/></td>
+
+								<td>
+                  <label style="color: #fff">.</label>
+                  <fieldset>
+                  	<% if params[:entrada_saida] == 'entrada' %>
+	                    <%= radio_button_tag :entrada_saida, 'entrada',  :Checked => "True" %> Entrada
+	                    <%= radio_button_tag :entrada_saida, 'saida' %> Saida
+	                    <%= radio_button_tag :entrada_saida, '' %> Todos
+	                   <% elsif params[:entrada_saida] == 'saida' %>
+	                    <%= radio_button_tag :entrada_saida, 'entrada' %> Entrada
+	                    <%= radio_button_tag :entrada_saida, 'saida',  :Checked => "True" %> Saida
+	                    <%= radio_button_tag :entrada_saida, '' %> Todos
+	                  <% else %>
+	                    <%= radio_button_tag :entrada_saida, 'entrada' %> Entrada
+	                    <%= radio_button_tag :entrada_saida, 'saida' %> Saida
+	                    <%= radio_button_tag :entrada_saida, '',  :Checked => "True" %> Todos
+	                   <% end -%>
+
+                  </fieldset>
+                </td>
+                <td style="padding:0px 10px;">
+                  <label style="color: #fff">.</label>
+                  <fieldset>
+                    <% if params[:conciliacao] == 'false' %>
+                      <%= radio_button_tag :conciliacao, 'false',  :Checked => "True"%> Pendentes
+                      <%= radio_button_tag :conciliacao, 'true' %> Conciliados
+                      <%= radio_button_tag :conciliacao, '' %> Todos
+                      <input name="tipo_data"  id="tipo_data"   size="10" type="hidden" value="0"/></td>
+                    <% elsif params[:conciliacao] == 'true' %>
+                      <%= radio_button_tag :conciliacao, 'false'%> Pendentes
+                      <%= radio_button_tag :conciliacao, 'true',  :Checked => "True" %> Conciliados
+                      <%= radio_button_tag :conciliacao, '' %> Todos
+                      <input name="tipo_data"  id="tipo_data"   size="10" type="hidden" value="0"/></td>
+                    <% else %>
+                      <%= radio_button_tag :conciliacao, 'false'%> Pendentes
+                      <%= radio_button_tag :conciliacao, 'true' %> Conciliados
+                      <%= radio_button_tag :conciliacao, '',  :Checked => "True" %> Todos
+                      <input name="tipo_data"  id="tipo_data"   size="10" type="hidden" value="0"/></td>
+                    	
+                    <% end %>
+                  </fieldset>
+                </td>
+                <td style="padding-right:5px;">
+                  <label><%= t('ACCOUNT') %></label>
+                    <%= select("busca", "conta", 
+                      Conta.all(:select => 'id,nome', conditions: 'tipo = 1', order: 'nome').collect {|p| [ p.nome, p.id ] },
+                      {:selected => params[:busca]["conta"], :prompt => 'Todos'},{:style => "width:250px"}) %>
+                </td>
+                <td style="padding-right:5px;">
+                  <label>Cliente</label>
+                  <%= select("busca", "persona",
+                    Persona.all(:select => 'id,nome', conditions: 'tipo_cliente = 1', order: 'nome').collect {|p| [ p.nome, p.id ] },
+                    {:selected => params[:busca]["persona"], :prompt => 'Todos'})   %>
+                </td>
+
+                <td>
+                  <label style="color: #fff">.</label>
+                  <%= submit_tag 'Filtrar', class: 'btn btn-blue' %>
+                </td>
+               </tr>
+            <% end %>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row header">
+  <div class="col-md-12">
+    <div class="panel">
+			<table>
+	      <tr class="header" style="background-color: #E5E5EF;">
+		      <td width="120" align="center"><%= t('DOC') %></td>
+		      <td width="140" align="center"><%= t('DATE') %> Conf. Cliente</td>
+		      <td width="70" align="center"><%= t('DATE') %> Lanç.</td>
+		      <td width="80" align="right">Credito</td>
+		      <td width="90" align="right">Debito</td>
+		      <% if params[:conciliacao] == 'true' %>
+		      	<td width="80" align="right"><b>Saldo</b></td>
+		      <% end %>
+		      <td width="180">Conta</td>
+		      <td width="150">Cliente</td>
+		      <td width="300">Obs.</td>
+		    </tr>
+	    </table>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+			<table>
+					<% if params[:conciliacao] == 'true' %>
+
+					<% @financas_anterior = Financa.relatorio_financas_saldo_anterior(params) %>
+					<% saldo = @financas_anterior.to_f %>
+						<tr>
+							<td colspan="6"></td>
+							<td width="80" align="right"><b><%= format_decimal(@financas_anterior) %></b></td>
+							<td></td>
+							<td></td>
+							<td>Saldo Anterior</td>
+						</tr>
+					<% end %>
+
+
+			      <% sub_tot_deb  = 0 %>
+			      <% sub_tot_cred = 0 %>
+			      <% quebra  = '' %>
+			      <% saldo_rs = 0 %>
+			      <%= form_tag update_individual_financas_path :method => :put do %>
+				      <% @financas.each do |b| %>
+								<% if params[:group_doc] == '1' %>
+
+									<% if quebra != b.documento_numero %>
+									  <% if quebra != "" %>
+									    <tr class="head">
+											    	<td colspan="5"></td>
+										        <td  style="padding: 10px">Total:</td>
+										        <% if b.moeda.to_i == 0 %>
+											        <td width="80" align="right"><b><%= format_decimal(sub_tot_cred.to_f) %></b></td>
+											        <td width="80" align="right"><b><%= format_decimal(sub_tot_deb.to_f) %></b></td>
+										        <% elsif b.moeda.to_i == 2 %>
+											        <td width="80" align="right"><b><%= format_decimal(sub_tot_cred.to_f) %></b></td>
+											        <td width="80" align="right"><b><%= format_decimal(sub_tot_deb.to_f) %></b></td>
+										        <% else %>
+											        <td width="80" align="right"><b><%= format_int(sub_tot_cred.to_f) %></b></td>
+											        <td width="80" align="right"><b><%= format_int(sub_tot_deb.to_f) %></b></td>
+										        <% end %>
+
+										        <% sub_tot_deb  = 0 %>
+										        <% sub_tot_cred = 0 %>
+										      </tr>
+										    </table>
+											</div>
+									  </div>
+								  </div>
+									<% end %>
+									<div class="row">
+									  <div class="col-md-12">
+									    <div class="panel">
+									    	<table>
+											    <tr>
+											    	<td class="head" align="center" style="padding: 10px"><b><%= quebra = b.documento_numero %></td>
+											    	<td align="center"><input type="checkbox" id="<%= quebra %>" value="<%= quebra %>" onclick="Seleciona('<%= quebra %>')"></td>
+											    </tr>
+									<% end %>
+								<% end %>
+				      	<%= fields_for "financas[]", b do |f| %>
+				         <tr class = "<%= cycle("cor1", "cor2") %>">
+				            <td width="120" align="center">
+				            	<%= b.id %>
+				            	<span class="label label-success"><small><%= b.usuario_nome %></small></span>
+				            	</td>
+				            <td width="20" align="center"><%= f.check_box :conciliacao, {onclick:"diferido(#{b.id})", class: "#{quebra}"} %></td>
+				            <td width="80">
+				            	<%= f.text_field :data_conciliacao, size: 10, onkeyup: "Formatadata(this,event)"  %>
+											<%= f.hidden_field :diferido, size: 10  %>
+											<%= f.hidden_field :data, size: 10  %>
+				            </td>
+										<td width="60" align="center"> <%= b.data.strftime("%d/%m/%y")%></td>
+										<% if b.moeda.to_i == 0 %>
+					            <td width="80" align="right">   <%= format_decimal(b.entrada_dolar)  %></td>
+					            <td width="80" align="right">   <%= format_decimal(b.saida_dolar)  %></td>
+								      <% sub_tot_deb  += b.saida_dolar.to_f %>
+								      <% sub_tot_cred += b.entrada_dolar.to_f %>
+
+											<% if params[:conciliacao] == 'true' %>
+													<td width="80" align="right"><b><%= format_decimal(saldo += (b.entrada_dolar.to_f - b.saida_dolar.to_f)) %></b></td>
+											<% end %>
+
+										<% elsif b.moeda.to_i == 2 %>
+					            <td width="80" align="right" style="font-family: 'prox-bold';"><%= format_decimal(b.entrada_real)  %></td>
+					            <td width="80" align="right" style="font-family: 'prox-bold';"><%= format_decimal(b.saida_real)  %></td>
+								      <% sub_tot_deb  += b.saida_real.to_f %>
+								      <% sub_tot_cred += b.entrada_real.to_f %>
+								      <% saldo_rs += (b.entrada_real.to_f - b.saida_real.to_f) %>
+
+											<% if params[:conciliacao] == 'true' %>
+													<td width="80" align="right"><b><%= format_decimal(saldo += (b.entrada_real.to_f - b.saida_real.to_f)) %></b></td>
+											<% end %>
+
+				            <% else %>
+					            <td width="80" align="right">   <%= format_int(b.entrada_guarani)  %></td>
+					            <td width="80" align="right">   <%= format_int(b.saida_guarani)  %></td>
+								      <% sub_tot_deb  += b.saida_guarani.to_f %>
+								      <% sub_tot_cred += b.entrada_guarani.to_f %>
+
+											<% if params[:conciliacao] == 'true' %>
+													<td width="80" align="right"><b><%= format_int(saldo += (b.entrada_guarani.to_f - b.saida_guarani.to_f)) %></b></td>
+											<% end %>
+
+				            <% end %>
+
+											<td width="180"><small><%= b.conta_nome %></small></td>
+											<td width="150"><small><%= b.persona_nome %></small></td>
+										  <td width="300" align="left" style="padding: 5px">
+										  	<small><%= h b.concepto %></small>
+										  </td>
+
+				         </tr>
+				        <% end %>
+				      <% end %>
+				      <tr>
+				      	<td colspan="5" align="right"> <b> Saldo ==></b></td>
+				      	<td class="b"> <b> <%= format_decimal(saldo_rs) %></b></td>
+				      </tr>
+			      </table>
+				      <br>
+				      <br>
+				      <br>
+				      <br>
+				      <br>
+				      <br>
+				      <br>
+				      <br>
+				      <br>
+				      <br>
+
+			      <div class="bt-conciliacao">
+			      	<%= submit_tag "Conciliar" , :class => "btn btn-green", :disable_with => "Concilando..." %>
+			      </div>
+			      <% end %>
+    </div>
+  </div>
+</div>
+
+<script LANGUAGE="JavaScript">  
+
+     <!--  
+     function diferido(campo) { 
+      var data_diferido = document.getElementById( 'financas_' + campo + '_data').value;
+
+      if( $('#financas_' + campo + '_conciliacao').is(':checked')) {
+          $('#financas_' + campo + '_data_conciliacao').val(data_diferido)
+      } else {
+          $('#financas_' + campo + '_data_conciliacao').val('')
+      }
+     }  
+     //-->  
+     function Seleciona(s){
+       if( $('#' + s).is(':checked')) {
+		       $('.' + s).each(function() {
+           	this.checked = true;
+						$('.' + s).each(function(index, value){
+							var id = $(this).attr("id");
+			      	var data_diferido = document.getElementById( 'financas_' + id.replace(/[^0-9]/g,'') + '_data').value;
+		          $('#financas_' + id.replace(/[^0-9]/g,'') + '_data_conciliacao').val(data_diferido);
+						});
+		       });
+		   } else {
+		      $('.' + s).each(function() {
+		           this.checked = false;
+								$('.' + s).each(function(index, value){
+									var id = $(this).attr("id");
+				      		var data_diferido = document.getElementById( 'financas_' + id.replace(/[^0-9]/g,'') + '_data').value;
+			          $('#financas_' + id.replace(/[^0-9]/g,'') + '_data_conciliacao').val('');
+								});
+
+		       });
+		   } 
+		}
+</SCRIPT>
+<script>
+
+$(window).scroll(function () {
+    if ($(window).scrollTop() > 226) {
+        $(".header").addClass("fixed");
+    } else {
+        $(".header").removeClass("fixed");
+    }
+});
+
+</script>
+
+<style>
+
+.fixed {
+    position:fixed;
+    top:0;
+    z-index: 999999;
+    background-color: #fff;
+    font-weight: bold;
+    width: 1140px;
+}
+
+td{
+	padding:  10px;
+}
+
+.bt-conciliacao{
+    position:fixed;
+    bottom:0;
+}
+</style>

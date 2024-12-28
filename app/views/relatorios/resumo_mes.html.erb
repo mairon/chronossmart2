@@ -1,0 +1,38 @@
+<h1 align="right" id="header">.</h1>
+Resumen del Mes
+<div class="group">
+  <h2>
+    <%= form_tag resultado_resumo_mes_relatorios_path, :method => "get" do%>
+      <table>
+
+        <tr valign="top">
+          <td> <%= t('DATE') %>:</td>
+          <td>
+            <fieldset>
+              <table>
+                <tr>
+                  <td>
+                    Mes<input name="mes" id="mes"  size="5"/>
+                    Año<input name="ano" id="ano"  size="5"/>
+                  </td>
+                </tr>
+              </table>
+            </fieldset>
+          </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>
+            <input type="submit" value="        Informe        " onclick="Tipo('0')"/>
+            <input type="submit" value="          Excel          " onclick="Tipo('1')"/>
+          </td>
+
+        </tr>
+
+        <input type="hidden" name="tipo" id="tipo"  size="5" value="0"/>
+      </table>
+    <% end %>
+  </h2>
+</div>
+
+

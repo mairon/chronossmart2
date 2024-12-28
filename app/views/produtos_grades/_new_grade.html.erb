@@ -1,0 +1,46 @@
+<%= form_for(produtos_grade) do |f| %>
+  <% if produtos_grade.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(produtos_grade.errors.count, "error") %> prohibited this produtos_grade from being saved:</h2>
+
+      <ul>
+      <% produtos_grade.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= f.hidden_field :produto_id %>
+  <%= f.hidden_field :fabricante_id, :value => @produto.fabricante_id %>
+  <table>
+  <tr>
+    <td>
+      <fieldset>
+        <table>
+          <tr>
+              <td width="225"><%= f.text_field :barra, :placeholder => 'Barra'  %></td>
+
+              <td width="255">
+              <%= f.collection_select :cor_id, Cor.all(:conditions => ["persona_id = #{@produto.fabricante_id}"], :select => 'id,nome',:order => '2'),:id,:nome,
+                                     {:prompt => 'Color' } %>
+
+              </td>
+
+              <td width="225">
+              <%= f.collection_select :tamanho_id, Tamanho.all(:select => 'id,nome',:order => '2'),:id,:nome,
+                                     {:prompt => 'Tamanho' }  %>
+
+              </td>
+              <td><%= f.submit :value => t('SAVE'), :disable_with => "Aguarde...", :class => "button", :id => 'button' %></td>
+          </tr>
+        </table>
+      </fieldset>
+    </td>
+  </tr>
+  </table>
+<% end %>
+<script>
+  $("#produtos_grade_barra").focus();
+</script>
+
+

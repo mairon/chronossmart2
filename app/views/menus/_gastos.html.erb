@@ -1,0 +1,52 @@
+<div class="panel">
+	<h1 id="header">
+    <%= t('LAST') %> 15 <%= t('EXPENSES') %>s
+  </h1>  
+	<div class="group">
+	   <table class="head_grid">
+	      <tr>
+	         <td width="100" align="center"><%= t('DATE') %></td>
+	         <td width="80">Proc</td>
+	         <td width="60"><%= t('TYPE') %></td>
+	         <td width="325" ><%= t('CLIENT') %></td>
+	         <td width="160" ><%= t('DOC') %></td>
+	         <td width="355" ><%= t('RUBLE') %></td>
+	         <td width="55"></td>
+	         <td width="70" align="right"><%= t('VALUE') %></td>
+
+	      </tr>
+	   </table>  
+	   <div class="rolagem" id="div" style="height: 250px">
+	      <table>
+	         <% @gastos.each do |d| %>
+	            <tr class="<%= cycle("cor1", "cor2")%>">
+	              <td width="80" align="center"><%= d.data.strftime("%d/%m/%y") %></td>
+	              <td width="60">
+              		<%= d.id.to_s.rjust(6,'0') %>
+	              </td>
+	              <td width="60">
+	              	<% if d.tipo.to_i == 0 %>
+	              		CT
+	              	<% else %>
+	              		CR
+	              	<% end %>	
+	              </td>
+	              <td width="355"><%= truncate(d.persona_nome, length: 20) %></td>
+	              <td width="160"><%= d.documento_numero_01 %>.<%= d.documento_numero_02 %>.<%= d.documento_numero %></td>
+	              <td width="355"><%= d.compras_custos.last.rubro.descricao unless d.compras_custos.last.nil? %></td>
+			          <% if d.moeda.to_i == 1 %>
+			            <td width="50"  align="center"><span class="gs">Gs</span></td>
+			            <td width="70" align="right"><%= format_int(d.total_guarani) %></td>
+			          <% elsif d.moeda.to_i == 0 %>
+			            <td width="50"  align="center"><span class="us">U$</span></td>
+			            <td width="70" align="right"><%= format_decimal(d.total_dolar) %></td>
+			          <% else %>
+			            <td width="50"  align="center"><span class="rs">R$</span></td>
+			            <td width="70" align="right"><%= format_decimal(d.total_real) %></td>
+			          <% end %>
+	            </tr>
+	         <% end %>
+	      </table>
+	   </div>
+	</div>
+</div>

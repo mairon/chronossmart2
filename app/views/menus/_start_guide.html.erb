@@ -1,0 +1,49 @@
+<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,100italic,400italic%7CRoboto+Condensed&amp;lang=pt-BR" rel="stylesheet">
+	<%= stylesheet_link_tag 'enjoyhint/enjoyhint', :media => 'all'%>
+	<%= javascript_include_tag 'enjoyhint/enjoyhint.min' %>
+
+<div class="start-guide">
+	<h1><span class="text-animated-one">Hola</span>, <span class="text-animated-two">instrucciones que te ayudaran a dar los primeros pasos para implementar tu</span> <span class="logo-text">Smart</span></h1>
+	<ul>
+		<% if Unidade.where(nome_sys: '').count != 0 %>
+			<li><a href="#" data-toggle="modal" data-target="#ModalCadastroUnidade">1 - Primero vamos registrar tus datos</a></li>
+		<% else %>
+			<strike><li><a href="#"> 1 - Primero vamos registrar tus datos</a></li></strike>
+		<% end %>
+
+		<% if Conta.count == 0 %>
+			<li><a href="#" id="etapa2">2 - Registro de caja y bancos</a></li>
+		<% else %>
+			<strike><li><a href="#">2 - Registro de caja y bancos</a></li></strike>
+		<% end %>
+
+		<% if Produto.count == 0 %>
+			<li><a href="#" id="etapa3"> 3 - Registro de Productos</a></li>
+		<% else %>
+			<strike><li><a href="#"> 3 - Registro de Productos</a></li></strike>
+		<% end %>
+
+		<% if Persona.count == 0 %>
+			<li><a href="#" id="etapa4"> 4 - Registro de Personas</li>
+		<% else %>
+			<strike><li><a href="#"> 4 - Registro de Personas</a></li></strike>
+		<% end %>
+	</ul>
+</div>
+
+<!-- Modal cadastro básicos -->
+<div class="modal fade " id="ModalCadastroUnidade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="myModalLabel">Catastro de la Empresa</h4>
+			</div>
+			<div class="modal-body">
+			<%= render :partial=>"/unidades/modal", :locals=>{unidade: Unidade.find(current_unidade.id)} %>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%= javascript_include_tag 'hint-sequence' %>

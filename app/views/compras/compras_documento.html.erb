@@ -1,0 +1,28 @@
+<ul class="tabs">
+  <li><a href="#tab1">Compra Doc. - [<%= t('EDITION') %>]</a></li>
+</ul>
+<div class="tab_container">
+  <div id="tab1" class="tab_content">
+  <input type="hidden" name="cotacao"id="cotacao"/>
+  <table>
+    <tr>
+      <td>
+        <div class="group">
+          <%= render :partial=>"index_documento", :locals=>{:compras_documentos => @compra.compras_documentos} %>
+        </div>
+      </td>
+    </tr>   
+    <tr>
+      <td>
+        <div class="group">
+          <%= render partial: "new_documento", locals: {compras_documento: ComprasDocumento.new(compra_id: @compra.id)} %>
+        </div>
+      </td>
+    </tr>
+  </table>
+    <div class="buttons">
+      <%= link_to t('BACK'), edit_compra_path(@compra), class: 'button back' %>
+      <%= link_to "Seguir", compra_path(@compra), class: 'button next' %>
+    </div>
+  </div>
+</div>

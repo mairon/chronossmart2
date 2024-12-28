@@ -1,0 +1,163 @@
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <h1 id="header">
+        <div class="pull-left">
+        Pantalla de Preparo
+          
+        </div>
+
+       
+        <div class="pull-right">
+          <span class="us"> 1111 </span> 
+        </div>
+      </h1>
+    </div>
+  </div>
+</div>
+
+<div class="row bord-stpes">  
+  <div class=" bord-steps">
+    <div class="panel">
+      <!-- Default panel contents -->
+      <div class="pipe-steps-title">
+        <div class="contact-action">
+          <header class="panel-title">
+            Pendiente
+            <div class="pull-right">
+              <%= @produtos.count(:id) %>
+            </div>            
+          </header>
+          <smal> 
+        </div>
+      </div>
+
+      <div class="connectedSortable" id="sortable1" data-box-id="1">
+        <% @produtos.each do |n| %>
+          <div class="card-stepp" id="1">
+            <div class="card-title">
+              #<%= n.id.to_s.rjust(6,'0') %> - Comanda <%= n.cartao_nome %>
+              <div class="card-time"><%= n.created_at.to_datetime.strftime("%d/%m/%y - %H:%M") %></div>
+            </div>
+            
+
+            <div class="card-cliente">
+              <ul>
+                <% VendasProduto.joins(:produto).where("produtos.preparacao = true and vendas_produtos.venda_id = #{n.id}").each do |vp| %>
+                <li>
+                  <%= vp.quantidade.to_i %> - <%= vp.produto_nome %>
+                  <ul>
+                    <% vp.produto_composicaos.each do |pc| %>
+                      <li><%= pc.componente_nome %></li>
+                    <% end %>
+                    <li><%= vp.obs.to_s %></li>
+                  </ul>                  
+                </li>
+
+                <% end %>
+              </ul>
+
+              <div align="center">
+                <%= link_to "EMPEZAR", status_preparo_vendas_path(venda_id: n.id, status_preparo: 1), class: 'btn btn-green preparo' %>
+              </div>
+
+            </div>
+          </div> 
+        <% end %>
+      </div>
+    </div>  
+  </div>
+
+  <div class=" bord-steps">
+    <div class="panel">
+      <!-- Default panel contents -->
+      <div class="pipe-steps-title">
+        <div class="contact-action">
+          <header class="panel-title">
+            En Produción
+            <div class="pull-right">
+              <%= @produtos.count(:id) %>
+            </div>            
+          </header>
+          <smal> 
+        </div>
+      </div>
+
+      <div class="connectedSortable" id="sortable1" data-box-id="1">
+        <% @produtos_s1.each do |n| %>
+          <div class="card-stepp" id="1">
+            <div class="card-title">
+              #<%= n.id.to_s.rjust(6,'0') %> - Comanda <%= n.cartao_nome %>
+              <div class="card-time"><%= n.created_at.to_datetime.strftime("%d/%m/%y - %H:%M") %></div>
+            </div>
+            
+
+            <div class="card-cliente">
+               <ul>
+                <% VendasProduto.joins(:produto).where("produtos.preparacao = true and vendas_produtos.venda_id = #{n.id}").each do |vp| %>
+                <li>
+                  <%= vp.quantidade.to_i %> - <%= vp.produto_nome %>
+                  <ul>
+                    <% vp.produto_composicaos.each do |pc| %>
+                      <li><%= pc.componente_nome %></li>
+                    <% end %>
+                    <li><%= vp.obs.to_s %></li>
+                  </ul>                  
+                </li>
+
+                <% end %>
+              </ul>
+              <div align="center">
+                <%= link_to "FINALIZAR", status_preparo_vendas_path(venda_id: n.id, status_preparo: 2), class: 'btn btn-green' %>
+                <a href="javascript:void(0)" class="button print" onClick="TicketCozinha(<%= n.id %>)">Imprimir</a>
+              </div>
+            </div>
+          </div> 
+        <% end %>
+      </div>
+    </div>  
+  </div>
+
+
+<style>
+  .card-time{
+    float: right;
+  }
+  .card-stepp {
+    flex-direction: row;
+    padding: 6px 8px;
+    cursor: pointer;
+    margin: 10px 8px;
+    min-height: 85px !important;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 10%), 0 2px 10px 0 rgb(0 0 0 / 4%);
+    border: 1px solid #ddd;
+    background-color: #f7f9fc;
+  } 
+
+  .card-stepp li{
+    font-size: 18px;
+    padding: 10px;
+  }   
+
+  .btn-green{
+    margin: 20px 0px 15px 0px;
+    width: 250px;
+    
+  }  
+
+  .preparo{
+    background-color: #ffc107;
+  }
+
+
+</style>
+
+
+<script>
+  function TicketCozinha(id){
+    var mywindow =  window.open('/vendas/'+ id +'/ticket_cozinha', '', ' SCROLLBARS=YES, TOP=150, LEFT=100, WIDTH=400, HEIGHT=500');
+    mywindow.print();
+  }
+</script>

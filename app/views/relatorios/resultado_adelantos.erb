@@ -1,0 +1,5 @@
+<% if params[:status] == '0' %>
+  <%= render "relatorios/forms/adelanto_proveedor" %>
+<% else %>
+  <%= render "relatorios/forms/adelanto_resumido" %>
+<% end %>

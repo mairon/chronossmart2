@@ -1,0 +1,51 @@
+<div class="panel">
+  <header class="panel-heading">
+    <%= link_to t('NEW'), new_producao_path, :class => "button add" %>
+    <div class="pull-right">
+      Produción
+    </div>
+
+  </header>
+<style>
+  #form-search td{
+    padding: 5px;
+  }
+</style>
+  <div class="panel-content" id="form-search">
+    <%= form_tag busca_cobros_path, :method => "get" do %>
+      <table>
+        <tr>
+          <!--FILTRO_DATA!-->
+          <td align="right"><%= t('DATE') %></td>
+          <td colspan="2">
+            <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+            <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+            </div>
+          <td style="padding-left: 5px"><%= t('TO') %></td>
+          <td >
+            <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+            <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+            </div>
+          </td>
+          <td colspan="4">
+            <input id="busca" name="busca" type="text" onkeyup = "pesquisa(this.value)" size="25"/>
+            <input type="button" class="btn btn-default" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar"/>
+            <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;") %>
+          </td>
+         </tr>
+      </table>
+    <% end %>
+  </div>
+</div>
+
+<div id="pagina"></div>
+
+<script language="javascript">
+  function pesquisa(valor){
+    url="/producaos/busca?" + $('form').serialize();
+    ajax(url);
+  }
+</script>
+<%= javascript_include_tag 'busca_ajax' %>

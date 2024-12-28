@@ -1,0 +1,21 @@
+<div class="group">
+<%= form_for(Lote.new) do |f| %>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Numero</label>
+      <%= f.text_field :numero, requerid: true %>
+    </div>
+    <div class="col-md-12">
+      <label>Vencimiento</label>
+      <%= f.date_select :vencimento %>
+    </div>
+    <div class="col-md-12">
+      <label>Numero Registro</label>
+      <%= f.text_field :numero_registro %>
+    </div>
+  </div>
+  <div class="footer-buttons">
+    <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+  </div>
+<% end %>
+</div>

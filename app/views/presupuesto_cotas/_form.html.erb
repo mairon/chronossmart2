@@ -1,0 +1,53 @@
+<%= form_for(@presupuesto_cota) do |f| %>
+  <% if @presupuesto_cota.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@presupuesto_cota.errors.count, "error") %> prohibited this presupuesto_cota from being saved:</h2>
+
+      <ul>
+      <% @presupuesto_cota.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> presupuesto_cotas - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                    <td align="right">Cuotas :</td>
+                    <td><%= f.number_field :cuotas %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">valor_gs :</td>
+                    <td><%= f.text_field :valor_gs %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">vencimento :</td>                    
+                    <td><%= f.date_select :vencimento %></td>
+                </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "btn btn-green" %>
+        <%= link_to 'Volver', presupuesto_path(@presupuesto_cota.presupuesto_id), :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

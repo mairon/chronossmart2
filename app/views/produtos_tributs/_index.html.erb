@@ -1,0 +1,36 @@
+<div class="group">
+   <table class="head_grid">
+      <tr>
+        <td width="80" align="center">Tipo ICMS</td>
+        <td width="80" align="center">Aliq. ICMS</td>
+        <td width="80" align="center">Red. ICMS</td>
+        <td width="100" align="center">NCM</td>
+        <td width="100" align="center">CST</td>
+        <td width="80" align="center">Sit. Tributária</td>
+        <td width="80" align="center">Aliq. PIS</td>
+        <td width="80" align="center">Aliq. Cofins</td>
+      </tr>
+   </table>
+
+   <div class="rolagem" dir="div">
+        <table>
+        <% produtos_tributs.each do |pt| %>
+            <% if pt.regime_id == current_unidade.regime_id %>
+                <tr class = "<%= cycle("cor1", "cor2") %>">
+                    <td width="80"><%=h pt.tipo_icms %></td>
+                    <td width="80" align="right"><%=h pt.aliq_icms %></td>
+                    <td width="80" align="right"><%=h pt.reducao_icms %></td>
+                    <td width="100" align="right"><%=h pt.ncm %></td>
+                    <td width="100" align="right"><%=h pt.cst %></td>
+                    <td width="80" align="right"><%=h pt.situacao_trib %></td>
+                    <td width="80" align="right"><%=h pt.aliq_pis %></td>
+                    <td width="80" align="right"><%=h pt.aliq_cofins %></td>
+
+                    <td><%= link_to 'Editar', edit_produtos_tribut_path(pt) %></td>
+                    <td><%= link_to t('DELETE'), pt, :confirm => 'Esta Seguro?', :method => :delete %></td>
+                </tr>
+            <% end %>
+        <% end %>
+        </table>
+    </div>
+</div>

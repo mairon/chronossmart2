@@ -1,0 +1,35 @@
+<%= form_tag update_individual_sub_grupos_path :method => :put do %>
+<h1 id="header">Marca: <%= @sub_grupo.descricao %></h1>
+
+<table class="head_grid">
+  <tr>
+    <td width="200"><%= t('UNIT') %></td>
+    <td width="100">Tabla</td>
+    <td width="115" align="right">%</td>
+    <td width="115" align="right">Max. Descuento %</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <%= hidden_field_tag :id, @sub_grupo.id %>
+    <% @unidades_porces.each do |up| %>
+      <%= fields_for "tabela_precos[]", up do |f| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="200"><%= up.unidade.unidade_nome %></td>
+          <td width="100"><%= up.tabela_preco.nome %></td>
+
+          <%= field_us '', f, :porcen %>
+          <%= field_us '', f, :max_desc %>
+        </tr>
+      <% end %>
+    <% end %>
+  </table>
+</div>
+
+<div class="buttons">
+  <%= submit_tag "Actulizar Porcetagen" , :class => "button save", :disable_with => "Aguarde..." %>
+	<%= link_to t('BACK'), edit_sub_grupo_path(@sub_grupo), :class => "button back" %>
+	<%= link_to 'Finalizar', sub_grupos_path, :class => "button next" %>
+</div>
+<% end %>

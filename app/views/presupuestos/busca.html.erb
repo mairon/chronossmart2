@@ -1,0 +1,56 @@
+<div class="group">
+   <table class="head_grid">
+      <tr>
+         <td width="60" align="center">Cod.</td>
+         <td width="60" align="center">Plan</td>
+         <td width="60" align="center">Origin</td>
+         <td width="60" align="center"><%= t('DATE') %></td>
+         <td width="100">Status</td>
+         <td width="80">Tabla Precio</td>
+         <td width="150">Vendedor</td>
+         <td width="280">Cliente</td>
+         <td width="30" align="right">Cant.</td>
+         <td width="70" align="right">Tot. Gs</td>
+      </tr>
+   </table>
+   <div class="rolagem" dir="div">
+      <table>
+         <tr>
+          <% @presupuestos.each do |presupuesto| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="60" align="center"><%= link_to presupuesto.id.to_s.rjust(6,'0'), presupuesto_path(presupuesto) %></td>
+              <td width="60" align="center"><%= presupuesto.condicao %></td>
+              <td width="60" align="center" height="20">
+                <% if presupuesto.origem != nil %>
+                  <span style="background:yellow; border-radius: 2px;padding: 0px 3px 0px 3px;">INT</span>
+                <% else %>
+                  <span style="background:green; border-radius: 2px;padding: 1px; margin:2px">EXT</span>
+                <% end %>
+              </td>
+              <td width="60" align="center"><%= presupuesto.data.strftime("%d/%m/%y") %></td>
+              <td width="100" align="left">
+                <% if presupuesto.status == 0 %>
+                  PENDIENTE
+                <% elsif presupuesto.status == 1 %>
+                  EN PROCESO
+                <% elsif presupuesto.status == 2 %>
+                  PARCIAL
+                <% elsif presupuesto.status == 3 %>                  
+                  FINALIZADO
+                <% end %>
+              </td>
+              <td width="80" align="left"><%= presupuesto.tabela_preco_nome %></td>
+              <td width="150" align="left"><%= truncate(presupuesto.vendedor, length: 16) %></td>
+              <td width="280" align="left"><%= truncate(presupuesto.persona_nome, length: 38) %></td>
+              <td width="30" align="right"><b><%= presupuesto.qtd.to_i %></b></td>
+              <td width="70" align="right"><b><%= format_int(presupuesto.total_gs.to_f) %></b></td>
+              <td><%= link_to '', edit_presupuesto_path(presupuesto), class: 'icon-pencil' %></td>
+              <td><%= link_to '', presupuesto, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+              <td><%= link_to '', print_presupuesto_presupuesto_path(presupuesto), target: "_blank",  class: 'icon-fullscreen' %></td>
+              <td><%= link_to 'Gerar Contrato', new_contrato_path(persona_id: presupuesto.persona_id, persona_nome: presupuesto.persona_nome, presupuesto_id: presupuesto, plano_id: presupuesto.plano_id, vendedor_id: presupuesto.vendedor_id), target: "_blank" %></td>
+
+            </tr>
+          <% end %>
+      </table>
+   </div>
+</div>

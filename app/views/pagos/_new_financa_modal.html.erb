@@ -1,0 +1,288 @@
+<style>
+  .group-cobro-financa td{
+    padding:  5px;
+  }
+</style>
+<%= form_for(pagos_financa, html: {name:"registration"}) do |f| %>
+   <%= f.hidden_field :pago_id %>
+   <%= f.hidden_field :cheque_status,:value => 0 %>
+   <%= f.hidden_field :cred_deb, :value => 0 %>
+   <%= hidden_field_tag :cotacao, @pago.cotacao.to_i %>
+   <%= hidden_field_tag :cotacao_real, @pago.cotacao_real.to_i %>
+   <%= hidden_field_tag :cotacao_rs_us, number_to_currency(@pago.cotacao_rs_us.to_f, :format =>'%n', :separator => ",") %>
+   <input type="hidden" id="data" value="<%= @pago.data.strftime("%d").to_i %>"/>
+   <input type="hidden" id="mes" value="<%= @pago.data.strftime("%m").to_i %>"/>
+   <input type="hidden" id="ano" value="<%= @pago.data.strftime("%Y").to_i %>"/>
+   <div class="group-cobro-financa">
+  <table>
+    <tr>
+      <td colspan="4">
+        <div class="group conta">
+          <table>
+            <tr>
+              <td>
+                <label>Forma de Pago</label>
+                <%= f.collection_select :forma_pago_id, FormaPago.all(:conditions => "cobro = true", :select     =>' id,nome', :order      => '1'), :id,:nome,{prompt: 'Selecion la Forma de Pago'},{onchange: "fp(this.options[this.selectedIndex].value)", autofocus: true} %>
+                <input type="hidden" name="forma_pg" id="forma_pg" value="1"/>
+                <% if @vuelto == 'true' %>
+                  <h4 style="color:red; float:left;" >Selecione un Tipo de Vuelto para Cerrar lo Lanzamiento!</h4>  
+                <% end %>
+
+              </td>
+              <td colspan="2">
+              <label><%= t('ACCOUNT') %></label>
+              <%= f.collection_select :conta_id, Conta.all(:conditions => "unidade_id = #{current_unidade.id}", :select     =>' id,nome', :order      => '1'), :id,:nome,{prompt: 'Selecion la Cuenta'} %>
+              <a href="javascript:void(0)" class="button cheque_terc" onClick="busca_cheque_terceiros()" style="display:none; width: 80px;">Buscar <%= t('CHECKS') %></a>
+              </td>
+            </tr>
+            <tr>
+
+                  <%= field_us_label 'U$',f,:valor_dolar, :value => format_decimal( @saldo_fina_us.to_f ), :onchange   => "UsToGsRsCtRs('cotacao','cotacao_real','cotacao_rs_us','pagos_financa_valor_dolar','pagos_financa_valor_guarani','pagos_financa_valor_real')", style: 'margin-right: 40px' %>
+
+                 <%= field_gs_label 'Gs.',f,:valor_guarani, 
+                                               :value => format_int( @saldo_fina_gs.to_f ), :onchange => "GsToUsRs('cotacao','cotacao_real','pagos_financa_valor_guarani','pagos_financa_valor_dolar','pagos_financa_valor_real')", style: 'margin-right: 40px' %>
+
+                  <%= field_us_label 'R$',f,:valor_real, :value => format_decimal( @saldo_fina_rs.to_f ),
+                            :onchange   => "RsToUsGsCtRs('cotacao','cotacao_real','cotacao_rs_us','pagos_financa_valor_guarani','pagos_financa_valor_dolar','pagos_financa_valor_real')" %>
+
+            </tr>
+          </table>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="4">
+          <div class="group cheque" style="display:none">
+            <table>
+              <tr> 
+                
+                <td>
+                  <label>Numero</label>
+                  <%= f.text_field :cheque, size: 15 %></td>
+                
+                <td>
+                <label><span style="display:none" class="titulo_data_dif">Venci/Diferido:</span></label>
+                  <span style="display:none" class="campo_data_dif"><%= f.date_select( :diferido, {},{:onkeyup     => "EnterTab(event,'vendas_financa_transportadora_id')"} )%></span>
+                </td>
+
+                
+                <td>
+                <label>Banco</label>
+                  <%= f.collection_select :banco_id, Persona.all( :select => ' id, nome', 
+                  :conditions => ["tipo_banco = 1"], :order  => '2' ), :id, :nome, {:prompt => "Selecione lo Banco"} %></td>
+                <td>
+                <label>Titular</label>
+                  <%= f.text_field :titular, size: 30 %>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="6">
+          <% documentos = PagosDetalhe.all(:conditions => ["pago_id = ?",@pago.id]).collect{|d| d.documento_numero}.join(", ") %>
+          <%= f.text_area :descricao, rows: 3, class: 'panel-field', value: t('CHARGE') + @pago.persona_nome + ' Docs : ' + documentos %>
+
+        </td>
+      </tr>
+      <tr>
+        <td colspan="6"><%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%></td>
+      </tr>
+    </table>
+   </div>
+
+<% end %>
+<script type="text/javascript">
+  $('#pagos_financa_forma_pago_id').selectize();
+  $('#pagos_financa_conta_id').selectize();
+  function toggleDiv(divid)               //
+{
+    if(document.getElementById(divid).style.display == 'none'){
+        document.getElementById(divid).style.display = 'block';
+    }else{
+        document.getElementById(divid).style.display = 'none';
+    }
+}
+
+
+function UsToGsRsCtRs(ct,ctrs,ctusrs,us,gs,rs){
+    var cambio = eval( parseFloat( document.getElementById(us).value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById(ct).value.replace(/\./g, "").replace(",", ".") ) ) ;
+    document.getElementById(gs).value = ( number_format( cambio,0, ',', '.') )
+
+    var cambiors = eval( parseFloat( document.getElementById(us).value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById(ctusrs).value.replace(/\./g, "").replace(",", ".") ) )  ;
+    document.getElementById(rs).value = ( number_format( cambiors,2, ',', '.') )
+}
+
+
+function RsToUsGsCtRs(ct,ctrs,ctusrs,gs,us,rs){
+    var cambio = eval( parseFloat( document.getElementById(rs).value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById(ctrs).value.replace(/\./g, "") ) )  ;
+    document.getElementById(gs).value = ( number_format( cambio,0, ',', '.') )
+
+    var cambiors = eval( parseFloat( document.getElementById(rs).value.replace(/\./g, "").replace(",", ".") ) / parseFloat( document.getElementById(ctusrs).value.replace(/\./g, "").replace(",", ".")) );
+
+    document.getElementById(us).value = ( number_format( cambiors,2, ',', '.') )
+}
+
+</script>
+<script>
+
+  function Comprovante() 
+  {
+    window.open('/pagos/' + document.getElementById('id').value + '/comprovante', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+
+    function ValidCompra(){
+      if (parseFloat(document.getElementById('sum').value) !=  0){
+        alert('La suma nos igual de la Documento');
+      }
+      else{
+        location.href="/pagos"
+      }
+    }
+</script>
+
+
+<script>
+function fp(v) {
+  $("#forma_pg").val(v);
+  if( v == '5' ){
+    $(".cheque").css('display','block');
+    $(".cheque").css('background','#bdefbd');
+    $(".conta").css('background','#bdefbd');
+    $(".titulo_data_dif").css('display','none');
+    $("#pagos_financa_cheque_status").val('1');
+    $("#pagos_financa_cred_deb").val('0');
+    $(".campo_data_dif").css('display','none');
+    $(".cheque_terc").css('display','none');
+
+  } else if( v == '6'){
+    $(".cheque").css('display','block');
+    $(".cheque").css('background','#bdefbd');
+    $(".conta").css('background','#bdefbd');
+    $(".titulo_data_dif").css('display','block');
+    $("#pagos_financa_cheque_status").val('1');
+    $(".campo_data_dif").css('display','block');
+    $("#pagos_financa_cred_deb").val('0');  
+    $(".cheque_terc").css('display','none');
+
+  } else if( v == '1'){
+    $(".cheque").css('display','none');
+    $(".titulo_data_dif").css('display','none');
+    $(".conta").css('background','#bdefbd');    
+    $(".campo_data_dif").css('display','none');
+    $("#pagos_financa_cheque_status").val('0');
+    $("#pagos_financa_cred_deb").val('0');   
+    $(".cheque_terc").css('display','none'); 
+  } else if( v == '3'){
+    $(".cheque").css('display','none');
+    $(".titulo_data_dif").css('display','none');
+    $(".conta").css('background','#bdefbd');    
+    $(".campo_data_dif").css('display','none');
+    $("#pagos_financa_cheque_status").val('0');  
+    $("#pagos_financa_cred_deb").val('0');  
+    $(".cheque_terc").css('display','none');
+  } else if( v == '8'){
+    $(".cheque").css('display','none');
+    $(".cheque").css('background','#ff6d6d');
+    $(".conta").css('background','#ff6d6d');    
+    $(".titulo_data_dif").css('display','none');    
+    $(".campo_data_dif").css('display','none');
+    $("#pagos_financa_cheque_status").val('0'); 
+    $("#pagos_financa_cred_deb").val('1');
+    $(".cheque_terc").css('display','none');
+
+
+  } else if( v == '9'){
+    $(".cheque").css('display','block');
+    $(".cheque").css('background','#ff6d6d');
+    $(".conta").css('background','#ff6d6d');    
+    $(".titulo_data_dif").css('display','block');    
+    $(".campo_data_dif").css('display','block');
+    $("#pagos_financa_cred_deb").val('1');
+    $("#pagos_financa_cheque_status").val('1'); 
+    $(".cheque_terc").css('display','none');   
+  } else if( v == '10'){
+    $(".cheque").css('display','block');
+    $(".cheque").css('background','#ff6d6d');
+    $(".conta").css('background','#ff6d6d');    
+    $(".titulo_data_dif").css('display','block');
+    $(".cheque_terc").css('display','block');
+    $(".campo_data_dif").css('display','block');
+    $("#pagos_financa_cred_deb").val('1');
+    $("#pagos_financa_cheque_status").val('1'); 
+    
+
+  } else{
+    $("#cheque_status").val('0');
+    $(".title_venc").css('display','none');
+    $(".content_venc").css('display','none');
+    $("#pagos_financa_cred_deb").val('0');  
+    $(".cheque_terc").css('display','none'); 
+  }
+}
+
+$('#pagos_financa_vuelto').click(function() {
+  if (this.checked) {
+    $(".tipo_vuelto").css('display','block');
+  } else {
+    $(".tipo_vuelto").css('display','none');
+  } 
+});
+
+function abre_vuelto(v) {
+  $("#cheque_tipo").val(v);
+  if( v == '0'){
+    $(".box_vuelto").css('display','block');
+    $(".vuelto_cheque").css('display','none');
+  }else{
+    $(".box_vuelto").css('display','block');
+    $(".vuelto_cheque").css('display','block');
+    
+  };
+}
+</script>
+
+<script type="text/javascript">
+$(function() {
+
+   $("form[name='registration']").validate({
+    ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input',
+    rules: {
+    "pagos_financa[forma_pago_id]": {required: true},
+    "pagos_financa[conta_id]": { 
+        required: function () {
+            return $("#pagos_financa_forma_pago_id").val() != '7';
+        }
+    },
+    "pagos_financa[cheque]": { 
+        required: function () {
+            return $("#pagos_financa_forma_pago_id").val() == '5' || $("#pagos_financa_forma_pago_id").val() == '6';
+        }
+    },
+
+    "pagos_financa[banco_id]": { 
+        required: function () {
+            return $("#pagos_financa_forma_pago_id").val() == '5' || $("#pagos_financa_forma_pago_id").val() == '6';
+        }
+    }
+  },
+    // Make sure the form is submitted to the destination defined
+    // in the "action" attribute of the form when valid
+    submitHandler: function(form) {
+      form.submit();
+    }
+  });
+});
+
+</script>
+
+
+<style>
+  label.error {
+    margin: 0px 10px 0px 10px;
+    width: auto;
+    color: #a94442;
+  }
+</style>

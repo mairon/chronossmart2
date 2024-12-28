@@ -1,0 +1,63 @@
+  <%= form_for(sueldos_detalhe) do |f| %>
+
+  <%= f.hidden_field :sueldo_id %>
+  <%= f.hidden_field :persona_id, :value => @sueldo.persona_id %>
+  <%= f.hidden_field :persona_nome, :value => @sueldo.persona_nome %>
+  <%= f.hidden_field :data, :value => @sueldo.data_inicio %>
+  <%= f.hidden_field :moeda, :value => @sueldo.moeda %>
+  <%= f.hidden_field :vencimento %>
+  <%= f.hidden_field :data_emissao %>
+  <div class="group">
+    <table>
+      <tr>
+        <td colspan="2">
+          <label><%= t('DOC') %></label>
+         <%= f.text_field :documento_numero_01, :size => 5 %>-<%= f.text_field :documento_numero_02, :size => 5 %>-<%= f.text_field :documento_numero, :size => 15 %></td>
+        
+        <td>
+          <label><%= t('SHARE') %></label>
+         <%= f.text_field :cota, :size => 5 %></td>
+          <% if @sueldo.moeda == 0 %>
+            <%= field_us_label 'Valor Us.:',f,:debito_us %>
+            <%= f.hidden_field :debito_gs %>
+            <%= f.hidden_field :debito_rs %>
+          <% elsif @sueldo.moeda == 1 %>
+           <%= field_gs_label 'Valor G$:',f,:debito_gs %>
+            <%= f.hidden_field :debito_us %>
+            <%= f.hidden_field :debito_rs %>
+          <% else %>
+           <%= field_us_label 'Valor R$:',f,:debito_rs %>
+            <%= f.hidden_field :debito_gs %>
+            <%= f.hidden_field :debito_us %>
+          <% end %>
+
+      </tr>
+      <tr>
+        <td colspan="3">
+          <label>Liquidación</label>
+            <%= f.radio_button :estado,0 %> Parte
+            <%= f.radio_button :estado,1, :Checked => "True"  %> Cancelación
+          </td>
+            <td>
+              <label>Tipo</label>
+              <%= f.select :tipo,
+              ([["ADELANTO", "ADELANTO"],
+                ["PRESTAMO", "PRESTAMO"],
+                ["BAJA DEUDA", "BAJA DEUDA"]
+
+                ]) %>
+            </td>
+      </tr>
+
+      <tr>
+        <td colspan="3">
+          <label>Descripción</label>
+          <%= f.text_area :descricao,:cols => 50, :rows => 1 %></td>
+        <td style="padding-top: 18px"><%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%></td>
+
+      </tr>
+
+    </table>
+    </div>      
+  <% end %>
+</body>

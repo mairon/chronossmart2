@@ -1,0 +1,55 @@
+<table>
+  <tr>
+      <td width="80" align="center">Cod.</td>
+      <td width="80" align="center">Cod. Fabr.</td>
+      <td width="150" align="center">Ubicacion</td>
+      <td width="500" align="center">Producto</td>
+      <td width="80" align="center">Saldo</td>
+      <td width="100" align="center">Total Des.</td>
+      <td width="100" align="center">Precio Gs.</td>
+      <td width="100" align="center">Precio U$.</td>
+  </tr>
+</table>
+
+<div class="rolagem" id="div">
+  <table>
+
+    <% for produto in @produtos %>
+      <% stock = Stock.sum( 'entrada - saida',:conditions => ['produto_id = ?',produto.id] ) %>
+		<% if stock.to_i > 0 %>
+        	<% custo = Stock.last( :conditions => ['produto_id = ? and status = 0', produto.id] ) %>
+
+      		<tr class = "<%= cycle( "cor1", "cor2" )%>"
+          		onMouseOver="javascript:this.style.backgroundColor='#949494'"
+          		onMouseOut="javascript:this.style.backgroundColor=''"
+          		onClick="Add( '<%= produto.id %>',
+										'<%= produto.nome %>',
+										'<%= produto.nome %>',
+										'<%=h number_to_currency( custo.unitario_dolar, :format=>' %n ', :separator => ",") %>',
+										'<%=h number_to_currency( custo.unitario_guarani, :format=>' %n ', :precision => 0) %>',
+										'<%=h number_to_currency( produto.preco_us, :format=>' %n ', :separator => ",") %>',
+										'<%=h number_to_currency( produto.preco_gs, :format=>' %n ', :precision => 0) %>' 	)">
+
+            	<td width="80" align="center"> <%=h produto.id%> </td>
+            	<td width="80" align="center"> <%=h produto.fabricante_cod%> </td>
+            	<td width="150" align="left">   <%=h produto.locacao%> </td>
+            	<td width="500" align="left">   <%=h produto.nome%> </td>
+            	<% if produto.stock.to_i <= 0 %>
+              	 <td width="80"  align="center"><font color="red"> <%=h format( "%.3f",produto.stock.to_f ) %></font> </td>
+            	<%else%>
+              	 <td width="80"  align="center"><font color="green"> <%=h format( "%.3f",produto.stock.to_f ) %></font> </td>
+            	<%end%>
+            	<td width="100"  align="center"> <%=h produto.desconto %> % </td>
+            	<td width="100" align="right">   <%=h number_to_currency( produto.preco_gs, :format=>' %n ', :precision => 0) %> </td>
+            	<td width="100" align="right">   <%=h number_to_currency( produto.preco_us,   :format=>' %n ', :separator => ",") %> </td>
+         	</tr>
+	    <% end %>
+    <% end %>
+  </table>
+</div>
+
+
+
+
+
+

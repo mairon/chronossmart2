@@ -1,0 +1,718 @@
+
+<html>
+<head>
+  <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+
+  <title>Impressao Balcão</title>
+</head>
+
+<!-- Required scripts -->
+<script type="text/javascript" src="/qz/js/dependencies/rsvp-3.1.0.min.js"></script>
+<script type="text/javascript" src="/qz/js/dependencies/sha-256.min.js"></script>
+<script type="text/javascript" src="/qz/js/qz-tray.js"></script>
+
+<!-- Page styling -->
+<script type="text/javascript" src="/qz/js/additional/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/qz/js/additional/bootstrap.min.js"></script>
+<script type="text/javascript" src="/qz/js/additional/jsrsasign-latest-all-min.js"></script>
+<script src="assets/signing/sign-message.js"></script>
+<link rel="stylesheet" href="/qz/css/font-awesome.min.css" />
+<link rel="stylesheet" href="/qz/css/bootstrap.min.css" />
+<link rel="stylesheet" href="/qz/css/style.css" />
+
+<style type="text/css">
+  @media print {
+    @page {
+      size:240mm 150mm;
+    }
+  }
+
+  td{
+    font-family: Verdana;
+    letter-spacing: 3px;
+    font-size: 11px;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-transform: uppercase;
+  }
+
+  .header{
+    font-size: 15px;
+  }
+</style>
+
+<body id="qz-page" role="document">
+
+  <div id="qz-alert" style="position: fixed; width: 60%; margin: 0 4% 0 36%; z-index: 900;"></div>
+  <div id="qz-pin" style="position: fixed; width: 30%; margin: 0 66% 0 4%; z-index: 900;"></div>
+
+  <div class="container" role="main">
+
+    <% printers = ConfigPrinter.find_by_sql("select descricao, printer from config_printers where processo = 'VAREJO' order by ordem") %>
+
+    <div class="row spread">
+      <div class="col-md-4">
+        <div id="qz-connection" class="panel panel-default" hidden="hidden">
+          <div class="panel-heading">
+            <button class="close tip" data-toggle="tooltip" title="Launch QZ" id="launch" href="#" onclick="launchQZ();" style="display: none;">
+              <i class="fa fa-external-link"></i>
+            </button>
+            <h3 class="panel-title">
+              Connection: <span id="qz-status" class="text-muted" style="font-weight: bold;">Unknown</span>
+            </h3>
+          </div>
+
+        </div>
+
+        <hr />
+
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h3 class="panel-title">Impressoras</h3>
+          </div>
+
+
+          <% if @fact_indep_produtos.present? %>
+
+            <div class="panel-body" id="a_imprimir">
+              <div class="form-group">
+
+                <input type="hidden" id="printerSearch" name="printerSearch">
+
+
+                <% printers.each do |p| %>
+                  <button class="set_printer btn btn-info" value="<%= p.printer %>" style="margin: 5px; width: 250px"><%= p.descricao %></button>
+                  <br />
+                <% end %>
+
+              </div>
+            </div>
+
+            <div class="panel-body" id="imprimindo" hidden="hidden">
+              <div class="form-group">
+                <p>Imprimindo...</p>
+              </div>
+            </div>
+          <% else %>
+            <div class="panel-body" id="imprimindo">
+              <div class="form-group">
+                <p>Esta venda não possui produtos.</p>
+              </div>
+            </div>
+          <% end %>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+
+
+<script>
+
+    $(document).ready(function(e) {
+        startConnection();
+        getPrinterName();
+    });
+
+
+    function getPrinterName(){
+      $(".set_printer").click(function(){
+        $("#printerSearch").val($(this).val());
+        setPrinter($(this).val());
+        printESCP();
+      });
+    }
+
+
+    /// Authentication setup ///
+    qz.security.setCertificatePromise(function(resolve, reject) {
+        //Preferred method - from server
+        $.ajax("/qz/assets/signing/digital-certificate.txt").then(resolve, reject);
+    });
+
+    qz.security.setSignaturePromise(function(toSign) {
+        return function(resolve, reject) {
+            //Preferred method - from server
+            $.ajax("/qz/assets/signing/sign-message.js?request=" + toSign).then(resolve, reject);
+        };
+    });
+
+
+    /// Connection ///
+    function launchQZ() {
+        if (!qz.websocket.isActive()) {
+            window.location.assign("qz:launch");
+            //Retry 5 times, pausing 1 second between each attempt
+            startConnection({ retries: 5, delay: 1 });
+        }
+    }
+
+    function startConnection(config) {
+        if (!qz.websocket.isActive()) {
+            updateState('Waiting', 'default');
+
+            qz.websocket.connect(config).then(function() {
+                updateState('Active', 'success');
+                findVersion();
+            }).catch(handleConnectionError);
+        } else {
+            displayMessage('An active connection with QZ already exists.', 'alert-warning');
+        }
+    }
+
+    function endConnection() {
+        if (qz.websocket.isActive()) {
+            qz.websocket.disconnect().then(function() {
+                updateState('Inactive', 'default');
+            }).catch(handleConnectionError);
+        } else {
+            displayMessage('No active connection with QZ exists.', 'alert-warning');
+        }
+    }
+
+    function listNetworkInfo() {
+        qz.websocket.getNetworkInfo().then(function(data) {
+            if (data.macAddress == null) { data.macAddress = 'UNKNOWN'; }
+            if (data.ipAddress == null) { data.ipAddress = "UNKNOWN"; }
+
+            var macFormatted = '';
+            for(var i = 0; i < data.macAddress.length; i++) {
+                macFormatted += data.macAddress[i];
+                if (i % 2 == 1 && i < data.macAddress.length - 1) {
+                        macFormatted += ":";
+                }
+            }
+
+            displayMessage("<strong>IP:</strong> " + data.ipAddress + "<br/><strong>Physical Address:</strong> " + macFormatted);
+        }).catch(displayError);
+    }
+
+
+    /// Detection ///
+    function findPrinter(query, set) {
+            $("#printerSearch").val(query);
+            qz.printers.find(query).then(function(data) {
+                    displayMessage("<strong>Found:</strong> " + data);
+                    if (set) { setPrinter(data); }
+            }).catch(displayError);
+    }
+
+    function findDefaultPrinter(set) {
+            qz.printers.getDefault().then(function(data) {
+                    displayMessage("<strong>Found:</strong> " + data);
+                    if (set) { setPrinter(data); }
+            }).catch(displayError);
+    }
+
+    DataImpressao = [
+
+        '\x1B' + '\x40', // init
+        '\x1B' + '\x4D' + '\x30', // normal text
+        '\x1B' + '\x61' + '\x30', // left align
+
+        '\x0A \x0A \x0A \x0A \x0A \x0A \x0A \x0A \x0A',
+
+
+        ' <%= ''.to_s.ljust(12, ' ') %><%= @ft.data.strftime("%d").to_s.ljust(15, ' ') %><%= l @ft.data, :format => :mes %><%= @ft.data.strftime("%y").to_s.rjust(17, ' ') %><% if @ft.tipo.to_i == 1 %><%= 'X'.to_s.rjust(28, ' ') %><% else %><%= 'X'.to_s.rjust(37, ' ') %><% end %>' + '\x0A',
+        '     <%= @ft.ruc %> \x0A  \x0A',
+        '                  <%= @ft.persona_nome %> \x0A',
+        '                 <%= @ft.persona.direcao %> - <%= @ft.persona.cidade.nome unless @ft.persona.cidade_id.blank? %><%= ' '.to_s.rjust(50, ' ') %><%= @ft.persona.telefone %> \x0A',
+
+        '<% qtd    = 0 %>',
+        '<% tot_us = 0 %>',
+        '<% s_tot_gs = 0 %>',
+        '<% tot_rs = 0 %>',
+        '<% tot_ex = 0 %>',
+        '<% tot_05 = 0 %>',
+        '<% tot_10 = 0 %>',
+
+        '\x0A \x0A \x0A',
+
+        '<% produtos_count = FactIndepProduto.find_by_sql('select count(id) from fact_indep_produtos where fact_indep_id = ' + @ft.cod_proc.to_s ).first %>',
+
+        '<% @fact_indep_produtos.each do |vp|%>',
+          '<%= ''.to_s.ljust(7,' ') %>',
+          '<%= (vp.quantidade.to_i).to_s.ljust(5, ' ') %>',
+          '<%= vp.produto_nome.to_s.ljust(35, ' ').first(30) %>',
+            '<%= format_int(vp.unit_gs.to_f).to_s.rjust(14, ' ') %>',
+            '<% if vp.produto.taxa.to_i == 0 %>',
+              '<%= format_int(vp.tot_gs.to_f).to_s.rjust(10, ' ') %>',
+              '<%= '0'.to_s.rjust(10, ' ') %>',
+              '<%= '0'.to_s.rjust(10, ' ') %>',
+              '<% tot_ex += vp.tot_gs.to_f %>',
+
+            '<% elsif vp.produto.taxa.to_i == 5 %>',
+
+              '<%= '0'.to_s.rjust(10, ' ') %>',
+              '<%= format_int(vp.tot_gs.to_f).to_s.rjust(10, ' ') %>',
+              '<%= '0'.to_s.rjust(10, ' ') %>',
+              '<% tot_05 += vp.tot_gs.to_f %>',
+
+            '<% elsif vp.produto.taxa.to_i == 10 %>',
+              '<%= '0'.to_s.rjust(10, ' ') %>',
+              '<%= '0'.to_s.rjust(10, ' ') %>',
+              '<%= format_int(vp.tot_gs.to_f).to_s.rjust(10, ' ') %>',
+              '<% tot_10 += vp.tot_gs.to_f %>',
+            '<% end %>',
+
+          '\x0A',
+          '<% qtd += vp.quantidade.to_i %>',
+          '<% s_tot_gs += vp.tot_gs.to_f %>',
+        '<% end %>',
+
+        '<% min_prod = 8 %>',
+
+        '<% altura = min_prod - produtos_count.count.to_i %>',
+
+        '<% altura.times.each do |vp| %>',
+          '\x0A',
+        '<% end %>',
+        '\x0A \x0A',
+
+        '<%= format_int(tot_ex).to_s.to_s.rjust(65, ' ') %>',
+        '<%= format_int(tot_05).to_s.to_s.rjust(12, ' ') %>',
+        '<%= format_int(tot_10).to_s.to_s.rjust(12, ' ') %>',
+
+        '\x0A',
+        '\x0A',
+
+        '<%= '   '.to_s.rjust(12, ' ') %>',
+        '<%= I18n.with_locale(:es) { s_tot_gs.to_i.to_words.upcase.to_s.ljust(66, ' ') } %>',
+        '<%= format_int(s_tot_gs).to_s.rjust(12, ' ') %>',
+
+        '\x0A',
+
+        '<%= format_int(tot_05.to_f / 21 ).to_s.rjust(22, ' ').ljust(25, ' ') %>',
+        '<%= format_int(tot_10.to_f / 11 ).to_s.rjust(22, ' ').ljust(35, ' ') %>',
+        '<%= format_int( (tot_05.to_f / 21) + (tot_10.to_f / 11) ).to_s.rjust(12, ' ').ljust(5, ' ') %>',
+        '\x0A ',
+
+        ];
+
+    function printESCP() {
+        var config = getUpdatedConfig();
+
+        var printData = DataImpressao
+
+        qz.print(config, printData).catch(displayError);
+
+        $("#a_imprimir").hide();
+        $("#imprimindo").show();        
+    }
+
+    $('#preview').val(DataImpressao);
+
+    /// Serial ///
+    function listSerialPorts() {
+        qz.serial.findPorts().then(function(data) {
+            var list = '';
+            for(var i = 0; i < data.length; i++) {
+                list += "&nbsp; <code>" + data[i] + "</code>" + serialButton(["serialPort"], [data[i]]) + "<br/>";
+            }
+
+            displayMessage("<strong>Available serial ports:</strong><br/>" + list);
+        }).catch(displayError);
+    }
+
+    function openSerialPort() {
+        var widthVal = $("#serialWidth").val();
+        if (!widthVal) { widthVal = null; }
+
+        var bounds = {
+            begin: $("#serialBegin").val(),
+            end: $("#serialEnd").val(),
+            width: widthVal
+        };
+
+        qz.serial.openPort($("#serialPort").val(), bounds).then(function() {
+            displayMessage("Serial port opened");
+        }).catch(displayError);
+    }
+
+    function sendSerialData() {
+        var properties = {
+            baudRate: $("#serialBaud").val(),
+            dataBits: $("#serialData").val(),
+            stopBits: $("#serialStop").val(),
+            parity: $("#serialParity").val(),
+            flowControl: $("#serialFlow").val()
+        };
+
+        qz.serial.sendData($("#serialPort").val(), $("#serialCmd").val(), properties).catch(displayError);
+    }
+
+    function closeSerialPort() {
+        qz.serial.closePort($("#serialPort").val()).then(function() {
+            displayMessage("Serial port closed");
+        }).catch(displayError);
+    }
+
+
+    /// Page load ///
+    $(document).ready(function() {
+        window.readingWeight = false;
+
+        resetRawOptions();
+        resetPixelOptions();
+        resetSerialOptions();
+        resetUsbOptions();
+        resetHidOptions();
+
+        startConnection();
+
+        $("#printerSearch").on('keyup', function(e) {
+            if (e.which == 13 || e.keyCode == 13) {
+                findPrinter($('#printerSearch').val(), true);
+                return false;
+            }
+        });
+
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            if (window.readingWeight) {
+                $("#usbWeightRadio").click();
+                $("#hidWeightRadio").click();
+            } else {
+                $("#usbRawRadio").click();
+                $("#hidRawRadio").click();
+            }
+        });
+
+        $("#usbRawRadio").click(function() { window.readingWeight = false; });
+        $("#usbWeightRadio").click(function() { window.readingWeight = true; });
+        $("#hidRawRadio").click(function() { window.readingWeight = false; });
+        $("#hidWeightRadio").click(function() { window.readingWeight = true; });
+
+        $("[data-toggle='tooltip']").tooltip();
+    });
+
+
+    function resetRawOptions() {
+        $("#rawPerSpool").val(1);
+        $("#rawEncoding").val(null);
+        $("#rawEndOfDoc").val(null);
+        $("#rawAltPrinting").prop('checked', false);
+        $("#rawCopies").val(1);
+    }
+
+    function resetPixelOptions() {
+        $("#pxlColorType").val("color");
+        $("#pxlCopies").val(1);
+        $("#pxlDensity").val('');
+        $("#pxlDuplex").prop('checked', false);
+        $("#pxlInterpolation").val("");
+        $("#pxlJobName").val("");
+        $("#pxlOrientation").val("");
+        $("#pxlPaperThickness").val(null);
+        $("#pxlPrinterTray").val(null);
+        $("#pxlRasterize").prop('checked', true);
+        $("#pxlRotation").val(0);
+        $("#pxlScale").prop('checked', true);
+        $("#pxlUnitsIN").prop('checked', true);
+
+        $("#pxlMargins").val(0).css('display', '');
+        $("#pxlMarginsTop").val(0);
+        $("#pxlMarginsRight").val(0);
+        $("#pxlMarginsBottom").val(0);
+        $("#pxlMarginsLeft").val(0);
+        $("#pxlMarginsActive").prop('checked', false);
+        $("#pxlMarginsGroup").css('display', 'none');
+
+        $("#pxlSizeWidth").val('');
+        $("#pxlSizeHeight").val('');
+        $("#pxlSizeActive").prop('checked', false);
+        $("#pxlSizeGroup").css('display', 'none');
+    }
+
+    function resetSerialOptions() {
+        $("#serialPort").val('');
+        $("#serialCmd").val('');
+        $("#serialBegin").val("0x0002"); //String.fromCharCode(2)
+        $("#serialEnd").val("0x000D"); //String.fromCharCode(13)
+
+        $("#serialBaud").val(9600);
+        $("#serialData").val(8);
+        $("#serialStop").val(1);
+        $("#serialParity").val('NONE');
+        $("#serialFlow").val('NONE');
+
+        // M/T PS60 - 9600, 7, 1, EVEN, NONE
+    }
+
+    function resetUsbOptions() {
+        $("#usbVendor").val('');
+        $("#usbProduct").val('');
+
+        $("#usbInterface").val('');
+        $("#usbEndpoint").val('');
+        $("#usbData").val('');
+        $("#usbResponse").val(8);
+        $("#usbStream").val(10);
+
+        // M/T PS60 - V:0x0EB8 P:0xF000, I:0x0 E:0x81
+        // Dymo S100 - V:0x0922 P:0x8009, I:0x0 E:0x82
+    }
+
+    function resetHidOptions() {
+        $("#hidVendor").val('');
+        $("#hidProduct").val('');
+
+        $("#hidInterface").val('');
+        $("#hidEndpoint").val('');
+        $("#hidData").val('');
+        $("#hidReport").val('');
+        $("#hidResponse").val(8);
+        $("#hidStream").val(10);
+    }
+
+    qz.websocket.setClosedCallbacks(function(evt) {
+        updateState('Inactive', 'default');
+        console.log(evt);
+
+        if (evt.reason) {
+            displayMessage("<strong>Connection closed:</strong> " + evt.reason, 'alert-warning');
+        }
+    });
+
+    qz.websocket.setErrorCallbacks(handleConnectionError);
+
+    qz.serial.setSerialCallbacks(function(streamEvent) {
+        if (streamEvent.type !== 'ERROR') {
+            console.log('Serial', streamEvent.portName, 'received output', streamEvent.output);
+            displayMessage("Received output from serial port [" + streamEvent.portName + "]: <em>" + streamEvent.output + "</em>");
+        } else {
+            console.log(streamEvent.exception);
+            displayMessage("Received an error from serial port [" + streamEvent.portName + "]: <em>" + streamEvent.exception + "</em>", 'alert-error');
+        }
+    });
+
+    qz.usb.setUsbCallbacks(function(streamEvent) {
+        var vendor = streamEvent.vendorId;
+        var product = streamEvent.productId;
+
+        if (vendor.substring(0, 2) != '0x') { vendor = '0x' + vendor; }
+        if (product.substring(0, 2) != '0x') { product = '0x' + product; }
+        var $pin = $('#' + vendor + product);
+
+        if (streamEvent.type !== 'ERROR') {
+            if (window.readingWeight) {
+                $pin.html("<strong>Weight:</strong> " + readScaleData(streamEvent.output));
+            } else {
+                $pin.html("<strong>Raw data:</strong> " + streamEvent.output);
+            }
+        } else {
+            console.log(streamEvent.exception);
+            $pin.html("<strong>Error:</strong> " + streamEvent.exception);
+        }
+    });
+
+    qz.hid.setHidCallbacks(function(streamEvent) {
+        var vendor = streamEvent.vendorId;
+        var product = streamEvent.productId;
+
+        if (vendor.substring(0, 2) != '0x') { vendor = '0x' + vendor; }
+        if (product.substring(0, 2) != '0x') { product = '0x' + product; }
+        var $pin = $('#' + vendor + product);
+
+        if (streamEvent.type === 'RECEIVE') {
+            if (window.readingWeight) {
+                var weight = readScaleData(streamEvent.output);
+                if (weight) {
+                        $pin.html("<strong>Weight:</strong> " + weight);
+                }
+            } else {
+                $pin.html("<strong>Raw data:</strong> " + streamEvent.output);
+            }
+        } else if (streamEvent.type === 'ACTION') {
+            displayMessage("<strong>Device status changed:</strong> " + "[v:" + vendor + " p:" + product + "] - " + streamEvent.actionType);
+        } else { //ERROR type
+            console.log(streamEvent.exception);
+            $pin.html("<strong>Error:</strong> " + streamEvent.exception);
+        }
+    });
+
+    var qzVersion = 0;
+    function findVersion() {
+        qz.api.getVersion().then(function(data) {
+            $("#qz-version").html(data);
+            qzVersion = data;
+        }).catch(displayError);
+    }
+
+    $("#askFileModal").on("shown.bs.modal", function() {
+        $("#askFile").focus().select();
+    });
+    $("#askHostModal").on("shown.bs.modal", function() {
+        $("#askHost").focus().select();
+    });
+
+
+
+    function handleConnectionError(err) {
+        updateState('Error', 'danger');
+
+        if (err.target != undefined) {
+            if (err.target.readyState >= 2) { //if CLOSING or CLOSED
+                displayError("Connection to QZ Tray was closed");
+            } else {
+                displayError("A connection error occurred, check log for details");
+                console.error(err);
+            }
+        } else {
+            displayError(err);
+        }
+    }
+
+    function displayError(err) {
+        console.error(err);
+        displayMessage(err, 'alert-danger');
+    }
+
+    function displayMessage(msg, css) {
+        if (css == undefined) { css = 'alert-info'; }
+
+        var timeout = setTimeout(function() { $('#' + timeout).alert('close'); }, 5000);
+
+        var alert = $("<div/>").addClass('alert alert-dismissible fade in ' + css)
+                        .css('max-height', '20em').css('overflow', 'auto')
+                        .attr('id', timeout).attr('role', 'alert');
+        alert.html("<button type='button' class='close' data-dismiss='alert'>&times;</button>" + msg);
+
+        $("#qz-alert").append(alert);
+    }
+
+    function pinMessage(msg, id, css) {
+        if (css == undefined) { css = 'alert-info'; }
+
+        var alert = $("<div/>").addClass('alert alert-dismissible fade in ' + css)
+                        .css('max-height', '20em').css('overflow', 'auto').attr('role', 'alert')
+                        .html("<button type='button' class='close' data-dismiss='alert'>&times;</button>");
+
+        var text = $("<div/>").html(msg);
+        if (id != undefined) { text.attr('id', id); }
+
+        alert.append(text);
+
+        $("#qz-pin").append(alert);
+    }
+
+    function updateState(text, css) {
+        $("#qz-status").html(text);
+        $("#qz-connection").removeClass().addClass('panel panel-' + css);
+
+        if (text === "Inactive" || text === "Error") {
+            $("#launch").show();
+        } else {
+            $("#launch").hide();
+        }
+    }
+
+
+
+    /// QZ Config ///
+    var cfg = null;
+    function getUpdatedConfig() {
+        if (cfg == null) {
+            cfg = qz.configs.create(null);
+        }
+
+        updateConfig();
+        return cfg
+    }
+
+    function updateConfig() {
+        var pxlSize = null;
+        if ($("#pxlSizeActive").prop('checked')) {
+            pxlSize = {
+                width: $("#pxlSizeWidth").val(),
+                height: $("#pxlSizeHeight").val()
+            };
+        }
+
+        var pxlMargins = $("#pxlMargins").val();
+        if ($("#pxlMarginsActive").prop('checked')) {
+            pxlMargins = {
+                    top: $("#pxlMarginsTop").val(),
+                    right: $("#pxlMarginsRight").val(),
+                    bottom: $("#pxlMarginsBottom").val(),
+                    left: $("#pxlMarginsLeft").val()
+            };
+        }
+
+        var copies = 1;
+        var jobName = null;
+
+        if ($("#rawTab").hasClass("active")) {
+            copies = $("#rawCopies").val();
+            jobName = $("#rawJobName").val();
+        } else {
+            copies = $("#pxlCopies").val();
+            jobName = $("#pxlJobName").val();
+        }
+
+        cfg.reconfigure({
+            altPrinting: $("#rawAltPrinting").prop('checked'),
+            encoding: $("#rawEncoding").val(),
+            endOfDoc: $("#rawEndOfDoc").val(),
+            perSpool: $("#rawPerSpool").val(),
+
+            colorType: $("#pxlColorType").val(),
+            copies: copies,
+            density: $("#pxlDensity").val(),
+            duplex: $("#pxlDuplex").prop('checked'),
+            interpolation: $("#pxlInterpolation").val(),
+            jobName: jobName,
+            margins: pxlMargins,
+            orientation: $("#pxlOrientation").val(),
+            paperThickness: $("#pxlPaperThickness").val(),
+            printerTray: $("#pxlPrinterTray").val(),
+            rasterize: $("#pxlRasterize").prop('checked'),
+            rotation: $("#pxlRotation").val(),
+            scaleContent: $("#pxlScale").prop('checked'),
+            size: pxlSize,
+            units: $("input[name='pxlUnits']:checked").val()
+        });
+    }
+
+    function setPrintFile() {
+        setPrinter({ file: $("#askFile").val() });
+        $("#askFileModal").modal('hide');
+    }
+
+    function setPrintHost() {
+        setPrinter({ host: $("#askHost").val(), port: $("#askPort").val() });
+        $("#askHostModal").modal('hide');
+    }
+
+    function setPrinter(printer) {
+        var cf = getUpdatedConfig();
+        cf.setPrinter(printer);
+
+        if (typeof printer === 'object' && printer.name == undefined) {
+            var shown;
+            if (printer.file != undefined) {
+                    shown = "<em>FILE:</em> " + printer.file;
+            }
+            if (printer.host != undefined) {
+                    shown = "<em>HOST:</em> " + printer.host + ":" + printer.port;
+            }
+
+            $("#configPrinter").html(shown);
+        } else {
+            if (printer.name != undefined) {
+                    printer = printer.name;
+            }
+
+            if (printer == undefined) {
+                    printer = 'NONE';
+            }
+            $("#configPrinter").html(printer);
+        }
+    }
+</script>
+
+</html>
+
+
+

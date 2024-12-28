@@ -1,0 +1,38 @@
+<h1 id="header">Clase/Marca - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+  <%= form_for(@clase) do |f| %>
+
+  <% if @clase.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@clase.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @clase.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <table>
+    <tr>
+      <td>
+        <label>Descripción:</label>
+        <%= f.text_field :descricao, size: 60, autofocus: true, required: true %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <label>Cod. Implantación:</label>
+        <%= f.text_field :cod_impl, size: 5 %>
+      </td>
+    </tr>
+  </table>
+
+  <div class="footer-buttons">
+    <%= f.submit t('SAVE'), :class => "btn btn-green", :disable_with => "Aguarde...", "data-plus-as-tab" => "false"   %>
+    <%= link_to t('BACK'), clases_path, :class => "btn btn-back" %>
+  </div>
+  <% end %>
+</div>

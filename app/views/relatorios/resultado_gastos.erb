@@ -1,0 +1,9 @@
+<% if params[:tp] == "0" %>   
+  <%= render :partial => 'relatorios/forms/gastos/analitico' %>
+<% elsif params[:tp] == "1" %>
+  <%= render :partial => 'relatorios/forms/gastos/analitico_custos' %>
+<% elsif params[:tp] == "2" %>
+  <%= render :partial => 'relatorios/forms/gastos/sintetico_grupo_rubro'  %>
+<% elsif params[:tp] == "3" %>
+  <%= render :partial => 'relatorios/forms/gastos/sintetico_rubro' %>
+<% end %>

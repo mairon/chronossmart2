@@ -1,0 +1,29 @@
+<div class="group">  
+   <table>
+      <tr>
+         <td width="80"align="center"><%= t('DATE') %></td>
+         <td width="150"align="center">Cod.</td>
+         <td width="300"align="center">Produto</td>
+         <td width="100"align="center">Cotacion</td>
+         <td width="100"align="center">Valor Dolar</td>
+         <td width="100"align="center">Valor Gs.</td>
+      </tr>
+   </table>
+
+   <div class="rolagem" id="div">
+      <table>
+         <% for persona in @tabela %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+               <td width="80"align="center"><%=h persona.data.strftime("%d/%m/%Y") %></td>
+               <td width="150"align="center"><%=h persona.codigo %></td>
+               <td width="300"align="left"><%=h persona.produto_nome %></td>
+               <td width="100"align="right"><%= number_to_currency(persona.cotacao, :format=>' %n ', :separator => ",") %></td>
+               <td width="100"align="right"><%= number_to_currency(persona.preco_venda_dolar, :format=>' %n ', :separator => ",") %></td>
+               <td width="100"align="right"><%= number_to_currency(persona.preco_venda_guarani, :format=>' %n ', :separator => ",") %></td>
+            </tr>
+         <% end %>
+      </table>
+   </div>
+</div>
+
+

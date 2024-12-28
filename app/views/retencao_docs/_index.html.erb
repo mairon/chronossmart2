@@ -1,0 +1,51 @@
+<table class="head_grid">
+  <tr>
+    <td width="200" >Factura</td>
+    <td width="50" >Cuotas</td>
+    <td width="200" >Retención</td>
+    <td width="20"></td>
+    <td width="80" align="right">Gravada</td>
+    <td width="80" align="right">IVA</td>
+    <td width="80" align="right">Retención</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div" style="height: 120px">
+  <table>
+    <% tot = 0 %>
+    <% retencao_docs.each do |f| %>
+   <tr class = "<%= cycle( "cor1", "cor2" )%>">
+      <td width="200"><%= f.documento_numero_01 %>-<%= f.documento_numero_02 %>-<%= f.documento_numero %></td>
+      <td width="50"><%= f.cota %></td>
+      <td width="200"><%= f.retencao_01  %>-<%= f.retencao_02 %>-<%= f.retencao_numero %></td>
+      <% if f.moeda.to_i == 0 %>
+        <td>U$</td>
+        <td width="80" align="right">   <%=h number_to_currency( f.valor_us, :format=>' %n ', :separeitor => ',')  %></td>
+        <td width="80" align="right">   <%=h number_to_currency( f.iva_us, :format=>' %n ', :separeitor => ',')  %></td>
+        <td width="80" align="right">   <%=h number_to_currency( f.retencao_us, :format=>' %n ', :separeitor => ',')  %></td>
+        <% tot += f.retencao_us.to_f %>
+      <% else %>
+      <td>G$</td>
+        <td width="80" align="right">   <%=h number_to_currency(f.valor_gs, :format=>' %n ', :precision => 0)  %></td>
+        <td width="80" align="right">   <%=h number_to_currency(f.iva_gs, :format=>' %n ', :precision => 0)  %></td>
+        <td width="80" align="right">   <%=h number_to_currency(f.retencao_gs, :format=>' %n ', :precision => 0)  %></td>
+        <% tot += f.retencao_gs.to_f %>
+      <% end %>
+      <td><%= link_to 'Imprimir', "#" %></td>
+        <td><%= link_to 'Editar', edit_retencao_doc_path(f) %></td>
+        <td><%= link_to t('DELETE'), f, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+  <table class="head_grid">
+    <tr>
+      <td align="right" width="560"></td>
+        <td width="100" align="right">
+          <b>
+            <%= number_to_currency( tot, :format =>' %n ', :separator => ",")   %>
+          </b>
+        </td>
+    </tr>
+  </table>
+

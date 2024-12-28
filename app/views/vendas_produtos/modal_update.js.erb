@@ -1,0 +1,2 @@
+$("#sub_total_guarani").html("<%= number_to_currency(VendasProduto.sum(:total_guarani,   :conditions => ['venda_id = ?',@vendas_produto.venda_id]), :format=>' %n ', :precision => 0)%>");	
+$("#total_guarani").html("<%= number_to_currency( ( (VendasProduto.sum(:total_guarani,   :conditions => ['venda_id = ?',@vendas_produto.venda_id]).to_f ) - (Venda.where(id: @vendas_produto.venda_id).last.desconto_gs.to_f )  ), :format=>' %n ', :precision => 0)%>");	

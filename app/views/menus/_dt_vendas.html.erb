@@ -1,0 +1,72 @@
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel">
+			<h1 id="header">
+		    Cliente: <%= @venda.persona.nome %> 
+		    <div style="float: right">
+		    	#<%= @venda.id.to_s.rjust(6,'0') %> - <%= @venda.documento_numero_01 %>-<%= @venda.documento_numero_02 %>-<%= @venda.documento_numero %>
+		    </div>
+		  </h1> 
+		  </div>
+	  </div> 
+	</div>
+
+<div class="row">
+	<div class="col-md-7">
+		<h1 id="header"><%= t('SALES') %></h1>
+			<div class="group">
+			   <table class="head_grid">
+			      <tr>
+			         <td width="80"><%= t('CODE') %></td>
+			         <td width="350">Producto</td>
+			         <td width="80" align="right">Ctd</td>
+			         <td width="80" align="right">Unit</td>
+			         <td width="80" align="right">Tot</td>
+
+			      </tr>
+			   </table>  
+			   <div class="rolagem" id="div" style="height: 150px">
+			      <table>
+			         <% @venda.vendas_produtos.each do |d| %>
+			            <tr class="<%= cycle("cor1", "cor2")%>">
+			              <td width="80"><%= d.produto_id %></td>
+			              <td width="350"><%= d.produto_nome %></td>
+			              <td width="80" align="right"><%= d.quantidade %></td>
+			              <td width="80" align="right"><%= format_decimal(d.unitario_dolar) %></td>
+			              <td width="80" align="right"><%= format_decimal(d.total_dolar) %></td>
+			            </tr>
+			         <% end %>
+			      </table>
+			   </div>
+			</div>
+		</div>
+		<div class="col-md-5">
+<div class="panel">
+	<h1 id="header">OS</h1>
+  <div class="panel-content">
+		<table class="head_grid">
+			<tr>
+				<td width="50"><%= t('CODE') %></td>
+				<td width="50">R.T.</td>
+				<td width="250">Responsable</td>
+				<td width="80" align="right">Qtd</td>
+			</tr>
+		</table>
+		<div class="rolagem" dir="div" style="height:80px">
+			<table>
+				<% @venda.vendas_ordem_servs.each do |o| %>
+					<tr class = "<%= cycle("cor1", "cor2") %>">
+						<td width="50"><%= o.id.to_s.rjust(6,'0') %></td>
+						<td width="50"><%= o.ordem_serv.rt %></td>
+						<% rp = Persona.find_by_id(o.ordem_serv.responsavel_id) if o.ordem_serv.responsavel_id.present?  %>
+						<td width="250"><%= rp.nome if rp.present? %></td>
+						<td width="80" align="right"><%= format_int((o.ordem_serv.ordem_serv_prods.where(status: true).sum(:quantidade) ).to_f + (o.ordem_serv.ordem_serv_prods.where(status: false).sum(:quantidade)).to_f) %></td>						
+					</tr>
+				<% end %>
+			</table>
+		</div>
+	</div>
+</div>
+
+			</div>		
+	</div>			

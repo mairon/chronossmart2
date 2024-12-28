@@ -1,0 +1,56 @@
+<% qtd = 0 %>
+<% tot = 0 %>
+<% sub_qtd = 0 %>
+<% sub_tot = 0 %>
+<% quebra = '' %>
+<table>
+  <% @vendas.each do |cp| %>
+		<% if quebra != cp.bico_nome %>
+		  <% if quebra != "" %>
+		  		<tr class="head">
+		  			<td colspan="4" align="right">Sub-Total ==> </td>
+			      <td width="40" align="right"><%= format_decimal(sub_qtd.to_f) %></td>
+			      <td width="70" align="right"><%= format_int(sub_tot) %></td>
+						<% sub_qtd = 0 %>
+						<% sub_tot = 0 %>
+		  		</tr>
+		  		<tr>
+		  			<td height="15"></td>
+		  		</tr>
+		    <% end %>
+		    <tr class="head">
+		    	<td  colspan="8"><%= quebra = cp.bico_nome %> - <%= cp.produto_nome %> </td>
+		    </tr>
+		<% end %>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+    	<td width="5"></td>
+    	<td width="40"><%= cp.controle_caixa.to_s.rjust(6,'0') %></td>
+    	<td width="80"><%= cp.turno_nome %></td>
+    	<td width="150"><%= cp.usuario_nome %> </td>
+      <td width="40" align="right"><%= format_decimal(cp.qtd.to_f) %></td>
+      <td width="70" align="right"><%= format_int(cp.tot_gs) %></td>
+      <% sub_qtd += cp.qtd.to_f %>
+      <% sub_tot += cp.tot_gs.to_f %>
+      <% qtd += cp.qtd.to_f %>
+      <% tot += cp.tot_gs.to_f %>
+    </tr>
+  <% end %>
+	<tr class="head">
+		<td colspan="4" align="right">Sub-Total ==> </td>
+    <td width="40" align="right"><%= format_decimal(sub_qtd.to_f) %></td>
+    <td width="70" align="right"><%= format_int(sub_tot) %></td>
+		<% sub_qtd = 0 %>
+		<% sub_tot = 0 %>
+	</tr>
+
+	<tr>
+		<td height="15"></td>
+	</tr>
+
+  <tr class="head">
+  <td colspan="4" align="right">Total General ==> </td>
+    <td width="40" align="right"><%= format_decimal(qtd) %></td>
+    <td width="70" align="right"><%= format_int(tot) %></td>
+  </tr>
+</table>

@@ -1,0 +1,55 @@
+
+<h1 id="header">Config Formulario - [<%= t('EDITION') %>]</h1>
+<div class="group">
+<%= form_for(@config_printer) do |f| %>
+  <% if @config_printer.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@config_printer.errors.count, "error") %> prohibited this config_printer from being saved:</h2>
+      <ul>
+      <% @config_printer.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <table>
+    <tr>
+      <td>
+        <label>Descricao</label>
+        <%= f.text_field :descricao, size: 53, autofocus: true %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <label>Processo</label>
+        <%= f.text_field :processo, size: 53 %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <label>Impressora</label>
+        <%= f.text_area :printer, size: 53 %>
+      </td>
+    </tr>
+     <tr>
+      <td>
+        <label>Ordem</label>
+        <%= f.text_field :ordem, size: 53 %>
+      </td>
+    </tr>
+
+     <tr>
+      <td>
+        <label>Unidad</label>
+        <%= f.collection_select :unidade_id, Unidade.select('id,unidade_nome').order('unidade_nome'), :id, :unidade_nome %>
+      </td>
+    </tr>
+
+    </table>
+    <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), config_printers_path, :class => "btn btn-back" %>
+    </div>
+  </div>
+<% end %>

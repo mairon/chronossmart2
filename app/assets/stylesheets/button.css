@@ -1,0 +1,192 @@
+a:hover{
+text-decoration: none;
+}
+
+.buttons{
+  padding: 7px;
+  border-top: 1px solid #e6e6e6;
+  color: #f5f5f5;
+  line-height: 1;
+  font-size:14px;
+  background: #f5f5f5;
+}
+
+.enviar {   
+  border: 1px solid #b1b5d0;
+  border: 1px solid #b1b5d0;
+  padding: 10px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  font-family:verdana,geneva,arial,helvetica,sans-serif;
+  font-size:14px;
+  font-weight:bold;
+} 
+
+.enviar:hover {   
+  background: #ddd;
+  border: 1px solid #bbb;
+  border-bottom: 1px solid #999;
+  cursor: pointer;
+  text-shadow: 0 2px 0 #ddd;
+} 
+
+
+.sair {   
+  
+  border: 1px solid #111;
+   padding: 10px 20px; 
+   -webkit-border-radius:0.2em;
+   -moz-border-radius:0.2em;
+   border-radius:0.2em;
+   font-family:verdana,geneva,arial,helvetica,sans-serif;
+   font-size:14px;
+   font-weight:bold;
+   text-decoration: none; 
+   color: #333; 
+} 
+
+
+.links {    
+  display: inline-block;
+    padding: 4px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    line-height: 20px;
+    color: #333;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    background-color: #f5f5f5;
+
+
+} 
+
+.links:hover {    
+        background-color: #ddd;
+} 
+
+
+.button{
+  display:inline-block;
+  padding:9px;
+  font-size:14px;
+  line-height:1.42857143;
+  text-align:center;
+  white-space:nowrap;
+  vertical-align:middle;
+  -ms-touch-action:manipulation;
+  touch-action:manipulation;
+  cursor:pointer;
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
+  background-image:none;
+  border:1px solid #ccc;
+  border-radius:3px;
+  font-family: 'prox';
+  margin-top: -1px
+}
+
+
+
+.button_info{
+  display: inline-block;
+  white-space: nowrap;
+  background-color: #ccc;
+}
+
+.button:focus{
+  cursor: pointer;
+  background-color: #f5f5f5; 
+}
+
+.button:focus
+{
+        outline: 0;
+        background: #fafafa;
+}    
+
+.button:before
+{
+    float: left;
+    margin-left: -5px;
+    margin-right: 5px;
+}
+
+/* Hexadecimal entities for the icons */
+
+.add{
+    color: #fff !important;
+    background-color: #5bb75b;
+    border-color: #5bb75b;
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 20%), 0 2px 10px 0 rgb(0 0 0 / 10%);
+}
+
+.add:hover,.add:focus {
+    color: #fff;
+    background-color: #449d44;
+}
+
+
+
+.add:before{
+  content: "\271A";
+}
+
+.edit:before
+{
+        content: "\270E";
+}
+
+.delete:before
+{
+        content: "\2718";
+}
+
+.save:before
+{
+        content: "\2714";
+}
+
+.email:before
+{
+        content: "\2709";
+}
+
+.like:before
+{
+        content: "\2764";
+}
+
+.next:before
+{
+        content: "\21AA";
+}
+
+.back:before
+{
+        content: "\21A9";
+}
+
+.star:before
+{
+        content: "\2605";
+}
+
+.spark:before
+{
+        content: "\2737";
+}
+
+.play:before
+{
+        content: "\25B6";
+}
+
+.print{
+  background: url(icon_print_black.png) no-repeat;
+  padding-left: 30px;
+  background-position: 4px 2px; 
+}

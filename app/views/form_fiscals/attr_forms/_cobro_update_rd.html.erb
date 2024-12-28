@@ -1,0 +1,35 @@
+<%= form_tag "/form_fiscals/cobro_update_rd" do %>
+	<%= hidden_field_tag :cod_proc, @cobro.id %>
+	<%= hidden_field_tag :sigla_proc, 'CB' %>
+	
+	<%= hidden_field_tag :produto_id, Empresa.last.produto_id %>
+	<%= hidden_field_tag :status, 1 %>
+	<%= hidden_field_tag :tipo, 0 %>
+	<%= hidden_field_tag :ruc, @cobro.persona.ruc %>
+	<%= hidden_field_tag :persona_nome, @cobro.persona.nome_fatura %>
+	<%= hidden_field_tag :persona_id, @cobro.persona_id %>
+	<%= hidden_field_tag :cota, 1 %>
+	<%= hidden_field_tag :tipo_op, 15 %>
+	<%= hidden_field_tag :moeda, @cobro.moeda %>
+	<div class="row">
+		<label>Fecha</label>
+		<%= text_field_tag :data, Time.now.strftime("%d/%m/%Y") %>
+	</div>
+	<div class="row">
+		<div class="col-md-4">
+			<label>Factura</label>
+			<%= select("busca", "doc", FormFiscal.all(:select => 'id,doc,doc_01,doc_02',:conditions => ["tipo_doc = 15 and status = 0 and unidade_id = #{current_unidade.id}"],limit: 60,:order => 'CAST(doc as integer)').collect {|p| [ p.doc_01 << '.' << p.doc_02 << '.' << p.doc, p.id ] },:class => "select", )  %>			
+		</div>
+		<div class="col-md-4">
+			<label>Monto</label>
+			<% if @cobro.moeda.to_i == 0 %>
+				<%= text_field_tag :tot_gs, @fecha_result_us.to_i, size: 10 %>
+			<% else %>
+				<%= text_field_tag :tot_gs, @fecha_result_gs.to_i, size: 10 %>
+			<% end %>
+		</div>
+		<div class="col-md-4" style="margin-top: 25px">
+			<%= submit_tag " Grabar ", :disable_with => "Aguarde...", :class => "btn btn-green" %>
+		</div>
+	</div>
+<% end %>

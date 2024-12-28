@@ -1,0 +1,5 @@
+$('#cidade_regiao_id').empty();
+
+<% for ne in @estados %>
+  $('#cidade_regiao_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+<% end %>

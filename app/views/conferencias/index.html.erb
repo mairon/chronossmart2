@@ -1,0 +1,33 @@
+<h1 id="header">Conferencias</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_conferencia_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="60" align="center">Laz.</td>
+    <td width="60" align="center"><%= t('DATE') %></td>
+    <td width="300">Sub-Grupo</td>
+    <td width="300">Depósito</td>
+    <td width="100" align="right">Chequeados</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @conferencias.each do |conferencia| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="60" align="center"><%= conferencia.id.to_s.rjust(6,'0') %></td>
+        <td width="60" align="center"><%= conferencia.data.strftime("%d/%m/%y") %></td>
+        <td width="300"><%= conferencia.sub_grupo.descricao unless conferencia.sub_grupo_id.blank? %></td>
+        <td width="300"><%= conferencia.deposito.nome unless conferencia.deposito_id.blank? %></td>
+        <td width="100" align="right"><%= conferencia.conferencia_produtos.count(:id) %></td>
+        <td><%= link_to '', edit_conferencia_path(conferencia), class: 'icon-pencil' %></td>
+        <td><%= link_to '', conferencia, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+<div class="head_grid">
+  <%= will_paginate @conferencias, "data-remote" => "true" %>
+</div>

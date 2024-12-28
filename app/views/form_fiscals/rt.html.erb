@@ -1,0 +1,75 @@
+<body  onload="print()">
+
+<style type="text/css">
+	
+div{
+	font-family:Arial;
+		font-size:8px;
+}
+
+td{
+	font-family:Arial;
+		font-size:8px;
+}
+
+</style>
+
+<div style="position: absolute;top:30px;left:80px;">
+	<%= @rt.data.strftime("%d") %>
+</div>
+<div style="position: absolute;top:30px;left:110px;">
+	<%= @rt.data.strftime("%m") %>
+</div>
+<div style="position: absolute;top:30px;left:140px;">
+	<%= @rt.data.strftime("%Y") %>
+</div>
+
+<div style="position: absolute;top:39px;left:110px;">
+	<%= @rt.persona_nome %>
+</div>
+<div style="position: absolute;top:48px;left:100px;">
+	<%= @rt.ruc %>
+</div>
+
+<div style="position: absolute;top:40px;left:480px;">
+<table>
+<% if @rt.sigla_proc == 'CP' %>
+	<% ret = Retencao.find_by_id(@rt.cod_proc) %>
+	<% documentos = RetencaoDoc.all(:conditions => ["retencao_id = ?",@rt.cod_proc]).collect{|d| d.documento_numero}.join(", ") %>
+	<% documentos1 = RetencaoDoc.all(:conditions => ["retencao_id = ?",@rt.cod_proc]).collect{|d| d.documento_numero_01}.join(", ") %>
+	<% documentos2 = RetencaoDoc.all(:conditions => ["retencao_id = ?",@rt.cod_proc]).collect{|d| d.documento_numero_02}.join(", ") %>
+    <tr><%= documentos2 %>-<%= documentos1 %>-<%= documentos %></tr>
+</table>
+</div>
+<% end %>
+_____________________________________
+
+<div style="position: absolute;top:75px;left:110px;">
+	<%= "valor_total_sin_iva" %>
+</div>
+<div style="position: absolute;top:84px;left:110px;">
+	<%= "iva" %>
+</div>
+<div style="position: absolute;top:93px;left:100px;">
+	<%= "valor_liquido" %>
+</div>
+<div style="position: absolute;top:102px;left:100px;">
+	<%= "iva" %>
+</div>
+<div style="position: absolute;top:113px;left:110px;">
+	<%= "%_retencao" %>
+</div>
+<div style="position: absolute;top:122px;left:140px;">
+	<%= "valor_retencao" %>
+</div>
+<div style="position: absolute;top:113px;left:400px;">
+	<%= "%_retencao" %>
+</div>
+<div style="position: absolute;top:122px;left:500px;">
+	<%= "valor_retencao" %>
+</div>
+<div style="position: absolute;top:133px;left:110px;">
+	<%= "valor_extenso" %>
+</div>
+
+</body>

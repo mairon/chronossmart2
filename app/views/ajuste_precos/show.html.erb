@@ -1,0 +1,124 @@
+<h1 id="header">Productos</h1>
+<div class="tab_container">
+	<br/>
+	<div class="group">
+		<fieldset>
+			<legend>Detalhes</legend>
+			<table>
+				<tr>
+					<td>Marca : </td>
+					<td> <b> <%= @ajuste_preco.sub_grupo.descricao unless @ajuste_preco.sub_grupo_id.blank? %></b></td>
+				</tr>
+
+				<tr>
+					<td>Colección : </td>
+					<td> <b> <%= @ajuste_preco.colecao.nome unless @ajuste_preco.colecao_id.blank? %></b></td>
+				</tr>
+
+				<tr>
+					<td>Operacíon: </td>
+					<td>
+					 <b>
+						<% if @ajuste_preco.tipo == 0 %>
+							Desconto
+						<% else %>
+							Acréscimos
+						<% end %>
+						</b>
+					</td>
+				</tr>
+			</table>
+		</fieldset>
+
+
+		<fieldset>
+			<legend>Porcentagen de Descuentos</legend>
+			<table>
+				<tr>
+					<td>Consumidor Final:</td>
+					<td><b> <%= @ajuste_preco.porcen_1 %>%</b></td>
+					<td width="200"></td>
+					<td>Colaboradores:</td>
+					<td><b>  <%= @ajuste_preco.porcen_3 %>%</b></td>
+				</tr>
+				<tr>
+					<td>Cliente Especial:</td>
+					<td><b>  <%= @ajuste_preco.porcen_2 %>%</b></td>
+					<td width="200"></td>
+					<td>Tabla 4:</td>
+					<td><b>  <%= @ajuste_preco.porcen_4 %>%</b></td>
+				</tr>
+			</table>
+		</fieldset>
+	</div>
+
+	<br/>
+	 <table class="head_grid">
+	  <tr>
+	  	<td width="150" rowspan="2">Cod</td>
+	    <td width="150" rowspan="2">Ref.</td>
+	    <td width="250" rowspan="2">Producto</td>
+	    <td align="center" colspan="2">Consumidor Final</td>
+	    <td align="center" colspan="2">Cliente Especial</td>
+	    <td align="center" colspan="2">Colaboradores</td>
+	    <td align="center" colspan="2">Tabla 04</td>
+	  </tr>
+	  <tr>
+	    <td width="70" align="right">Anterior</td>
+	    <td width="70" align="right">Ajust</td>
+
+	    <td width="70" align="right">Anterior</td>
+	    <td width="70" align="right">Ajust</td>
+
+	    <td width="70" align="right">Anterior</td>
+	    <td width="70" align="right">Ajust</td>
+
+	    <td width="70" align="right">Anterior</td>
+	    <td width="70" align="right">Ajust</td>
+	  </tr>
+	</table>
+
+	<div class="rolagem" dir="div">
+	  <table>
+	  <% @produtos.each do |p| %>
+	    <tr class = "<%= cycle("cor1", "cor2") %>">
+	    	<td width="150"><%= p.produto_id %></td>
+	      <td width="150"><%= p.produto.fabricante_cod %></td>
+	      <td width="250"><%= p.produto.nome %></td>
+	      <td width="71" align="right"> <%= number_to_currency(p.preco_1_us, :format=>' %n ', :separator => ",")  %></td>
+				<% if @ajuste_preco.tipo.to_i == 0 %>
+					<td width="71" align="right"> <%= number_to_currency((p.preco_1_us.to_f -  (p.preco_1_us.to_f * (@ajuste_preco.porcen_1.to_f / 100))), :format=>' %n ', :separator => ",")  %></td>
+				<% else %>
+					<td width="71" align="right"> <%= number_to_currency((p.preco_1_us.to_f +  (p.preco_1_us.to_f * (@ajuste_preco.porcen_1.to_f / 100))), :format=>' %n ', :separator => ",")  %></td>
+				<% end %>
+
+	      <td width="71" align="right"> <%= number_to_currency(p.preco_2_us, :format=>' %n ', :separator => ",")  %></td>
+				<% if @ajuste_preco.tipo.to_i == 0 %>
+					<td width="71" align="right"> <%= number_to_currency((p.preco_2_us.to_f -  (p.preco_2_us.to_f * (@ajuste_preco.porcen_2.to_f / 100))), :format=>' %n ', :separator => ",")  %></td>
+				<% else %>
+					<td width="71" align="right"> <%= number_to_currency((p.preco_2_us.to_f +  (p.preco_2_us.to_f * (@ajuste_preco.porcen_2.to_f / 100))), :format=>' %n ', :separator => ",")  %></td>
+				<% end %>
+
+	      <td width="71" align="right"> <%= number_to_currency(p.preco_3_us, :format=>' %n ', :separator => ",")  %></td>
+				<% if @ajuste_preco.tipo.to_i == 0 %>
+					<td width="71" align="right"> <%= number_to_currency((p.preco_3_us.to_f -  (p.preco_3_us.to_f * (@ajuste_preco.porcen_3.to_f / 100))), :format=>' %n ', :separator => ",")  %></td>
+				<% else %>
+					<td width="71" align="right"> <%= number_to_currency((p.preco_3_us.to_f +  (p.preco_3_us.to_f * (@ajuste_preco.porcen_3.to_f / 100))), :format=>' %n ', :separator => ",")  %></td>
+				<% end %>
+
+	      <td width="71" align="right"> <%= number_to_currency(p.preco_4_us, :format=>' %n ', :separator => ",")  %></td>
+				<% if @ajuste_preco.tipo.to_i == 0 %>
+					<td width="71" align="right"> <%= number_to_currency((p.preco_4_us.to_f -  (p.preco_4_us.to_f * (@ajuste_preco.porcen_4.to_f / 100))), :format=>' %n ', :separator => ",")  %></td>
+				<% else %>
+					<td width="71" align="right"> <%= number_to_currency((p.preco_4_us.to_f +  (p.preco_4_us.to_f * (@ajuste_preco.porcen_4.to_f / 100))), :format=>' %n ', :separator => ",")  %></td>
+				<% end %>
+	  <% end %>
+	  </table>
+	</div>
+
+	<div class="buttons">
+	  <%= link_to t('BACK'), edit_ajuste_preco_path(@ajuste_preco), :class => "button back" %>
+	  <%= link_to 'Finalizar',  ajuste_precos_path, :class => "button next" %>
+	</div>
+
+</div>

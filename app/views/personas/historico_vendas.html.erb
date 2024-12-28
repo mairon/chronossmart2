@@ -1,0 +1,118 @@
+  <div class="group">
+    <div class="row">
+      <div class="col-md-12">
+        <h2>
+          Cliente: <%= @persona.id.to_s.rjust(6,'0') %>-<%= @persona.nome_fatura %> | Fantasia: <%= @persona.nome %> | RUC/CI: <%= @persona.ruc %>
+        </h2>
+      </div>
+    </div>
+     <%= form_tag busca_historico_vendas_persona_path, :method => "get" do %>
+      <div class="row">
+        <div class="col-md-12">
+          <label>Periodo</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+            <div class="input-group">
+              <%= text_field_tag :inicio, nil, onkeyup: "Formatadata(this,event)", required: true, size: 15 %>
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default" >
+                  <i class="icon-calendar" aria-hidden="true"></i>
+                </button>
+              </span>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="input-group">
+              <%= text_field_tag :final, nil, onkeyup: "Formatadata(this,event)", required: true, size: 15 %>
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default" >
+                  <i class="icon-calendar" aria-hidden="true"></i>
+                </button>
+              </span>
+            </div>
+        </div>
+        <div class="col-md-4">
+          <div class="input-group">
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default" >
+                <i class="icon-search" aria-hidden="true"></i>
+              </button>
+            </span>
+            <input id="busca" name="busca" type="search" value="<%= params[:busca]%>" placeholder="Buscar" onKeyUp="pesquisa(document.getElementById('busca').value)" size="40" autocapitalize="off" autocomplete="off" autocorrect="off" autofocus />
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinner", :width => 21, :height => 21, :style =>"display: none;" ) %>
+        </div>
+
+
+      </div>
+       <% end %>
+   </div>
+
+   <div id="pagina"></div>
+</body>
+
+
+ <script language="javascript">
+
+  function pesquisa(valor){
+    url="/personas/<%= @persona.id %>/busca_historico_vendas?" + $('form').serialize();
+    ajax(url);
+  }
+
+  function ajax(url){
+    $('#spinner').show();
+    req = null;
+
+    if (window.XMLHttpRequest) {
+
+      req = new XMLHttpRequest();
+
+      req.onreadystatechange = processReqChange;
+
+      req.open("GET",url,true);
+
+      req.send(null);
+
+    } else if (window.ActiveXObject) {
+
+      req = new ActiveXObject("Microsoft.XMLHTTP");
+
+      if (req) {
+        req.onreadystatechange = processReqChange;
+
+        req.open("GET",url,true);
+
+        req.send();
+      }
+    }
+  }
+
+
+  function processReqChange()
+  {
+
+    if (req.readyState == 4) {
+
+      if (req.status ==200) {
+        onSuccess:$('#spinner').hide();
+        document.getElementById('pagina').innerHTML = req.responseText;
+
+      } else {
+        alert("Houve um problema ao obter os dados:n" + req.statusText);
+      }
+    }
+  }
+
+  function bloqEnter(objEvent) {
+      var iKeyCode;
+      iKeyCode = objEvent.keyCode;
+      if(iKeyCode == 13) return false;
+      return true;
+  }
+</script>

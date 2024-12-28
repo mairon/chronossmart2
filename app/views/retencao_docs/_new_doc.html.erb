@@ -1,0 +1,77 @@
+<%= form_for(retencao_doc) do |f| %>
+  <% if retencao_doc.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@retencao_doc.errors.count, "error") %> prohibited this retencao_doc from being saved:</h2>
+
+      <ul>
+      <% retencao_doc.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= f.hidden_field :retencao_id %>
+  <%= f.hidden_field :data, value: @retencao.data %>
+  <%= f.hidden_field :moeda %>
+  <%= f.hidden_field :persona_id, value: @retencao.persona_id %>
+  <%= f.hidden_field :cotacao, value: @retencao.cotacao %>
+  <%= f.hidden_field :unidade_id, value: current_unidade.id %>
+  <div class="group">
+    <table>
+      <tr>
+        <td align="right">Doc.:</td>
+        <td>
+          <%= f.text_field :documento_numero_01, size: 5 %>-
+          <%= f.text_field :documento_numero_02, size: 5 %>-
+          <%= f.text_field :documento_numero, size: 15 %>
+        </td>
+        <td align="right">Cuota :</td>
+        <td><%= f.text_field :cota, size: 5 %></td>
+      </tr>
+      <tr>
+        <%= field_us 'Valor U$:',f,:valor_us %>
+        <%= field_gs 'Valor G$:',f,:valor_gs %>
+      </tr>
+
+      <tr>
+        <%= field_us 'IVA U$:', f, :iva_us %>
+        <%= field_gs 'IVA G$:', f, :iva_gs %>
+      </tr>
+      <tr>
+        <%= field_us 'Retenido %:', f, :retencao_perc, onchange: "CalcPercentualGs(), CalcPercentualUs()" %>
+      </tr>
+      <tr>
+        <%= field_us 'Retenido U$:', f, :retencao_us, required: true %>
+        <%= field_gs 'Retenido G$:', f, :retencao_gs, required: true %>
+      </tr>
+      <tr>
+        <td align="right">Retención:</td>
+        <td>
+          <%= f.text_field :retencao_01, size: 5, required: true %>-
+          <%= f.text_field :retencao_02, size: 5, required: true %>-
+          <%= f.text_field :retencao_numero, size: 15, required: true %>
+        </td>
+        <td></td>
+        <td>
+          <%= f.submit t('SAVE'), :class => "button add", :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %>
+        </td>
+      </tr>
+    </table>
+  </div>
+<% end %>
+
+<script>
+  function CalcPercentualGs(){
+    var perc = parseFloat($("#retencao_doc_retencao_perc").val().replace(/\./g, "").replace(",", ".")) / 100;
+    var perc_iva = $("#retencao_doc_iva_gs").val().replace(/\./g, "").replace(",", ".");
+    $("#retencao_doc_retencao_gs").val(number_format((perc_iva * perc),0, ',', '.'))
+  }
+
+  function CalcPercentualUs(){
+    var perc = parseFloat($("#retencao_doc_retencao_perc").val().replace(/\./g, "").replace(",", ".")) / 100;
+    var perc_iva = $("#retencao_doc_iva_us").val().replace(/\./g, "").replace(",", ".");
+    $("#retencao_doc_retencao_us").val(number_format((perc_iva * perc),2, ',', '.'))
+  }
+
+</script>

@@ -1,0 +1,27 @@
+<table class="head_grid">
+  <tr>
+    <td width="150"><%= t('NAME') %></ttd>
+    <td width="100">Tel.</td>
+    <td width="100">Cargo</td>
+    <td width="100"><%= t('DATE') %> Nasc.</td>
+    <td width="150">E-mail</td>
+  </tr>
+</table>
+
+<div class="list" dir="div">
+  <table>
+    <% persona_contatos.each do |persona_contato| %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td width="150"><small><%= persona_contato.nome %></small></td>
+        <td width="100"><%= persona_contato.telefone_01 %></td>
+        <td width="100"><%= persona_contato.cargo.nome unless persona_contato.cargo_id.blank? %></td>
+        <td width="100"><%= persona_contato.data_nascimento.strftime("%d/%m/%Y") %></td>
+        <td width="150"><%= persona_contato.email_01 %></td>
+        <td><%= link_to '', edit_persona_contato_path(persona_contato), class: 'icon-pencil' %></td>
+        <td><%= link_to '', persona_contato, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>
+
+      </tr>
+    <% end %>
+  </table>
+</div>
+

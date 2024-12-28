@@ -1,0 +1,43 @@
+<h1 id="header">Devolución de Cheque Cliente</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_dev_cheque_cliente_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="50">Lanz.</td>
+    <td width="70"><%= t('DATE') %></td>
+    <td width="250">Motivo</td>
+    <td width="250">Cliente</td>
+    <td width="200"><%= t('ACCOUNT') %></td>
+    <td width="10"></td>
+    <td width="100" align="right"><%= t('VALUE') %></td>
+    <td width="350">Concepto</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @dev_cheque_clientes.each do |dev_cheque_cliente| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="50"><%= dev_cheque_cliente.id.to_s.rjust(6,'0') %></td>
+        <td width="70"><%= dev_cheque_cliente.data.to_date.strftime("%d/%m/%y") %></td>
+        <td width="250"><%= dev_cheque_cliente.motivos_dev_cheque.nome %></td>
+        <td width="250"><%= dev_cheque_cliente.persona.nome %></td>
+        <td width="200"><%= dev_cheque_cliente.conta.nome %></td>
+        <% if dev_cheque_cliente.moeda == 0 %>
+          <td>U$</td>
+          <td width="100" align="right"><%= format_decimal(dev_cheque_cliente.dev_cheque_cliente_dts.sum(:valor_us)) %></td>  
+        <% else %>
+          <td>G$</td>
+          <td width="100" align="right"><%= format_int(dev_cheque_cliente.dev_cheque_cliente_dts.sum(:valor_gs)) %></td>
+        <% end %>
+  
+        <td width="350"><%= dev_cheque_cliente.obs %></td>
+        <td><%= link_to 'Editar', edit_dev_cheque_cliente_path(dev_cheque_cliente) %></td>
+        <td><%= link_to t('DELETE'), dev_cheque_cliente, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

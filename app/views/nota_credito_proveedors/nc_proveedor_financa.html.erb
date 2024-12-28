@@ -1,0 +1,64 @@
+<h1 align="right" id="header">Nota de Credito</h1>
+
+   <ul class="tabs">
+      <li><a href="#tab1">N.C. Proveedor - [Financas]</a></li>
+   </ul>
+
+   <div class="tab_container">
+      <div id="tab1" class="tab_content">
+
+           <% form_for(@nota_credito_proveedor) do |f| %>
+
+              <% if @nota_credito_proveedor.tipo == 0 %>
+                 <fieldset> 
+                 <legend>Contado</legend>
+                   <table>
+                     <tr>
+                       <td align="right">Conta:</td>
+                       <td><%= f.collection_select :conta_id, Conta.all( :select => 'id,nome',
+                                                                         :order  => '1' ),:id,
+                                                                                          :nome %></td>
+                       <td align="right">Cheque :</td>
+                       <td><%= f.text_field :cheque,
+                                            :size => 15 %></td>
+                     </tr>
+                     
+                     <tr>
+                       <td colspan="2"></td>
+                      <td>Diferido : </td>
+                      <td><%= f.date_select :diferido %></td>
+                    </tr>
+                 </table>
+               </fieldset>
+              <% end %>
+              <table>
+                <tr>
+                  <td align="right">N. : </td>
+                  <td>
+                    <%= f.text_field :documento_numero_01, :size => 1 ,:value => @nota_credito_proveedor.documento_numero_01 %> -
+                    <%= f.text_field :documento_numero_02, :size => 1 ,:value => @nota_credito_proveedor.documento_numero_02%> -
+                    <%= f.text_field :documento_numero,:size => 15 ,:value => @nota_credito_proveedor.documento_numero%>
+                  </td>
+                </tr>
+                <tr>
+                   <%=  field_us 'Valor U$:',f,:total_dolar, :value => number_to_currency(@valor_total_us ,    :format=>' %n ', :separator => ",") %>
+                   <%=  field_gs 'Valor Gs.:',f,:total_guarani, :value => number_to_currency(@valor_total_gs ,    :format=>' %n ', :precision => 0) %>                               
+                </tr>
+                <tr>
+                  <td align="right" valign="top">Concepto :</td>
+                  <td colspan="4"><%= f.text_area :concepto, :cols => '54', :rows=>"3"%></td>                  
+                </tr>
+              </table>
+   <%=  f.hidden_field :documento_id,     :value => '6' %>
+   <%=  f.hidden_field :documento_nome,   :value => 'NOTA DE CREDITO' %>
+   </div>
+</div>
+
+<div class="buttons">
+    <%= link_to t('BACK'), "/nota_credito_proveedors/nc_proveedor_aplic/#{@nota_credito_proveedor.id}" , :class => 'button back' %>         
+    <%= f.submit "Finalizar", :confirm => t('CONFIRMATION_MESSAGE'),:class => 'button' %>
+</div>
+</div>
+
+<% end %>
+

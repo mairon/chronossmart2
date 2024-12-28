@@ -1,0 +1,76 @@
+<style>
+  .group td, p{
+    padding: 6px;
+    font-size: 12px;
+  }
+
+</style>
+<table>
+  <tr>
+    <td align="left"><%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 90) %></td>
+    <td width="350"><h2 align="center">SOLICITUD <%= @solicitude.id.to_s.rjust(6,'0') %></h2></td>
+  </tr>
+</table>
+
+<div class="group">
+  <table>
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td width=200">Nombre</td>
+      <td width="530"><%= @solicitude.usuario.usuario_nome unless @solicitude.usuario.nil? %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td>Fecha de la solicitud</td>
+      <td><%= @solicitude.created_at.strftime("%d/%m/%y - %H:%M") %></td>
+    </tr>
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td>Desde Fecha y Hora</td>
+      <td><%= @solicitude.data.strftime("%d/%m/%y") unless @solicitude.data.blank? %> - <%= @solicitude.time.strftime("%H:%M")  unless @solicitude.data.blank? %></td>
+    </tr>
+
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td>Motivo</td>
+      <td><%= @solicitude.motivo.nome %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td>Concepto</td>
+      <td><%= @solicitude.obs %></td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td>Horas Desc.</td>
+      <td><%= @solicitude.hrs_desc %> hrs</td>
+    </tr>
+
+    <tr class = "<%= cycle("cor1", "cor2") %>">
+      <td>Monto Descuento Gs.</td>
+      <td><%= format_int(@solicitude.hrs_desc.to_i * ((@solicitude.usuario.persona.salario.to_f / 30) / 8)) %> (<%= I18n.with_locale(:es) {(@solicitude.hrs_desc.to_i * ((@solicitude.usuario.persona.salario.to_f / 30) / 8)).to_i.to_words.upcase }%>) </td>
+    </tr>
+
+  </table>
+
+
+
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+
+  <p align="center">______________________________________________</p>
+  <p align="center"><%= @solicitude.usuario.usuario_nome unless @solicitude.usuario.nil? %></p>
+  <p align="center">C.I.:<%= @solicitude.usuario.persona.ruc unless @solicitude.usuario.nil? %></p>
+  <br>
+  <br>
+  <br>
+
+  <p align="center">Autorizado por: <%= Usuario.find(@solicitude.autorizado_por).usuario_nome unless @solicitude.autorizado_por.nil? %> <%= @solicitude.autorizado_data.strftime("%Y-%m-%d") %></p>
+  
+</div>
+

@@ -1,0 +1,112 @@
+ <div class="group">
+<%= form_for(@consumicao_interna) do |f| %>
+
+		<% if @consumicao_interna.errors.any? %>
+		<div id="error_explanation">
+			<h2><%= pluralize(@consumicao_interna.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+			<ul>
+				<% @consumicao_interna.errors.full_messages.each do |msg| %>
+				<li>
+					<%= msg %>
+				</li>
+				<% end %>
+			</ul>
+		</div>
+	<% end %>
+		<table>
+			<tr>
+				<td> 
+				<label><%= t('DATE') %></label>
+				<%= f.date_select :data %></td>
+				<%= f.hidden_field :moeda, value: Unidade.last.moeda %>
+			</tr>
+
+      <tr>
+        <td colspan="5">
+          <label>Persona</label>
+          <%= f.text_field :persona_nome, required: true, class: 'autocomplete panel-field' %>
+           <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+          <%= f.hidden_field :persona_id %>
+        </td>
+      </tr>
+      <tr>
+      	<td>
+      		<label>Motivo</label>
+      		<%= f.collection_select :motivo_id, Motivo.all( :select => ' id, nome', :order  => '2' ), :id, :nome,{:prompt => 'Selecione'} %>
+      	</td>
+      </tr>
+      <tr>
+        <td>
+          <label>Centro de Costo</label>
+          <%= f.collection_select :centro_custo_id, CentroCusto.all( :select => ' id, nome', :order  => '2' ), :id, :nome,{:prompt => 'Selecione'} %>
+        </td>
+      </tr> 
+
+      <tr>
+        <td>
+          <label>Rodado</label>
+          <%= f.collection_select :rodado_id, Rodado.all( :select => ' id, placa', :order  => '2' ), :id, :placa,{:prompt => 'Selecione'} %>
+        </td>
+      </tr>
+
+			<tr>
+				<td style="padding-bottom: 15px"> 
+					<label>Tipo Economico</label><br>
+					<%= f.radio_button :tipo_economico, 1 %> Costo Fijo
+					<%= f.radio_button :tipo_economico, 2 %> Costo Variable
+				</td>
+			</tr>
+
+			<tr>
+				<td><%= f.text_area :concepto, :rows => 5, :cols => 30, placeholder: 'Concepto:' %></td>
+			</tr>
+		</table>
+	<div class="footer-buttons">
+    <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    <%= link_to t('BACK'), consumicao_internas_path, :class => "btn btn-back" %>
+  </div>
+ 	<% end %>
+</div>
+
+<script type="text/javascript">
+  $(function() {
+    $( "#consumicao_interna_persona_nome" ).autocomplete({
+        source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+        $.ajax({
+          url: "/personas/busca",
+          dataType: "json",
+
+          data: {
+            tipo: 'DESCRIPCION',
+            busca: request.term
+          },
+          beforeSend: function(){
+          $("#spinner").addClass("sppiner_show");
+          },
+
+          success: function( data ) {
+            $("#sppiner").removeClass("sppiner_show");
+            response( data );
+          },
+        });
+      },
+      minLength: 2,
+      change: function( event, ui ) {
+        $("#consumicao_interna_persona_id").val("");
+        $('#consumicao_interna_persona_id').val(ui.item.id);
+        return false;
+      }
+    });
+    $( "#consumicao_interna_persona_nome" ).change(function(){
+      if ($( "#consumicao_interna_persona_id" ).val() == ''){
+      }
+    });
+  });
+</script>
+
+
+<script>
+  $('#consumicao_interna_motivo_id, #consumicao_interna_rodado_id, #consumicao_interna_centro_custo_id').selectize();
+</script>

@@ -1,0 +1,53 @@
+<%= stylesheet_link_tag 'calendar/main', :media => 'all'%>
+<%= javascript_include_tag 'calendar/main' %>
+<%
+  escala_all = PersonaEscala.order('data')
+%>
+
+
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,listYear'
+          },
+
+          events:[
+            <% escala_all.includes(:persona).each do |t| %>
+              {
+                title: "<%= t.persona.nome %> - <%= t.obs[0..30] %> '",
+                description: "<%= t.obs[0..30] %>",
+                date: '<%= t.data.to_date.strftime("%Y-%m-%d") %>',
+                id: '<%= t.id.to_s %>',
+                <% if t.tipo.to_i == 0 %>
+                  color: '#4F6CFF'
+                <% elsif t.tipo.to_i == 1 %>
+                  color: '#2E8B57'
+                <% elsif t.tipo.to_i == 2 %>
+                  color: '#d642db'
+                <% end %>
+
+              },
+            <% end %>
+          ],
+        });
+        calendar.setOption('locale', 'es');
+        calendar.render();
+      });
+
+</script>
+
+
+<div class="panel">
+  <header class="panel-heading">
+    Agenda Escala Empleado
+  </header>
+
+  <div  class="panel-body">
+    <div id="calendar"></div>
+  </div>
+</div>

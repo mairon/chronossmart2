@@ -1,0 +1,13 @@
+<h1>Listing pagos_detalhes</h1>
+
+<table>
+  <tr>
+  </tr>
+
+<% for pagos_detalhe in @pagos_detalhes %>
+	<% #pagos_detalhe.update_attribute :updated_at, '2014-04-22 11:15:25.2792' %>
+  <tr>
+  	<td><%= format_decimal(pagos_detalhe.pago_real.to_f)  %>- <%= format_decimal(pagos_detalhe.saldo_real) %></td>
+  </tr>
+<% end %>
+</table>

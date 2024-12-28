@@ -1,0 +1,296 @@
+  <div class="steps">
+      <ul class="steps-container">
+          <li style="width:33%;" class="activated">
+              <div class="step">
+                <div class="step-image"><span><div class="step-current">1</div></span></div>
+                
+              </div>
+          </li>
+          <li style="width:33%;">
+              <div class="step">
+                <div class="step-image"><span><div class="step-current">2</div></span></div>
+                
+              </div>
+          </li>
+          <li style="width:33%;">
+              <div class="step">
+                <div class="step-image"><span><div class="step-current">3</div></span></div>
+                
+              </div>
+          </li>
+      </ul>
+      <div class="step-bar" style="width: 33%;"></div>
+  </div>
+	<%= form_for(@compra) do |f| %>
+		<% if @compra.errors.any? %>
+			<div id="error_explanation">
+				<h2><%= pluralize(@compra.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+				<ul>
+					<% @compra.errors.full_messages.each do |msg| %>
+					<li>
+						<%= msg %>
+					</li>
+					<% end %>
+				</ul>
+			</div>
+		<% end %>
+	<% if params[:action] == 'new_gasto' %>
+		<%= f.hidden_field :tipo_compra, value: 1 %>
+		<%= f.hidden_field :fiscal, value: '0' %>
+		<%= hidden_field_tag :prov_gasto, 'true' %>
+		<%= f.hidden_field :documento_numero_01, value: '000' %>
+		<%= f.hidden_field :documento_numero_02, value: '000' %>
+		<%= f.hidden_field :documento_timbrado, value: '00000000' %>
+		<%= f.hidden_field :proveedore_id %>
+		<%= f.hidden_field :moeda %>
+		<%= f.hidden_field :persona_nome, size: 88, required: true, class: 'autocomplete' %>
+    <%= f.hidden_field :persona_id %></td>
+
+	<% else %>	
+		<%= hidden_field_tag :moeda, @compra.moeda %>		
+	<% end %>
+			<table>
+				<tr>
+					<td>
+						<label><%= t('DATE') %></label><br>
+						<%= f.date_select :data %> 
+					</td>
+
+					<td> 
+						<label>Tipo</label><br>
+						<%= f.select :tipo,
+                ([[ "Contado", 0],
+                	["Credito", 1]]) %>					
+					</td>
+
+					<td>
+						<label>Competência</label><br>
+						<%= f.date_select :competencia, :discard_day => true %>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label><%= t('QUOTE') %> U$xGs</label><br>
+						<%= f.text_field :cotacao, size: 10, class: "money_gs", dir: "rtl", :required => true %>
+					</td>
+					<td>
+						<label><%= t('QUOTE') %> R$xGs</label><br>
+						<%= f.text_field :cotacao_real, size: 10, dir: "rtl", class: "money_gs", :required => true %>
+					 </td>
+					 <td>
+					 		<label><%= t('QUOTE') %> R$xU$</label><br>
+							<%= f.text_field :cotacao_rs_us, size: 10, dir: "rtl", class: "money_us", :required => true %>
+					</td>
+				</tr>
+
+				<tr>
+					<td>
+						<label>Rodados</label><br>
+           	<%= f.collection_select :rodado_id,
+               Rodado.all( :select => 'id,placa',
+                           :order  => '2' ),:id,:placa,
+                         { :prompt => 'Seleccione el Rodado' }, {style: 'width: 166px'} %>
+
+					</td>
+					<td colspan="2"> 
+						<label>Numero</label><br>
+						<%= f.text_field :documento_numero, size: 25, maxlength: 25, required: true, placeholder: '0000001' %>						
+					</td>
+				</tr>
+				<tr> 
+					<td colspan="3"> 
+							<table class="valores-gs">
+								<tr>
+									<%= field_gs_label 'Descuento Gs.',f,:desconto_guarani %>
+									<td width="128"></td>
+									<%= field_gs_label 'Total Gs.',f,:total_guarani %>
+								</tr>
+							</table>
+
+							<table hidden class="valores-us">
+								<tr>
+									<%= field_us_label 'Descuento U$',f,:desconto_dolar %>
+									<td width="128"></td>
+									<%= field_us_label 'Total U$',f,:total_dolar %>
+								</tr>
+							</table>
+
+							<table hidden class="valores-rs">
+								<tr>
+									<%= field_us_label 'Descuento R$',f,:desconto_real %>
+									<td width="128"></td>
+									<%= field_us_label 'Total R$',f,:total_real %>
+								</tr>
+							</table>				
+					</td>
+				</tr>
+				<tr> 
+					<td colspan="3"><%= f.text_area :descricao, cols: 88, :rows => 4, placeholder: 'Concepto:'%></td>
+				</tr>
+			</table>			
+		<div class="modal-footer">
+			<%= f.submit "Seguir", class: "button add", disable_with: "Aguarde...", "data-plus-as-tab" => "false"   %>
+	  </div>
+<% end %>
+
+
+	<script>
+	  //cotacao
+		$(document).ready(function() {
+
+			$('#compra_data_3i').focus();
+
+			moeda = $('#moeda').val();
+		    if (moeda == '1') {
+			    $(".valores-gs").show();
+			    $(".valores-rs").hide();
+			    $(".valores-us").hide();
+
+		   	} else if (moeda == '0') {
+
+			    $(".valores-us").show();
+			    $(".valores-rs").hide();
+			    $(".valores-gs").hide();
+		   	} else if (moeda == '2') {
+			    $(".valores-rs").show();
+			    $(".valores-us").hide();
+			    $(".valores-gs").hide();
+		   	}
+
+
+	    $.ajax({url: '/buscas/cotz_us_compra',
+	            type: 'POST',
+	            beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+	            data: 'data=' + $('#compra_data_3i').val()+'/'+
+	                            $('#compra_data_2i').val()+'/'+
+	                            $('#compra_data_1i').val(),
+	            success: function(data){
+	            $('#compra_cotacao').val(number_format(data, 0, ',', '.'));} });
+
+	    $.ajax({url: '/buscas/cotz_rs_compra',
+	            type: 'POST',
+	            beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+	            data: 'data=' + $('#compra_data_3i').val()+'/'+
+	                            $('#compra_data_2i').val()+'/'+
+	                            $('#compra_data_1i').val(),
+	            success: function(data){
+	            $('#compra_cotacao_real').val(number_format(data, 0, ',', '.'));} });
+
+	    $.ajax({url: '/buscas/cotz_rs_us_compra',
+	            type: 'POST',
+	            beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+	            data: 'data=' + $('#compra_data_3i').val()+'/'+
+	                            $('#compra_data_2i').val()+'/'+
+	                            $('#compra_data_1i').val(),
+	            success: function(data){
+	            $('#compra_cotacao_rs_us').val(number_format(data, 2, ',', '.'));} });
+		});
+	</script>
+	<% if params[:prov_gasto] == 'true' %>
+		
+		<script> 
+		$(document).ready(function() {
+	    $.ajax({url: '/buscas/proveedor_pagar',
+	            type: 'POST',
+	            beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+	            data: 'prev_gasto=' + <%= params[:titulo] %>,
+	            success: function(data){
+			          $('#compra_persona_id').val(data["prov"].persona_id);
+			          $('#compra_persona_nome').val(data["prov"].persona_nome);
+			          $('#compra_documento_numero').val(data["prov"].documento_numero);
+			          $('#compra_proveedore_id').val(data["prov"].id);
+			          $('#compra_moeda').val(data["prov"].moeda);
+								d = data["prov"].moeda;
+								if (d == '1') {
+							    $(".valores-gs").show();
+							    $(".valores-rs").hide();
+							    $(".valores-us").hide();
+							    $("#compra_moeda_1").attr('checked', 'checked');
+							    $('#compra_total_guarani').val(number_format(data["prov"].divida_guarani, 0, ',', '.'));
+
+						   	} else if (d == '0') {
+
+							    $(".valores-us").show();
+							    $(".valores-rs").hide();
+							    $(".valores-gs").hide();
+							    $("#compra_moeda_0").attr('checked', 'checked');
+							    $('#compra_total_dolar').val(number_format(data["prov"].divida_dolar, 2, ',', '.'));
+						   	} else if (d == '2') {
+							    $(".valores-rs").show();
+							    $(".valores-us").hide();
+							    $(".valores-gs").hide();
+							    $("#compra_moeda_2").attr('checked', 'checked');
+							    $('#compra_total_real').val(number_format(data["prov"].divida_real, 2, ',', '.'));
+						   	}						          
+	        		} });
+			});
+		</script>
+	<% end %>
+
+
+<script type="text/javascript">
+
+  //calc valores
+  $( "#compra_exentas_guarani, #compra_gravadas_05_guarani, #compra_gravadas_10_guarani" ).blur(function() {  
+  	var exentas_gs = $('#compra_exentas_guarani').val();
+  	var grav_05_gs = $('#compra_gravadas_05_guarani').val();
+  	var grav_10_gs = $('#compra_gravadas_10_guarani').val();
+  	var tot_gs = (parseFloat(exentas_gs.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_05_gs.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_10_gs.replace(/\./g, "").replace(",", ".")) );
+  	$('#compra_total_guarani').val(number_format(tot_gs, 0, ',', '.'));
+  });
+
+  $( "#compra_exentas_dolar, #compra_gravadas_05_dolar, #compra_gravadas_10_dolar" ).blur(function() {  
+  	var exentas_us = $('#compra_exentas_dolar').val();
+  	var grav_05_us = $('#compra_gravadas_05_dolar').val();
+  	var grav_10_us = $('#compra_gravadas_10_dolar').val();
+  	var tot_us = (parseFloat(exentas_us.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_05_us.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_10_us.replace(/\./g, "").replace(",", ".")) );
+  	$('#compra_total_dolar').val(number_format(tot_us, 2, ',', '.'));
+  });
+
+  $( "#compra_exentas_real, #compra_gravadas_05_real, #compra_gravadas_10_real" ).blur(function() {  
+  	var exentas_rs = $('#compra_exentas_real').val();
+  	var grav_05_rs = $('#compra_gravadas_05_real').val();
+  	var grav_10_rs = $('#compra_gravadas_10_real').val();
+  	var tot_rs = (parseFloat(exentas_rs.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_05_rs.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_10_rs.replace(/\./g, "").replace(",", ".")) );
+  	$('#compra_total_real').val(number_format(tot_rs, 2, ',', '.'));
+  });
+
+</script>
+
+<script type="text/javascript">
+	$(function() {
+		$( "#compra_persona_nome" ).autocomplete({
+				source: function( request, response ) {
+					$("#sppiner").addClass("sppiner_show");
+				$.ajax({
+					url: "/personas/busca?per=PROVEEDOR",
+					dataType: "json",
+
+					data: {
+						tipo: 'DESCRIPCION',
+						busca: request.term
+					},
+					beforeSend: function(){
+					$("#spinner").addClass("sppiner_show");
+					},
+
+					success: function( data ) {
+						$("#sppiner").removeClass("sppiner_show");
+						response( data );
+					},
+				});
+			},
+			minLength: 2,
+			change: function( event, ui ) {
+				$("#compra_persona_id").val("");
+				$('#compra_persona_id').val(ui.item.id);
+				return false;
+			}
+		});
+		$( "#compra_persona_nome" ).change(function(){
+			if ($( "#compra_persona_id" ).val() == ''){
+			}
+		});
+	});
+
+</script>

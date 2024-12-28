@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <ss:Styles>
+    <ss:Style ss:ID="1">
+      <ss:Font ss:Bold="1"/>
+      <ss:Alignment ss:Horizontal="Center"/>
+      <ss:Interior ss:Pattern="Gray25"/>
+    </ss:Style>
+    <ss:Style ss:ID="2">
+      <ss:Alignment ss:Horizontal="Center"/>
+    </ss:Style>
+  </ss:Styles>
+  <Worksheet ss:Name="Sheet1">
+    <Table>
+      <Row>
+        <Cell><Data ss:Type="String">Cod.</Data></Cell>
+        <Cell><Data ss:Type="String">Data REG</Data></Cell>
+        <Cell><Data ss:Type="String">Comp.</Data></Cell>
+        <Cell><Data ss:Type="String">Doc.</Data></Cell>
+        <Cell><Data ss:Type="String"><%= t('PROVIDER') %></Data></Cell>
+        <Cell><Data ss:Type="String"><%= t('CLASSIFICATION') %></Data></Cell>
+        <Cell><Data ss:Type="String">Placa</Data></Cell>
+        <Cell><Data ss:Type="String">Valor</Data></Cell>
+      </Row>
+      <% totgt = 0 %>
+      <% @gastos.each do |gt| %>
+        <Row>
+          <Cell><Data ss:Type="String"><%= gt.compra_id.to_s.rjust(8,'0') %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= gt.data.strftime("%d/%m/%y") %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= gt.competencia.strftime("%m/%Y") unless gt.competencia.blank? %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= gt.doc %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= gt.persona_nome %></Data></Cell>
+          <Cell><Data ss:Type="String"><%= gt.rubro %></Data></Cell>
+
+          <Cell><Data ss:Type="String"><%= gt.placa %></Data></Cell>
+          <% if params[:moeda] == '0' %>
+            <Cell><Data ss:Type="Number"><%= gt.total_dolar.to_f %></Data></Cell>
+            <% totgt +=  gt.total_dolar %>
+          <% elsif params[:moeda] == '1' %>
+            <Cell><Data ss:Type="Number"><%= gt.total_guarani.to_f %></Data></Cell>
+            <% totgt +=  gt.total_guarani %>
+          <% else %>
+            <Cell><Data ss:Type="Number"><%= gt.total_real.to_f %></Data></Cell>
+            <% totgt +=  gt.total_real %>
+          <% end %>
+        </Row>
+      <% end %>
+      <Row>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"><%= totgt %></Data></Cell>
+      </Row>
+    </Table>
+  </Worksheet>
+</Workbook>

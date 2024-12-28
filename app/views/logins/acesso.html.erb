@@ -1,0 +1,196 @@
+<style type="text/css">
+	#gerador {
+		width: 550px;
+		margin: 50px auto;
+		padding: 0px 0px 50px 0px;
+		border: 1px dotted #515FB6;
+		background: #FFFFFF;
+	}
+	#gerador h1 {
+		font: 210% Verdana, Arial, Sans-serif;
+		color: #1E4E8F;
+		text-align: center;
+		padding: 30px 0px 50px 0px;
+	}
+	#gerador h1 span {
+		font: 12px Verdana, Arial, Sans-serif;
+		color: #1E4E8F;
+	}
+	#gerador form {
+		text-align: center;
+	}
+	#gerador form input {
+		width: 250px;
+		font: 14px Verdana, Arial, Sans-serif;
+		color: #000000;
+		padding: 5px 10px;
+		border: 2px solid #E1E1E1;
+	}
+	#gerador form span input {
+		width: 150px;
+		font: 14px Verdana, Arial, Sans-serif;
+		color: #000000;
+		padding: 5px 10px;
+		margin: 20px 0px 0px 0px;
+		border: 2px solid #E1E1E1;
+		background: #F1F1F1;
+	}
+	#gerador form label {
+		font: 14px Verdana, Arial, Sans-serif;
+		color: #000000;
+	}
+	#gerador form label input {
+		width: 20px;
+		margin: 20px 10px 0px 0px;
+	}
+	#gerador #control {
+		padding-left: 50px;
+		text-align: left;
+	}
+	#options {
+		text-align: left;
+	}
+	#options.off {
+		display: none;
+	}
+	#options.on {
+		display: block;
+	}
+	#options div {
+		font: 14px Verdana, Arial, Sans-serif;
+		color: #000000;
+		padding: 10px 0px 0px 50px;
+	}
+	#options div input {
+		width: 50px;
+		text-align: right;
+	}
+</style>
+<script type="text/javascript">
+	/**
+	 *
+	 *	Password Generator
+	 *	version 0.1
+	 *
+	 *	@author Rog�rio Alencar Lino Filho
+	 *	@url http://rogeriolino.wordpress.com/
+	 *	@date 04 de Setembro de 2007
+	 *
+	 */
+
+	var Password = function() {
+		this.pass = "";
+
+		this.generate = function(chars) {
+			for (var i= 0; i<chars; i++) {
+				this.pass += this.getRandomChar();
+			}
+			return this.pass;
+		}
+		this.getRandomChar = function() {
+			/*
+			 *	matriz contendo em cada linha indices (inicial e final) da tabela ASCII para retornar alguns caracteres.
+			 *	[48, 57] = numeros;
+			 *	[64, 90] = "@" mais letras maiusculas;
+			 *	[97, 122] = letras minusculas;
+			 */
+			var ascii = [[48, 57],[64,90],[97,122]];
+			var i = Math.floor(Math.random()*ascii.length);
+			return String.fromCharCode(Math.floor(Math.random()*(ascii[i][1]-ascii[i][0]))+ascii[i][0]);
+		}
+	}
+	function showPass(alvo, pass) {
+		document.getElementById(alvo).value = pass;
+	}
+
+	function newPass() {
+		var pwd = new Password();
+		showPass("login_senha", pwd.generate(document.getElementById("chars").value));
+	}
+
+	function toggleOption() {
+		var op = document.getElementById("options");
+		if ((op.getAttribute("class") == "off") || (op.className == "off")) {
+			op.className = "on";
+			op.setAttribute("class", "on");
+		} else {
+			op.className = "off";
+			op.setAttribute("class", "off");
+		}
+	}
+</script>
+</head>
+<body>
+	<div id="gerador">
+		<h1>Generar Password</h1>
+		<%= form_for(@password) do |f| %>
+		<%= f.hidden_field :status, :value =>0  %>
+		<div>
+			<p align="left">
+			</p>
+
+			<p align="left">
+				Venci. :
+
+				<%= f.date_select :vencimento  %>
+			</p>
+			<p align="left">
+			</p>
+
+			<p align="left">
+				Senha :
+				<%= f.text_field :senha  %>
+				<span>
+					<input type="button" onclick="newPass();" value="Generate" />
+				</span>
+
+			</p>
+
+		</div>
+		<div>
+		</div>
+		<div id="control">
+			<label for="op">
+				<input type="checkbox" id="op" name="op" onclick="toggleOption();" />
+				Option
+			</label>
+		</div>
+		<div id="options" class="off">
+			<div>
+				Characters:
+				<input type="text" id="chars" value="10" maxlength="4" />
+			</div>
+		</div>
+		<span> <%= f.submit t('SAVE'),:disable_with => "Aguarde..." %> </span>
+		<% end %>
+	</div>
+	<div id="gerador">
+		<table>
+			<tr>
+				<td width="40" align="center">Cod.</td>
+				<td width="70" align="center"><%= t('EXPIRATION') %></td>
+				<td width="150" align="center">Senha</td>
+				<td width="150" align="center">Lib.</td>
+				<td width="5" align="center">Status</td>
+			</tr>
+		</table>
+		<div class="rolagem_cobro" id="div">
+			<table>
+
+				<% @list.each do |ls| %>
+				<tr class="<%= cycle("cor1", "cor2")%>">
+					<td width="40" align="center"><%= ls.id%></td>
+					<td width="70" align="center"><%= ls.vencimento.strftime("%d/%m/%Y")%></td>
+					<td width="150" align="center"><%= ls.senha%></td>
+					<td width="150" align="center"><%= ls.liberacao%></td>
+					<td width="30" align="center"><%= ls.status%></td>
+				</tr>
+				<% end %>
+			</table>
+		</div>
+	<p align="right" >   <%= link_to 'Salir', '/enterprise'%>
+	
+	</div>
+</p>
+</body>
+</html>

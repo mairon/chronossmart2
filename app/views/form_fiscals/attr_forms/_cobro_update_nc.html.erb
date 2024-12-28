@@ -1,0 +1,26 @@
+<%= form_tag "/form_fiscals/cobro_update_nc" do %>
+	<%= hidden_field_tag :cod_proc, @cobro.id %>
+	<%= hidden_field_tag :sigla_proc, 'CB' %>
+	<%= hidden_field_tag :data, @cobro.data %>
+	<%= hidden_field_tag :status, 1 %>
+	<%= hidden_field_tag :tipo, 1 %>
+	<%= hidden_field_tag :ruc, @cobro.persona.ruc %>
+	<%= hidden_field_tag :persona_nome, @cobro.persona.nome_fatura %>
+	<%= hidden_field_tag :persona_id, @cobro.persona_id %>
+	<%= hidden_field_tag :cota, 1 %>
+	<%= hidden_field_tag :tipo_op, 9 %>
+	<%= hidden_field_tag :moeda, 1 %>
+	<%= hidden_field_tag :tot_gs, @tot_des_gs.to_i %>
+	<table>
+		<tr>
+			<td align="right">NC:</td>
+			<td><%=   select("busca", "doc", FormFiscal.all(:select => 'id,doc,doc_01,doc_02',:conditions => ["tipo_doc = 3 and status = 0 "],limit: 1,:order => 'CAST(doc as integer)').collect {|p| [ p.doc_01 << '.' << p.doc_02 << '.' << p.doc, p.id ] },:class => "select")  %></td></td>
+			<td rowspan="2"><%= submit_tag " Grabar ", :disable_with => "Aguarde...", :class => "button", style:'height:40px'  %></td>
+		</tr>
+		<tr>
+			<td align="right">Monto Ex.:</td>
+			<td><%= text_field_tag :ex_gs, @tot_des_gs.to_i, size: 14 %></td>
+
+		</tr>
+	</table>
+<% end %>

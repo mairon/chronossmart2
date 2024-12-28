@@ -1,0 +1,38 @@
+<div class="group">
+  <h2> <%= t('VOUCHER') %> de Retención</h2>
+  <table class="head_grid">
+    <tr>
+      <td width="100"><%= t('DOC') %></td>
+      <td width="70" align="right"><%= t('VALUE') %></td>
+    </tr>
+  </table>
+
+  <div class="rolagem_cobro" dir="div" style="height: 170px">
+    <table>
+      <% @rts.each do |rt| %>
+      <% if rt.status == 2 %>
+        <% color = '#fa3e40' %>
+      <% end %>
+
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td  width="100"  bgcolor="<%=color%>"><%= rt.doc_01 %>.<%= rt.doc_02 %>.<%= rt.doc %><%= rt.sigla_proc %></td>
+          <% if @pago.moeda == 0 %>
+            <td  width="70"  align="right"  bgcolor="<%=color%>"><%= format_decimal(rt.tot_us) %></td>
+          <% else %>  
+            <td  width="70"  align="right"  bgcolor="<%=color%>"><%= format_int(rt.tot_gs) %></td>
+          <% end %>
+          
+          
+          <% if rt.status == 1 %>
+            <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(rt, status: '2') %></td>          
+            <td><%= link_to 'Imprimir', "#",  :onclick => "ComprovanteRt(#{rt.id})" %></td>
+          <% end %>
+          <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(rt, status: '0') %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+  <% unless @rts.exists?(:status => "1") %>
+    <%= render partial: "form_fiscals/attr_forms/pago_update_rt" %>
+  <% end %>
+</div>

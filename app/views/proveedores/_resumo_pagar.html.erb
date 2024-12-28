@@ -1,0 +1,69 @@
+
+<% tot_us = 0 %>
+<% tot_gs = 0 %>
+<% tot_rs = 0 %>
+<% subdivida_us = 0 %>
+<% subdivida_gs = 0 %>
+<% quebra = '' %>
+
+<table>
+	<% @resumo.each do |rs| %>
+	<% if quebra != rs.clase_produto %>
+
+	  <% if quebra != "" %>
+			<% if params[:moeda].to_s == "0" %>
+		    <tr class="head">
+	        <td colspan="3" align="right"><%= number_to_currency(subdivida_us, :format=>' %n ', :separeitor => ',') %></td>
+		    </tr>
+	    <% else %>
+		    <tr class="head">
+	        <td colspan="3" align="right"><%= number_to_currency(subdivida_gs, :format=>' %n ', :precision => 0) %></td>
+		    </tr>
+	    <% end %>
+
+      <% subdivida_us = 0 %>
+
+	  <% end %>
+
+	  <% setor = Setor.find_by_id(rs.clase_produto,:select => 'nome') %>
+
+	<% end %>
+	 <tr class="<%= cycle("cor1", "cor2") %>" >
+		<td width="20" align="center"><%= rs.persona_id %></td>
+		<td width="550" align="left"><%= rs.persona_nome %></td>
+		<% if params[:moeda].to_s == "0" %>
+			<td width="100" align="right"><%= number_to_currency( rs.saldo_us, :format=>' %n ', :separeitor => ",") %></td>
+		<% elsif params[:moeda].to_s == "1" %>
+			<td width="100" align="right"><%= number_to_currency( rs.saldo_gs, :format=>' %n ', :precision => 0 ) %></td>
+		<% else %>
+			<td width="100" align="right"><%= number_to_currency( rs.saldo_rs, :format=>' %n ', :separeitor => ",") %></td>
+		<% end %>
+		<td width="80" align="center"><%= rs.venci.to_date.strftime("%d/%m/%Y") %></td>
+	</tr>
+	<% subdivida_us += rs.saldo_us.to_f %>
+	<% tot_us += rs.saldo_us.to_f %>
+	<% tot_gs += rs.saldo_gs.to_f %>
+	<% tot_rs += rs.saldo_rs.to_f %>
+	<% end %>
+
+	<% if params[:moeda].to_s == "0" %>
+    <tr class="head">
+      <td colspan="3" align="right"><%= number_to_currency(subdivida_us, :format=>' %n ', :separeitor => ',') %></td>
+    </tr>
+  <% else %>
+    <tr class="head">
+      <td colspan="3" align="right"><%= number_to_currency(subdivida_gs, :format=>' %n ', :precision => 0) %></td>
+    </tr>
+  <% end %>
+
+	<tr class="head">
+		<% if params[:moeda].to_s == "0" %>
+			<td colspan="3" width="100" align="right"><%= number_to_currency( tot_us, :format=>' %n ', :separeitor => ",") %></td>
+		<% elsif params[:moeda].to_s == "1" %>
+			<td colspan="3" width="100" align="right"><%= number_to_currency( tot_gs, :format=>' %n ', :precision => 0 ) %></td>
+		<% else %>
+			<td colspan="3" width="100" align="right"><%= number_to_currency( tot_rs, :format=>' %n ', :separeitor => ",") %></td>
+		<% end %>
+	</tr>
+</table>
+

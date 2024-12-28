@@ -1,0 +1,227 @@
+<%= form_tag update_individual_usuario_perfils_path :method => :put do %>
+<style type="text/css" media="screen">
+  .rolagem{
+    height: 400px;
+  }
+</style>
+
+   <div>
+      <ul class="tabs">
+        <li><a href="#">Perfil Usuario: <%= @usuario.usuario_nome %></a></li>
+      </ul>
+      <div class="tab_container">
+      <table class="head_grid">
+        <tr>
+          <td width="200"><%= t('CODE') %></td>
+          <td width="200">Grupo</td>
+          <td width="350">Processo</td>
+          <td width="100" align="center">
+          Menu
+          <br>
+          <input type="checkbox" id="selectAllM" value="selectAllM"><br/>
+          </td>
+          <td width="100" align="center">
+          Crear
+          <br>
+          <input type="checkbox" id="selectAllC" value="selectAllC"><br/>
+          </td>
+
+          <td width="100" align="center">
+          Visualizar
+          <br>
+          <input type="checkbox" id="selectAllR" value="selectAllR"><br/>
+
+          </td>
+
+          <td width="100" align="center">
+          Atulizar
+          <br>
+          <input type="checkbox" id="selectAllU" value="selectAllU"><br/>
+          </td>
+          <td width="100" align="center">
+          <%= t('DELETE') %>
+          <br>
+          <input type="checkbox" id="selectAllD" value="selectAllD"><br/>
+          </td>
+        </tr>
+      </table>
+      <div class="rolagem" dir="div">
+        <table>
+        <% grupo = '' %>
+        <% @menu.each do |m| %>
+          <%= fields_for "usuario_perfils[]", m do |f| %>
+
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <%= hidden_field_tag "id", params[:id] %>
+              <% if m.codigo[2..10] == '' %>
+                <% if grupo != m.menu.nome %>
+                  <% grupo = m.menu.nome %>
+                <% end %>
+
+                <td width="200"><b><%= m.codigo %></b></td>
+                <td width="200"><b><%= grupo %></b></td>
+                <td width="350"><b><%= m.menu.nome %></b></td>
+              <% elsif m.codigo[3..5] == '999' %>
+                <td width="200"><%= m.codigo %></td>
+                <td width="200"><%= grupo %></td>
+                <td width="350">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <%= t('LISTING') %> <%= m.menu.nome %></td>
+              <% else %>
+                <td width="200"><%= m.codigo %></td>
+                <td width="200"><%= grupo %></td>
+                <td width="350">&nbsp&nbsp&nbsp&nbsp<%= m.menu.nome %></td>
+              <% end %>
+
+              <td width="100" align="center"><%= f.check_box :m, class: 'm' %>  </td>
+              <% if m.codigo[3..5] != '999' %>
+                <td width="100" align="center"><%= f.check_box :c, class: 'c' %>  </td>
+                <td width="100" align="center"><%= f.check_box :r, class: 'r' %>  </td>
+                <td width="100" align="center"><%= f.check_box :u, class: 'u' %>  </td>
+                <td width="100" align="center"><%= f.check_box :d, class: 'd' %>  </td>
+              <% end %>
+            </tr>
+          <% end %>
+        <% end %>
+        </table>
+      </div>
+<%= submit_tag " Atulizar Autorizaciones ",:disable_with => "Aguarde...", :class => "button"  %>
+<% end %>
+<hr>
+<div class="group">
+<%= form_for(@usuario) do |f| %>
+
+  <textarea cols="100%" id="usuario_menu_code" name="usuario[menu_code]" rows="5" readonly class= "panel-field">
+    <ul class="nav navbar-nav">
+      <% menu = UsuarioPerfil.where("usuario_perfils.usuario_id = #{@usuario.id } and usuario_perfils.m = true and usuario_perfils.codigo = SUBSTR(menus.codigo, 1, 2) and LENGTH(menus.codigo) = 2").order('menus.nome').includes(:menu).select('usuario_perfils.menu_id,menus.codigo') %>
+      <% menu.each do |m| %>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id="<%= m.menu_id %>" href="<%= m.menu.url %>" title="<%= m.codigo %>"><%= eval("m.menu.nome_#{@usuario.locale.downcase.gsub('-','_')}")  %><b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu">
+            <% submenu = UsuarioPerfil.where("usuario_perfils.usuario_id = #{@usuario.id } and usuario_perfils.m = true and SUBSTR(menus.codigo , 1, 2) = '#{m.codigo}' and LENGTH(menus.codigo) = 6 ").order('menus.nome').includes(:menu).select('usuario_perfils.menu_id,menus.codigo') %>
+              <% submenu.each do |sm| %>
+
+                <% if sm.menu.sub.to_i == 1 %>
+
+                  <li class="dropdown-submenu">
+                    <a tabindex="-1" href="#" class="dropdown-submenu-toggle" id="<%= sm.menu_id %>" href="#" title="<%= sm.codigo %>"> <%= eval("sm.menu.nome_#{@usuario.locale.downcase.gsub('-','_')}")  %> <b class="caret"></b></a>
+
+                    <% sub = UsuarioPerfil.where("usuario_perfils.usuario_id = #{@usuario.id } and usuario_perfils.m = true and SUBSTR(menus.codigo , 1, 6) = '#{sm.codigo}' and LENGTH(menus.codigo) = 10").order('menus.nome').includes(:menu).select('usuario_perfils.menu_id,menus.codigo') %>
+                    <ul class="dropdown-menu">
+                      <% sub.each do |l| %>
+                        <li><a id="<%= l.menu_id %>" href="<%= l.menu.url %>" title="<%= l.codigo %>"><%= eval("l.menu.nome_#{@usuario.locale.downcase.gsub('-','_')}")  %></a></li>
+                     <% end %>
+                    </ul>
+                  </li>
+
+                <% else %>
+                  <li><a id="<%= sm.menu_id %>" href="<%= sm.menu.url %>" title="<%= sm.codigo %>"><%= eval("sm.menu.nome_#{@usuario.locale.downcase.gsub('-','_')}")  %></a></li>
+                <% end %>
+              <% end %>
+              <% if m.codigo != '02' and m.codigo != '08' and m.codigo != '06' %>
+                <li class="dropdown-submenu">
+                  <a tabindex="-1" href="#" class="dropdown-submenu-toggle" ><%= t('LISTING') %>s  <b class="caret"></b></a>
+                  <% listados = UsuarioPerfil.where("usuario_perfils.usuario_id = #{@usuario.id } and usuario_perfils.m = true and SUBSTR(menus.codigo , 1, 2) = '#{m.codigo}' AND  SUBSTR(menus.codigo , 4, 3) = '999' and LENGTH(menus.codigo) = 10").order('menus.nome').includes(:menu).select('usuario_perfils.menu_id, menus.codigo') %>
+                  <ul class="dropdown-menu">
+                   <% listados.each do |l| %>
+                      <li><a href="<%= l.menu.url %>" title="<%= l.codigo %>"><%= eval("l.menu.nome_#{@usuario.locale.downcase.gsub('-','_')}")  %></a></li>
+                   <% end %>
+                </ul>
+              </li>
+            <% end %>
+          </ul>
+        </li>
+      <% end %>
+   </ul>
+  </textarea>
+<br>
+<%= f.submit 'GENERAR MENU', class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+<% end %>
+</div>
+
+
+<% select("busca", "usuario", Usuario.all(:select => 'id,usuario_nome').collect {|p| [ p.usuario_nome, p.id ] },
+                { :include_blank => true },{onchange: 'GetUsuario()'})   %>
+
+    <input type="hidden" name="usuario_clone" id="usuario_clone">
+    <div class="buttons">
+    <%= link_to 'Gerar Perfil', "#" ,onclick: 'GeraPerfil()', :class => "button" %>
+     <%= link_to 'Editar', edit_usuario_path(@usuario), :class => "button back" %>
+     <%= link_to 'Finalizar', usuarios_path, :class => "button delete" %>
+   </div>
+</div>
+</div>
+
+<script type="text/javascript">
+function GetUsuario(){
+  var u = $('#busca_usuario').val();
+  $('#usuario_clone').val(u);
+};
+
+function GeraPerfil(){
+  document.location.href = '/usuarios/gerar_perfil?id='+ <%= @usuario.id %> +'&usuario=' +  $('#usuario_clone').val();
+}
+
+
+$('#selectAllM').click(function() {
+   if (this.checked) {
+       $('.m').each(function() {
+           this.checked = true;
+       });
+   } else {
+      $('.m').each(function() {
+           this.checked = false;
+       });
+   }
+});
+
+
+
+$('#selectAllC').click(function() {
+   if (this.checked) {
+       $('.c').each(function() {
+           this.checked = true;
+       });
+   } else {
+      $('.c').each(function() {
+           this.checked = false;
+       });
+   }
+});
+
+$('#selectAllR').click(function() {
+   if (this.checked) {
+       $('.r').each(function() {
+           this.checked = true;
+       });
+   } else {
+      $('.r').each(function() {
+           this.checked = false;
+       });
+   }
+});
+
+$('#selectAllU').click(function() {
+   if (this.checked) {
+       $('.u').each(function() {
+           this.checked = true;
+       });
+   } else {
+      $('.u').each(function() {
+           this.checked = false;
+       });
+   }
+});
+
+$('#selectAllD').click(function() {
+   if (this.checked) {
+       $('.d').each(function() {
+           this.checked = true;
+       });
+   } else {
+      $('.d').each(function() {
+           this.checked = false;
+       });
+   }
+});
+
+</script>

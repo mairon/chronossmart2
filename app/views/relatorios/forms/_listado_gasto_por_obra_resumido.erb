@@ -1,0 +1,118 @@
+<% quebra   = "" %>
+<% subtotal = 0 %>
+<% total    = 0 %>
+<% totgt    = 0 %>
+<% totdb    = 0 %>
+<% totcr    = 0 %>
+
+
+<div class="group">
+   <table>
+      <% @gastos.each do |gt| %>
+      <% if quebra != gt.obra  %>
+
+         <% if quebra != "" %>
+            <tr class="head">
+            <% if params[:moeda] == '0'%>
+         	   <td colspan="2"></td>
+               <td width="80" align="right">    <%= number_to_currency( subtotal, :format =>' %n ', :separeitor => ',' ) %> </td>
+            <% else %>
+         	   <td colspan="2"></td>
+               <td width="80" align="right">    <%= number_to_currency( subtotal, :format =>' %n ', :precision => 0 ) %> </td>
+            <% end %>
+            </tr>
+
+            <tr>
+               <td></td>
+            </tr>
+
+            <% subtotal  = 0 %>
+
+         <% end %>
+		<tr>
+         <td colspan="7" class="head"><%=h quebra = gt.obra %> - <% pd = Produto.last(:conditions => ["fabricante_cod = ?",quebra]) unless quebra.blank? %> <%= pd.nome  unless pd.nome.blank? %></td>
+		</tr>
+
+		<tr>
+         <td colspan="7" class="head" align="certer"> -Etapas</td>
+		</tr>
+
+		
+		<% etapas = Produto.all(:select =>"fabricante_cod,nome,preco_venda_guarani,preco_venda_dolar", :conditions => ["barra = ?",quebra])%>
+		<% etapas.each do |et| %>
+			<tr>
+	            <td colspan="5" class="head"><%= et.fabricante_cod %> - <%= et.nome %></td>
+	            <% if params[:moeda] == '0'%>
+    	           <td width="80" align="right">    <%= number_to_currency( et.preco_venda_dolar, :format =>' %n ', :separeitor => ',' ) %> </td>
+        	    <% else %>
+            	   <td width="80" align="right">    <%= number_to_currency( et.preco_venda_guarani, :format =>' %n ', :precision => 0 ) %> </td>            
+            	<% end %>
+			</tr>
+		<% end %>
+		<tr>
+         <td colspan="5" class="head" align="certer"> -Custos</td>			
+		</tr>
+
+      <% end %>
+
+
+                       
+         <tr class = "<%= cycle("corb1", "corb2") %>">
+            <td width="30"  align="center">   <%= gt.obra %></td>
+            <td width="1550" align="left">     <%= gt.rubro_desc %></td>            
+            <% if params[:moeda] == '0'%>                           
+               <td width="80" align="right">    <%= number_to_currency( gt.total, :format =>' %n ', :separeitor => ',' ) %> </td>
+               <td width="80" align="right">    <%= number_to_currency( gt.deb_us, :format =>' %n ', :separeitor => ',' ) %> </td>
+               <td width="80" align="right">    <%= number_to_currency( gt.cred_us, :format =>' %n ', :separeitor => ',' ) %> </td>
+               <td width="80" align="right"></td>
+               <% totgt    +=  gt.total.to_f %>
+               <% subtotal +=  gt.total.to_f %>
+               <% totdb    += gt.deb_us.to_f %>
+               <% totcr    += gt.cred_us.to_f %>
+
+            <% else %>
+               <td width="80" align="right">    <%= number_to_currency( gt.total, :format =>' %n ', :precision => 0 ) %> </td>
+               <td width="80" align="right">    <%= number_to_currency( gt.deb_gs, :format =>' %n ', :precision => 0 ) %> </td>
+               <td width="80" align="right">    <%= number_to_currency( gt.cred_gs, :format =>' %n ', :precision => 0 ) %> </td>
+               <td width="80" align="right"></td>
+               <% totgt    +=  gt.total.to_f %>            
+               <% subtotal +=  gt.total.to_f %>
+               <% totdb    += gt.deb_gs.to_f %>
+               <% totcr    += gt.cred_gs.to_f %>
+            <% end %> 
+         </tr>
+      <% end %>
+      
+      <tr class="head">
+	      <td colspan="2"></td>
+            <% if params[:moeda] == '0'%>
+               <td width="80" align="right">    <%= number_to_currency( subtotal, :format =>' %n ', :separeitor => ',' ) %> </td>
+               <td width="80" align="right">    <%= number_to_currency( totdb, :format =>' %n ', :separeitor => ',' ) %> </td>
+               <td width="80" align="right">    <%= number_to_currency( totcr, :format =>' %n ', :separeitor => ',' ) %> </td>
+               <td width="80" align="right">    <%= number_to_currency( ( ( subtotal.to_f + totcr.to_f ) - totdb.to_f) , :format =>' %n ', :separeitor => ',' ) %> </td>
+
+            <% else %>
+               <td width="80" align="right">    <%= number_to_currency( subtotal, :format =>' %n ', :precision => 0 ) %> </td>            
+               <td width="80" align="right">    <%= number_to_currency( totdb, :format =>' %n ', :precision => 0 ) %> </td>            
+               <td width="80" align="right">    <%= number_to_currency( totcr, :format =>' %n ', :precision => 0 ) %> </td>            
+               <td width="80" align="right">    <%= number_to_currency( ( ( subtotal.to_f + totcr.to_f ) - totdb.to_f) , :format =>' %n ', :precision => 0 ) %> </td>
+
+            <% end %>
+      </tr>
+            
+         <tr class="head" height="30">
+            <td colspan="2"></td>
+            <% if params[:moeda] == '0'%>
+               <td width="80" align="right">    <%= number_to_currency( totgt, :format =>' %n ', :separeitor => ',' ) %> </td>
+               <td width="80" align="right">    <%= number_to_currency( totdb, :format =>' %n ', :separeitor => ',' ) %> </td>
+               <td width="80" align="right">    <%= number_to_currency( totcr, :format =>' %n ', :separeitor => ',' ) %> </td>
+               <td width="80" align="right">    <%= number_to_currency( ( ( subtotal.to_f + totcr.to_f ) - totdb.to_f) , :format =>' %n ', :separeitor => ',' ) %> </td>
+            <% else %>
+               <td width="80" align="right">    <%= number_to_currency( totgt, :format =>' %n ', :precision => 0 ) %> </td>            
+               <td width="80" align="right">    <%= number_to_currency( totdb, :format =>' %n ', :precision => 0 ) %> </td>            
+               <td width="80" align="right">    <%= number_to_currency( totcr, :format =>' %n ', :precision => 0 ) %> </td>            
+               <td width="80" align="right">    <%= number_to_currency( ( ( subtotal.to_f + totcr.to_f ) - totdb.to_f) , :format =>' %n ', :precision => 0 ) %> </td>
+            <% end %>
+         </tr>
+   </table>
+</div>

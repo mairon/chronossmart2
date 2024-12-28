@@ -1,0 +1,87 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-md-2">
+          <%= form_for(@persona) do |f| %>
+          <%= hidden_field_tag :tipo_func, '1' %>
+          <div class="row">
+            <div class="col-md-12"><%= f.file_field :picture, class: 'panel-field' %></div>
+          </div>
+          <div class="row">
+            <div class="col-md-12"><%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %></div>
+          </div>
+
+            <br>
+
+          <% end %>
+        </div>
+        <div class="col-md-9">
+          <label><i class="icon-user"></i> <b><%= @persona.nome %></b> | Doc. <b><%= @persona.ruc %></b> </label>
+          <label><i class="icon-envelope"></i> <%= @persona.email %></label>
+          <label><%= image_tag 'phone.png', height: 14 %> <%= link_to  @persona.telefone, "https://api.whatsapp.com/send?phone=595#{@persona.telefone}", target: '_blank' %> <%= @persona.telefone2 %></label>
+          <label><i class="icon-tag"></i>
+            <% if @persona.tipo_cliente.to_i == 1 %>
+              <span style="background-color: #91DC5A;" class="panel-tag">Cliente</span>
+            <% end %>
+            <% if @persona.tipo_fornecedor.to_i == 1 %>
+              <span style="background-color: #933EC5;" class="panel-tag"><%= t('PROVIDER') %></span>
+            <% end %>
+            <% if @persona.tipo_banco.to_i == 1 %>
+              <span style="background-color: #006DF0;" class="panel-tag">Banco</span>
+            <% end %>
+            <% if @persona.tipo_funcionario.to_i == 1 %>
+              <span style="background-color: #D80027;" class="panel-tag"><%= t('EMPLOYEE') %></span>
+            <% end %>
+            <% if @persona.tipo_vendedor.to_i == 1 %>
+              <span style="background-color: #FFDA44;" class="panel-tag">Vendedor</span>
+            <% end %>
+            <% if @persona.tipo_indicador.to_i == 1 %>
+              <span style="background-color: #00CAD9;" class="panel-tag">Indicador</span>
+            <% end %>
+          </label>
+        </div>
+        <div class="col-md-1" align="right">
+          <%= link_to image_tag("icon-edit.png", width: '13'), edit_funcionario_persona_path(@persona), class: 'panel-icon-right' %>
+
+          <%= link_to  persona_path(:id => @persona.id, tipo_func: '1'), :confirm => 'Estas Seguro?', :method => :delete, :class => "btn btn-danger", style: 'margin-top: 65px' do %>
+            <i class="icon-white" style="background-position: -456px 0;"></i>
+          <% end %>
+          <%= link_to t('BACK'), index_funcionario_personas_path, :class => "btn btn-back", style: 'margin-right: 100px !important' %>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-6">
+    <div class="row">
+      <div class="col-md-12">
+        
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <div class="panel-body">
+            <p>
+              <%= link_to 'Historial de RRHH', print_funcionario_persona_path(@persona), target: '_blank', class: 'btn' %>
+              <hr>
+            </p>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <%= render "/personas/eps/ferias" %>
+      </div>
+    </div>
+
+  </div>
+</div>

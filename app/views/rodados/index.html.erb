@@ -1,0 +1,29 @@
+<h1 id="header"><%= t('VEHICLES') %></h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_rodado_path, :class => "button add" %>
+</div>
+<div class="group">
+   <table class="head_grid">
+      <tr>
+         <td width="110" align="center"><%= t('CODE') %></td>
+         <td width="250" ><%= t('BOARD') %></td>
+         <td width="250" >Modelo</td>
+         <td width="250" ><%= t('RESPONSIBLE') %></td>
+         <td width="52"></td>
+      </tr>
+   </table>
+   <div class="rolagem" id="div">
+      <table>
+         <% @rodados.each do |rodado| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+               <td width="110" align="center"><%= rodado.id.to_s.rjust(6,'0') %></td>
+               <td width="250"><%= rodado.placa %></td>
+               <td width="250"><%= rodado.modelo %></td>
+               <td width="250" ><%= rodado.responsavel %></td>
+               <td><%= link_to '', edit_rodado_path(rodado), class: 'icon-pencil' %></td>
+               <td><%= link_to '', rodado, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>
+            </tr>
+         <% end %>
+      </table>
+   </div>
+</div>

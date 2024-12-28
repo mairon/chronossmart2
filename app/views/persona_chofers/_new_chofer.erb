@@ -1,0 +1,31 @@
+<%= form_for(persona_chofer) do |f| %>
+  <% if persona_chofer.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(persona_chofer.errors.count, "error") %> prohibited this persona_chofer from being saved:</h2>
+
+      <ul>
+      <% persona_chofer.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+    <%= f.hidden_field :persona_id %>
+    <table>
+      <tr>
+        <td width="1000">
+          <fieldset>
+            <table>
+              <tr>
+                <td align="right">Chofer :</td>                    
+                <td>
+                <%= f.collection_select :chofer_id, @chofers, :id, :nome, {prompt: 'Selecione lo Chofer'} %>
+                <%= f.submit :value => t('SAVE'), :class => "button" %></td>
+              </tr>                 
+            </table>
+          </fieldset>
+        </td>
+      </tr>
+    </table>
+  </div>
+<% end %>

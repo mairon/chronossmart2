@@ -1,0 +1,48 @@
+   <div>
+      <ul class="tabs">
+         <li><a href="#tab1">Marcas Relacionadas</a></li>
+      </ul>
+
+      <div class="tab_container">
+         <div id="tab1">
+         	<table>
+         		<tr>
+         			<td>Nombre : </td>
+         			<td><%= @persona.nome %> </td>
+         		</tr>
+         	</table>
+            <table>
+              <tr>
+                  <td>
+
+										<div class="group">
+										   <table class="head_grid">
+										      <tr>
+										         <td width="50" align="center">Cod.</td>
+										         <td width="500">Descripcion</td>
+										      </tr>
+										   </table>
+										   <div class="rolagem" id="div">
+										      <table>
+										         <% @marcas.each do |sub_grupo| %>
+										            <tr class = "<%= cycle("cor1", "cor2") %>">
+										               <td width="50" align="center"><%=h sub_grupo.id.to_s.rjust(6,'0') %></td>
+										               <td width="500" align="left"><%=h sub_grupo.descricao %></td>
+										            </tr>
+										         <% end %>
+										      </table>
+										   </div>
+										</div>
+
+                  </td>
+                </tr>
+            </table>
+          </div>
+        </div>
+   </div>
+   <div class="buttons">
+     <%= link_to 'Editar', edit_persona_path(@persona), :class => "button back" %> 
+     <%= link_to 'Salir', personas_path, :class => "button delete" %>
+   </div>
+
+

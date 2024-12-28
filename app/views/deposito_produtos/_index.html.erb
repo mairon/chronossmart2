@@ -1,0 +1,26 @@
+<ul class="tabs">
+      <li><a href="#tab1"> Deposito Productos - [<%= t('EDITION') %>]</a></li>
+</ul>
+  <div class="tab_container">
+      <div id="tab1" class="tab_content">
+
+        <table class="head_grid">
+          <tr>
+                    <td width="300" align="center">Producto</td>
+              </tr>
+        </table>
+
+        <div class="rolagem" dir="div">
+          <table>
+            <% deposito_produtos.each do |deposito_produto| %>
+              <tr class = "<%= cycle("cor1", "cor2") %>">
+                          <td width="300" align="left"><%= deposito_produto.produto.nome %></td>
+                        <td><%= link_to 'Editar', edit_deposito_produto_path(deposito_produto) %></td>
+                <td><%= link_to t('DELETE'), deposito_produto, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+      </div>
+    </div>
+

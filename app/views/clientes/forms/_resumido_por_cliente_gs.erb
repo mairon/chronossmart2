@@ -1,0 +1,53 @@
+   <% pers      = "AND ID = #{params[:busca]["persona"]} " unless params[:busca]["persona"].blank? %>
+
+   <% if params[:tipo_cliente].to_s == '0' %>
+         <% tipo_cliente = "AND tipo_funcionario = 0 " %>
+   <% elsif params[:tipo_cliente].to_s == '1' %>
+         <% tipo_cliente = "AND tipo_funcionario = 1  " %>
+   <% else %>
+         <% tipo_cliente = "" %>
+   <% end %>
+   <% persona   = Persona.all(:select => 'id,nome', :conditions => ["ID IS NOT NULL #{tipo_cliente} #{pers} "],:order => 'nome') %>
+
+
+   <table>
+      <% a_venc_gs  = 0%>
+      <% vencido_gs = 0%>
+      <% persona.each do |cl|%>
+         <% divida_gs_vencida   = Cliente.sum('divida_guarani - cobro_guarani',:conditions => ["vencimento <= '#{params[:final_faturacao]}' AND liquidacao = 0 AND persona_id = ? ",cl.id]) %>
+         <% divida_gs_a_vencer  = Cliente.sum('divida_guarani - cobro_guarani',:conditions => ["vencimento > '#{params[:final_faturacao]}' AND liquidacao = 0 AND persona_id = ? ",cl.id]) %>
+         <% sum  = divida_gs_vencida.to_f + divida_gs_a_vencer.to_f %>
+         <% if params[:atraso] == "0"  %>
+            <% if divida_gs_vencida.to_f > 0 %>
+               <tr>
+                  <td width="50" align="left">    <%= cl.id%> </td>
+                  <td width="650" align="left">   <%= cl.nome%> - <% pr = Persona.find_by_id(cl.id)%> Tel.:  <%= pr.telefone %></td>
+                  <td width="100" align="right">  <%= number_to_currency( divida_gs_vencida.to_f, :format=>' %n ', :precision => 0) %> </td>
+                  <td width="100" align="right">  <%= number_to_currency( divida_gs_a_vencer.to_f, :format=>' %n ', :precision => 0) %> </td>
+                  <td width="100" align="right">  <%= number_to_currency( divida_gs_vencida.to_f + divida_gs_a_vencer.to_f, :format=>' %n ', :precision => 0) %> </td>
+               </tr>
+               <% a_venc_gs  += divida_gs_vencida.to_f %>
+               <% vencido_gs += divida_gs_a_vencer.to_f %>
+            <% end %>
+         <% else %>
+            <% if sum.to_f > 0 %>
+               <tr>
+                  <td width="50" align="left">    <%= cl.id%> </td>
+                  <td width="650" align="left">   <%= cl.nome%> </td>
+                  <td width="100" align="right">  <%= number_to_currency( divida_gs_vencida.to_f, :format=>' %n ', :precision => 0) %> </td>
+                  <td width="100" align="right">  <%= number_to_currency( divida_gs_a_vencer.to_f, :format=>' %n ', :precision => 0) %> </td>
+                  <td width="100" align="right">  <%= number_to_currency( divida_gs_vencida.to_f + divida_gs_a_vencer.to_f, :format=>' %n ', :precision => 0) %> </td>
+               </tr>
+               <% a_venc_gs  += divida_gs_vencida.to_f %>
+               <% vencido_gs += divida_gs_a_vencer.to_f %>
+            <% end %>
+         <% end %>
+      <% end %>
+      <tr class="head">
+         <td colspan="2"></td>
+         <td width="100" align="right">  <%= number_to_currency( a_venc_gs.to_f, :format=>' %n ', :precision => 0) %> </td>
+         <td width="100" align="right">  <%= number_to_currency( vencido_gs.to_f, :format=>' %n ', :precision => 0) %> </td>
+         <td width="100" align="right">  <%= number_to_currency( a_venc_gs.to_f + vencido_gs.to_f, :format=>' %n ', :precision => 0) %> </td>
+      </tr>
+   </table>
+

@@ -1,0 +1,23 @@
+<table>
+<% @metas.each do |m| %>
+	<tr>
+		<td align="center" width="35" ><%= m.id.to_s.rjust(6,'0') %></td>
+		<td width="70" align="center" ><%= m.periodo_inicio.to_date.strftime("%d/%m/%Y") %>
+		<td width="70" align="center" ><%= m.periodo_final.to_date.strftime("%d/%m/%Y") %>
+		<td align="left" width="450" ><%= m.descricao.to_s %></td>
+
+		<% if params[:moeda].to_s  == '0' %>
+       <td width="60" align="right">    <%=  number_to_currency( m.valor_min_us, :format =>' %n ', :separeitor => ',' ) %> </td>
+       <td width="60" align="right">    <%=  number_to_currency( m.valor_max_us, :format =>' %n ', :separeitor => ',' ) %> </td>
+    <% elsif params[:moeda].to_s  == '1' %>
+       <td width="60" align="right">    <%=  number_to_currency( m.valor_min_gs, :format =>' %n ', :precision => 0 ) %> </td>
+       <td width="60" align="right">    <%=  number_to_currency( m.valor_max_gs, :format =>' %n ', :precision => 0 ) %> </td>
+    <% else %>
+       <td width="60" align="right">    <%=  number_to_currency( m.valor_min_rs, :format =>' %n ', :separeitor => ',' ) %> </td>
+       <td width="60" align="right">    <%=  number_to_currency( m.valor_max_rs, :format =>' %n ', :separeitor => ',' ) %> </td>
+    <% end %>
+
+	</tr>
+<% end %>	
+</table>
+

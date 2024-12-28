@@ -1,0 +1,5 @@
+<% if params[:tipo].to_s === "2"%>
+   <%= render 'livro_compra_demonstrativo' %>
+<% else %>
+   <%= render 'livro_compra_legal' %>
+<% end %>

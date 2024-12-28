@@ -1,0 +1,82 @@
+<%= form_tag "/form_fiscals/fact_indep_update_ft" do %>
+	<%= hidden_field_tag :cod_proc, @fact_indep.id %>
+	<%= hidden_field_tag :sigla_proc, 'FI' %>
+	<%= hidden_field_tag :status, 1 %>
+	<%= hidden_field_tag :tipo, 1 %>
+	<%= hidden_field_tag :persona_id, @fact_indep.persona_id %>
+	<%= hidden_field_tag :cota, 1 %>
+	<%= hidden_field_tag :tipo_op, 9 %>
+	<%= hidden_field_tag :moeda, 1 %>
+	<%= hidden_field_tag :tot_gs, @tot_des_gs.to_i %>
+	<table>
+
+	<% ruc = @fact_indep.persona.ruc %>
+	<% nome = @fact_indep.persona_nome %>
+	<tr>
+	<tr>
+		<td style="padding: 5px">
+		<label>Fecha</label>
+			<%= telephone_field_tag :data, Time.now.strftime("%d/%m/%Y"), onkeyup: "Formatadata(this,event)", size: 10 %>			
+		</td>
+			<td style="padding: 5px">
+				<label>RUC</label>
+				<%= telephone_field_tag :ruc, ruc %>
+			</td>
+		</tr>
+	<tr>
+			<td colspan="8" style="padding: 5px">
+				<label>Nombre</label>
+				<%= text_field_tag :persona_nome, nome, size: 20, class: 'panel-field' %>
+			</td>
+	</tr>
+
+		<tr>			
+			<td style="padding: 5px">
+				<label>Factura</label>
+				<%= select("busca", "doc", FormFiscal.all(:select => 'id,doc,doc_01,doc_02',:conditions => ["tipo_doc = 1 and status = 0 and unidade_id = #{current_unidade.id}"],limit: 40,:order => 'CAST(doc as integer)').collect {|p| [ p.doc_01 << '.' << p.doc_02 << '.' << p.doc, p.id ] },:class => "select")  %></td></td>
+			<td style="padding-top: 25px">
+				<%= submit_tag " Facturar ", :disable_with => "Aguarde...", :class => "btn btn-green", "data-plus-as-tab" => "false", id: "submit_fatura"  %>
+			</td>
+		</tr>
+	</table>
+<% end %>          
+
+
+<% @ultima_data_fatura = FormFiscal.where("tipo_doc = 1 and status != 0 and unidade_id = #{current_unidade.id}").last %>
+<input type="hidden" id="data_ultima_fatura" value="<%= @ultima_data_fatura.data.strftime("%d/%m/%Y") %>">
+
+<script>
+  $().ready(function() {
+    // validate signup form on keyup and submit
+    $("form").validate({
+      rules: {
+        ruc: "required",
+        persona_nome: "required",
+        data: "required"
+        }
+    });
+  });
+
+  	//valida data 
+	$('#data').change(function() {
+		var data_1 = $('#data').val();
+		var data_2 = $('#data_ultima_fatura').val();
+
+		var format_data_1 = new Date(data_1.replace(/(\d{2})\/(\d{2})\/(\d{4})/,'$2/$1/$3'));
+    var format_data_2 = new Date(data_2.replace(/(\d{2})\/(\d{2})\/(\d{4})/,'$2/$1/$3'));
+
+    if (format_data_2 > format_data_1) {
+      alert("Fecha menos que ultima Factura emitida! - " + data_2);
+    }  
+  });
+
+</script>
+
+<style>
+label.error {
+  margin: 0px 10px 0px 10px;
+  width: auto;
+  color: red;
+}
+</style>
+

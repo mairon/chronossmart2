@@ -1,0 +1,77 @@
+
+ <table>
+   <tr >
+    <td align="right"><%= t('DATE') %> :</td>
+    <td colspan="3"><%= f.date_select :data ,{},{:onblur => "ProdutoDataCotacao()"} %>
+
+    Costo Gs.: <%= number_to_currency( @produto.custo_produto_guarani_iva, :format =>' %n ', :precision => 0 ) %>
+
+    U$:  <%= number_to_currency( @produto.custo_produto_dolar_iva, :format =>' %n ', :separeitor => "," ) %>
+    </td>
+        <%= hidden_field_tag( 'key' ) %>
+
+  </tr>
+
+  <tr >
+        <td align="right">Cotizacion :</td>
+        <td><%= text_field :produto,
+                           :cotacao ,
+                           { :size    => 15,:value => @produto.cotacao,
+                             :onfocus  => remote_function(:update => "key",
+                                                         :url    => { :action => :get_moeda},
+                                                                      :with   => "'key='+ key.value ") } %>*
+        </td>
+
+        <td align="right">Max. Descuento :</td>
+        <td><%= f.text_field :desconto,
+                             :size   => 15 %> % </td>
+
+   </tr>
+
+   <tr >
+
+     <td align="right">Precio Venta Gs.:</td>
+     <td><%= f.text_field :preco_venda_guarani,
+                          :size   => 15,
+                          :onchange => "ProdutoDolar()" %> * </td>
+
+
+     <td align="right">Precio Venta U$.:</td>
+     <td><%= f.text_field :preco_venda_dolar,
+                          :size   => 15,
+                          :onchange => "ProdutoGs()" %>* </td>
+
+   </tr>
+
+
+   <tr >
+
+     <td align="right">Precio Min. Gs.:</td>
+     <td><%= f.text_field :preco_minorista_guarani,
+                          :size   => 15,
+                          :onchange => "ProdutoMinoristaDolar()" %> * </td>
+
+
+     <td align="right">Precio Min. U$.:</td>
+     <td><%= f.text_field :preco_minorista_dolar,
+                          :size   => 15,
+                          :onchange => "ProdutoMinoristaGs()" %>* </td>
+
+   </tr>
+
+   <tr >
+
+     <td align="right">Precio Maior. Gs.:</td>
+     <td><%= f.text_field :preco_maiorista_guarani,
+                          :size   => 15,
+                          :onchange => "ProdutoMaioristaDolar()" %> * </td>
+
+
+     <td align="right">Precio Maior. U$.:</td>
+     <td><%= f.text_field :preco_maiorista_dolar,
+                          :size   => 15,
+                          :onchange => "ProdutoMaioristaGs()" %>* </td>
+
+   </tr>
+ </table>
+

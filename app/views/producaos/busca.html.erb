@@ -1,0 +1,32 @@
+<div class="panel">
+  <div class="panel-content">
+     <table class="head_grid">
+        <tr>
+           <td width="80" align="center">Cod.</td>
+           <td width="80" align="center"><%= t('DATE') %> Inicio</td>
+           <td width="150">Zafra</td>
+           <td width="150">Cultivo</td>
+           <td width="150">Parcela</td>
+        </tr>
+     </table>
+     <div class="rolagem" dir="div">
+        <table>
+           <tr>
+           </tr>
+
+
+           <% @producaos.each do |producao| %>
+              <tr class = "<%= cycle("cor1", "cor2") %>">
+                <td width="80" align="center"><%= producao.id.to_s.rjust(6,'0') %></td>
+                <td width="80" align="center"><%= producao.data.strftime("%d/%m/%y") %></td>
+                <td width="150"><%= producao.safra.nome unless producao.safra.nil? %></td>
+                <td width="150"><%= producao.cultivo.nome unless producao.cultivo.nil? %></td>
+                <td width="150"><%= producao.parcela.nome  unless producao.parcela.nil?%></td>
+                <td><%= link_to '', edit_producao_path(producao), class: 'icon-pencil' %></td>
+                <td><%= link_to '', producao, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+              </tr>
+           <% end %>
+        </table>
+     </div>
+  </div>
+</div>

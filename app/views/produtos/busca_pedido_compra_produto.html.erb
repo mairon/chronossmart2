@@ -1,0 +1,143 @@
+ <div class="group_cd" style="padding: 5px">
+ Buscar:
+      <input id         ="busca"
+             name       ="busca"
+             type       ="search"
+             onkeydown="pesquisa(document.getElementById('busca').value)"
+             size       ="80" autofocus />
+      <%= image_tag("load.gif",
+                                   :align => "absmiddle",
+                                   :border => 0,
+                                   :id => "spinner",
+                                   :width => 21,
+                                   :height => 21,
+                                   :style =>"display: none;" ) %>
+</div>
+<input type="hidden" id="moeda" value="<%= params[:moeda]%>">
+<input type="hidden" id="clase_id" value="<%= params[:clase_id]%>">
+<div id="pagina"></div>
+<script language="javascript">
+  var moeda = document.getElementById('moeda').value
+   function Fecha(produto_nome,produto_id,multiplo_compra,fabricante_cod,clase_id,unit_us,unit_gs)
+   {
+      window.opener.document.getElementById('pedido_compra_produto_produto_nome').value      = produto_nome;
+      window.opener.document.getElementById('pedido_compra_produto_produto_id').value        = produto_id;
+      window.opener.document.getElementById('pedido_compra_produto_quantidade').value        = multiplo_compra;
+      window.opener.document.getElementById('multiplo').value                                 = multiplo_compra;
+      if(moeda == '0'){
+        window.opener.document.getElementById('pedido_compra_produto_unitario_dolar').value    = unit_us;
+      }else{
+        window.opener.document.getElementById('pedido_compra_produto_unitario_guarani').value  = unit_gs;    
+      }  
+      
+      window.opener.document.getElementById('pedido_compra_produto_fabricante_cod').value    = fabricante_cod;
+      window.opener.document.getElementById('pedido_compra_produto_clase_id').value          = clase_id;
+      window.opener.document.getElementById("pedido_compra_produto_quantidade").focus()
+      self.close();
+   }
+
+   function pesquisa(valor)
+
+   {
+      url="/produtos/dinamic_busca_pedido_compra_produto?busca="+valor + "&moeda=<%= params[:moeda] %>";
+
+      ajax(url);
+
+   }
+
+
+   function ajax(url)
+
+   {
+
+
+
+      //alert(nick);
+
+      //alert(dest);
+
+      //alert(msg);
+
+      $('#spinner').show();
+
+      req = null;
+
+      // Procura por um objeto nativo (Mozilla/Safari)
+
+      if (window.XMLHttpRequest) {
+
+         req = new XMLHttpRequest();
+
+         req.onreadystatechange = processReqChange;
+
+         req.open("GET",url,true);
+
+         req.send(null);
+
+         // Procura por uma versão ActiveX (IE)
+
+      } else if (window.ActiveXObject) {
+
+         req = new ActiveXObject("Microsoft.XMLHTTP");
+
+         if (req) {
+
+
+
+            req.onreadystatechange = processReqChange;
+
+            req.open("GET",url,true);
+
+
+
+            req.send();
+
+         }
+
+      }
+
+   }
+
+
+
+   function processReqChange()
+
+   {
+
+
+
+      // apenas quando o estado for "completado"
+
+      if (req.readyState == 4) {
+
+
+
+         // apenas se o servidor retornar "OK"
+
+
+
+         if (req.status ==200) {
+
+
+
+            // procura pela div id="pagina" e insere o conteudo
+
+            // retornado nela, como texto HTML
+
+
+            onSuccess:$('#spinner').hide();
+            document.getElementById('pagina').innerHTML = req.responseText;
+
+
+
+         } else {
+
+            alert("Houve um problema ao obter os dados:n" + req.statusText);
+
+         }
+
+      }
+
+   }
+</script>
+</body>

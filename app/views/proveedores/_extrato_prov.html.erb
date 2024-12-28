@@ -1,0 +1,120 @@
+  <% quebra  = "" %>
+  <% sub_div    = 0 %>
+  <% sub_pg     = 0 %>
+  <% sub_saldo  = 0 %>
+
+  <% div    = 0 %>
+  <% pg     = 0 %>
+  <% saldo  = 0 %>
+  <table>
+    <% @proveedores.each do |c| %>
+     <% if quebra != c.persona_nome %>
+
+        <%if quebra != "" %>
+          <tr class="head">
+            <td colspan="7"></td>
+            <% if params[:moeda] == '1' %>
+              <td width="60" align="right"><%= format_int(sub_div.to_f) %></td>
+              <td width="60" align="right"><%= format_int(sub_pg.to_f) %></td>
+              <td width="60" align="right"><%= format_int(sub_saldo.to_f) %></td>
+            <% else %>
+              <td width="60" align="right"><%= format_decimal(sub_div.to_f) %></td>
+              <td width="60" align="right"><%= format_decimal(sub_pg.to_f) %></td>
+              <td width="60" align="right"><%= format_decimal(sub_saldo.to_f) %></td>
+            <% end %>
+          </tr>
+        <% end %>
+        <tr>
+          <td class="head" colspan="12"><%= c.persona_id %> - <%= quebra = c.persona_nome %></td>
+        </tr>
+
+        <% sub_div    = 0 %>
+        <% sub_pg     = 0 %>
+        <% sub_saldo  = 0 %>
+
+     <% end %>
+      <% if params[:moeda] == '0' %>
+        <% saldo_dolar = (c.divida_dolar.to_f - c.anterior_us.to_f) %>
+      <% elsif params[:moeda] == '1' %>
+        <% saldo_guarani = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+      <% elsif params[:moeda] == '2' %>
+        <% saldo_real = (c.divida_real.to_f - c.anterior_rs.to_f) %>
+      <% end %>
+
+
+      <tr class = "<%= cycle( "cor1", "cor2" ) %>" >
+
+        <td width="40"  align="center"><%= c.data.strftime("%d/%m/%y")%></td>
+        <td width="40"  align="center"><%= c.vencimento.strftime("%d/%m/%y")%></td>
+        <td width="40"  align="center"><%= c.pg_data.to_date.strftime("%d/%m/%y") unless c.pg_data.nil? %></td>
+        <td width="80"><small><%= c.centro_custo_nome %></small></td>
+        <td width="260"><small><%= c.rubro_nome.to_s + ' - ' %> <%= c.descricao.to_s %></small></td>
+        <td width="60"><%= c.documento_numero %></td>
+        <td width="20"  align="center"><%= c.cota %>/<%= c.tot_cotas %></td>
+        <% if params[:moeda] == '0' %>
+          <td width="60" align="right"><%= format_decimal(c.divida_dolar.to_f) %></td>
+          <td width="60" align="right"><%= format_decimal(c.anterior_us.to_f) %></td>
+          <td width="60" align="right"><%= format_decimal(saldo_dolar.to_f) %></td>
+          <% sub_div    += c.divida_dolar.to_f %>
+          <% sub_pg     += c.anterior_us.to_f %>
+          <% sub_saldo  += saldo_dolar.to_f %>
+
+          <% div    += c.divida_dolar.to_f %>
+          <% pg     += c.anterior_us.to_f %>
+          <% saldo  += saldo_dolar.to_f %>
+
+        <% elsif params[:moeda] == '1' %>
+          <td width="60" align="right"><%= format_int(c.divida_guarani.to_f) %></td>
+          <td width="60" align="right"><%= format_int(c.anterior_gs.to_f) %></td>
+          <td width="60" align="right"><%= format_int(saldo_guarani.to_f) %></td>
+          <% sub_div    += c.divida_guarani.to_f %>
+          <% sub_pg     += c.anterior_gs.to_f %>
+          <% sub_saldo  += saldo_guarani.to_f %>
+
+          <% div    += c.divida_guarani.to_f %>
+          <% pg     += c.anterior_gs.to_f %>
+          <% saldo  += saldo_guarani.to_f %>
+        <% elsif params[:moeda] == '2' %>
+          <td width="60" align="right"><%= format_decimal(c.divida_real.to_f) %></td>
+          <td width="60" align="right"><%= format_decimal(c.anterior_rs.to_f) %></td>
+          <td width="60" align="right"><%= format_decimal(saldo_real.to_f) %></td>
+          <% sub_div    += c.divida_real.to_f %>
+          <% sub_pg     += c.anterior_rs.to_f %>
+          <% sub_saldo  += saldo_real.to_f %>
+
+          <% div    += c.divida_real.to_f %>
+          <% pg     += c.anterior_rs.to_f %>
+          <% saldo  += saldo_real.to_f %>
+
+        <% end %>
+      </tr>
+    <% end %>
+
+    <tr class="head">
+      <td colspan="7"></td>
+      <% if params[:moeda] == '1' %>
+        <td width="60" align="right"><%= format_int(sub_div.to_f) %></td>
+        <td width="60" align="right"><%= format_int(sub_pg.to_f) %></td>
+        <td width="60" align="right"><%= format_int(sub_saldo.to_f) %></td>
+      <% else %>
+        <td width="60" align="right"><%= format_decimal(sub_div.to_f) %></td>
+        <td width="60" align="right"><%= format_decimal(sub_pg.to_f) %></td>
+        <td width="60" align="right"><%= format_decimal(sub_saldo.to_f) %></td>
+      <% end %>
+    </tr>
+
+    <tr class="head">
+      <td colspan="7"></td>
+      <% if params[:moeda] == '1' %>
+        <td width="60" align="right"><%= format_int(div.to_f) %></td>
+        <td width="60" align="right"><%= format_int(pg.to_f) %></td>
+        <td width="60" align="right"><%= format_int(saldo.to_f) %></td>
+      <% else %>
+        <td width="60" align="right"><%= format_decimal(div.to_f) %></td>
+        <td width="60" align="right"><%= format_decimal(pg.to_f) %></td>
+        <td width="60" align="right"><%= format_decimal(saldo.to_f) %></td>
+      <% end %>
+    </tr>
+
+  </table>
+</div>

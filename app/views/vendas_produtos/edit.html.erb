@@ -1,0 +1,45 @@
+<div id="contents">
+  <h1 id="header"><%= @vendas_produto.produto_nome %></h1>
+
+  <div class="panel-content" id="pagina">
+  <%= form_for(@vendas_produto) do |f| %>
+
+    <div id="error_explanation" style="display:none"></div>
+      <%= f.hidden_field :venda_id %>
+        <div class="row">
+          <div class="col-md-12">
+            <label>Cantidad</label>
+            <%= f.text_field :quantidade, dir: "rtl", class: 'panel-field', autofocus: true %>
+          </div>
+        </div>
+
+
+        <div class="row">
+          <div class="col-md-12">
+            <label>Ingredientes</label>
+            <%= f.collection_select :produto_composicao_ids, ProdutoComposicao.where(produto_id: @vendas_produto.produto_id), :id, :componente_nome, {class: 'panel-field'}, {:multiple => true} %>
+
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <br>
+            <%= f.text_area :obs, rows: 5, cols: 40, placeholder: 'Obs', class: 'panel-field' %>
+          </div>
+        </div>
+       
+        <div class="row">
+          <div class="col-md-12 footer-buttons">
+            <%= f.submit "Grabar", :disable_with => "Aguarde..." , :class => "btn btn-green", "data-plus-as-tab" => "false" %>
+            <%= link_to "Volver", venda_path(@vendas_produto.venda_id) %>
+          </div>
+        </div>
+      </div>
+  <% end %>
+</div>
+
+
+<script>
+  $('#vendas_produto_produto_composicao_ids').selectize();
+</script>

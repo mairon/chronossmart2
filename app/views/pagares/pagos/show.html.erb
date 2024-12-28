@@ -1,0 +1,80 @@
+<h1 id="header"><%= t('DATE') %> <%= @pago.data.strftime("%d/%m/%Y")%> |
+                Prov. <%= @pago.persona_nome %> |
+                Moneda :
+                <% if @pago.moeda == 0 %>
+                  <font color="green"> Dolar</font>
+                  <% if  @pago.adelanto == 1 %>
+                  <% sum_adelanto = AdelantoCota.sum('valor_us', :conditions => ["adelanto_id = #{@pago.adelanto_id}"]) %>
+                    Valor Adelanto: <%= number_to_currency( sum_adelanto, :format =>' %n ', :separeitor => ',' ) %>
+                  <% end %>
+                <% elsif @pago.moeda == 1 %>
+                  <font color="red"> Guaranies </font>
+                  <% if  @pago.adelanto == 1 %>
+                  <% sum_adelanto = AdelantoCota.sum('valor_gs', :conditions => ["adelanto_id = #{@pago.adelanto_id}"]) %>
+                    Valor Adelanto: <%= number_to_currency( sum_adelanto, :format =>' %n ', :separeitor => ',' ) %>
+                  <% end %>
+                <% else %>
+                  <font color="blue"> Real</font>
+                  <% if  @pago.adelanto == 1 %>
+                  <% sum_adelanto = AdelantoCota.sum('valor_rs', :conditions => ["adelanto_id = #{@pago.adelanto_id}"]) %>
+                    Valor Adelanto: <%= number_to_currency( sum_adelanto, :format =>' %n ', :separeitor => ',' ) %>
+                  <% end %>
+                <% end %>
+
+                | Cotizacion U$.: 
+                <%= number_to_currency( @pago.cotacao, :format =>' %n ', :precision => 0 ) %> 
+                R$.: <%= number_to_currency( @pago.cotacao_real, :format =>' %n ', :precision => 0 ) %>
+
+</h1>
+
+<%= render :partial=>"busca_proveedor" %>
+
+<br/>
+<%= render :partial=>"new_detalhe", :locals=>{:pagos_detalhe=>PagosDetalhe.new(:pago_id=>@pago.id)} %>
+
+<br/>
+<%= render :partial=>"index_detalhe", :locals=>{:pagos_detalhes => @pago.pagos_detalhes} %>
+<div class="buttons">
+  <% if @pago.adelanto.to_i == 1 %>
+  <a href="/pagos/<%=params[:id]%>/pago_adelanto" class="button back"><%= t('BACK') %></a>
+    
+  <% else %>
+    <a href="/pagos/<%=params[:id]%>/edit" class="button back"><%= t('BACK') %></a>
+  <% end %>
+   
+   <a href="#" onclick="SeguirPagos()" class="button next">Seguir</a> 
+</div>
+   <%= hidden_field_tag :id, @pago.id %>
+   <%= hidden_field_tag :count, @count %>
+   <%= hidden_field_tag :moeda, @pago.moeda %>
+
+
+<script>
+
+function SeguirPagos() //
+{
+   id = document.getElementById('id').value
+        {
+            if ( document.getElementById('count').value <= 0  )
+                {
+                   alert ('Es Necessario Agregar Los Pagos Pulse F4');
+                   return false;
+                }
+            else
+                {
+                    location.href="/pagos/"+id+"/pago_final";
+                }
+
+         }
+
+}
+
+  document.onkeydown=function(e)
+{
+  //BOTAO F4
+  if(e.which == 115)
+    location.href="/pagos/nova_cota/"+ document.getElementById('id').value;
+          //SEGUIR FINANCAS
+}
+
+</script>

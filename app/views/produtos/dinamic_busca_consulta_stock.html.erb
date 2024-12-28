@@ -1,0 +1,54 @@
+<style>
+  .hidden-input{
+    background-color: #999999;
+  }
+  .hidden-input:hover{
+    background-color: transparent;
+  }
+
+</style>
+<table class="head_grid">
+   <tr>
+    <td width="55"></td>
+      <td width="100">Codigo</td>
+      <td width="100">Ubicación</td>
+      <td width="100">Referecia</td>
+      <td width="460">Producto</td>
+      <td width="40" align="right">CTD</td>
+      <td width="70" align="right">Precio</td>
+      <td width="50"></td>
+   </tr>
+</table>
+<div class="rolagem" id="div" style="height: 345px;">
+   <table>
+      <% count = 0 %>
+      <% @produtos.each do |p| %>
+         <tr class = "<%= cycle( "cor1", "cor2" )%>">
+            <td width="35" class="<%= count %>"><input type="text" id="<%= count %>" class="<%= count %>" value="<%= count %>" size="1" style="border: none;"
+          onkeypress="OpenDt(<%= p.produto_id %>)" data-plus-as-tab="false"></td>
+            <td class="<%= count %>" width="100"> <%= p.produto_id.to_s.rjust(6,'0') %> </td>
+            <td class="<%= count %>" width="100"> <%= p.locacao %> </td>
+            <td class="<%= count %>" width="100"> <%= p.fabricante_cod %> </td>
+            <td class="<%= count %>" width="460"> <a href="#" onclick="OpenDt(<%= p.produto_id %>)"><%= p.produto_id.to_s.rjust(6,'0') %>-<%= p.nome %></a></td>
+            <% if p.stock.to_i <= 0 %>
+               <td class="<%= count %>" width="40"  align="right"><font color="red"> <%= format( "%.0f",p.stock.to_f ) %></font> </td>
+            <%else%>
+               <td class="<%= count %>" width="40"  align="right"><font color="green"> <%= format( "%.0f",p.stock.to_f ) %></font> </td>
+            <%end%>
+            <% if current_unidade.moeda == 0 %>
+              <td class="<%= count %>" width="70" align="right"><%= format_decimal( p.tabela_1_us.to_f ) %></td>
+            <% else %>
+              <td class="<%= count %>" width="70" align="right"><%= format_int( p.tabela_1_gs.to_f ) %></td>
+            <% end %>
+         </tr>
+         <% count += 1 %>
+      <% end %>
+      <input type="hidden" id="foco" value="-1">
+   </table>
+</div>
+
+
+
+
+
+

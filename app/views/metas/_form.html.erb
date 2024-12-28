@@ -1,0 +1,105 @@
+<%= form_for(@meta) do |f| %>
+	<% if @meta.errors.any? %>
+		<div id="error_explanation">
+			<h2><%= pluralize(@meta.errors.count, "error") %> prohibited this meta from being saved:</h2>
+
+			<ul>
+			<% @meta.errors.full_messages.each do |msg| %>
+				<li><%= msg %></li>
+			<% end %>
+			</ul>
+		</div>
+	<% end %>
+
+	<ul class="tabs">
+			<li><a href="#tab1">Metas - [<%= t('EDITION') %>]</a></li>
+	 </ul>
+
+	 <div class="tab_container">
+			<div id="tab1" class="tab_content">
+				<table>
+					<tr>
+						<td width="450" colspan="2">
+							<fieldset>
+								<legend>Periodo</legend>
+								<table>
+									<tr>
+										<td align="right">Inicio :</td>
+										<td colspan="1"><%= f.date_select :periodo_inicio %></td>
+
+										<td align="right">Final :</td>
+										<td colspan="1"><%= f.date_select :periodo_final %></td>
+									</tr>
+								</table>
+							</fieldset>
+						</td>
+					</tr>
+					<td></td>
+					<td></td>
+					<tr>
+						<td  valign="top" >
+							<fieldset>
+								<legend><%= t('COIN') %></legend>
+								<table>
+									<tr>
+										<td><%= f.radio_button :moeda, 0, :checked => true %>DOLAR </td>
+									</tr>
+									<tr>
+										<td><%= f.radio_button :moeda, 1 %>GUARANI</td>
+									</tr>
+									<tr>
+										<td><%= f.radio_button :moeda, 2 %>REAL</td>
+									</tr>
+								</table>
+							</fieldset>
+						</td>
+
+						<td>
+							<fieldset>
+							<legend>Valores</legend>
+							<table>
+								<tr>
+									<%= field_us 'Min. U$:',f,:valor_min_us %>
+									<%= field_us 'Max. U$:',f,:valor_max_us %>
+								</tr>
+
+								<tr>
+									<%= field_gs 'Min. Gs:',f,:valor_min_gs %>
+									<%= field_gs 'Max. Gs:',f,:valor_max_gs %>
+								</tr>
+
+								<tr>
+									<%= field_us 'Min. R$:',f,:valor_min_rs %>
+									<%= field_us 'Max. R$:',f,:valor_max_rs %>
+
+								</tr>
+							</table>
+							</fieldset>
+						</td>
+					</tr>
+
+					<tr>
+						<td colspan="2">
+							<fieldset>
+								<legend>Status</legend>
+									<%= f.radio_button :status, 0, :checked => true %>ATIVO
+									<%= f.radio_button :status, 1 %>INATIVO
+							</fieldset>
+						</td>
+					</tr>
+
+					<tr>
+						<td colspan="2" valign="top"><%= f.text_area :descricao,
+																			 :cols => 80, :rows => 6,  placeholder: 'Concepto:' %></td>
+
+					</tr>
+
+
+				</table>
+			</div>
+			<div class="buttons">
+				<%= f.submit :value => "Seguir", :class => "button" %>
+				<%= link_to 'Salir', metas_path, :class => "button back" %>
+			</div>
+			<% end %>
+</div>

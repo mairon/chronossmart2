@@ -1,0 +1,68 @@
+<%= form_for(contrato_servicos) do |f| %>
+<% if contrato_servicos.errors.any? %>
+		<div id="error_explanation">
+			<h2><%= pluralize(contrato_servicos.errors.count, "error") %> prohibited this contrato_servicos_path from being saved:</h2>
+
+			<ul>
+			<% contrato_servicos.errors.full_messages.each do |message| %>
+				<li><%= message %></li>
+			<% end %>
+			</ul>
+		</div>
+	<% end %>
+	<div class="group">
+		<table>
+			<tr>
+				<td align="right">Contrato :</td>
+				<td><%= f.text_field :contrato_id %></td>
+
+				<td align="right">Produto :</td>
+				<td><%= f.collection_select :produto_id, Produto.select('id,nome').order('nome'), :id,
+														:nome,{},{:class => "selc_medium"} %></td>
+
+				<td align="right">Quantidade :</td>
+				<td><%= f.number_field :quantidade %></td>
+
+				<% if @contrato.moeda == 1 %>
+
+					<td align="right">Unitario US$ :</td>
+					<td><%= f.text_field :unitario_us %></td>
+
+					<td align="right">Total US$ :</td>
+					<td><%= f.text_field :total_us %></td>
+
+				<% else %>
+
+					<td align="right">Unitario G$ :</td>
+					<td><%= f.text_field :unitario_gs %></td>
+
+					<td align="right">Total G$ :</td>
+					<td><%= f.text_field :total_gs %></td>
+
+				<% end %>
+			</tr>
+		</table>
+
+		<div class="buttons">
+			<%= f.submit :value => t('SAVE'), :class => "button" %>
+			<%= link_to t('BACK'), contrato_servicos_path, :class => "button back" %>
+		</div>
+	</div>
+<% end %>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		jQuery.validator.setDefaults({
+			success: "valid"
+		});
+
+		$("form").validate({
+			rules: {
+				"contrato_servicos[contrato_id]": {required: true},
+				"contrato_servicos[produto_id]": {required: true},
+				"contrato_servicos[quantidade]": {required: true},
+			}
+		});
+	});
+</script>
+

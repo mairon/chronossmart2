@@ -1,0 +1,46 @@
+<h1 id="header">Libro <%= t('PURCHASE') %></h1>
+<div class="group">
+  <h2>
+    <%= form_tag resultado_livro_compra_contabilidades_path, :method => "get" do%>
+      <table>
+        <tr>
+          <td colspan="4"> 
+            <label>Periodo</label>
+            <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+            <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+            </div>
+            <div class="date-separ"><%= t('TO') %></div>
+            <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+            <div class="input-group-addon-f">
+            <span class="icon-calendar"></span>
+            </div>                  
+          </td>
+        </tr>
+
+        <tr height="35">
+          <td colspan="4">
+            <label for=""><%= t('UNIT') %></label>
+             <%=  select("busca", "unidade", Unidade.all(:select => 'id,unidade_nome',:order => 'unidade_nome').collect {|p| [ p.unidade_nome, p.id ] }, { :prompt => "Selecione la Unidad", required: true })   %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <input type="submit" class="btn  btn-green" value="           Informe           " onclick="Tipo('0')"/>
+            <input type="submit" class="btn btn-blue" value="          Excel          " onclick="Tipo('1')"/>
+          </td>
+
+        </tr>
+
+        <input type="hidden" name="tipo" id="tipo"  size="5" value="0"/>
+      </table>
+    <% end %>
+  </h2>
+</div>
+
+<script>
+
+  $('#busca_unidade').selectize();
+
+</script>

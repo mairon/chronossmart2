@@ -1,0 +1,83 @@
+<h1 id="header"> <%= t('VEHICLES') %> - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+  <%= form_for(@rodado) do |f| %>
+  
+    <% if @rodado.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@rodado.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @rodado.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <table>
+    <tr>
+      <td>
+        <label>Tipo</label>
+        <% if Empresa.last.segmento.to_i != 2 %>
+          <%= f.radio_button :tipo, 0, :checked => true %> Cavalito
+          <%= f.radio_button :tipo, 1 %> Carreta
+        <% end %>
+        <%= f.radio_button :tipo, 2 %> Vehico ADM
+        <%= f.radio_button :tipo, 3 %> Vehico Venta
+        
+      </td>
+    </tr>
+      <tr>
+        <td>
+          <label><%= t('BOARD') %></label>
+          <%= f.text_field :placa, required: true, class: 'panel-field' %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <label>Marca</label>
+          <%= f.text_field :marcao, class: 'panel-field' %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <label>Modelo</label>
+          <%= f.text_field :modelo, class: 'panel-field' %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <label>Chasis</label>
+          <%= f.text_field :chassi, class: 'panel-field' %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <label><%= t('RESPONSIBLE') %></label>
+          <%= f.text_field :responsavel, class: 'panel-field' %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <label><%= t('CAPACITY') %></label>
+          <%= f.text_field :capacidade, class: 'panel-field' %>
+        </td>
+      </tr>
+    </table>
+   <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), rodados_path, :class => "btn btn-back" %>
+   </div>
+<% end %>
+</div>
+
+<script type="text/javascript">
+  $('#rodado_rubro_grupo_id').selectize();
+  
+</script>

@@ -1,0 +1,47 @@
+$('#vendas_financas').empty();
+
+$('#vendas_financas').append("<%= escape_javascript(render(:partial => @venda.vendas_financas )) %>");
+$('#modal-forma-pagamento').modal('hide');
+
+<%
+  @produto_sum_us = (VendasProduto.sum(:total_dolar,:conditions => ['venda_id = ?',params[:id]] ) -  @venda.desconto_us.to_f)
+  @produto_sum_gs = (VendasProduto.sum(:total_guarani,:conditions => ['venda_id = ?',params[:id]] ) -  @venda.desconto_gs.to_f)
+  @produto_sum_rs = (VendasProduto.sum(:total_real, :conditions => ['venda_id = ?',params[:id]] ) -  @venda.desconto_rs.to_f)
+
+
+  @cred_us = VendasFinanca.sum(:valor_dolar, :conditions=> ["cred_deb = 0 AND venda_id = #{@venda.id}"])
+  @deb_us  = VendasFinanca.sum(:valor_dolar, :conditions=> ["cred_deb = 1 AND venda_id = #{@venda.id}"])
+
+  @cred_gs = VendasFinanca.sum(:valor_guarani, :conditions=> ["cred_deb = 0 AND venda_id = #{@venda.id}"])
+  @deb_gs  = VendasFinanca.sum(:valor_guarani, :conditions=> ["cred_deb = 1 AND venda_id = #{@venda.id}"])
+
+  @cred_rs = VendasFinanca.sum(:valor_real, :conditions=> ["cred_deb = 0 AND venda_id = #{@venda.id}"])
+  @deb_rs  = VendasFinanca.sum(:valor_real, :conditions=> ["cred_deb = 1 AND venda_id = #{@venda.id}"])
+
+  @saldo_gs = (@produto_sum_gs.to_f - (@cred_gs.to_f - @deb_gs.to_f))
+  @saldo_us = (@produto_sum_us.to_f - (@cred_us.to_f - @deb_us.to_f))
+  @saldo_rs = (@produto_sum_rs.to_f - (@cred_rs.to_f - @deb_rs.to_f))
+
+%>
+
+$(".saldo-gs").html("<small>Gs.</small> <%= format_int(@saldo_gs) %>");
+$(".saldo-us").html("<small>U$</small> <%= format_decimal(@saldo_us) %>");
+$(".saldo-rs").html("<small>R$</small> <%= format_decimal(@saldo_rs) %>");
+
+$("#valor").val("<%= format_int(@saldo_gs) %>");
+$("#valor_sem_gs").val("<%= format_int(@saldo_gs) %>");
+$("#valor_sem_us").val("<%= format_int(@saldo_us) %>");
+$("#valor_sem_rs").val("<%= format_int(@saldo_rs) %>");
+
+$("#fact_ad_01").val("");
+$("#fact_ad_02").val("");
+$("#fact_ad").val("");
+
+
+
+<% if (@venda.moeda.to_i == 1 and @saldo_gs.to_i == 0) || (@venda.moeda.to_i == 0 and @saldo_us.to_i == 0) || (@venda.moeda.to_i == 2 and @saldo_rs.to_i == 0) %>
+  $(".content-forma-pago").hide();
+  $(".content-btns").show();
+  $(".partial-fatuamento").show();
+  
+<% end %>

@@ -1,0 +1,18 @@
+<h1>Listing sueldos_detalhes</h1>
+
+<table>
+  <tr>
+  </tr>
+
+<% @sueldos_detalhes.each do |sueldos_detalhe| %>
+  <tr>
+    <td><%= link_to 'Show', sueldos_detalhe %></td>
+    <td><%= link_to 'Edit', edit_sueldos_detalhe_path(sueldos_detalhe) %></td>
+    <td><%= link_to 'Destroy', sueldos_detalhe, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New sueldos_detalhe', new_sueldos_detalhe_path %>

@@ -1,0 +1,246 @@
+
+
+<div class="group">
+  <table>
+    <% quebra = "" %>
+    <!-- EM DOLAR !-->
+    <% if params[:moeda].to_s == '0'%>
+      <% @balance.each do |balance|%>
+         <% if quebra != balance.codigo[0..01]  %>
+            <%if quebra != "" %>
+            <% end %>
+               <% quebra = balance.codigo[0..01]%>
+         <% end %>
+         <%
+              #CLASE
+               if balance.codigo[02..14]== ""
+                  varcodigo = balance.codigo[0..01]
+              #GRUPO
+               elsif balance.codigo[04..10]== ""
+                     varcodigo = balance.codigo[0..03]
+              #SUB_GRUPO
+               elsif balance.codigo[7..8]== ""
+                     varcodigo = balance.codigo[0..6]
+              #ITEM
+               elsif balance.codigo[11..3]== ""
+                     varcodigo = balance.codigo[0..10]
+              #SUB_ITEM
+               else
+                     varcodigo = balance.codigo
+
+               end
+       %>
+
+       <% sum_debe_anterior  = DiarioDebe.sum(:valor_dolar,:conditions => [ "unidade_id = #{current_unidade.id} and data < '#{params[:inicio].split("/").reverse.join("-")}' AND contabilidade LIKE ?","#{varcodigo}%"]) %>
+       <% sum_haber_anterior = DiarioHaber.sum(:valor_dolar,:conditions => [ "unidade_id = #{current_unidade.id} and data < '#{params[:inicio].split("/").reverse.join("-")}' AND contabilidade LIKE ?","#{varcodigo}%"]) %>
+
+       <% sum_debe  = DiarioDebe.sum(:valor_dolar,:conditions => [ "unidade_id = #{current_unidade.id} and data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' AND contabilidade LIKE ?","#{varcodigo}%"]) %>
+       <% sum_haber = DiarioHaber.sum(:valor_dolar,:conditions => [ "unidade_id = #{current_unidade.id} and data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' AND contabilidade LIKE ?","#{varcodigo}%"]) %>
+
+          <% if ( sum_debe_anterior - sum_haber_anterior ) + sum_debe - sum_haber != 0 %>
+              <tr class = "<%= cycle("cor1", "cor2") %>">
+                <% if balance.codigo[02..14]== ""%> 
+                        <td width="300"><b><%=  balance.codigo%></b> - <%=  balance.descricao %></td>
+                <% elsif balance.codigo[04..10]== ""%>
+                        <td width="300"> &nbsp <b><%=  balance.codigo%></b> - <%=  balance.descricao %></td>
+                <% elsif balance.codigo[7..8]== ""%>
+                        <td width="300"> &nbsp&nbsp&nbsp&nbsp <b><%=  balance.codigo%></b> - <%=  balance.descricao %></td>
+                <% elsif balance.codigo[11..3]== ""%>
+                        <td width="300"> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b><%=  balance.codigo%></b> - <%=  balance.descricao %></td>                
+                <%else%>
+                        <td width="300"> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b><%=  balance.codigo%></b> - <%=  balance.descricao %></td>                
+                <%end%>
+                <td width="80" align="right"><%=  number_to_currency(sum_anterior =  ( sum_debe_anterior - sum_haber_anterior ) , :format=>' %n ', :separeitor => ',')%></td>
+                <td width="80" align="right"><%=  number_to_currency(sum_debe , :format=>' %n ', :separeitor => ',' ) %></td>
+                <td width="80" align="right"><%=  number_to_currency(sum_haber , :format=>' %n ', :separeitor => ',' ) %></td>
+                <td width="80" align="right"><%=  number_to_currency( ( sum_anterior + sum_debe - sum_haber ) , :format=>' %n ', :separeitor => ',' )  %></td>
+              </tr>
+          <% end %>
+          
+      <% end %>
+      <tr>
+      	<td colspan="5">___________________________________________________________________________________________________________________________________________________</td>
+      </tr>
+
+    </table>
+      <!-- RESULTADO!-->
+    <% else %>
+      <!-- EM GUARANI !-->
+      <% @balance.each do |balance|%>
+         <% if quebra != balance.codigo[0..01]  %>
+            <%if quebra != "" %>
+                 <tr height="80" >
+                     <td colspan="6"></td>                     
+                 </tr>
+            <% end %>
+               <% quebra = balance.codigo[0..01]%>
+         <% end %>
+
+         <%
+              #CLASE
+               if balance.codigo[02..14]== ""
+                  varcodigo = balance.codigo[0..01]
+              #GRUPO
+               elsif balance.codigo[04..10]== ""
+                     varcodigo = balance.codigo[0..03]
+              #SUB_GRUPO
+               elsif balance.codigo[7..8]== ""
+                     varcodigo = balance.codigo[0..6]
+              #ITEM
+               elsif balance.codigo[11..3]== ""
+                     varcodigo = balance.codigo[0..10]
+              #SUB_ITEM
+               else
+                     varcodigo = balance.codigo
+
+               end       
+       %>
+       <% sum_debe_anterior  = DiarioDebe.sum(:valor_guarani,:conditions => [ "date_part('month', data) < '#{params[:mes].to_i}'  AND  date_part('year', data) = '#{params[:ano]}' AND contabilidade LIKE ?","#{varcodigo}%"]) %>
+       <% sum_haber_anterior = DiarioHaber.sum(:valor_guarani,:conditions => [ "date_part('month', data) < '#{params[:mes].to_i}'  AND  date_part('year', data) = '#{params[:ano]}' AND contabilidade LIKE ?","#{varcodigo}%"]) %>
+
+       <% sum_debe  = DiarioDebe.sum(:valor_guarani,:conditions => [ "date_part('month', data) = '#{params[:mes]}'  AND  date_part('year', data) = '#{params[:ano]}' AND contabilidade LIKE ?","#{varcodigo}%"]) %>
+       <% sum_haber = DiarioHaber.sum(:valor_guarani,:conditions => [ "date_part('month', data) = '#{params[:mes]}'  AND  date_part('year', data) = '#{params[:ano]}' AND contabilidade LIKE ?","#{varcodigo}%"]) %>
+
+          <% if ( sum_debe_anterior - sum_haber_anterior ) + sum_debe - sum_haber != 0 %>
+              <tr class = "<%= cycle("corb1", "corb2") %>">
+                <% if balance.codigo[02..14]== ""%> 
+                        <td width="280"><b><%=  balance.codigo%></b> - <%=  balance.descricao %></td>
+                <% elsif balance.codigo[04..10]== ""%>
+                        <td width="280"> &nbsp&nbsp&nbsp <b><%=  balance.codigo%></b> - <%=  balance.descricao %></td>
+                <% elsif balance.codigo[7..8]== ""%>
+                        <td width="280"> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b><%=  balance.codigo%></b> - <%=  balance.descricao %></td>
+                <% elsif balance.codigo[11..3]== ""%>
+                        <td width="280"> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b><%=  balance.codigo%></b> - <%=  balance.descricao %></td>                
+                <%else%>
+                        <td width="280"> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b><%=  balance.codigo%></b> - <%=  balance.descricao %></td>                
+                <%end%>        
+                <td width="100" align="right">      <%=  number_to_currency(sum_anterior =  ( sum_debe_anterior - sum_haber_anterior ) , :format=>' %n ', :precision => 0)%></td>
+                <td width="100" align="right">      <%=  number_to_currency(sum_debe , :format=>' %n ', :precision => 0) %></td>
+                <td width="100" align="right">      <%=  number_to_currency(sum_haber , :format=>' %n ', :precision => 0) %></td>
+                <td width="100" align="right">      <%=  number_to_currency( ( sum_anterior + sum_debe - sum_haber ) , :format=>' %n ', :precision => 0)  %></td>
+              </tr>
+          <% end %>
+          
+      <% end %>
+      <tr>
+      	<td colspan="5">___________________________________________________________________________________________________________________________________________________</td>
+      </tr>
+
+    </table>
+    
+    <table>
+      <!-- RESULTADO!-->
+       
+      <tr class="head">
+      	<td colspan="5" align="center">RESUMEN DEL CUADRO DE RESULTADOS</td>
+      </tr>
+
+      <tr>
+      	<td colspan="5">___________________________________________________________________________________________________________________________________________________</td>
+      </tr>
+      
+      <tr>
+      	<td colspan="5" align="center">      	
+          <table>
+              <% indice = 0 %>
+              <% tot    = 0 %>
+              <% @balance.each do |resultado|%>
+                 <% if indice.to_i <= 2%>
+                 <% if resultado.codigo[02..14]== ""
+                       varcodigo = resultado.codigo[0..01]
+                     end %>
+
+                 <% sum_debe_anterior  = DiarioDebe.sum(:valor_guarani,:conditions => [ "data < '#{params[:inicio].split("/").reverse.join("-")}' AND contabilidade LIKE ?","#{varcodigo}%"]) %>
+       
+                 <% sum_haber_anterior = DiarioHaber.sum(:valor_guarani,:conditions => [ "data < '#{params[:inicio].split("/").reverse.join("-")}' AND contabilidade LIKE ?","#{varcodigo}%"]) %>
+
+                 <% sum_debe  = DiarioDebe.sum(:valor_guarani,:conditions => [ "data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}'  AND  '#{params[:final].split("/").reverse.join("-")}' AND contabilidade LIKE ?","#{varcodigo}%"]) %>
+       
+                 <% sum_haber = DiarioHaber.sum(:valor_guarani,:conditions => [ "data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}'  AND  '#{params[:final].split("/").reverse.join("-")}' AND contabilidade LIKE ?","#{varcodigo}%"]) %>
+
+                 <% if ( sum_debe_anterior - sum_haber_anterior ) + sum_debe - sum_haber != 0 %>
+                       <% number_to_currency(sum_anterior =  ( sum_debe_anterior - sum_haber_anterior ) , :format=>' %n ', :precision => 0)%>
+                      <% if resultado.codigo[02..14]== ""%> 
+                        <tr>
+                         <td>Total <%=  resultado.descricao %></td>
+                         <% if ( sum_anterior.to_f + sum_debe.to_f - sum_haber.to_f ) < 0 %>
+                           <td align="right"><%= number_to_currency( ( sum_anterior.to_f + sum_debe.to_f - sum_haber.to_f ) * -1 , :format=>' %n ', :precision => 0)  %></td>                       
+                         <% else %>
+                           <td align="right"><%= number_to_currency( ( sum_anterior.to_f + sum_debe.to_f - sum_haber.to_f ) , :format=>' %n ', :precision => 0)  %></td>                       
+                         <% end %>
+                        </tr>
+                       <% tot    += ( sum_anterior.to_f + sum_debe.to_f - sum_haber.to_f ) %>
+                       <% indice += 1 %>
+                      <% end %>
+                 <% end %>
+                 <% end %>
+             <% end %>
+             <tr>
+             	<td></td>
+             	<td>_________________________</td>
+             </tr>
+             <tr class="head">
+             	<td width="150">Resultado</td>
+                <td align="right"><%= number_to_currency( tot.to_f , :format=>' %n ', :precision => 0)  %></td>                       
+             </tr>
+          </table>
+      	</td>
+      </tr>
+      
+      <tr>
+      	<td colspan="5" align="center">      	
+          <table>
+              <% indice2 = 0 %>
+              <% tot2    = 0 %>              
+              <% @balance.each do |resultado|%>
+                 <% if resultado.codigo[02..14]== ""
+                       varcodigo = resultado.codigo[0..01]
+                     end %>
+
+                 <% sum_debe_anterior  = DiarioDebe.sum(:valor_guarani,:conditions => [ "data < '#{params[:inicio].split("/").reverse.join("-")}' AND contabilidade LIKE ?","#{varcodigo}%"]) %>
+       
+                 <% sum_haber_anterior = DiarioHaber.sum(:valor_guarani,:conditions => [ "data < '#{params[:inicio].split("/").reverse.join("-")}' AND contabilidade LIKE ?","#{varcodigo}%"]) %>
+
+                 <% sum_debe  = DiarioDebe.sum(:valor_guarani,:conditions => [ "data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}'  AND  '#{params[:final].split("/").reverse.join("-")}' AND contabilidade LIKE ?","#{varcodigo}%"]) %>
+       
+                 <% sum_haber = DiarioHaber.sum(:valor_guarani,:conditions => [ "data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}'  AND  '#{params[:final].split("/").reverse.join("-")}' AND contabilidade LIKE ?","#{varcodigo}%"]) %>
+
+                 <% if ( sum_debe_anterior - sum_haber_anterior ) + sum_debe - sum_haber != 0 %>
+                       <% number_to_currency(sum_anterior =  ( sum_debe_anterior - sum_haber_anterior ) , :format=>' %n ', :precision => 0)%>
+                      <% if resultado.codigo[02..14]== ""%> 
+                        <% if indice2.to_i > 2%>
+
+                        <tr>
+                         <td> Total <%=  resultado.descricao %></td>
+                         <% if ( sum_anterior.to_f + sum_debe.to_f - sum_haber.to_f ) < 0 %>
+                           <td align="right"><%= number_to_currency( ( sum_anterior.to_f + sum_debe.to_f - sum_haber.to_f ) * -1, :format=>' %n ', :precision => 0)  %></td>                       
+                         <% else %>
+                           <td align="right"><%= number_to_currency( ( sum_anterior.to_f + sum_debe.to_f - sum_haber.to_f )  , :format=>' %n ', :precision => 0)  %></td>                       
+                         <% end %>
+                        </tr>
+                         <% tot2 += ( sum_anterior.to_f + sum_debe.to_f - sum_haber.to_f )%>
+                        <% end %>
+                       <% indice2 += 1%>
+                      <% end %>
+                 <% end %>
+             <% end %>
+             <tr height="5">
+             	<td></td>
+             	<td>_________________________</td>
+             </tr>
+             <tr class="head">
+             	<td width="150">Resultado</td>
+                <td align="right"><%= number_to_currency( tot2.to_f * -1 , :format=>' %n ', :precision => 0)  %></td>                       
+             </tr>
+          </table>
+      	</td>
+      </tr>
+
+      <tr>
+      	<td colspan="5">___________________________________________________________________________________________________________________________________________________</td>
+      </tr>
+    <% end %>
+
+  </table>
+</div>
+

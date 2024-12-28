@@ -1,0 +1,70 @@
+<body onload="ImputFocus('setor_nome')">
+
+<%= form_for(@setor) do |f| %>
+  <% if @setor.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@setor.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @setor.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+    <ul class="tabs">
+      <li><a href="#tab1">Sector - [<%= t('EDITION') %>]</a></li>
+    </ul>
+
+    <div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+           <td>
+
+              <fieldset>
+                <table width="450">
+
+                  <tr>
+                    <td align="right">Descripcion :</td>
+                    <td><%= f.text_field :nome, :size => 30,
+                          :onkeydown => "f(this)",
+                          :onkeyup   => "f(this)" %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Sigla :</td>
+                      <td><%= f.text_field :sigla, :size => 5,
+                          :onkeydown => "f(this)",
+                          :onkeyup   => "f(this)" %></td>
+                  </tr>
+
+                  <tr>
+                    <td align="right">Responsable :</td>
+                    <td> <%= f.collection_select :responsavel_id, Persona.all( :select     => ' id,nome,tipo_funcionario',
+                                                        :conditions => ["tipo_funcionario = 1"],
+                                                        :order      => '2'),:id,:nome, { :include_blank => true } %></td>
+                    
+                  </tr>
+
+
+                </table>
+              </fieldset>
+
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="buttons">
+        <%= f.submit t('SAVE'), :class => 'button', :disable_with => "Aguarde..." %>  
+        <%= link_to t('BACK'), setors_path, :class => 'button back' %>
+      </div>
+
+    </div>
+<% end %>
+
+
+

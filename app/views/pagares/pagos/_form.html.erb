@@ -1,0 +1,125 @@
+
+  <%= form_for(@pago) do |f| %>
+    <% if @pago.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@pago.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @pago.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <ul class="tabs">
+   <li><a href="#tab1">Pago - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+
+<div class="tab_container">
+   <div id="tab1" class="tab_content">
+      <table>
+        <tr>
+          <td align="right" class="label"> <%= t('DATE') %>:</td>
+          <td><%= f.date_select :data %></td>
+        </tr>
+
+        <tr>
+          <td class="label">Cotizacion U$:</td>
+          <td>  <%= text_field :pago, :cotacao ,
+                                      :size     => 10,
+                                      :value    => @pago.cotacao.to_i %>
+          </td>
+               
+          <td class="label">Cotizacion R$:</td>
+          <td>  <%= text_field :pago, :cotacao_real ,
+                                      :size    => 10,
+                                      :value   => @pago.cotacao_real.to_i %> 
+          </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>
+              <table>
+                <tr>
+                  <td>
+                    <fieldset>
+                      <legend><%= t('COIN') %></legend>
+                      <%= f.radio_button :moeda, 1,  :Checked => "True" %> Gs.
+                      <%= f.radio_button :moeda, 0 %> Dolar
+                      <%= f.radio_button :moeda, 2 %> Real
+
+                    </fieldset>
+                  </td>
+                </tr>
+              </table>
+          </td>
+        </tr>
+
+    		<tr>
+    			<td></td>
+    			<td><%= f.check_box :adelanto %>Aplicar Antecipo o Descuento</td>
+    		</tr>
+
+
+        <tr>
+          <td align="right">Proveedor :</td>
+              <%= f.hidden_field :persona_id %>
+          <td colspan="4"><%= f.text_field :persona_nome, :size => 100 %>Pulse F2 para Busca.</td>
+        </tr>
+        <tr>
+          <td align="right">Ruc:</td>
+          <td><%= f.text_field :ruc, :size => 20 %></td>
+        </tr>
+      </table>
+    </div>
+
+  <div class="buttons">
+      <%= link_to t('BACK'), pagos_path, :class => "button back"   %> 
+      <%= f.submit "Seguir", :class => "button", :disable_with => "Aguarde..." %>
+  </div>
+</div>
+
+  <% end %>
+
+<script>
+
+
+    //ABRI POPUP-----------------------------------------------------------------
+    document.onkeydown=function(e)
+    {
+      if(e.which == 113)
+        window.open('/personas/persona_pago', 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=10, WIDTH=1000, HEIGHT=400');
+    }
+    //FIM ABRI POPUP----------------------------------------------------------------
+
+</script>
+
+<script type="text/javascript">
+//busca cotacao dolar
+$("#pago_cotacao").focus(function(){
+  $.ajax({url: '/buscas/cotz_us_compra',
+          type: 'POST',
+          beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+          data: 'data=' + $('#pago_data_3i').val()+'/'+
+                          $('#pago_data_2i').val()+'/'+
+                          $('#pago_data_1i').val(),
+          success: function(data){
+          $('#pago_cotacao').val(data);} })
+});
+//busca cotacao real
+$("#pago_cotacao_real").focus(function(){
+  $.ajax({url: '/buscas/cotz_rs_compra',
+          type: 'POST',
+          beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+          data: 'data=' + $('#pago_data_3i').val()+'/'+
+                          $('#pago_data_2i').val()+'/'+
+                          $('#pago_data_1i').val(),
+          success: function(data){
+          $('#pago_cotacao_real').val(data);} })
+});
+  
+</script>

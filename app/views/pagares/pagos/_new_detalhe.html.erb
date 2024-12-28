@@ -1,0 +1,157 @@
+
+<%= form_for(pagos_detalhe) do |f| %>
+  <%= f.hidden_field :pago_id  %>
+  <%= f.hidden_field :persona_id,   :value => @pago.persona_id %>
+  <%= f.hidden_field :persona_nome, :value => @pago.persona_nome  %>
+  <%= f.hidden_field :data,         :value => @pago.data  %>
+  <%= f.hidden_field :moeda,        :value => @pago.moeda  %>
+  <%= f.hidden_field :compra_id %>
+  <%= f.hidden_field :clase_produto %>
+  <input type="hidden" id="cotacao" value="<%= @pago.cotacao %>"/>
+
+  <div class="group_cd">
+
+  <table>
+    <tr height="35">
+      <td class="label">Documento :</td>
+      <td><%= f.text_field :documento_nome,
+                           :size     => 24 ,
+                           :readonly => "readonly"%></td>
+      <td class="label">N. Doc.:</td>
+      <td><%= f.text_field :documento_numero_01,
+                           :size     => 3 ,
+                           :readonly => "readonly"%>
+          <%= f.text_field :documento_numero_02,
+                           :size     => 3 ,
+                           :readonly => "readonly"%>
+          <%= f.text_field :documento_numero,
+                           :size     => 15 ,
+                           :readonly => "readonly"%></td>
+      <td class="label">Cuota :</td>
+      <td><%= f.text_field :cota,
+                           :size     => 10 ,
+                           :readonly => "readonly"%></td>
+      <td class="label">Vencimento :</td>
+      <td><%= f.date_select :vencimento ,
+                            :readonly => "readonly"%></td>
+    </tr>
+  
+    <% if @pago.moeda == 0 %>
+
+        <!-- VALORES DOLAR!-->
+        <tr>
+           <%= field_us 'Valor U$ :',f,:valor_dolar,:readonly => "readonly"  %>
+           <%= f.hidden_field :valor_guarani %>
+           <%= f.hidden_field :valor_real %>
+
+           <%= field_us 'Anterior U$ :',f,:anterior_dolar,:readonly => "readonly"  %>
+           <%= f.hidden_field :anterior_guarani %>
+           <%= f.hidden_field :anterior_real %>
+
+          <%= field_us 'Saldo U$ :',f,:saldo_dolar  %>
+          <%= f.hidden_field :saldo_guarani %>
+          <%= f.hidden_field :saldo_real %>
+        </tr>
+
+    <% elsif @pago.moeda == 1 %>
+
+        <!-- VALORES GUARANI !-->
+        <tr>
+           <%= field_gs 'Valor Gs.:',f,:valor_guarani,:readonly => "readonly"  %>
+           <%= f.hidden_field :valor_dolar %>
+           <%= f.hidden_field :valor_real %>
+
+           <%= field_gs 'Anterior Gs.:',f,:anterior_guarani,:readonly => "readonly"  %>
+           <%= f.hidden_field :anterior_dolar %>
+           <%= f.hidden_field :anterior_real %>
+
+           <%= field_gs 'Saldo Gs.:',f,:saldo_guarani%>
+           <%= f.hidden_field :saldo_dolar %>
+           <%= f.hidden_field :saldo_real %>
+        </tr>
+    <% else %>
+
+        <!-- VALORES REAIS !-->
+        <tr>
+           <%= field_us 'Valor Rs.:',f,:valor_real, :readonly => "readonly"  %>
+           <%= f.hidden_field :valor_dolar %>
+           <%= f.hidden_field :valor_guarani %>
+
+           <%= field_us 'Anterior R$ :',f,:anterior_real, :readonly => "readonly"  %>
+           <%= f.hidden_field :anterior_dolar %>
+           <%= f.hidden_field :anterior_guarani %>
+
+           <%= field_us 'Saldo R$ :',f,:saldo_real, :readonly => "readonly" %>
+           <%= f.hidden_field :saldo_dolar %>
+           <%= f.hidden_field :saldo_guarani %>
+        </tr>
+
+    <% end %>
+
+  </table>
+
+    <!-- TOTAIS!-->
+    <table>
+      <tr>        
+        <td width="90"></td>
+        <td>
+          <fieldset>
+            <legend>Valores A Aplicar</legend>
+            <table>
+              <tr>
+
+                <% if @pago.moeda == 0 %>
+
+                  <%= field_us 'Descuento :',f,:desconto_dolar,:value =>0 %>
+
+                  <%= field_us 'Interes :',f,:interes_dolar,:value =>0 %>
+
+                  <%= field_us 'Pago U$ : ',f,:pago_dolar,:value =>0 %>
+
+                <% elsif @pago.moeda == 1 %>
+
+                  <%= field_gs 'Descuento :',f,:desconto_guarani,:value =>0 %>
+
+                  <%= field_gs 'Interes :',f,:interes_guarani,:value =>0 %>
+
+                  <%= field_gs 'Pago U$ : ',f,:pago_guarani,:value =>0 %>
+
+              <% else %>
+
+                  <%= field_us 'Descuento :',f,:desconto_real, :value =>0 %>
+
+                  <%= field_us 'Interes :',f,:interes_real, :value =>0 %>
+
+                  <%= field_us 'Pago R$ : ',f,:pago_real, :value =>0 %>
+
+              <% end %>
+              </tr>
+
+              <tr>
+                <td class="label">Estado:</td>
+                <td colspan="2"><%= f.radio_button :estado,0, :Checked => "True"%> Parte</td>
+                <td><%= f.radio_button :estado,1%> Cancelacion</td>
+              </tr>
+
+            </table>
+          </fieldset>
+        </td>
+        <td valign="bottom"><%= f.submit t('SAVE'), :disable_with => "Aguarde...", :class => "button" %></td>
+      </tr>
+    </table>
+  </div>  
+
+  <script>
+    //ABRI POPUP-----------------------------------------------------------------
+    document.onkeydown=function(e)
+    {
+      var cliente = document.getElementById("pagos_detalhe_persona_id") .value;
+      var id      = document.getElementById("pagos_detalhe_pago_id") .value;
+      if(e.which == 113)
+        window.open('/pagos/busca_proveedor/'+id +'?busca=' + cliente, 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=10, WIDTH=1300, HEIGHT=400');
+    }
+    //FIM ABRI POPUP----------------------------------------------------------------
+
+  </script>
+<% end %>
+

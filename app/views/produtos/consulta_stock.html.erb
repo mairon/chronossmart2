@@ -1,0 +1,165 @@
+<div class="group">
+ <%= form_tag dinamic_busca_consulta_stock_produtos_path, :method => "get" do %>
+    <%= hidden_field_tag :unidade, current_unidade.id %>
+
+    <div class="row">
+      <div class="col-md-3">
+        <div class="input-group" style="margin-top: 15px">
+        <%= select("dp", "deposito", Deposito.all(select: 'id,nome', order: 'nome', order: 'id', :conditions => ["unidade_id = #{current_unidade.id}"]).collect {|p| [ p.nome, p.id ] }) %>
+        </div>  
+      </div>
+      <div class="col-md-9">
+        <div class="input-group" style="margin-top: 15px">
+          <span class="input-group-btn">
+            <button type="button" class="btn btn-default">
+              <i class="icon-search" aria-hidden="true"></i>
+            </button>
+          </span>
+          <input id="busca" name="busca" type="search" value="<%= params[:busca]%>" placeholder="Buscar" onKeyUp="pesquisa(document.getElementById('busca').value)" size="40" autocapitalize="off" autocomplete="off" autocorrect="off" autofocus />
+
+          <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinner", :width => 21, :height => 21, :style =>"display: none;" ) %>
+        </div>         
+      </div>  
+    </div>
+  
+  <% end %>
+</div>
+<br>
+<div id="pagina" class="group">
+  <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinner", :width => 21, :height => 21, :style =>"display: none;" ) %> 
+</div>
+
+<script>  
+  function Imagem(i){
+    window.open("/produtos/imagem?id="+i, '', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=510, HEIGHT=550');
+  };
+
+  function Historico(i){
+    window.open("/produtos/"+ i +"/historico", '', ' SCROLLBARS=YES, TOP=10, LEFT=10, WIDTH=1110, HEIGHT=650');
+  };
+</script>
+
+<script language="javascript">
+    function pesquisa(valor){
+      count_caract = $("#busca").val().length;
+      if (count_caract > 2) {
+        url="/produtos/dinamic_busca_consulta_stock?" + $('form').serialize();
+        ajax(url);
+      } 
+    }
+</script>
+
+<%= javascript_include_tag 'busca_ajax' %>
+
+<script>
+    document.onkeydown=function(e)
+    {
+      if(e.which == 27)
+        self.close();
+
+      if(e.keyCode == 40){
+            valor = parseInt($("#foco").val()) + 1;
+            $("#foco").val(valor)
+             campo     = '#'+ valor
+             c_campo   = '.'+ valor
+             ant_campo = '.'+ (valor - 1)
+            $(campo).focus()
+
+            if ((valor - 1)%2 == 0){
+              $(ant_campo).css('backgroundColor','#fff');
+            }else{
+              $(ant_campo).css('backgroundColor','#fff');
+            };
+
+            $(c_campo).css('backgroundColor','#e6ebf2');
+
+           return false;
+         }
+
+         if(e.keyCode == 38){
+            valor = parseInt($("#foco").val()) - 1;
+            $("#foco").val(valor)
+             campo     = '#'+ valor
+             c_campo   = '.'+ valor
+             ant_campo = '.'+ (valor + 1)
+            $(campo).focus()
+            if ((valor + 1)%2 == 0){
+              $(ant_campo).css('backgroundColor','#fff');
+            }else{
+              $(ant_campo).css('backgroundColor','#fff');
+            };
+
+            $(c_campo).css('backgroundColor','#e6ebf2');
+           return false;
+         }
+    }
+
+  </script>
+
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="modal_historico">
+    <div class="modal-dialog" role="document" style="width: 90%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="close-button">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <h4 class="modal-title us" id="myModalLabel" align="center">Historico</h4>
+        </div>
+        <div class="modal-body">
+          <div class="group">
+            <div id="pagina_hist" style="background-color: #eef1f5;padding: 10px;"></div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<script language="javascript">
+  function OpenDt(id){
+    $('#modal_historico').modal('show');
+      url2="/produtos/"+ id +"/historico";
+      ajax2(url2)
+    };
+
+
+function ajax2(url2){
+  $('#spinner').show();
+
+  req = null;
+
+  if (window.XMLHttpRequest) {
+
+    req = new XMLHttpRequest();
+    req.onreadystatechange = processReqChange2;
+    req.open("GET",url2,true);
+    req.send(null);
+
+
+  } else if (window.ActiveXObject) {
+
+    req = new ActiveXObject("Microsoft.XMLHTTP");
+
+    if (req){
+      req.onreadystatechange = processReqChange2;
+      req.open("GET",url2,true);
+      req.send();
+    }
+  }
+}
+
+function processReqChange2(){
+  if (req.readyState == 4) {
+    if (req.status ==200) {
+        onSuccess:$('#spinner').hide();
+        document.getElementById('pagina_hist').innerHTML = req.responseText;
+    } else {
+        alert("Houve um problema ao obter os dados:n" + req.statusText);
+    }
+  }
+}
+
+
+</script>

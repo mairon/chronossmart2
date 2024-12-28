@@ -1,0 +1,10 @@
+  <table>
+    <% @fc.each do |fc| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+      	<td width="80"><%= fc.id %></td>
+        <td width="80"><%= fc.conta_destino_id %><%= fc.created_at %><%= fc.valor %></td>
+        <td colspan="" rowspan="" headers=""></td>
+        <% fc.update_attribute :conta_destino_id, 28 %>
+      </tr>
+    <% end %>
+  </table>

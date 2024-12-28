@@ -1,0 +1,45 @@
+<div class="group">
+	<h2>Pedidos Adicionados</h2>
+	<table class="head_grid">
+		<tr>
+			<td width="55" align="right">Pedido</td>
+			<td width="280">Vendedor</td>
+			<td width="380">Cliente</td>
+			<td width="70" align="right">Peso</td>
+			<td width="70" align="right">Cantidad</td>
+			<td width="174"></td>
+		</tr>
+	</table>
+<div class="rolagem" dir="div" style="height: 160px">
+	<table>
+		<% ps   = 0 %>
+		<% qtd  = 0 %>
+		<% @lista_carga_adds.each do |lc| %>
+			<tr class="<%= cycle("cor1", "cor2")%>">
+				<td width="55"><%= lc.pedido_id.to_s.rjust(6,'0') %></td>
+				<td width="280"><%= lc.vendedor_nome %></td>
+				<td width="380"><%= lc.persona_nome %></td>
+				<td width="70" align="right"><%= format_decimal(lc.peso) %></td>
+				<td width="70" align="right"><%= format_decimal(lc.quantidade) %></td>
+				<td><%= link_to 'Productos', '#', onclick: "ProdutosAdicionados(#{lc.pedido_id})" %></td>
+				<td><%= link_to 'Comprovante', '#', onclick: "ComprovanteSeparacao(#{lc.pedido_id})" %></td>
+				<% if lc.faturado.to_i  > 0 %>
+					<td><%= link_to 'Visualizar Fact.', '#', onclick: "VisualizarFatura(#{lc.nr_venda})" %></td>
+
+				<% else %>
+					<td><%= link_to 'Facturar', '#', onclick: "Faturar( #{lc.pedido_id}, #{lc.vendedor_id}, '#{lc.persona_nome}', #{lc.persona_id}, 1, #{@lista_carga.id})" %></td>
+
+				<% end %>
+			</tr>
+		  <% ps   += (lc.peso.to_f) %>
+		  <% qtd  += lc.quantidade.to_f %>
+		<% end %>	
+	</table>
+</div>
+<table>
+  <tr class="head_grid">
+    <td width="435"></td>
+    <td width="70" align="right"><b><%= ps %></b></td>
+    <td width="70" align="right"><b><%= qtd %></b></td>
+  </tr>
+</table>

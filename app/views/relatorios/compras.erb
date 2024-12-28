@@ -1,0 +1,186 @@
+<h1 id="header"><%= t('LISTING') %> de Compras</h1>
+<div class="group">
+  <h2>
+     <%= form_tag resultado_compras_relatorios_path, :method => "get" do%>
+        <table>
+          <tr>
+            <td colspan="4"> 
+              <label>Periodo</label>
+              <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+              <div class="input-group-addon-f">
+                <span class="icon-calendar"></span>
+              </div>
+              <div class="date-separ"><%= t('TO') %></div>
+              <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+              <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+              </div>                  
+              </td>
+          </tr>
+          <tr>
+            <td colspan="4">
+              <label>Proveedor</label>
+               <%=   select("busca", "proveedor", Persona.all(:select => 'id,nome',:conditions => ['tipo_fornecedor = 1'],:order => 'nome').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Todos...' })   %>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="#" data-value="4" title="Tipo de Compra" class="TipoCompra checked" >Todos</a>
+            </td>
+            <td align="center">
+              <a href="#" data-value="0" title="Tipo de Compra" class="TipoCompra" >Compra Interna</a>
+            </td>
+            <td align="center">
+              <a href="#" data-value="3" title="Tipo de Compra" class="TipoCompra" >Compra de Bienes</a>
+            </td>
+            <%= hidden_field_tag :tipo_compra, 4 %>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="#" data-value="" title="Tipo" class="Status checked" >Todos</a>
+            </td>
+            <td align="center">
+              <a href="#" data-value="0" title="Tipo" class="Status" >Contado</a>
+            </td>
+            <td align="center">
+              <a href="#" data-value="1" title="Tipo" class="Status" >Credito</a>
+              </td>
+              <%= hidden_field_tag :status, '' %>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="#" data-value="0" title="Formato" class="Detalhe checked" >Sintético</a>
+            </td>
+            <td align="center">
+              <a href="#" data-value="1" title="Formato" class="Detalhe" >Analítico</a>
+            </td>
+              <%= hidden_field_tag :detalhe, 0 %>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="4">
+              <%= check_box_tag :lancamento,'1' %> <%= t('ALL_RELEASES') %>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="#" data-value="0" title="Moneda" class="Moeda us <%= 'checked' if current_unidade.moeda.to_i == 0 %>" ><%= t('DOLLARS') %></a>
+            </td>
+            <td align="center">
+              <a href="#" data-value="1" title="Moneda" class="Moeda gs <%= 'checked' if current_unidade.moeda.to_i == 1 %>" ><%= t('GUARANIS') %></a>
+            </td>
+            <td align="center">
+              <a href="#" data-value="2" title="Moneda" class="Moeda rs <%= 'checked' if current_unidade.moeda.to_i == 2 %>" ><%= t('REAIS') %></a>
+            </td>
+            <%= hidden_field_tag :moeda, current_unidade.moeda %>
+          </tr>
+          <tr>
+            <td colspan="4" class="footer-buttons">
+              <input  id="button" class="acao btn btn-green" value="Informe"  style="cursor:pointer;" id="myModalLabel" data-toggle="modal" data-width="500" data-height="781" data-target="#myiframe" data-dismiss="modal" />
+              <input  id="button" type="submit" class="btn btn-blue" value="Excel" onclick = "Tipo('1')"/>
+          </tr>
+          <input type="hidden" name="tipo" id="tipo" size="5" value="0"/>
+
+        </table>
+     <% end %>
+</div>
+
+
+<div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 1100px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel"><%= t('LISTING') %> de Compras</h4>
+      </div>
+      <div class="modal-body" align="center">
+        <div class="embed-responsive embed-responsive-16by9" style="height: 460px">
+          <iframe class="embed-responsive-item" id="iframeModal" frameborder="0 " border="0"></iframe>
+        </div>
+      </div>      
+    </div>
+  </div>
+</div>
+
+<script>
+	$('#busca_proveedor').selectize();
+
+
+  $(document).ready(function() {
+    $(".TipoCompra").click(function() {
+      $("#tipo_compra").val($(this).attr('data-value'));
+      $(".TipoCompra").css("border-bottom", "none");
+      $(".TipoCompra").css("color", "#918f8f");
+      $(this).css("border-bottom", "2px solid #B94A48");
+      $(this).css("text-align", "center");
+      $(this).css("color", "#B94A48");
+    });
+
+    $(".Status").click(function() {
+      $("#status").val($(this).attr('data-value'));
+      $(".Status").css("border-bottom", "none");
+      $(".Status").css("color", "#918f8f");
+      $(this).css("border-bottom", "2px solid #B94A48");
+      $(this).css("text-align", "center");
+      $(this).css("color", "#B94A48");
+    });
+
+    $(".Detalhe").click(function() {
+      $("#detalhe").val($(this).attr('data-value'));
+      $(".Detalhe").css("border-bottom", "none");
+      $(".Detalhe").css("color", "#918f8f");
+      $(this).css("border-bottom", "2px solid #B94A48");
+      $(this).css("text-align", "center");
+      $(this).css("color", "#B94A48");
+    });
+
+    $(".Moeda").click(function() {
+      $("#moeda").val($(this).attr('data-value'));
+      $(".Moeda").css("border-bottom", "none");
+      $(".Moeda").css("color", "#918f8f");
+      $(this).css("border-bottom", "2px solid #B94A48");
+      $(this).css("text-align", "center");
+      $(this).css("color", "#B94A48");
+    });
+  });
+
+( function($) {
+  
+function iframeModalOpen(){
+
+    $('.acao').on('click', function(e) {
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+      
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+      
+      // stampiamo i nostri dati nell'iframe
+      $("#myiframe iframe").attr({
+        'src': '/relatorios/resultado_compras?' + $('form').serialize(),
+        'height': height,
+        'width': width,
+        'allowfullscreen':''
+      });
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#myiframe').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+    });
+  }
+  
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+  
+  } ) ( jQuery );
+
+</script>

@@ -1,0 +1,95 @@
+
+<div class="tab_container">
+<div id="tab1" class="tab_content">
+<div class="group" style="padding: 15px">
+  <table>
+    <tr>
+      <td colspan="6">
+        <fieldset>
+          <table>
+            <tr>
+              <td align="right">Departamento:</td>
+              <td colspan="3"><%= f.text_field :departamento, size: 50 %></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td colspan="3">
+              <fieldset>
+                <%= f.check_box :folha_pagamento %>Generar Hoja de Pago
+              </fieldset>
+              </td>
+            </tr>
+            <tr>
+              <td align="right"><%= t('COIN') %>:</td>
+              <td colspan="3">
+                <fieldset>
+                  <%= f.radio_button :folha_pagamento_moeda, 1,  :Checked => "True" %> Gs.
+                  <%= f.radio_button :folha_pagamento_moeda, 0 %> Dolar
+                  <%= f.radio_button :folha_pagamento_moeda, 2 %> Real              
+                </fieldset>
+               
+              </td>
+            </tr>
+            <tr>
+              <td align="right">I.P.S.:</td>
+              <td colspan="3"><%= f.text_field :ips, size: 15 %></td>
+            </tr>
+            <tr>
+              <td align="right"><%= t('DATE') %> Ingresso:</td>
+              <td colspan="3"><%= f.date_select :data_entrada, :start_year => 1995 %></td>
+            </tr>
+
+          </table>
+        </fieldset>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="6">
+        <fieldset>
+          <table>
+            <tr>
+              <%= field_us 'Sueldo:',f,:salario %>
+              <%= field_us 'Sueldo Minino:',f,:salario_minimo %>
+            </tr>            
+          </table>
+        </fieldset>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="6">
+        <fieldset>
+          <legend>Comisiones</legend>
+          <table>
+
+            <tr>
+              <%= field_us 'Venta:',f,:comissao %>
+            </tr>
+          </table>
+        </fieldset>
+      </td>
+    </tr>
+
+    <tr>
+      <td align="right">Forma de Cobro:</td>
+      <td><%= f.select :emp_forma_cobro,
+                      ( [ ["RECIBO COMUN", "0"],
+                        ["FACTURACION", "1"], ] ) %>
+      </td>
+    <% if params[:action] == 'new' %>
+    <td align="right">Unidade :</td>
+      <td><%= f.text_field :unidade_id, value: current_unidade.id %></td>
+      <% else %>
+      <td align="right"><%= t('UNIT') %>:</td>
+      <td><%= f.collection_select :unidade_id, Unidade.all( :select => 'id,unidade_nome', :order => '2'),:id, :unidade_nome %></td>
+
+    <% end %>
+    </tr>
+  </table>
+  </div>
+  <div class="buttons">
+    <%= link_to 'Perfil', edit_persona_path(@persona), :class => "button back" %> 
+    <%= f.submit " Finalizar ", disable_with: "Aguarde...", class: "button add" %> 
+  </div>    
+
+</div>
+</div>

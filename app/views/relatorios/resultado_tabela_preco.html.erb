@@ -1,0 +1,32 @@
+<div class="group">
+   <table>
+      <% @tabela_preco.each do |p| %>
+        <tr class="<%= cycle("cor1", "cor2") %>">
+          <td width="100">  <%= p.produto_id.to_s.rjust(6,'0') %></td>
+          <td width="470" align="left"><%= p.nome %></td>
+          <td width="70" align="right"><%= p.saldo.to_i %></td>
+          <% if params[:moeda] == '0' %>
+            <td width="70" align="right">  <%= format_int(p.custo_medio_us) %> </td>
+            <td width="70" align="right">  <%= format_decimal(p.preco_1_us) %> </td>
+
+          <% elsif params[:moeda] == '1' %>
+            <td width="70" align="right">  <%= format_int(p.custo_medio_gs) %> </td>
+            <td width="70" align="right">  <%= format_int(p.preco_1_gs) %> </td>
+          <% else %>
+            <td width="70" align="right">  <%= format_int(p.custo_medio_rs) %> </td>
+            <td width="70" align="right">  <%= format_decimal(p.preco_1_rs) %> </td>
+          <% end %>
+        </tr>
+      <% end %>
+   </table>
+</div>
+
+<style type="text/css">
+   table { border-collapse: collapse;
+           font-size: 9px}
+
+   .titulo{}
+   td,tr { border: 1px solid black; }
+</style>
+
+

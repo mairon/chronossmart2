@@ -1,0 +1,37 @@
+<table class="head_grid">
+  <tr>
+    <td width="55" align="center">Pedido</td>
+    <td width="250">Cliente</td>
+    <td width="250">Produto</td>
+    <td width="70" align="right">Peso</td>
+    <td width="70" align="right">Quantidade</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div"  style="height: 200px">
+  <table>
+    <% ps = 0 %>
+    <% qtd  = 0 %>
+    <% lista_carga_produtos.each do |p| %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td width="55" align="center"><%= p.presupuesto_id.to_s.rjust(6,'0') %></td>
+        <td width="250"><%= p.presupuesto.persona.nome %></td>
+        <td width="250"><%= p.produto.nome %></td>
+        <td width="70" align="right"><%= (p.produto.peso.to_f *  p.quantidade.to_f) %></td>
+        <td width="70" align="right"><%= p.quantidade.to_f %></td>
+        <td><%= link_to '', edit_lista_carga_produto_path(p), class: 'icon-pencil' %></td>
+        <td><%= link_to '', p, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+        <% ps += (p.produto.peso.to_f *  p.quantidade.to_f) %>
+        <% qtd  += p.quantidade.to_f %>
+      </tr>
+    <% end %>
+  </table>
+</div>
+  <table>
+    <tr class="head_grid">
+      <td width="555"></td>
+      <td width="70" align="right"><b><%= ps %></b></td>
+      <td width="70" align="right"><b><%= qtd %></b></td>
+    </tr>
+  </table>
+

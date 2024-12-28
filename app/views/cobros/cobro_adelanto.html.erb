@@ -1,0 +1,63 @@
+<h1 id="header"><%= t('DATE') %> <%= @cobro.data.strftime("%d/%m/%Y")%> |
+                Cliente. <%= @cobro.persona_nome %> |
+                <%= t('COIN') %> :
+                <% if @cobro.moeda == 0 %>
+                  <font color="green"> Dolar</font>
+                <% elsif @cobro.moeda == 1 %>
+                  <font color="red"> <%= t('GUARANIS') %> </font>
+                <% else %>
+                  <font color="blue"> Real</font>
+                <% end %>
+
+                | <%= t('QUOTATION') %> U$.: 
+                <%= number_to_currency( @cobro.cotacao, :format =>' %n ', :precision => 0 ) %> 
+                R$.: <%= number_to_currency( @cobro.cotacao_real, :format =>' %n ', :precision => 0 ) %>
+
+</h1>
+
+<%= render :partial=>"busca_adelantos" %>
+<br/>
+<%= render :partial=>"cobros_adelantos/new_adelanto", :locals=>{:cobros_adelanto=>CobrosAdelanto.new(:cobro_id=>@cobro.id)} %>
+
+<br/>
+<%= render :partial=>"cobros_adelantos/index", :locals=>{:cobros_adelantos => @cobro.cobros_adelantos} %>
+
+  <div class="footer-buttons">
+    <a href="#" onclick="SeguirCobros()" class="btn btn-info next">Seguir</a> 
+    <a href="/cobros/<%=params[:id]%>/edit" class="btn btn-back"><%= t('BACK') %></a> 
+
+  </div>
+
+   <%= hidden_field_tag :id, @cobro.id %>
+   <%= hidden_field_tag :count, @cobro.cobros_adelantos.present? %>
+   <%= hidden_field_tag :moeda, @cobro.moeda %>
+
+<br>
+<script>
+
+function SeguirCobros(){
+   id = document.getElementById('id').value
+        {
+            if ( document.getElementById('count').value == 'false' )
+                {
+                   alert ('Es Necessario Aplicar los Adelantos');
+                   return false;
+                }
+            else
+                {
+                    location.href="/cobros/"+id+"";
+                }
+
+         }
+
+}
+
+  document.onkeydown=function(e)
+{
+  //BOTAO F4
+  if(e.which == 115)
+    location.href="/pagos/nova_cota/"+ document.getElementById('id').value;
+          //SEGUIR FINANCAS
+}
+
+</script>

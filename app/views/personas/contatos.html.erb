@@ -1,0 +1,54 @@
+<h1 id="header">Persona - [Detalhe] <b><%= @persona.nome %></b></h1>
+<div class="acessos">
+  <%= link_to 'Contatos', contatos_persona_path(@persona.id), :class => "btn btn-info" %>
+</div>
+<div class="acessos">
+  <button type="button" class="button add" data-toggle="modal" data-target="#myModal">Nuevo</button>
+</div>
+<table>
+  <tr>
+    <td>
+      <div>
+        <table>
+          <tr>
+            <td>
+              <div class="group">
+                <%= render :partial=>"/persona_contatos/index", :locals=>{:persona_contatos => @persona.persona_contatos} %>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              
+            </td>
+          </tr>
+        </table>
+      </div>
+    </td>
+  </tr>
+</table>
+<div class="buttons">
+  <%= link_to 'Perfil', edit_persona_path(@persona), :class => "button back" %> 
+  <%= link_to 'Finalizar', personas_path, :class => "button delete" %>
+</div>
+
+<!-- Button trigger modal -->
+
+
+<!-- Modal -->
+<div class="modal fade " id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Nuevo Contato</h4>
+      </div>
+      <div class="modal-body">
+        <%= render :partial=>"/persona_contatos/new_contato", :locals=>{:persona_contato=>PersonaContato.new(:persona_id=>@persona.id)} %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>

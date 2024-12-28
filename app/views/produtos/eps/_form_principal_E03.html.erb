@@ -1,0 +1,178 @@
+<table>
+  <tr>
+      <td valign="top">
+         <fieldset>
+         <table>
+            <tr>
+
+              <td align="right" width="130">Referencia:</td>
+              <td><%= f.text_field :fabricante_cod, :size => 20,
+                                          :onchange  => " $.ajax({url: '/buscas/get_fabricante_cod',
+                                                type: 'POST',
+                                                data: 'fabricante=' + $('#produto_fabricante_cod').val(),
+                                                success: function(data){
+                                                  $('#produto_nome').val(data);} })" %></td>
+
+              <%= field_text 'Producto:',5,f,:nome,100,'produto_tipo_produto_0' %>
+            </tr>
+            <tr>
+              <td align="right">Clase:</td>
+              <td>
+                <%= f.collection_select :clase_id, Clase.all(:select => 'id,descricao',:order => '2'),:id,:descricao,{:include_blank => true}, {style: "width:200px"} %>
+              </td>
+              <td  align="right" width="160">Grupo:</td>
+              <td>
+                <%= f.collection_select :grupo_id, Grupo.all(:select => 'id,descricao',:order => '2'),:id,:descricao,{:include_blank => true}, {style: "width:200px"} %>
+              </td>
+              <td align="right"> Marca:</td>
+              <td>
+                <%= f.collection_select :sub_grupo_id, SubGrupo.all(:select => 'id,descricao',:order => '2'),:id,:descricao,{:include_blank => true}, {style: "width:200px"} %>
+              </td>
+            </tr>
+
+            <tr>
+              <td align="right">Proveedor:</td>
+              <td><%= f.collection_select :fabricante_id, Persona.all(:select => 'id,nome',:conditions =>['tipo_fornecedor = 1'],:order => '2'),:id,:nome,{:include_blank => true}, {style: "width:200px"} %>
+              </td>
+              <td align="right">Colección:</td>
+              <td>
+                <%= f.collection_select :colecao_id, Colecao.all(:select => 'id,nome',:order => '2'),:id,:nome,{:include_blank => true} %>
+
+                <%= image_tag("load.gif",
+                  :align => "absmiddle",
+                  :border => 0,
+                  :id => "spinner",
+                  :width => 21,
+                  :height => 21,
+                  :style =>"display: none;" ) %>
+              </td>
+              <td align="right" width="80">Página:</td>
+              <td width="230"><%= f.text_field :pagina, :size => 15 %>
+            </tr>
+
+            <tr>
+               <td align="right">Iva:</td>
+               <% if @produto.taxa == 0 %>
+                  <td width="230"><%= f.text_field :taxa, :value => 10, :size => 15 %>
+                <% else %>
+                <td width="230"><%= f.text_field :taxa, :size => 15 %>
+                <% end %>
+               </td>
+              <td align="right" width="80">Ubicacion:</td>
+               <td><%= f.text_field :locacao,
+                                    :size => 20 %></td>
+              <td align="right">Tipo :</td>
+              <td>
+                  <%= f.select :tipo_produto,
+                            ([["PRODUCTO", "0"],
+                              ["SERVICIO", "1"]]) %>
+              </td>
+            </tr>
+            <% if current_unidade.id == 1 %>
+              <tr>
+                <%= field_us 'Cotiz. R$xU$:',f,:cotacao_rs_us %>
+                <%= field_us 'Custo Ref. R$:',f,:custo_base_rs,
+                     :onblur   => "VRsToUsGs('produto_cotacao_rs_us','produto_cotacao','produto_custo_base_rs','produto_custo_base_us','produto_custo_base_gs')" %>
+              </tr>
+              <tr>
+                <%= field_gs 'U$xG$:',f,:cotacao %>
+
+                <%= field_us 'Custo Ref. U$:',f,:custo_base_us,
+                                   :onblur   => "VRPsToUsGs('produto_cotacao_rs_us','produto_cotacao','produto_custo_base_rs','produto_custo_base_us','produto_custo_base_gs')" %>
+              </tr>
+
+              <tr>
+                <td></td>
+                <td></td>
+                <%= field_us 'Custo Ref. G$:',f,:custo_base_gs,
+                                   :onchange   => "VRsToUsGs('produto_cotacao_rs_us','produto_cotacao','produto_custo_base_rs','produto_custo_base_us','produto_custo_base_gs')",
+                                   :onKeyUp  => "EnterTab(event,'btn')", :readonly => "readonly" %>
+
+              </tr>
+            <% end %>
+
+         </table>
+        </fieldset>
+      </td>
+
+
+      <td rowspan="4" valign="top">
+      <div id="sidebar">
+      <table>
+        <tr>
+           <td>
+              <div class="avatar">
+              <table>
+                 <tr>
+
+                    <td>
+                       <% if @produto.picture_content_type.present? %>
+                          <%= image_tag @produto.picture.url,:size => "240x210" %>
+                       <% else %>
+                          <%= image_tag ('../images/defalt.jpg') %>
+                       <% end %>
+                    </td>
+
+                 </tr>
+              </table>
+                 </div>
+           </td>
+        </tr>
+
+        <tr>
+           <td colspan="2"><%= f.file_field :picture,:size => 23 %><br/><hr/></td>
+        </tr>
+              <tr>
+                <td colspan="2">
+                  <fieldset>
+                     <table>
+                      <tr>
+                       <td>
+                          <div class="stock_atual">
+                                Stock Atual : <%= @quantidade %>  |
+                          </div>
+                       </td>
+                       <td align="right">
+                           <a href="javascript:void(0)" onClick="AbrirHistoricoPreco('<%= @produto.id.to_i %>')">Hist. Precio</a>
+                       </td>
+                      </tr>
+                    </table>
+                  </fieldset>
+                </td>
+              </tr>
+              <tr>
+                <td valign="top" colspan="2">
+                Obs.: <%= f.text_area :obs, :rows => 5, :cols => 25 %>
+                </td>
+              </tr>
+         </table>
+        </div>
+      </td>
+   </tr>
+  </table>
+
+<script>
+  $("#produto_fabricante_cod").focus();
+
+$("#produto_sub_grupo_id").change(function() {
+
+      var data=$('#produto_sub_grupo_id').val();
+      $.ajax({
+
+        type: "POST",
+         url: "/dynamic_colecao/"+data,
+        data: data,
+
+        beforeSend: function()
+        {
+            $('#spinner').show();
+        },
+
+        success: function(response)
+        {
+          $('#spinner').hide();
+        }
+
+      });
+  });
+</script>

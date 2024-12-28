@@ -1,0 +1,73 @@
+<p>
+  <b>Nota credito proveedor:</b>
+  <%=h @nota_credito_proveedor_aplic.nota_credito_proveedor_id %>
+</p>
+
+<p>
+  <b><%= t('DATE') %>:</b>
+  <%=h @nota_credito_proveedor_aplic.data %>
+</p>
+
+<p>
+  <b><%= t('PERSON') %>:</b>
+  <%=h @nota_credito_proveedor_aplic.persona_id %>
+</p>
+
+<p>
+  <b>Persona <%= t('NAME') %>:</b>
+  <%=h @nota_credito_proveedor_aplic.persona_nome %>
+</p>
+
+<p>
+  <b>Documento numero 01:</b>
+  <%=h @nota_credito_proveedor_aplic.documento_numero_01 %>
+</p>
+
+<p>
+  <b>Documento numero 02:</b>
+  <%=h @nota_credito_proveedor_aplic.documento_numero_02 %>
+</p>
+
+<p>
+  <b>Documento numero:</b>
+  <%=h @nota_credito_proveedor_aplic.documento_numero %>
+</p>
+
+<p>
+  <b>Cota:</b>
+  <%=h @nota_credito_proveedor_aplic.cota %>
+</p>
+
+<p>
+  <b>Valor dolar:</b>
+  <%=h @nota_credito_proveedor_aplic.valor_dolar %>
+</p>
+
+<p>
+  <b>Valor guarani:</b>
+  <%=h @nota_credito_proveedor_aplic.valor_guarani %>
+</p>
+
+<p>
+  <b>Valor real:</b>
+  <%=h @nota_credito_proveedor_aplic.valor_real %>
+</p>
+
+<p>
+  <b>Moeda:</b>
+  <%=h @nota_credito_proveedor_aplic.moeda %>
+</p>
+
+<p>
+  <b>Clase produto:</b>
+  <%=h @nota_credito_proveedor_aplic.clase_produto %>
+</p>
+
+<p>
+  <b>Tipo:</b>
+  <%=h @nota_credito_proveedor_aplic.tipo %>
+</p>
+
+
+<%= link_to 'Edit', edit_nota_credito_proveedor_aplic_path(@nota_credito_proveedor_aplic) %> |
+<%= link_to 'Back', nota_credito_proveedor_aplics_path %>

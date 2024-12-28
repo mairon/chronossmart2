@@ -1,0 +1,805 @@
+
+	<% filtro = " AND date_part('month', data) = '#{params[:mes]}'  AND  date_part('year', data) = '#{params[:ano]}'" %>
+
+<table>
+   <tr>
+     <td>
+    
+<table>
+   
+   <!-- TITLE!-->
+   <tr class="header">
+     <td align="center" colspan="10" bgcolor="#C0C0C0"><b> Ventas </b></td>
+   </tr>
+
+   <!-- VENDAS!-->
+   <tr class="header">
+     <!-- HEADERS!-->
+     <td align="center" colspan="3" bgcolor="#C0C0C0">Servicios</td>
+
+     <td align="center" colspan="3" bgcolor="#C0C0C0">Repuestos</td>
+     
+     <td align="center" colspan="4" bgcolor="#C0C0C0">Maquinarios</td>     
+   </tr>  
+
+   
+  <!-- FIELD!--> 
+  <tr>
+    <!-- SERVICIOS!-->
+    <td align="center">Cantidad</td>         
+  
+    <td align="center">Contado</td>
+    
+    <td align="center">Credito</td>
+    
+    <!-- REPUESTOS!-->
+    <td align="center">Cantidad</td>         
+  
+    <td align="center">Contado</td>
+    
+    <td align="center">Credito</td>
+    
+    <!-- MAQUINARIOS!-->        
+    <td align="center">Cantidad</td>                                  
+    
+    <td align="center">Contado</td>
+    
+    <td align="center">Credito</td>       
+    
+    <td align="center"><%= t('INTEREST') %></td>           
+  </tr>  
+
+  <tr>
+
+    <!-- VALUES REPUESTOS!-->
+    <td width="100" align="right">
+      <%= number_to_currency( VendasProduto.sum(:quantidade,:conditions => ["PRODUTOS.TIPO_PRODUTO = 1  AND date_part('month', VENDAS_PRODUTOS.data) = '#{params[:mes]}'  AND  date_part('year', VENDAS_PRODUTOS.data) = '#{params[:ano]}'"], :joins => "INNER JOIN PRODUTOS  ON VENDAS_PRODUTOS.PRODUTO_ID = PRODUTOS.ID"), :format=>' %n ', :precision => 0 )%>
+    </td>
+ 
+    <td width="100" align="right">
+      <%= number_to_currency( contado_sv = VendasProduto.sum(:total_dolar, :conditions => ["VENDAS_PRODUTOS.TIPO = 0 AND PRODUTOS.TIPO_PRODUTO = 1 AND VENDAS_PRODUTOS.CLASE_PRODUTO  = 0  AND date_part('month', VENDAS_PRODUTOS.data) = '#{params[:mes]}'  AND  date_part('year', VENDAS_PRODUTOS.data) = '#{params[:ano]}'"], :joins => "INNER JOIN PRODUTOS  ON VENDAS_PRODUTOS.PRODUTO_ID = PRODUTOS.ID"), :format=>' %n ', :separeitor => ',' )%>
+    </td>
+    
+    <td width="100" align="right">
+      <%= number_to_currency( credito_sv = VendasProduto.sum(:total_dolar, :conditions => ["VENDAS_PRODUTOS.TIPO = 1 AND PRODUTOS.TIPO_PRODUTO = 1 AND VENDAS_PRODUTOS.CLASE_PRODUTO  = 0  AND date_part('month', VENDAS_PRODUTOS.data) = '#{params[:mes]}'  AND  date_part('year', VENDAS_PRODUTOS.data) = '#{params[:ano]}'"], :joins => "INNER JOIN PRODUTOS  ON VENDAS_PRODUTOS.PRODUTO_ID = PRODUTOS.ID"), :format=>' %n ', :separeitor => ',' )%>
+    </td>
+
+    <!-- VALUES REPUESTOS!-->
+    <td width="100" align="right">
+      <%= number_to_currency( VendasProduto.sum(:quantidade, :conditions => ["PRODUTOS.TIPO_PRODUTO = 0 AND VENDAS_PRODUTOS.CLASE_PRODUTO  = 0  AND date_part('month', VENDAS_PRODUTOS.data) = '#{params[:mes]}'  AND  date_part('year', VENDAS_PRODUTOS.data) = '#{params[:ano]}'"], :joins => "INNER JOIN PRODUTOS  ON VENDAS_PRODUTOS.PRODUTO_ID = PRODUTOS.ID"), :format=>' %n ', :separeitor => ',' )%>
+    </td>
+ 
+    <td width="100" align="right">
+      <%= number_to_currency( contado_rp = VendasProduto.sum(:total_dolar, :conditions => ["VENDAS_PRODUTOS.TIPO = 0 AND PRODUTOS.TIPO_PRODUTO = 0 AND VENDAS_PRODUTOS.CLASE_PRODUTO  = 0  AND date_part('month', VENDAS_PRODUTOS.data) = '#{params[:mes]}'  AND  date_part('year', VENDAS_PRODUTOS.data) = '#{params[:ano]}'"], :joins => "INNER JOIN PRODUTOS  ON VENDAS_PRODUTOS.PRODUTO_ID = PRODUTOS.ID"), :format=>' %n ', :separeitor => ',' )%>
+    </td>
+    
+    <td width="100" align="right">
+      <%= number_to_currency( credito_rp = VendasProduto.sum(:total_dolar, :conditions => ["VENDAS_PRODUTOS.TIPO = 1 AND PRODUTOS.TIPO_PRODUTO = 0 AND VENDAS_PRODUTOS.CLASE_PRODUTO  = 0  AND date_part('month', VENDAS_PRODUTOS.data) = '#{params[:mes]}'  AND  date_part('year', VENDAS_PRODUTOS.data) = '#{params[:ano]}'"], :joins => "INNER JOIN PRODUTOS  ON VENDAS_PRODUTOS.PRODUTO_ID = PRODUTOS.ID"), :format=>' %n ', :separeitor => ',' )%>
+    </td>
+    
+    <!-- VALUES MAQUINARIOS!-->     
+    <td width="100" align="right">
+      <%= number_to_currency( VendasProduto.sum(:quantidade,:conditions => ["clase_produto = 1 #{filtro}"]), :format=>' %n ', :precision => 0)%>
+    </td>
+
+    <td width="100" align="right">
+      <%= number_to_currency( contado_mq = Venda.sum(:total_dolar,:conditions => ["tipo = 0 AND clase_produto = 1 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+    
+    
+    <td width="100" align="right">
+      <%= number_to_currency( credito_mq = Venda.sum(:total_dolar,:conditions => ["tipo = 1 AND clase_produto = 1 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+    <td width="100" align="right">
+    	<% int_venda     =  VendasProduto.sum( ('total_dolar') ,:conditions => ["produto_id = 5880 AND clase_produto = 1 #{filtro}"])%>
+    	<% int_venda_dif =  VendasProduto.sum( ('total_dolar - (unitario_dolar * quantidade)') ,:conditions => ["clase_produto = 1 #{filtro}"])%>
+      <%= number_to_currency( int_venda_dif.to_f + int_venda.to_f , :format=>' %n ', :separeitor => ',')%>
+    </td>
+    
+    
+  </tr>
+  <tr>
+
+    <!-- TOTAL SERVICIOS!-->
+    <td colspan="3" align="center">
+       Total : <%= number_to_currency( contado_sv.to_f + credito_sv.to_f, :format=>' %n ', :separeitor => ',') %>
+    </td>
+
+    <!-- TOTAL REPUESTOS!-->
+    <td colspan="3" align="center">
+       Total : <%= number_to_currency( contado_rp.to_f + credito_rp.to_f, :format=>' %n ', :separeitor => ',') %>
+    </td>
+    
+    <!-- TOTAL MAQUINARIOS!-->
+    <td colspan="4" align="center">
+       Total : <%= number_to_currency( contado_mq.to_f + credito_mq.to_f, :format=>' %n ', :separeitor => ',') %>
+    </td>  
+  <tr>     
+
+  <tr height="30">
+    <td colspan="10" align="center" >
+    	<font size="2">
+    		<b>
+             Total Bruto de las Ventas : <%= number_to_currency( ( (contado_mq.to_f + contado_rp.to_f) + (credito_mq.to_f + credito_rp.to_f) +( contado_sv.to_f + credito_sv.to_f ))  , :format=>' %n ', :separeitor => ',') %>    			
+    		</b>
+    	</font>
+    </td>    
+  <tr>     
+
+  
+  <!-- VENDEDORES!-->
+  <tr>
+    <td colspan="5" valign="top">    
+      <table>
+        <tr>
+          <td width="350"><b>Vendedor(Repuestos)</b> </td>
+          <td> <b><%= t('SALES') %></b> </td>    
+          <td> <b>Valores</b> </td>              
+        </tr>
+
+
+        <% sql ="SELECT P.ID AS ID,
+                 P.NOME AS NOME,
+                (SELECT COUNT(ID) FROM VENDAS WHERE VENDEDOR_ID = P.ID  AND CLASE_PRODUTO = 0  AND TIPO IS NOT NULL AND date_part('month', data) = '#{params[:mes]}'  AND  date_part('year', data) = '#{params[:ano]}')  AS VENDAS,
+                 (SELECT SUM(TOTAL_DOLAR) FROM VENDAS WHERE VENDEDOR_ID = P.ID  AND CLASE_PRODUTO = 0  AND TIPO IS NOT NULL  AND date_part('month', data) = '#{params[:mes]}'  AND  date_part('year', data) = '#{params[:ano]}')  AS TOTAL_VENDAS
+          FROM   PERSONAS P
+          WHERE  TIPO_VENDEDOR = 1
+          ORDER BY 3
+          DESC"%>
+                  
+        <% Persona.find_by_sql(sql).each do |vd|%>
+ 
+           <tr>
+             <% if vd.vendas.to_i > 0%>
+                <td><%= vd.nome %></td>    
+                <td align="center"><%= vd.vendas %></td>        
+                <td align="right"><%= number_to_currency( vd.total_vendas, :format=>' %n ', :separeitor => ',') %></td>        
+             <% end%>
+           </tr>
+        <% end %>  
+      </table>            
+    </td>
+    
+    <td colspan="5" valign="top">
+      <table>
+        <tr>
+          <td width="350"><b>Vendedor(Maquinas)</b> </td>
+          <td> <b><%= t('SALES') %></b> </td>    
+          <td> <b>Valores</b> </td>              
+        </tr>
+
+
+        <% sql ="SELECT P.ID AS ID,
+                 P.NOME AS NOME,
+                (SELECT COUNT(ID) FROM VENDAS WHERE VENDEDOR_ID = P.ID  AND CLASE_PRODUTO = 1  AND date_part('month', data) = '#{params[:mes]}'  AND  date_part('year', data) = '#{params[:ano]}')  AS VENDAS,
+                 (SELECT SUM(TOTAL_DOLAR) FROM VENDAS WHERE VENDEDOR_ID = P.ID  AND CLASE_PRODUTO = 1  AND date_part('month', data) = '#{params[:mes]}'  AND  date_part('year', data) = '#{params[:ano]}')  AS TOTAL_VENDAS
+          FROM   PERSONAS P
+          WHERE  TIPO_VENDEDOR = 1
+          ORDER BY 3
+          DESC"%>
+                  
+        <% Persona.find_by_sql(sql).each do |vd|%>
+ 
+           <tr>
+             <% if vd.vendas.to_i > 0%>
+                <td><%= vd.nome %></td>    
+                <td align="center"><%= vd.vendas %></td>        
+                <td align="right"><%= number_to_currency( vd.total_vendas, :format=>' %n ', :separeitor => ',') %></td>        
+             <% end%>
+           </tr>
+        <% end %>  
+      </table>
+   
+    </td>
+  </tr>
+</table>
+
+</tr>
+
+<tr>
+  <td>
+  
+<!--COBROS!-->
+<table>
+   
+   <!-- TITLE!-->
+   <tr class="header">
+     <td align="center" colspan="6" bgcolor="#C0C0C0"> <b><%= t('CHARGE') %>s</b></td>
+   </tr>
+
+   <tr class="header">
+     <!-- HEADERS!-->
+     <td align="center" colspan="3" bgcolor="#C0C0C0">Repuestos</td>
+     
+     <td align="center" colspan="3" bgcolor="#C0C0C0">Maquinarios</td>     
+   </tr>  
+   
+  <!-- FIELD!--> 
+  <tr>
+    <!-- REPUESTOS!-->
+    <td align="center">Cantidad</td>         
+  
+    <td align="center">Total</td>
+    
+    <td align="center"><%= t('INTEREST') %></td>    
+        
+    <!-- MAQUINARIOS!-->        
+    <td align="center">Cantidad</td>                                  
+    
+    <td align="center">Total</td>
+    
+    <td align="center"><%= t('INTEREST') %></td>        
+    
+  </tr>  
+
+  <tr>
+    <!-- VALUES REPUESTOS!-->
+    <td width="100" align="right">
+      <%= number_to_currency( Cobro.count(:id,:conditions => ["clase_produto = 0 #{filtro}"]), :format=>' %n ', :precision => 0)%>
+    </td>
+
+ 
+    <td width="100" align="right">
+      <%= number_to_currency( cb_total_rp = Cobro.sum(:valor_dolar,:conditions => ["clase_produto = 0 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+    <td width="100" align="right">
+      <%= number_to_currency( CobrosDetalhe.sum(:interes_dolar,:conditions => ["clase_produto = 0 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+
+    <!-- VALUES MAQUINARIOS!-->
+    <td width="100" align="right">
+      <%= number_to_currency( Cobro.count(:id,:conditions => ["clase_produto = 1 #{filtro}"]), :format=>' %n ', :precision => 0)%>
+    </td>
+ 
+    <td width="100" align="right">
+      <%= number_to_currency( cb_total_mq = Cobro.sum(:valor_dolar,:conditions => ["clase_produto = 1 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+    <td width="100" align="right">
+      <%= number_to_currency( CobrosDetalhe.sum(:interes_dolar,:conditions => ["clase_produto = 1 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+    
+  </tr>
+
+  <tr height="30">
+    <td colspan="6" align="center"> 
+    	<font size="2">
+    		<b>
+              Total Bruto de las <%= t('CHARGE') %>s: <%= number_to_currency( cb_total_mq.to_f + cb_total_rp.to_f , :format=>' %n ', :separeitor => ',') %>    			
+    		</b>
+    	</font>
+    </td>    
+  <tr>     
+
+     </td>
+   </tr>	
+
+
+<tr>
+  <td colspan="6">
+  
+<!--PAGOS!-->
+<table>
+   
+   <!-- TITLE!-->
+   <tr class="header">
+     <td align="center" colspan="6" bgcolor="#C0C0C0"> <b>Pagos</b></td>
+   </tr>
+
+   <tr class="header">
+     <!-- HEADERS!-->
+     <td align="center" colspan="3" bgcolor="#C0C0C0">Repuestos</td>
+     
+     <td align="center" colspan="3" bgcolor="#C0C0C0">Maquinarios</td>     
+   </tr>  
+   
+  <!-- FIELD!--> 
+  <tr>
+    <!-- REPUESTOS!-->
+    <td align="center" colspan="2">Cantidad</td>         
+  
+    <td align="center">Total</td>
+           
+    <!-- MAQUINARIOS!-->        
+    <td align="center" colspan="2">Cantidad</td>                                  
+    
+    <td align="center">Total</td>
+    
+  </tr>  
+
+  <tr>
+    <!-- VALUES REPUESTOS!-->
+    <td width="100" align="right" colspan="2">
+      <%= number_to_currency( Pago.count(:id,:conditions => ["clase_produto = 0 #{filtro}"]), :format=>' %n ', :precision => 0)%>
+    </td>
+
+ 
+    <td width="100" align="right">
+      <%= number_to_currency( pg_total_rp = PagosDetalhe.sum(:pago_dolar,:conditions => ["clase_produto = 0 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+    <!-- VALUES MAQUINARIOS!-->
+    <td width="100" align="right" colspan="2">
+      <%= number_to_currency( Pago.count(:id,:conditions => ["clase_produto = 1 #{filtro}"]), :format=>' %n ', :precision => 0)%>
+    </td>
+ 
+    <td width="100" align="right">
+      <%= number_to_currency( pg_total_mq = PagosDetalhe.sum(:pago_dolar,:conditions => ["clase_produto = 1 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+  </tr>
+
+  <tr height="30">
+    <td colspan="4" align="center"> 
+    	<font size="2">
+    		<b>
+              Total Bruto de los Pagos : <%= number_to_currency( pg_total_mq.to_f + pg_total_rp.to_f , :format=>' %n ', :separeitor => ',') %>    			
+    		</b>
+    	</font>
+    </td>    
+  <tr>     
+
+     </td>
+   </tr>	
+   
+<tr>
+  <td colspan="6">
+  
+<!--COMPRAS!-->
+<table>
+
+   <!-- TITLE!-->
+   <tr class="header">
+     <td align="center" colspan="9" bgcolor="#C0C0C0"> <b> Compra de Mercaderias</b></td>
+   </tr>
+
+
+   <tr class="header">
+     <!-- HEADERS!-->
+     <td align="center" colspan="3" bgcolor="#C0C0C0">Repuestos</td>
+     
+     <td align="center" colspan="3" bgcolor="#C0C0C0">Maquinarios</td>     
+     
+     <td align="center" colspan="3" bgcolor="#C0C0C0">Repuestos/Maquinarios</td>          
+   </tr>  
+   
+   
+  <!-- FIELD!--> 
+  <tr>
+    <!-- REPUESTOS!-->
+    <td align="center">Cantidad</td>         
+  
+    <td align="center">Contado</td>
+    
+    <td align="center">Credito</td>    
+        
+    <!-- MAQUINARIOS!-->        
+    <td align="center">Cantidad</td>                                  
+    
+    <td align="center">Contado</td>
+    
+    <td align="center">Credito</td>        
+
+    <!-- REPUESTOS/MAQUINARIOS!-->        
+    <td align="center">Cantidad</td>                                  
+    
+    <td align="center">Contado</td>
+    
+    <td align="center">Credito</td>        
+
+    
+  </tr>  
+
+  <tr>
+    <!-- VALUES REPUESTOS!-->
+    <td width="100" align="right">
+      <%= number_to_currency( Compra.count(:id,:conditions => ["clase_produto = 0 AND tipo_compra = 0 #{filtro}"]), :format=>' %n ', :precision => 0)%>
+    </td>
+
+ 
+    <td width="100" align="right">
+      <%= number_to_currency( cp_total_rp_cont = Compra.sum(:total_dolar,:conditions => ["clase_produto = 0  AND tipo_compra = 0 AND tipo = 0 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+    <td width="100" align="right">
+      <%= number_to_currency( cp_total_rp_cred = Compra.sum(:total_dolar,:conditions => ["clase_produto = 0  AND tipo_compra = 0 AND tipo = 1 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+    <!-- VALUES MAQUINARIOS!-->
+    <td width="100" align="right">
+      <%= number_to_currency( Compra.count(:id,:conditions => ["clase_produto = 1 AND tipo_compra = 0 #{filtro}"]), :format=>' %n ', :precision => 0)%>
+    </td>
+ 
+    <td width="100" align="right">
+      <%= number_to_currency( cp_total_mq_cont = Compra.sum(:total_dolar,:conditions => ["clase_produto = 1  AND tipo_compra = 0 AND tipo = 0 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+    <td width="100" align="right">
+      <%= number_to_currency( cp_total_mq_cred = Compra.sum(:total_dolar,:conditions => ["clase_produto = 1  AND tipo_compra = 0 AND tipo = 1 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+
+    <!-- VALUES REPUESTOS/MAQUINARIOS!-->
+    <td width="100" align="right">
+      <%= number_to_currency( Compra.count(:id,:conditions => ["clase_produto = 2 AND tipo_compra = 0 #{filtro}"]), :format=>' %n ', :precision => 0)%>
+    </td>
+ 
+    <td width="100" align="right">
+      <%= number_to_currency( cp_total_rp_mq_cont = Compra.sum(:total_dolar,:conditions => ["clase_produto = 2  AND tipo_compra = 0 AND tipo = 0 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+    <td width="100" align="right">
+      <%= number_to_currency( cp_total_rp_mq_cred = Compra.sum(:total_dolar,:conditions => ["clase_produto = 2  AND tipo_compra = 0 AND tipo = 1 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+    
+  </tr>
+  
+  <tr>
+    <td width="100" align="center" colspan="3">
+        <%= number_to_currency( ( cp_total_rp_cont +  cp_total_rp_cred ), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+    <td width="100" align="center" colspan="3">
+        <%= number_to_currency( ( cp_total_mq_cont +  cp_total_mq_cred ), :format=>' %n ', :separeitor => ',')%>
+    </td>
+    
+    <td width="100" align="center" colspan="3">
+        <%= number_to_currency( ( cp_total_rp_mq_cred +  cp_total_rp_mq_cont ), :format=>' %n ', :separeitor => ',')%>
+    </td>
+    
+  </tr>
+
+  <tr height="30">
+    <td colspan="9" align="center">
+    	<font size="2">
+    		<b>
+              Total Bruto de las Compra Mercaderia: <%= number_to_currency( cp_total_mq_cont.to_f + cp_total_mq_cred.to_f + cp_total_rp_cred.to_f + cp_total_rp_cont.to_f + cp_total_rp_mq_cont.to_f + cp_total_rp_mq_cred.to_f , :format=>' %n ', :separeitor => ',') %>    			
+    		</b>
+    	</font>
+    </td>    
+  <tr>     
+
+     </td>
+   </tr>   
+
+<tr>
+  <td colspan="10">
+  
+<!--COMPRAS IMPORTACAO!-->
+<table>
+
+   <!-- TITLE!-->
+   <tr class="header">
+     <td align="center" colspan="9" bgcolor="#C0C0C0"><b> Compra de Importacion </b></td>
+   </tr>
+   
+
+   <tr class="header">
+     <!-- HEADERS!-->
+     <td align="center" colspan="3" bgcolor="#C0C0C0">Repuestos</td>
+     
+     <td align="center" colspan="3" bgcolor="#C0C0C0">Maquinarios</td>     
+     
+     <td align="center" colspan="3" bgcolor="#C0C0C0">Repuestos/Maquinarios</td>          
+   </tr>  
+   
+  <!-- FIELD!--> 
+  <tr>
+    <!-- REPUESTOS!-->
+    <td align="center">Cantidad</td>         
+  
+    <td align="center">Contado</td>
+    
+    <td align="center">Credito</td>    
+        
+    <!-- MAQUINARIOS!-->        
+    <td align="center">Cantidad</td>                                  
+    
+    <td align="center">Contado</td>
+    
+    <td align="center">Credito</td>        
+
+    <!-- REPUESTOS/MAQUINARIOS!-->        
+    <td align="center">Cantidad</td>                                  
+    
+    <td align="center">Contado</td>
+    
+    <td align="center">Credito</td>        
+
+    
+  </tr>  
+
+  <tr>
+    <!-- VALUES REPUESTOS!-->
+    <td width="100" align="right">
+      <%= number_to_currency( Compra.count(:id,:conditions => ["clase_produto = 0 AND tipo_compra = 2 #{filtro}"]), :format=>' %n ', :precision => 0)%>
+    </td>
+
+    <td width="100" align="right">
+      <%= number_to_currency( cpi_total_rp_cont = Compra.sum(:total_dolar,:conditions => ["clase_produto = 0  AND tipo_compra = 2 AND tipo = 0 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+    <td width="100" align="right">
+      <%= number_to_currency( cpi_total_rp_cred = Compra.sum(:total_dolar,:conditions => ["clase_produto = 0  AND tipo_compra = 2 AND tipo = 1 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+    <!-- VALUES MAQUINARIOS!-->
+    <td width="100" align="right">
+      <%= number_to_currency( Compra.count(:id,:conditions => ["clase_produto = 1 AND tipo_compra = 2 #{filtro}"]), :format=>' %n ', :precision => 0)%>
+    </td>
+ 
+    <td width="100" align="right">
+      <%= number_to_currency( cpi_total_mq_cont = Compra.sum(:total_dolar,:conditions => ["clase_produto = 1  AND tipo_compra = 2 AND tipo = 0 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+    <td width="100" align="right">
+      <%= number_to_currency( cpi_total_mq_cred = Compra.sum(:total_dolar,:conditions => ["clase_produto = 1  AND tipo_compra = 2 AND tipo = 1 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+
+    <!-- VALUES REPUESTOS/MAQUINARIOS!-->
+    <td width="100" align="right">
+      <%= number_to_currency( Compra.count(:id,:conditions => ["clase_produto = 2 AND tipo_compra = 2 #{filtro}"]), :format=>' %n ', :precision => 0)%>
+    </td>
+ 
+    <td width="100" align="right">
+      <%= number_to_currency( cpi_total_rp_mq_cont = Compra.sum(:total_dolar,:conditions => ["clase_produto = 2  AND tipo_compra = 2 AND tipo = 0 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+    <td width="100" align="right">
+      <%= number_to_currency( cpi_total_rp_mq_cred = Compra.sum(:total_dolar,:conditions => ["clase_produto = 2  AND tipo_compra = 2 AND tipo = 1 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+    
+  </tr>
+  
+  <tr>
+    <td width="100" align="center" colspan="3">
+        <%= number_to_currency( ( cpi_total_rp_cont +  cpi_total_rp_cred ), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+    <td width="100" align="center" colspan="3">
+        <%= number_to_currency( ( cpi_total_mq_cont +  cpi_total_mq_cred ), :format=>' %n ', :separeitor => ',')%>
+    </td>
+    
+    <td width="100" align="center" colspan="3">
+        <%= number_to_currency( ( cpi_total_rp_mq_cred +  cpi_total_rp_mq_cont ), :format=>' %n ', :separeitor => ',')%>
+    </td>
+    
+  </tr>
+
+  <tr height="30">
+    <td colspan="9" align="center">
+    	<font size="2">
+    		<b>
+             Total Bruto de las Compra De Importacion : <%= number_to_currency( cpi_total_mq_cont.to_f + cpi_total_mq_cred.to_f + cpi_total_rp_cred.to_f + cpi_total_rp_cont.to_f + cpi_total_rp_mq_cont.to_f + cpi_total_rp_mq_cred.to_f , :format=>' %n ', :separeitor => ',') %>    			
+    		</b>
+    	</font>
+    </td>    
+  <tr>     
+
+     </td>
+   </tr>        
+<tr>
+  <td colspan="10">
+  
+<!--COMPRAS DE BENS!-->
+<table>
+   
+   <!-- TITLE!-->
+   <tr class="header">
+     <td align="center" colspan="10" bgcolor="#C0C0C0">Compra de Bienes </td>
+   </tr>
+   
+  <!-- FIELD!--> 
+  <tr>
+    <!-- REPUESTOS!-->
+    <td align="center" colspan="3">Cantidad</td>         
+  
+    <td align="center" colspan="3">Contado</td>
+    
+    <td align="center" colspan="3">Credito</td>    
+            
+  </tr>  
+
+  <tr>
+
+    <!-- VALUES REPUESTOS/MAQUINARIOS!-->
+    <td width="300" align="right" colspan="3">
+      <%= number_to_currency( Compra.count(:id,:conditions => ["clase_produto = 2 AND tipo_compra = 3 #{filtro}"]), :format=>' %n ', :precision => 0)%>
+    </td>
+ 
+    <td width="300" align="right" colspan="3">
+      <%= number_to_currency( cpb_total_rp_mq_cont = Compra.sum(:total_dolar,:conditions => ["clase_produto = 2  AND tipo_compra = 3 AND tipo = 0 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+
+    <td width="300" align="right" colspan="3">
+      <%= number_to_currency( cpb_total_rp_mq_cred = Compra.sum(:total_dolar,:conditions => ["clase_produto = 2  AND tipo_compra = 3 AND tipo = 1 #{filtro}"]), :format=>' %n ', :separeitor => ',')%>
+    </td>
+    
+  </tr>
+  
+  <tr>
+    <td width="100" align="center" colspan="3" >
+        <%= number_to_currency( ( cpb_total_rp_mq_cred +  cpb_total_rp_mq_cont ), :format=>' %n ', :separeitor => ',')%>
+    </td>
+    
+  </tr>
+
+  <tr height="30">
+    <td colspan="10" align="center">
+    	<font size="2">
+    		<b>
+              Total Bruto de las Compra De Bienes: <%= number_to_currency( ( cpb_total_rp_mq_cred +  cpb_total_rp_mq_cont ), :format=>' %n ', :separeitor => ',')%>    			    		
+    		</b>
+    	</font>
+    </td>    
+  <tr>     
+
+     </td>
+   </tr>      
+</table>
+
+
+
+
+<!--TRANSACOES BANCARIAS!-->
+<table>
+   
+   <!-- TITLE!-->
+   <tr class="header">
+     <td align="center" colspan="10" bgcolor="#C0C0C0">GASTOS E INTERES BANCARIOS </td>
+   </tr>
+   
+   		 <% bcp = Compra.sum(:total_dolar,:conditions => ["rubro_id = 187 #{filtro}"])%>
+   		 <% beg = Egresso.sum(:valor_dolar,:conditions => ["rubro_id = 187 #{filtro}"])%>
+   		 <% number_to_currency( ( bcp.to_f + beg.to_f ), :format=>' %n ', :separeitor => ',') %>
+   		
+  <tr height="30">
+    <td colspan="10" width="800" align="center">
+    	<font size="2">
+    		<b>
+              Total Bruto : <%= number_to_currency( ( bcp.to_f + beg.to_f), :format=>' %n ', :separeitor => ',')%>    			    		
+    		</b>
+    	</font>
+    </td>    
+  <tr>     
+
+   <tr class="header">
+     <td align="center" colspan="10" bgcolor="#C0C0C0"><%= t('INTERES').upcase %> COBRADOS </td>
+   </tr>
+  <tr height="30">
+    <td colspan="2" width="800" align="center">
+    	<font size="2">
+    		<b>
+              Interes Repuestos
+    		</b>
+    	</font>
+    </td>    
+    <td colspan="2" width="800" align="center">
+    	<font size="2">
+    		<b>
+              Interes Maquinarios
+    		</b>
+    	</font>
+    </td>    
+       <td colspan="2" width="800" align="center">
+    	<font size="2">
+    		<b>
+              Interes Particulares
+    		</b>
+    	</font>
+    </td>    
+ 
+  <tr>     
+
+   		 <% int_rep  = Ingresso.sum(:valor_dolar,:conditions => ["rubro_id = 107 #{filtro}"])%>   
+   		 <% int_maq  = Ingresso.sum(:valor_dolar,:conditions => ["rubro_id = 108 #{filtro}"])%>   
+   		 <% int_part = Ingresso.sum(:valor_dolar,:conditions => ["rubro_id = 200 #{filtro}"])%>   
+
+  <tr height="30">
+    <td colspan="2" align="center">
+    	<font size="2">
+    		<b>
+              <%= number_to_currency( ( int_rep ), :format=>' %n ', :separeitor => ',')%>    			    		
+    		</b>
+    	</font>
+    </td>    
+
+    <td colspan="2" align="center">
+    	<font size="2">
+    		<b>
+              <%= number_to_currency( ( int_maq ), :format=>' %n ', :separeitor => ',')%>    			    		
+    		</b>
+    	</font>
+    </td>    
+
+    <td colspan="2" align="center">
+    	<font size="2">
+    		<b>
+              <%= number_to_currency( ( int_part ), :format=>' %n ', :separeitor => ',')%>    			    		
+    		</b>
+    	</font>
+    </td>    
+
+  <tr>     
+
+
+  <tr height="30">
+    <td colspan="10" width="800" align="center">
+    	<font size="2">
+    		<b>
+              Total Bruto : <%= number_to_currency( ( int_rep + int_maq + int_part ), :format=>' %n ', :separeitor => ',')%>    			    		
+    		</b>
+    	</font>
+    </td>    
+  <tr>     
+
+   
+   <tr>	
+   	<td>
+   	</td>  
+   </tr>
+</table>
+
+<style type="text/css">
+	table {
+		border-collapse: collapse;
+		font-size: 10px
+	}
+	.header {
+		font-size: 12px
+	}
+	td, tr {
+		border: 1px solid black;
+	}
+
+#graphbox {
+	border:1px solid #e7e7e7;
+	padding:20px 20px;
+	width:100%;
+	background-color:#f8f8f8;
+
+}
+#graphbox h2{
+	color:#666666;
+	font-family:Arial, sans-serif;
+	font-size:1.1em;
+	padding-bottom:0.3em;
+	font-weight:bold;
+	text-align:center;
+}
+#graphbox p {
+	color:#888888;
+	font-family:Arial, sans-serif;
+	font-size:0.2em;
+	padding-top: 0.3em;
+	text-align:left;
+}
+.graph {
+	background-color: #F0EFEF;
+	border:1px solid #cccccc;
+	padding:2px 2px;
+
+}
+.graph .orangebar, .graph .greenbar, .graph .bluebar {
+	text-align:left;
+	height:1em;
+	line-height:1.8em;
+	font-family:Arial, sans-serif;
+	display:block;
+}
+.graph .orangebar {
+	background-color:#ff6600;
+}
+.graph .greenbar {
+	background-color:#66CC33;
+}
+.graph .bluebar {
+	background-color:#3399CC;
+
+}
+
+ </style>
+

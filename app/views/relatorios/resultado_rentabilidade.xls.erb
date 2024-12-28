@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <ss:Styles>
+    <ss:Style ss:ID="1">
+      <ss:Font ss:Bold="1"/>
+      <ss:Alignment ss:Horizontal="Center"/>
+      <ss:Interior ss:Pattern="Gray25"/>
+    </ss:Style>
+    <ss:Style ss:ID="2">
+      <ss:Alignment ss:Horizontal="Center"/>
+    </ss:Style>
+  </ss:Styles>
+  <Worksheet ss:Name="Sheet1">
+    <Table>
+      <Row ss:StyleID="1">
+        <Cell><Data ss:Type="String"><B><%= t('DATE') %></B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Cod</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Ref.</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Producto</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Unit</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Custo</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>Renta</B></Data></Cell>
+        <Cell><Data ss:Type="String"><B>%</B></Data></Cell>
+      </Row>
+
+        <% qtd       = 0 %>
+        <% unit_us   = 0 %>
+        <% unit_gs   = 0 %>
+        <% costo_us  = 0 %>
+        <% costo_gs  = 0 %>
+        <% @stocks.each do |st| %>
+          <Row>
+            <Cell><Data ss:Type="String"><%= st.data.strftime("%d/%m/%y") %></Data></Cell>
+            <Cell><Data ss:Type="String"><%= st.clase_id.to_s.rjust(2,"0") %>.<%= st.grupo_id.to_s.rjust(4,"0") %>.<%= st.produto_id.to_s.rjust(6,"0") %></Data></Cell>
+            <Cell><Data ss:Type="String"><%= st.fabricante_cod %></Data></Cell>
+            <Cell><Data ss:Type="String"><%= st.produto_nome %></Data></Cell>
+            <Cell><Data ss:Type="Number"><%= st.unitario_dolar.to_f * st.quantidade.to_f %></Data></Cell>
+            <Cell><Data ss:Type="Number"><%= dif =( (st.unitario_dolar.to_f * st.quantidade ) - (st.custo_promed_us.to_f * st.quantidade)) %></Data></Cell>
+            <Cell><Data ss:Type="Number"><%= total_us = ( ( dif.to_f * 100 ) /  ( st.custo_promed_us.to_f * st.quantidade ) ) %></Data></Cell>
+            <% unit_us += ( st.unitario_dolar.to_f * st.quantidade )%>
+            <% costo_us += ( st.custo_promed_us.to_f * st.quantidade ) %>
+            <% qtd  += st.quantidade %>
+
+          </Row>
+
+        <% end %>
+        <Row ss:StyleID="1">
+          <Cell><Data ss:Type="String"><B></B></Data></Cell>
+          <Cell><Data ss:Type="String"><B></B></Data></Cell>
+          <Cell><Data ss:Type="String"><B></B></Data></Cell>
+          <Cell><Data ss:Type="String"><B></B></Data></Cell>
+          <Cell><Data ss:Type="Number"><B><%= qtd.to_f %></B></Data></Cell>
+          <Cell><Data ss:Type="Number"><B><%= unit_us.to_f %></B></Data></Cell>
+          <Cell><Data ss:Type="Number"><B><%= costo_us.to_f %></B></Data></Cell>
+          <Cell><Data ss:Type="Number"><B><%= dif_tot =( unit_us.to_f - costo_us.to_f ) %></B></Data></Cell>
+          <Cell><Data ss:Type="Number"><B><%= total_all_us = ( ( dif_tot.to_f * 100 ) /  costo_us.to_f ) %></B></Data></Cell>
+        </Row>
+
+    </Table>
+  </Worksheet>
+</Workbook>

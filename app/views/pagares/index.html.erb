@@ -1,0 +1,34 @@
+<h1 align="right" id="header">Cierre de Caja</h1>
+<div class="acessos">
+	<%= link_to t('NEW'), new_pagare_path, :class => "button add" %>
+
+</div>
+<div class="group">
+   <table>
+      <tr>
+         <td width="50" align="center">Cod.</td>
+         <td width="80" align="center"><%= t('DATE') %></td>
+         <td width="80" align="center"><%= t('EXPIRATION') %></td>
+         <td width="400" align="center">Deodor</td>
+
+      </tr>
+   </table>
+   <div class="rolagem" dir="div">
+      <table>
+        <% @pagares.each do |pagare| %>
+
+          <tr class = "<%= cycle("cor1", "cor2") %>">
+             <td width="50" align="center" ><%=h pagare.id %></td>
+             <td width="80" align="center"><%=h pagare.data.strftime("%d/%m/%Y") %></td>
+             <td width="80" align="center"><%=h pagare.vencimento.strftime("%d/%m/%Y") %></td>
+             <td width="400" align="left"><%=h pagare.persona_nome %></td>
+             <td width="100" align="right" ><%=number_to_currency(  pagare.valor_guarani, :format =>' %n ', :precision => 0)%></td>                         
+             <td><%= link_to 'Editar', edit_pagare_path(pagare) %></td>
+             <td><%= link_to t('DELETE'), pagare, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+          </tr>
+        <% end %>
+</table>
+
+  </div>
+</div>
+

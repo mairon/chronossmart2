@@ -1,0 +1,281 @@
+<!-- form agricultura de precision!-->
+<body onload="VendasProdutoFocoCod()">
+<% form_remote_for vendas_produto, :html     => { :id => 'vendas_produtos_form' },
+                                   :loading => "Element.show('spinner');",
+                                   :success => "Element.hide('spinner');" do |f| %>
+<div id="errors">  <%= f.error_messages %></div>
+
+
+  <div class="group">
+    <%= f.hidden_field :venda_id %>
+    <%= f.hidden_field :produto_id %>
+    <%= f.hidden_field :fabricante_cod %>
+    <%= f.hidden_field :codigo %>
+    <%= f.hidden_field :tipo %>
+    <%= f.hidden_field :clase_id %>
+    <%= f.hidden_field :grupo_id %>
+    <%= f.hidden_field :sub_grupo_id %>
+    <%= f.hidden_field :saldo %>
+    <%= f.hidden_field :cotacao, :value => @venda.cotacao.to_i %>
+    <%= f.hidden_field :persona_id,    :value => @venda.persona_id %>
+    <%= f.hidden_field :persona_nome,  :value => @venda.persona_nome %>
+    <%= f.hidden_field :clase_produto, :value => @venda.clase_produto %>
+    <%= f.hidden_field :moeda,         :value => @venda.moeda %>
+    <input type="hidden" id="moeda" name="moeda" value="<%= @venda.moeda %>" />
+    <table >
+
+      <tr height="35">
+        <td align="right">Deposito :</td>
+        <td><%= f.collection_select(  :deposito_id, Deposito.all(:select => 'id,nome',:order => '2'),:id,:nome,{},{:onkeyup => "EnterTab(event,'venda_produto_produto_busca_')"} )%></td>
+
+          <td align="right">Codigo :</td>
+          <td> <%= text_field_tag( 'codigo',
+                                    nil,
+                                    :id     => "codigo",
+                                    :onblur => remote_function( :update     => "codigo",
+                                                                  :url        => { :action     => :get_codigo_barra_produto, :id => @venda.id},
+                                                                  :with       => "'deposito_id='+document.getElementById('vendas_produto_deposito_id').value+'&codigo='+this.value"),
+                                                                  :size       => 10,
+                                                                  :onkeyup    => "f(this),EnterTab(event,'vendas_produto_quantidade')",
+                                                                  :onkeypress => "return bloqEnter(event)"
+            ) %>
+          </td>
+
+
+        <td align="right">Producto :</td>
+
+        <td colspan="5"><%= hidden_field_tag( :produto_busca ,nil) %>
+
+            <%= f.hidden_field :produto_cod%>
+            <%= f.hidden_field :produto_nome%>
+
+            <%= text_field_with_auto_complete  :venda_produto_produto_busca,nil,
+                                               { :onchange => remote_function( :update       => "venda_produto_produto_busca_",
+                                                                               :url          => { :action => :get_produto,:id => @venda.id},
+                                                                               :with         => "'produto_busca='+this.value"),
+                                                                               :size         => 50,
+                                                                               :onkeyup      => "f(this),EnterTab(event,'vendas_produto_quantidade')",
+                                                                               :onkeypress   => "return bloqEnter(event)"},
+                                                                             { :method       => :get,
+                                                                               :param_name   => 'busca'
+                                                                               }
+             %></td>
+
+
+        <td align="right">Cantidad :</td>
+        <td><%= f.text_field :quantidade,
+                             :size       => 8,
+                             :value      => 1,
+                             :onkeyup    => "EnterTab(event,'vendas_produto_total_desconto')",
+                             :onkeypress => "return bloqEnter(event)",
+                             :onblur     => " VendasProdutoTotalDolar(),
+                                              VendasProdutoTotalGs(),
+                                              VendasProdutoIvaGs(),
+                                              VendasProdutoIvaDolar()"%></td>
+
+        <td align="right">Saldo : <font color="red"><SPAN id="red"></SPAN> </font>
+                                  <font color="green"><SPAN id="green"></SPAN> </font>
+        </td>
+
+      </tr>
+	  <tr height="10">
+        <td align="right">Am Macro +B + S : </td>
+        <td><%= f.text_field :amostra_macro_comple,
+                             :size       => 10 %></td>
+
+
+        <td align="right">Am Completa : </td>
+        <td><%= f.text_field :amostra_completa,
+                             :size       => 10 %></td>
+
+        <td align="right">Am Macro : </td>
+        <td><%= f.text_field :amostra_macro,
+                             :size       => 10 %></td>
+	</tr>
+	<tr height="10">
+
+        <td align="right">Am Extrat. : </td>
+        <td><%= f.text_field :amostra_extratificante,
+                             :size       => 10,
+                             :onblur => "CalcAmostragem()" %></td>
+
+        <td align="right">Catd Am : </td>
+        <td><%= f.text_field :nro_amostra,
+                             :size       => 10 %></td>
+
+        <td align="right">Ponto Amost. : </td>
+        <td><%= f.text_field :ponto_amostrais,
+                             :size       => 10 %></td>
+
+
+	  </tr>
+
+	<tr height="10">
+
+        <td align="right">Laboratorio : </td>
+		<td><%= f.collection_select :laboratorio_id, Persona.all( :select     =>' id,nome',:conditions => ["tipo_laboratorio = 1"],:order      => '1'), :id,:nome %></td>
+
+	  </tr>
+
+
+      <tr>
+
+        <td align="right">Total Desc.:</td>
+        <td><%= f.text_field :total_desconto,
+                             :size       => 5,
+                             :value      => 0,
+                             :onkeyup    => "EnterTab(event,'vendas_produto_interes')",
+                             :onkeypress => "return bloqEnter(event)",
+                             :onchange   => " VendasProdutoTotalDolar(),
+                                              VendasProdutoTotalGs(),
+                                              VendasProdutoIvaGs(),
+                                              VendasProdutoIvaDolar(),
+                                              VendasProdutoTotalDesconto()"%> %</td>
+
+
+        <td align="right">Maximo Desc.:</td>
+        <td><%= f.text_field :desconto,
+                             :size    => 5,
+                             :readonly => "readonly",
+                             :value   => '',
+                             :onkeyup => "EnterTab(event,'vendas_produto_interes')",
+                             :onkeypress => "return bloqEnter(event)",
+                             :onchange   => " VendasProdutoTotalDolar(),
+                                              VendasProdutoTotalGs(),
+                                              VendasProdutoIvaGs(),
+                                              VendasProdutoIvaDolar()",
+                             :readonly => "readonly"%> %</td>
+
+        <td align="right"><%= t('INTERES') %>:</td>
+        <td><%= f.text_field :interes,
+                             :size       => 5,
+                             :value      => 0,
+                             :onkeyup    => " EnterTab(event,'vendas_produto_unitario_guarani')",
+                             :onkeypress => " return bloqEnter(event)",
+                             :onchange   => " VendasProdutoTotalDolar(),
+                                              VendasProdutoTotalGs(),
+                                              VendasProdutoIvaGs(),
+                                              VendasProdutoIvaDolar(),
+                                              VendasProdutoInteres() "%> %</td>
+
+
+            <%= f.hidden_field :taxa %>
+
+        </tr>
+
+
+
+  <% if @venda.moeda == 0  %>
+        <tr height="35">
+            <%= field_us 'Unit. U$ :',f,:unitario_dolar,
+                                        :onkeypress => " return bloqEnter(event)",
+                                        :onblur     => " VendasProdutoUnitGs(),                                                         
+                                                         VendasProdutoTotalDolar(),
+                                                         VendasProdutoTotalGs(),
+                                                         VendasProdutoIvaGs(),
+                                                         VendasProdutoIvaDolar(),
+                                                         VendasProdutoPorcentagemInversa()" %>
+            <%= f.hidden_field :total_guarani%>
+            <%= field_us 'Total U$ :',f,:total_dolar,
+                                        :readonly => "readonly",            
+                                        :onblur => "VendasProdutoPorcentagemInversa(),
+                                                    VendasProdutoIvaGs(),
+                                                    VendasProdutoIvaDolar()" %>
+
+
+            <%= f.hidden_field :unitario_guarani %>
+            <%= f.hidden_field :preco_dolar %>
+            <%= f.hidden_field :preco_guarani %>
+            <%= f.hidden_field :preco_fixo_dolar %>
+            <%= f.hidden_field :preco_fixo_guarani %>
+            <%= f.hidden_field :iva_dolar%>
+            <%= f.hidden_field :iva_guarani%>
+             <td>
+                <%= f.submit "Adicionar", :class => "button" %>                
+             </td>
+
+             <td>
+               <%= image_tag("/images/load.gif",
+                             :align => "absmiddle",
+                             :border => 0,
+                             :id => "spinner",
+                             :width => 21,
+                             :height => 21,
+                             :style =>"display: none;" ) %>
+             </td>
+
+          </tr>
+
+      <% else %>
+
+
+          <tr height="35">
+            <%= field_gs 'Unit. Gs.:',f,:unitario_guarani,
+                                        :onblur => " VendasProdutoUnitDolar(),
+                                                     VendasProdutoTotalDolar(),
+                                                     VendasProdutoTotalGs(),
+                                                     VendasProdutoIvaGs(),
+                                                     VendasProdutoIvaDolar(),
+                                                     VendasProdutoPorcentagemInversa()" %>
+
+
+            <%= field_gs 'Total. Gs.:',f,:total_guarani,
+                                         :onblur => "VendasProdutoPorcentagemInversa(),
+                                                     VendasProdutoIvaGs(),
+                                                     VendasProdutoIvaDolar()" %>
+
+
+            <%= f.hidden_field :iva_dolar%>
+            <%= f.hidden_field :iva_guarani%>
+            <%= f.hidden_field :preco_dolar %>
+            <%= f.hidden_field :preco_guarani %>
+            <%= f.hidden_field :preco_fixo_dolar %>
+            <%= f.hidden_field :preco_fixo_guarani %>            
+            <%= f.hidden_field :total_dolar%>
+            <%= f.hidden_field :unitario_dolar%>
+
+             <td>
+                <%= f.submit " Adicionar ", :class => "button" %>                
+             </td>
+
+             <td>
+               <%= image_tag("/images/load.gif",
+                             :align => "absmiddle",
+                             :border => 0,
+                             :id => "spinner",
+                             :width => 21,
+                             :height => 21,
+                             :style =>"display: none;" ) %>
+             </td>
+
+          </tr>
+
+      <% end %>
+
+    </table>
+
+  <% end %>
+
+</div>
+</body>
+
+
+
+<script>
+	function CalcAmostragem()                //
+	{
+		document.getElementById("vendas_produto_nro_amostra").value = 
+		parseFloat( document.getElementById("vendas_produto_amostra_macro_comple").value) + 
+		parseFloat( document.getElementById("vendas_produto_amostra_macro").value) +
+		parseFloat( document.getElementById("vendas_produto_amostra_completa").value) + 
+		parseFloat( document.getElementById("vendas_produto_amostra_extratificante").value);
+
+		document.getElementById("vendas_produto_ponto_amostrais").value = 
+		parseFloat( document.getElementById("vendas_produto_amostra_macro_comple").value) + 
+		parseFloat( document.getElementById("vendas_produto_amostra_macro").value) +
+		parseFloat( document.getElementById("vendas_produto_amostra_completa").value); 
+
+	}
+
+</script>
+

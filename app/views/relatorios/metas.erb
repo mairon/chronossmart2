@@ -1,0 +1,67 @@
+<body onload="ImputFocus('inicio')">
+   <h1 align="right" id="header">.</h1>
+   <ul class="tabs">
+      <li><a href="#tab1"><%= t('LISTING') %> de Metas</a></li>
+   </ul>
+
+   <div class="tab_container">
+      <div id="tab1" class="tab_content">
+         <%= form_tag resultado_metas_relatorios_path, :method => "get" do%>
+            <table>
+               <tr height="35">
+                  <td align="right">De :</td>
+                  <td>
+                     <input name="inicio" id="inicio"  size="10"  onkeyup="Formatadata(this,event)" />
+                     Hasta
+                     <input name="final"  id="final"   size="10" onkeyup="Formatadata(this,event)"/>
+                  </td>
+               </tr>
+
+                <tr>
+                  <td align="right"><%= t('COIN') %> :</td>
+                  <td>
+                    <fieldset>
+                       <%= radio_button_tag :moeda, 0,  :Checked => "True" %> <%= t('DOLLARS') %>
+                       <%= radio_button_tag :moeda, 1 %> <%= t('GUARANIS') %>
+                       <%= radio_button_tag :moeda, 2 %> Real
+                    </fieldset>
+                  </td>
+               </tr>
+
+               <tr>
+                  <td align="right">Empleado :</td>
+                  <td>
+                     <%=   select("busca", "persona", Persona.all(:select => 'id,nome',:conditions => ["tipo_funcionario = 1"],:order => 'nome').collect {|p| [ p.nome, p.id ] }, { :include_blank => true })   %>
+                  </td>
+               </tr>
+
+               <tr>
+                  <td></td>
+                  <td>
+                     <input  id      ="button"
+                             type    ="submit"
+                             value   ="            Informe           "
+                             onclick = "Tipo('0')"/>
+
+                     <input type     = "submit"
+                            value    = "            Excel            "
+                            onclick  = "Tipo('1')"/>
+                  </td>
+               </tr>
+
+               <input type  = "hidden"
+                      name  = "tipo"
+                      id    = "tipo"
+                      size  = "5"
+                      value = "0"/>
+            </table>
+         <% end %>
+   </div>
+ </div>
+
+</body>
+
+
+
+
+

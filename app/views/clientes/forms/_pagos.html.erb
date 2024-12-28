@@ -1,0 +1,78 @@
+<style>
+  td{
+    padding: 2px;
+    border-bottom: 1px solid #efefef !important;
+  }
+
+  .hoje{
+    border-left: 6px solid #f2b835;
+  }
+
+  .venc{
+    border-left: 6px solid #e33d43;
+  }
+
+</style>
+
+<table class="head_grid">
+  <tr>
+    <td width="60" align="center">Titulo</td>
+    <td width="80" align="center">Fecha Comp.</td>
+    <td width="200">Descripción</td>
+    <td width="200">Cuenta</td>
+    <td width="250">Classificación</td>
+    <td width="60">Doc.</td>
+    <td width="55" align="center">Cuota</td>
+    <td width="25"></td>
+    <td width="100" align="right">Saldo</td>
+    <td width="60"></td>
+  </tr>
+</table>
+<div>
+  <table>
+    <% @clientes.each do |f| %>
+      <tr class="acao<%= f.id %> <%= cycle("cor1", "cor2") %>">
+        <td width="60">
+
+          <%= link_to  '#titulo-historico', "data-toggle": "modal", "data-target": "#titulo-historico", "data-id": "#{f.id}",
+          "data-moeda": "#{f.moeda}",
+          "data-cota": "#{f.cota}",
+          "data-documento-numero-01": "#{f.documento_numero_01}",
+          "data-documento-numero-02": "#{f.documento_numero_02}",
+          "data-documento-numero": "#{f.documento_numero}",
+          "data-titulo": "#{f.titulo}",
+          "data-titulo-descr": "#{f.titulo.to_s.rjust(6,'0')}",
+          "data-persona-id": "#{f.persona_id}" do %>
+            <%= f.titulo.to_s.rjust(6,'0') %>
+          <% end %>
+        </td>
+        <td width="80" align="center"><b><%= f.data.strftime("%d/%m/%y") %></b></td>
+        <td width="200"><small><%= f.descricao %> <%= f.persona_nome %></small></td>
+        <td width="200"><small><%= f.conta_nome %></small></td>
+        <td width="250"> <small> <%= f.rubro_nome %></small></td>
+        <td width="60">
+          <%= f.documento_numero %>
+        </td>
+        <td width="55" align="center">
+          <div style="border: 1px solid #969696; border-radius: 3px; padding: 1px 0px 1px 0px;"><%= f.cota %>/<%= f.tot_cotas %></div>
+        </td>
+        <% if f.moeda.to_i == 0 %>
+          <td width="25" align="center" class="us">U$</td>
+          <td width="100" align="right"><b><%= format_decimal(f.divida_dolar) %></b></td>
+        <% elsif f.moeda.to_i == 1 %>
+          <td width="25" align="center" class="gs">Gs.</td>
+          <td width="100" align="right"><b><%= format_int(f.divida_guarani) %></b></td>
+        <% else %>
+          <td width="25" align="center" class="rs">R$</td>
+          <td width="100" align="right"><b> <%= format_decimal(f.divida_real) %></b></td>
+        <% end %>
+        <td width="60">
+          <%= link_to '', f, data: { remote: true}, method: :delete, class: 'icon-trash', onclick: "ActiveAlert(#{f.id})" %>
+        </td>
+      </tr>
+    <% end %>
+
+  </table>
+</div>
+
+

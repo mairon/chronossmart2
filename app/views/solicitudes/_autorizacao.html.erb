@@ -1,0 +1,45 @@
+<h1 id="header">Solicitud/Registro de Faltas</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_solicitude_path, :class => "button add" %>
+</div>
+
+<div class="group">
+    <%= form_tag busca_solicitudes_path, :method => "get" do %>
+      <table>
+        <tr>
+          <td align="right">Status</td>
+          <td>
+            <select name="status" id="status">
+              <option value="">TODOS</option>
+              <option value="PENDIENTE">PENDIENTE</option>
+              <option value="AUTORIZADO">AUTORIZADO</option>
+              <option value="NEGADO">NEGADO</option>
+            </select>
+          </td>
+          <td>
+            <select name="tipo" id="tipo">
+              <option>NOMBRE</option>
+              <option>CODIGO</option>
+            </select>
+          </td>
+          <td colspan="3">
+            <input id="busca" name="busca" type="text" onkeyup = "pesquisa(this.value),f(this)"onkeydown = "f(this)" onkeypress ="return bloqEnter(event)" size="30" />
+            <input type="button" class="btn btn-blue" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar"/>
+          </td>
+          <td width="25"><%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;" ) %></td>
+        </tr>
+      </table>
+    <% end %>
+</div>
+
+<div id="pagina"></div>
+
+</div>
+<script language="javascript">
+  function pesquisa(valor){
+    url="/solicitudes/busca?" + $('form').serialize();
+    ajax(url);
+  }
+</script>
+
+<%= javascript_include_tag 'busca_ajax' %>

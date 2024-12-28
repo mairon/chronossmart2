@@ -1,0 +1,52 @@
+ <div class="group">
+  <%= form_for(@proveedore) do |f| %>
+    <%= hidden_field_tag :proc, 'prov_gasto' %>
+    <table>
+      <tr>
+        <td>
+          <label><%= t('PROVIDER') %></label>
+          <b><%= @proveedore.persona.nome %></b>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label><%= t('QUOTA') %></label>
+          <b><%= @proveedore.cota.to_s.rjust(2,'0') %></b>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <label><%= t('DOC') %></label>
+          <%= f.text_field :documento_numero_01, required: true, size: 5 %>-<%= f.text_field :documento_numero_02, required: true, size: 5 %>-<%= f.text_field :documento_numero, required: true, size: 13 %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <label>Venc</label>
+          <%= f.date_select :vencimento, :end_year => 2060 %>
+        </td>
+      </tr>
+
+      <tr>
+        <% if @proveedore.moeda == 0 %>
+
+          <%= field_us_label 'Valor U$:',f,:divida_dolar %>
+        <% elsif @proveedore.moeda == 1 %>
+
+          <%= field_gs_label 'Valor Gs.:',f,:divida_guarani %>
+        <% else %>
+
+          <%= field_us_label 'Valor R$:',f,:divida_real %>
+        <% end %>
+      </tr>
+    </table>
+    <div class="footer-buttons">
+      <%= f.submit t('SAVE'), :class => "btn btn-green", :disable_with => "Aguarde...", "data-plus-as-tab" => "false"   %>
+      <%= link_to  proveedore_path(:id => @proveedore.id, :proc => 'prov_gasto', id_proc: @proveedore.cod_proc), :confirm => 'Esta Seguro?', :method => :delete, :class => "btn btn-danger " do %>
+        <i class="icon-white" style="background-position: -456px 0;"></i>
+      <% end %>
+    </div>
+    <% end %>
+  </div>

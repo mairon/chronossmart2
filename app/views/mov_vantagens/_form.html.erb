@@ -1,0 +1,41 @@
+<%= form_for(@mov_vantagen) do |f| %>
+  <% if @mov_vantagen.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@mov_vantagen.errors.count, "error") %> prohibited this mov_vantagen from being saved:</h2>
+
+      <ul>
+      <% @mov_vantagen.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> mov_vantagens - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', mov_vantagens_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

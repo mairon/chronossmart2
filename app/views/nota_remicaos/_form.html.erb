@@ -1,0 +1,199 @@
+<%= form_for( @nota_remicao ) do |f| %>
+  <div class="box-panel" style="display: table; margin: 0 auto;">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Nota Remición
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-6">
+                <label><%= t('DATE') %></label>
+                <%= f.text_field :data, value: Time.now.strftime("%d/%m/%Y"),  class: "panel-field date", autofocus: true, required: true %>
+              </div>
+              <div class="col-md-6">
+                <label>Doc.</label>
+                <%= f.text_field :documento_numero_01, size: 3 %>-<%= f.text_field :documento_numero_02, size: 3 %>-<%= f.text_field :documento_numero, size: 10 %>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <label>Cliente</label>
+                <%= f.text_field :persona_nome, required: true, class: 'autocomplete panel-field' %>
+                 <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+                <%= f.hidden_field :persona_id %>
+              </div>
+            </div> 
+
+            <div class="row">
+              <div class="col-md-6">
+                <label>Deposito</label>
+                <%= f.collection_select :deposito_id, Deposito.select('id,nome').order('2'), :id, :nome, {:include_blank => true} %>
+              </div>
+           
+              <div class="col-md-6">
+                <label>Motivo</label>
+                <%= f.select :motivo,
+                              ( [ ["Traslado por venta", "1"], 
+                                  ["Traslado por consignación", "2"],
+                                  ["Exportación", "3"],
+                                  ["Traslado por nota_remicao", "4"],
+                                  ["Importación", "5"],
+                                  ["Traslado por devolución", "6"],
+                                  ["Traslado entre locales de la empresa", "7"],
+                                  ["Traslado de bienes por transformación", "8"],
+                                  ["Traslado de bienes por reparación", "9"],
+                                  ["Traslado por emisor móvil", "10"],
+                                  ["Exhibición o demostración", "11"],
+                                  ["Participación en ferias", "12"],
+                                  ["Traslado de encomienda", "13"],
+                                  ["Decomiso", "14"],
+                                  ["Otro", "99"]] ), {:include_blank => true} %>        
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <label>Obs</label>
+                <%= f.text_area :obs, class: 'panel-field', rows: 5 %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Transporte
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+
+              <div class="col-md-6">
+                <label>Chofer</label>
+                <%= f.collection_select :chofer_id, Persona.where(tipo_chofer: 1).select('id,nome').order('2'), :id, :nome, {:include_blank => true} %>
+              </div>
+              <div class="col-md-6">
+                <%= field_gs_label 'Valor del Flete Gs.:',f, :valor_guarani %>
+              </div>
+
+            </div>
+            <div class="row">
+
+              <div class="col-md-6">
+                <label>Chapa Cavalito</label>
+                <%= f.collection_select :rodado_cv_id, Rodado.where(tipo: 0).select('id,placa').order('2'), :id, :placa, {:include_blank => true} %>
+              </div>
+
+              <div class="col-md-6">
+                <label>Chapa Carreta</label>
+                <%= f.collection_select :rodado_cr_id, Rodado.where(tipo: 1).select('id,placa').order('2'), :id, :placa, {:include_blank => true} %>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Destino
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-12">
+              <label><%= t('CITY') %></label>
+              <%= f.collection_select :cidade_id, Cidade.find_by_sql("SELECT C.ID, (E.NOME || ' > ' ||  C.NOME || ' > ' || D.NOME) AS NOME FROM CIDADES C
+
+INNER JOIN DISTRITOS D
+ON D.ID = C.DISTRITO_ID
+
+INNER JOIN ESTADOS E
+ON E.ID = D.ESTADO_ID
+
+ORDER BY 2
+"), :id, :nome, {prompt: 'Selecione a cidade'} %>
+            </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <label><%= t('ADDRESS') %></label>
+                <%= f.text_field :direcao, class: 'panel-field' %>
+              </div>
+              <div class="col-md-6">
+                <label >Km </label>
+                <%= f.text_field :kms, class: 'panel-field' %><small>Kilómetros estimados de recorrido</small>
+              </div>
+            </div>
+          </div>
+          <div class="footer-buttons">
+            <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+            <%= link_to t('BACK'), nota_remicaos_path, :class => "btn btn-back" %>
+          </div>    
+
+
+        </div>
+      </div>
+    </div>    
+  </div>
+<% end %>
+  
+  <script>
+      $('#nota_remicao_motivo, #nota_remicao_deposito_id, #nota_remicao_cidade_id, #nota_remicao_chofer_id, #nota_remicao_rodado_cv_id, #nota_remicao_rodado_cr_id').selectize();    
+
+  $(function() {
+    $( "#nota_remicao_persona_nome" ).autocomplete({
+        source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+        $.ajax({
+          url: "/personas/busca?per=CLIENTE",
+          dataType: "json",
+
+          data: {
+            tipo: 'DESCRIPCION',
+            busca: request.term
+          },
+          beforeSend: function(){
+          $("#spinner").addClass("sppiner_show");
+          },
+
+          success: function( data ) {
+            $("#sppiner").removeClass("sppiner_show");
+            response( data );
+          },
+        });
+      },
+      minLength: 2,
+      change: function( event, ui ) {
+        $("#nota_remicao_persona_id").val("");
+        $('#nota_remicao_persona_id').val(ui.item.id);
+        return false;
+      }
+    });
+    $( "#nota_remicao_persona_nome" ).change(function(){
+      if ($( "#nota_remicao_persona_id" ).val() == ''){
+      }
+    });
+  });      
+  </script>
+
+  <style>
+    div#contents{
+      background: none !important;
+    }
+  </style>

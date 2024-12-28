@@ -1,0 +1,57 @@
+<h1 id="header"><%= t('FORM_OF_PAYMENT') %> - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+
+  <%= form_for(@tabela_preco) do |f| %>
+    <% if @tabela_preco.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@tabela_preco.errors.count, "error") %> prohibited this tabela_preco from being saved:</h2>
+
+      <ul>
+      <% @tabela_preco.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <table>
+    <tr>
+      <td>
+        <label><%= t('DESCRIPTION') %></label>
+        <%= f.telephone_field :nome, autofocus: true, required: true, class: 'panel-field' %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <label>Obs.</label>
+        <%= f.text_area :obs, rows: 5, cols: 56 %>
+        
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.check_box :status, checked: true %> <%= t('ACTION_S') %></td>
+    </tr> 
+
+    <tr>
+      <td><%= f.check_box :presupuesto %> Presupuesto</td>
+    </tr> 
+
+    <tr>
+      <td>
+        <fieldset>
+          <legend>Nivel de acesso usuario</legend>
+          <%= f.radio_button :tipo_usuario, 0 %> Administrado
+          <%= f.radio_button :tipo_usuario, 1 %> Financeiro
+          <%= f.radio_button :tipo_usuario, 2, defaul: true %> Usuario
+        </fieldset>
+      </td>
+
+    </tr>
+
+  </table>
+   <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), tabela_precos_path, :class => "btn btn-back" %>
+   </div>
+  <% end %>
+</div>

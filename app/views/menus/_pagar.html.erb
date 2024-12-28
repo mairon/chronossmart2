@@ -1,0 +1,90 @@
+<div class="panel">
+	<h1 id="header">
+    <%= image_tag('002-upload.png', height: '14px',style: "margin-top: -3px") %>
+		<%= t('ACCOUNT') %>s a <%= t('PAY') %>
+		<div class="pull-right">
+      <% if current_unidade.moeda == 0 %>
+        <p style="font-size: 19px">
+        	<small style="color: #000"><%= t('TODAY') %></small>
+        	<a href="#" >
+        		<span class="us">U$ <b class="us"><%= format_decimal(@saldo_pagar_hoje_us) %></b></span>
+        	</a>
+        </p>
+      <% elsif current_unidade.moeda == 1 %>
+        <p style="font-size: 19px">
+        	<small style="color: #000"><%= t('TODAY') %></small>
+        	<a href="#">
+        		<span class="gs">GS <b class="gs"><%= format_int(@saldo_pagar_hoje_gs) %></b></span>
+        	</a>
+        </p>
+      <% elsif current_unidade.moeda == 2 %>
+        <p style="font-size: 19px">
+        	<small style="color: #000"><%= t('TODAY') %></small>
+        	<a href="#">
+        		<span class="rs">R$ <b class="rs"><%= format_decimal(@saldo_pagar_hoje_rs) %></b></span>
+        	</a>
+        </p>
+			<% end %>			
+		</div>
+  </h1>
+  
+  <div class="panel-body">
+		<div class="row">
+			<div class="col-md-6">
+				<header>
+	        <strong><small style="color: #000">En Atraso</small></strong>
+	        <% if current_unidade.moeda == 0 %>
+		        <p style="font-size: 19px">
+		        	<a href="#" >
+		        		<span class="us">U$ <b class="us"><%= format_decimal(@saldo_pagar_atraso_us) %></b></span>
+		        	</a>
+		        </p>
+	        <% elsif current_unidade.moeda == 1 %>
+		        <p style="font-size: 19px">
+		        	<a href="#">
+		        		<span class="gs">GS <b class="gs"><%= format_int(@saldo_pagar_atraso_gs) %></b></span>
+		        	</a>
+		        </p>
+	        <% elsif current_unidade.moeda == 2 %>
+		        <p style="font-size: 19px">
+		        	<a href="#">
+		        		<span class="rs">R$ <b class="rs"><%= format_decimal(@saldo_pagar_atraso_rs) %></b></span>
+		        	</a>
+		        </p>
+					<% end %>
+	      </header>
+			</div>
+
+			<div class="col-md-6">
+				<header>
+	        <strong><small style="color: #000"><%= t('REMAINING') %> <%= t('OF') %> <%= t('MONTH') %></small></strong>
+	        <% if current_unidade.moeda == 0 %>
+		        <p style="font-size: 19px">
+		        	<a href="#">
+		        		<span class="us">U$ <b class="us"><%= format_decimal(@saldo_pagar_mes_us) %></b></span>
+		        	</a>
+		        </p>
+	        <% elsif current_unidade.moeda == 1 %>
+		        <p style="font-size: 19px">
+		        	<a href="#">
+		        		<span class="gs">GS <b class="gs"><%= format_int(@saldo_pagar_mes_gs) %></b></span>
+		        	</a>
+		        </p>
+	        <% elsif current_unidade.moeda == 2 %>
+		        <p style="font-size: 19px">
+		        	<a href="#">
+		        		<span class="rs">R$ <b class="rs"><%= format_decimal(@saldo_pagar_mes_rs) %></b></span>
+		        	</a>
+		        </p>
+	        <% end %>
+	      </header>		  									
+			</div>
+		</div>
+  </div>
+</div>
+
+<script>
+	function ComprovantePagar(){
+		window.open('/proveedores/painel_pagar?lp=consulta', '', ' SCROLLBARS=YES, TOP=150, LEFT=300, WIDTH=750, HEIGHT=700');
+	}
+</script>

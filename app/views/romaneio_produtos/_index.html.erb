@@ -1,0 +1,49 @@
+   <table class="head_grid">
+      <tr>
+         <td width="100" align="center">Cod.</td>
+         <td width="350">Producto</td>
+         <td width="80" align="right">Kg.</td>
+         <td width="100" align="right">Bruto</td>
+         <td width="100" align="right">Tara</td>
+         <td width="100" align="right">Neto</td>
+         <td width="100" align="right">Unit.</td>
+         <td width="100" align="right">Total</td>
+
+      </tr>
+   </table>
+   <div class="rolagem" id="div">
+      <table>
+         <% qtd     = 0 %>
+         <% custogs = 0 %>
+         <% totgs   = 0 %>
+         <% kg      = 0 %>
+
+         <% romaneio_produtos.each do |nota_remicao_produto| %>
+            <% kgproduto = Produto.find_by_id(nota_remicao_produto.produto_id)%>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td width="100" align="center"><%= nota_remicao_produto.produto_id %></td>
+              <td width="350" align="left"><%= nota_remicao_produto.produto.nome %></td>
+              <td width="80" align="right"><%= kgproduto.peso.to_f %></td>
+              <td width="100" align="right"><%= format_peso(nota_remicao_produto.bruto) %></td>
+              <td width="100" align="right"><%= format_peso(nota_remicao_produto.tara) %></td>
+              <td width="100" align="right"><%= format_peso(nota_remicao_produto.quantidade) %></td>
+              <td width="100" align="right"><%= format_decimal(nota_remicao_produto.unit_dolar) %></td>
+              <td width="100" align="right"><%= format_decimal(nota_remicao_produto.total_dolar) %></td>
+              <td><%= link_to '', edit_romaneio_produto_path(nota_remicao_produto), class: 'icon-pencil' %></td>
+              <td><%= link_to '', nota_remicao_produto, :confirm => 'Estas Seguro?', :method => :delete , class: 'icon-trash'%></td>
+
+               <% qtd     = qtd.to_f + nota_remicao_produto.quantidade.to_f  %>
+               <% kg      = kg.to_f + kgproduto.peso.to_f  %>
+
+            </tr>
+         <% end %>
+      </table>
+   </div>
+   <table>
+      <tr>
+         <td width="530"></td>
+         <td width="80" align="right"><%= number_to_currency( kg, :format=>' %n ', :precision => 0) %></td>
+         <td width="120" align="right"><%= qtd %></td>
+
+      </tr>
+   </table>

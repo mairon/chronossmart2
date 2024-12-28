@@ -1,0 +1,6 @@
+$('#entrega_persona_id').empty();
+$('#entrega_persona_id').append($("<option></option>").attr("value",'').text('Selecione').change());
+
+<% for ne in @personas %>
+  	$('#entrega_persona_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+<% end %>

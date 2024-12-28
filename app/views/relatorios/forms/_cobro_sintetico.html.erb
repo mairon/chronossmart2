@@ -1,0 +1,208 @@
+<% if params[:detalhe].to_s == '0' %>
+  <% quebra   = "" %>
+  <% valor_us   = 0 %>
+  <% cobrado_us = 0 %>
+  <% valor_gs   = 0 %>
+  <% cobrado_gs = 0 %>
+
+  <table>
+    <% @cobros.each do |c|%>
+      <tr class="<%= cycle("cor1", "cor2") %>" >
+        <td width="40"><%= c.cobro_id.to_s.rjust(6,'0') %></td>
+        <td width="50" align="center"><%= c.data.strftime("%d/%m/%y") %></td>
+        <td width="20" ></td>
+        <td width="60" ><%= c.recibo %></td>
+        <td width="100" ><%= c.doc %></td>
+        <td width="180" ><%= truncate(c.persona_nome, :length => 33) %></td>
+        <td width="35" >
+          <% if c.estado.to_i == 0 %>
+            PARTE
+            <% else %>
+            CANCEL
+          <% end %>
+        </td>
+        <td width="15" align="right" ><%= c.cota %></td>
+        <% if params[:moeda] == "0" %>
+          <td width="70" align="right"> <%= number_to_currency( c.valor_dolar.to_f, :format=>' %n ', :separeitor => "," ) %></td>
+          <td width="70" align="right"> <%= number_to_currency( c.cobro_dolar.to_f, :format=>' %n ', :separeitor => "," ) %></td>
+        <% elsif params[:moeda] == "1" %>
+          <td width="70" align="right"> <%= number_to_currency( c.valor_guarani.to_f, :format=>' %n ', :precision => 0) %></td>
+          <td width="70" align="right"> <%= number_to_currency( c.cobro_guarani.to_f, :format=>' %n ', :precision => 0) %></td>
+        <% end %>
+        <% valor_us   += c.valor_dolar.to_f %>
+        <% cobrado_us += c.cobro_dolar.to_f %>
+
+        <% valor_gs   += c.valor_guarani.to_f %>
+        <% cobrado_gs += c.cobro_guarani.to_f %>
+      </tr>
+    <% end %>
+
+    <tr class="head">
+      <td colspan="8"></td>
+      <% if params[:moeda] == "0" %>
+        <td align="right"><%= number_to_currency( valor_us.to_f, :format=>' %n ', :separeitor => ',') %></td>
+        <td align="right"><%= number_to_currency( cobrado_us.to_f, :format=>' %n ', :separeitor => ',') %></td>
+      <% else %>
+        <td align="right"><%= number_to_currency( valor_gs.to_f, :format=>' %n ', :precision => 0) %></td>
+        <td align="right"><%= number_to_currency( cobrado_gs.to_f, :format=>' %n ', :precision => 0) %></td>
+      <% end %>
+
+    </tr>
+  </table>
+<!--LISTADO DETALHADO!-->
+<% else %>
+
+  <% quebra   = "" %>
+  <% totus    = 0 %>
+  <% subtotus = 0 %>
+  <% desc_us  = 0 %>
+  <% int_us   = 0 %>
+  <% valor_us = 0 %>
+
+  <% totgs    = 0 %>
+  <% subtotgs = 0 %>
+  <% desc_gs  = 0 %>
+  <% int_gs   = 0 %>
+  <% valor_gs = 0 %>
+  <table>
+
+     <% @cobros.each do |cobro|%>
+        <% if params[:detalhe] == "1" %>
+            <tr class=" head" height="20" >
+              <td></td>
+           </tr>
+           <tr class=" head <%= cycle("cor1", "cor2") %>" >
+        <% else %>
+           <tr class="<%= cycle("cor1", "cor2") %>" >
+        <% end %>
+           <td width="50"> <%= cobro.id.to_s.rjust(6,'0') %> </td>
+           <td width="50" align="center"> <%= cobro.data.strftime("%d/%m/%y")%> </td>
+           <td width="380" align="left" colspan="4"> <%= truncate(cobro.persona_nome, :length => 40) %> </td>
+           <td width="50" align="center"> <%= cobro.documento_numero %> </td>
+           <% if params[:moeda] == "0" %>
+              <td width="100" align="right"> <%= number_to_currency(cobro.valor_dolar, :format=>' %n ', :separeitor => "," )%> </td>
+           <% elsif params[:moeda] == "1" %>
+              <td width="100" align="right"> <%= number_to_currency(cobro.valor_guarani, :format=>' %n ', :precision => 0 )%> </td>
+           <% else %>
+              <td width="100" align="right"> <%= number_to_currency(cobro.valor_real, :format=>' %n ', :separeitor => "," )%> </td>
+           <% end %>
+        </tr>
+
+        <%  subtotus  += cobro.valor_dolar.to_f %>
+        <%  totus     += cobro.valor_dolar.to_f %>
+        <%  subtotgs  += cobro.valor_guarani.to_f %>
+        <%  totgs     += cobro.valor_guarani.to_f %>
+
+        <tr class="<%= cycle("cor2", "cor2") %>">
+          <td colspan="8">
+            <table>
+
+        <!-- DETALHES POR FATURA !-->
+        <% if params[:detalhe] == "1" %>
+           <% cobro_detalhe = CobrosDetalhe.all(:conditions => ["cobro_id = ?",cobro.id])%>
+           <tr>
+            <td colspan="3"> - Dividas</td>
+           </tr>
+
+           <tr>
+              <td colspan="10">
+                  <table>
+                    <% cobro_detalhe.each do |detalhe|%>
+                      <tr class="<%= cycle("cor1", "cor2") %>">
+                        <td width="50" align="center"> <%= detalhe.id.to_s.rjust(6,'0')%> </td>
+                        <td width="205"> <%= detalhe.documento_numero_01%>-<%= detalhe.documento_numero_02%>-<%= detalhe.documento_numero%> Cuota - <%= detalhe.cota %></td>
+                          <% if params[:moeda] == "0" %>
+                            <td width="100" align="right"><%= number_to_currency( detalhe.cobro_dolar.to_f, :format=>' %n ', :separeitor => ",")%> </td>
+                         <% elsif params[:moeda] == "1" %>
+                            <td width="100" align="right"><%= number_to_currency( detalhe.cobro_guarani.to_f, :format=>' %n ', :precision => 0 ) %> </td>
+                         <% end %>
+                       </tr>
+
+                       <% desc_us  += detalhe.desconto_dolar.to_f %>
+                       <% int_us   += detalhe.interes_dolar.to_f %>
+                       <% valor_us += detalhe.cobro_dolar.to_f %>
+
+                       <% desc_gs  += detalhe.desconto_guarani.to_f %>
+                       <% int_gs   += detalhe.interes_guarani.to_f %>
+                       <% valor_gs += detalhe.cobro_guarani.to_f %>
+
+                    <% end %>
+                  </table>
+              </td>
+           </tr>
+
+           <tr>
+            <td colspan="3">- <%= t('FORM_OF_PAYMENT') %></td>
+           </tr>
+
+           <% cobro_financa = CobrosFinanca.all(:conditions => ["cobro_id = ?",cobro.id])%>
+
+           <tr>
+              <td colspan="10"> 
+                  <table>      
+                        <% cobro_financa.each do |detalhe|%>
+                           <tr class="<%= cycle("cor1", "cor2") %>">
+                              <td width="50" align="center"><%= detalhe.id.to_s.rjust(6,'0')%> </td>
+                                <td width="100" align="left">            <%= detalhe.conta_nome %>  </td>
+                                <td width="100" align="left">            <%= detalhe.cheque %>  </td>                        
+                              <% if params[:moeda] == "0" %>
+                                <td width="100" align="right">            <%= number_to_currency( detalhe.valor_dolar.to_f, :format=>' %n ', :separeitor => ",")%> </td>
+                             <% elsif params[:moeda] == "1" %>
+                                <td width="100" align="right">            <%= number_to_currency( detalhe.valor_guarani.to_f, :format=>' %n ', :precision => 0)%> </td>
+                            <% else %>    
+                                <td width="100" align="right">            <%= number_to_currency( detalhe.valor_real.to_f, :format=>' %n ', :separeitor => ",")%> </td>
+                             <% end %>
+                           </tr>
+                           <% end %>
+                  </table>
+              </td>
+           </tr>
+
+
+        <% end %>
+            </table>
+          </td>
+        </tr>
+
+     <% end %>
+
+    
+     <tr class="head"  height="50">
+         <td></td>
+         <td></td>
+         <td></td>
+         <td></td>
+
+        <% if params[:detalhe] == "1" %> 
+
+         <% if params[:moeda] == "0" %>
+              <td width="100" align="right"> <%= number_to_currency( desc_us.to_f, :format=>' %n ', :separeitor => ",")%> </td>
+              <td width="100" align="right"> <%= number_to_currency( int_us.to_f, :format=>' %n ', :separeitor => ",")%> </td>
+              <td width="100" align="right"> <%= number_to_currency( valor_us.to_f, :format=>' %n ', :separeitor => ",")%> </td>
+         <% elsif params[:moeda] == "1" %>
+              <td width="100" align="right"> <%= number_to_currency( desc_gs.to_f, :format=>' %n ', :precision => 0)%> </td>
+              <td width="100" align="right"> <%= number_to_currency( int_gs.to_f, :format=>' %n ', :precision => 0)%> </td>
+              <td width="100" align="right"> <%= number_to_currency( valor_gs.to_f, :format=>' %n ', :precision => 0)%> </td>
+         <% else %>
+              <td width="100" align="right"> <%= number_to_currency( desc_rs.to_f, :format=>' %n ', :separeitor => ",")%> </td>
+              <td width="100" align="right"> <%= number_to_currency( int_rs.to_f, :format=>' %n ', :separeitor => ",")%> </td>
+              <td width="100" align="right"> <%= number_to_currency( valor_rs.to_f, :format=>' %n ', :separeitor => ",")%> </td>
+         <% end %>
+
+        <% else %>
+              <td></td>
+              <td></td>
+              <td></td>
+
+        <% end %>
+         <% if params[:moeda] == "0" %>
+            <td width="100" align="right"> <%= number_to_currency( totus.to_f, :format=>' %n ', :separeitor => "," ) %></td>
+         <% elsif params[:moeda] == "1" %>
+            <td width="100" align="right"> <%= number_to_currency(totgs.to_f, :format=>' %n ', :separeitor => "," ) %></td>
+         <% else %>
+            <td width="100" align="right"> <%= number_to_currency(totrs.to_f, :format=>' %n ', :separeitor => "," ) %></td>
+         <% end %>
+
+     </tr>
+  </table>
+<% end %>

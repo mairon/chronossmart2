@@ -1,0 +1,62 @@
+<%= form_for(@dev_cheque_cliente_dt) do |f| %>
+  <% if @dev_cheque_cliente_dt.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@dev_cheque_cliente_dt.errors.count, "error") %> prohibited this dev_cheque_cliente_dt from being saved:</h2>
+
+      <ul>
+      <% @dev_cheque_cliente_dt.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> dev_cheque_cliente_dts - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                    <td align="right">dev_cheque_cliente_id :</td>
+                    <td><%= f.number_field :dev_cheque_cliente_id %></td>
+                                    
+                    <td align="right">obs :</td>
+                    <td><%= f.text_area :obs %></td>
+                                    
+                    <td align="right">valor_us :</td>                    
+                    <td><%= f.text_field :valor_us %></td>
+                                    
+                    <td align="right">valor_gs :</td>                    
+                    <td><%= f.text_field :valor_gs %></td>
+                                    
+                    <td align="right">cheque :</td>                    
+                    <td><%= f.text_field :cheque %></td>
+                                    
+                    <td align="right">titula :</td>                    
+                    <td><%= f.text_field :titula %></td>
+                                    
+                    <td align="right">banco :</td>                    
+                    <td><%= f.text_field :banco %></td>
+                  </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), dev_cheque_cliente_dts_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

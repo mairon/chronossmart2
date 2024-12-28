@@ -1,0 +1,59 @@
+<h1 id="header">Prov. Gasto</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_prov_gasto_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="110" align="center"><%= t('CODE') %></td>
+    <td width="250"><%= t('PROVIDER') %></td>
+    <td width="350"><%= t('CLASSIFICATION') %></td>
+    <td width="60" align="center"><%= t('DATE') %> Venc.</td>
+    <td width="60">Comp.</td>
+    <td width="30"></td>
+    <td align="right" width="70"><%= t('VALUE') %></td>
+    <td width="80"></td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @prov_gastos.each do |prov_gasto| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="110" align="center"><%= prov_gasto.id.to_s.rjust(6,'0') %></td>
+        <td width="250"><%= prov_gasto.persona.nome %></td>
+        <td width="350"><%= prov_gasto.plano_de_conta_id %> - <%= prov_gasto.plano_de_conta.descricao unless  prov_gasto.plano_de_conta.nil? %> | <small><%= prov_gasto.obs %></small></td>
+        <td width="60" align="center"><%= prov_gasto.dia_venc %></td>
+        <td width="60"><%= prov_gasto.competencia %></td>
+        <% if prov_gasto.moeda.to_i == 0 %>
+          <td width="30">U$</td>
+          <td width="70" align="right"><%= format_decimal(prov_gasto.valor_us) %></td>
+        <% elsif prov_gasto.moeda.to_i == 1 %>
+          <td width="30">Gs.</td>
+          <td width="70" align="right"><%= format_int(prov_gasto.valor_gs) %></td>
+        <% else %>
+          <td width="30">R$</td>
+          <td width="70" align="right"><%= format_decimal(prov_gasto.valor_rs) %></td>
+        <% end %>
+          <td><%= link_to '', prov_gasto_path(prov_gasto), class: 'icon-fullscreen' %></td>
+          <td><%= link_to '', prov_gasto, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+
+<div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="myModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel">Nuevo Provisionamento</h4>
+      </div>
+      <div class="modal-body" align="center">
+      	<%= render 'form' %>
+      </div>
+    </div>
+  </div>
+</div>

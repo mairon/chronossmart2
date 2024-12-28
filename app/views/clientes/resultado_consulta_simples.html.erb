@@ -1,0 +1,120 @@
+<table>
+  <tr>
+    <td>
+      <div class="group">
+        <% empresa = Empresa.last(:select => "taxa_interes") %>
+         <table class="head_grid">
+            <tr>
+              <td width="60" align="center"><%= t('DATE') %></td>
+              <td width="150"><%= t('DOC') %></td>
+              <td width="50" align="center"><%= t('SHARE') %></td>
+              <td width="70" align="center">Venc.</td>
+              <td width="60" align="center">Dias</td>
+              <td width="80" align="right"><%= t('INTEREST') %></td>
+              <td width="80" align="right"><%= t('VALUE') %></td>
+              <td width="80" align="right">Anterior</td>
+              <td width="80" align="right">Saldo</td>
+
+            </tr>
+          </table>
+
+          <div class="rolagem" dir="div" style="height: 100px;">
+
+            <table>
+              <% tot_interes_gs   = 0 %>
+              <% tot_divida_gs    = 0 %>
+              <% tot_corrigida_gs = 0 %>
+              <% @cliente.each do |c| %>
+
+                  <% if params[:moeda].to_i == 0 %>
+                    <% saldo_dolar = (c.divida_dolar.to_f - c.anterior_us.to_f) %>
+                    <% saldo_dolar_original = (c.divida_dolar.to_f - c.anterior_us.to_f) %>
+                  <!-- calculo de interes -->
+                  <%  dias = Date.today - c.vencimento.to_date if c.liquidacao == 0  %>
+                  <%  if dias >= 0  %>           
+                      <%  interes_us = ( ( dias.to_i * empresa.taxa_interes.to_f ) * saldo_dolar.to_f) / 100 %>          
+                  <% else %>
+                     <%  interes_us = 0  %>          
+                  <% end %>
+                  <% saldo_guarani = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+                  <tr class = "<%= cycle( "cor1", "cor2" ) %>">
+                <% else %>
+                 
+                  <% saldo_guarani = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+                  <% saldo_guarani_original = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
+
+                  <!-- calculo de interes -->
+                  <%  dias = Date.today - c.vencimento.to_date if c.liquidacao == 0  %>
+                  <%  if dias >= 0  %>           
+                      <%  interes_gs = ( ( dias.to_i * empresa.taxa_interes.to_f ) * saldo_guarani.to_f) / 100  %>      
+                  <% else %>
+                     <%  interes_gs = 0  %>    
+                  <% end %>
+
+                  <% saldo_dolar = (c.divida_dolar.to_f - c.anterior_us.to_f) %>
+                  <tr class = "<%= cycle( "cor1", "cor2" ) %>">
+
+                <% end %>
+               
+
+                <td width="60"  align="center"><%= c.data.strftime("%d/%m/%y")%></td>
+                <td width="150"><%= c.documento_numero_01%>-<%= c.documento_numero_02%>-<%= c.documento_numero%></td>
+                <td width="50"  align="center"><%= c.cota %></td>
+                <td width="70"  align="center"><%= c.vencimento.strftime("%d/%m/%y")%></td>
+                <td width="60" align="center"><%= dias.to_i %></td>
+
+                <% if params[:moeda].to_i == 0 %>
+                <td width="80" align="right"><%= number_to_currency(interes_us, :format=>' %n ', :separeitor => ',')%></td>
+                  <td width="80" align="right"><%= number_to_currency(c.divida_dolar, :format=>' %n ', :separeitor => ',')%></td>
+                  <td width="80" align="right"><%= number_to_currency(c.anterior_us, :format=>' %n ', :separeitor => ',' )%></td>
+                  <td width="80" align="right"><%= number_to_currency(saldo_dolar_original, :format=>' %n ', :separeitor => ',' )%></td>
+                <% else %>
+                  <td width="80" align="right"><%= number_to_currency(interes_gs, :format=>' %n ', :precision => 0 )%></td>
+                  <td width="80" align="right"><%= number_to_currency(c.divida_guarani, :format=>' %n ', :precision => 0 )%></td>
+                  <td width="80" align="right"><%= number_to_currency(c.anterior_gs, :format=>' %n ', :precision => 0 )%></td>
+                  <td width="80" align="right"><%= number_to_currency(saldo_guarani_original, :format=>' %n ', :precision => 0 )%></td>
+                  <% tot_interes_gs   += interes_gs.to_f %>
+                  <% tot_divida_gs    += saldo_guarani_original.to_f %>
+                  <% tot_corrigida_gs += ( saldo_guarani.to_f ) %>
+
+                <% end %>
+
+              </tr>
+            <% end %>
+          </table>
+        </div>
+        <table class="head_grid">
+          <tr>
+            <td width="390" align="right">Saldo:</td>
+            <% if params[:moeda].to_i == 1 %>
+              <td width="80" align="right"><b><%= format_int(tot_interes_gs.to_f) %></b></td>
+              <td width="80" align="right"></td>
+              <td width="80" align="right"></td>
+              <td width="80" align="right"><b><%= format_int(tot_divida_gs.to_f) %></b></td>
+            <% end %>
+          </tr>
+        </table>
+      </div>
+    </td>
+    <td style=" padding-right: 10px;">
+      <div class="group" style="height: 152px; padding: 5px; margin-left: 10px;">
+        <p style="font-size: 15px;text-align: right;">Limite Credito<br> <span class="label label-primary"><%= format_int(@persona.limite_credito) %></span></p>
+        <p style="font-size: 15px;text-align: right;">Utilizado<br> <span class="label label-warning"><%= format_int(tot_divida_gs.to_f) %></span></p>
+
+        <% if (@persona.limite_credito.to_f - tot_divida_gs.to_f) <= 0 %>
+          <p style="font-size: 15px;text-align: right;">Dispobible<br> <span class="label label-danger"><%= format_int(@persona.limite_credito.to_f - tot_divida_gs.to_f) %></span></p>          
+        <% else %>
+          <p style="font-size: 15px;text-align: right;">Dispobible<br> <span class="label label-success"><%= format_int(@persona.limite_credito.to_f - tot_divida_gs.to_f) %></span></p>
+        <% end %>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="4">
+    <br>
+    <div class="group">
+      <h2>Obs: <%= @persona.observacao.gsub('<<csq>>','<br/>').html_safe %></h2>
+    </div>
+    </td>
+  </tr>
+</table>

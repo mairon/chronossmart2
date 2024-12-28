@@ -1,0 +1,54 @@
+<div class="panel">
+  <header class="panel-heading">
+
+</header>
+
+   <table class="head_grid">
+      <tr>
+         <td width="80"><%= t("DATE")%></td>
+         <td width="480">Cliente</td>
+         <td width="100">Telefone</td>
+      </tr>
+   </table>
+   <div class="rolagem" id="div">
+      <table>
+         <% total = 0 %>
+         <% @aniversarios.each do |cl| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+
+             <td width="50">
+               <% if cl.data_nascimento.strftime("%d") == Time.now.strftime("%d") and cl.data_nascimento.strftime("%m") == Time.now.strftime("%m") %>
+                 <i class="icon-gift"></i>
+               <% end %>
+             </td>
+               <td width="50" align="left"><%= cl.data_nascimento.strftime("%d/%m") %></td>
+               <td width="480" align="left"><small> <%=link_to  cl.nome, edit_persona_path(cl.id)%></small></td>
+               <td width="150">
+                  <small>
+                    <i class="fa fa-whatsapp"></i> <a href=" http://api.whatsapp.com/send?1=pt_BR&phone=<%= cl.telefone.to_s.gsub(' ', '').gsub('+', '') %>" target="_blank"><%= cl.telefone %></a>
+                  </small>
+               </td>
+            </tr>
+            <% total += 1 %>
+         <% end %>
+         <% @aniversario_contatos.each do |cl| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+
+             <td width="50">
+               <% if cl.data_nascimento.strftime("%d") == Time.now.strftime("%d") and cl.data_nascimento.strftime("%m") == Time.now.strftime("%m") %>
+                 <i class="icon-gift"></i>
+               <% end %>
+             </td>
+               <td width="50" align="left"><%= cl.id %></td>
+               <td width="50" align="left"><%= cl.data_nascimento.strftime("%d/%m") %></td>
+               <td width="480" align="left"><%= link_to "#{cl.persona.nome} - #{cl.nome}", persona_path(cl.persona_id)%></td>
+               <td width="150">
+                 <i class="fa fa-whatsapp"></i> <a href=" http://api.whatsapp.com/send?1=pt_BR&phone=<%= cl.persona.telefone.to_s.gsub(' ', '').gsub('+', '') %>" target="_blank"><%= cl.persona.telefone %></a>
+               </td>
+            </tr>
+            <% total += 1 %>
+         <% end %>
+      </table>
+   </div>
+   Total : <%= total %>
+   </div>

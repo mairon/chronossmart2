@@ -1,0 +1,38 @@
+<%= form_for(fechamento_caixa_dt) do |f| %>
+  <% if fechamento_caixa_dt.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(fechamento_caixa_dt.errors.count, "error") %> prohibited this fechamento_caixa_dt from being saved:</h2>
+
+      <ul>
+      <% fechamento_caixa_dt.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= f.hidden_field :fechamento_caixa_id %>
+  <%= f.hidden_field :forma_pago_id, value: 17 %>
+
+  <div class="row">
+    <div class="col-md-6">
+      <label>Cuenta <%= t('SOURCE_S') %></label>
+      <%= f.collection_select :conta_origem_id, Conta.all(:select => 'id,nome',:order => '1,2',:conditions => ["unidade_id = #{current_unidade.id} and terminal_id = #{ @fechamento_caixa.abertura_caixa.terminal_id} and forma_pago_id = 1"]),:id,:nome,{:prompt => 'selecione la Cuenta'},{required: true} %>
+      
+    </div>
+    <div class="col-md-6">
+        <label>Cuenta Destino</label>
+        <%= f.collection_select :conta_destino_id, Conta.all(:select => 'id,nome',:order => '1,2',:conditions => ["unidade_id = #{current_unidade.id} and tesouraria = true "]),:id,:nome,{:prompt => 'selecione la Cuenta'},{required: true} %>
+      
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <%= field_us_label 'Valor',f,:valor %>      
+    </div>
+
+    <div class="col-md-6">
+      <label>.</label>
+      <%= f.submit :value => t('SAVE'), :class => "button add", :disable_with => "Aguarde..." %>
+    </div>
+  </div>              
+<% end %>

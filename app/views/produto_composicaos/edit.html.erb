@@ -1,0 +1,42 @@
+<h1>Editing produto_composicao</h1>
+
+<% form_for(@produto_composicao) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :produto_id %><br />
+    <%= f.text_field :produto_id %>
+  </p>
+  <p>
+    <%= f.label :componente_id %><br />
+    <%= f.text_field :componente_id %>
+  </p>
+  <p>
+    <%= f.label :componente_nome %><br />
+    <%= f.text_field :componente_nome %>
+  </p>
+  <p>
+    <%= f.label :clase_id %><br />
+    <%= f.text_field :clase_id %>
+  </p>
+  <p>
+    <%= f.label :grupo_id %><br />
+    <%= f.text_field :grupo_id %>
+  </p>
+        <tr>
+          <td align="right">Cantidad :</td>        
+          <td><%= f.text_field :quantidade, :size => 15 %></td>             
+        </tr>
+
+        <tr>
+          <%= field_us 'Custo U$ :',f,:ultimo_custo_dolar %>
+          <%= field_us 'Gs. :',f,:ultimo_custo_guarani %> 
+
+          <td>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @produto_composicao %> |
+<%= link_to 'Back', produto_composicaos_path %>

@@ -1,0 +1,41 @@
+
+<%= form_for(nota_credito_proveedor_produto) do |f| %>
+  <%= f.hidden_field :nota_credito_proveedor_id %>
+  <%= f.hidden_field :data,:value => @nota_credito_proveedor.data %>
+  <%= f.hidden_field :cotacao,:value => @nota_credito_proveedor.cotacao.to_i %>
+  <%= f.hidden_field :produto_id %>
+  <%= f.hidden_field :deposito_id %>
+  <%= f.hidden_field :deposito_nome %>
+  <%= f.hidden_field :unitario_dolar %>
+  <%= f.hidden_field :unitario_guarani %>
+  <%= f.hidden_field :unitario_real %>
+  <%= f.hidden_field :total_dolar %>
+  <%= f.hidden_field :total_guarani %>
+  <%= f.hidden_field :total_real %>
+  <%= hidden_field_tag :max_qtd, nil %>
+
+  <div class="group">
+    <table>
+   	  <tr>
+        <td>Producto:</td>
+        <td><%= f.text_field :produto_nome, :size => 85 %></td>
+        <td>Cantidad:</td>
+        <td><%= f.text_field :quantidade, :size => 10, onblur: "ValidMaxQtd()" %></td>
+        <td><%= f.submit t('SAVE'), class: 'btn btn-info' %></td>
+      </tr>
+    </table>
+  </div>
+<% end %>
+
+<script>
+	
+	function ValidMaxQtd(){
+		var max = document.getElementById('max_qtd').value
+		var valor = document.getElementById('nota_credito_proveedor_produto_quantidade').value
+		if (parseFloat(valor.replace(/\./g, "").replace(",", ".") ) > parseFloat(max.replace(/\./g, "").replace(",", ".") )){
+			alert('Cantidad Major que lo Maximo permitido!');
+			document.getElementById('nota_credito_proveedor_produto_quantidade').value = max
+			document.getElementById('nota_credito_proveedor_produto_quantidade').focus();
+		}		
+	}
+</script>

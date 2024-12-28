@@ -1,0 +1,57 @@
+<body onload="DataInicio(),DataFinal(),CampoInicio()">
+   <h1 id="header">   <%= t('LISTING') %> de Pagos Anticipados</h1>
+   <div class="group">
+      <h2>
+         <%= form_tag resultado_pago_antecipado_relatorios_path, :method => "get" do%>
+            <table>
+
+               <tr>
+                  <td align="right">Cliente :</td>
+                  <td>
+
+                   <%=   select("busca", "persona", Persona.all(:select => 'id,nome',:conditions => ["tipo_cliente = 1"]).collect {|p| [ p.nome, p.id ] },                 { :prompt => 'Todos...' },{:class => "selc_medium"})%></td>
+
+                  </td>
+               </tr>
+
+              <tr>
+                <td align="right"></td>
+                <td>
+                  <fieldset>
+                    <legend><%= t('COIN') %> :</legend>
+                    <%= radio_button_tag :moeda, 0 %>Dólares
+                    <%= radio_button_tag :moeda, 1,  :Checked => "True"  %> <%= t('GUARANIS') %>
+                    <%= radio_button_tag :moeda, 2  %> <%= t('REAIS') %>
+                  </fieldset>
+                </td>
+              </tr>
+
+               <tr>
+                  <td></td>
+                  <td>
+                    <input  id      ="button"
+                            type    ="submit"
+                            class   = "button_info"
+                            value   ="Informe"
+                            onclick = "Tipo('0')"/>
+
+                    <input type     = "submit"
+                           class   = "button_info"
+                           value    = "Excel"
+                           onclick  = "Tipo('1')"/>
+                  </td>
+               </tr>
+
+               <input type  = "hidden"
+                      name  = "tipo"
+                      id    = "tipo"
+                      size  = "5"
+                      value = "0"/>
+
+            </table>
+         <% end %>
+      </h2>
+   </div>
+</body>
+
+

@@ -1,0 +1,37 @@
+<body onload="DataFinal(),CampoInicio()">
+  <h1 align="right" id="header">.</h1>
+  Relatorio Consumo Bomba
+  <div class="group">
+    <h2>
+      <%= form_tag resultado_relatorio_consumo_bomba_stocks_path, :method => "get" do%>
+        <table>          
+
+          <tr>
+            <td> Fecha:</td>
+            <td><input name="inicio" id="inicio"  size="9"  onkeyup="Formatadata(this,event)" />
+              Hasta
+              <input name="final"  id="final"   size="9" onkeyup="Formatadata(this,event)"/></td>
+          </tr>
+
+          <tr>
+            <td>Turno :</td>
+            <td>
+              <%=   select("busca", "turno", Turno.all(:select => 'id,nome').collect {|p| [ p.nome, p.id ] }, { :include_blank => true })   %></td>
+          </tr>
+          <tr>
+            <td>Bomba :</td>
+
+            <td>
+              <%= select("busca", "bomba", Produto.all(:select => 'id,nome,tipo',:conditions => ["tipo = 1"]).collect {|p| [ p.nome, p.id ] }, { :include_blank => true })   %>
+             <%=  submit_tag "     Buscar     "%>
+            </td>
+          </tr>
+
+
+          <% end %>
+      </table>
+    </h2>
+  </div>
+</body>
+
+

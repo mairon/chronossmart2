@@ -1,0 +1,2 @@
+module AnalizeEnsaiosHelper
+end

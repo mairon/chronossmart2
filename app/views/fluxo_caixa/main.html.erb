@@ -1,0 +1,263 @@
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content">
+        <div class="row">
+          <div class="col-md-2"><h1><br>Flujo de Caja</h1></div>
+          <div class="col-md-7 col-md-offset-3">
+
+            <%= form_tag fluxo_caixa_main_path, :method => "get" do %>
+              <div class="row">
+                <div class="col-md-3">
+                  <label><%= t('CENTER_OF_COSTOS') %></label>
+                  <%= select_tag("busca_centro_custos", options_for_select(CentroCusto.all( :select => 'id,nome', :order  => '1' ).collect {|p| [ p.nome, p.id ]}, selected: params[:busca_centro_custos] ), {:prompt => 'Todos...' } )  %>
+                </div>
+
+                <div class="col-md-3">
+                  <label><%= t('COIN') %></label>
+                  <% if params[:moeda].blank? %>
+                    <% if current_unidade.moeda.to_i == 0 %>
+                      <% set_coin = 0 %>
+                      <% set_form_coin = [t('DOLLARS'), 0] %>
+                    <% elsif current_unidade.moeda.to_i == 1 %>
+                      <% set_coin = 1 %>
+                      <% set_form_coin = [t('GUARANIS'), 1] %>
+                    <% elsif current_unidade.moeda.to_i == 2 %>
+                      <% set_coin = 2 %>
+                      <% set_form_coin = [t('REAIS'), 2] %>
+                    <% end %>
+                  <% else %>
+                    <% if params[:moeda].to_i == 0 %>
+                      <% set_coin = 0 %>
+                      <% set_form_coin = [t('DOLLARS'), 0] %>
+                    <% elsif params[:moeda].to_i == 1 %>
+                      <% set_coin = 1 %>
+                      <% set_form_coin = [t('GUARANIS'), 1] %>
+                    <% elsif params[:moeda].to_i == 2 %>
+                      <% set_coin = 2 %>
+                      <% set_form_coin = [t('REAIS'), 2] %>
+                    <% end %>
+                  <% end %>
+
+                  <%= select_tag "moeda", options_for_select([ [t('DOLLARS'), 0], [t('GUARANIS'), 1], [t('REAIS'), 2] ], set_form_coin ) %>
+                </div>
+
+                <% if set_coin.to_i == 0 %>
+                  <div class="col-md-3">
+                    <label >Cotz. U$xGs.</label>
+                    <%= telephone_field_tag :us_gs, format_int(Moeda.last.dolar_compra), class: 'panel-field', size: 6, class: "money_gs", dir: "rtl" %>
+                  </div>
+                  <div class="col-md-3">
+                    <label >Cotz. U$xR$.</label>
+                    <%= telephone_field_tag :us_rs, format_decimal(Moeda.last.rs_us_compra), class: 'panel-field', size: 6, class: "money_us", dir: "rtl", step: ".01" %>
+                  </div>
+                <% elsif set_coin.to_i == 1 %>
+                  <div class="col-md-3">
+                    <label >Cotz. Gs.xU$</label>
+                    <%= telephone_field_tag :gs_us, format_int(Moeda.last.dolar_compra), class: 'panel-field', size: 6, class: "money_gs", dir: "rtl" %>
+                  </div>
+                  <div class="col-md-3">
+                    <label >Cotz. Gs.xR$.</label>
+                    <%= telephone_field_tag :gs_rs, format_int(Moeda.last.real_venda), class: 'panel-field', size: 6, class: "money_us", dir: "rtl", step: ".01" %>
+                  </div>
+                <% elsif set_coin.to_i == 2 %>
+                  <div class="col-md-3">
+                    <label >Cotz. R$xGs.</label>
+                    <%= telephone_field_tag :rs_gs, format_int(Moeda.last.real_venda), class: 'panel-field', size: 6, class: "money_gs", dir: "rtl" %>
+                  </div>
+                  <div class="col-md-3">
+                    <label >Cotz. R$xU$.</label>
+                    <%= telephone_field_tag :rs_us, format_decimal(Moeda.last.rs_us_compra), class: 'panel-field', size: 6, class: "money_us", dir: "rtl", step: ".01" %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+    <div class="panel">
+      <div class="panel-content">
+      <div style="width: 1130px; overflow:auto;">
+        <div style="width: 1400px">
+
+          <% cc  = "AND CENTRO_CUSTO_ID = #{params[:busca_centro_custos]}"  unless params[:busca_centro_custos].blank? %>
+          <% fcc = "AND CONTAS.CENTRO_CUSTO_ID = #{params[:busca_centro_custos]}"  unless params[:busca_centro_custos].blank? %>
+
+          <table>
+            <% saldo_inicial = 0 %>
+            <tr>
+              <td>SALDO <%= t('CASHIER') %></td>
+              <td align="right"><%= format_int( saldo_inicial = (Financa.joins(:conta).where("CONTAS.TIPO = 0 AND FINANCAS.DATA <= '#{Time.now.to_date}' #{fcc}").sum('FINANCAS.ENTRADA_GUARANI - FINANCAS.SAIDA_GUARANI')).to_f) %> | </td>
+              <td> SALDO BANCO</td>
+              <td align="right"><%= format_int( saldo_inicial += (Financa.joins(:conta).where("CONTAS.TIPO = 1 AND FINANCAS.DATA <='#{Time.now.to_date}' #{fcc}").sum('FINANCAS.ENTRADA_GUARANI - FINANCAS.SAIDA_GUARANI')).to_f) %></td>
+            </tr>
+          </table>
+
+
+          <table class="table table-bordered tree">
+            <thead >
+              <tr class="head">
+                <td class="frozer" rowspan="2" width="950" valign="middle"></td>
+                <% meses = 1 %>
+                <% 12.times do |s| %>
+                  <td width="200" align="right"><b><%= Date::MONTHNAMES[meses.to_i].to_s %></b></td>
+                  <% meses += 1 %>
+                <% end %>
+              </tr>
+            </thead>
+            <tbody>
+
+
+              <% tot_desp_01 = 0 %>
+              <% tot_desp_02 = 0 %>
+              <% tot_desp_03 = 0 %>
+              <% tot_desp_04 = 0 %>
+              <% tot_desp_05 = 0 %>
+              <% tot_desp_06 = 0 %>
+              <% tot_desp_07 = 0 %>
+              <% tot_desp_08 = 0 %>
+              <% tot_desp_09 = 0 %>
+              <% tot_desp_10 = 0 %>
+              <% tot_desp_11 = 0 %>
+              <% tot_desp_12 = 0 %>
+
+              <% tot_receb_01 = 0 %>
+              <% tot_receb_02 = 0 %>
+              <% tot_receb_03 = 0 %>
+              <% tot_receb_04 = 0 %>
+              <% tot_receb_05 = 0 %>
+              <% tot_receb_06 = 0 %>
+              <% tot_receb_07 = 0 %>
+              <% tot_receb_08 = 0 %>
+              <% tot_receb_09 = 0 %>
+              <% tot_receb_10 = 0 %>
+              <% tot_receb_11 = 0 %>
+              <% tot_receb_12 = 0 %>
+
+              <% saldo_02 = 0 %>
+              <% saldo_03 = 0 %>
+              <% saldo_04 = 0 %>
+              <% saldo_05 = 0 %>
+              <% saldo_06 = 0 %>
+              <% saldo_07 = 0 %>
+              <% saldo_08 = 0 %>
+              <% saldo_09 = 0 %>
+              <% saldo_10 = 0 %>
+              <% saldo_11 = 0 %>
+              <% saldo_12 = 0 %>
+
+              <% @plano_contas_saldo.each do |s| %>
+                <tr class="<%= cycle( "cor1", "cor2" )%>">
+                  <td><b><%= s.rubro_nome %></b></td>
+                  <td align="right"> <%= format_int(saldo_inicial.to_f) %></td>
+                  <td align="right"> <%= format_int(saldo_02 = (saldo_inicial.to_f + s.prov_01.to_f) ) %></td>
+                  <td align="right"> <%= format_int(saldo_03 = (saldo_02.to_f + s.prov_02.to_f)) %></td>
+                  <td align="right"> <%= format_int(saldo_04 = (saldo_03.to_f + s.prov_03.to_f)) %></td>
+                  <td align="right"> <%= format_int(saldo_05 = (saldo_04.to_f + s.prov_04.to_f)) %></td>
+                  <td align="right"> <%= format_int(saldo_06 = (saldo_05.to_f + s.prov_05.to_f)) %></td>
+                  <td align="right"> <%= format_int(saldo_07 = (saldo_06.to_f + s.prov_06.to_f)) %></td>
+                  <td align="right"> <%= format_int(saldo_08 = (saldo_07.to_f + s.prov_07.to_f)) %></td>
+                  <td align="right"> <%= format_int(saldo_09 = (saldo_08.to_f + s.prov_08.to_f)) %></td>
+                  <td align="right"> <%= format_int(saldo_10 = (saldo_09.to_f + s.prov_09.to_f)) %></td>
+                  <td align="right"> <%= format_int(saldo_11 = (saldo_10.to_f + s.prov_10.to_f)) %></td>
+                  <td align="right"> <%= format_int(saldo_12 = (saldo_11.to_f + s.prov_11.to_f)) %></td>
+                </tr>
+              <% end %>
+
+              <% @plano_contas.each do |pc| %>
+                <tr class="<%= cycle( "cor1", "cor2" )%>">
+                  <td><b><%= pc.rubro_nome %></b></td>
+                  <td align="right"> <%= format_int(pc.prov_01) %></td>
+                  <td align="right"> <%= format_int(pc.prov_02) %></td>
+                  <td align="right"> <%= format_int(pc.prov_03) %></td>
+                  <td align="right"> <%= format_int(pc.prov_04) %></td>
+                  <td align="right"> <%= format_int(pc.prov_05) %></td>
+                  <td align="right"> <%= format_int(pc.prov_06) %></td>
+                  <td align="right"> <%= format_int(pc.prov_07) %></td>
+                  <td align="right"> <%= format_int(pc.prov_08) %></td>
+                  <td align="right"> <%= format_int(pc.prov_09) %></td>
+                  <td align="right"> <%= format_int(pc.prov_10) %></td>
+                  <td align="right"> <%= format_int(pc.prov_11) %></td>
+                  <td align="right"> <%= format_int(pc.prov_12) %></td>
+                  <% if pc.rubro_nome != 'RECEBER' %>
+                    <% tot_desp_01 += pc.prov_01.to_f %>
+                    <% tot_desp_02 += pc.prov_02.to_f %>
+                    <% tot_desp_03 += pc.prov_03.to_f %>
+                    <% tot_desp_04 += pc.prov_04.to_f %>
+                    <% tot_desp_05 += pc.prov_05.to_f %>
+                    <% tot_desp_06 += pc.prov_06.to_f %>
+                    <% tot_desp_07 += pc.prov_07.to_f %>
+                    <% tot_desp_08 += pc.prov_08.to_f %>
+                    <% tot_desp_09 += pc.prov_09.to_f %>
+                    <% tot_desp_10 += pc.prov_10.to_f %>
+                    <% tot_desp_11 += pc.prov_11.to_f %>
+                    <% tot_desp_12 += pc.prov_12.to_f %>
+                  <% else %>
+                    <% tot_receb_01 += pc.prov_01.to_f %>
+                    <% tot_receb_02 += pc.prov_02.to_f %>
+                    <% tot_receb_03 += pc.prov_03.to_f %>
+                    <% tot_receb_04 += pc.prov_04.to_f %>
+                    <% tot_receb_05 += pc.prov_05.to_f %>
+                    <% tot_receb_06 += pc.prov_06.to_f %>
+                    <% tot_receb_07 += pc.prov_07.to_f %>
+                    <% tot_receb_08 += pc.prov_08.to_f %>
+                    <% tot_receb_09 += pc.prov_09.to_f %>
+                    <% tot_receb_10 += pc.prov_10.to_f %>
+                    <% tot_receb_11 += pc.prov_11.to_f %>
+                    <% tot_receb_12 += pc.prov_12.to_f %>
+                  <% end %>
+                <% end %>
+              </tr>
+              <tr>
+                <td><b>TOTAL DESPESAS</b></td>
+                <td align="right"> <%= format_int(tot_desp_01) %></td>
+                <td align="right"> <%= format_int(tot_desp_02) %></td>
+                <td align="right"> <%= format_int(tot_desp_03) %></td>
+                <td align="right"> <%= format_int(tot_desp_04) %></td>
+                <td align="right"> <%= format_int(tot_desp_05) %></td>
+                <td align="right"> <%= format_int(tot_desp_06) %></td>
+                <td align="right"> <%= format_int(tot_desp_07) %></td>
+                <td align="right"> <%= format_int(tot_desp_08) %></td>
+                <td align="right"> <%= format_int(tot_desp_09) %></td>
+                <td align="right"> <%= format_int(tot_desp_10) %></td>
+                <td align="right"> <%= format_int(tot_desp_11) %></td>
+                <td align="right"> <%= format_int(tot_desp_12) %></td>
+              </tr>
+
+              <tr>
+                <td><b>SALDO MÊS</b></td>
+                <td align="right"> <%= format_int(saldo_inicial.to_f + tot_receb_01.to_f + tot_desp_01.to_f) %></td>
+                <td align="right"> <%= format_int(saldo_02.to_f + tot_receb_02.to_f + tot_desp_02.to_f) %></td>
+                <td align="right"> <%= format_int(saldo_03.to_f + tot_receb_03.to_f + tot_desp_03.to_f) %></td>
+                <td align="right"> <%= format_int(saldo_04.to_f + tot_receb_04.to_f + tot_desp_04.to_f) %></td>
+                <td align="right"> <%= format_int(saldo_05.to_f + tot_receb_05.to_f + tot_desp_05.to_f) %></td>
+                <td align="right"> <%= format_int(saldo_06.to_f + tot_receb_06.to_f + tot_desp_06.to_f) %></td>
+                <td align="right"> <%= format_int(saldo_07.to_f + tot_receb_07.to_f + tot_desp_07.to_f) %></td>
+                <td align="right"> <%= format_int(saldo_08.to_f + tot_receb_08.to_f + tot_desp_08.to_f) %></td>
+                <td align="right"> <%= format_int(saldo_09.to_f + tot_receb_09.to_f + tot_desp_09.to_f) %></td>
+                <td align="right"> <%= format_int(saldo_10.to_f + tot_receb_10.to_f + tot_desp_10.to_f) %></td>
+                <td align="right"> <%= format_int(saldo_11.to_f + tot_receb_11.to_f + tot_desp_11.to_f) %></td>
+                <td align="right"> <%= format_int(saldo_12.to_f + tot_receb_12.to_f + tot_desp_12.to_f) %></td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<script>
+
+  $('#busca_centro_custos, #moeda').change(function (){
+    window.location.href = "/fluxo_caixa/main?" + $('form').serialize() ;
+  });
+
+</script>
+

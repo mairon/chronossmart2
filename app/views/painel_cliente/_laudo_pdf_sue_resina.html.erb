@@ -1,0 +1,235 @@
+<style>
+	.page-break { display:block; clear:both; page-break-after:always; }
+table {
+		font-family:Lucida Console;
+		font-size:10px;
+		border-collapse: collapse;
+	}
+	table td{
+		height:20px;
+
+	}
+	.header{
+		font-size: 10px;
+		border:1px solid black;
+	}
+
+	.destaque{
+		font-size: 12px;
+		border:1px solid black;
+	  -moz-border-radius:8px;
+	  -webkit-border-radius:8px;
+	  padding:10px;
+	  margin:10px 0 10px 0;
+	}
+
+	.obs{
+		font-size: 7px;
+	}
+
+tr.cor2 {
+    background: #c0d9c0;
+}
+
+tr.cor1 {
+    background: white;
+}
+
+</style>
+<body>
+	<table>
+		<tr>
+			<td colspan="4">
+				<div >
+					<table>
+				    <tr height="100">
+				    	<td colspan="2"><%= wicked_pdf_image_tag('logo_biosollo.png', :width => 150, :height => 80) %></td>
+				    	<td width="700" align="center" valign="bottom">
+				    		<p>Km 4 Super Carretera - Teléfono: (061) 573 616</p>
+				    		<p>www.biosollo.com.py - biosollo@biosollo.com.py - Ciudad del Este - Paraguay</p>
+				    	</td>
+				    </tr>
+			    </table>
+			    </div>
+	  	</td>
+		</tr>
+
+    <tr>
+    	<td>
+    		<br>
+    		<br>
+    		<br>
+    		<br>
+    	</td>
+    </tr>
+
+    <tr>
+	    	<td valign="top">
+	    		<div>
+	    			<table align="center">
+	    				<tr height="520">
+	    					<td valign="top"  align="center" >
+
+			    		<table  align="center">
+								<% quebra   = "" %>
+								<% @amostras.each do |a| %>
+									<% if a.solicitante == '' %>
+		                  <% soli = a.empresa_nome %>
+		                <% else %>
+		                  <% soli = a.solicitante %>
+		                <% end %>
+
+		                <% if quebra != soli %>
+		                  <% if quebra != "" %>
+		                    <tr height="50">
+		                      <td colspan="3">
+		                      </td>
+		                    </tr>
+		                  <% end %>
+
+		                  <tr>
+		                  	<% quebra = soli %>
+		                    <td colspan="4" width="1050" style="font-size:12px;"><b>Solicitante:</b> <%= a.empresa_nome %></td>
+		                  </tr>
+		                  <tr>
+		                    <td colspan="3" style="font-size:10px;"><b>Propietario:</b> <%= a.solicitante %></td>
+									    	<td colspan="3" style="font-size:11px;" align="center">
+									    		<b><%= t('DATE') %> de Entrada:</b><%= a.data.to_date.strftime("%d/%m/%Y") %>
+									    	</td>
+		                  </tr>
+
+											<tr>
+												<td width="1500" colspan='6' align="center">
+													<div class="destaque">
+															<h2>Resultado de Análisis de Suelo - Extractor Resina</h2>
+													</div>
+												</td>
+											</tr>
+						    			<tr class="header">
+						    				<td class="header" align="center" width="60"><b>Nº Control </b></td>
+						    				<td class="header" align="center" width="200"><b>Identificación de la muestra </b></td>
+						    				<td class="header" align="center" width="80"><b>
+						    					P <br>
+						    					mg dm³
+						    				</b></td>
+						    				<td class="header" align="center" width="80"><b>
+						    					K<br>
+						    					Cmol<small style="position:absolute; margin-top: 3px ">c</small>&nbsp&nbsp dm³</b></td>
+						    				<td class="header" align="center" width="80"><b>Ca<br>
+						    					Cmol<small style="position:absolute; margin-top: 3px ">c</small>&nbsp&nbsp dm³</b></td>
+						    				<td class="header" align="center" width="80"><b>Mg<br>
+						    					Cmol<small style="position:absolute; margin-top: 3px ">c</small>&nbsp&nbsp dm³</b></td>
+						    			</tr>
+
+		              <% end %>
+			    			<tr class="header">
+			    				<td class="header" align="center"><%= a.amostra %></td>
+			    				<td class="header" align="center">
+			    					<%= 'LT: ' + a.lote.to_s unless a.lote.to_s.blank? %>
+			    	    		<%= ' PT: ' + a.detalhe_amostra.to_s unless a.detalhe_amostra.to_s.blank? %>
+			    	    		<%=  ' PROF: ' + a.profundidade.to_s unless a.profundidade.to_s.blank?  %>
+			    				</td>
+			    				<td class="header" align="center">
+				    				<% germ_rp = EntradaResultEnsaio.find_by_metodo_id( 195, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if germ_rp != nil %>
+				    					<%= number_to_currency(germ_rp.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+			    				<td class="header" align="center" width="80">
+				    				<% vig = EntradaResultEnsaio.find_by_metodo_id( 196, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if vig != nil %>
+				    					<%= number_to_currency(vig.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+			    				<td class="header" align="center">
+				    				<% pg = EntradaResultEnsaio.find_by_metodo_id( 197, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if pg != nil %>
+				    					<%= number_to_currency(pg.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+			    				<td class="header" align="center">
+				    				<% pv = EntradaResultEnsaio.find_by_metodo_id( 198, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id,se_ger_poder_germi') %>
+				    				<% if pv != nil %>
+				    					<%= number_to_currency(pv.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+				    				<% else %>
+				    					NS
+				    				<% end %>
+			    				</td>
+			    			</tr>
+
+				    		<% end %>
+
+			    		</table>
+					</td>
+				</tr>
+			</table>
+
+	    		</div>
+					<table>
+						<tr>
+							<td></td>
+						</tr>
+		    		<tr>
+		    			<td style="font-size: 14px font:Tahoma;">
+		    				<p style="font-family:Tahoma;">Metodologia: Análise Química para Avaliação da Fertilidade de Solos Tropicais, 2001.</p>
+		    				<p style="font-family:Tahoma;">El análisis se restringe a la muestra  recibida en el laboratorio - El laboratorio no se responsabiliza por la colecta/muestreo del material.</p>
+		    			</td>
+		    		</tr>
+		    		<tr>
+		    			<td width="1200"><hr></td>
+		    		</tr>
+					</table>
+
+					<table>
+    			<tr>
+	    			
+	    			<td width="1200" align="right">
+	    				<div>
+		    				<table>
+		    					<td style="font-size: 14px font-family:Tahoma;">
+		    						Ciudad del Este, <%= @revisao_result.data.strftime("%d") %>/<%= @revisao_result.data.strftime("%m") %>/<%= @revisao_result.data.strftime("%Y") %>
+
+		    					</td>
+		    				</table>
+		    			</div>
+	    			</td>
+    			</tr>
+			    <tr>
+			    	<td heigth="150">
+			    	</td>
+			    </tr>
+
+    			<tr>
+	    			<td width="300"></td>
+	    			<td width="600"  align="right">
+	    				<div>
+		    				<table>
+		    					<td  align="center">
+		    					 <p><%= wicked_pdf_image_tag('firma_alex.png', :width => 50, :height => 50) %></p>
+		    					 <p valign="top">---------------------------------------</p>
+		    					 <p>Alexson Bobato</p>
+		    					 <p>Gerente Comercial</p>
+		    					</td>
+		    				</table>
+		    			</div>
+	    			</td>
+    			</tr>
+			    <tr>
+			    	<td heigth="120"></td>
+			    </tr>
+
+
+    		</table>
+	    	</td>
+    	</td>
+    </tr>
+	</table>
+</body>
+
+

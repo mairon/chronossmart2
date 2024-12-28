@@ -1,0 +1,66 @@
+<%= form_for(compras_empaque) do |f| %>
+  <% if compras_empaque.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(compras_empaque.errors.count, "error") %> prohibited this compras_empaque from being saved:</h2>
+
+      <ul>
+      <% compras_empaque.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= f.hidden_field :compra_id %>
+  <%= f.hidden_field :quantidade, value: 1 %>
+  <%= f.hidden_field :preco_gs %>
+  <div class="group">
+    <table>
+      <tr>
+          <td>
+            <input type="text" id="referencia" size="20" autofocus>
+
+          <%= f.collection_select :produtos_grade_id, @compras_produtos,:produtos_grade_id, :dt_grade %>
+          <%= image_tag("load.gif",
+                :align => "absmiddle",
+                :border => 0,
+                :id => "spinner",
+                :width => 21,
+                :height => 21,
+                :style =>"display: none;" ) %>
+
+        </td>
+          <td align="right">Barra :</td>
+          <td><%= f.text_field :barra %></td>
+          <%= field_gs 'Custo G$:',f,:custo_gs, :readonly => "readonly" %>
+          <%= field_gs 'Precio G$:',f,:preco_alterado_gs %>
+          <td>
+
+          <%= f.submit :value => t('SAVE'), :disable_with => "Aguarde...", :class => "button" %>
+          </td>
+      </tr>
+    </table>
+  </div>
+    </div>
+<% end %>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+      $("#referencia").change(function(){
+        var data=$('#referencia').val();
+        $.ajax({
+          type: "GET",
+           url: "/dynamic_compra_empaque_produto?fabricante=" + data +"&id=<%= @compra.id %>",
+          beforeSend: function()
+          {
+              $('#spinner').show();
+          },
+
+          success: function(response)
+          {
+            $('#spinner').hide();
+          }
+
+        });
+      });
+  });
+</script>

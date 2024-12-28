@@ -1,0 +1,128 @@
+<table>
+<% empresa = Empresa.last(:select => "taxa_interes") %>
+<% interes_gs = 0 %>
+<% interes_us = 0 %>
+<% sub_divida = 0 %>
+<% sub_cobro  = 0 %>
+<% sub_int    = 0 %>
+<% sub_v_ajus = 0 %>
+<% quebra = "" %>
+<% @clientes.each do |c| %>
+
+  <% if quebra != c.persona_nome  %>
+    <% if quebra != "" %>
+      <tr class="head">
+        <td colspan="5">Sub Total</td>
+        <td width="60" align="right"><%= format_int(sub_divida) %></td>
+        <td width="60" align="right"><%= format_int(sub_cobro) %></td>        
+        <td width="60" align="right"><%= format_int(sub_divida.to_f - sub_cobro.to_f) %></td>
+        <td></td>
+        <td width="60" align="right"><%= format_int(sub_int) %></td>
+        <td width="60" align="right"><%= format_int(sub_v_ajus) %></td>
+      </tr>
+      <% interes_gs = 0 %>
+      <% sub_divida = 0 %>
+      <% sub_cobro  = 0 %>
+      <% sub_int    = 0 %>
+      <% sub_v_ajus = 0 %>
+
+    <% end %>
+    <tr>
+      <td class="head" colspan="10"><%= c.persona_id.to_s.rjust(6,'0') %> - <%= quebra = c.persona_nome %>  - Ruc/CI <%= c.ruc %> - Tel.: <%= c.telefone %> - Clasf.: <%= c.classificacao %>  | Ciudad: <%= c.cidade_nome %> | Direc. <%= c.direcao %> |  - Obs.: <%= c.observacao %>
+    </tr>
+  <% end %>
+
+  <tr class = "<%= cycle( "cor1", "cor2" )%>">
+    <td align="center" width="50"><%= c.data.strftime("%d/%m/%y") %></td>
+    <td align="center" width="50"><%= c.vencimento.strftime("%d/%m/%y") %></td>
+    <td width="100"><%= c.documento_numero_01 %>-<%= c.documento_numero_02 %>-<%= c.documento_numero %></td>
+    <td align="center" width="30"><%= c.cota %></td>
+    <td width="430"><%= raw c.descricao.to_s.gsub(/\n/, '<br/>') %></td>
+    <% if params[:moeda] == '1' %>
+      <td width="60" align="right"><%= format_int(c.divida_guarani) %></td>
+      <td width="60" align="right"><%= format_int(c.cobro_guarani) %></td>
+      <td width="60" align="right"><%= format_int(c.divida_guarani.to_f - c.cobro_guarani.to_f) %></td>
+      <% sub_divida += c.divida_guarani.to_f %>
+      <% sub_cobro  += c.cobro_guarani.to_f %>
+      <% sub_int    += interes_gs.to_f %>
+      <% sub_v_ajus += (c.divida_guarani.to_f - c.cobro_guarani.to_f) + interes_gs.to_f %>
+
+    <% elsif params[:moeda] == '0' %>
+      <td width="60" align="right"><%= format_decimal(c.divida_dolar) %></td>
+      <td width="60" align="right"><%= format_decimal(c.cobro_dolar) %></td>
+      <td width="60" align="right"><%= format_decimal(c.divida_dolar.to_f - c.cobro_dolar.to_f) %></td>
+      <% sub_divida += c.divida_dolar.to_f %>
+      <% sub_cobro  += c.cobro_dolar.to_f %>
+      <% sub_int    += interes_us.to_f %>
+      <% sub_v_ajus += (c.divida_dolar.to_f - c.cobro_dolar.to_f) + interes_us.to_f %>
+
+    <% end %>
+    <%  dias = Date.today - c.vencimento.to_date if c.liquidacao == 0  %>
+    <td align="center" width="20">
+      <% if dias.to_i > 0 %>
+        <b class="gs"><%= dias.to_i %></b>
+      <% else %>
+        <b class="us"><%= dias.to_i %></b>
+      <% end %>
+    </td>
+
+    <td width="60" align="right">      
+      <% if params[:moeda] == '1' %>
+        <%  if dias.to_i >= 0  %>
+          <% if  c.divida_guarani.to_f - c.cobro_guarani.to_f > 0 %>           
+              <%  interes_gs = ( ( dias.to_i * empresa.taxa_interes.to_f ) * (c.divida_guarani.to_f - c.cobro_guarani.to_f) ) / 100  %>
+            <% else %>
+              <%  interes_gs = 0  %>    
+            <% end %>
+        <% else %>
+           <%  interes_gs = 0  %>    
+        <% end %>
+
+        <%= format_int(interes_gs ) %>
+      <% elsif params[:moeda] == '0' %>
+
+      <%  if dias.to_i >= 0  %>
+          <% if  c.divida_dolar.to_f - c.cobro_dolar.to_f > 0 %>           
+              <%  interes_us = ( ( dias.to_i * empresa.taxa_interes.to_f ) * (c.divida_dolar.to_f - c.cobro_dolar.to_f) ) / 100  %>
+            <% else %>
+              <%  interes_us = 0  %>    
+            <% end %>
+        <% else %>
+           <%  interes_us = 0  %>    
+        <% end %>
+
+        <%= format_decimal(interes_us ) %>      
+      <% end %>
+    </td>
+    <% if params[:moeda] == '1' %>
+      <td width="60" align="right"><%= format_int( (c.divida_guarani.to_f - c.cobro_guarani.to_f) + interes_gs.to_f ) %></td>
+    <% else %>
+      <td width="60" align="right"><%= format_decimal( (c.divida_dolar.to_f - c.cobro_dolar.to_f) + interes_us.to_f ) %></td>
+    <% end %>
+
+  </tr>
+<% end %>
+  <% if params[:moeda] == '1' %>
+    <tr class="head">
+      <td colspan="5">Sub Total</td>
+      <td width="60" align="right"><%= format_int(sub_divida) %></td>
+      <td width="60" align="right"><%= format_int(sub_cobro) %></td>    
+      <td width="60" align="right"><%= format_int(sub_divida.to_f - sub_cobro.to_f) %></td>
+      <td></td>
+      <td width="60" align="right"><%= format_int(sub_int) %></td>
+      <td width="60" align="right"><%= format_int(sub_v_ajus) %></td>
+    </tr>
+  <% else %>
+
+    <tr class="head">
+      <td colspan="5">Sub Total</td>
+      <td width="60" align="right"><%= format_decimal(sub_divida) %></td>
+      <td width="60" align="right"><%= format_decimal(sub_cobro) %></td>    
+      <td width="60" align="right"><%= format_decimal(sub_divida.to_f - sub_cobro.to_f) %></td>
+      <td></td>
+      <td width="60" align="right"><%= format_decimal(sub_int) %></td>
+      <td width="60" align="right"><%= format_decimal(sub_v_ajus) %></td>
+    </tr>
+  <% end %>
+
+</table>

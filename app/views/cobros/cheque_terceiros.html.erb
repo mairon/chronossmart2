@@ -1,0 +1,54 @@
+<div class="group">
+  <table>
+     <tr>
+        <td width="50" align="center">Cod.</td>
+        <td width="60" align="center"><%= t('DATE') %></td>
+        <td width="250" align="center">Resp.</td>
+        <td width="60" align="center">Dif.</td>
+        <td width="200" align="center">Titular</td>
+        <td width="200" align="center">Banco</td>
+        <td width="250" align="center"><%= t('ACCOUNT') %></td>
+        <td width="100" align="center">N. <%= t('CHECKS') %></td>
+        <td width="70" align="center">Valores</td>
+     </tr>
+  </table>
+  <div class="rolagem" id="div">
+     <table>
+
+        <% @diferido.each do |diferido| %>
+            <tr class = "<%= cycle("cor1", "cor2")%>"
+             onMouseOver="javascript:this.style.backgroundColor='#949494'"
+             onMouseOut="javascript:this.style.backgroundColor=''"
+             onclick="Fecha('<%= diferido.cheque %>',
+                '<%= diferido.titular %>',
+                '<%= format_decimal( diferido.entrada_dolar ) %>',
+                '<%= format_int( diferido.entrada_guarani ) %>' )">
+              <td width="50" align="center"><%= diferido.id %></td>
+              <td width="60" align="center"><%= diferido.data.strftime("%d/%m/%y") %></td>
+              <td width="250" align="left"><%= diferido.persona_nome %></td>
+              <td width="60" align="center"><%= diferido.diferido.strftime("%d/%m/%y") %></td>
+              <td width="200" align="left"><%= diferido.titular %></td>
+              <td width="200" align="left"><%= diferido.banco %></td>
+              <td width="250" align="left"><%= diferido.conta_nome %></td>
+              <td width="100" align="center"><%= diferido.cheque %></td>
+              <% if params[:moeda] == "0" %>
+                <td width="70" align="right"><%= format_decimal( diferido.entrada_dolar ) %></td>
+              <% else %>
+                <td width="70" align="right"><%= format_int( diferido.entrada_guarani ) %></td>
+              <% end %>
+           </tr>
+        <% end %>
+
+     </table>
+  </div>
+</div>
+    <script language="javascript">
+      function Fecha(cheque,titular,entrada_dolar,entrada_guarani){
+        window.opener.document.getElementById('cobros_financa_cheque').value         = cheque;
+        window.opener.document.getElementById('cobros_financa_titular').value        = titular;
+        window.opener.document.getElementById('cobros_financa_valor_dolar').value    = entrada_dolar;
+        window.opener.document.getElementById('cobros_financa_valor_guarani').value  = entrada_guarani;
+        window.opener.document.getElementById('cobros_financa_valor_real').value     = 0;
+        self.close();
+      }
+    </script>

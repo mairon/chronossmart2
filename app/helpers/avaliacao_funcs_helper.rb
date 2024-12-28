@@ -1,0 +1,2 @@
+module AvaliacaoFuncsHelper
+end

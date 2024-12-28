@@ -1,0 +1,176 @@
+<h1 id="header">Compra Importación - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+
+  <%= form_for(@compra) do |f| %>
+    <% if @compra.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@compra.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+        <ul>
+          <% @compra.errors.full_messages.each do |msg| %>
+          <li>
+            <%= msg %>
+          </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <% if params[:action] == 'new' %>
+      <%= f.hidden_field :tipo_compra, value: 2 %>
+      <%= f.hidden_field :fiscal, value: '0' %>
+      <%= f.hidden_field :tipo, value: 1 %>
+      <%= f.hidden_field :documento_numero_01, value: '000' %>
+      <%= f.hidden_field :documento_numero_02, value: '000' %>
+      <%= f.hidden_field :documento_timbrado, value: '00000000' %>
+    <% else %>  
+      <%= hidden_field_tag :moeda, @compra.moeda %>   
+    <% end %>
+
+    <table>
+      <tr>
+          <td colspan="10">
+            <label><%= t('DATE') %></label>
+            <%= f.date_select :data %>
+          </td>
+        </tr> 
+        <tr>
+          <td>
+            <label>USD x PYG</label>
+            <%= f.text_field :cotacao, size: 10, class: "money_gs", dir: "rtl", :required => true %>
+          </td>
+
+          <td>
+            <label>PYG x BRL</label>
+            <%= f.text_field :cotacao_real, size: 10, class: "money_gs", dir: "rtl", :required => true %>
+          </td>
+
+          <td>
+            <label>BRL x USD</label>
+            <%= f.text_field :cotacao_rs_us, size: 10, dir: "rtl", class: "money_us", :required => true %>
+          </td>          
+
+          <td>
+            <label>EUR x PYG</label>
+            <%= f.text_field :cotacao_eu_gs, size: 10, class: "money_us", dir: "rtl", :required => true %>
+          </td>
+          <td>
+            <label>EUR x USD</label>
+            <%= f.text_field :cotacao_eu_us, size: 10, dir: "rtl", class: "money_us", :required => true %>
+          </td>
+
+        </tr>
+        <tr>
+          <td colspan="8">
+            <label><%= t('COIN') %></label>
+            <%= f.radio_button  :moeda, 1, Checked: "True" %> Gs.
+            <%= f.radio_button :moeda, 0 %> Dolar
+            <%= f.radio_button :moeda, 2 %> Real
+            <%= f.radio_button :moeda, 4 %> Euro
+          </td>
+        </tr>
+        <tr>
+          <td colspan="8">
+            <label>Proveedor</label>
+            <%= f.text_field :persona_nome, size: 70, required: true, class: 'autocomplete' %>
+            <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+            <%= f.hidden_field :persona_id %>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="8">
+            <label>Numero - INVOICE</label>
+              <%= f.text_field :documento_numero, size: 25, maxlength: 60, required: true, placeholder: '0000001' %>              
+          </td>
+        </tr>
+      </table>
+      <table>
+        <tr>
+          <%= field_us_label 'Imponible(FOB) €',f,:total_euro, onchange: "EuToUsGs('compra_cotacao_eu_us','compra_cotacao_eu_gs', 'compra_total_euro', 'compra_total_dolar','compra_total_guarani')" %>
+          <%= field_us_label 'Imponible(FOB) US$',f,:total_dolar, onchange: "UsToEsGs('compra_cotacao_eu_us','compra_cotacao', 'compra_total_euro', 'compra_total_dolar','compra_total_guarani')" %>
+          <%= field_us_label 'Imponible(FOB) Gs.',f,:total_guarani, onchange: "GsToEsUs('compra_cotacao_eu_gs','compra_cotacao', 'compra_total_euro', 'compra_total_dolar','compra_total_guarani')" %>
+          <%= field_us_label 'Imponible(FOB) R$',f,:total_real, onchange: "RsToUsGs('compra_cotacao_rs_us','compra_cotacao_real', 'compra_total_real', 'compra_total_dolar','compra_total_guarani')" %>
+        </tr>
+
+        <tr>
+          <%= field_us_label 'Flete €',f,:frete_euro, onchange: "EuToUsGs('compra_cotacao_eu_us','compra_cotacao_eu_gs', 'compra_frete_euro', 'compra_frete_dolar','compra_frete_guarani')" %>
+          <%= field_us_label 'Flete US$',f,:frete_dolar, onchange: "UsToEsGs('compra_cotacao_eu_us','compra_cotacao', 'compra_frete_euro', 'compra_frete_dolar','compra_frete_guarani')" %>
+          <%= field_us_label 'Flete Gs.',f,:frete_guarani, onchange: "GsToEsUs('compra_cotacao_eu_gs','compra_cotacao', 'compra_frete_euro', 'compra_frete_dolar','compra_frete_guarani')" %>
+          <%= field_us_label 'Flete R$',f,:frete_real, onchange: "RsToUsGs('compra_cotacao_rs_us','compra_cotacao_real', 'compra_frete_real', 'compra_frete_dolar','compra_frete_guarani')" %>
+        </tr>
+
+        <tr>
+          <%= field_us_label 'Seguro €',f,:seguro_euro, onchange: "EuToUsGs('compra_cotacao_eu_us','compra_cotacao_eu_gs', 'compra_seguro_euro', 'compra_seguro_dolar','compra_seguro_guarani')" %>
+          <%= field_us_label 'Seguro US$',f,:seguro_dolar, onchange: "UsToEsGs('compra_cotacao_eu_us','compra_cotacao', 'compra_seguro_euro', 'compra_seguro_dolar','compra_seguro_guarani')" %>
+          <%= field_us_label 'Seguro Gs.',f,:seguro_guarani, onchange: "GsToEsUs('compra_cotacao_eu_gs','compra_cotacao', 'compra_seguro_euro', 'compra_seguro_dolar','compra_seguro_guarani')" %>
+          <%= field_us_label 'Seguro R$',f,:seguro_real, onchange: "RsToUsGs('compra_cotacao_rs_us','compra_cotacao_real', 'compra_seguro_real', 'compra_seguro_dolar','compra_seguro_guarani')" %>
+        </tr>
+
+        <tr>
+          <%= field_us_label 'Despacho €',f,:despacho_euro, onchange: "EuToUsGs('compra_cotacao_eu_us','compra_cotacao_eu_gs', 'compra_despacho_euro', 'compra_despacho_dolar','compra_despacho_guarani')" %>
+          <%= field_us_label 'Despacho US$',f,:despacho_dolar, onchange: "UsToEsGs('compra_cotacao_eu_us','compra_cotacao', 'compra_despacho_euro', 'compra_despacho_dolar','compra_despacho_guarani')" %>
+          <%= field_us_label 'Despacho Gs.',f,:despacho_guarani, onchange: "GsToEsUs('compra_cotacao_eu_gs','compra_cotacao', 'compra_despacho_euro', 'compra_despacho_dolar','compra_despacho_guarani')" %>
+          <%= field_us_label 'Despacho R$',f,:despacho_real, onchange: "RsToUsGs('compra_cotacao_rs_us','compra_cotacao_real', 'compra_despacho_real', 'compra_despacho_dolar','compra_despacho_guarani')" %>
+        </tr>
+
+
+        <tr>
+          <%= field_us_label 'Otros €',f,:outros_euro, onchange: "EuToUsGs('compra_cotacao_eu_us','compra_cotacao_eu_gs', 'compra_outros_euro', 'compra_outros_dolar','compra_outros_guarani')" %>
+          <%= field_us_label 'Otros US$',f,:outros_dolar, onchange: "UsToEsGs('compra_cotacao_eu_us','compra_cotacao', 'compra_outros_euro', 'compra_outros_dolar','compra_outros_guarani')" %>
+          <%= field_us_label 'Otros Gs.',f,:outros_guarani, onchange: "GsToEsUs('compra_cotacao_eu_gs','compra_cotacao', 'compra_outros_euro', 'compra_outros_dolar','compra_outros_guarani','compra_outros_real', 'compra_cotacao_real')" %>
+          <%= field_us_label 'Otros R$',f,:outros_real, onchange: "RsToUsGs('compra_cotacao_rs_us','compra_cotacao_real', 'compra_outros_real', 'compra_outros_dolar','compra_outros_guarani')" %>
+        </tr>
+
+      </table>
+      <table width="100%">
+        <tr>
+          <td>
+            <br>
+            <%= f.text_area :descricao, :rows => 4, placeholder: 'Concepto:', class: 'panel-field' %>
+          </td>
+        </tr>
+      </table>
+    <div class="footer-buttons">
+      <%= f.submit "Seguir", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"   %>
+      <%= link_to t('BACK'), compras_url, class: "btn btn-back" %>
+    </div>
+  </div>
+<% end %>
+
+
+<script type="text/javascript">
+  $(function() {
+    $( "#compra_persona_nome" ).autocomplete({
+        source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+        $.ajax({
+          url: "/personas/busca?per=PROVEEDOR",
+          dataType: "json",
+
+          data: {
+            tipo: 'DESCRIPCION',
+            busca: request.term
+          },
+          beforeSend: function(){
+          $("#spinner").addClass("sppiner_show");
+          },
+
+          success: function( data ) {
+            $("#sppiner").removeClass("sppiner_show");
+            response( data );
+          },
+        });
+      },
+      minLength: 2,
+      change: function( event, ui ) {
+        $("#compra_persona_id").val("");
+        $('#compra_persona_id').val(ui.item.id);
+        return false;
+      }
+    });
+    $( "#compra_persona_nome" ).change(function(){
+      if ($( "#compra_persona_id" ).val() == ''){
+      }
+    });
+  });
+
+</script>

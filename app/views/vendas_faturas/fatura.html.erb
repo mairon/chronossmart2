@@ -1,0 +1,5 @@
+<% if @venda.tipo_venda == 0 %>
+	<%= render :partial => "modelo_fatura01" %>
+<% else %>
+	<%= render :partial => "modelo_fatura02" %>
+<% end %>

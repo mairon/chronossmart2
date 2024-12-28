@@ -1,0 +1,37 @@
+
+<table class="head_grid">
+  <tr>
+    <td width="300">Persona</td>
+    <td width="100">Status</td>
+  </tr>
+</table>
+<% ativ  = 0 %>
+<% intiv = 0 %>
+<div class="rolagem" dir="div">
+  <table>
+    <% grupo_personas_dts.each do |gp| %>
+      <tr class = "<%= cycle( "cor1", "cor2" )%>">
+        <td width="300"><%= gp.persona.nome %></td>
+        <td width="100" title="<%= gp.motivo %>">
+          <% if gp.status == 1 %>
+            <font color="green">Activo</font>
+            <% ativ  += 1 %>
+          <% else %>
+            <font color="red">Inactivo</font>
+            <% intiv += 1 %>
+          <% end %>
+        </td>
+        <td><%= link_to 'Editar', edit_grupo_personas_dt_path(gp) %></td>
+        <td><%= link_to t('DELETE'), gp, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+<table class="head_grid">
+  <tr>
+    <td width="400">
+      <font color="green">Activos: <%= ativ %></font>
+      <font color="red">Inactivos: <%= intiv %></font>
+    </td>
+  </tr>
+</table>

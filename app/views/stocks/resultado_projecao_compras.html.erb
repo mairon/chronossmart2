@@ -1,0 +1,44 @@
+<table>
+  <% tot_ant     = 0 %>
+  <% tot_et      = 0 %>
+  <% tot_et_nc   = 0 %>
+  <% tot_sd      = 0 %>
+  <% tot_sd_nc   = 0 %>
+  <% tot_saldo_p = 0 %>
+  <% tot_saldo_a = 0 %>
+
+  <% @stocks.each do |s| %>
+  <tr class = "<%= cycle("cor1", "cor2") %>">
+    <td width="75" align="center" ><%= s.clase_id.to_s.rjust(2,"0") << '.' << s.grupo_id.to_s.rjust(4,"0") << '.' << s.id.to_s.rjust(6,"0") %></td>
+    <td width="230" align="left" ><%= truncate(s.nome, :length => 38 ) %>(<%= s.embalagem%>)</td>
+    <td width="60" align="right"><%= number_to_currency(s.anterior.to_f, :format=>' %n ', :separeitor => ",") %></td>  
+    <td width="60" align="right"><%= number_to_currency(s.entrada.to_f, :format=>' %n ', :separeitor => ",") %></td>  
+    <td width="60" align="right"><%= number_to_currency(s.entrada_nc_prov.to_f, :format=>' %n ', :separeitor => ",") %></td>  
+    <td width="60" align="right"><%= number_to_currency(s.saida.to_f, :format=>' %n ', :separeitor => ",") %></td>  
+    <td width="60" align="right"><%= number_to_currency(s.saida_nc_cli.to_f, :format=>' %n ', :separeitor => ",") %></td>  
+    <td width="60" align="right"><%= number_to_currency(s.saldo_periodo.to_f, :format=>' %n ', :separeitor => ",") %></td>  
+    <td width="60" align="right"><%= number_to_currency(s.saldo_stock.to_f, :format=>' %n ', :separeitor => ",") %></td>  
+  </tr>
+
+  <% tot_ant     += s.anterior.to_f %>
+  <% tot_et      += s.entrada.to_f %>
+  <% tot_et_nc   += s.entrada_nc_prov.to_f %>
+  <% tot_sd      += s.saida.to_f %>
+  <% tot_sd_nc   += s.saida_nc_cli.to_f %>
+  <% tot_saldo_p += s.saldo_periodo.to_f %>
+  <% tot_saldo_a += s.saldo_stock.to_f %>
+
+  <% end %>
+
+  <tr class="head" height="30">
+    <td colspan="2"></td>
+    <td align="right"><%= number_to_currency(tot_ant.to_f, :format=>' %n ', :separeitor => ",") %></td>  
+    <td align="right"><%= number_to_currency(tot_et.to_f, :format=>' %n ', :separeitor => ",") %></td>  
+    <td align="right"><%= number_to_currency(tot_et_nc.to_f, :format=>' %n ', :separeitor => ",") %></td>  
+    <td align="right"><%= number_to_currency(tot_sd.to_f, :format=>' %n ', :separeitor => ",") %></td>  
+    <td align="right"><%= number_to_currency(tot_sd_nc.to_f, :format=>' %n ', :separeitor => ",") %></td>  
+    <td align="right"><%= number_to_currency(tot_saldo_p.to_f, :format=>' %n ', :separeitor => ",") %></td>  
+    <td align="right"><%= number_to_currency(tot_saldo_a.to_f, :format=>' %n ', :separeitor => ",") %></td>  
+  </tr>
+
+</table>

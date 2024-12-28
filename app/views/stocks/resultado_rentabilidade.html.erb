@@ -1,0 +1,35 @@
+<% qtd = 0 %>
+<% cmv = 0 %>
+<% fat = 0 %>
+<% dif = 0 %>
+<table>
+	<% @cmvs.each do |v| %>
+		<tr class = "<%= cycle("cor1", "cor2") %>">
+			<td align="center" width="40"><%= v.produto_id.to_s.rjust(6,'0') %></td>
+			<td width="150"><%= truncate(v.referencia) %></td>
+			<td width="250"><%= truncate(v.produto_nome) %></td>
+			<td width="250"><%= truncate(v.persona_nome) %></td>
+			<td align="right" width="40"><%= v.quantidade.to_i %></td>
+			<% qtd += v.quantidade.to_f %>
+				<td align="right" width="70"><%= format_int(v.custo_medio_gs.to_f) %></td>
+				<td align="right" width="70"><%= format_int(v.custo_medio_gs.to_f * v.quantidade.to_f) %></td>
+				<td align="right" width="70"><%= format_int(v.unitario_guarani.to_f) %></td>
+				<td align="right" width="70"><%= format_int(v.total_guarani) %></td>
+				<td align="right" width="70"><%= format_int( (v.total_guarani.to_f - (v.custo_medio_gs.to_f * v.quantidade.to_f) ) ) %></td>
+				<td align="right" width="40"><%= format_int( ((v.total_guarani.to_f - (v.custo_medio_gs.to_f * v.quantidade.to_f) ) / (v.custo_medio_gs.to_f * v.quantidade.to_f)) * 100  ) %>%</td>
+				<% cmv += (v.custo_medio_gs.to_f * v.quantidade.to_f) %>
+				<% fat += v.total_guarani.to_f %>
+				<% dif += (v.total_guarani.to_f - (v.custo_medio_gs.to_f * v.quantidade.to_f) ) %>
+		</tr>
+	<% end %>
+	<tr class="head">
+		<td colspan="4"></td>
+		<td align="right" width="40"><%= qtd.to_i %></td>
+		<td></td>
+		<td align="right" width="70"><%= format_int(cmv.to_f) %></td>
+		<td></td>
+		<td align="right" width="70"><%= format_int(fat.to_f) %></td>
+		<td align="right" width="70"><%= format_int(dif.to_f) %></td>
+		<td align="right" width="40"><%= format_int( (dif.to_f * 100) / cmv.to_f) %>%</td>
+	</tr>
+</table>

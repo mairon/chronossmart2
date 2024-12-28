@@ -1,0 +1,25 @@
+<h1 id="header">produtos_tamanhos</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_produtos_tamanho_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Produto</td>
+            <td>Tamanho</td>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @produtos_tamanhos.each do |produtos_tamanho| %>
+      <tr>
+                  <td><%= produtos_tamanho.produto_id %></td>
+                  <td><%= produtos_tamanho.tamanho_id %></td>
+                <td><%= link_to 'Editar', edit_produtos_tamanho_path(produtos_tamanho) %></td>
+        <td><%= link_to t('DELETE'), produtos_tamanho, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

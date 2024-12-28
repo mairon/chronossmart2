@@ -1,0 +1,198 @@
+<div class="modal fade" id="modal-output" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel">Saida</h4>
+      </div>
+      <div class="modal-body">
+
+        <%= form_for(Proveedore.new) do |f| %>
+          <%= hidden_field_tag :proc, 'menu' %>
+          <div class="panel-modal-body">
+            <div class="row">
+              <div class="col-md-3">
+                <div class="input-group">
+                  <label>Pagar em </label>
+                  <%= f.text_field :vencimento, onkeyup: "Formatadata(this,event)", required: true, class: 'date-format', size: 15, autocapitalize: "off", autocomplete: "off",  autocorrect: "off" %>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <div class="input-group">
+                  <label>Pago em </label>
+                  <%= f.text_field :data, onkeyup: "Formatadata(this,event)", class: 'date-format', size: 15, autocapitalize: "off", autocomplete: "off",  autocorrect: "off" %>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <label>Plano de Contas </label>
+                <%= f.collection_select :rubro_id, Rubro.select("id, (codigo || ' - ' || descricao) as descricao" ).order('2'),:id, :descricao, {:prompt => 'Selecione'}, {required: true} %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <label>Historico</label>
+                <%= f.text_field :descricao, class: 'panel-field' %>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <label><%= t('ACCOUNT') %></label>
+                <%= f.collection_select :conta_id, Conta.select("id,nome" ).order('2'),:id, :nome, {:prompt => 'Selecione'} %>
+              </div>
+            </div>
+
+            <div class="row">
+              <% if current_unidade.moeda.to_i == 0 %>
+                <div class="col-md-4">
+                  <label><%= t('COIN') %></label>
+                  <%= f.select :moeda, [['Dolar',0],['Guaranies',1],['Real',2]] %>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="rb-dv-gs" hidden>
+                    <%= field_gs_label 'Valor a Pagar Gs.:',f,:divida_guarani%>
+                  </div>
+                  <div class="rb-dv-us">
+                    <%= field_us_label 'Valor a Pagar U$:',f,:divida_dolar%>
+                  </div>
+                  <div class="rb-dv-rs" hidden>
+                    <%= field_us_label 'Valor a Pagar R$:',f,:divida_real%>
+                  </div>
+                </div>
+
+                <div class="col-rb-4">
+                  <div class="rb-rc-gs" hidden>
+                    <%= field_gs_label 'Valor Pago Gs.:',f,:pago_guarani%>
+                  </div>
+                  <div class="rb-rc-us">
+                    <%= field_us_label 'Valor Pago U$:',f,:pago_dolar%>
+                  </div>
+                  <div class="rb-rc-rs" hidden>
+                    <%= field_us_label 'Valor Pago R$:',f,:pago_real%>
+                  </div>
+                </div>
+
+              <% elsif current_unidade.moeda.to_i == 1 %>
+                <div class="col-md-4">
+                  <label><%= t('COIN') %></label>
+                  <%= f.select :moeda, [['Guaranies',1],['Dolar',0],['Real',2]] %>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="rb-dv-gs">
+                    <%= field_gs_label 'Valor a Pagar Gs.:',f,:divida_guarani%>
+                  </div>
+                  <div class="rb-dv-us" hidden>
+                    <%= field_us_label 'Valor a Pagar U$:',f,:divida_dolar%>
+                  </div>
+                  <div class="rb-dv-rs" hidden>
+                    <%= field_us_label 'Valor a Pagar R$:',f,:divida_real%>
+                  </div>
+                </div>
+
+                <div class="col-rb-4">
+                  <div class="rb-rc-gs">
+                    <%= field_gs_label 'Valor Pago Gs.:',f,:pago_guarani%>
+                  </div>
+                  <div class="rb-rc-us" hidden>
+                    <%= field_us_label 'Valor Pago U$:',f,:pago_dolar%>
+                  </div>
+                  <div class="rb-rc-rs" hidden>
+                    <%= field_us_label 'Valor Pago R$:',f,:pago_real%>
+                  </div>
+                </div>
+
+              <% elsif current_unidade.moeda.to_i == 2 %>
+                <div class="col-md-4">
+                  <label><%= t('COIN') %></label>
+                  <%= f.select :moeda, [['Real',2],['Guaranies',1],['Dolar',0]] %>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="rb-dv-gs" hidden>
+                    <%= field_gs_label 'Valor a Pagar Gs.:',f,:divida_guarani%>
+                  </div>
+                  <div class="rb-dv-us" hidden>
+                    <%= field_us_label 'Valor a Pagar U$:',f,:divida_dolar%>
+                  </div>
+                  <div class="rb-dv-rs">
+                    <%= field_us_label 'Valor a Pagar R$:',f,:divida_real%>
+                  </div>
+                </div>
+
+                <div class="col-rb-4">
+                  <div class="rb-rc-gs" hidden>
+                    <%= field_gs_label 'Valor Pago Gs.:',f,:pago_guarani %>
+                  </div>
+                  <div class="rb-rc-us" hidden>
+                    <%= field_us_label 'Valor Pago U$:',f,:pago_dolar%>
+                  </div>
+                  <div class="rb-rc-rs">
+                    <%= field_us_label 'Valor Pago R$:',f,:pago_real%>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <br>
+                <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $('#proveedore_rubro_id').selectize();
+  $('#proveedore_conta_id').selectize();
+
+
+  $('#proveedore_moeda').change(function() {
+    v = $('#proveedore_moeda').val()
+    if( v == '0'){ //dolar
+        $(".rb-dv-us").show();
+        $(".rb-rc-us").show();
+
+        $(".rb-dv-gs").hide();
+        $(".rb-rc-gs").hide();
+
+        $(".rb-dv-rs").hide();
+        $(".rb-rc-rs").hide();
+
+
+      } else if( v == '1'){ //guarani
+        $(".rb-dv-gs").show();
+        $(".rb-rc-gs").show();
+
+        $(".rb-dv-us").hide();
+        $(".rb-rc-us").hide();
+
+        $(".rb-dv-rs").hide();
+        $(".rb-rc-rs").hide();
+
+
+      } else if( v == '2'){ //real
+        $(".rb-dv-rs").show();
+        $(".rb-rc-rs").show();
+
+        $(".rb-dv-gs").hide();
+        $(".rb-rc-gs").hide();
+
+        $(".rb-dv-us").hide();
+        $(".rb-rc-us").hide();
+
+      };
+  });
+</script>

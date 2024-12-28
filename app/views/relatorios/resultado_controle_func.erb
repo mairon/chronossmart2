@@ -1,0 +1,64 @@
+
+<table>
+	<% entrada = 0 %>
+	<% saida   = 0 %>
+	<%@fx_emp.each do |f|%>
+	<tr>
+		<td width="40" align="center"><%= f.id %></td>
+		<% if f.status.to_i == 0 %>
+			<td width="80" align="center"><%= f.data.strftime("%d/%m/%Y") %></td>
+			<td width="80" align="center"></td>
+		<% else %>
+			<td width="80" align="center"></td>
+			<td width="80" align="center"><%= f.data.strftime("%d/%m/%Y") %></td>
+		<% end %>
+		<td width="40" align="center"><%= f.ob_ref %></td>
+		<td width="200" align="left"><%= truncate(f.responsavel_nome, :leght => 15) %></td>
+		<td width="200" align="left"><%= truncate(f.persona_nome, :leght => 15) %></td>
+		<% if f.status.to_i == 0 %>
+			<td width="100" align="center" >Entrada</td>
+			<% entrada += 1 %>
+			
+		<% else %>
+			<td width="100" align="center">Salida</td>
+			<% saida   += 1 %>
+		<% end %>
+		<td width="200" align="left"><%= truncate(f.descricao, :leght => 10) %></td>
+	</tr>
+	<% end %>
+	<tr>
+		<td colspan="8">----------------------------------------------------------------------------------------------------------------------------------</td>
+	</tr>
+
+    <tr>
+    	<td colspan="5">Periodo em Dias : <%= dias = ( (params[:final].to_date - params[:inicio].to_date) + 1 ) %></td>
+				
+   	</tr>
+	<tr>
+		<td colspan="5">Entrada : <%= entrada %></td>
+    </tr>
+    
+    <tr>
+		<td colspan="5">Salida : <%= saida %></td>		
+    </tr>
+
+	<tr>
+		<td colspan="5">Fluxo de Entrada = <%= ( ( entrada.to_f / ( entrada.to_f + saida.to_f ) ) * 100).to_f.round(2) %> % </td>
+	</tr>
+	<tr>		
+		<td colspan="5">Fluxo de Salida  = <%= ( ( saida.to_f / ( entrada.to_f + saida.to_f) ) * 100 ).to_f.round(2) if saida.to_f > 0 %> % </td>		
+	</tr>
+    		
+
+	<tr>
+		<td colspan="5">Media de Entradas Por dia : <%= (entrada.to_f / dias.to_f).to_f.round(2) %> empleados por dia</td>
+    </tr>
+    
+    <tr>
+		<td colspan="5">Media de Salidas Por dia : <%= ( ( saida.to_f / dias.to_f ) ).to_f.round(2)  %> empleados por dia</td>
+    </tr>
+		
+		
+
+
+</table>

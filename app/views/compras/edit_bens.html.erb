@@ -1,0 +1,5 @@
+<% if @compra.fiscal.to_i == 1 %>
+  <%= render :partial => "/compras/eps/form_compra_bens_fiscal" %>
+<% else %>
+  <%= render :partial => "/compras/eps/form_compra_bens" %>
+<% end %>

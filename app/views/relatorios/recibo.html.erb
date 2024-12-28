@@ -1,0 +1,168 @@
+<body onload="window.print()">
+	<tr>
+		<td style="height:13.50cm;width:28cm;" valign="top">
+		<table>
+			
+			<tr>
+				<td style="height:2.35cm" valign="bottom"><span style="margin-left:21.00cm;font-family:Lucida Console, Courier, Monotype;font-size:10px;"><%= @cobro.documento_numero%></span> </td>
+			</tr>
+			
+			<tr>
+				<td valign="top" style="height:1.90cm;width:29cm;">
+			        <table  style="font-family:Lucida Console, Courier, Monotype;font-size:12px;">
+			        	<tr>
+			        		<td width="790" valign="bottom"><span style="margin-left:2.65cm"> <%= @cobro.data.strftime("%d")%> de <%= @cobro.data.strftime("%B")%> de <%= @cobro.data.strftime("%Y")%> </span></td>
+			        		<td width="200" valign="bottom"> <%= @cobro.ruc%></td>
+			        	</tr>
+			        	
+			        	<tr>
+			        		<td width="790" valign="bottom"><span style="margin-left:3.50cm"> <%= @cobro.persona_nome %> </span></td>
+			        		<td width="200" valign="bottom"></td>
+			        	</tr>
+
+			        	<tr>
+			        		<td width="790"><span style="margin-left:2.65cm"> </span></td>
+			        		<td width="200">
+			        		</td>
+			        	</tr>
+
+			        </table>		
+				</td>
+			</tr>
+
+			<tr>
+				<td valign="top" style="height:2cm;width:29cm;">
+			        <table  style="font-family:Lucida Console, Courier, Monotype;font-size:12px;">
+			        	<tr>
+			        		<td width="470" height="5"><span style="margin-left:2.05cm;" ></span></td>
+			        		<td width="470" height="25"><span style="margin-left:2.05cm;" ></span></td>
+
+			        	</tr>
+			        	
+			        	<tr>
+			        		<td rowspan="2" valign="top">
+			        			<span style="margin-left:2.20cm;" > 
+   			        			   <% if @cobro.moeda == 0 %> 
+			        			      <%= number_to_currency( @total_us.to_f,      :format =>' %n ', :separeitor => "," )%>
+			        			   <% else %>
+			        			      <%= number_to_currency( @total_gs.to_f,      :format =>' %n ', :precision =>0 )%>
+			        			   <% end %>			        			
+			        		    </span>
+			        		</td>
+			        		
+			        		<td width="550" height="90" rowspan="2" valign="top">
+			        			<table style="font-family:Lucida Console, Courier, Monotype;font-size:12px;">			        				
+			        				<% @cf.each do |cf|%>
+			        				  <% if cf.cheque != ''%>
+			        				  <tr>
+			        				  	<td width="150" align="center"><%= cf.cheque%></td>
+			        				  	<td width="200" align="center"><%= cf.banco%></td>
+			        				  	<td width="200" align="right">
+      			        			     <% if @cobro.moeda == 0 %> 
+			        			            <%= number_to_currency( cf.valor_dolar.to_f,      :format =>' %n ', :separeitor => "," )%>
+			        			         <% else %>
+			        			            <%= number_to_currency( cf.valor_guarani.to_f,      :format =>' %n ', :precision =>0 )%>
+			        			         <% end %>			        			         			        			
+			        				  	</td>
+			        				  </tr>
+			          				  <% end %>			        				  
+			        				<% end %>
+			        			</table>
+			        			
+			        		</td>
+
+			        	</tr>
+
+			        </table>		
+				</td>
+			</tr>
+
+			<tr>
+				<td valign="top" style="height:2.50cm;width:29cm;">
+			        <table  style="font-family:Lucida Console, Courier, Monotype;font-size:12px;">
+			        	<tr>
+			        		<td width="500" height="150" valign="top">
+			                    <table  style="font-family:Lucida Console, Courier, Monotype;font-size:12px;">
+			                    	<% indice = 0 %>
+			        				<% @cd.each do |cd|%>
+			        				<% if indice % 2 == 0 %>
+			        				       <tr>
+   			        				  	      <td width="150" align="center"><%= indice%><%= cd.documento_numero%></td>
+   			        				  	      <td width="150" align="center"><%= cd.vencimento.strftime("%d/%m/%Y")%></td>
+			        				  	      <td width="200" align="right">
+      			        			           <% if @cobro.moeda == 0 %> 
+			        			                  <%= number_to_currency( cd.cobro_dolar.to_f,      :format =>' %n ', :separeitor => "," )%>
+			        			               <% else %>
+			        			                  <%= number_to_currency( cd.cobro_guarani.to_f,      :format =>' %n ', :precision =>0 )%>
+			        			               <% end %>
+			        			
+			        				  	      </td>
+			        				       </tr>
+			        				   <% end %>
+			        				   
+			        			       <% indice += 1 %>
+
+			        				<% end %>
+
+			        			</table>
+			        		</td>
+			        		<td width="100"></td>
+			        		<td width="500" height="150" valign="top">
+			                    <table  style="font-family:Lucida Console, Courier, Monotype;font-size:12px;">
+			                    	<% indice = 0 %>
+			                    	
+			        				<% @cd.each do |cd|%>
+			        				   <% if indice % 2 == 1 %>			        				
+			        				       <tr>
+   			        				  	      <td width="150" align="center"><%= indice%><%= cd.documento_numero%></td>
+   			        				  	      <td width="150" align="center"><%= cd.vencimento.strftime("%d/%m/%Y")%></td>
+			        				  	      <td width="200" align="right">
+      			        			           <% if @cobro.moeda == 0 %> 
+			        			                  <%= number_to_currency( cd.cobro_dolar.to_f,      :format =>' %n ', :separeitor => "," )%>
+			        			               <% else %>
+			        			                  <%= number_to_currency( cd.cobro_guarani.to_f,      :format =>' %n ', :precision =>0 )%>
+			        			               <% end %>
+			        			
+			        				  	      </td>
+			        				       </tr>
+			        				   <% end %>
+			        				   
+			        			       <% indice += 1 %>
+
+			        				<% end %>
+			        			</table>
+			        		</td>
+
+			        	</tr>
+			        	
+			        </table>		
+				</td>
+			</tr>
+			<tr style="font-family:Lucida Console, Courier, Monotype;font-size:12px;">
+				<td valign="top" >
+					<span style="margin-left:2.35cm;" >
+				       <% if @cobro.moeda == 0 %> 
+			              <%= number_to_currency( @total_us.to_f,      :format =>' %n ', :separeitor => "," )%>
+			           <% else %>
+			              <%= number_to_currency( @total_gs.to_f,      :format =>' %n ', :precision =>0 )%>
+			           <% end %>			        			
+                    </span>
+				</td>
+			</tr>
+
+			<tr style="font-family:Lucida Console, Courier, Monotype;font-size:12px;">
+				<td valign="top">
+					<span style="margin-left:7.05cm;" >
+						<% if @cobro.moeda == 0 %>
+						   <%= @total_us.to_f.por_extenso_em_dolares.upcase %>
+						<% else %>
+						   <%= @total_gs.to_f.por_extenso.upcase %>
+						<% end %>
+                    </span>
+				</td>
+			</tr>
+
+		</table>
+		</td>
+	</tr>
+</table>

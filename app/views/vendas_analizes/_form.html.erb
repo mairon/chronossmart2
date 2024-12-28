@@ -1,0 +1,71 @@
+<%= form_for(@vendas_analize) do |f| %>
+  <% if @vendas_analize.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@vendas_analize.errors.count, "error") %> prohibited this vendas_analize from being saved:</h2>
+
+      <ul>
+      <% @vendas_analize.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> vendas_analizes - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">venda_id :</td>                    
+                      <td><%= f.number_field :venda_id %></td>
+                                      
+                      <td align="right">persona_id :</td>                    
+                      <td><%= f.number_field :persona_id %></td>
+                                      
+                      <td align="right"><%= t('DATE') %> :</td>                    
+                      <td><%= f.date_select :data %></td>
+                                      
+                      <td align="right">valor_us :</td>                    
+                      <td><%= f.text_field :valor_us %></td>
+                                      
+                      <td align="right">analize_id :</td>                    
+                      <td><%= f.number_field :analize_id %></td>
+                                      
+                      <td align="right">solicitude :</td>                    
+                      <td><%= f.number_field :solicitude %></td>
+                                      
+                      <td align="right">status :</td>                    
+                      <td><%= f.number_field :status %></td>
+                                      
+                      <td align="right">porce :</td>                    
+                      <td><%= f.text_field :porce %></td>
+                                      
+                      <td align="right">valor_gs :</td>                    
+                      <td><%= f.text_field :valor_gs %></td>
+                                      
+                      <td align="right">valor_rs :</td>                    
+                      <td><%= f.text_field :valor_rs %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), vendas_analizes_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

@@ -1,0 +1,33 @@
+<h1 id="header">plano_venda_conds</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_plano_venda_cond_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Plano venda</t>
+            <td>Nome</t>
+            <td>Quantidade</t>
+            <td>Valor gs</t>
+            <td>Valor us</t>
+            <td>Obs</t>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @plano_venda_conds.each do |plano_venda_cond| %>
+      <tr>
+                  <td><%= plano_venda_cond.plano_venda_id %></td>
+                  <td><%= plano_venda_cond.nome %></td>
+                  <td><%= plano_venda_cond.quantidade %></td>
+                  <td><%= plano_venda_cond.valor_gs %></td>
+                  <td><%= plano_venda_cond.valor_us %></td>
+                  <td><%= plano_venda_cond.obs %></td>
+                <td><%= link_to 'Editar', edit_plano_venda_cond_path(plano_venda_cond) %></td>
+        <td><%= link_to 'Borrar', plano_venda_cond, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

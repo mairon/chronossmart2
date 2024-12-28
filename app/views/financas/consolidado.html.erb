@@ -1,0 +1,150 @@
+<style>
+  .panel-content td{
+    padding: 10px;
+    border-bottom: 1px solid #efefef !important;
+  }
+</style>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="group">
+        <h1 id="header">Consolidado de Contas</h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%
+
+sql = "SELECT CONTA_ID, MAX(CONTA_NOME) AS CONTA_NOME, SUM(ENTRADA_REAL) AS ENTRADA_REAL, SUM(SAIDA_REAL) AS SAIDA_REAL, SUM(ENTRADA_REAL_ANTERIOR) AS ENTRADA_REAL_ANTERIOR, SUM(SAIDA_REAL_ANTERIOR) AS SAIDA_REAL_ANTERIOR FROM (
+                  SELECT  F.CONTA_ID,
+                          MAX(C.NOME) AS CONTA_NOME,
+                          SUM(F.ENTRADA_REAL) AS ENTRADA_REAL,
+                          SUM(0) AS SAIDA_REAL,
+                          SUM(0) AS ENTRADA_REAL_ANTERIOR,
+                          SUM(0) AS SAIDA_REAL_ANTERIOR
+                  FROM FINANCAS F
+
+                  INNER JOIN CONTAS C
+                  ON C.ID = F.CONTA_ID
+
+                  WHERE C.CONSOLIDADO = TRUE AND date_part('month', F.DATA ) = '#{Time.now.strftime("%m")}'  AND  date_part('year', F.DATA ) = '#{Time.now.strftime("%Y")}'
+                  GROUP BY 1
+
+                  UNION ALL
+
+                  SELECT F.CONTA_ID,
+                         MAX(C.NOME) AS CONTA_NOME,
+                         SUM(0) AS ENTRADA_REAL,
+                         SUM(F.SAIDA_REAL) AS SAIDA_REAL,
+                        SUM(0) AS ENTRADA_REAL_ANTERIOR,
+                        SUM(0) AS SAIDA_REAL_ANTERIOR
+
+                  FROM FINANCAS F
+
+                  INNER JOIN CONTAS C
+                  ON C.ID = F.CONTA_ID
+
+                  WHERE C.CONSOLIDADO = TRUE AND date_part('month', F.DATA ) = '#{Time.now.strftime("%m")}'  AND  date_part('year', F.DATA ) = '#{Time.now.strftime("%Y")}'
+                  GROUP BY 1
+
+
+
+
+                UNION ALL
+
+                SELECT  F.CONTA_ID,
+                          MAX(C.NOME) AS CONTA_NOME,
+                          SUM(0) AS ENTRADA_REAL,
+                          SUM(0) AS SAIDA_REAL,
+                          SUM(F.ENTRADA_REAL) AS ENTRADA_REAL_ANTERIOR,
+                          SUM(0) AS SAIDA_REAL_ANTERIOR
+                  FROM FINANCAS F
+
+                  INNER JOIN CONTAS C
+                  ON C.ID = F.CONTA_ID
+
+                  WHERE C.CONSOLIDADO = TRUE AND F.DATA <  '#{Time.now.strftime("%Y")}-#{Time.now.strftime("%m")}-01'
+                  GROUP BY 1
+
+                  UNION ALL
+
+                  SELECT F.CONTA_ID,
+                         MAX(C.NOME) AS CONTA_NOME,
+                         SUM(0) AS ENTRADA_REAL,
+                         SUM(0) AS SAIDA_REAL,
+                        SUM(0) AS ENTRADA_REAL_ANTERIOR,
+                        SUM(F.SAIDA_REAL) AS SAIDA_REAL_ANTERIOR
+
+                  FROM FINANCAS F
+
+                  INNER JOIN CONTAS C
+                  ON C.ID = F.CONTA_ID
+
+                  WHERE C.CONSOLIDADO = TRUE AND  F.DATA < '#{Time.now.strftime("%Y")}-#{Time.now.strftime("%m")}-01'
+
+                  GROUP BY 1
+
+
+
+                  ) AS FOO
+                GROUP BY 1
+                ORDER BY 2"
+contas =   Financa.find_by_sql(sql)
+%>
+
+
+
+
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <header class="panel-heading">
+          </header>
+          <header>
+
+            <nav class="navbar navbar-default">
+              <a href="javascript:void(0)" class="btn btn-blue" onClick="window.print();"  style="margin: 10px; float: right"><%= image_tag('printer.png') %> Imprimir</a>
+            </nav>
+          </header>
+
+          <div class="panel-content">
+            <table class="head_grid">
+              <tr>
+                <td width="250">Conta</td>
+                <td width="100" align="right">Anterior</td>
+                <td width="100" align="right">Entrada</td>
+                <td width="100" align="right">Saida</td>
+                <td width="100" align="right">Saldo</td>
+              </tr>
+            </table>
+            <table>
+              <% @financas.each do |f| %>
+                <tr class="<%= cycle("cor1", "cor2") %>">
+                  <td width="250"><%= f.conta_nome %></td>
+                <td width="100" align="right"><%= format_decimal(f.entrada_real_anterior.to_f - f.saida_real_anterior.to_f) %></td>
+                  <td width="100" align="right"><%= format_decimal(f.entrada_real) %></td>
+                  <td width="100" align="right"><%= format_decimal(f.saida_real) %></td>
+                  <td width="100" align="right"  style="font-family: 'prox-bold'; color: #222;"><%= format_decimal( ((f.entrada_real_anterior.to_f - f.saida_real_anterior.to_f) + f.entrada_real.to_f) - f.saida_real.to_f ) %></td>
+                </tr>
+              <% end %>
+              <tr>
+                <td><hr></td>
+              </tr>
+
+              <% contas.each do |c| %>
+                <tr class="<%= cycle("cor1", "cor2") %>">
+                  <td width="250"><%= c.conta_nome %></td>
+                <td width="100" align="right"><%= format_decimal(c.entrada_real_anterior.to_f - c.saida_real_anterior.to_f) %></td>
+                  <td width="100" align="right"><%= format_decimal(c.entrada_real) %></td>
+                  <td width="100" align="right"><%= format_decimal(c.saida_real) %></td>
+                  <td width="100" align="right"  style="font-family: 'prox-bold'; color: #222;"><%= format_decimal( ((c.entrada_real_anterior.to_f - c.saida_real_anterior.to_f) + c.entrada_real.to_f) - c.saida_real.to_f ) %></td>
+                </tr>
+              <% end %>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>

@@ -1,0 +1,109 @@
+
+  <div class="row">
+    <div class="col-md-9">
+      <div class="panel">
+        <div  class="panel-body">
+          <h1 id="header">
+            <%= t('DATE') %> <%= @pago.data.strftime("%d/%m/%Y")%> |
+            <%= @pago.persona_nome %>
+            | Cot. U$:
+            <%= format_int( @pago.cotacao ) %> 
+            R$.: <%= format_int( @pago.cotacao_real ) %>
+            R$xU$: <%= format_decimal( @pago.cotacao_rs_us ) %>
+          </h1>
+
+          <%= render :partial=>"index_financa", :locals=>{:pagos_financas => @pago.pagos_financas} %>
+
+          <% if @pago.moeda.to_i == 0 %>
+
+            <% if (@fecha_result_us.to_f.round(2) != (@financ_cred_us.to_f - @financ_deb_us.to_f).to_f.round(2)) %>
+              <%= render :partial=>"new_financa", :locals=>{:pagos_financa=>PagosFinanca.new(:pago_id=>@pago.id)} %>
+            <% elsif (@fecha_result_us.to_f.round(2) == (@financ_cred_us.to_f - @financ_deb_us.to_f).to_f.round(2)) %>
+              <div class="alert alert-success" align="center" style="margin: 10px">
+                <font color="green"><h1> <b><%= t('OPERATION_CONCLUDED') %></b></h1></font>
+              </div>
+            <% end %>
+
+          <% elsif @pago.moeda.to_i == 1 %>
+
+            <% if (@fecha_result_gs.to_f.round(2) != (@financ_cred_gs.to_f - @financ_deb_gs.to_f).to_f.round(2))  %>
+              <%= render :partial=>"new_financa", :locals=>{:pagos_financa=>PagosFinanca.new(:pago_id=>@pago.id)} %>
+            <% elsif (@fecha_result_gs.to_f.round(2) == (@financ_cred_gs.to_f - @financ_deb_gs.to_f).round(2)) %>
+              <div class="alert alert-success" align="center" style="margin: 10px">
+                <font color="green"><h1> <b>Operação Concluida Click en Finalizar !</b></h1></font>
+              </div>
+            <% end %>
+
+          <% elsif @pago.moeda.to_i == 2 %>
+
+            <% if (@fecha_result_rs.to_f.round(2) != (@financ_cred_rs.to_f - @financ_deb_rs.to_f).to_f.round(2)) %>
+              <%= render :partial=>"new_financa", :locals=>{:pagos_financa=>PagosFinanca.new(:pago_id=>@pago.id)} %>
+            <% elsif (@fecha_result_rs.to_f.round(2) == (@financ_cred_rs.to_f - @financ_deb_rs.to_f).to_f.round(2)) %>
+              <div class="alert alert-success" align="center" style="margin: 10px">
+                <font color="green"><h1> <b>Operação Concluida Click en Finalizar!</b></h1></font>
+              </div>
+            <% end %>
+          <% end %>
+
+
+          <div class="footer-buttons">             
+            <% if @pago.moeda == 0 %>
+              <input type="hidden" id="sum" value="<%= format_decimal( @fecha_result_us.to_f ) %>">
+              <input type="hidden" id="tot" value="<%= format_decimal( (@financ_cred_us.to_f - @financ_deb_us.to_f) ) %>">
+              <% if @fecha_result_us.to_f.round(2) != (@financ_cred_us.to_f - @financ_deb_us.to_f).round(2) %>
+                <h1 style="color:red; float:left; font-size:32px" ><%= t('PENDING') %></h1>
+              <% else %>
+                <a href="#" class="btn btn-green delete" onclick="ValidCompra()" >Finalizar</a>
+              <% end %>
+
+            <% elsif @pago.moeda == 1 %>
+              <input type="hidden" id="sum" value="<%= format_int( @fecha_result_gs.to_f ) %>">
+              <input type="hidden" id="tot" value="<%= format_int((@financ_cred_gs.to_f - @financ_deb_gs.to_f) ) %>">
+              <% if @fecha_result_gs.to_f.round(2) != (@financ_cred_gs.to_f - @financ_deb_gs.to_f).round(2) %>
+                <h1 style="color:red; float:left; font-size:32px" ><%= t('PENDING') %></h1>
+              <% else %>
+                <a href="#" class="btn btn-green" onclick="ValidCompra()" >Finalizar</a>
+              <% end %>
+            <% else %>
+              <input type="hidden" id="sum" value="<%= format_decimal( @fecha_result_rs.to_f ) %>">
+              <input type="hidden" id="tot" value="<%= format_decimal( (@financ_cred_rs.to_f - @financ_deb_rs.to_f) ) %>">
+
+              <% if @fecha_result_rs.to_f.round(2) != (@financ_cred_rs.to_f - @financ_deb_rs.to_f).round(2) %>
+                <h1 style="color:red; float:left; font-size:32px" ><%= t('PENDING') %></h1>
+              <% else %>
+                <a href="#" class="btn btn-green" onclick="ValidCompra()" >Finalizar</a> 
+              <% end %>
+            <% end %>
+
+            <a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"><%= image_tag('printer.png') %> <%= t('VOUCHER') %></a>
+            <a href="/pagos/<%=params[:id]%>" class="btn btn-back" ><%= t('BACK') %></a> 
+          </div>          
+        </div>
+      </div>
+    <%= hidden_field_tag :id, @pago.id %>
+    </div>
+    <div class="col-md-3">
+      <%= render "somatorio_financeira" %>
+    </div>
+  </div>
+
+<script>
+
+  function Comprovante(){
+    window.open('/pagos/' + document.getElementById('id').value + '/comprovante', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+  function ComprovanteRt(id){
+    window.open('/form_fiscals/rt?id=' + id +'', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+
+  function ValidCompra(){
+  if (parseFloat(document.getElementById('sum').value) !=  parseFloat(document.getElementById('tot').value)){
+        alert('La suma nos igual de la Documento');
+      }
+      else{
+        location.href="/pagos/" + $("#id").val() + "/valida_processo"
+      }
+    }
+</script>

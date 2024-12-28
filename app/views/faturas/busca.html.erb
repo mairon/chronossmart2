@@ -1,0 +1,51 @@
+<div class="group">
+	<table>
+		<tr>
+			<td width="80" align="center">Cod.</td>
+			<td width="80" align="center"><%= t('DATE') %></td>
+			<td width="150" align="center">Factura</td>
+			<td width="400" align="center">Cliente</td>
+			<td width="100" align="center">Total Gs</td>
+			<td width="100" align="center">Total U$.</td>
+			<td width="50" align="center">Tipo</td>
+		</tr>
+	</table>
+
+	<div class="rolagem" dir="div">
+		<table>
+			<% @faturas.each do |fatura| %>
+
+			<% if fatura.status == 1 %>
+			<% color = '#fa3e40' %>
+
+			<tr class = "<%= cycle("cor1", "cor2") %>">
+				<td width="80" align="center"  bgcolor="<%= color%>"> <%= h fatura.id%></td>
+				<td width="80" align="center"  bgcolor="<%= color%>"> <%= h fatura.data.strftime("%d/%m/%Y")%></td>
+				<td width="150" align="left"   bgcolor="<%= color%>"> <%= h fatura.documento_numero_01%>-<%= h fatura.documento_numero_02%>-<%= h fatura.documento_numero%></td>
+				<td width="400" align="left"   bgcolor="<%= color%>"> <%= h fatura.persona_nome%></td>
+				<td width="100" align="right"  bgcolor="<%= color%>"> <%= h number_to_currency(fatura.total_dolar, :format=>' %n ', :separator => "," )  %></td>
+				<td width="100" align="right"  bgcolor="<%= color%>"> <%= h number_to_currency(fatura.total_guarani, :format=>' %n ', :precision => 0 )  %></td>
+				<td width="50" align="center"  bgcolor="<%= color%>"> <%= h fatura.tipo  %></td>
+				<td bgcolor="<%= color%>"><%= link_to 'Editar', edit_fatura_path(fatura) %></td>
+				<td bgcolor="<%= color%>"><%= link_to t('DELETE'), fatura, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+			</tr>
+			
+			<% else %>
+			
+			<tr class = "<%= cycle("cor1", "cor2") %>">
+				<td width="80" align="center"> <%= h fatura.id%></td>
+				<td width="80" align="center"> <%= h fatura.data.strftime("%d/%m/%Y")%></td>
+				<td width="150" align="left" > <%= h fatura.documento_numero_01%>-<%= h fatura.documento_numero_02%>-<%= h fatura.documento_numero%></td>
+				<td width="400" align="left" > <%= h fatura.persona_nome%></td>
+				<td width="100" align="right"> <%= h number_to_currency(fatura.total_dolar, :format=>' %n ', :separator => "," )  %></td>
+				<td width="100" align="right"> <%= h number_to_currency(fatura.total_guarani, :format=>' %n ', :precision => 0 )  %></td>
+				<td width="50" align="center"> <%= h fatura.tipo  %></td>
+				<td><%= link_to 'Editar', edit_fatura_path(fatura) %></td>
+				<td><%= link_to t('DELETE'), fatura, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+			</tr>
+
+			<% end %>
+			<% end %>
+		</table>
+	</div>
+</div>

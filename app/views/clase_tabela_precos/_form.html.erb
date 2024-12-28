@@ -1,0 +1,50 @@
+<%= form_for(@clase_tabela_preco) do |f| %>
+  <% if @clase_tabela_preco.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@clase_tabela_preco.errors.count, "error") %> prohibited this clase_tabela_preco from being saved:</h2>
+
+      <ul>
+      <% @clase_tabela_preco.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> clase_tabela_precos - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">clase_id :</td>                    
+                      <td><%= f.number_field :clase_id %></td>
+                                      
+                      <td align="right">tabela_preco_id :</td>                    
+                      <td><%= f.number_field :tabela_preco_id %></td>
+                                      
+                      <td align="right">perc :</td>                    
+                      <td><%= f.text_field :perc %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), clase_tabela_precos_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

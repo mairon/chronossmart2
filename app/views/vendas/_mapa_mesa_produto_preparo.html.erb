@@ -1,0 +1,41 @@
+<table class="head_grid">
+  <tr>
+    <td width="45" align="center">Código</td>
+    <td width="60" align="center">Apertura</td>
+    <td width="60" align="center">CM</td>
+    <td width="250">Producto</td>
+    <td width="20" align="right">Ctd</td>
+    <td width="100" align="center">Status</td>
+  </tr>
+</table>
+<div class="rolagem" dir="div" style="height: 345px;">
+	<table>
+		<% @produtos.each do |v| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>"  >
+        <td width="45" align="center"><%= v.id.to_s.rjust(6,'0') %></td>
+        <td align="center" width="60"><%= v.created_at.strftime("%H:%M") %></td>
+        <td width="60" align="center"><%= v.cartao_nome %></td>
+        <td width="250"><small>
+          <%= v.produto_nome %> 
+          <%= v.obs %>
+        </small></td>
+        <td width="20" align="right"><%= v.quantidade.to_i %></td>
+        <td width="100" align="center">
+          <% if  v.status_preparo == 0 %>
+            <span class="btn-primary">En Fila</span>
+          <% else %>
+            <span class="btn-success">En Preparo</span>
+          <% end %>
+        </td>
+      </tr>
+		<% end %>
+	</table>
+</div>
+
+
+<style>
+  bt-alert{
+    padding: 5px;
+    border-radius: 4px;
+  }
+</style>

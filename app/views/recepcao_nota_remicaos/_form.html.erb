@@ -1,0 +1,218 @@
+<body onload="NotaRemicaoExibeDivDestino()">
+
+  <h1 align="right" id="header">Recepcion-Nota-Remicion</h1>
+
+  Recepcion Nota Remicion - Edicion
+
+  <%= form_for( @recepcao_nota_remicao ) do |f| %>
+  <% if @recepcao_nota_remicao.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@recepcao_nota_remicao.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @recepcao_nota_remicao.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+        <div class="group_cd">
+          <!--ORIGEM!-->
+          <table>
+            <tr>
+              <td>
+                <fieldset>
+                  <legend><%= t('SOURCE_S') %></legend>
+                   <table>
+                     <tr height="35">
+                         <td align="right"><%= t('DATE') %> :</td>
+                         <td><%= f.date_select :data %></td>
+
+                         <td align="right">Nr. Doc :</td>
+                         <td><%= f.text_field :documento_numero_01,
+                                              :size => 3%></td>
+                         <td><%= f.text_field :documento_numero_02,
+                                              :size => 3%></td>
+                         <td><%= f.text_field :documento_numero,
+                                              :size => 15%></td>
+
+                     </tr>
+
+                     <tr height="35">
+                         <td align="right">Unidade :</td>
+                         <td><%= f.collection_select :origem_unidade_id, Unidade.all( :select => ' id,
+                                                                                                   unidade_nome',
+                                                                                       :order  => '2' ), :id,
+                                                                                                         :unidade_nome,{:include_blank => true} %></td>
+
+                         <td align="right">Deposito :</td>
+                         <td colspan="3"><%= f.collection_select :deposito_id, Deposito.all( :select => ' id,
+                                                                                                          nome',
+                                                                                             :order  => '2' ), :id,
+                                                                                                               :nome,{:include_blank => true} %></td>
+
+                     </tr>
+                   </table>
+                </fieldset>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <fieldset>
+                  <legend>Motivo</legend>
+                  <table>
+                    <tr height="35">
+                      <td><%= f.radio_button :motivo, 0,  :Checked => "True", :onblur => "RecepcaoNotaRemicaoSetaMotivo('0'),RecepcaoNotaRemicaoExibeDivDestino()"  %> Translado locales Empresa</td>
+                      <td><%= f.radio_button :motivo, 1,  :onblur => "RecepcaoNotaRemicaoSetaMotivo('1'),RecepcaoNotaRemicaoExibeDivDestino()"  %> <%= t('SALE') %></td>
+                    </tr>
+
+                    <tr>
+                      <td><%= f.radio_button :motivo, 2,  :onblur => "RecepcaoNotaRemicaoSetaMotivo('1'),RecepcaoNotaRemicaoExibeDivDestino()"  %> <%= t('PURCHASE') %></td>
+                      <td><%= f.radio_button :motivo, 3,  :onblur => "RecepcaoNotaRemicaoSetaMotivo('1'),RecepcaoNotaRemicaoExibeDivDestino()" %> Devolución</td>
+                    </tr>
+                    <input type="hidden" id="motivo" name="motivo" value="<%= @recepcao_nota_remicao.motivo %>"/>
+                  </table>
+                </fieldset>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <fieldset>
+                  <legend>Transporte</legend>
+                  <table>
+                    <tr height="35">
+                      <td align="right">Chapa :</td>
+                      <td align="right"><%= f.text_field :chapa,
+                                                         :size => 10%></td>
+
+                      <td align="right">Chofer :</td>
+                      <td colspan="3"><%= f.collection_select :chofer_id, Persona.all( :select     => ' id,
+                                                                                                        nome',
+                                                                                       :conditions => ["tipo_chofer = 1"],
+                                                                                       :order      => '2' ), :id,
+                                                                                                             :nome,{:include_blank => true} %></td>
+                   </tr>
+
+                   <tr height="35">
+                    <td align="right">Ruc/C.I.:</td>
+                    <td align="right"><%= f.text_field :chofer_ruc,
+                                                       :size => 10%></td>
+
+
+                   </tr>
+
+                    <tr height="35">
+                      <td align="right">Transportadora :</td>
+                      <td colspan="3"><%= f.collection_select :transportadora_id, Persona.all( :select     => ' id,
+                                                                                                                nome',
+                                                                                               :conditions => ["tipo_transportadora = 1"],
+                                                                                               :order      => '2' ), :id,
+                                                                                                                     :nome,{:include_blank => true} %></td>
+                   </tr>
+
+                  </table>
+                </fieldset>
+              </td>
+            </tr>
+          </table>
+
+          <table>
+            <tr>
+              <td>
+                <fieldset>
+                  <legend>Destino</legend>
+                  <div id="UNIDADE" style="display:none;">
+                        <table>
+                          <tr>
+                            <td align="right">Sucursal :</td>
+                            <td> <%= f.text_field( :destino_unidade_id,
+                                                   :onblur   => {:remote => true,
+                                                                 :update => "recepcao_nota_remicao_destino_unidade_id",
+                                                                                 :url        => { :action     => :get_unidade_cod, :id => 1},
+                                                                                 :with       => "'recepcao_nota_remicao_destino_unidade_id='+this.value"},
+                                                                                 :size       => 5,
+                                                                                 :onkeypress => "return bloqEnter(event)") %>
+
+
+                                <%= f.collection_select :destino_unidade_nome, Unidade.all( :select => ' id,
+                                                                                                      unidade_nome',
+                                                                                          :order  => '2' ), :unidade_nome,
+                                                                                                            :unidade_nome,{:include_blank => true} %></td>
+
+
+                          </tr>
+                      </table>
+                  </div>
+
+                  <div id="PERSONA" style="display:none;">
+                        <table>
+                          <tr>
+                            <td align="right">Cliente :</td>
+
+                            <td><%= f.text_field( :destino_persona_cod,
+                                                  :onblur   => {:remote => true,
+                                                                :update => "recepcao_nota_remicao_destino_persona_cod",
+                                                                                :url        => { :action     => :get_persona_cod, :id => 1},
+                                                                                :with       => "'recepcao_nota_remicao_destino_persona_cod='+this.value"},
+                                                                                :size       => 5,
+                                                                                :onkeypress => "return bloqEnter(event)") %>
+
+
+                                <%= f.collection_select :destino_persona_id, Persona.all( :select => ' id,
+                                                                                                       nome',
+                                                                                          :order  => '2' ), :id,
+                                                                                                            :nome,{:include_blank => true} %></td>
+
+
+                          </tr>
+                      </table>
+                  </div>
+
+                  <table>
+                    <tr height="35">
+                      <td align="right">Direcion :</td>
+                      <td><%= f.text_field :direcao,
+                                           :size => 15%></td>
+
+                      <td align="right">Barrio :</td>
+                      <td><%= f.text_field :bairro,
+                                           :size => 15%></td>
+                    </tr>
+
+                    <tr height="35">
+                      <td align="right">Ciudad :</td>
+                      <td colspan="4"><%= f.collection_select :cidade_id, Cidade.all( :select => ' id,
+                                                                                        nome',
+                                                                                    :order  => '2' ), :id,
+                                                                                                      :nome,{:include_blank => true} %></td>
+
+                    </tr>
+                  </table>
+
+                </fieldset>
+              </td>
+
+              <td valign="top">
+                <fieldset>
+                  <legend>Autorizacion :</legend>
+                  <table>
+                    <tr>
+                      <td><%= f.radio_button :estado,0, :Checked => "True" %> No</td>
+                      <td><%= f.radio_button :estado, 1 %> Si</td>
+                    </tr>
+                  </table>
+                </fieldset>
+
+              </td>
+            </tr>
+          </table>
+
+
+
+        </div>
+  <%= f.submit t('SAVE') %> | <%= link_to t('BACK'), recepcao_nota_remicaos_path %>
+  <% end %>
+</body>

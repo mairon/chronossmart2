@@ -1,0 +1,47 @@
+<h1 id="header">Entregas</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_entrega_path, :class => "button add" %>
+</div>
+  <div class="group">
+    <h2>
+      <%= form_tag busca_entregas_path, :method => "get" do %>
+        <table>
+          <tr>
+            <td><%= radio_button_tag :filtro, 0 %></td>
+            <td align="right"> De:</td>
+            <td>
+              <%= text_field_tag :inicio, nil, onkeyup:"Formatadata(this,event)" %>
+              Hasta
+              <%= text_field_tag :final, nil, onkeyup:"Formatadata(this,event)" %>
+            </td>
+          </tr>
+          <!--FILTRO_CLIENTE!-->
+          <tr>
+            <td><%= radio_button_tag :filtro, 1, nil %></td>
+            <td>
+              <select name="tipo" id="tipo">
+                <option>CODIGO</option>
+                <option>RESPONSABLE</option>
+              </select>
+            </td>
+            <td>
+              <%= search_field_tag :busca, nil, size: 24, onkeyup: "pesquisa(this.value)" %>
+              <%= radio_button_tag :status, 0, style: 'top: -20px;' %>En Curso
+              <%= radio_button_tag :status, 1 ,nil , style: 'top: -20px;' %>Finalizado
+            </td>
+            <td><%= link_to 'Buscar', '#', class: 'button', onclick: "pesquisa(document.getElementById('busca').value)" %>
+            <td width="25"><%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;" ) %></td>
+          </tr>
+        </table>
+        <% end %>
+      </h2>
+    </div>
+
+    <div id="pagina"></div>
+<script language="javascript">
+  function pesquisa(lista_carga){
+    url="/entregas/busca?" + $('form').serialize();  
+    ajax(url);
+  }
+</script>
+<%= javascript_include_tag 'busca_ajax' %> 

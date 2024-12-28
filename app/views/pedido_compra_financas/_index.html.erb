@@ -1,0 +1,29 @@
+<table class="head_grid">
+  <tr>
+    <td width="30" align="center">Cota</td>
+    <td width="70" align="right"><%= t('VALUE') %></td>
+    <td width="60" align="center">Venc.</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% pedido_compra_financas.each do |pedido_compra_financa| %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td width="30" align="center"><%= pedido_compra_financa.cota %></td>
+        <td width="70" align="right">
+          <% if @pedido_compra.moeda == 0 %>
+            <%= format_decimal(pedido_compra_financa.valor_us) %>
+          <% elsif @pedido_compra.moeda == 1 %>
+            <%= format_int(pedido_compra_financa.valor_gs) %>
+          <% elsif @pedido_compra.moeda == 2 %>
+            <%= format_decimal(pedido_compra_financa.valor_rs) %>
+          <% end %>
+        </td>
+        <td width="60" align="center"><%= pedido_compra_financa.vencimento.strftime("%d/%m/%y") %></td>
+        <td><%= link_to t('DELETE'), pedido_compra_financa, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

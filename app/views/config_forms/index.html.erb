@@ -1,0 +1,29 @@
+<h1 id="header">config_forms</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_config_form_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="55">Cod.</td>
+    <td width="300">Nombre</td>
+    <td width="150"><%= t('UNIT') %></td>
+    <td width="150">Terminal</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @config_forms.each do |c| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="55"><%= c.id.to_s.rjust(6,'0') %></td>
+        <td width="300"><%= c.nome %></td>
+        <td width="150"><%= c.unidade.unidade_nome %></td>
+        <td width="150"><%= c.terminal.nome %></td>
+        <td><%= link_to 'Editar', edit_config_form_path(c) %></td>
+        <td><%= link_to t('DELETE'), c, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

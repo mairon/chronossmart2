@@ -1,0 +1,45 @@
+<div class="modal fade" id="modal-busca" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+
+          <h4 class="modal-title" id="myModalLabel">Buscar Tareas</h4>
+        </div>
+         <div class="modal-body">
+
+            <div class="group">
+              <form action="#" id="form_tarefa">
+                <div class="input-group" style="margin-top: 15px">
+                  <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" >
+                      <i class="icon-search" aria-hidden="true"></i>
+                    </button>
+                  </span>
+                  <input id="busca" name="busca" style="margin-top: 0px; margin-right: 5px" type="search" value="<%= params[:busca]%>" placeholder="Buscar" onKeyUp="pesquisa(document.getElementById('busca').value)" size="40" autocapitalize="off" autocomplete="off" autocorrect="off" autofocus />
+                  <%= check_box_tag :lancamento, '1' %> Registro Anteriores
+
+                  <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinner", :width => 21, :height => 21, :style =>"display: none;" ) %>
+                </div>
+              </form>
+            </div>
+
+            <div class="group">
+              <div id="pagina">
+              </div>
+            </div>
+
+        </div>
+      </div>
+    </div>
+</div>
+
+<script language="javascript">
+  function pesquisa(valor){
+    url="/tarefas/busca_tarefas?" + $('#form_tarefa').serialize();
+    ajax(url);
+  }
+</script>
+<%= javascript_include_tag 'busca_ajax' %>

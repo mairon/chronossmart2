@@ -1,0 +1,194 @@
+<h1 id="header">Liquidación de Empleado - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+
+<%= form_for(@recisao_func) do |f| %>
+  <% if @recisao_func.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@recisao_func.errors.count, "error") %> prohibited this recisao_func from being saved:</h2>
+
+      <ul>
+      <% @recisao_func.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+      <table>
+        <tr>
+          <td colspan="3">
+            <label>Fecha Calculo</label>
+            <%= f.date_select :data_calculo %>
+          </td>
+        </tr>
+
+        <tr>
+          <td colspan="3">
+            <label>Empleado</label>
+            <%= f.collection_select :persona_id, Persona.all( :select     => 'id,nome,tipo_funcionario',
+              :conditions => ["tipo_funcionario = 1 AND UNIDADE_ID = #{current_unidade.id}"],
+              :order      => '2'),:id,:nome, {prompt: 'Selecione lo Empleado'} %>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="3">
+            <label>Fecha de Entrada</label>
+            <%= f.date_select :data_entrada, {:include_blank => true, :default => nil, start_year: 1980} %>
+            <input type="hidden" name="fromDate" id="fromDate" placeholder="yyyy-mm-dd" />
+          </td>
+        </tr>
+
+        <tr>
+          <td colspan="3">
+            <label>Fecha de Salida</label>
+            <%= f.date_select :data_saida %>
+            <input type="hidden" name="toDate" id="toDate" placeholder="yyyy-mm-dd" value="<%= Time.now.strftime("%Y-%m-%d")%>" />
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <label>Antiguedad en Años</label>
+            <%= f.number_field :antiguedad_ano %>
+          </td>
+          <td>
+            <label>Antiguedad en Meses</label>
+            <%= f.number_field :antiguedad_meses %>
+          </td>
+          <td>
+            <label>Antiguedad en Días</label>
+            <%= f.number_field :antiguedad_dias %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <label>Dias Trabajados</label>
+            <%= f.number_field :dias_trabalhados %>
+          </td>
+        </tr>       
+
+        <tr>
+          <%= field_gs_label 'Salario Base',f,:salario_mensal, :readonly => "readonly" %>
+          <%= field_gs_label 'Salario Diario',f,:salario_diario, :readonly => "readonly" %>
+        </tr>
+
+        <tr>
+          <td colspan="3">
+            <label>Motivo Salida</label>
+          <%= f.select :motivo,
+            ([["RENUNCIA", 0],
+              ["RETIRO JUSTIFICADO", 1],
+              ["DESPIDO JUSTIFICADO", 2],
+              ["DESPIDO INJUSTIFICADO", 3]
+              ]), {prompt: 'Selecione lo Motivo'} %>
+          </td>
+        </tr>
+      </table>
+
+    <div class="footer-buttons">
+      <%= f.submit "Seguir", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), recisao_funcs_path, :class => "btn btn-back" %>
+    </div>
+    <% end %>
+  </div>
+
+  <script type="text/javascript">
+
+    $(function() {
+      $("#recisao_func_persona_id").change(function(){
+
+        $.ajax({
+          url: "/buscas/get_funcionario?cod="+ $("#recisao_func_persona_id").val(),
+          dataType: "json",
+          success: function( data ) {
+            $("#recisao_func_data_entrada_3i").val(parseInt(data.persona.data_entrada.substring(8, 10)) )
+            $("#recisao_func_data_entrada_2i").val(parseInt(data.persona.data_entrada.substring(5, 7)) )
+            $("#recisao_func_data_entrada_1i").val(parseInt(data.persona.data_entrada.substring(0, 4)) )
+            $("#fromDate").val(data.persona.data_entrada )
+            $("#recisao_func_salario_mensal").val(number_format( data.persona.salario,0, ',', '.'))
+            $("#recisao_func_salario_diario").val(number_format( parseInt(data.persona.salario  ) / 30 ,0, ',', '.'))
+            var day   = $("#recisao_func_data_saida_3i").val();
+            $("#recisao_func_dias_trabalhados").val(day);
+            calculate();
+          },
+        });
+
+      });
+
+      $("#recisao_func_data_saida_3i, #recisao_func_data_saida_2i, #recisao_func_data_saida_1i").change(function(){
+        var year  = $("#recisao_func_data_saida_1i").val();
+        var month = $("#recisao_func_data_saida_2i").val();
+        var day   = $("#recisao_func_data_saida_3i").val();
+
+        var dt_saida = (year + '-' + month + '-' + day)
+
+        $("#toDate").val( dt_saida);
+
+        $("#recisao_func_dias_trabalhados").val(day);
+
+
+        calculate();
+
+      });
+
+
+
+    });
+
+    function calculate(){
+      var fromDate = document.getElementById('fromDate').value;
+      var toDate = document.getElementById('toDate').value;
+
+      try {
+        document.getElementById('result').innerHTML = '';
+
+        var result = getDateDifference(new Date(fromDate), new Date(toDate));
+
+        if (result && !isNaN(result.years)) {
+          $("#recisao_func_antiguedad_ano").val(result.years);
+          $("#recisao_func_antiguedad_meses").val(result.months);
+          $("#recisao_func_antiguedad_dias").val(result.days);
+
+          document.getElementById('result').innerHTML =
+            result.years + ' year' + (result.years == 1 ? ' ' : 's ') +
+            result.months + ' month' + (result.months == 1 ? ' ' : 's ') + 'and ' +
+            result.days + ' day' + (result.days == 1 ? '' : 's');
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function getDateDifference(startDate, endDate) {
+      if (startDate > endDate) {
+        console.error('Start date must be before end date');
+        return null;
+      }
+      var startYear = startDate.getFullYear();
+      var startMonth = startDate.getMonth();
+      var startDay = startDate.getDate();
+
+      var endYear = endDate.getFullYear();
+      var endMonth = endDate.getMonth();
+      var endDay = endDate.getDate();
+
+      // We calculate February based on end year as it might be a leep year which might influence the number of days.
+      var february = (endYear % 4 == 0 && endYear % 100 != 0) || endYear % 400 == 0 ? 29 : 28;
+      var daysOfMonth = [31, february, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+      var startDateNotPassedInEndYear = (endMonth < startMonth) || endMonth == startMonth && endDay < startDay;
+      var years = endYear - startYear - (startDateNotPassedInEndYear ? 1 : 0);
+
+      var months = (12 + endMonth - startMonth - (endDay < startDay ? 1 : 0)) % 12;
+
+      // (12 + ...) % 12 makes sure index is always between 0 and 11
+      var days = startDay <= endDay ? endDay - startDay : daysOfMonth[(12 + endMonth - 1) % 12] - startDay + endDay;
+
+      return {
+        years: years,
+        months: months,
+        days: days
+      };
+    }
+  </script>
+  <p id="result"></p>

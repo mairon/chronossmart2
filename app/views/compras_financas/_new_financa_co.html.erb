@@ -1,0 +1,268 @@
+<%= form_tag gerar_cotas_credito_compras_path, :method => "get" do %>
+  <%= hidden_field_tag :id, @compra.id %>
+  <input type="hidden"  name="moeda" id="moeda"  size="5" value="" />
+  <input type="hidden"  name="cota" id="cota"  size="5" value="<%= ComprasFinanca.where(compra_id: @compra.id).size.to_i + 1 %>" />
+  <input type="hidden"  name="documento_numero_01" id="documento_numero_01"  size="5" value="<%= @compra.documento_numero_01 %>" />
+  <input type="hidden"  name="documento_numero_02" id="documento_numero_02"  size="5" value="<%= @compra.documento_numero_02 %>" />
+  <input type="hidden"  name="documento_numero" id="documento_numero"  size="10" value="<%= @compra.documento_numero %>" />
+  <input type="hidden" name="venci" id="venci" size="15" value="<%= @compra.data.strftime("%d/%m/%Y")%>" />
+  <input type="hidden"  name="cotas" id="cotas"  size="10" value="1" />
+  <input type="hidden"  name="cheque_status" id="cheque_status" value="0" />
+  <input type="hidden"  name="cred_deb" id="cred_deb" value="0" />
+  <input type="hidden"  name="tipo" id="tipo" value="0" />
+
+    <div id="tab1" class="tab_content group conta">
+      <table>
+        <tr>
+          <td>
+            <label><%= t('DATE') %></label>
+            <input type="text" name="data" id="data" size="10" onkeyup="Formatadata(this,event)", value="<%= @compra.data.strftime("%d/%m/%Y")%>" required="true" />
+          </td>
+          <td colspan="3">
+            <label><%= t('FORM_OF_PAYMENT') %></label>
+            <%= select("busca", "forma_pago", FormaPago.all(:select => ' id,nome', :conditions => ["pago = true"],
+              :order => '2').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione' },
+              {autofocus: true, required: true, onchange: "fp(this.options[this.selectedIndex].value)"})   %>             
+
+            <div style="display:none; float: right" class="pago_ant">
+              <a href="javascript:void(0)" class="btn btn-blue" onClick="busca_pago_antecipado()">Buscar pago antecipado</a>
+              <input hidden="" type="text" id="fact_an" name="fact_an">
+              <input hidden="" type="text" id="fact_an_01" name="fact_an_01">
+              <input hidden="" type="text" id="fact_an_02" name="fact_an_02">
+              <input hidden="" type="text" id="fact_an_cota" name="fact_an_cota">
+            </div>
+
+            <div style="display:none; float: right" class="cheque_terc">
+              <a href="javascript:void(0)" class="btn btn-blue " onClick="busca_cheque_terceiros()">Buscar <%= t('CHECKS') %></a>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 0px 10px">
+            <label><%= t('ACCOUNT') %></label>
+            <% if current_unidade.conta_multi_unidades == true %>
+              <%= select("busca", "conta", Conta.all(:select => ' id,nome', :conditions => ["status = true"], :order => '2').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione' },{required: true})   %>
+            <% else %>
+              <%= select("busca", "conta", Conta.all(:select => ' id,nome', :conditions => ["status = true and unidade_id = #{current_unidade.id}"], :order => '2').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione' },{required: true})   %>
+            <% end %>            
+          </td>
+          <td>
+            <label>Valor U$</label>
+            <input  type="tel"  name="valor_us" id="valor_us"  size="15" value="<%= format_decimal(@sum_dolar) %>" class = "money_us" dir="rtl" />
+          </td>                
+          <td>
+            <label>Valor Gs</label>
+            <input  type="tel"  name="valor_gs" id="valor_gs"  size="15" value="<%= format_int(@sum_guarani) %>" class = "money_gs" dir="rtl" />
+          </td>
+          <td>
+            <label>Valor R$</label>
+            <input  type="tel"  name="valor_rs" id="valor_rs"  size="15" value="<%= format_decimal(@sum_real) %>" class = "money_us" dir="rtl" />
+          </td> 
+        </tr>
+
+        <tr>  
+          <td colspan="4"> 
+            <div style="display:none" class="group cheque">
+              <table>
+                <tr>  
+                  <td>
+                    <label>Banco</label>
+                    <%= select("busca", "banco_id", Persona.all(:select => ' id, nome', :conditions => ["tipo_banco = 1"],
+                                 :order => '2').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione lo Banco' })   %>
+                  </td>
+                  <td>
+                    <label>Numero:</label> 
+                    <%= text_field_tag :cheque %>
+                  </td>
+                  <td>
+                    <label class="titulo_data_dif">Venci/Diferido:</label>
+                    <input class="titulo_data_dif" type="text" name="diferido" id="diferido" size="10" onkeyup="Formatadata(this,event)", value="<%= @compra.data.strftime("%d/%m/%Y")%>" /> 
+                  </td>
+                  <td>
+                    <label>Titular:</label>
+                    <%= text_field_tag :titular %>
+                  </td>
+                </tr>
+              </table>
+            </div> 
+          </td> 
+        </tr>
+        <tr>  
+          <td colspan="4"  style="padding: 15px 10px"> 
+ 
+          </td> 
+        </tr>
+        <tr>
+          <td colspan="4">
+            <%= submit_tag t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+          </td>
+        </tr> 
+      </table>
+    </div>
+<% end %>
+
+
+<script type="text/javascript">
+
+$("#busca_conta").change(function() {
+  $.ajax({url: "/buscas/get_moeda_conta",
+    type: 'GET',
+    beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+    data: "conta=" + escape($("#busca_conta").val()),
+    error: function(XMLHttpRequest, textStatus, errorThrown) {
+      alert('Moneda no Encontrada!');
+    },
+    success: function(data){
+      $('#moeda').val(data);
+      d = $('#moeda').val(); 
+    }
+  });
+
+     
+});
+  $("#cheque_status").click(function() {
+    if($('#cheque_status').is(':checked')){
+      $("#numero_cheque").css('display','block');
+    }else{
+      $("#numero_cheque").css('display','none');
+    };
+  });
+
+  function fp(v) {
+    $("#forma_pg").val(v);
+    if( v == '5'){ //CHEQUE AO DIA
+      $(".cheque").css('display','block'); 
+      $(".cheque").css('background','#bdefbd');
+      $(".conta").css('background','#bdefbd');      
+      $(".titulo_data_dif").css('display','none');
+      $("#cheque_status").val('1');
+      $("#cred_deb").val('0');
+      $(".campo_data_dif").css('display','none');
+      $(".cheque_terc").css('display','none'); 
+      $(".pago_ant").css('display','none'); 
+      $('#busca_conta').prop('disabled',false);
+      $('#busca_conta').prop('required',true);
+      $('#cheque').prop('required',true);
+      
+    } else if( v == '6'){ //CHEQUE DIFERIDO
+      $(".cheque").css('display','block');
+      $(".cheque").css('background','#bdefbd');
+      $(".conta").css('background','#bdefbd');            
+      $(".titulo_data_dif").css('display','block');
+      $("#cheque_status").val('1');
+      $(".campo_data_dif").css('display','block');
+      $("#cred_deb").val('0');  
+      $(".cheque_terc").css('display','none'); 
+      $(".pago_ant").css('display','none'); 
+      $('#busca_conta').prop('disabled',false);
+      $('#busca_conta').prop('required',true);
+      $('#cheque').prop('required',true);
+
+    } else if( v == '1'){ //CONTADO
+      $(".cheque").css('display','none');
+      $(".cheque").css('background','#bdefbd');
+      $(".conta").css('background','#bdefbd');            
+      $(".titulo_data_dif").css('display','none'); 
+      $(".campo_data_dif").css('display','none');
+      $("#cheque_status").val('0');
+      $("#cred_deb").val('0');   
+      $(".cheque_terc").css('display','none'); 
+      $(".pago_ant").css('display','none');
+      $('#busca_conta').prop('disabled',false);
+      $('#busca_conta').prop('required',true);
+      $('#cheque').prop('required',false);
+
+    } else if( v == '8'){ //VUELTO EFETIVO
+      $(".cheque").css('display','none'); 
+      $(".cheque").css('background','#ff6d6d');
+      $(".conta").css('background','#ff6d6d');    
+      $(".titulo_data_dif").css('display','none');    
+      $(".campo_data_dif").css('display','none');
+      $("#cheque_status").val('0'); 
+      $("#cred_deb").val('1');
+      $(".cheque_terc").css('display','none'); 
+      $(".pago_ant").css('display','none'); 
+      $('#busca_conta').prop('disabled',false);
+      $('#busca_conta').prop('required',true);
+      $('#cheque').prop('required',false);
+
+    } else if( v == '9'){ //VUELTO CHEQUE
+      $(".cheque").css('display','block');
+      $(".cheque").css('background','#ff6d6d');
+      $(".conta").css('background','#ff6d6d');       
+      $(".titulo_data_dif").css('display','block');    
+      $(".campo_data_dif").css('display','block');
+      $("#cred_deb").val('1');
+      $("#cheque_status").val('1'); 
+      $(".cheque_terc").css('display','none');  
+      $(".pago_ant").css('display','none');  
+      $('#busca_conta').prop('disabled',false);
+      $('#busca_conta').prop('required',true);
+      $('#cheque').prop('required',true);
+
+    } else if( v == '11'){ //PAGO CHEQUE TERCEIROS
+      $(".cheque").css('display','block'); 
+      $(".titulo_data_dif").css('display','block');
+      $(".cheque_terc").css('display','block');
+      $(".campo_data_dif").css('display','block');
+      $("#cred_deb").val('0');
+      $("#cheque_status").val('1'); 
+      $(".pago_ant").css('display','none'); 
+      $('#busca_conta').prop('disabled',false);
+      $('#busca_conta').prop('required',true);
+      $('#cheque').prop('required',true);
+
+    } else if( v == '12'){  //PAGO ANTECIPADO
+      $(".pago_ant").css('display','block');
+      $(".cheque").css('background','#bdefbd');
+      $(".conta").css('background','#bdefbd');  
+      $(".titulo_data_dif").css('display','none'); 
+      $(".campo_data_dif").css('display','none'); 
+      $(".cheque").css('display','none');               
+      $(".titulo_data_dif").css('display','none');
+      $("#cheque_status").val('0');
+      $("#cred_deb").val('0');
+      $(".campo_data_dif").css('display','none');
+      $(".cheque_terc").css('display','none'); 
+      $('#busca_conta').prop('required',false);
+      $('#busca_conta').prop('disabled',true);
+      $("#busca_conta").val('0');
+      $('#cheque').prop('required',false);
+
+    }
+  }
+
+  $('#pagos_financa_vuelto').click(function() {
+    if (this.checked) {
+      $(".tipo_vuelto").css('display','block');
+    } else {
+      $(".tipo_vuelto").css('display','none');
+    } 
+  });
+
+  function abre_vuelto(v) {
+    $("#cheque_tipo").val(v);
+    if( v == '0'){
+      $(".box_vuelto").css('display','block');
+      $(".vuelto_cheque").css('display','none');
+    }else{
+      $(".box_vuelto").css('display','block');
+      $(".vuelto_cheque").css('display','block');
+      
+    };
+  }
+
+  function busca_cheque_terceiros(){
+    if ($("#busca_conta").val() == '') {
+      alert('Selecione una Cuenta!')
+      $("#busca_conta").focus();
+    }else{
+      window.open('/compras/cheque_terceiros?moeda='+ <%= @compra.moeda %> +'&conta_id='+ $("#busca_conta").val(), 'Pagina', ' SCROLLBARS=YES, TOP=50, LEFT=10, WIDTH=1200, HEIGHT=550');
+    }
+  }
+
+  function busca_pago_antecipado(){
+    window.open('/compras/pago_antecipado?persona_id='+ <%= @compra.persona_id %> + '&id=' + <%= @compra.id %> + '&moeda=' + <%= @compra.moeda %>, 'Pagina', ' SCROLLBARS=YES, TOP=50, LEFT=10, WIDTH=800, HEIGHT=500');
+  }
+
+</script>

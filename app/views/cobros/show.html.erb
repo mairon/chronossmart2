@@ -1,0 +1,105 @@
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel">
+        <h1 id="header">
+
+          <%= t('DATE') %> <%= @cobro.data.strftime("%d/%m/%y")%> |
+            <%= @cobro.persona_nome %> |
+            <%= t('COIN') %>:
+            <% if @cobro.moeda == 0 %>
+              <font color="green"> <%= t('DOLLARS') %>
+              </font>
+            <% elsif @cobro.moeda == 1 %>
+              <font color="red"> <%= t('GUARANIS') %> </font>
+            <% else %>
+              <font color="blue"><%= t('REAIS') %></font>
+            <% end %>
+            | <%= t('CURRENCY') %> U$.: 
+            <%= number_to_currency( @cobro.cotacao, :format =>' %n ', :precision => 0 ) %> 
+            R$.: <%= number_to_currency( @cobro.cotacao_real, :format =>' %n ', :precision => 0 ) %>
+
+        </h1>
+      </div>
+    </div>
+  </div>
+
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <%= render :partial=>"busca_cliente" %>
+      <br>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <%= render :partial=>"index_detalhe", :locals=>{:cobros_detalhes => @cobro.cobros_detalhes} %>
+      <div class="footer-buttons">
+        <a href="#" onclick="SeguirCobros()" class="btn btn-info next"><%= t('PROCEED') %></a> 
+        <% if @cobro.adelanto.to_i == 1 %>
+          <a href="/cobros/<%=params[:id]%>/cobro_adelanto" class="btn btn-back"><%= t('BACK') %></a> 
+        <% else %>
+          <a href="/cobros/<%=params[:id]%>/edit" class="btn btn-back"><%= t('BACK') %></a> 
+        <% end %>
+
+        <% if @int.to_f > 0 %>
+          <% if current_user.tipo.to_i == 0 %>
+            <a href="/cobros/<%=params[:id]%>?tira_interes=true" class="btn btn-warning" ><%= t('TAKE_OUT') %> <%= t('INTEREST') %></a>  
+          <% end %>
+        <% end %>
+      </div>
+      <br>
+    </div>
+  </div>
+</div>
+
+<%= hidden_field_tag :id, @cobro.id %>
+<%= hidden_field_tag :count, @count %>
+
+
+<script>
+function SeguirCobros(){
+  id = document.getElementById('id').value;
+
+  if ( document.getElementById('count').value <= 0  ){
+    alert ('Es Necessario Agregar Los Cobros Pulse F4');
+    return false;
+  }else{
+    location.href="/cobros/" + id +"/cobro_final" ;
+  }
+};
+</script>
+
+<style>
+  form{
+    padding: 0px !important;
+  }
+</style>
+
+<script type="text/javascript">
+  $(function() {
+    //abre tela de desconto
+    $( "#dialog" ).dialog({
+      autoOpen: false,
+      height: 200,
+      width: 300,
+      modal: true,
+      show: {
+        effect: "fade",
+        duration: 400
+      },
+      hide: {
+        effect: "fade",
+        duration: 400
+      }
+    });
+
+    $( "#opener" ).click(function() {
+      $( "#dialog" ).dialog( "open" );
+    });
+  });
+</script>

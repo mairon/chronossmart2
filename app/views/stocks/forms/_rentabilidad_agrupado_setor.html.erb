@@ -1,0 +1,25 @@
+<table>
+	<% @stocks.each do |v| %>
+		<tr>
+			<td width="50" align="center" ><%= v.clase_id.to_s.rjust(4,'0') %></td>
+			<td width="325" align="left" ><%= v.descricao %></td>
+			<td width="80" align="right" ><%= v.sum_qtd %></td>
+			<% if params[:moeda] == '0' %>
+				<td width="60" align="right"><%= number_to_currency( v.sum_us.to_f , :format=>' %n ', :separeitor => ',') %></td>				
+			<% elsif params[:moeda] == '1' %>
+				<td width="60" align="right"><%= number_to_currency( v.sum_gs.to_f , :format=>' %n ', :precision => 0 ) %></td>				
+			<% elsif params[:moeda] == '1' %>
+				<td width="60" align="right"><%= number_to_currency( v.sum_gs.to_f , :format=>' %n ', :separeitor => ',') %></td>				
+			<% end %>
+
+			<% if params[:moeda] == '0' %>
+				<td width="60" align="right"><%= number_to_currency( 0 , :format=>' %n ', :separeitor => ',') %></td>				
+			<% elsif params[:moeda] == '1' %>
+				<td width="60" align="right"><%= number_to_currency( 0 , :format=>' %n ', :precision => 0 ) %></td>				
+			<% elsif params[:moeda] == '1' %>
+				<td width="60" align="right"><%= number_to_currency( v.sum_gs.to_f , :format=>' %n ', :separeitor => ',') %></td>				
+			<% end %>
+
+		</tr>
+	<% end %>
+</table>

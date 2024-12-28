@@ -1,0 +1,29 @@
+<div class="panel">
+  <header class="panel-heading" style="font-size: 14px">
+    Cierre de Caja: 
+		<b><%= @fechamento_caixa.abertura_caixa.id.to_s.rjust(6,'0') %></b> |
+		Periodo : <b><%= @fechamento_caixa.abertura_caixa.data.strftime("%d/%m/%Y") %> hasta <%= @fechamento_caixa.data.strftime("%d/%m/%Y") %></b> |
+		Usuario : <b><%= @fechamento_caixa.abertura_caixa.usuario.usuario_nome %></b> |
+		Turno : <b><%= @fechamento_caixa.abertura_caixa.turno.nome %></b> |
+		Terminal : <b><%= @fechamento_caixa.abertura_caixa.terminal.nome %></b>						
+  </header>
+	
+
+	<div class="panel-content" style="padding: 10px">
+
+		<% if @fechamento_caixa.status.to_i == 0 %>
+			<div style="float:left; margin: 0px 5px">
+				<%= link_to 'Atuliza Forma de Pago', "/fechamento_caixas/atuliza_forma_pagos?id=#{@fechamento_caixa.id}", class: 'button' %>
+				<%= link_to 'Cerrar Caja', "/fechamento_caixas/fecha_caixa?id=#{@fechamento_caixa.id}", class: 'btn btn-green', confirm: 'Todos los Datos estão Cerrados?' %>
+			</div>
+		<% else %>
+			<div class="Mensagem" id="observacao"><b>CAJA CERRADO Y CONFERIDO!</b></div>
+		<% end %>
+		<div style="margin: 0px 10px">
+			<% if @fechamento_caixa.status.to_i == 0 %>
+				<%= link_to 'Lanz. Efetivo', "#", class: 'button add acao' %>
+			<% end %>
+			<%= link_to 'Cierre Detalhado', print_dt_fechamento_fechamento_caixa_path(@fechamento_caixa), target: '_blank', class: 'button print' %>
+		</div>
+	</div>
+</div>

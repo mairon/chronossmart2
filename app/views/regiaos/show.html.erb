@@ -1,0 +1,55 @@
+<ul class="tabs">
+      <li><a href="#tab1"> Regiãos: <%= @regiao.nome %> - Estado: <%= @regiao.estado.nome unless @regiao.estado.nil? %> - País: <%= @regiao.paise.nome unless @regiao.paise.nil? %></a></li>
+</ul>
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+                <table>
+					<table class="head_grid">
+					  <tr>
+					    <td width="450"><%= t('CITIES') %></td>
+					    <td width="80" align="right">População</td>
+					  </tr>
+					</table>
+
+					<div class="rolagem" dir="div">
+					  <table>
+					  	<% p = 0 %>
+					  	<% cd = 0 %>
+					    <% @regiao.cidades.each do |c| %>
+					      <tr class = "<%= cycle("cor1", "cor2")%>" >
+					        <td width="450"><%= c.nome %></td>
+					        <td width="80" align="right"><%= c.populacao.to_i %></td>
+					      </tr>
+					      <% p += c.populacao.to_i %>
+					      <% cd += 1 %>
+					    <% end %>
+					  </table>
+					</div>
+					<table class="head_grid">
+					  <tr>
+					    <td width="450">População Total:</td>
+					    <td width="80" align="right"><b><%= p %></b></td>
+					  </tr>
+
+					  <tr>
+					    <td width="450">Cidades Total:</td>
+					    <td width="80" align="right"><b><%= cd %></b></td>
+					  </tr>
+					</table>
+
+              	</table>
+
+	          </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="buttons">
+      	<%= link_to 'Editar', edit_regiao_path(@regiao), :class => "button back" %>
+        <%= link_to 'Sair', regiaos_path, :class => "button next" %>        
+      </div>
+    </div>

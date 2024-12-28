@@ -1,0 +1,51 @@
+<div class="group">
+  <table class="head_grid">
+     <tr>
+        <td width="50" align="center"><%= t('CODE') %></td>
+        <td width="60" align="center"><%= t('DATE') %></td>
+        <td width="250">Responsable</td>
+        <td width="60" align="center">Dif.</td>
+        <td width="200">Titular</td>
+        <td width="200">Banco</td>
+        <td width="140" align="center">Nº <%= t('CHECKS') %></td>
+        <td width="70" align="center">Valores</td>
+     </tr>
+  </table>
+  <div class="rolagem" id="div">
+    <table> 
+      <% @diferido.each do |diferido| %>
+        <tr class = "<%= cycle("cor1", "cor2")%>"
+            onMouseOver="javascript:this.style.backgroundColor='#e6ebf2'"
+            onMouseOut="javascript:this.style.backgroundColor=''"
+            onclick="Fecha('<%= diferido.cheque %>',
+                           '<%= diferido.titular %>',
+                           '<%= format_decimal( diferido.entrada_dolar ) %>',
+                           '<%= format_int( diferido.entrada_guarani ) %>' )">
+          <td width="50" align="center"><%= diferido.id.to_s.rjust(6,'0') %></td>
+          <td width="60" align="center"><%= diferido.data.strftime("%d/%m/%y") unless diferido.blank? %></td>
+          <td width="250"><%= diferido.persona_nome %></td>
+          <td width="60" align="center"><%= diferido.diferido.strftime("%d/%m/%y") unless diferido.blank? %></td>
+          <td width="200"><%= diferido.titular %></td>
+          <td width="200"><%= diferido.banco %></td>
+          <td width="140" align="center"><%= diferido.cheque %></td>
+          <% if params[:moeda] == "0" %>
+            <td width="70" align="right"><%= format_decimal( diferido.entrada_dolar ) %></td>
+          <% else %>
+            <td width="70" align="right"><%= format_int( diferido.entrada_guarani ) %></td>
+          <% end %>
+        </tr>
+      <% end %> 
+    </table>
+  </div>
+</div>
+
+<script language="javascript">
+  function Fecha(cheque,titular,entrada_dolar,entrada_guarani){
+    window.opener.document.getElementById('cheque').value    = cheque;
+    window.opener.document.getElementById('titular').value   = titular;
+    window.opener.document.getElementById('valor_us').value  = entrada_dolar;
+    window.opener.document.getElementById('valor_gs').value  = entrada_guarani;
+    window.opener.document.getElementById('valor_rs').value  = 0;
+    self.close();
+  }
+</script>

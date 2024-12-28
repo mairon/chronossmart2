@@ -1,0 +1,122 @@
+<div class="panel">
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-10">
+        <h3><%= t('DOC') %>s</h3>
+      </div>
+      <div class="col-md-2">
+        <a class="modalButton-frma panel-icon-right" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-linha-credito">
+          <b>+</b>
+        </a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+      <div class="group">
+         <table class="head_grid">
+          <td width="50"></td>
+
+           <td width="300"><%= t("DOC")%></td>
+           <td width="100">Vencimento</td>
+         </table>
+         <div class="rolagem" id="div">
+           <table>
+            <% @persona.persona_docs.order("vencimento").each do |d| %>
+              <tr class="<%= cycle("cor1", "cor2")%>">
+                <td width="50">
+
+                  <%= link_to(d.doc_attach.url, target: '_blank') do %>
+                  <% if d.doc_attach_content_type == 'application/pdf' %>
+                      <%= image_tag 'ficheiro-pdf.png', class: 'img-thumbnail' %>
+                    <% else %>
+                      <%= image_tag d.doc_attach, class: 'img-thumbnail' %>
+                    <% end %>
+                  <% end %>
+                  </td>
+
+                <td width="300"><%= d.documento.nome unless d.documento.nil? %></td>
+                <td>
+                  <% if d.status == true %>
+                    <span class="label label-warning">Pendente</span>
+                  <% else %>
+                    <span class="label label-success">OK</span>
+                  <% end %>
+                </td>
+                <td width="100">
+                  <% if d.sem_venc == true %>
+                    SIN VENCIMIENTO
+                  <% else %>
+                    <% if d.status == true %>
+                        <% if Time.now.to_date > d.vencimento.to_date %>
+                          <span class="label label-danger"> <%= d.vencimento.strftime("%d/%m/%y") %></span>
+                        <% else %>
+                          <%= d.vencimento.strftime("%d/%m/%y") %>
+                        <% end %>
+                      <% else %>
+                        <%= d.vencimento.strftime("%d/%m/%y") %>
+                      <% end %>
+                  <% end %>
+
+                </td>
+                <td><%= link_to '', edit_persona_doc_path(d), class: 'icon-pencil' %></td>
+                <td><%= link_to '', d, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modal-linha-credito" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('DOC') %></h4>
+      </div>
+      <div class="modal-body">
+        <%= form_for(PersonaDoc.new, :html => { :multipart => true }) do |f| %>
+        <%= f.hidden_field :persona_id, value: @persona.id %>
+          <div class="row panel-modal-body">
+            <div class="col-md-12">
+              <label>Vencimento</label>
+              <%= f.date_select :vencimento, end_year: (Date.today.year + 15) %>
+            </div>
+            <div class="col-md-12">
+              <label></label>
+              <%= f.check_box :sem_venc %> Sin Vencimiento
+            </div>
+
+            <div class="col-md-12">
+              <label><%= t('DOC') %></label>
+              <%= f.collection_select :documento_id, Documento.where(folha: true),:id,:nome,{:prompt => 'Selecione '} %>
+            </div>
+            <div class="col-md-6">
+              <label>Imagem</label>
+              <%= f.file_field :doc_attach %>
+            </div>
+            <div class="col-md-12">
+              <label>Obs.</label>
+              <%= f.text_area :obs, class: "panel-field", rows: 5 %>
+            </div>
+
+           <div class="col-md-12">
+              <br>
+              <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+           </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $('#persona_doc_documento_id').selectize();
+</script>

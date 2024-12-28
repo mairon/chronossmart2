@@ -1,0 +1,139 @@
+sheet = workbook.create_worksheet
+sheet.name = "Relatorio de Stock"
+
+format  = Spreadsheet::Format.new( :color => "white", :weight => "bold", :pattern_fg_color => "gray", :pattern => 1, :align => :center)
+bold    = Spreadsheet::Format.new :weight => :bold, :align => :right
+left    = Spreadsheet::Format.new :align => :left
+right   = Spreadsheet::Format.new :align => :right
+center  = Spreadsheet::Format.new :align => :center
+sheet.row(00).default_format = format
+
+sheet[00,00]  = 'Fecha'
+sheet[00,01]  = 'Producto'
+sheet[00,02]  = 'Unit.'
+sheet[00,03]  = 'Total'
+sheet[00,04]  = 'Cantidad'
+
+indice    = 1
+quebra         = ""
+quebra2        = ""
+subunitario    = 0
+subtotal       = 0
+subquantidade  = 0
+subtotalbomba  = 0
+tottotal       = 0
+totquantidade  = 0 
+
+@stocks.each do |lancamento|
+
+
+          if quebra != lancamento.produto_nome
+             if quebra2 != lancamento.quantidade_bomba
+
+             if quebra != ""
+                if quebra2 != ""
+
+                    row = sheet.row(indice)
+                    row.push  ""
+                    row.push  ""
+                    row.push  ""
+                    row.push  number_to_currency(subunitario, :format=>' %n ', :precision => 0 )
+                    row.push  number_to_currency(subtotal, :format=>' %n ', :precision => 0 )
+                    row.push  number_to_currency(subquantidade, :format=>' %n ', :precision => 0 )
+
+                sheet.row(indice).set_format(0,  center)
+                sheet.row(indice).set_format(1,  right)
+                sheet.row(indice).set_format(2,  left)
+                sheet.row(indice).set_format(3,  left)
+                sheet.row(indice).set_format(4,  center)
+                sheet.row(indice).set_format(5,  center)
+                sheet.row(indice).set_format(6,  bold)
+                sheet.row(indice).set_format(7,  bold)
+                sheet.row(indice).set_format(8,  bold)
+
+                indice = indice + 1
+                indice = indice + 1
+
+                subunitario = 0
+                subtotal    = 0
+
+               end
+             end
+
+             quebra = lancamento.produto_nome
+
+          end
+          end
+
+          row = sheet.row(indice)
+          row.push  lancamento.data.strftime("%d/%m/%Y")
+          row.push  lancamento.produto_nome
+          row.push  number_to_currency(lancamento.unitario_guarani, :format=>' %n ', :precision => 0 )
+          row.push  number_to_currency(lancamento.unitario_guarani * lancamento.saida, :format=>' %n ', :precision => 0 )
+          row.push  number_to_currency(lancamento.saida, :format=>' %n ', :precision => 0 )
+
+
+          sheet.row(indice).set_format(0,  center)
+          sheet.row(indice).set_format(1,  right)
+          sheet.row(indice).set_format(2,  left)
+          sheet.row(indice).set_format(3,  left)
+          sheet.row(indice).set_format(4,  center)
+          sheet.row(indice).set_format(5,  center)
+          sheet.row(indice).set_format(6,  right)
+          sheet.row(indice).set_format(7,  right)
+          sheet.row(indice).set_format(8,  right)
+
+          indice    = indice + 1
+
+
+          subunitario   = subunitario + lancamento.unitario_guarani
+          subtotal      = subtotal + lancamento.unitario_guarani * lancamento.saida
+          tottotal      = tottotal + lancamento.unitario_guarani * lancamento.saida
+          totquantidade = totquantidade + lancamento.saida
+          subtotalbomba = lancamento.quantidade_bomba
+
+
+end
+
+row = sheet.row(indice)
+row.push  ""
+row.push  ""
+row.push  ""
+row.push  number_to_currency(tottotal, :format=>' %n ', :precision => 0 )
+row.push  number_to_currency(totquantidade, :format=>' %n ', :precision => 0 )
+row.push  number_to_currency(subtotalbomba, :format=>' %n ', :precision => 0 )
+row.push  number_to_currency(subtotalbomba + totquantidade, :format=>' %n ', :precision => 0 )
+
+
+sheet.row(indice).set_format(0,  center)
+sheet.row(indice).set_format(1,  right)
+sheet.row(indice).set_format(2,  left)
+sheet.row(indice).set_format(3,  left)
+sheet.row(indice).set_format(4,  center)
+sheet.row(indice).set_format(5,  center)
+sheet.row(indice).set_format(6,  bold)
+sheet.row(indice).set_format(7,  bold)
+sheet.row(indice).set_format(8,  bold)
+
+
+indice = indice + 1
+indice = indice + 1
+
+row = sheet.row(indice)
+row.push  ""
+row.push  ""
+row.push  ""
+row.push  number_to_currency(tottotal, :format=>' %n ', :precision => 0 )
+row.push  number_to_currency(totquantidade, :format=>' %n ', :precision => 0 )
+
+sheet.row(indice).set_format(0,  center)
+sheet.row(indice).set_format(1,  right)
+sheet.row(indice).set_format(2,  left)
+sheet.row(indice).set_format(3,  left)
+sheet.row(indice).set_format(4,  center)
+sheet.row(indice).set_format(5,  center)
+sheet.row(indice).set_format(6,  bold)
+sheet.row(indice).set_format(7,  bold)
+sheet.row(indice).set_format(8,  bold)
+
+

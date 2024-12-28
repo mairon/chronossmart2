@@ -1,0 +1,158 @@
+<h1 id="header">Transferencia Cuentas - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+<%= form_for(@transferencia_conta) do |f| %>
+  <% if @transferencia_conta.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@transferencia_conta.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+      <ul>
+        <% @transferencia_conta.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <table>
+    <tr>
+      <td>
+        <label><%= t('DATE') %></label>
+        <%= f.date_select :data %>
+      </td>
+
+      <td> 
+        <label>Cotz. GsxU$</label>
+        <%= f.text_field  :cotacao, size: 10, precision: 0, autofocus: true, required: true  %>
+      </td>
+      <td style="padding-left: 46px">
+        <label> GsxR$</label>
+        <%= f.text_field :cotacao_real, size: 10, precision: 0, required: true  %>
+      </td>
+    </tr>
+                      
+
+    <tr>
+      <td colspan="3">
+        <fieldset>
+          <legend>Tipo de Transacción</legend>
+          <%= f.radio_button :deposito, 0,  :Checked => "True" %> Transacción Entre Cuentas
+          <%= f.radio_button :deposito, 1 %> Depósito
+          <%= f.radio_button :deposito, 2 %> Transf. de Cheque en Efetivo
+        </fieldset>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="3">
+        <label>Nº</label>
+        <% if params[:action] == 'new' %>
+          <%= f.text_field :numero, size: 27, value: (Adelanto.where(tipo: 0).maximum(:id).to_i + 1).to_s.rjust(6,'0') %>
+        <% else %>
+          <%= f.text_field :numero, size: 27 %>
+        <% end %>
+      </td>      
+
+    </tr>
+
+    <!--CONTA ORIGEM !-->
+    <tr>        
+      <td>
+        <label>COnta Origem</label>
+        <%= f.collection_select :ingreso_id, Conta.all( :select => ' id,nome', 
+                :conditions => ["unidade_id = #{current_unidade.id}"], :order  => 'ordem' ), :id,:nome, {prompt: 'Seleccione la Cuenta'}, {required: true } %>
+      </td>
+
+            <!--DESTINO CONTA!-->
+      <td colspan="2">
+        <label>Conta Destino</label>
+        <%= f.collection_select :destino_id, Conta.all( :select => ' id,nome',:conditions => ["unidade_id = #{current_unidade.id}"], :order  => 'ordem' ), :id, :nome, {prompt: 'Seleccione la Cuenta'}, {required: true } %>
+      </td>
+
+          </tr>
+          
+          
+          <td colspan="3">
+              <fieldset>
+                <legend>Valores</legend>
+                <table>
+                  <tr>
+                     <%= field_gs_label 'Efectivo Gs:',f,:valor_guarani, :onchange => "GsToUsRs('transferencia_conta_cotacao','transferencia_conta_cotacao_real','transferencia_conta_valor_guarani','transferencia_conta_valor_dolar','transferencia_conta_valor_real')", required: true %>
+
+                     <%= field_us_label 'U$:',f,:valor_dolar,:onchange   => "UsToGsRs('transferencia_conta_cotacao','transferencia_conta_cotacao_real','transferencia_conta_valor_dolar','transferencia_conta_valor_guarani','transferencia_conta_valor_real')", required: true  %>
+
+                     <%= field_us_label 'R$:',f,:valor_real,
+                        :onchange   => "RsToUsGs('transferencia_conta_cotacao','transferencia_conta_cotacao_real','transferencia_conta_valor_guarani','transferencia_conta_valor_dolar','transferencia_conta_valor_real')", required: true %>
+                  </tr>
+                </table>
+              </fieldset>
+            </td>    
+      </table>
+      <table>
+        <tr>
+          <td><%= f.text_area :concepto, cols: 63, rows: 4, placeholder: 'Obs', required: true %></td>
+        </tr>
+      </table>
+
+      <div class="footer-buttons">
+        <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+        <%= link_to t('BACK'), transferencia_contas_path, :class => "btn btn-back" %>
+    </div>
+  <% end %>
+</div>
+
+<% if params[:action] == 'new' %>
+  <script>
+    //cotacao
+    $(document).ready(function() {
+
+      $('#transferencia_conta_data_3i').focus();
+
+      $.ajax({url: '/buscas/cotz_us_compra',
+              type: 'POST',
+              beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+              data: 'data=' + $('#transferencia_conta_data_3i').val()+'/'+
+                              $('#transferencia_conta_data_2i').val()+'/'+
+                              $('#transferencia_conta_data_1i').val(),
+              success: function(data){
+              $('#transferencia_conta_cotacao').val(number_format(data, 0, ',', '.'));} });
+
+      $.ajax({url: '/buscas/cotz_rs_compra',
+              type: 'POST',
+              beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+              data: 'data=' + $('#transferencia_conta_data_3i').val()+'/'+
+                              $('#transferencia_conta_data_2i').val()+'/'+
+                              $('#transferencia_conta_data_1i').val(),
+              success: function(data){
+              $('#transferencia_conta_cotacao_real').val(number_format(data, 0, ',', '.'));} });
+
+      $.ajax({url: '/buscas/cotz_rs_us_compra',
+              type: 'POST',
+              beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+              data: 'data=' + $('#transferencia_conta_data_3i').val()+'/'+
+                              $('#transferencia_conta_data_2i').val()+'/'+
+                              $('#transferencia_conta_data_1i').val(),
+              success: function(data){
+              $('#transferencia_conta_cotacao_rs_us').val(number_format(data, 2, ',', '.'));} });
+    });
+  </script>
+<% end %>
+
+<script>
+  function SetaMoeda(valor){
+    document.getElementById('moeda').value = valor
+  }
+
+  $('#transferencia_conta_ingreso_id, #transferencia_conta_destino_id').on('change', function() {
+    var origem  = $("#transferencia_conta_ingreso_id").val();
+    var destino = $("#transferencia_conta_destino_id").val();
+    if (origem == destino) {
+      alert('Las cuentas no pueden ser iguales!')
+      $("#transferencia_conta_destino_id").value(0);
+      $("#transferencia_conta_ingreso_id").focus();
+    }
+    
+  });
+
+  $('#transferencia_conta_ingreso_id').selectize();
+  $('#transferencia_conta_destino_id').selectize();
+</script>

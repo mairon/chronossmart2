@@ -1,0 +1,190 @@
+<%= form_for(@cobros_detalhe) do |f| %>
+  <%= f.hidden_field :cobro_id  %>
+  <%= f.hidden_field :persona_id,   :value => @cobros_detalhe.cobro.persona_id %>
+  <%= f.hidden_field :persona_nome, :value => @cobros_detalhe.cobro.persona_nome  %>
+  <%= f.hidden_field :data,         :value => @cobros_detalhe.cobro.data  %>
+  <%= f.hidden_field :venda_id %>
+  <%= f.hidden_field :clase_produto %>
+  <%= f.hidden_field :vendedor_id %>
+  <%= f.hidden_field :vendedor_nome %>
+  <%= f.hidden_field :pagare %>
+  <%= f.hidden_field :moeda, :value =>  @cobros_detalhe.cobro.moeda.to_i%>
+  <%= hidden_field_tag :cotacao,@cobros_detalhe.cobro.cotacao.to_i %>
+<div class="group_cd">
+  <table>
+    <tr >
+      <td align="right">Documento :</td>
+      <td><%= f.text_field :documento_nome, 
+                           :size     => 20 ,
+                           :readonly => "readonly"%></td>
+      <td align="right">N. Doc.:</td>
+      <td><%= f.text_field :documento_numero_01, 
+                           :size     => 2 ,
+                           :readonly => "readonly"%>
+          <%= f.text_field :documento_numero_02,
+                           :size     => 2 ,
+                           :readonly => "readonly"%>
+          <%= f.text_field :documento_numero,
+                           :size     => 20 ,
+                           :readonly => "readonly"%></td>
+      <td align="right">Cuota :</td>
+      <td><%= f.text_field :cota,
+                           :size     => 10 ,
+                           :readonly => "readonly"%></td>
+      <td align="right">Vencimento :</td>
+      <td><%= f.date_select :vencimento ,
+                            :readonly => "readonly"%></td>
+    </tr>
+
+    <tr >
+
+      <!-- VALORES DOLAR!-->
+      <% if @cobros_detalhe.cobro.moeda == 0 %>
+
+            <%= field_us 'Valor U$ :',f,:valor_dolar,:readonly => "readonly" %>
+            <%= f.hidden_field :valor_guarani %>
+            <%= f.hidden_field :valor_real %>
+
+            <%= field_us 'Anterior U$ :',f,:anterior_dolar,:readonly => "readonly" %>
+            <%= f.hidden_field :anterior_guarani %>
+            <%= f.hidden_field :anterior_real %>
+
+            <%= field_us 'Saldo U$ :',f,:saldo_dolar,:readonly => "readonly" %>
+            <%= f.hidden_field :saldo_guarani %>
+            <%= f.hidden_field :saldo_real %>
+
+      <!-- VALORES GUARANI !-->
+      <% elsif @cobros_detalhe.cobro.moeda == 1 %>
+      
+            <%= field_gs 'Valor Gs.:',f,:valor_guarani,:readonly => "readonly" %>
+            <%= f.hidden_field :valor_dolar %>
+            <%= f.hidden_field :valor_real %>
+
+            <%= field_gs 'Anterior Gs.:',f,:anterior_guarani,:readonly => "readonly" %>
+            <%= f.hidden_field :anterior_dolar %>
+            <%= f.hidden_field :anterior_real %>
+
+            <%= field_gs 'Saldo Gs.:',f,:saldo_guarani,:readonly => "readonly" %>
+            <%= f.hidden_field :saldo_dolar %>
+            <%= f.hidden_field :saldo_real %>
+
+      <% else %>
+
+            <%= field_us 'Valor R$ :',f,:valor_real, :readonly => "readonly" %>
+            <%= f.hidden_field :valor_dolar %>
+            <%= f.hidden_field :valor_real %>
+
+            <%= field_us 'Anterior R$ :',f,:anterior_real, :readonly => "readonly" %>
+            <%= f.hidden_field :anterior_dolar %>
+            <%= f.hidden_field :anterior_real %>
+
+            <%= field_us 'Saldo R$ :',f,:saldo_real, :readonly => "readonly" %>
+            <%= f.hidden_field :saldo_dolar %>
+            <%= f.hidden_field :saldo_real %>
+
+      <% end %>
+    </tr>
+     <tr>
+        <td align="right">Sector :</td>
+        <td>    
+        <%= f.collection_select :clase_produto, Setor.all( :select     => ' id,nome',
+          :order      => '2'),:id, :nome,{:include_blank => true},{} %>
+        </td>
+       <td colspan="5">Vendedor: <%= f.collection_select :vendedor_id, Persona.all( :select     => ' id,nome,tipo_vendedor',
+                                      :conditions => ["tipo_vendedor = 1"],
+                                      :order      => '2'),:id,:nome, { :include_blank => true },:class => "selc_medium" %></td>
+
+     </tr>
+
+    <tr >
+      <td></td>
+      <td colspan="6">
+        <fieldset>
+          <table>
+            <tr>
+             <% if @cobros_detalhe.cobro.moeda == 0 %>
+
+                    <%= field_us 'Descuento :',f,:desconto_dolar, :value => 0 %>
+
+                    <%= field_us 'Interes :',f,:interes_dolar %>
+                    <%= f.hidden_field :interes_guarani %>
+                    <%= f.hidden_field :interes_real %>
+
+                    <%= field_us 'U$ :',f,:cobro_dolar %>
+
+             <% elsif @cobros_detalhe.cobro.moeda == 1 %>
+                    <%= field_gs 'Descuento :',f, :desconto_guarani, :value => 0 %>
+
+                    <% if current_user.tipo.to_i == 0 %>
+                      <%= field_gs_label 'Interes',f,:interes_guarani %>
+                    <% else %>
+                      <%= field_gs_label 'Interes',f,:interes_guarani, :readonly => "readonly" %>
+                    <% end %>
+
+                    <%= field_gs 'Gs.:',f,:cobro_guarani %>
+                    <%= f.hidden_field :interes_dolar %>
+                    <%= f.hidden_field :interes_real %>
+
+             <% else %>
+
+                    <%= field_us 'Descuento :',f,:desconto_real, :value => 0 %>
+
+                    <%= field_us 'Interes :',f,:interes_real %>
+                    <%= f.hidden_field :interes_guarani %>
+                    <%= f.hidden_field :interes_dolar %>                    
+
+                    <%= field_us 'U$ :',f,:cobro_real %>
+
+             <% end %>
+            </tr>
+            <tr>
+             <td><%= f.check_box :interes %><%= t('INTEREST') %></td>
+              <td align="right">Estado:</td>
+              <td colspan="2"><%= f.radio_button :estado,0, :Checked => "True", :onblur => "VerificaValor()"%> Parte</td>
+              <td><%= f.radio_button :estado,1, :onblur => "VerificaValor()"  %> Cancelacion</td>
+              
+            </tr>
+          </table>
+          
+        </fieldset>
+      </td>
+      <td valign="bottom">
+        <%= f.submit t('SAVE'), :class => 'button' %>
+      </td>
+    </tr>
+
+  </table>
+<div class="buttons">
+  <a href="/cobros/<%=@cobros_detalhe.cobro_id %>" class="button back"><%= t('BACK') %></a> 
+</div>
+
+</div>
+  
+  <script>
+    //ABRI POPUP-----------------------------------------------------------------
+    document.onkeydown=function(e)
+    {
+      var id      = document.getElementById("cobros_detalhe_cobro_id") .value;
+      if(e.which == 113)
+        window.open('/cobros/busca_cliente/'+id, 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=10, WIDTH=1400, HEIGHT=400');
+    }
+    //FIM ABRI POPUP----------------------------------------------------------------
+
+
+function VerificaValor(){
+  if ( document.getElementById('moeda').value == '0' ){
+        if ( (document.getElementById('cobros_detalhe_cobro_dolar').value == document.getElementById('cobros_detalhe_saldo_dolar').value) && ( document.getElementById('cobros_detalhe_estado_0').checked)) {
+            alert('Verifique se no es Cancelacion lo Lanzamiento!')
+        }
+  }
+  else if ( document.getElementById('moeda').value == 1 ){
+    alert('dolar') 
+  }
+  else {
+    alert('dolar') 
+  }
+}
+
+
+  </script>
+<% end %>

@@ -1,0 +1,119 @@
+<style>
+  .tots-dash #header-dash{
+    font-size: 18px;
+    margin: 0 auto;
+    display: block;
+    padding: 17px 20px;
+    color: #777777;
+    border-bottom: 1px solid #F3F5F8;
+  }
+
+  .tots-dash .panel-body{
+    font-size: 26px;
+    color: #777777;
+    font-weight: bold;
+    padding: 10px !important;
+
+  }
+
+</style>
+<% if params[:data_inicio] == nil %>
+<% periodo = "AND date_part('month', V.DATA) = '#{Time.now.strftime('%m')}'  AND  date_part('year', V.DATA) = '#{Time.now.strftime('%Y')}'" %>
+<% else %>
+<% periodo = "AND V.DATA BETWEEN '#{params[:data_inicio].to_s.split("/").reverse.join("-")}' AND '#{params[:data_final].to_s.split("/").reverse.join("-")}'" %>
+<% end %>
+
+
+<% sql = "SELECT SUM(TOT_GS) AS TOT_GS, SUM(QTD) AS QTD FROM (
+        SELECT
+              SUM(VP.TOTAL_GUARANI - VP.DESCONTO_GUARANI) AS TOT_GS,
+              SUM(VP.QUANTIDADE) AS QTD
+        FROM VENDAS_PRODUTOS VP
+        INNER JOIN VENDAS V
+        ON V.ID = VP.VENDA_ID
+        WHERE V.UNIDADE_ID = #{current_unidade.id}
+        #{periodo}
+        AND (SELECT COUNT(VF) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID ) > 0
+
+        UNION ALL
+
+        SELECT
+                (SUM(VP.TOTAL_GUARANI) * -1) AS TOT_GS,
+                (SUM(VP.QUANTIDADE) * -1) AS QTD
+            FROM
+              NOTA_CREDITOS_DETALHES VP
+              INNER JOIN NOTA_CREDITOS V
+              ON V.ID = VP.NOTA_CREDITO_ID
+            WHERE V.OPERACAO = 0
+            #{periodo}
+            AND V.UNIDADE_ID = #{current_unidade.id}
+
+        ) AS X"
+
+    count_fact = Venda.find_by_sql(sql)
+  %>
+
+<% sqlv = "SELECT COUNT(V.ID) QTD_VENDA FROM VENDAS V  WHERE V.ID > 0 #{periodo} AND (SELECT COUNT(VF) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID ) > 0 AND V.UNIDADE_ID = #{current_unidade.id}" %>
+
+<% f_venda = Venda.find_by_sql(sqlv) %>
+
+  <div class="col-md-3">
+    <div class="panel tots-dash">
+      <h1 id="header-dash" align="center">
+        Facturación
+      </h1>
+      <div class="panel-body">
+        <h1 align="center"><%= format_int(count_fact[0].tot_gs.to_f) %></h1>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="col-md-3">
+    <div class="panel tots-dash">
+      <h1 id="header-dash" align="center">
+        Ticket Médio por Ventas
+      </h1>
+      <div class="panel-body">
+        <h1 align="center"><%= format_int(count_fact[0].tot_gs.to_f / f_venda[0].qtd_venda.to_f) %></h1>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <div class="col-md-2">
+    <div class="panel tots-dash">
+      <h1 id="header-dash" align="center">
+        Qtd Ventas
+      </h1>
+      <div class="panel-body">
+        <h1 align="center"><%= format_int(f_venda[0].qtd_venda.to_f) %></h1>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="panel tots-dash">
+      <h1 id="header-dash" align="center">
+        Qtd Prod. Vds.
+      </h1>
+      <div class="panel-body">
+        <h1 align="center"><%= format_int(count_fact[0].qtd.to_f) %></h1>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-2">
+    <div class="panel tots-dash">
+      <h1 id="header-dash" align="center">
+        Precio Médio
+      </h1>
+      <div class="panel-body">
+        <h1 align="center"><%= format_int(count_fact[0].tot_gs.to_f / count_fact[0].qtd.to_f) %></h1>
+      </div>
+    </div>
+  </div>
+
+

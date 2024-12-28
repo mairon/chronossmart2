@@ -1,0 +1,35 @@
+<div class="group">
+   <table class="head_grid">
+      <tr>
+       	<td width="50" align="center"></td>
+        <td width="80" align="center">Cod.</td>
+        <td width="600">Producto</td>
+        <td width="80" align="right">Cantidad</td>
+      </tr>
+   </table>
+   <div class="rolagem_cobro" dir="div">
+      <table>
+		<% indice = 1 %>
+		<% qtd = 0 %>
+	  	<% @transferencia_deposito_detalhes.each do |tdp| %>
+      <% tdp.update_attribute :custo_guarani, 0 %>
+          <tr class = "<%= cycle("cor1", "cor2") %>">
+		      <td width="50" align="center"><%=h indice %></td>
+		      <td width="80"><%=h tdp.produto_id %></td>
+		      <td width="600" align="left"><%=h tdp.produto_nome %></td>
+		      <td width="80" align="right"><%=h tdp.quantidade %></td>
+		      <% qtd += tdp.quantidade.to_f %>
+		  </tr>
+		  <% indice += 1 %>
+		<% end %>
+	</table>
+</div>
+<table class="head_grid">
+  <tr>
+   	<td width="50" align="center"></td>
+    <td width="80" align="center"></td>
+    <td width="600" align="center"></td>
+    <td width="80" align="right"><%= qtd %></td>
+  </tr>
+</table>
+

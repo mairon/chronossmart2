@@ -1,0 +1,73 @@
+<table class="head_grid">
+   <tr>
+      <% if @compra.tipo == 0 %>
+         <td width="200"><%= t('ACCOUNT') %></td>
+         <td width="150"><%= t('CHECKS') %></td>
+      <% else %>
+         <td width="50" align="center"><%= t('SHARE') %></td>
+         
+      <% end %>
+      <td width="40" align="center"><%= t('COIN') %></td>
+      <td width="70" align="right">Valor </td>
+      <td width="80" align="center">Venc.</td>
+      <td width="77"></td>
+   </tr>
+</table>
+<div class="rolagem" dir="div" style="height: 200px">
+   <table>
+      <% tot_us = 0 %>
+      <% tot_gs = 0 %>
+      <% tot_rs = 0 %>
+      <% block  = 0 %>
+      <% @prov_produtos.each do |cf| %>
+         <tr class = "<%= cycle("cor1", "cor2") %>">
+            <% if @compra.tipo == 0 %>
+               <td width="200"><%= cf.conta.nome unless cf.conta_id.blank? %></td>
+               <td width="150"><%= cf.cheque %></td>
+            <% else %>
+               <td width="50" align="center"><%= cf.cota %></td>   
+
+            <% end %>
+            
+            
+            <% if cf.moeda == 0 %>
+               <td width="40" align="center">U$.</td>
+               <td width="70" align="right"><%= format_decimal(cf.valor_dolar) %></td>
+               <% tot_us += cf.valor_dolar %>
+            <% elsif cf.moeda == 1 %>
+               <td width="70" align="center">Gs.</td>
+               <td width="70" align="right"><%= format_int(cf.valor_guarani) %></td>
+               <% tot_gs += cf.valor_guarani %>
+            <% else %>
+               <td width="70" align="center">R$.</td>
+               <td width="70" align="right"><%= format_decimal(cf.valor_real) %></td>
+               <% tot_rs += cf.valor_real %>
+            <% end %>
+            <% if cf.tipo == 0 %>
+               <td width="80" align="center"><%= cf.diferido.strftime("%d/%m/%y") %></td>
+            <% else %>
+               <td width="80" align="center"><%= cf.vencimento.strftime("%d/%m/%y") %></td>
+            <% end %>
+            <% doc = Proveedore.count(:id, :conditions => "tabela_id != #{cf.id} and persona_id = #{cf.persona_id} and documento_numero_01 = '#{cf.documento_numero_01}' and documento_numero_02 = '#{cf.documento_numero_02}' and documento_numero = '#{cf.documento_numero}' and cota = #{cf.cota}") %>
+               <td><%= link_to 'Editar', edit_compras_financa_path(cf) %></td>
+               <td><%= link_to t('DELETE'), cf, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+         </tr>
+         <% end %>
+   </table>
+</div>
+<table>
+   <tr>
+      <td width="90"></td>
+      <td width="100" align="right">
+         <b>
+         <% if @compra.moeda.to_i == 0  %>
+            <%=h number_to_currency(tot_us, :format=>' %n ', :separator => ",")  %>
+         <% elsif @compra.moeda.to_i == 1 %>
+            <%=h number_to_currency(tot_gs, :format=>' %n ', :precisin => 0)  %>
+         <% else %>
+            <%=h number_to_currency(tot_rs, :format=>' %n ', :separator => ",")  %>
+         <% end %>
+         </b>
+      </td>
+   </tr>
+</table>

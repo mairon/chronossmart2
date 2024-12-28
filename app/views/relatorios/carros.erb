@@ -1,0 +1,39 @@
+   <h1 id="header"> Relatorio Carros</h1>
+
+   <div class="group">
+      <h2>
+         <%= form_tag resultado_carros_path, :method => 'get' do%>
+            <table>
+
+               <tr height="35">
+                  <td align="right">Marca:</td>
+                  <td>
+                     <input name="marca" id="marca"  size="10"  type="text" />
+                     Marca
+                  </td>
+               </tr>
+
+              <tr height="35">
+                  <td></td>
+                  <td>
+                     <input  id      ="button"
+                             type    ="submit"
+                             value   ="            Informe           "
+                             onclick = "Tipo('0')"/>
+
+                     <input type     = "submit"
+                            value    = "            Excel            "
+                            onclick  = "Tipo('1')"/>
+                  </td>
+               </tr>
+
+               <input type  = "hidden"
+                      name  = "tipo"
+                      id    = "tipo"
+                      size  = "5"
+                      value = "0"/>
+
+            </table>
+         <% end %>
+      </h2>
+   </div>

@@ -1,0 +1,28 @@
+<h1 id="header">Catastros > Grupos</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_grupo_path, :class => "button add" %>
+</div>
+
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="55" align="center"><%= t('CODE') %></td>
+      <td width="300" align="center">Descripción</td>
+      <td width="80" align="right">Cantidad Productos Relacionados</td>
+      <td width="50"></td>
+    </tr>
+  </table>
+  <div class="rolagem" id="div">
+    <table>
+      <% for classe in @grupos %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="55" align="center"><%=h classe.id.to_s.rjust(6,'0') %></td>
+          <td width="300" align="left"><%=h classe.descricao %></td>
+          <td width="80" align="right"><%= Produto.count(:id, conditions: "grupo_id = #{classe.id}") %></td>
+          <td><%= link_to '', edit_grupo_path(classe), class: 'icon-pencil' %></td>
+          <td><%= link_to '', classe, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+<p>
+  <b>Nc proveedor:</b>
+  <%=h @nc_proveedor_fatura.nc_proveedor_id %>
+</p>
+
+<p>
+  <b><%= t('PERSON') %>:</b>
+  <%=h @nc_proveedor_fatura.persona_id %>
+</p>
+
+<p>
+  <b>Persona <%= t('NAME') %>:</b>
+  <%=h @nc_proveedor_fatura.persona_nome %>
+</p>
+
+<p>
+  <b>Documento numero 01:</b>
+  <%=h @nc_proveedor_fatura.documento_numero_01 %>
+</p>
+
+<p>
+  <b>Documento numero 02:</b>
+  <%=h @nc_proveedor_fatura.documento_numero_02 %>
+</p>
+
+<p>
+  <b>Documento numero:</b>
+  <%=h @nc_proveedor_fatura.documento_numero %>
+</p>
+
+<p>
+  <b>Status:</b>
+  <%=h @nc_proveedor_fatura.status %>
+</p>
+
+<p>
+  <b><%= t('DATE') %>:</b>
+  <%=h @nc_proveedor_fatura.data %>
+</p>
+
+
+<%= link_to 'Edit', edit_nc_proveedor_fatura_path(@nc_proveedor_fatura) %> |
+<%= link_to 'Back', nc_proveedor_faturas_path %>

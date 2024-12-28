@@ -1,0 +1,38 @@
+  <table class="head_grid">
+    <tr>
+      <td width="80" align="center">Fecha</td>
+      <td width="100" align="center">Horario</td>
+      <td width="200">Responsable</td>
+      <td width="250">Cliente</td>
+      <td width="200">Servicio/Producto</td>
+      <td width="200">Obs</td>
+    </tr>
+  </table>
+  <div class="rolagem" id="div">
+    <table>
+      <% @tarefas.each do |c| %>
+        <tr class = "<%= cycle("cor1", "cor2")%>" >
+          <td width="80" align="center">
+            <%= c.dia_inicio.to_datetime.strftime("%d/%m/%y") %>
+            <%= l(c.dia_inicio.to_date, :format => :dia_semana, locale: 'es') %>
+          </td>
+          <td width="100" align="center">
+            <%= c.dia_inicio.to_datetime.strftime("%H:%M") %>-<%= c.dia_final.to_datetime.strftime("%H:%M") %>
+          </td>
+          <td width="200">
+            <small>
+            <p style=" padding: 3px; border-radius: 5px; display: inherit; background-color: <%= c.color_tag %>;">
+              <%= c.vendedor_nome  %>
+            </p>
+            </small>
+          </td>
+          <td width="250"><small><%= c.persona_nome %></small></td>
+          <td width="200"><small><%= c.produtos_tarefas.map  { |t| t.produto.nome }.join(', ') %></small></td>
+          <td width="200"><small><%= c.descricao %></small></td>
+          <td><%= link_to '', edit_tarefa_path(c), class: 'icon-pencil' %></td>
+          <td><%= link_to '', c, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+
+        </tr>
+      <% end %>
+    </table>
+  </div>

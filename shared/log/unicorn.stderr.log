@@ -1,0 +1,84 @@
+I, [2024-01-16T19:20:02.148800 #9]  INFO -- : Refreshing Gem list
+The PGconn, PGresult, and PGError constants are deprecated, and will be
+removed as of version 1.0.
+
+You should use PG::Connection, PG::Result, and PG::Error instead, respectively.
+
+Called from /usr/local/bundle/gems/activesupport-3.2.22.5/lib/active_support/dependencies.rb:236:in `load_dependency'
+I, [2024-01-16T19:20:04.728207 #9]  INFO -- : listening on addr=0.0.0.0:3000 fd=11
+F, [2024-01-16T19:20:04.728743 #9] FATAL -- : error adding listener addr=/chronos-smart2/shared/sockets/unicorn.sock
+Errno::EOPNOTSUPP: Operation not supported - connect(2) for /chronos-smart2/shared/sockets/unicorn.sock
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `initialize'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `new'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `bind_listen'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:242:in `listen'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `block in bind_new_listeners!'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `each'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `bind_new_listeners!'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:141:in `start'
+  /usr/local/bundle/gems/unicorn-6.1.0/bin/unicorn:128:in `<top (required)>'
+  /usr/local/bundle/bin/unicorn:23:in `load'
+  /usr/local/bundle/bin/unicorn:23:in `<top (required)>'
+I, [2024-01-16T19:30:05.886929 #9]  INFO -- : Refreshing Gem list
+The PGconn, PGresult, and PGError constants are deprecated, and will be
+removed as of version 1.0.
+
+You should use PG::Connection, PG::Result, and PG::Error instead, respectively.
+
+Called from /usr/local/bundle/gems/activesupport-3.2.22.5/lib/active_support/dependencies.rb:236:in `load_dependency'
+I, [2024-01-16T19:30:08.569706 #9]  INFO -- : listening on addr=0.0.0.0:3000 fd=11
+F, [2024-01-16T19:30:08.570124 #9] FATAL -- : error adding listener addr=/chronos-smart2/shared/sockets/unicorn.sock
+Errno::EOPNOTSUPP: Operation not supported - connect(2) for /chronos-smart2/shared/sockets/unicorn.sock
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `initialize'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `new'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `bind_listen'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:242:in `listen'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `block in bind_new_listeners!'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `each'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `bind_new_listeners!'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:141:in `start'
+  /usr/local/bundle/gems/unicorn-6.1.0/bin/unicorn:128:in `<top (required)>'
+  /usr/local/bundle/bin/unicorn:23:in `load'
+  /usr/local/bundle/bin/unicorn:23:in `<top (required)>'
+I, [2024-01-16T19:30:53.270494 #9]  INFO -- : Refreshing Gem list
+The PGconn, PGresult, and PGError constants are deprecated, and will be
+removed as of version 1.0.
+
+You should use PG::Connection, PG::Result, and PG::Error instead, respectively.
+
+Called from /usr/local/bundle/gems/activesupport-3.2.22.5/lib/active_support/dependencies.rb:236:in `load_dependency'
+I, [2024-01-16T19:30:55.860552 #9]  INFO -- : listening on addr=0.0.0.0:3000 fd=11
+F, [2024-01-16T19:30:55.860982 #9] FATAL -- : error adding listener addr=/chronos-smart2/shared/sockets/unicorn.sock
+Errno::EOPNOTSUPP: Operation not supported - connect(2) for /chronos-smart2/shared/sockets/unicorn.sock
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `initialize'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `new'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `bind_listen'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:242:in `listen'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `block in bind_new_listeners!'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `each'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `bind_new_listeners!'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:141:in `start'
+  /usr/local/bundle/gems/unicorn-6.1.0/bin/unicorn:128:in `<top (required)>'
+  /usr/local/bundle/bin/unicorn:23:in `load'
+  /usr/local/bundle/bin/unicorn:23:in `<top (required)>'
+I, [2024-01-16T19:32:37.190358 #9]  INFO -- : Refreshing Gem list
+The PGconn, PGresult, and PGError constants are deprecated, and will be
+removed as of version 1.0.
+
+You should use PG::Connection, PG::Result, and PG::Error instead, respectively.
+
+Called from /usr/local/bundle/gems/activesupport-3.2.22.5/lib/active_support/dependencies.rb:236:in `load_dependency'
+I, [2024-01-16T19:32:39.942373 #9]  INFO -- : listening on addr=0.0.0.0:3000 fd=11
+F, [2024-01-16T19:32:39.942817 #9] FATAL -- : error adding listener addr=/chronos-smart2/shared/sockets/unicorn.sock
+Errno::EOPNOTSUPP: Operation not supported - connect(2) for /chronos-smart2/shared/sockets/unicorn.sock
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `initialize'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `new'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `bind_listen'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:242:in `listen'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `block in bind_new_listeners!'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `each'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `bind_new_listeners!'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:141:in `start'
+  /usr/local/bundle/gems/unicorn-6.1.0/bin/unicorn:128:in `<top (required)>'
+  /usr/local/bundle/bin/unicorn:23:in `load'
+  /usr/local/bundle/bin/unicorn:23:in `<top (required)>'

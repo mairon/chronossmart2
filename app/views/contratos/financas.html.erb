@@ -1,0 +1,54 @@
+<ul class="tabs">
+	<li><a href="#tab1"> Contratos Forma de Pago - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="group">
+
+	<% if @contrato.contrato_financas.present? %>
+	<tr>
+		<td ></td>
+		<td align="left"><%= link_to "Remover", destroy_all_contrato_path(@contrato.id), class: "button remove" %></td>
+	</tr>
+	<% end%>
+
+	<p>
+		<%= render partial:  "/contrato_financas/index_financas", locals: {contrato_financas: @contrato.contrato_financas} %>
+	</p>
+
+	<%= form_tag gera_cotas_contrato_path, id: @contrato.id, method: "get" do %>
+		<%= hidden_field_tag :total_gs, @contrato.contrato_servicos.sum(:total_gs) %>
+		<%= hidden_field_tag :total_us, @contrato.contrato_servicos.sum(:total_us) %>
+			<% unless @contrato.contrato_financas.present? %>
+				<table>
+					<tr>
+						<td align="right">Cuotas:</td>
+						<td><%= text_field_tag :cotas, nil, :size=>"6" %></td>
+
+						<td align="right">Dia de cobrança:</td>
+						<td><%= text_field_tag :cobranca, nil, :size=>"6" %></td>
+
+						<td align="right"><%= submit_tag "Generar Cuotas ", class: "button add" %></td>
+					</tr>
+				</table>
+			<% end %>
+	<% end%>
+	<div class="buttons">
+		<%= link_to t('BACK'), contrato_path(@contrato.id), :class => "button back" %>
+		<%= link_to 'Finalizar', contratos_path, :class => "button next" %>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		jQuery.validator.setDefaults({
+			success: "valid"
+		});
+
+		$("form").validate({
+			rules: {
+				cotas: "required",
+				cobranca: "required"
+			}
+		});
+	});
+</script>

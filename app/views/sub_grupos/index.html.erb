@@ -1,0 +1,25 @@
+<h1 id="header">Catastros > Sub-Grupo</h1>
+<div class="acessos">
+   <%= link_to t('NEW'), new_sub_grupo_path, :class => 'button add' %>    
+</div>
+
+<div class="group">
+   <table class="head_grid">
+      <tr>
+         <td width="50" align="center"><%= t('CODE') %></td>
+         <td width="500">Descripción</td>
+      </tr>
+   </table>
+   <div class="rolagem" id="div">
+      <table>
+         <% @sub_grupos.each do |sub_grupo| %>
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+               <td width="50" align="center"><%= sub_grupo.id.to_s.rjust(6,'0') %></td>
+               <td width="500" align="left"><%= sub_grupo.descricao %></td>
+               <td><%= link_to '', edit_sub_grupo_path(sub_grupo), class: 'icon-pencil' %></td>
+               <td><%= link_to '', sub_grupo, :confirm => 'Are you sure?', :method => :delete, class: 'icon-trash' %></td>
+            </tr>
+         <% end %>
+      </table>
+   </div>
+</div>

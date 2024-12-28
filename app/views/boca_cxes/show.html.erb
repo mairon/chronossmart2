@@ -1,0 +1,34 @@
+<ul class="tabs">
+	<li><a href="#tab1"> Boca Caja Productos - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="group">
+	<h2>
+		<p>
+		  <strong style="margin-left: 10px;">Descripción:</strong>
+		  <%= @boca_cx.nome %>
+		 </p>
+		 &nbsp
+		<p hidden="">
+		  <strong style="margin-left: 10px;">Comisión:</strong>
+		  <%= number_to_currency( @boca_cx.comissao.to_f , :format =>'%n', :separator => "," ) %>
+		</p>
+		&nbsp
+		<p>
+		  <strong style="margin-left: 10px;">De:</strong>
+		  <%= @boca_cx.periodo_inicio.strftime("%d/%m/%Y")  %>
+		  <strong style="margin-left: 100px;"><%= t('TO') %>:</strong>
+		  <%= @boca_cx.periodo_final.strftime("%d/%m/%Y") %>
+		</p>
+	</h2>
+</div>
+
+<p>
+	<%= render partial: "/boca_cx_produtos/index_boca_cxes", locals: {boca_cx_produtos: @boca_cx.boca_cx_produtos} %>
+</p>
+
+<p>
+	<%= render partial: "/boca_cx_produtos/new_boca_cxes", locals: {boca_cx_produtos: BocaCxProduto.new(boca_cx_id: @boca_cx.id) } %>
+</p>
+
+

@@ -1,0 +1,23 @@
+
+<table class="head_grid">
+  <tr>
+    <td width="200">Producto</td>
+    <td width="70">Precio U$</td>
+    <td width="70">Precio G$</td>
+    <td width="70">Precio R$</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div" style="height:220px">
+  <table>
+    <% persona_produtos.each do |pp| %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td width="200"><%= pp.produto.nome %></td>
+        <td width="70" align="right"><%= format_decimal(pp.preco_us.to_f) %></td>
+        <td width="70" align="right"><%= format_int(pp.preco_gs.to_f) %></td>
+        <td width="70" align="right"><%= format_decimal(pp.preco_rs.to_f) %></td>
+        <td><%= link_to t('DELETE'), pp, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>

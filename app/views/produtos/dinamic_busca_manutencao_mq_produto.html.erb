@@ -1,0 +1,52 @@
+<table   class="head_grid">
+   <tr>
+      <td width="80" align="center">Cod.</td>
+      <td width="80" align="center">Cod. Fabr.</td>
+      <td width="150" align="center">Ubicacion</td>
+      <td width="500" align="center">Producto</td>
+      <td width="80" align="center">Saldo</td>
+      <td width="100" align="center">Costo U$.</td>
+      <td width="100" align="center">Costo Gs.</td>
+
+   </tr>
+</table>
+
+<div class="rolagem" id="div">
+   <table>
+
+      <% @produtos.each do |produto| %>
+
+         <% stock = Stock.sum( 'entrada - saida',:conditions => ['produto_id = ?',produto.id] ) %>
+         <tr class = "<%= cycle( "cor1", "cor2" )%>"
+             onMouseOver="javascript:this.style.backgroundColor='#949494'"
+             onMouseOut="javascript:this.style.backgroundColor=''"
+             onClick="Fecha( '<%= produto.id %>',
+                   '<%= produto.nome %>',
+                   '<%= produto.clase_id %>',
+                   '<%= produto.grupo_id %>',
+                   '<%= produto.sub_grupo_id %>',
+                   '<%= produto.fabricante_cod %>',
+                   '<%= number_to_currency(produto.preco_venda_dolar.to_f, :format=>' %n ', :separator => ",") %>',
+                   '<%= number_to_currency(produto.preco_venda_guarani.to_f.to_f, :format=>' %n ', :separator => ",") %>',
+                   '<%= stock %>')">
+            <td width="80" align="center"> <%=h produto.id%> </td>
+            <td width="80" align="center"> <%=h produto.fabricante_cod%> </td>
+            <td width="150" align="left">   <%=h produto.locacao%> </td>
+            <td width="500" align="left">   <%=h produto.nome%> </td>
+            <% if stock.to_i <= 0 %>
+               <td width="80"  align="center"><font color="red"> <%=h format( "%.3f",stock.to_f ) %></font> </td>
+            <%else%>
+               <td width="80"  align="center"><font color="green"> <%=h format( "%.3f",stock.to_f ) %></font> </td>
+            <%end%>
+            <td width="100" align="right">   <%= number_to_currency(produto.preco_venda_dolar.to_f.to_f, :format=>' %n ', :separator => ",")%> </td>
+            <td width="100" align="right">   <%= number_to_currency(produto.preco_venda_guarani.to_f.to_f, :format=>' %n ', :precision => 0)%> </td>
+         </tr>
+      <% end %>
+   </table>
+</div>
+
+
+
+
+
+

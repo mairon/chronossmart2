@@ -1,0 +1,97 @@
+<div class="group">
+ <%= form_tag "#", :method => "get" do %>
+    <%= hidden_field_tag :unidade, current_unidade.id %>
+
+    <div class="row">     
+      <div class="col-md-5">
+        <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+        <div class="input-group-addon-f" style="margin-right: 10px">
+          <span class="icon-calendar"></span>
+        </div>      
+
+        <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+        <div class="input-group-addon-f">
+          <span class="icon-calendar"></span>
+        </div>            
+      </div>
+
+      <div class="col-md-2">
+        <select name="tipo" id="tipo">
+          <option>CLIENTE</option>
+          <option selected>CODIGO</option>
+          <option><%= t('DOC').upcase %></option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <div class="input-group">
+          <span class="input-group-btn">
+            <button type="button" class="btn btn-default">
+              <i class="icon-search" aria-hidden="true"></i>
+            </button>
+          </span>
+          <input id="busca" name="busca" type="search" value="<%= params[:busca]%>" placeholder="Buscar" onKeyUp="pesquisa(document.getElementById('busca').value)" autocapitalize="off" autocomplete="off" autocorrect="off" autofocus />
+
+          
+        </div>         
+      </div>  
+      <div class="col-md-2">
+        <input type="button" class="btn btn-blue" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar" />
+        <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinner", :width => 21, :height => 21, :style =>"display: none;" ) %>
+      </div>
+    </div>
+  
+  <% end %>
+</div>
+
+<br>
+
+
+<div class="group">
+	<div id="pagina"></div>
+</div>
+
+
+<script language="javascript">
+  $(".acao_rm").click(function() {
+  	$('#modal_devolucao').modal('show');    
+  });
+
+  function pesquisa(valor){
+    url="/venda_devolucaos/busca_vendas?" + $('form').serialize();
+    ajax(url);    
+  }
+</script>
+
+
+<script type="text/javascript">
+function checkclick() { 
+	 if ($("#selectAllM").is(':checked')) {
+       $('.m').each(function() {
+           this.checked = true;
+       });
+   } else {
+      $('.m').each(function() {
+           this.checked = false;
+       });
+   } 
+};
+</script>
+
+<script LANGUAGE="JavaScript">  
+ <!--  
+ var total     = 0;  
+ function soma(campo) { 
+  var valor = document.getElementById( 'valor_' + campo.value).value;
+
+  if (campo.checked)  {
+    total     += eval( valor.replace(/\./g, "").replace(",", ".") );
+    
+  } else {
+    total     -= eval( valor.replace(/\./g, "").replace(",", ".") );
+  }
+  document.getElementById('valor').value = ( number_format( total,0, ',', '.') );
+ }  
+ //-->  
+ </SCRIPT> 
+<%= javascript_include_tag 'busca_ajax' %>
+

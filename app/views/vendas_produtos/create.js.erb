@@ -1,0 +1,37 @@
+
+<% if @vendas_produto.errors.any? %>
+
+	$('#error_explanation').html("<ul><% @vendas_produto.errors.full_messages.each do |msg| %><li><%= escape_javascript ( msg ) %></li> <% end %></ul>");
+	$("#error_explanation").show(300);
+
+<% else %>
+	$('#new_vendas_produto')
+	$('#vendas_produtos').append("<%= escape_javascript(render(:partial => @vendas_produto)) %>");
+	$("#sub_total_dolar").html("<%= number_to_currency(VendasProduto.sum(:total_dolar,   :conditions => ['venda_id = ?',@vendas_produto.venda_id]), :format=>' %n ', :precision => 2)%>");	
+	$("#total_dolar").html("<%= number_to_currency( ( (VendasProduto.sum(:total_dolar,   :conditions => ['venda_id = ?',@vendas_produto.venda_id]).to_f ) - (Venda.where(id: @vendas_produto.venda_id).last.desconto_us.to_f )  ), :format=>' %n ', :precision => 2)%>");	
+
+	$("#sub_total_guarani").html("<%= number_to_currency(VendasProduto.sum(:total_guarani,   :conditions => ['venda_id = ?',@vendas_produto.venda_id]), :format=>' %n ', :precision => 0)%>");	
+	$("#total_guarani").html("<%= number_to_currency( ( (VendasProduto.sum(:total_guarani,   :conditions => ['venda_id = ?',@vendas_produto.venda_id]).to_f ) - (Venda.where(id: @vendas_produto.venda_id).last.desconto_gs.to_f )  ), :format=>' %n ', :precision => 0)%>");	
+
+
+	<% count_linhas = VendasProduto.where(venda_id: @vendas_produto.venda_id).count(:id) %>
+	<% if count_linhas.to_i == 13 %>
+		alert('ya alcanzó maximos de líneas en la factura!')
+	<% else %>
+	  $("#count-linhas").html("<%= count_linhas %>");
+	  $("#count-produtos").html("<%= VendasProduto.where(venda_id: @vendas_produto.venda_id).sum(:quantidade).to_i %>");
+  <% end %>
+
+  	$('#venda_persona_nome').attr('readonly', 'readonly');
+
+	$("#total_real").html("<%= number_to_currency(VendasProduto.sum(:total_real,   :conditions => ['venda_id = ?',@vendas_produto.venda_id]), :format=>' %n ', :precision => 2)%>");
+	
+	$("#new_vendas_produto")[0].reset();
+	$("#spinner-add-prod").hide("fast");
+	$('<%= VendasConfig.where(unidade_id: current_unidade.id).last.focus_first %>').focus();
+	 $('.button').attr({
+        disabled: false
+      });
+<% end %>
+
+$('.lista-produtos').scrollTop($('.lista-produtos')[0].scrollHeight);

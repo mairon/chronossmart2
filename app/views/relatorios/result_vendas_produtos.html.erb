@@ -1,0 +1,17 @@
+<% if params["status"] == '0' %>
+	<!-- agrupado por produto !-->
+	<%= render '/relatorios/forms/venda_produtos_agrupado_produto' %>
+<% elsif params["status"] == '1' %>
+	<!-- agrupado por sub-grupo !-->
+	<%= render '/relatorios/forms/venda_produtos_agrupado_sub_grupo' %>
+<% elsif params["status"] == '2' %>
+	<!-- agrupado por grupo !-->
+	<%= render '/relatorios/forms/venda_produtos_agrupado_grupo' %>
+<% elsif params["status"] == '3' %>
+	<!-- agrupado por curva-abc !-->
+	<%= render '/relatorios/forms/venda_produtos_curva_abc' %>
+<% elsif params["status"] == '5' %>	
+	<!-- detalhado por produto !-->
+	<%= render '/relatorios/forms/venda_produtos_detalhado_produto' %>
+
+<% end %>

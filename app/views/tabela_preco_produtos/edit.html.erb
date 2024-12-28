@@ -1,0 +1,12 @@
+<h1>Editing tabela_preco_produto</h1>
+
+<% form_for(@tabela_preco_produto) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.submit "Update" %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @tabela_preco_produto %> |
+<%= link_to 'Back', tabela_preco_produtos_path %>

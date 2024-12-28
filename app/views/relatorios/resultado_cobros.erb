@@ -1,0 +1,7 @@
+<% if params[:detalhe] == "2" %>
+  <%= render :partial => "/relatorios/forms/cobro_forma_pagamentos" %>
+<% elsif params[:detalhe] == "3" %>
+  <%= render :partial => "/relatorios/forms/cobro_rendicion" %>
+<% else %>
+  <%= render :partial => "/relatorios/forms/cobro_sintetico" %>
+<% end %>

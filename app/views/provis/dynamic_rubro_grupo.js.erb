@@ -1,0 +1,5 @@
+$('#provi_rubro_id').empty();
+
+<% for ne in @rubros %>
+  $('#provi_rubro_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.descricao %>').change());
+<% end %>

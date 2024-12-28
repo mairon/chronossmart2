@@ -1,0 +1,45 @@
+<form>
+<table class="head_grid">
+	 <tr>	 	
+		<td width="80" align="center"><%= t('SALE') %></td>
+		<td width="360" >Producto</td>
+		<td width="70" align="right">Cant.</td>
+		<td width="70" align="right">Unit</td>
+		<td width="70" align="right">Total</td>
+</table>
+<% tot_qtd = 0  %>
+<% tot = 0  %>
+<div class="rolagem" dir="div" style="height: 200px">
+	<table>
+	<% @produtos_faturados.each do |p| %>
+		<tr>
+			<td width="80" align="center"><%= p.vendas_produto.venda_id.to_s.rjust(6,'0') unless p.vendas_produto.nil? %></td>
+			<td width="360"><%= p.produto_nome %></td>
+			<td width="70" align="right"><%= format_int(p.quantidade.to_f) %></td>
+			<td width="70" align="right"><%= format_int(p.unit_gs.to_f) %></td>
+			<td width="70" align="right"><%= format_int(p.tot_gs) %></td>
+
+			<td>
+				<% if @ft_ativo.to_i == 0 %>
+					<%= link_to '', p, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %>
+				<% end %>
+			</td>
+			<% tot_qtd += p.quantidade.to_f  %>
+			<% tot += p.tot_gs  %>
+		</tr>
+	<% end %>
+	</table>
+</div>
+	<table class="head_grid">
+		<tr>
+			<td width="440">
+				<%= link_to 'Finalizar', fact_indeps_path, class: 'btn btn-blue' %>
+				<%= link_to t('BACK'), edit_fact_indep_path(@fact_indep), :class => "btn btn-back" %>
+			</td>
+			<td width="70" align="right"><%= format_int(tot_qtd) %></td>
+			<td width="65" align="right"></td>
+			<td width="70" align="right"><%= format_int(tot) %></td>
+		</tr>
+	</table>
+
+</form>

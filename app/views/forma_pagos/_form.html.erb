@@ -1,0 +1,65 @@
+<h1 id="header">Forma de Pago - [Edición]</h1>
+ <div class="group">
+
+  <%= form_for(@forma_pago) do |f| %>
+    <% if @forma_pago.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@forma_pago.errors.count, "error") %> prohibited this forma_pago from being saved:</h2>
+
+      <ul>
+      <% @forma_pago.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <table>
+    <tr>
+      <td>
+        <label>Descripción</label>
+        <%= f.text_field :nome, autofocus: true,required: true, size: 60 %></td>
+    </tr>
+    <tr>                
+      <td>
+      <label>Tipo</label>
+      <%= f.radio_button :tipo, 0, checked: true %> Movimentar Cuentas Caja/Banco
+      <%= f.radio_button :tipo, 1 %> Movimentar Cuentas Corrientes
+      </td>
+    </tr>                 
+
+    <tr>                
+      <td><%= f.check_box :status %> Status</td>
+    </tr>                 
+
+
+    <tr>                
+      <td><%= f.check_box :cobro %> Cobro</td>
+    </tr>                 
+
+    <tr>
+      <td><%= f.check_box :pago %> Pago</td>
+    </tr>
+    <tr>
+      <td><%= f.check_box :venda %> Venda</td>
+    </tr>
+    <tr>
+      <td><%= f.check_box :adelanto %> Adelanto</td>
+    </tr>
+
+    <tr>
+      <td><%= f.check_box :gasto %> Gasto</td>
+    </tr>
+    <tr>
+      <td>
+        <label>Icon</label>
+        <%= f.text_field :tag_icon, size: 20 %></td>
+    </tr>
+
+  </table>
+  <div class="footer-buttons">
+    <%= f.submit "Grabar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    <%= link_to 'Volver', forma_pagos_path, :class => "btn btn-back" %>
+  </div>      
+  <% end %>
+</div>

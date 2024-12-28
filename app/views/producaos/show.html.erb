@@ -1,0 +1,40 @@
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel">
+        <h1 id="header">
+          Produción <%= @producao.nome %> | <%= @producao.cultivo.nome unless @producao.cultivo.nil? %> - <%= @producao.safra.nome unless @producao.safra.nil? %>
+           - <%= @producao.parcela.nome unless @producao.parcela.nil? %>
+          <div class="pull-right">
+          </div>
+        </h1>
+      </div>
+    </div>
+  </div>
+
+<div class="row">
+  <div class="col-md-7">
+      <div class="panel">
+        <h1 id="header">
+            Requisitado/Devolución
+            <div class="pull-right">
+              <%= link_to 'Add Prod.', '#', class: 'button add', 'data-toggle' => "modal", 'data-target' => "#add_prod", 'data-dismiss' => "modal", 'aria-labe' => "Close", id: "nf" %>
+            </div>
+        </h1>
+
+        <div class="panel-content">
+          <%= render 'requi_dev' %>
+        </div>
+      </div>
+  </div>
+  <div class="col-md-5">
+      <div class="panel">
+        <h1 id="header">
+            Costo General de Produción
+        </h1>
+
+        <div class="panel-content">
+          <%= render 'custo_geral' %>
+        </div>
+      </div>
+  </div>
+</div>

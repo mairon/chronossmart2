@@ -1,0 +1,147 @@
+
+<h1 id="header">Orden de Servicio - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+  <%= form_for(@ordem_serv) do |f| %>
+  <% if @ordem_serv.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@ordem_serv.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+
+      <ul>
+        <% @ordem_serv.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div class="row">
+    <div class="col-md-6">
+      <label><%= t('DATE') %></label>
+      <%= f.date_select :data %>
+    </div>
+    <div class="col-md-6">
+      <fieldset>
+        <legend><%= t('COIN') %></legend>
+        <% if current_unidade.moeda.to_i == 0 %>
+          <%= f.radio_button :moeda, 1 %> Guaranies
+          <%= f.radio_button :moeda, 0,  :Checked => "True" %> Dolar
+          <%= f.radio_button :moeda, 2 %> Real
+        <% elsif current_unidade.moeda.to_i == 1 %>
+          <%= f.radio_button :moeda, 1,  :Checked => "True" %> Guaranies
+          <%= f.radio_button :moeda, 0 %> Dolar
+          <%= f.radio_button :moeda, 2 %> Real
+
+        <% elsif current_unidade.moeda.to_i == 2 %>
+          <%= f.radio_button :moeda, 1 %> Guaranies
+          <%= f.radio_button :moeda, 0 %> Dolar
+          <%= f.radio_button :moeda, 2,  :Checked => "True" %> Real
+        <% end %>
+      </fieldset>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+       <%= f.check_box :garantia %> Garantía
+    </div>
+  </div>
+  <% if params[:action] == 'edit' %>
+    <div class="row">
+      <div class="col-md-6">
+        <label>Status</label>
+        <%= f.select :status,( [["PENDIENTE", "PENDIENTE"], ["CANCELADO", "CANCELADO"], ["BAJADO", "BAJADO"]]) %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="row">
+    <div class="col-md-6">
+      <label>Comprovante Interno:</label>
+      <%= f.text_field :rt, class: 'panel-field', placeholder: '0000', required: true %>
+    </div>
+    <div class="col-md-6">
+      <label>Responsable</label>
+      <%= f.collection_select :responsavel_id, Persona.where(tipo_vendedor: 1).select('id,nome').order('2'), :id, :nome,{prompt: 'Seleccione lo Responsable'}, {required: true, class: 'input-select' } %>
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Cliente</label>
+      <%= f.text_field :persona_nome, required: true, class: 'autocomplete panel-field' %>
+      <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+      <%= f.hidden_field :persona_id %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <label>Indicador</label>
+      <%= f.collection_select :indicador_id, Persona.all( :select     => ' id,nome,tipo_indicador', :conditions => ["tipo_indicador = 1"], :order      => '2'),:id,:nome, { :prompt => 'Seleccione Indicador'} %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <label>Tipo</label>
+      <%= f.select :tipo, options_for_select([['NUEVO','NUEVO'],
+      ['USADO','USADO']]), {class: 'input-select', prompt: 'Seleccione lo Tipo'} %>
+    </div>
+    <div class="col-md-6">
+      <label>Modelo</label>
+      <%= f.text_field :modelo, class: 'panel-field' %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <label></label>
+      <%= f.text_area :obs, rows: 5, cols: 80, class: 'panel-field' %>
+    </div>
+  </div>
+  <div class="footer-buttons">
+    <%= f.submit "Seguir", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    <%= link_to t('BACK'), ordem_servs_path, :class => "btn btn-back" %>
+  </div>
+<% end %>
+</div>
+
+<script type="text/javascript">
+  $('#ordem_serv_responsavel_id').selectize();
+  $('#ordem_serv_indicador_id').selectize();
+  $('#ordem_serv_tipo').selectize();
+  $('#ordem_serv_uso').selectize();
+  $(function() {
+    $( "#ordem_serv_persona_nome" ).autocomplete({
+        source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+        $.ajax({
+          url: "/personas/busca?per=CLIENTE",
+          dataType: "json",
+
+          data: {
+            tipo: 'DESCRIPCION',
+            busca: request.term
+          },
+          beforeSend: function(){
+          $("#spinner").addClass("sppiner_show");
+          },
+
+          success: function( data ) {
+            $("#sppiner").removeClass("sppiner_show");
+            response( data );
+          },
+        });
+      },
+      minLength: 2,
+      change: function( event, ui ) {
+        $("#ordem_serv_persona_id").val("");
+        $('#ordem_serv_persona_id').val(ui.item.id);
+        return false;
+      }
+    });
+    $( "#ordem_serv_persona_nome" ).change(function(){
+      if ($( "#ordem_serv_persona_id" ).val() == ''){
+      }
+    });
+  });
+</script>

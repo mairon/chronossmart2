@@ -1,0 +1,34 @@
+<%= form_for(boca_cx_produtos) do |f| %>
+	<% if boca_cx_produtos.errors.any? %>
+		<div id="error_explanation">
+			<h2><%= pluralize(boca_cx_produtos.errors.count, "error") %> prohibited this boca_cx_produtos from being saved:</h2>
+
+			<ul>
+			<% boca_cx_produtos.errors.full_messages.each do |msg| %>
+				<li><%= msg %></li>
+			<% end %>
+			</ul>
+		</div>
+	<% end %>
+
+	<div class="group">
+		<table style="margin-left:20px;">
+			<tr>
+				<td hidden="">
+				<%= f.text_field :boca_cx_id, :value => params[:boca_cx_id] %>
+				</td>
+				<td align="right">Producto :</td>
+				<td><%= f.collection_select :produto_id, Produto.select('id,nome').order('nome'), :id, :nome,{} %></td>
+			</tr>
+			<tr>
+				<td align="right">Comisión :</td>
+				<td><%= f.text_field :comissao %></td>
+			</tr>
+		</table>
+	</div>
+
+	<div class="buttons">
+		<%= f.submit :value => t('SAVE'), :class => "button add" %>
+		<%= link_to t('BACK'), boca_cxes_path, :class => "button back" %>
+	</div>
+<% end %>

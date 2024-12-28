@@ -1,0 +1,254 @@
+   <table align="left"  valign="top">
+
+      <tr>
+         <td>
+            <table>
+               <tr>
+                  <td>
+
+                        <% $empresa %>
+                  </td>
+
+                  <td  align="right">
+                     <b>
+                        <h3><%= t('VOUCHER').upcase %> DE NOTA DE CREDITO PROVEEDOR   N. <%= @nota_credito_proveedor.id %></h3>
+                     </b>
+                  </td>
+
+            </table>
+         </td>
+      </tr>
+
+
+   </tr>
+   <tr>
+      <td colspan="2" aling="center">
+            ___________________________________________________________________________________________________________________________________________________________
+      </td>
+   </tr>
+
+
+
+   <tr>
+      <td>
+         <table>
+            <tr>
+               <td align="right">
+                     Fecha :
+               </td>
+
+               <td align="left">
+                     <%= @nota_credito_proveedor.data.strftime("%d/%m/%Y") %>
+               </td>
+
+            </tr>
+
+            <tr>
+               <td align="right">
+                     Proveedor :
+               </td>
+
+               <td align="left">
+                     <%= @nota_credito_proveedor.persona_nome %>
+               </td>
+
+            </tr>
+
+            <tr>
+               <td align="right">
+                     N. Nota de Credito :
+               </td>
+
+               <td align="left">
+                     <%= @nota_credito_proveedor.documento_numero_01 %> - <%= @nota_credito_proveedor.documento_numero_02 %> - <%= @nota_credito_proveedor.documento_numero %>
+               </td>
+            </tr>
+
+            <%if @nota_credito_proveedor.moeda == 0
+               moeda   = "DOLAR"
+               importe = @total_dolar
+            elsif @nota_credito_proveedor.moeda == 1
+               moeda = "GUARANI"
+               importe = @total_guarani
+            else
+               moeda = "REAIS"
+               importe = @total_real
+            end%>
+
+            <%if @nota_credito_proveedor.tipo == 0
+               tipo = 'CONTADO'
+            else
+               tipo = 'CREDITO'
+            end%>
+
+
+            <tr>
+               <td align="right">
+                     Compra :
+               </td>
+               <td>
+                     <%= tipo %>
+               </td>
+
+            </tr>
+
+
+            <tr>
+               <td align="right">
+                     Moneda:
+               </td>
+               <td>
+                     <%=moeda%>
+               </td>
+
+            </tr>
+            <tr>
+               <td align="right">
+                    Concepto :
+               </td>
+
+               <td align="left">
+                     <%= @nota_credito_proveedor.concepto %>
+               </td>
+
+            </tr>
+
+         </table>
+      </td>
+   </tr>
+
+   <tr>
+      <td colspan="4" aling="center">
+            ___________________________________________________________________________________________________________________________________________________________
+      </td>
+   </tr>
+   <tr>
+      <td colspan="4" align="center">
+         <b>
+            <h3>
+            ITENS DEL <%= t('VOUCHER').upcase %>
+            </h3>
+         </b>
+      </td>
+   </tr>
+
+   <tr>
+      <td colspan="4" aling="center">
+            ___________________________________________________________________________________________________________________________________________________________
+      </td>
+   </tr>
+
+   <tr>
+      <td>
+         <table>
+            <tr class="head">
+               <td width="100"><%= t('PURCHASE') %></td>
+               <td width="100">Ref.</td>
+               <td width="450">Producto</td>
+               <td width="320">Cor</td>
+               <td width="60">Tamanho</td>
+               <td width="60" align="right">Cantidade</td>
+               <td width="70" align="right">Unit.</td>
+               <td width="70" align="right">Total</td>
+            </tr>
+            <% qtd  = 0 %>
+            <% cust = 0 %>
+            <% unit = 0 %>
+            <% tot  = 0 %>
+            <% iva  = 0 %>
+
+            <% @produtos.each do |prod| %>
+               <tr class="<%= cycle("cor1", "cor2")%>">
+                  <td width="100"><%= prod.compra_id %></td>
+                  <td width="100"><%= prod.fabricante_cod %></td>
+                  <td width="450"><%= prod.produto_nome %></td>
+                  <td width="320"><%= prod.cor_nome %></td>
+                  <td width="60"><%= prod.tamanho_nome %></td>
+                  <td width="60" align="center"><%= prod.quantidade.to_i %></td>
+                  <% if @nota_credito_proveedor.moeda == 0  %>
+                     <td width="70" align="right"><%= number_to_currency( prod.unitario_dolar, :format=>' %n ', :separator => ",") %></td>
+                     <td width="70"align="right"><%= number_to_currency( prod.total_dolar, :format=>' %n ', :separator => ",") %></td>
+                     <% qtd  = qtd  +  prod.quantidade%>
+                     <% unit = unit + prod.unitario_dolar %>
+                     <% tot  = tot  + prod.total_dolar%>
+                  <% elsif @nota_credito_proveedor.moeda == 1 %>
+                     <td width="70" align="right"><%= number_to_currency( prod.custo_guarani, :format=>' %n ', :precision => 0) %></td>
+                     <td width="70" align="right"><%= number_to_currency( prod.unitario_guarani, :format=>' %n ', :precision => 0) %></td>
+                     <td width="70" align="right"><%= number_to_currency( prod.total_guarani, :format=>' %n ', :precision => 0) %></td>
+                     <% qtd  = qtd  +  prod.quantidade %>
+                     <% unit = unit + prod.unitario_guarani %>
+                     <% tot  = tot  + prod.total_guarani %>
+
+                  <% else %>
+                     <td width="70" align="right"><%= number_to_currency( prod.unitario_real , :format=>' %n ', :separator => ",") %></td>
+                     <td width="70" align="right"><%= number_to_currency( prod.total_real , :format=>' %n ', :separator => ",") %></td>
+                     <% qtd  = qtd  +  prod.quantidade %>
+                     <% unit = unit + prod.unitario_real %>
+                     <% tot  = tot  + prod.total_real %>
+                  <% end %>
+               </tr>
+            <% end %>
+            <tr>
+               <td height="30"></td>
+            </tr>
+
+            <tr class="head">
+               <td colspan="5" ></td>
+               <td width="60" align="center"><%= number_to_currency( qtd, :format=>' %n ', :precision => 0) %></td>
+               <% if @nota_credito_proveedor.moeda == 1 %>
+                  <td width="70" align="right"><%= number_to_currency( unit, :format=>' %n ', :precision => 0) %></td>
+                  <td width="70" align="right"><%= number_to_currency( tot, :format=>' %n ', :precision => 0) %></td>
+               <% else %>
+                  <td width="70" align="right"><%= number_to_currency( unit, :format=>' %n ', :separator => ",") %></td>
+                  <td width="70" align="right"><%= number_to_currency( tot, :format=>' %n ', :separator => ",") %></td>
+               <% end %>
+            </tr>
+         </table>
+      </td>
+   </tr>
+
+   <tr>
+      <td colspan="5">
+         <p class="border">
+            <b>Aplicaciones</b>
+         </p>
+      </td>
+   </tr>
+   <tr>
+      <td>
+         <table border='1'>
+            <tr class="head">
+            <td width="50"><%= t('DOC') %></td>
+            <td width="50"><%= t('SHARE') %></td>
+            <td width="100" align="right"><%= t('VALUE') %></td>
+
+
+            </tr>
+            <% @aplics.each do |c| %>
+            <tr class="<%= cycle("cor1", "cor2") %>" >
+               <td width="150"><%= c.documento_numero_01 %>-<%= c.documento_numero_02 %>-<%= c.documento_numero %></td>
+               <td width="50"><%= c.cota %></td>
+               <% if @nota_credito_proveedor.moeda == 0 %>
+                  <td width="100" align="right">   <%= h number_to_currency(c.valor_dolar, :format=>' %n ', :separator => ",")  %></td>
+               <% elsif @nota_credito_proveedor.moeda == 1 %>
+                  <td width="100" align="right">   <%= h number_to_currency(c.valor_guarani, :format=>' %n ', :precision => 0)  %></td>
+               <% else %>
+                  <td width="100" align="right">   <%= h number_to_currency(c.valor_real, :format=>' %n ', :separator => ",")  %></td>
+               <% end %>
+            </tr>
+            <% end %>
+         </table>
+      </td>
+   </tr>
+</table>
+</body>
+
+
+
+
+
+<style type="text/css">
+   table {
+      border-collapse: collapse;
+   }
+</style>

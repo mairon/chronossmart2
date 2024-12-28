@@ -1,0 +1,168 @@
+<body onload="CampoInicioFatura()">
+  <h1 id="header"><%= t('LISTING') %> de <%= t('ACCOUNT') %>s a Pagar</h1>
+  <div class="group">
+    <h2>
+      <%= form_tag relatorio_contas_pagar_proveedores_path, :method => "get" do%>
+        <table>
+
+          <tr>
+            <td> Fecha Facturacion:</td>
+            <td><input name="inicio_faturacao" id="inicio_faturacao"  size="10"  onkeyup="Formatadata(this,event)" type="text"/>
+              Hasta
+              <input name="final_faturacao"  id="final_faturacao"   size="10" onkeyup="Formatadata(this,event)" type="text"/></td>
+          </tr>
+          <tr>
+            <td> Fecha Vencimento:</td>
+            <td><input name="inicio_vencimento" id="inicio_vencimento"  size="10"  onkeyup="Formatadata(this,event)" type="text"/>
+              Hasta
+              <input name="final_vencimento"  id="final_vencimento"   size="10" onkeyup="Formatadata(this,event)" type="text"/></td>
+          </tr>
+
+          <tr>
+            <td align="right">Proveedor :</td>
+
+            <td>
+              <%= text_field_tag( 'campo_persona',
+                                   nil,
+                                   :id => "campo_persona",
+                                   :onchange => {:remote => true,
+                                                 :update => "campo_persona",
+                                                                :url => { :action => :get_persona, :id => 1},
+                                                                :with => "'campo_persona='+this.value"},
+                                                                :size => 5
+              ) %>
+              <%=   select("busca", "persona", Persona.all(:select => 'id,nome',:conditions => ['tipo_fabricante = 1 OR tipo_fornecedor = 1'],:order => 'nome').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Todos...' },{:class => "selc_medium"})   %>
+
+            </td>
+          </tr>
+
+          <tr>
+              <td align="right">Sector :</td>
+              <td>
+                <%= select("busca", "clase_produto", Setor.all(:select => 'id,nome').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Todos...' },{:class => "selc_medium"})%></td>
+              </td>
+           </tr>
+
+          <tr>
+            <td></td>
+            <td>
+              <fieldset>
+                <legend>Tipo Proveedor</legend>
+                <input id="clase" name="tipo_prov" type="radio" value="0"  checked/> Local
+                <input id="clase" name="tipo_prov" type="radio" value="1"/>Exterior
+                <input id="clase" name="tipo_prov" type="radio" value="2"/>Todos
+              </fieldset>
+            </td>
+          </tr>
+
+
+          <tr>
+            <td></td>
+            <td>
+              <fieldset>
+                <legend>Filtros</legend>
+                <input id="filtro" name="filtro" type="radio" value="0"  checked/> <%= t('EM') %> <%= t('OPEN') %>
+                <input id="filtro" name="filtro" type="radio" value="1"/>Canceladas
+                <input id="filtro" name="filtro" type="radio" value="2"/>Todos
+              </fieldset>
+
+            </td>
+          </tr>
+
+          <tr>
+            <td></td>
+            <td>
+                <%= check_box_tag :lancamento %> <%= t('ALL_RELEASES') %>
+            </td>
+          </tr>
+
+          <tr>
+            <td></td>
+            <td>
+              <fieldset>
+                <legend><%= t('COIN') %></legend>
+                <input id         = "moeda"
+                       name       = "moeda"
+                       type       = "radio"
+                       value      = "0"
+                       checked
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "EnterTab(event,'button')" />Dolar
+
+                <input id    ="moeda"
+                       name  ="moeda"
+                       type  ="radio"
+                       value ="1"
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "EnterTab(event,'button')" /><%= t('GUARANIS') %>
+
+                <input id    ="moeda"
+                       name  ="moeda"
+                       type  ="radio"
+                       value ="2"
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "EnterTab(event,'button')" /> <%= t('REAIS') %>
+
+              </fieldset>
+            </td>
+          </tr>
+
+          <tr>
+            <td></td>
+            <td>
+              <fieldset>
+                <input id         = "detalhe"
+	                     name       = "detalhe"
+                       type       = "radio"
+                       value      = "3"
+                       checked
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Extracto Proveedor
+
+                <input id         = "detalhe"
+                       name       = "detalhe"
+                       type       = "radio"
+                       value      = "0"
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Detallado por Factura
+
+                <input id    ="detalhe"
+                       name  ="detalhe"
+                       type  ="radio"
+                       value ="1"
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Detallado por Productos
+
+                <input id         = "detalhe"
+                       name       = "detalhe"
+                       type       = "radio"
+                       value      = "2"
+                       onkeypress = "return bloqEnter(event)"
+                       onkeyup    = "Formatadata(this,event),EnterTab(event,'button')" />Resumen por Proveedor
+
+              </fieldset>
+            </td>
+          </tr>
+
+          <tr>
+            <td></td>
+            <td>
+              <input type="submit" value="Informe" onclick="Tipo('0')" class="button_info"/>
+              <input type="submit" value="Excel" onclick="Tipo('1')" class="button_info"/>
+            </td>
+
+          </tr>
+
+          <input type="hidden" name="tipo" id="tipo"  size="5" value="0"/>
+
+      <% end %>
+
+
+        </table>
+
+
+    </h2>
+  </div>
+</body>
+
+

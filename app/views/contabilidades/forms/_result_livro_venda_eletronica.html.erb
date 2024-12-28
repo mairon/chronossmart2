@@ -1,0 +1,90 @@
+
+<%
+
+  format_xls 'table.my-table' do
+    workbook use_autowidth: true
+    format '.header', b: true # bold
+  end        
+
+%>
+  <table class="my-table">   
+    <tr class="header">
+      <td>FECHA </td>
+      <td>TIPO_DOCUMENTO</td>
+      <td>FACTURA</td>
+      <td>SERIE</td>
+      <td>CDC</td>
+      <td>TIMBRADO</td>
+      <td>TIMBRADO_VENCIMIENTO</td>
+      <td>TIPO_DOCUMENTO_PERSONA</td>
+      <td>DOCUMENTO_PERSONA</td>
+      <td>NOMBRE_PERSONA</td>
+      <td>GRAVADAS_10</td>
+      <td>GRAVADAS_05</td>
+      <td>EXENTAS</td>
+      <td>TOTAL</td>
+      <td>MONEDA</td>
+      <td>CONDICION</td>
+      <td>CUOTAS</td>
+      <td>CUENTA_10</td>
+      <td>CUENTA_05</td>
+      <td>CUENTA_00</td>
+      <td>SUCURSAL</td>
+      <td>ESTADO_DOCUMENTO</td>
+      <td>MOTIVO</td>
+    </tr>
+
+  
+      <% @venda.each do |venda| %>
+          
+        <tr>
+          <td><%= venda.data.to_date.strftime("%d/%m/%Y") %></td>
+          <% if venda.tipo_emissao.to_i == 0 %>
+            <td>IMPRESO</td>
+          <% elsif venda.tipo_emissao.to_i == 1 %>
+            <td>ELECTRONICO</td>
+          <% end %>
+          <td ><%= venda.documento_numero_01 %>-<%= venda.documento_numero_02 %>-<%= venda.documento_numero %> </td>
+          <td ><%= venda.serie %></td>
+          <td class="cdc">"<%= venda.cdc.to_s %>"</td>
+          <td ><%= venda.timbrado %></td>
+          <td><%= venda.vencimento.to_date.strftime("%d/%m/%Y") %></td>
+          <% if venda.ruc.to_s.count('-').to_i == 0 %>
+            <td>CI</td>
+          <% else %>
+            <td>RUC</td>
+          <% end %>
+          <td ><%= venda.ruc %></td>
+          <td ><%= venda.persona_nome %></td>
+
+          <% if venda.moeda.to_i == 1 %>
+            <td align="right"><%= format_int( venda.gravadas_10_guarani.to_f - ( venda.gravadas_10_guarani.to_f / 11 )).to_s.gsub('.', '') %></td>
+            <td align="right"><%= format_int( (venda.gravadas_05_guarani.to_f - venda.imposto_05_guarani.to_f)).to_s.gsub('.', '') %></td>              
+            <td align="right"><%= format_int( venda.exentas_guarani.to_f).to_s.gsub('.', '') %></td>
+            <td align="right"><%= format_int( venda.total_guarani).to_s.gsub('.', '') %></td>
+            <td>GS</td>
+          <% else %>
+            <td align="right"><%= format_decimal( venda.gravadas_10_dolar.to_f - ( venda.gravadas_10_dolar.to_f / 11 )).to_s.gsub('.', '').gsub(',', '.') %></td>
+            <td align="right"><%= format_decimal( (venda.gravadas_05_dolar.to_f - venda.imposto_05_dolar.to_f)).to_s.gsub('.', '').gsub(',', '.') %></td>              
+            <td align="right"><%= format_decimal( venda.exentas_dolar.to_f).to_s.gsub('.', '').gsub(',', '.') %></td>
+            <td align="right"><%= format_decimal( venda.total_dolar).to_s.gsub('.', '').gsub(',', '.') %></td>
+            <td>US</td>
+          <% end %>
+
+          <% if venda.tipo == 0 %>
+          <td align="center" >CONTADO</td>
+          <% else %>
+          <td align="center" >CREDITO</td>
+          <% end %>
+          <td><%= venda.cotas %></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <% if venda.status == 1 %>
+            <td>ACTIVO</td>
+          <% elsif venda.status == 2 %>
+            <td>CANCELADO</td>
+          <% end %>
+          <td><%= venda.motivo %></td>
+      <% end %>
+    </table>

@@ -1,0 +1,33 @@
+<h1 id="header">Eventos</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_evento_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="50" align="center">Código</td>
+    <td width="50" align="center">Fecha</td>
+    <td width="250">Descripción</td>
+    <td width="100">Invitados</td>
+    <td width="100">Confirmados</td>
+    <td width="100">Presentes </td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @eventos.each do |evento| %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+        <td width="50" align="center"><%= link_to evento.id.to_s.rjust(6,'0'), evento_path(evento)  %></td>        
+        <td width="50" align="center"><%= evento.data.strftime("%d/%m/%y") %></td>
+        <td width="250"><%= evento.nome %></td>
+        <td width="100"><%= evento.evento_convidados.count %></td>
+        <td width="100"><%= evento.evento_convidados.where(confirmado: true).count %></td>
+        <td width="100"><%= evento.evento_convidados.where(presente: true).count %></td>
+        <td><%= link_to '', edit_evento_path(evento), class: 'icon-pencil' %></td>
+        <td><%= link_to '', evento, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

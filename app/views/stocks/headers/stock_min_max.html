@@ -1,0 +1,105 @@
+<% #VERIFICA SE  TEM CLASE E IMPRIME
+        if params[:busca]["clase"].blank?
+            clase = 'Todos..'
+        else
+            clase   = params[:busca]["clase"]
+            cl_c = Clase.find_by_id(params[:busca]["clase"])
+            cl_desc = ' - ' << cl_c.descricao
+
+        end
+        #VERIFICA SE  TEM GRUPO E IMPRIME
+        if params[:busca]["grupo"].blank?
+            grupo = 'Todos..'
+        else
+            grupo = params[:busca]["grupo"]
+            gp_c  = Grupo.find_by_id(params[:busca]["grupo"])
+            gp_desc = ' - ' << gp_c.descricao
+        end
+
+        #VERIFICA SE  TEM SUB_GRUPO E IMPRIME
+        if params[:busca]["sub_grupo"].blank?
+            sgrupo = 'Todos..'
+        else
+            sgrupo = params[:busca]["sub_grupo"]
+            sgp_c  = SubGrupo.find_by_id(params[:busca]["sub_grupo"])
+            sgp_desc = ' - ' << sgp_c.descricao
+        end
+
+
+        #VERIFICA SE  TEM PRODUTO E IMPRIME
+        if params[:busca]["produto"].blank?
+            produto = 'Todos..'
+        else
+            produto = params[:busca]["produto"]
+            pd_c    = Produto.find_by_id(params[:busca]["produto"])
+            pd_desc = ' - ' << pd_c.descricao
+
+        end
+
+        #VERIFICA SE  TEM DEPOSITO E IMPRIME
+        if params[:busca]["deposito"].blank?
+            deposito = 'Todos..'
+        else
+            deposito = params[:busca]["deposito"]
+        end
+        %>
+
+<table width="755">
+	<tr>
+		<td align="center"><%= $empresa_nome %></td>
+	</tr>
+	<tr>
+		<td align="center">CONSULTA STOCK MINIMO Y MAXIMO</td>
+	</tr>
+
+	<tr>
+		<td align="left">Fecha....: <%= params[:inicio] %> hasta <%=params[:final] %></td>
+	</tr>
+
+	<tr>
+		<td align="left">Sector...: <%= clase.to_s.rjust(6,'0') %> <%= cl_desc %></td>
+	</tr>
+	<tr>
+		<td align="left">Grupo....: <%= grupo.to_s.rjust(6,'0') %> <%= gp_desc %></td>
+	</tr>
+	<tr>
+		<td align="left">Sub-Grupo: <%= sgrupo.to_s.rjust(6,'0') %> <%= sgp_desc %></td>
+	</tr>
+	<tr>
+		<td align="left">Produto..: <%= produto.to_s.rjust(6,'0') %><%= pd_desc %></td>
+	</tr>
+	<tr>
+		<td align="left">Deposito.: <%= deposito.to_s.rjust(6,'0') %></td>
+	</tr>
+	<tr>
+
+		<td align="left">
+			<% if params[:filtro].to_s == '0' %>
+				Filtro...: Todos Los Productos
+			<% elsif params[:filtro].to_s == '1' %>
+				Filtro...: Productos Abajo y Igual al Stock Minimo
+			<% elsif params[:filtro].to_s == '2' %>
+				Filtro...: Productos Arriba y Igual al Stock Maximo
+			<% end %>
+		</td>
+	</tr>
+	<tr>
+		
+		<td>
+			<hr>
+			<table>
+				<tr>
+					<td width="90" align="left" >Cod.</td>
+				    <td width="90" align="left" >Fabricante</td>
+				    <td width="430" align="left">Descripcion</td>  
+				    <td width="60" align="right">Ultimo Custo</td>  
+				    <td width="60" align="right">Stock Atual</td>  
+				    <td width="60" align="right">Minimo</td>  
+				    <td width="60" align="right">P/ Maximo</td>  
+				    <td width="60" align="right">Maximo</td>  
+				</tr>	
+			</table>
+		</td>
+	</tr>
+
+</table>

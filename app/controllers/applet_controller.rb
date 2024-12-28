@@ -1,0 +1,3 @@
+class AppletController < ApplicationController
+
+end

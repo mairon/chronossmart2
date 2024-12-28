@@ -1,0 +1,29 @@
+<h1 id="header">Plan de Pagos</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_plano_path, :class => "button add" %>
+</div>
+
+<div class="group">
+  <table class="head_grid">
+    <tr>
+    	<td width="50" align="center"><%= t('CODE') %></td>
+    	<td width="350">Condición</td>
+      <td width="50" align="center">PVD</td>
+      <td width="75"></td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+    <table>
+      <% @planos.each do |plano| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="50"  align="center"><%= plano.id.to_s.rjust(6,'0') %></td>
+          <td width="350"><%= plano.condicao %></td>
+          <td width="50" align="center"><%= plano.pdv %></td>
+          <td><%= link_to '', edit_plano_path(plano), class: 'icon-pencil', title: 'Modificar' %></td>
+          <td><%= link_to '', plano, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash', title: t('DELETE') %></td>
+          <td><%= link_to '', plano_path(plano), class: 'icon-th-list', title: 'Politica de ventas' %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

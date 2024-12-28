@@ -1,0 +1,167 @@
+<h1 id="header">Compra Produto - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+	<table>
+		<tr>
+			<td>
+				<div class="group" style="padding: 5px">
+					<h2>
+					Proveedor: <b> <%= @compra.persona_nome %></b> |
+					<% if @compra.moeda.to_i == 0 %>
+						<span style="color:green">
+						Total U$:<%= format_decimal( @compra.total_dolar.to_f ) %>
+						</span>
+						Desc. U$: <span style="color:green"><%= format_decimal( @compra.desconto_dolar.to_f ) %></span>
+						Total c/ Descuento U$: <span style="color:green"><%= format_decimal( @compra.total_dolar.to_f - @compra.desconto_dolar.to_f ) %></span>
+
+					<% elsif @compra.moeda.to_i == 1 %>
+						<span style="color:red">
+						Total Prod. Gs.:<%= format_int( @compra.total_guarani.to_f ) %> |
+						</span>
+						Desc. Gs.: <span style="color:red"><%= format_int( @compra.desconto_guarani.to_f ) %></span> |
+						Frete. Gs.: <span style="color:red"><%= format_int( @compra.frete_guarani.to_f ) %></span> |
+						Outros. Gs.: <span style="color:red"><%= format_int( @compra.outros_guarani.to_f ) %></span> |
+						Total General Gs.: <span style="color:red"><%= format_int( (@compra.total_guarani.to_f + @compra.frete_guarani.to_f + @compra.outros_guarani.to_f) - @compra.desconto_guarani.to_f ) %></span>
+
+					<% elsif @compra.moeda.to_i == 2 %>
+						<span style="color:blue">
+						Total R$:<%= format_decimal( (@compra.total_real.to_f + @compra.frete_guarani.to_f + @compra.outros_guarani.to_f) - @compra.desconto_guarani.to_f ) %>
+						</span>
+						Desc. R$: <span style="color:blue"><%= format_decimal( @compra.desconto_real.to_f ) %></span>
+						Total c/ Descuento R$: <span style="color:blue"><%= format_decimal( @compra.total_real.to_f - @compra.desconto_real.to_f ) %></span>
+
+					<% elsif @compra.moeda.to_i == 4 %>
+						<span style="color:blue">
+						Total €:<%= format_decimal( @compra.total_euro.to_f ) %>
+
+					<% end %>
+					</h2>
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				<table>
+					<tr>
+						<td>
+							<div class="group">
+							<div id="compras_produtos">
+							<% if @compra.tipo_compra == 3 %>
+								<%= render :partial => "index_produtos_bens" %>
+							<% elsif @compra.tipo_compra == 2 %>
+								<%= render :partial => "/compras_produtos/index_produto_imp" %>
+							<% else %>
+								<%= render :partial => "/compras_produtos/index_produto" %>
+							<% end %>
+							</div>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				<% if @compra.tipo_compra == 3 %>
+					<%= render partial:"compras/eps/new_produto_bens", :locals=>{:compras_produto=>ComprasProduto.new(:compra_id=>@compra.id)} %>
+				<% else %>
+					<% if @compra.moeda == 0 %>
+						<% sum_produtos  = ComprasProduto.sum('total_dolar', :conditions => ["compra_id = #{@compra.id}"]) %>
+						<% valor_nota_us = (@compra.total_dolar.to_f - @compra.desconto_dolar.to_f) %>
+						<% if valor_nota_us.to_f.round(2) == sum_produtos.to_f.round(2) %>
+							<div class="alert alert-success" align="center" style="margin: 10px">
+								<h1><b>Productos Adcionados click en Seguir!</b></h1>
+							</div>
+						<% elsif sum_produtos.to_f.round(2) > valor_nota_us.to_f.round(2) %>
+							<div class="alert alert-danger" align="center" style="margin: 10px">
+								<h1><b>Monto de los productos mayor que la nota!</b></h1>
+							</div>
+						<% elsif sum_produtos.to_f.round(2) < valor_nota_us.to_f.round(2) %>
+							<%= render partial: "compras/eps/new_produto_E04", :locals=>{:compras_produto=>ComprasProduto.new(:compra_id=>@compra.id)} %>
+						<% end %>
+
+					<% elsif @compra.moeda == 1 %>
+						<% sum_produtos = ComprasProduto.sum('total_guarani', :conditions => ["compra_id = #{@compra.id}"]).to_f.round(0) %>
+						<% valor_nota_gs = ( (@compra.total_guarani.to_f + @compra.frete_guarani.to_f + @compra.outros_guarani.to_f) - @compra.desconto_guarani.to_f ) %>
+						<% if valor_nota_gs.to_i == sum_produtos.to_i %>
+							<div class="alert alert-success" align="center" style="margin: 10px">
+								<h1><b>Productos Adcionados click en Seguir!</b></h1>
+							</div>
+						<% elsif sum_produtos.to_i > valor_nota_gs.to_i %>
+							<div class="alert alert-danger" align="center" style="margin: 10px">
+								<h1><b>Monto de los productos mayor que la nota!</b></h1>
+							</div>
+						<% elsif sum_produtos.to_i < valor_nota_gs.to_i %>
+							<%= render partial: "compras/eps/new_produto_E04", :locals=>{:compras_produto=>ComprasProduto.new(:compra_id=>@compra.id)} %>
+						<% end %>
+
+					<% elsif @compra.moeda == 2 %>
+						<% sum_produtos  = ComprasProduto.sum('total_real', :conditions => ["compra_id = #{@compra.id}"]) %>
+						<% valor_nota_rs = (@compra.total_real.to_f - @compra.desconto_real.to_f) %>
+						<% if valor_nota_rs.to_f.round(2) == sum_produtos.to_f.round(2) %>
+							<div class="alert alert-success" align="center" style="margin: 10px">
+								<h1><b>Productos Adcionados click en Seguir!</b></h1>
+							</div>
+						<% elsif sum_produtos.to_f.round(2) > valor_nota_rs.to_f.round(2) %>
+							<div class="alert alert-danger" align="center" style="margin: 10px">
+								<h1><b>Monto de los productos mayor que la nota!</b></h1>
+							</div>
+						<% elsif sum_produtos.to_f.round(2) < valor_nota_rs.to_f.round(2) %>
+							<%= render partial: "compras/eps/new_produto_E04", :locals=>{:compras_produto=>ComprasProduto.new(:compra_id=>@compra.id)} %>
+						<% end %>
+
+					<% elsif @compra.moeda == 4 %>
+						<% sum_produtos  = ComprasProduto.sum('total_euro', :conditions => ["compra_id = #{@compra.id}"]) %>
+						<%= valor_nota_rs = (@compra.total_euro.to_f ) %>
+						<% if valor_nota_rs.to_f.round(2) == sum_produtos.to_f.round(2) %>
+							<div class="alert alert-success" align="center" style="margin: 10px">
+								<h1><b>Productos Adcionados click en Seguir!</b></h1>
+							</div>
+						<% elsif sum_produtos.to_f.round(2) > valor_nota_rs.to_f.round(2) %>
+							<div class="alert alert-danger" align="center" style="margin: 10px">
+								<h1><b>Monto de los productos mayor que la nota!</b></h1>
+							</div>
+						<% elsif sum_produtos.to_f.round(2) < valor_nota_rs.to_f.round(2) %>
+							<%= render partial: "compras/eps/new_produto_E04", :locals=>{:compras_produto=>ComprasProduto.new(:compra_id=>@compra.id)} %>
+						<% end %>
+
+					<% end %>
+				<% end %>
+			</td>
+		</tr>
+	</table>
+
+	<div class="footer-buttons" style="margin-left: 12px">
+		<!-- teste total dolar -->
+		<% if @compra.moeda == 0 %>
+			<% if valor_nota_us.to_f.round(2) == sum_produtos.to_f.round(2) %>
+				<%= link_to 'Seguir', compras_financa_compra_path(@compra), class: "btn btn-info next", "data-plus-as-tab" => "false" %>
+			<% end %>
+		<% elsif @compra.moeda == 1 %>
+			<% if valor_nota_gs.to_i == sum_produtos.to_i %>
+				<%= link_to 'Seguir', compras_financa_compra_path(@compra), class: "btn btn-info next", "data-plus-as-tab" => "false" %>
+			<% end %>
+
+		<% else %>
+			<% if valor_nota_rs.to_f.round(2) == sum_produtos.to_f.round(2) %>
+				<%= link_to 'Seguir', compras_financa_compra_path(@compra), class: "btn btn-info next", "data-plus-as-tab" => "false" %>
+			<% end %>
+		<% end %>
+		<a href="/compras/<%=params[:id]%>/comprovante" class="btn btn-blue"><%= image_tag('printer.png') %> <%= t('VOUCHER') %></a>
+
+		<% if @compra.tipo_compra == 3 %>
+			<%= link_to t('BACK'), edit_bens_compra_path(@compra), class: "btn btn-back" %>
+		<% else %>
+			<%= link_to t('BACK'), edit_compra_path(@compra), class: "btn btn-back" %>
+		<% end %>
+		<br>
+		<br>
+	</div>
+</div>
+
+<%= hidden_field_tag :id, @compra.id %>
+<%= hidden_field_tag :adcionais, @compra.adcionais %>
+<script>
+	$(".next").focus()
+</script>

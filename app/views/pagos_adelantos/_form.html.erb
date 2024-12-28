@@ -1,0 +1,74 @@
+<%= form_for(@pagos_adelanto) do |f| %>
+  <% if @pagos_adelanto.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@pagos_adelanto.errors.count, "error") %> prohibited this pagos_adelanto from being saved:</h2>
+
+      <ul>
+      <% @pagos_adelanto.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> pagos_adelantos - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">pago_id :</td>                    
+                      <td><%= f.number_field :pago_id %></td>
+                                      
+                      <td align="right"><%= t('DATE') %> :</td>                    
+                      <td><%= f.date_select :data %></td>
+                                      
+                      <td align="right">persona_id :</td>                    
+                      <td><%= f.number_field :persona_id %></td>
+                                      
+                      <td align="right">liquidacao :</td>                    
+                      <td><%= f.number_field :liquidacao %></td>
+                                      
+                      <td align="right">documento_numero_01 :</td>                    
+                      <td><%= f.text_field :documento_numero_01 %></td>
+                                      
+                      <td align="right">documento_numero_02 :</td>                    
+                      <td><%= f.text_field :documento_numero_02 %></td>
+                                      
+                      <td align="right">documento_numero :</td>                    
+                      <td><%= f.text_field :documento_numero %></td>
+                                      
+                      <td align="right">cota :</td>                    
+                      <td><%= f.number_field :cota %></td>
+                                      
+                      <td align="right">valor_us :</td>                    
+                      <td><%= f.text_field :valor_us %></td>
+                                      
+                      <td align="right">valor_gs :</td>                    
+                      <td><%= f.text_field :valor_gs %></td>
+                                      
+                      <td align="right">valor_rs :</td>                    
+                      <td><%= f.text_field :valor_rs %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), pagos_adelantos_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

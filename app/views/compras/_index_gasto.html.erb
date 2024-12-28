@@ -1,0 +1,93 @@
+<table class="head_grid">
+   <tr>
+      <td width="50" align="center">cod</td>
+      <td width="250" align="center">Rubro</td>
+      <td width="100" align="center">Exentas</td>
+      <td width="100" align="center">Gravada 05</td>
+      <td width="100" align="center">Iva 05</td>
+      <td width="100" align="center">Gravada 10</td>
+      <td width="100" align="center">Iva 10</td>
+   </tr>
+</table>
+<div class="rolagem" dir="div">
+
+   <table>
+      <% exenta_us = 0 %>
+      <% gr_05_us  = 0 %>
+      <% gr_10_us  = 0 %>
+      <% imp_05_us = 0 %>
+      <% imp_10_us = 0 %>
+
+      <% exenta_gs = 0 %>
+      <% gr_05_gs  = 0 %>
+      <% gr_10_gs  = 0 %>
+      <% imp_05_gs = 0 %>
+      <% imp_10_gs = 0 %>
+
+      <% compras_gastos.each do |compras_gasto| %>
+         <tr class = "<%= cycle("cor1", "cor2") %>">
+            <td width="50" align="center"><%= compras_gasto.id %></td>
+            <td width="250"><%= compras_gasto.rubro_descricao %></td>
+            <% if @compra.moeda == 0 %>
+               <td width="100" align="right">    <%= h number_to_currency( compras_gasto.exentas_dolar,       :format =>' %n ', :separator => ",")  %></td>
+               <td width="100" align="right">    <%= h number_to_currency( compras_gasto.gravadas_05_dolar,  :format =>' %n ', :separator => ",")  %></td>
+               <td width="100" align="right">    <%= h number_to_currency( compras_gasto.imposto_05_dolar,  :format =>' %n ', :separator => ",")  %></td>
+               <td width="100" align="right">    <%= h number_to_currency( compras_gasto.gravadas_10_dolar,  :format =>' %n ', :separator => ",")  %></td>
+               <td width="100" align="right">    <%= h number_to_currency( compras_gasto.imposto_10_dolar,  :format =>' %n ', :separator => ",")  %></td>
+
+               <% exenta_us += compras_gasto.exenta_dolar %>
+               <% gr_05_us  += compras_gasto.gravadas_05_dolar %>
+               <% gr_10_us  += compras_gasto.gravadas_10_dolar %>
+               <% imp_05_us += compras_gasto.imposto_05_dolar %>
+               <% imp_10_us += compras_gasto.imposto_10_dolar %>
+            <% elsif @compra.moeda == 1 %>
+               <td width="100" align="right">    <%= h number_to_currency(compras_gasto.exentas_guarani,       :format =>' %n ', :precision => 0)  %></td>
+               <td width="100" align="right">    <%= h number_to_currency(compras_gasto.gravadas_05_guarani,  :format =>' %n ', :precision => 0)  %></td>
+               <td width="100" align="right">    <%= h number_to_currency(compras_gasto.imposto_05_guarani,  :format =>' %n ',  :precision => 0)  %></td>
+               <td width="100" align="right">    <%= h number_to_currency(compras_gasto.gravadas_10_guarani,  :format =>' %n ', :precision => 0)  %></td>
+               <td width="100" align="right">    <%= h number_to_currency(compras_gasto.imposto_10_guarani,  :format =>' %n ',  :precision => 0)  %></td>
+
+               <% exenta_gs += compras_gasto.exentas_guarani%>
+               <% gr_05_gs  += compras_gasto.gravadas_05_guarani%>
+               <% gr_10_gs  += compras_gasto.gravadas_10_guarani%>
+               <% imp_05_gs += compras_gasto.imposto_05_guarani%>
+               <% imp_10_gs += compras_gasto.imposto_10_guarani%>
+            <% else %>
+               <td width="100" align="right">    <%= h number_to_currency( compras_gasto.exentas_real,       :format =>' %n ', :separator => ",")  %></td>
+               <td width="100" align="right">    <%= h number_to_currency( compras_gasto.gravadas_05_real,  :format =>' %n ', :separator => ",")  %></td>
+               <td width="100" align="right">    <%= h number_to_currency( compras_gasto.imposto_05_real,  :format =>' %n ', :separator => ",")  %></td>
+               <td width="100" align="right">    <%= h number_to_currency( compras_gasto.gravadas_10_real,  :format =>' %n ', :separator => ",")  %></td>
+               <td width="100" align="right">    <%= h number_to_currency( compras_gasto.imposto_10_real,  :format =>' %n ', :separator => ",")  %></td>
+
+               <% exenta_us += compras_gasto.exentas_real %>
+               <% gr_05_us  += compras_gasto.gravadas_05_real %>
+               <% gr_10_us  += compras_gasto.gravadas_10_real %>
+               <% imp_05_us += compras_gasto.imposto_05_real %>
+               <% imp_10_us += compras_gasto.imposto_10_real %>
+
+            <% end %>
+            <td><%= link_to 'Editar', edit_compras_gasto_path(compras_gasto) %></td>
+            <td><%= link_to t('DELETE'), compras_gasto, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+         </tr>
+      <% end %>
+   </table>
+</div>
+   <table>
+      <tr>
+         <% if @compra.moeda == 0  %>
+            <td width="300"></td>
+            <td width="100" align="right">    <%= h number_to_currency(exenta_us,  :format =>' %n ',  :separator => ",")  %></td>
+            <td width="100" align="right">    <%= h number_to_currency(gr_05_us,   :format =>' %n ',  :separator => ",")  %></td>
+            <td width="100" align="right">    <%= h number_to_currency(imp_05_us,  :format =>' %n ',  :separator => ",")  %></td>
+            <td width="100" align="right">    <%= h number_to_currency(gr_10_us,   :format =>' %n ',  :separator => ",")  %></td>
+            <td width="100" align="right">    <%= h number_to_currency(imp_10_us,  :format =>' %n ',  :separator => ",")  %></td>
+         <% else %>
+            <td width="300"></td>
+            <td width="100" align="right">    <%= h number_to_currency(exenta_gs,  :format =>' %n ',  :precision => 0)  %></td>
+            <td width="100" align="right">    <%= h number_to_currency(gr_05_gs,   :format =>' %n ',  :precision => 0)  %></td>
+            <td width="100" align="right">    <%= h number_to_currency(imp_05_gs,  :format =>' %n ',  :precision => 0)  %></td>
+            <td width="100" align="right">    <%= h number_to_currency(gr_10_gs,   :format =>' %n ',  :precision => 0)  %></td>
+            <td width="100" align="right">    <%= h number_to_currency(imp_10_gs,  :format =>' %n ',  :precision => 0)  %></td>
+         <% end %>
+      </tr>
+   </table>

@@ -1,0 +1,124 @@
+<table>
+	<tr>
+		<td>
+			<div style="border-right: 1px solid #eee; padding-right: 10px;margin-top: 10px">
+				<%= render :partial=>"index_financa_modal", :locals=>{:cobros_financas => @cobro.cobros_financas} %>
+				
+				<% if @cobro.moeda == 0 %>
+					<% if (@fecha_result_us.to_f.round(2) != (@financ_cred_us.to_f - @financ_deb_us.to_f).to_f.round(2)) %>
+					  <%= render :partial=>"new_financa_modal", :locals=>{:cobros_financa=>CobrosFinanca.new(:cobro_id=>@cobro.id)} %>
+					  <% @cobro.update_attributes(op: false) %>
+					<% elsif (@fecha_result_us.to_f.round(2) == (@financ_cred_us.to_f - @financ_deb_us.to_f).to_f.round(2)) %>
+				  	<div class="alert alert-success" align="center" style="margin: 10px">
+				  		<b><%= t('OPERATION_CONCLUDED') %></b>
+				  		<% @cobro.update_attributes(op: true) %>
+				  	</div>
+				  	<a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"  style="margin: 10px"><%= image_tag('printer.png') %> Recibo</a>
+					<% end %>
+				<% elsif @cobro.moeda == 1 %>
+				  <% if (@fecha_result_gs.to_f.round(2) != (@financ_cred_gs.to_f - @financ_deb_gs.to_f).to_f.round(2))  %>
+				    <%= render :partial=>"new_financa_modal", :locals=>{:cobros_financa=>CobrosFinanca.new(:cobro_id=>@cobro.id)} %>
+				    	<% @cobro.update_attributes(op: false) %>
+				  <% elsif (@fecha_result_gs.to_f.round(2) == (@financ_cred_gs.to_f - @financ_deb_gs.to_f).round(2)) %>
+				  	<div class="alert alert-success" align="center" style="margin: 10px">
+				  		<b><%= t('OPERATION_CONCLUDED') %></b>
+				  		<% @cobro.update_attributes(op: true) %>
+				  	</div>
+				  	<a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"  style="margin: 10px"><%= image_tag('printer.png') %> Recibo</a>
+				  <% end %>
+				<% else %>
+				  <% if (@fecha_result_rs.to_f.round(2) != (@financ_cred_rs.to_f - @financ_deb_rs.to_f).to_f.round(2)) %>
+				    <%= render :partial=>"new_financa_modal", :locals=>{:cobros_financa=>CobrosFinanca.new(:cobro_id=>@cobro.id)} %>
+				    	<% @cobro.update_attributes(op: false) %>
+				  <% elsif (@fecha_result_rs.to_f.round(2) == (@financ_cred_rs.to_f - @financ_deb_rs.to_f).to_f.round(2)) %>
+				  	<div class="alert alert-success" align="center" style="margin: 10px">
+				  		<b><%= t('OPERATION_CONCLUDED') %></b>
+				  		<% @cobro.update_attributes(op: true) %>
+				  	</div>
+				  	<a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"  style="margin: 10px"><%= image_tag('printer.png') %> Recibo</a>
+				  <% end %>
+				<% end %>
+			</div>			
+
+		</td>
+		<td valign="top" style="padding: 10px">
+			<%= form_for(@cobro, remote: true) do |c| %>
+				<input type='hidden' name='_method' value='put'>
+				<label><%= t('DATE') %></label>
+				<%= c.date_select :data %>
+	      <%= image_tag("load.gif",
+	                  :align => "absmiddle",
+	                  :border => 0,
+	                  :id => "spinner",
+	                  :width => 21,
+	                  :height => 21,
+	                  :style =>"display: none;" ) %>            
+
+
+
+        <script type="text/javascript">
+	        $('#cobro_data_3i, #cobro_data_2i, #cobro_data_1i').on('change', function() {
+				    var data = $(".edit_cobro").serializeArray();
+
+				    $.ajax({
+				      method: 'PUT',
+				      url: '/cobros/<%= @cobro.id %>',
+				      data: data,
+				      dataType: 'script',
+							beforeSend: function(){
+				      	$("#spinner").show("fast");
+				      },
+				      success: function(){
+				      $('#spinner').hide("slow");
+				      }				      
+				    });		
+
+	        });
+        </script>
+        <% if @cobro.cobros_financas.present? %>
+	        <script type="text/javascript">
+	        	$(".edit_cobro :input").prop("disabled", true);
+					</script>
+        <% end %>
+
+			<% end %>		
+
+
+				<div>
+	        <div class="group">
+	          <h1 id="header">
+							Ultimos Pagos
+	          </h1>
+	          <div class="rolagem" dir="div" style="height: 150px">
+							<table>
+					      <tr class="<%= cycle("cor1", "cor2") %>" style="cursor:pointer;">
+					      	<td width="60" align="center">12/10/18</td>
+					        <td width="60" align="center">DOC01</td>
+					        <td width="20" align="center">C</td>
+					        <td width="70" align="right">2.000,00</td>
+					      </tr>
+					      <tr class="<%= cycle("cor1", "cor2") %>" style="cursor:pointer;">
+					      	<td width="60" align="center">12/10/18</td>
+					        <td width="60" align="center">DOC01</td>
+					        <td width="20" align="center">C</td>
+					        <td width="70" align="right">2.000,00</td>
+					      </tr>
+					      <tr class="<%= cycle("cor1", "cor2") %>" style="cursor:pointer;">
+					      	<td width="60" align="center">12/10/18</td>
+					        <td width="60" align="center">DOC01</td>
+					        <td width="20" align="center">C</td>
+					        <td width="70" align="right">2.000,00</td>
+					      </tr>
+					 		</table>
+				 		</div>
+	        </div>
+	      </div>
+			</div>	
+		</td>
+	</tr>
+</table>
+<script type="text/javascript">
+	  function Comprovante(){
+    window.open('/cobros/'+<%= @cobro.id %>+'/comprovante', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=100, WIDTH=600, HEIGHT=400');
+  }  	
+</script>

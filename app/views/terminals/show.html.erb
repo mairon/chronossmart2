@@ -1,0 +1,52 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <header class="panel-heading" style="font-family: 'prox'; font-size: 18px;
+    padding-bottom: 10px;">
+        Terminal #<%= @terminal.id.to_s.rjust(6,'0') %> - <%= @terminal.nome %>
+
+      </header>
+      <div class="panel-content">
+          <table class="head_grid">
+             <tr>
+                <td width="200"><%= t('FORM_OF_PAYMENT') %></td>
+                <td width="180"><%= t('ACCOUNT') %></td>
+                <td width="50"><%= t('COIN') %></td>                
+             </tr>
+          </table>
+          <div class="rolagem" dir="div" style="height: 300px;">
+             <table>
+                <% @terminal.terminal_contas.each do |cf| %>
+                  <tr class = "<%= cycle("cor1", "cor2") %>">
+                    <td width="200"><%= cf.forma_pago.nome %></td>
+                    <td width="180"><%= cf.conta.nome %></td>
+                    <% if cf.moeda.to_i == 0 %>
+                      <td width="50" align="center"><span class="us">U$</span></td>
+                    <% elsif cf.moeda.to_i == 1 %>
+                      <td width="50" align="center"><span class="gs">Gs</span></td>
+                    <% elsif cf.moeda.to_i == 2 %>
+                      <td width="50" align="center"><span class="rs">R$</span></td>
+                    <% end %>
+                    <td><%= link_to '', edit_terminal_conta_path(cf), class: "icon-pencil" %></td>
+                    <td><%= link_to '', cf, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: "icon-trash" %></td>
+                  </tr>
+                <% end %>
+             </table>
+          </div>        
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content">
+				<%= render :partial=>"terminal_contas/new", :locals=>{:terminal_conta=>TerminalConta.new(:terminal_id=>@terminal.id)} %>      	
+			</div>    	
+    </div>
+  </div>
+</div>
+
+
+
+

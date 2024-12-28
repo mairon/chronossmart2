@@ -1,0 +1,164 @@
+<%= form_for(Ingresso.new) do |f| %>
+  <%= f.hidden_field :operacao, value: '1' %>
+  <div class="row">
+    <div class="col-md-9">
+      <label><%= t('DATE') %></label>
+      <%= f.date_select :data %>
+    </div>
+    <div class="col-md-3">
+      <label>Status</label>
+      <%= f.select :status, [['Liberado', true], ['Pendente', false]], {class: "panel-field", selected: true} %>
+    </div>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <label>Nº SWIFT</label>
+      <%= f.text_field :swift_numero, class: "panel-field" %>
+    </div>
+
+    <div class="col-md-6">
+      <label>Modal</label>
+      <%= f.collection_select :conta_id, Conta.all( :select => ' id, nome',:conditions => ["modal = true and unidade_id = #{current_unidade.id}"], :order  => '2' ), :id, :nome, {:prompt => "Selecione"}, {class: 'modal_conta'} %>
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+        <label>Empresa Modal</label>
+        <%= f.collection_select :persona_id_modal, Persona.all( :select => ' id, nome', :conditions => ["tipo_cliente = 1 and tipo_vendedor = 1"], :order  => '2' ), :id, :nome, {:prompt => "Selecione"}, {class: 'modal_cliente'} %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+        <label>Cliente</label>
+        <%= f.collection_select :persona_id, Persona.all( :select => ' id, nome', :conditions => ["tipo_cliente = 1"], :order  => '2' ), :id, :nome, {:prompt => "Selecione"}, {class: 'modal_cliente'} %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <label>Agência</label>
+      <%= f.text_field :bc_agencia, class: 'panel-field' %>
+    </div>
+    <div class="col-md-6">
+      <label>Conta</label>
+      <%= f.text_field :bc_conta, class: 'panel-field' %>
+    </div>
+  </div>
+
+
+  <div class="row">
+    <div class="col-md-4">
+      <%= field_us_label 'Valor em U$:',f, :valor_base_us, class: 'm_valor_base_us money_us' %>
+    </div>
+
+
+    <div class="col-md-4">
+      <%= field_us_label 'Cambio Banco',f, :cambio_banco, class: 'm_cambio_banco money_ds' %>
+    </div>
+
+    <div class="col-md-4">
+      <label>Valor R$ Banco</label>
+      <%= text_field_tag :valor_rs_banco, nil, class: 'm_valor_rs_banco', size: 15, readonly: true, dir: "rtl" %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4">
+
+    </div>
+
+    <div class="col-md-4">
+      <%= field_us_label 'Cambio Modal',f, :cambio_modal, class: 'm_cambio_modal money_ds' %>
+    </div>
+
+    <div class="col-md-4">
+      <label>Valor R$ Modal</label>
+      <%= text_field_tag :valor_rs_modal, nil, class: 'm_valor_rs_modal', size: 15, readonly: true, dir: "rtl" %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4">
+
+    </div>
+
+    <div class="col-md-4">
+      <%= field_us_label 'Cambio Cliente',f, :cambio_comercial, class: 'm_cambio_comercial money_ds' %>
+    </div>
+
+    <div class="col-md-4">
+      <%= field_us_label 'Valor R$ Cliente:',f, :valor_real, class: 'm_valor_real money_ds', readonly: true %>
+    </div>
+  </div>
+
+
+  <div class="row">
+    <div class="col-md-4">
+      <%= field_us_label 'Taxa Adm Banco',f, :taxa_adm_bc, class: 'm_taxa_adm_bc money_us' %>
+    </div>
+
+    <div class="col-md-4">
+      <%= field_us_label 'Taxa Contrato',f, :taxa_contrato, class: 'm_taxa_contrato money_us' %>
+    </div>
+
+    <div class="col-md-4">
+      <%= field_us_label 'Valor IOF:',f, :valor_iof, class: 'm_valor_iof money_us' %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <br>
+      <%= f.text_area :concepto, cols: 10, rows: 4, placeholder: 'Obs:' %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12" align="center">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    </div>
+  </div>
+</div>
+<% end %>
+
+<script type="text/javascript">
+  $('.modal_conta').selectize();
+
+  $('.modal_cliente').selectize();
+
+  $('#modal-ingresso-modal').on('shown.bs.modal', function() {
+    $('.modal_conta')[0].selectize.focus();
+  })
+
+  $('.m_cambio_banco').change(function() {
+    var base_rs = $('.m_valor_base_us').val()
+    var c_banco = $('.m_cambio_banco').val()
+      $('.m_valor_rs_banco').val( number_format( (parseFloat(base_rs.replace(/\./g, "").replace(",", ".")) *  parseFloat(c_banco.replace(/\./g, "").replace(",", "."))),2, ',', '.' )  )
+
+    var taxa_iof = 0.38 //taxa padrão IOF
+    var c_banco = $('.m_valor_rs_banco').val().replace(/\./g, "").replace(",", ".")
+      $('.m_valor_iof').val( number_format( (parseFloat(taxa_iof / 100) * parseFloat(c_banco) ),2, ',', '.' )  )
+
+  })
+
+
+  $('.m_cambio_comercial').change(function() {
+    var base_rs = $('.m_valor_base_us').val()
+    var c_banco = $('.m_cambio_comercial').val()
+      $('.m_valor_real').val( number_format( (parseFloat(base_rs.replace(/\./g, "").replace(",", ".")) *  parseFloat(c_banco.replace(/\./g, "").replace(",", "."))),2, ',', '.' )  )
+  })
+
+
+  $('.m_cambio_modal').change(function() {
+    var base_rs = $('.m_valor_base_us').val()
+    var c_banco = $('.m_cambio_modal').val()
+      $('.m_valor_rs_modal').val( number_format( (parseFloat(base_rs.replace(/\./g, "").replace(",", ".")) *  parseFloat(c_banco.replace(/\./g, "").replace(",", "."))),2, ',', '.' )  )
+  })
+
+
+</script>

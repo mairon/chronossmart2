@@ -1,0 +1,21 @@
+<div class="rolagem" dir="div">
+  <% tot = 0 %>
+  <table>
+    <% compra_produto_grades.each do |compra_produto_grade| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>" >
+        <td width="120"><%= compra_produto_grade.cor.nome %></td>
+        <td width="105"><%= compra_produto_grade.tamanho.nome %></td>
+        <td width="190" align="right"><%= compra_produto_grade.quantidade %></td>
+        <td><%= link_to t('DELETE'), compra_produto_grade, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+        <% tot += compra_produto_grade.quantidade.to_f %>
+      </tr>
+    <% end %>
+  </table>
+</div>
+
+<table>
+  <tr>
+    <td width="235"></td>
+    <td width="190" align="right"><b> <%= tot %></b></td>
+  </tr>
+</table>

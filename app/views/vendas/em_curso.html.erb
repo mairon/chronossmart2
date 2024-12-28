@@ -1,0 +1,58 @@
+<style type="text/css">
+  .rolagem td{
+    cursor:pointer
+  }
+</style>
+<% count_v = 0 %>
+<% count_a = 0 %>
+<h1 id="header">En Curso</h1>
+<div class="acessos">
+  <a href="/vendas" title="" class="btn btn-blue">Todas las <%= t('SALES') %></a>
+</div>
+
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="80" align="center"><%= t('CODE') %></td>
+      <td width="60" align="center"><%= t('DATE') %></td>
+      <td width="250">Vendedor</td>
+      <td width="350">Cliente</td>
+      <td width="50" align="right">Ctd.</td>
+      <td width="35" align="center"></td>
+      <td width="80" align="right">Monto</td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div">
+    <table>
+    <% @vendas_pendentes.each do |v| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>" onclick="OpenCobraca(<%= v.id %>)">
+        <td width="80" align="center"><b><%= v.id.to_s.rjust(8,'0') %></b></td>
+        <td width="60" align="center"><%= v.data.strftime("%d/%m/%y")%></td>
+        <td width="250" align="left"><%= v.vendedor %></td>
+        <td width="350" align="left"><%= truncate( v.cliente, :length => 35 ) %></td>
+        <td width="50" align="right"><%= v.qtd.to_f %></td>
+        <% if v.moeda.to_i == 0 %>
+        <td width="35" align="center">U$</td>
+          <td width="80" align="right"><%= format_decimal( v.tot_us ) %></td>
+        <% else %>
+          <td width="35" align="center"><span class="gs">Gs</span></td>
+          <td width="80" align="right"><b><%= format_int( v.tot_gs ) %></b></td>
+        <% end %>
+  		</tr>
+    <% end %>
+  </table>
+  </div>
+</div>
+
+
+<div class="head_grid">
+  <%= will_paginate @vendas_pendentes %>
+</div>
+
+<script type="text/javascript">
+  function OpenCobraca(id){
+    window.location = '/vendas/'+ id ;
+
+  };
+
+</script>

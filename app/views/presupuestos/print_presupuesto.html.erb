@@ -1,0 +1,8 @@
+<% if Empresa.last.segmento.to_i == 1 %>
+	<%= render '/presupuestos/forms/print_pdf' %>
+<% else %>
+	<%= render '/presupuestos/forms/print_matricial' %>
+<% end %>
+
+
+

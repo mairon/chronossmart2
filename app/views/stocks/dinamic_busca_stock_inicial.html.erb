@@ -1,0 +1,32 @@
+  <table class="head_grid">
+    <tr>
+      <td width="80" align="center">Cod.</td>
+      <td width="80" align="center"><%= t('DATE') %></td>
+      <td width="80" align="center">Deposito</td>
+      <td width="400">Producto</td>
+      <td width="100" align="right">Cantidad</td>
+      <td width="100" align="right">Costo Gs.</td>
+
+    </tr>
+
+  </table>
+   
+  <div class="rolagem" dir="div">
+    <table>
+      <% @stocks.each do |stock| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="80" align="center"><%= stock.id.to_s.rjust(6,'0') %></td>
+          <td width="80" align="center"><%= stock.data.strftime("%d/%m/%y")%></td>
+          <td width="80" align="center"><%= stock.deposito_id %></td>
+          <td width="400"><%= stock.produto_nome %></td>
+          <td width="100" align="right"><%= h stock.entrada%></td>
+          <td width="100" align="right"><%= h format_int(stock.unitario_guarani )%></td>
+          <td><%= link_to '', edit_stock_path(stock), class: 'icon-pencil' %></td>
+          <td><%= link_to '', stock, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+<div class="head_grid">
+  <%= will_paginate @stocks, "data-remote" => "true" %>
+</div>

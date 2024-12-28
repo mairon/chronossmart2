@@ -1,0 +1,370 @@
+<style>
+	.page-break { display:block; clear:both; page-break-after:always; }
+table {
+		font-family:Lucida Console;
+		font-size:10px;
+		border-collapse: collapse;
+	}
+	table td{
+		height:20px;
+
+	}
+	.header{
+		font-size: 12px;
+		border:1px solid black;
+	  -moz-border-radius:8px;
+	  -webkit-border-radius:8px;
+	  padding:10px;
+
+
+	}
+	.obs{
+		font-size: 7px;
+	}
+
+tr.cor2 {
+    background: #c0d9c0;
+}
+
+tr.cor1 {
+    background: white;
+}
+
+</style>
+<body>
+<% @amostras.each do |a| %>
+<div class="page-break">
+
+	<table>
+		<tr>
+			<td colspan="5">
+				<div >
+					<table>
+				    <tr>
+				    	<td colspan="2"><%= wicked_pdf_image_tag('logo_biosollo.png', :width => 150, :height => 80) %></td>
+				    	<td width="700" align="center" valign="bottom">
+				    		<p>Km 4 Super Carretera - Teléfono: (061) 573 616</p>
+				    		<p>www.biosollo.com.py - biosollo@biosollo.com.py - Ciudad del Este - Paraguay</p>
+				    	</td>
+				    </tr>
+			    </table>
+			    </div>
+	  	</td>
+		</tr>
+
+    <tr>
+    	<td heigth="80"></td>
+    </tr>
+
+		<tr>
+			<td width="1500" colspan='2'>
+				<div class="header">
+					<table>
+				    <tr height="20">
+				    	<td>Solicitante:</td>
+				    	<td  width="400"><%= a.empresa_nome %></td>
+
+				    	<td>Control:</td>
+				    	<td><%= a.amostra.to_s.rjust(6,'0') %></td>
+
+				    </tr>
+
+				    <tr height="20">
+				    	<td>Proprietário:</td>
+				    	<td><%= a.solicitante %></td>
+				    	<td><%= t('DATE') %>:</td>
+				    	<td><%= a.data.to_date.strftime("%d/%m/%Y") %></td>
+				    </tr>
+
+				    <tr height="20">
+				    	<td>Dirección:</td>
+				    	<td><%= a.local_coleta %></td>
+
+				    	<td>Cultivo:</td>
+				    	<td><%= a.cultura %></td>
+
+				    </tr>
+
+						<tr height="20">
+				    	<td>Ident. Muestra:</td>
+				    	<td>LT: <%= a.lote %> - PT: <%= a.detalhe_amostra %></td>
+				    </tr>
+					</table>
+				</div>
+
+			</td>
+		</tr>
+
+    <tr>
+    	<td heigth="80"></td>
+    </tr>
+
+		<tr>
+			<td width="1500" colspan='5' align="center">
+				<div class="header">
+						<h2>Resultado de Análisis de Granos</h2>
+				</div>
+			</td>
+		</tr>
+    <tr>
+    	<td heigth="80"></td>
+    </tr>
+
+    <tr>
+	    	<td valign="top">
+	    		<div class="header">
+	    		<table>
+	    			<tr style="border-bottom: 1px solid black">
+	    				<td width="380"><b>Determinaciónes: Macronutrientes</b></td>
+	    				<td width="300" align="center"><b>Resultado g/Kg</b></td>
+	    				<td width="300" align="center"></td>
+	    			</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Fósforo (P) </td>
+	    				<td align="center">
+	    					<% fosforo = AmostraEnsaio.find_by_metodo_id( 167, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    					<% if fosforo != nil %>
+	    						<%= number_to_currency( fosforo.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    						<% else %>
+										NS
+	    					<% end %>
+	    				</td>
+	    				<td align="center">
+	    				</td>
+		    		</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Nitrógeno (N) </td>
+	    				<td align="center">
+	    					<% nitrogeno = AmostraEnsaio.find_by_metodo_id( 168, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    					<% if nitrogeno != nil %>
+
+	    						<%= number_to_currency( nitrogeno.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    						<% else %>
+										NS
+	    					<% end %>
+
+	    				</td>
+	    				<td align="center">
+	    				</td>
+		    		</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Potasio (K) </td>
+	    				<td align="center">
+	    					<% potasio = AmostraEnsaio.find_by_metodo_id( 164, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    					<% if potasio != nil %>
+	    						<%= number_to_currency( potasio.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    					<% else %>
+										NS
+	    					<% end %>
+
+	    				</td>
+	    				<td align="center">
+	    				</td>
+		    		</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Calcio (Ca) </td>
+	    				<td align="center">
+	    					<% calcio = AmostraEnsaio.find_by_metodo_id( 162, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    					<% if calcio != nil %>
+	    					<%= number_to_currency( calcio.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    						    						<% else %>
+										NS
+	    					<% end %>
+
+	    				</td>
+	    				<td align="center">
+	    				</td>
+		    		</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Magnesio (Mg) </td>
+	    				<td align="center">
+	    					<% magnesio = AmostraEnsaio.find_by_metodo_id( 163, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    					<% if magnesio != nil %>
+	    					<%= number_to_currency( magnesio.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    						<% else %>
+										NS
+	    					<% end %>
+	    				</td>
+	    				<td align="center">
+	    				</td>
+		    		</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Azufre (S) </td>
+	    				<td align="center">
+	    					<% azufre = AmostraEnsaio.find_by_metodo_id( 165, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    					<% if azufre != nil %>
+	    					<%= number_to_currency( azufre.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    						<% else %>
+										NS
+	    					<% end %>
+
+	    				</td>
+	    				<td align="center">
+	    				</td>
+		    		</tr>
+	    		</table>
+	    		</div>
+	    	</td>
+    	</td>
+    </tr>
+
+    <tr>
+    	<td heigth="80"></td>
+    </tr>
+
+    <tr>
+	    	<td valign="top">
+	    		<div class="header">
+	    		<table>
+	    			<tr style="border-bottom: 1px solid black">
+	    				<td width="380"><b>Determinaciónes: Micronutrientes</b></td>
+	    				<td width="300" align="center"><b>Resultado mg/Kg</b></td>
+	    				<td width="300" align="center"></td>
+	    			</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Cobre (Cu) </td>
+	    				<td align="center">
+	    					<% cobre = AmostraEnsaio.find_by_metodo_id( 158, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    					<% if cobre != nil %>
+	    					<%= number_to_currency( cobre.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    						<% else %>
+										NS
+	    					<% end %>
+
+	    				</td>
+	    				<td align="center">
+	    				</td>
+		    		</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Zinc (Zn) </td>
+	    				<td align="center">
+	    					<% zinco = AmostraEnsaio.find_by_metodo_id( 159, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    					<% if zinco != nil %>
+	    					<%= number_to_currency( zinco.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    						<% else %>
+										NS
+	    					<% end %>
+
+	    				</td>
+	    				<td align="center">
+	    				</td>
+		    		</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Manganeso (Mn) </td>
+	    				<td align="center">
+	    					<% manganeso = AmostraEnsaio.find_by_metodo_id( 163, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    					<% if manganeso != nil %>
+	    					<%= number_to_currency( manganeso.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    						<% else %>
+										NS
+	    					<% end %>
+
+	    				</td>
+	    				<td align="center">
+	    				</td>
+		    		</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Boro (B) </td>
+	    				<td align="center">
+	    					<% boro = AmostraEnsaio.find_by_metodo_id( 166, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    					<% if boro != nil %>
+	    					<%= number_to_currency( boro.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    						<% else %>
+										NS
+	    					<% end %>
+
+	    				</td>
+	    				<td align="center">
+	    				</td>
+		    		</tr>
+
+	    			<tr class="<%= cycle("cor1", "cor2") %>" >
+	    				<td>Hierro (Fe) </td>
+	    				<td align="center">
+	    					<% ferro = AmostraEnsaio.find_by_metodo_id( 161, :conditions => ["amostra = ?", a.amostra], :select => 'id,resultado,metodo_id') %>
+	    					<% if ferro != nil %>
+	    					<%= number_to_currency( ferro.resultado.to_f, :format=>' %n ', :separeitor => ",", :precision => 2) %>
+	    						<% else %>
+										NS
+	    					<% end %>
+
+	    				</td>
+	    				<td align="center">
+	    				</td>
+		    		</tr>
+	    		</table>
+	    	</div>
+	    	<br>
+	    		*Metodología: (Embrapa, 2009)
+	    	</td>
+    	</td>
+    </tr>
+    <tr>
+    	<td>
+    		<table>
+    			<tr>
+	    			<td width="300"></td>
+	    			<td width="600">
+	    				<div class="header">
+		    				<table>
+		    					<td>Ciudad del Este, <%= @revisao_result.data.strftime("%d") %>/<%= @revisao_result.data.strftime("%m") %>/<%= @revisao_result.data.strftime("%Y") %></td>
+		    				</table>
+		    			</div>
+	    			</td>
+    			</tr>
+			    <tr>
+			    	<td heigth="80"></td>
+			    </tr>
+
+    			<tr>
+	    			<td width="300"></td>
+	    			<td width="600"  align="center">
+	    				<div class="header">
+		    				<table>
+		    					<td  align="center">
+		    					 <p> <%= wicked_pdf_image_tag('firma_alex.png', :width => 50, :height => 50) %></p>
+		    					 <p>____________________________________</p>
+		    					 <p>Alexson Bobato</p>
+		    					 <p>Gerente Comercial</p>
+		    					</td>
+		    				</table>
+		    			</div>
+	    			</td>
+    			</tr>
+			    <tr>
+			    	<td heigth="80"></td>
+			    </tr>
+
+    			<tr>
+	    			<td width="300"></td>
+	    			<td width="600">
+	    				<div class="header">
+		    				<table>
+		    					<td>
+		    						El (los) resultado (s) del (los) análisis representa la (s) muetra (s) enviada (s) al laboratório por el interesado, no siendo de nuetra responsabilidad el muestreo y recomendaciones del manejo. Este resultado del análisi no tiene valor jurídico como laudo oficial para cualquier finalidad: seguro rural, acciones jurídicas, etc.
+		    					</td>
+		    				</table>
+		    			</div>
+	    			</td>
+    			</tr>
+
+    		</table>
+    	</td>
+    </tr>
+
+	</table>
+</div>
+<% end %>
+</body>
+
+

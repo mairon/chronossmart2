@@ -1,0 +1,18 @@
+<% @saldo_transacoes.each do |sr| %>
+<div class="panel">
+  <h1 id="header" align="center" style="font-size: 14px;"><b class="bold-black"><%= sr.persona_nome %></b></h1>
+	<table class="list">
+
+		<tr class = "<%= cycle("cor1", "cor2") %>">
+			<td width="80">R$</td>
+			<td width="90" align="right" ><%= format_decimal(sr.saldo_rs) %></td>		
+		</tr>
+
+		<tr class = "<%= cycle("cor1", "cor2") %>">
+			<td width="80">USDT</td>
+			<td width="90" align="right" ><%= format_decimal(sr.saldo_usdt) %></td>		
+		</tr>	
+	</table>
+	<br>
+</div>
+<% end %>

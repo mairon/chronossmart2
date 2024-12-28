@@ -1,0 +1,70 @@
+sheet = workbook.create_worksheet
+sheet.name = "Relatorio de Stock"
+
+format  = Spreadsheet::Format.new( :color => "white", :weight => "bold", :pattern_fg_color => "gray", :pattern => 1, :align => :center)
+bold    = Spreadsheet::Format.new :weight => :bold, :align => :right
+left    = Spreadsheet::Format.new :align => :left
+center  = Spreadsheet::Format.new :align => :center
+sheet.row(00).default_format = format
+
+sheet[00,00]  = 'Fecha'
+sheet[00,01]  = 'codigo'
+sheet[00,02]  = 'Coenta'
+sheet[00,03]  = 'Entrada'
+sheet[00,04]  = 'Salida'
+sheet[00,05]  = 'Saldo'
+
+
+
+
+indice            = 1
+totentrada        = 0
+totsaida          = 0
+
+@financas.each do |lancamento|
+
+            row       = sheet.row(indice)
+            row.push  lancamento.data.strftime("%d/%m/%Y")
+            row.push  lancamento.conta_id
+            row.push  lancamento.conta_nome
+            row.push  number_to_currency(lancamento.entrada_guarani.to_f, :format=>' %n ', :precision => 0)
+            row.push  number_to_currency(lancamento.saida_guarani.to_f, :format=>' %n ', :precision => 0)
+
+            indice = indice + 1
+            totentrada = totentrada + lancamento.entrada_guarani
+            totsaida   = totsaida + lancamento.saida_guarani
+
+            sheet.row(indice + -1).set_format(0,  center)
+            sheet.row(indice + -1).set_format(1,  center)
+            sheet.row(indice + -1).set_format(2,  center)
+            sheet.row(indice + -1).set_format(3,  bold)
+            sheet.row(indice + -1).set_format(4,  bold)
+            sheet.row(indice + -1).set_format(5,  bold)
+            sheet.row(indice + -1).set_format(6,  bold)
+            sheet.row(indice + -1).set_format(7,  center)
+            sheet.row(indice + -1).set_format(8,  left)
+            sheet.row(indice + -1).set_format(9,  bold)
+            sheet.row(indice + -1).set_format(10, bold)
+            sheet.row(indice + -1).set_format(11, bold)
+            sheet.row(indice + -1).set_format(12, bold)
+            sheet.row(indice + -1).set_format(13, center)
+            sheet.row(indice + -1).set_format(14, bold)
+
+end
+
+row = sheet.row(indice)
+row.push  "Anterior"
+row.push  number_to_currency(@financas_aterior, :format=>' %n ', :precision => 0)
+row.push  ""
+row.push  number_to_currency(totentrada, :format=>' %n ', :precision => 0)
+row.push  number_to_currency(totsaida, :format=>' %n ', :precision => 0)
+row.push  number_to_currency(totentrada - totsaida, :format=>' %n ', :precision => 0)
+
+sheet.row(indice).set_format(1,  bold)
+sheet.row(indice).set_format(2,  bold)
+sheet.row(indice).set_format(3,  bold)
+sheet.row(indice).set_format(4,  bold)
+sheet.row(indice).set_format(5,  bold)
+sheet.row(indice).set_format(6,  bold)
+
+

@@ -1,0 +1,99 @@
+<h1 id="header">Sueldo</h1>
+ <div class="group">
+
+<%= form_for(@sueldo) do |f| %>
+  <% if @sueldo.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@sueldo.errors.count, "error") %> prohibited this adelanto_cota from being saved:</h2>
+
+      <ul>
+      <% @sueldo.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+    <table>
+      <tr>
+        <td>
+          <label>Mês Referente</label>
+          <%= f.date_select :data_inicio, :discard_day => true %>
+        </td>
+
+        <td>
+          <label>Dias</label>
+          <%= f.text_field :dias, class: 'panel-field', size: 5 %>
+        </td>
+
+      </tr>
+
+      <tr>
+        <td colspan="2">
+          <label>Periodo Hrs. Trabajadas Inicio</label>
+          <%= f.date_select :inicio_ponto %>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <label>Periodo Hrs. Trabajadas Final</label>
+          <%= f.date_select :final_ponto %>
+        </td>
+      </tr>
+
+
+      <tr>
+        <td colspan="5">
+          <fieldset>
+            <legend><%= t('COIN') %></legend>
+            <% if current_unidade.moeda.to_i == 0 %>
+              <%= f.radio_button :moeda, 1 %> <%= t('GUARANIS') %>
+              <%= f.radio_button :moeda, 0,  :Checked => "True" %> Dolar
+              <%= f.radio_button :moeda, 2 %> Real
+            <% elsif current_unidade.moeda.to_i == 1 %>
+              <%= f.radio_button :moeda, 1, :Checked => "True" %> <%= t('GUARANIS') %>
+              <%= f.radio_button :moeda, 0 %> Dolar
+              <%= f.radio_button :moeda, 2 %> Real
+
+            <% elsif current_unidade.moeda.to_i == 2 %>
+              <%= f.radio_button :moeda, 1 %> <%= t('GUARANIS') %>
+              <%= f.radio_button :moeda, 0 %> Dolar
+              <%= f.radio_button :moeda, 2,  :Checked => "True" %> Real
+            <% end %>
+          </fieldset>
+        </td>
+      </tr>
+
+
+      <tr>
+        <td colspan="5">
+          <fieldset>
+            <legend>Tipo Liquidación</legend>
+              <%= f.radio_button :tipo_liquidacao, 0 %> Sueldo
+              <%= f.radio_button :tipo_liquidacao, 1 %> Vacaciones
+              <%= f.radio_button :tipo_liquidacao, 2 %> Aguinaldo
+          </fieldset>
+        </td>
+      </tr>
+
+
+      <tr>
+        <td colspan="2">
+          <label>Empleado</label>
+          <%= f.collection_select :persona_id,
+                Persona.all( :select     => 'id,nome,tipo_funcionario',
+                :conditions => ["tipo_funcionario = 1 AND ESTADO = 0 AND UNIDADE_ID = #{current_unidade.id}"],
+                :order      => '2'),:id,:nome %>
+        </td>
+      </tr>
+    </table>
+  <div class="footer-buttons">
+    <%= f.submit "Seguir", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    <%= link_to t('BACK'), sueldos_path, :class => "btn btn-back" %>
+  </div>
+
+  <% end %>
+</div>
+
+<script>
+  $('#sueldo_persona_id').selectize();
+</script>

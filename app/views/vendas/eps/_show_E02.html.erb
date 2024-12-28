@@ -1,0 +1,130 @@
+<ul class="tabs">
+  <li><a href="#tab1">Venta [Producto]</a></li>
+</ul>
+<div class="tab_container">
+	<table>
+       <tr>
+           <td>
+    <div class="group">
+	  <table>
+		<tr>
+			<td align="right">Cliente : </td>
+			<td><b> <%= @venda.persona_nome %></b></td>
+
+			<td align="right">Clasificacion : </td>
+			<td><b><%= @venda.classificacao   %></b></td>
+		</tr>
+	</table>
+  </div>
+   </td>
+
+       </tr>
+
+		<tr>
+			<td>
+			<div class="group">
+				<table class="head_grid">
+					<tr>
+						<td width="450">Produto</td>
+						<td width="80" align="right">Cantidad</td>
+						<td width="80" align="right">Unit </td>
+						<td width="80" align="right">Total </td>
+						<td width="35"></td>
+
+					</tr>
+				</table>
+				<div class="rolagem" dir="div">
+					<div id="vendas_produtos">
+						<%= render :partial => @venda.vendas_produtos %>
+					</div>
+				</div>
+			</div>
+			</td>
+			<% if Empresa.last.modulo_tintometrico == true %>
+				<td width="210" valign="top">
+					<fieldset>
+						<legend>Tintometria</legend>
+						<%= link_to image_tag('dacar.jpg', width: '200', style: 'border: 2px solid #888;float:left'), '#', onclick: "BuscaTintometria('dacar')" %>
+						<%= link_to image_tag('lazzuril.jpg', width: '200', style: 'border: 2px solid #888;float:left'), '#', onclick: "BuscaTintometria('lazzuril')" %>
+						<%= link_to image_tag('farben.jpg', width: '200', style: 'border: 2px solid #888;float:left'), '#', onclick: "BuscaTintometria('farben')" %>
+					</fieldset>
+				</td>
+			<% end %>
+			
+		</tr>
+
+		<tr>
+			<td align="center">
+			<div class="group">
+				<table>
+					<tr>
+						<% if @venda.moeda == 0 %>
+
+							<td>
+								<font class="style3" color="green">Total U$.:</font>
+								<font class="style3" color="green">
+									<span id="total_dolar">	<%= number_to_currency(@total_dolar, :format=>' %n ', :separator => ",") %></span>
+								</font>
+							</td>
+
+						<% elsif @venda.moeda == 1 %>
+
+							<td>
+								<font class="style3" color="red">Total Gs.:</font>
+								<font class="style3" color="red">
+									<span id="sub_total"><%= number_to_currency(@total_guarani, :format=>' %n ',:precision => 0) %></span>
+								</font>
+							</td>
+
+						<% else %>
+
+							<td>
+								<font class="style3" color="blue">Total R$.:</font>
+								<font class="style3" color="blue">
+									<span id="total_real"><%= number_to_currency(@total_real, :format=>' %n ', :separator => ",") %></span>
+								</font>
+							</td>
+						<% end %>
+
+					</tr>
+				</table>
+			</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td><%= render :partial => "/vendas_produtos/new_produto" %></td>
+		</tr>
+	</table>
+
+
+	<div class="buttons">
+	  <%= link_to t('BACK'), edit_venda_path(@venda), :class => "button back" %>
+	  <%= link_to 'Seguir', vendas_financa_vendas_path(:id => @venda.id) , :class => "button next" %>
+	</div>
+</div>
+
+<script type="text/javascript">
+  document.onkeydown=function(e)
+  {
+      //LISTA DE PRODUTOS
+      var deposito = document.getElementById('vendas_produto_deposito_id').value
+      var dt       = document.getElementById('vendas_produto_data').value
+      if(e.which == 113)
+         window.open('/produtos/busca_venda_produto?deposito_id=' + deposito + '&data=' + dt + '&unidade='+<%= @venda.unidade_id %>+'&persona_id='+<%= @venda.persona_id %>+'&moeda='+<%= @venda.moeda %>+'', 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=2500, HEIGHT=400');
+
+   };
+
+
+	function BuscaTintometria(m){
+		window.open("/vendas/busca_tintometria?marca="+ m, 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=2500, HEIGHT=600');
+	};
+
+	function Formula(v){
+		window.open("/vendas_produtos/"+ v +"/formula" , 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=580, HEIGHT=400');
+	};
+
+</script>
+
+
+

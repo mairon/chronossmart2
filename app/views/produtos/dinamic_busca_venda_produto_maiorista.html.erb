@@ -1,0 +1,51 @@
+<table>
+	<tr>
+		<td width="80" align="center">Cod.</td>
+		<td width="500" align="center">Produto</td>
+		<td width="50" align="center">Saldo</td>
+		<td width="100" align="center">Total Des.</td>
+		<td width="100" align="center">Maiorista Gs.</td>
+		<td width="100" align="center">Maiorista U$.</td>
+
+	</tr>
+</table>
+
+<div class="rolagem" id="div">
+	<table>
+		<% for produto in @produtos %>
+			<% stock = Stock.sum( 'entrada - saida',:conditions => ['produto_id = ?',produto.id] ) %>
+			<tr class = "<%= cycle( "cor1", "cor2" )%>"
+					onMouseOver="javascript:this.style.backgroundColor='#949494'"
+					onMouseOut="javascript:this.style.backgroundColor=''"
+					onClick="Fecha( '<%= produto.nome %>',
+									'<%= produto.preco_maiorista_dolar %>',
+									'<%= produto.preco_maiorista_guarani %>',
+									'<%= produto.id %>',
+									'<%= produto.codigo %>',
+									'<%= produto.clase_id%>',
+									'<%= produto.grupo_id%>',
+									'<%= produto.taxa %>',
+									'<%= produto.desconto %>',
+									'<%= stock %>',
+									'<%= produto.fabricante_cod %>')">
+				<td width="80" align="center"> <%=h produto.cod_velho%> </td>
+				<td width="500" align="left">   <%=h produto.nome%> </td>
+				<% if stock.to_i <= 0 %>
+					<td width="50"  align="center"><font color="red"> <%=h format( "%.3f",stock.to_f ) %></font> </td>
+				<%else%>
+					<td width="50"  align="center"><font color="green"> <%=h format( "%.3f",stock.to_f ) %></font> </td>
+				<%end%>
+
+				<td width="100"  align="center"> <%=h produto.desconto %> % </td>
+				<td width="100" align="right">   <%=h number_to_currency(produto.preco_maiorista_guarani, :format=>' %n ', :precision => 0) %> </td>
+				<td width="100" align="right">   <%=h number_to_currency(produto.preco_maiorista_dolar,   :format=>' %n ', :separator => ",") %> </td>
+			</tr>
+		<% end %>
+	</table>
+</div>
+
+
+
+
+
+

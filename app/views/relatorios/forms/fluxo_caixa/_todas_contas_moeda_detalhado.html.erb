@@ -1,0 +1,208 @@
+<% sql_saldo_cx = "SELECT C.NOME AS CONTA_NOME,
+										      SUM(F.ENTRADA_REAL - F.SAIDA_REAL) AS SALDO_RS
+										FROM FINANCAS F
+
+										INNER JOIN CONTAS C
+										ON C.ID = F.CONTA_ID
+										WHERE C.TIPO = 0 AND C.MOEDA = #{params[:moeda]} AND DATA < '#{params[:inicio].split("/").reverse.join("-")}'
+										GROUP BY 1"
+
+saldo_cx = Financa.find_by_sql(sql_saldo_cx)
+%>
+
+
+<% sql_saldo_bc = "SELECT C.NOME AS CONTA_NOME,
+										      SUM(F.ENTRADA_REAL - F.SAIDA_REAL) AS SALDO_RS
+										FROM FINANCAS F
+
+										INNER JOIN CONTAS C
+										ON C.ID = F.CONTA_ID
+										WHERE C.TIPO = 1 AND F.CONCILIACAO = TRUE AND C.MOEDA = #{params[:moeda]} AND F.DATA < '#{params[:inicio].split("/").reverse.join("-")}'
+										GROUP BY 1"
+	saldo_bc = Financa.find_by_sql(sql_saldo_bc)
+%>
+
+
+<% sql_mov_fc = "SELECT C.VENCIMENTO,
+						       COALESCE(C.PERSONA_NOME, 'OP. FINANCEIRA') AS PERSONA_NOME,
+							   C.DESCRICAO,
+                 COALESCE(CC.NOME, 'OP. FINANCEIRA') AS CENTRO_CUSTO_NOME,
+                 'OP. FINANCEIRA' AS RUBRO_NOME,
+							   C.DOCUMENTO_NUMERO_01,
+							   C.DOCUMENTO_NUMERO_02,
+							   C.DOCUMENTO_NUMERO,
+							   C.COTA,
+							   C.DIVIDA_REAL AS ENTRADA_REAL,
+							   0 AS SAIDA_REAL
+						FROM CLIENTES C
+            LEFT JOIN CENTRO_CUSTOS CC
+            ON CC.ID = C.CENTRO_CUSTO_ID
+
+						WHERE C.LIQUIDACAO = 0
+						AND C.MOEDA = #{params[:moeda]}
+						AND C.VENCIMENTO BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
+
+						UNION ALL
+
+						SELECT C.VENCIMENTO,
+						       COALESCE(C.PERSONA_NOME, 'OP. FINANCEIRA') AS PERSONA_NOME,
+							   C.DESCRICAO,
+                 COALESCE(CC.NOME, 'OP. FINANCEIRA') AS CENTRO_CUSTO_NOME,
+                 COALESCE(R.DESCRICAO, 'OP. FINANCEIRA') AS RUBRO_NOME,
+							   C.DOCUMENTO_NUMERO_01,
+							   C.DOCUMENTO_NUMERO_02,
+							   C.DOCUMENTO_NUMERO,
+							   C.COTA,
+							   0 AS ENTRADA_REAL,
+							   C.DIVIDA_REAL AS SAIDA_REAL
+						FROM PROVEEDORES C
+            LEFT JOIN CENTRO_CUSTOS CC
+            ON CC.ID = C.CENTRO_CUSTO_ID
+            LEFT JOIN RUBROS R
+            ON R.ID = C.RUBRO_ID
+
+						WHERE C.LIQUIDACAO = 0
+						AND C.MOEDA = #{params[:moeda]}
+						AND C.VENCIMENTO BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
+
+						ORDER BY 1"
+
+mov_fc = Financa.find_by_sql(sql_mov_fc)
+%>
+
+
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content">
+      	<div class="modal-grid" style="padding: 10px; color: #444;font-family: 'prox-bold';">
+						<table>
+
+						<% saldo_ant = 0 %>
+						<% saldo_cx.each do |sc| %>
+							<tr>
+								<td width="200"><%= sc.conta_nome %></td>
+								<td width="70" align="right"><%= format_decimal(sc.saldo_rs) %></td>
+								<% saldo_ant += sc.saldo_rs.to_f %>
+							</tr>
+						<% end %>
+
+						<% saldo_bc.each do |sb| %>
+							<tr>
+								<td width="200"><%= sb.conta_nome %></td>
+								<td width="70" align="right"><%= format_decimal(sb.saldo_rs) %></td>
+								<% saldo_ant += sb.saldo_rs.to_f %>
+							</tr>
+						<% end %>
+							<tr>
+								<td width="200">Saldo Conciliado <small>(<%= Financa.where(conciliacao: true).last.updated_at.strftime("%d/%m/%y - %H:%M") unless Financa.where(conciliacao: true).last.nil? %>)</small></td>
+								<td width="70" align="right"><%= format_decimal(saldo_ant) %></td>
+							</tr>
+
+						</table>
+      	</div>
+      </div>
+
+      <div class="panel-content">
+        <div class="modal-grid">
+					<table class="head_grid">
+					  <tr>
+					    <td width="350">Favorecido</td>
+              <td width="200">CC</td>
+              <td width="200"><%= t('CLASSIFICATION') %></td>
+					    <td width="400">Descrição</td>
+					    <td width="150"><%= t('DOC') %></td>
+					    <td width="70" align="right">Entrada</td>
+					    <td width="70" align="right">Saida</td>
+					    <td width="70" align="right">Saldo</td>
+					  </tr>
+					</table>
+					<div class="rolagem_rl" dir="div" style="hieght: 100% !important">
+					<table>
+						<% quebra = '' %>
+						<% sub_c = 0 %>
+						<% sub_d = 0 %>
+
+						<% tot_c = 0 %>
+						<% tot_d = 0 %>
+						<% saldo_rec = saldo_ant.to_f %>
+
+						<% mov_fc.each do |mf| %>
+
+
+
+         	<% if quebra != mf.vencimento %>
+            <% if quebra != "" %>
+               <tr class="head_grid" style="background-color: #eeedff">
+               		<td><b>Saldo do dia</b></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+									<td width="70" align="right"><b class="us" style="font-family: 'prox-bold';"><%= format_decimal(sub_c) %></b></td>
+									<td width="70" align="right"><b class="gs" style="font-family: 'prox-bold';"><%= format_decimal(sub_d) %></b></td>
+									<td width="70" align="right"><b class="rs" style="font-family: 'prox-bold';"><%= format_decimal( saldo_rec) %></b></td>
+
+									<% sub_c = 0 %>
+									<% sub_d = 0 %>
+               </tr>
+            	<% end %>
+							<tr>
+								<td colspan="6"><b style="font-family: 'prox-bold';"><% quebra = mf.vencimento %> <%= Date::DAYNAMES[mf.vencimento.wday].to_s %> - <%= mf.vencimento.to_date.strftime("%d/%m/%y") %> </b></td>
+							</tr>
+
+            <% end %>
+
+							<tr class = "<%= cycle("cor1", "cor2") %>">
+								<td width="350"><%= mf.persona_nome %></td>
+                <td width="200"><%= mf.centro_custo_nome %></td>
+                <td width="200"><small><%= mf.rubro_nome %></small></td>
+								<td width="400"><%= mf.descricao %></td>
+								<td width="150"><%= mf.documento_numero %> - <%= mf.cota %></td>
+								<td width="70" align="right"><b class="us"><%= format_decimal(mf.entrada_real) %></b></td>
+								<td width="70" align="right"><b class="gs"><%= format_decimal(mf.saida_real) %></b></td>
+								<td width="70" align="right"><b class="rs"><%= format_decimal( saldo_rec += (mf.entrada_real.to_f - mf.saida_real.to_f)) %></b></td>
+
+								<% sub_c += mf.entrada_real.to_f %>
+								<% sub_d += mf.saida_real.to_f %>
+							</tr>
+						<% end %>
+             <tr class="head_grid" style="background-color: #eeedff">
+             		<td><b>Saldo do dia</b></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+								<td width="70" align="right"><b class="us" style="font-family: 'prox-bold';"><%= format_decimal(sub_c) %></b></td>
+								<td width="70" align="right"><b class="gs" style="font-family: 'prox-bold';"><%= format_decimal(sub_d) %></b></td>
+								<td width="70" align="right"><b class="rs" style="font-family: 'prox-bold';"><%= format_decimal(saldo_rec) %></b></td>
+
+								<% sub_c = 0 %>
+								<% sub_d = 0 %>
+             </tr>
+					</table>
+					</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<style>
+
+	.rolagem_rl{
+		background: white;
+    overflow: auto;
+    padding: 1px 1px 1px 1px;
+	}
+
+
+	.rolagem_rl td {
+  padding: 10px;
+  border-bottom: 1px solid #efefef !important;
+  cursor: pointer;
+}
+</style>

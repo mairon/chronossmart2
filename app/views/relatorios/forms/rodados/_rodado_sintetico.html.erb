@@ -1,0 +1,46 @@
+<div class="group list">
+	<% remicao = 0 %>
+	<% gastos  = 0 %>
+	<table>
+		<tr class="head">
+			<td>Tipo</td>
+			<td>Chapa</td>
+			<td>Marca</td>
+			<td align="right">Remisión</td>
+			<td align="right">Gastos</td>
+			<td align="right">Saldo</td>
+		</tr>
+		
+	<% cv = "AND id = #{params[:busca]["cavalito"]}" unless params[:busca]["cavalito"].blank? %>
+	<% Rodado.where("tipo = 0 #{cv}").each do |c|%>
+		<% not_remi_cv = NotaRemicao.where("rodado_cv_id = #{c.id} and data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'") %>
+
+		<% gt_cv = Compra.where("rodado_id = #{c.id} and data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'") %>
+		<tr class="<%= cycle("cor1", "cor2")%>">
+			<td >CAVALITO</td>
+			<td width="100"><%= c.placa %></td>
+			<td width="150"><%= c.marcao %></td>
+			<td width="70" align="right"><%= format_int(not_remi_cv.sum(:valor_guarani)) %></td>
+			<td width="70" align="right"><%= format_int(gt_cv.sum(:total_guarani)) %></td>
+			<td width="70" align="right"><%= format_int(not_remi_cv.sum(:valor_guarani).to_f - gt_cv.sum(:total_guarani).to_f ) %></td>
+		</tr>		
+	<% end %>	
+	<% cr = "AND id = #{params[:busca]["carreta"]}" unless params[:busca]["carreta"].blank? %>
+	<% Rodado.where("tipo = 1 #{cr}").each do |c|%>
+		<% not_remi_cr = NotaRemicao.where("rodado_cr_id = #{c.id} and data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'") %>
+
+		<% gt_cv = Compra.where("rodado_id = #{c.id} and data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'") %>
+		<tr class="<%= cycle("cor1", "cor2")%>">
+			<td >CARRETA</td>
+			<td width="100"><%= c.placa %></td>
+			<td width="150"><%= c.marcao %></td>
+			<td width="70" align="right"><%= format_int(not_remi_cr.sum(:valor_guarani)) %></td>
+			<td width="70" align="right"><%= format_int(gt_cv.sum(:total_guarani)) %></td>
+			<td width="70" align="right"><%= format_int(not_remi_cr.sum(:valor_guarani).to_f - gt_cv.sum(:total_guarani).to_f ) %></td>
+		</tr>		
+	<% end %>	
+
+
+	</table>
+</div>
+

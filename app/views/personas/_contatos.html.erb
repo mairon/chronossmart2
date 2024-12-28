@@ -1,0 +1,36 @@
+<div class="panel">
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-10">
+        <h3>Contactos</h3>
+      </div>
+      <div class="col-md-2">
+        <a class="modalButton-frma panel-icon-right" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-contato">
+          <%= image_tag("icon-edit.png", width: '13') %>
+        </a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <%= render :partial=>"/persona_contatos/index", :locals=>{:persona_contatos => @persona.persona_contatos} %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade " id="modal-contato" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Nuevo Contato</h4>
+      </div>
+      <div class="modal-body">
+        <%= render :partial=>"/persona_contatos/new_contato", :locals=>{:persona_contato=>PersonaContato.new(:persona_id=>@persona.id)} %>
+      </div>
+    </div>
+  </div>
+</div>

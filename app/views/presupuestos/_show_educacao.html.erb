@@ -1,0 +1,57 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <h1 id="header">
+        Pedido Venta Productos - <small>Cliente: <%= @presupuesto.persona_nome %> | Ctd Dependientes: <b><%= @presupuesto.qtd_dependentes %> | | Tabla de Precio: <b><%= @presupuesto.tabela_preco.nome unless @presupuesto.tabela_preco.blank? %></b></small>
+        <div class="pull-right">
+          <a class="btn btn-blue" data-toggle="modal" data-width="800" data-height="781" data-target="#modal-item">Nuevo Produtos/Servicio</a>
+        </div>
+      </h1>
+      <div class="panel-body">
+        <%= render :partial=>"presupuesto_produtos/index_educacao", :locals=>{:presupuesto => @presupuesto,:presupuesto_produtos => @presupuesto.presupuesto_produtos} %>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-body">
+        <%= render "cotas" %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel" style="padding: 15px 30px">
+      <%= link_to t('BACK'), edit_presupuesto_path(@presupuesto),:class =>'btn' %>
+      <%= link_to 'Generar (PDF)', print_presupuesto_presupuesto_path(@presupuesto),:class =>'btn btn-print' %> 
+      <%= link_to 'Finalizar', presupuestos_path,:class =>'btn' %>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modal-item" tabindex="-1" role="dialog" aria-labelledby="modal-item" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>  
+        <h4 class="modal-title" id="myModalLabel">Nuevo Producto/Servicio</h4>
+      </div>
+      <div class="modal-body" style="padding: 5px 20px 20px 20px">
+        <%= render :partial=>"presupuesto_produtos/new_produto_educacao" , :locals=>{:presupuesto => @presupuesto, :presupuesto_produto => PresupuestoProduto.new } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  $('#modal-item').on('shown.bs.modal', function () {
+      $('#presupuesto_produto_persona_dependente_nome').focus();
+  });  
+
+</script>

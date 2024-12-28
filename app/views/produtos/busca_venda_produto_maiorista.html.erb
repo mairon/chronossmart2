@@ -1,0 +1,174 @@
+<body onload="CampoTipo()">     
+  <div class="group_cd">
+    <%form_tag dinamic_busca_venda_produto_maiorista_produtos_path, :method => "get" do%>
+
+    <select name="tipo" id="tipo" onKeyUp    ="EnterTab(event,'busca')">
+       <option>CODIGO</option>
+       <option>DESCRIPCION</option>
+    </select>
+
+
+      <input id         ="busca"
+             name       ="busca"
+             type       ="text"
+             onkeypress ="return bloqEnter(event)"
+             onKeyUp    ="EnterTab(event,'button')"
+             onkeydown  ="f(this)" />
+
+      <input type   ="button"
+             id     ="button"
+             onclick="pesquisa(document.getElementById('busca').value)"
+             value  ="Buscar..."/>
+
+    <% end %>
+</div>
+
+    <div id="pagina">
+    </div>
+
+
+
+    <script language="javascript">
+  
+      function Fecha(produto_nome,unitario_dolar,unitario_guarani,id,codigo,clase_id,grupo_id,taxa,desconto,stock,fabricante_cod)
+      {
+        window.opener.document.getElementById('vendas_produto_produto_nome').value        = produto_nome;
+        window.opener.document.getElementById('venda_produto_produto_busca_').value       = produto_nome;
+        window.opener.document.getElementById('vendas_produto_unitario_dolar').value      = unitario_dolar;
+        window.opener.document.getElementById('vendas_produto_unitario_guarani').value    = unitario_guarani;
+        window.opener.document.getElementById('vendas_produto_produto_id').value          = id;
+        window.opener.document.getElementById('vendas_produto_codigo').value              = codigo;
+        window.opener.document.getElementById('vendas_produto_clase_id').value            = clase_id;
+        window.opener.document.getElementById('vendas_produto_grupo_id').value            = grupo_id;
+        window.opener.document.getElementById('vendas_produto_taxa').value                = taxa;
+        window.opener.document.getElementById('vendas_produto_desconto').value            = desconto;
+        window.opener.document.getElementById('vendas_produto_saldo').value               = stock;
+        window.opener.document.getElementById('vendas_produto_fabricante_cod').value      = fabricante_cod;
+        window.opener.document.getElementById('vendas_produto_quantidade').value          = '';
+        if ( stock <= 0 )
+              {
+              window.opener.document.getElementById('red').innerHTML                                   =  '<span>'+stock+'</span>' ;
+              window.opener.document.getElementById('green').innerHTML                                 =  '' ;
+              }
+        else
+              {
+              window.opener.document.getElementById('green').innerHTML                                 =  '<span>'+stock+'</span>' ;
+              window.opener.document.getElementById('red').innerHTML                                   =  '' ;
+              }
+
+        window.opener.document.getElementById("vendas_produto_quantidade").focus()
+        self.close();
+      }
+      
+
+      function pesquisa(valor)
+
+      {
+
+            tipo   = document.getElementById('tipo').value
+            //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+            url="/produtos/dinamic_busca_venda_produto_maiorista?tipo="+tipo+"&busca="+valor;
+
+        ajax(url);
+
+      }
+
+
+      function ajax(url)
+
+      {
+
+
+
+        //alert(nick);
+
+        //alert(dest);
+
+        //alert(msg);
+
+
+
+        req = null;
+
+        // Procura por um objeto nativo (Mozilla/Safari)
+
+        if (window.XMLHttpRequest) {
+
+          req = new XMLHttpRequest();
+
+          req.onreadystatechange = processReqChange;
+
+          req.open("GET",url,true);
+
+          req.send(null);
+
+          // Procura por uma versão ActiveX (IE)
+
+        } else if (window.ActiveXObject) {
+
+          req = new ActiveXObject("Microsoft.XMLHTTP");
+
+          if (req) {
+
+
+
+            req.onreadystatechange = processReqChange;
+
+            req.open("GET",url,true);
+
+
+
+            req.send();
+
+          }
+
+        }
+
+      }
+
+
+
+      function processReqChange()
+
+      {
+
+
+
+        // apenas quando o estado for "completado"
+
+        if (req.readyState == 4) {
+
+
+
+          // apenas se o servidor retornar "OK"
+
+
+
+          if (req.status ==200) {
+
+
+
+            // procura pela div id="pagina" e insere o conteudo
+
+            // retornado nela, como texto HTML
+
+
+
+            document.getElementById('pagina').innerHTML = req.responseText;
+
+
+
+          } else {
+
+            alert("Houve um problema ao obter os dados:n" + req.statusText);
+
+          }
+
+        }
+
+      }
+    </script>
+  
+</body>
+

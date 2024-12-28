@@ -1,0 +1,104 @@
+<body onload="ImputFocus('producao_data_finalizacao_3i')">
+   <h1 align="right" id="header">Produción</h1>
+
+   <%= form_for(@producao) do |f| %>
+      <ul class="tabs">
+         <li><a href="#tab1">Produción - Detalhes</a></li>
+      </ul>
+
+      <div class="tab_container">
+         <div id="tab1" class="tab_content">
+
+            
+            <div class="grid">
+               <%= render :partial=>"producao_produtos/index", :locals=>{:producao => @producao,:producao_produtos => @producao.producao_produtos} %>
+            </div>
+
+
+            <table>
+               <tr>
+                  <td>
+                     <fieldset>
+
+                        <table>
+                           <tr>
+                              <td align="right"><%= t('DATE') %> Finalizacion:</td>
+                              <td colspan="3"><%= f.date_select :data_finalizacao,{},{:onblur => "DataCotacao('producao_data_3i','producao_data_2i','producao_data_1i')"}  %></td>
+                              <td colspan="3">
+                                 <fieldset>
+                                    <%= f.radio_button :status, 0,  :Checked => "True"%>En andamento
+                                    <%= f.radio_button :status, 1%> Finalizar
+                                 </fieldset>
+                              </td>
+
+
+                           </tr>
+
+                           <tr>
+                              <td align="right">Producto :</td>
+                              <td ><%= @producao.produto_nome %></td>
+                           </tr>
+
+                           <tr>
+                              <td align="right">Cantidad :</td>
+                              <td><%= @producao.quantidade %></td>
+                           </tr>
+                           <%= f.hidden_field :quantidade ,:value =>  number_to_currency( @producao.quantidade, :format =>' %n ', :separator => ",")%>
+                           <tr>
+                              <td align="right">Costo U$. :</td>
+                              <td align="left" ><%= number_to_currency( custo = ( @total /@producao.quantidade.to_f ) , :format =>' %n ', :separator => ",")%></td>
+                              <%= f.hidden_field :custo_dolar ,:value =>  number_to_currency( custo = ( @total /@producao.quantidade.to_f ) , :format =>' %n ', :separator => ",")%>
+
+                              <td align="right">Costo Gs.:</td>
+                              <td><%= number_to_currency( ( custo.to_f * @producao.cotacao ) , :format =>' %n ', :precision => 0) %></td>
+                              <%= f.hidden_field :custo_guarani ,:value =>  number_to_currency( ( custo.to_f * @producao.cotacao ) , :format =>' %n ', :precision => 0)%>
+
+                           </tr>
+
+                           <tr>
+                              <td align="right">Deposito :</td>
+                              <td colspan="4"><%= f.collection_select :deposito_id, Deposito.all( :select => ' id,nome',
+                                                                                                :order  => '2' ), :id,
+                                                                                                                  :nome %></td>
+                           </tr>
+
+
+                           <tr>
+                             <td align="right">Balcao :</td>
+                             <td><%= f.text_field :porcen_balcao,
+                                                  :size      => 5,
+                                                  :dir       => "rtl",
+                                                  :precision => 0,
+                                                  :value     => 60 %> % </td>
+
+                             <td align="right">Mayorista :</td>
+                             <td><%= f.text_field :porcen_mayorista,
+                                                  :size      => 5,
+                                                  :dir       => "rtl",
+                                                  :precision => 0,
+                                                  :value     => 25 %> % </td>
+
+                             <td align="right">Corporativo :</td>
+                             <td><%= f.text_field :porcen_corporativo,
+                                                  :size      => 5,
+                                                  :dir       => "rtl",
+                                                  :precision => 0,
+                                                  :value     => 15 %> % </td>
+                           </tr>
+
+
+                        </table>
+                     </fieldset>
+                  </td>
+               </tr>
+            </table>
+         </div>
+      <div class="buttons">
+         <%= link_to t('BACK'), producao_path(@producao)  , :class => "button back" %> 
+         <%= f.submit t('SAVE'),:disable_with => "Aguarde..."  , :class => "button"  %> 
+         <%= link_to 'Salir', producaos_path  , :class => "button delete" %> 
+         <%= link_to_if @producao.status == 1, 'Imprimir', detalhe_print_producao_path(@producao),:format => 'pdf'  , :class => "button print" %>
+      </div>
+    </div>
+   <% end %>
+</body>

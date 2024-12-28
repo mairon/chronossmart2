@@ -1,0 +1,34 @@
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="150">Documiento</td>
+      <td width="50" align="center"><%= t('SHARE') %></td>
+      <td width="80" align="right">Monto</td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div" style="height: 100px">
+    <table>
+      <% tot_us = 0 %>
+      <% tot_gs = 0 %>
+      <% tot_rs = 0 %>
+      <% cobros_adelantos.each do |pagos_financa| %>
+        <tr class = "<%= cycle( "cor1", "cor2" )%>">
+          <td width="150" align="left"><%= pagos_financa.documento_numero_01 %>-<%= pagos_financa.documento_numero_02 %>-<%= pagos_financa.documento_numero %></td>
+          <td width="50" align="left"><%= pagos_financa.cota %></td>
+          <td width="80" align="right"><%= number_to_currency( pagos_financa.valor_gs,      :format =>' %n ', :precision => 0 )%></td>
+          <% tot_gs += pagos_financa.valor_gs %>
+          <td><%= link_to '', edit_pagos_financa_path(pagos_financa), class: 'icon-pencil' %></td>
+          <td><%= link_to '', pagos_financa, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+
+        </tr>
+      <% end %>
+    </table>
+  </div>
+
+  <table class="head_grid">
+    <tr>
+      <td width="205"></td>
+        <td width="80" align="right"><%= number_to_currency( tot_gs,      :format =>' %n ', :precision => 0 )%></td>
+    </tr>
+  </table>
+</div>

@@ -1,0 +1,57 @@
+
+
+<% turma = "and id = #{params[:busca]["turma"]}" unless params[:busca]["turma"].blank? %>
+<% persona = "and id = #{params[:persona_id]}" unless params[:persona_id].blank? %>
+
+<% Turma.where("id > 0 #{turma}").each do |t| %>
+<table class="break">	
+	<tr>
+		<td><b><%= t.nome %></b></td>
+		<td colspan="31"><b><%= Date::MONTHNAMES[params[:inicio].to_date.strftime("%m").to_i] %></b></td>
+	</tr>
+	<tr>
+		<td> Alunos(as)</td>
+		<% 1..(params[:inicio].to_date.end_of_month).strftime("%d").to_i.times do |d| %>
+	  	<td align="center"><span class="bold-black"><%= d.to_i + 1 %></span></td>
+	  <% end %>
+	  	<td align="center">Tot.</td>
+	</tr>
+	<% per = Persona.where("tipo_aluno = 1 and unidade_id = #{params[:unidade_id]} and turma_id = #{t.id} #{persona}") %>
+	<% per.each do |p| %>
+	<%
+	  sql = "select data,
+	   (SELECT CP.DATETIME FROM CHECK_POINTS CP WHERE CP.PERSONA_ID = #{p.id} AND CP.CHECK_POINT_TYPE = 'ENTRADA' AND DATETIME::DATE = du.data ORDER BY CP.ID DESC LIMIT 1) AS CHECK
+from dias_uteis du where date_part('month', du.data) = '#{(params[:inicio].to_date).strftime("%m")}'" 
+		check_persona = DiasUtei.find_by_sql(sql)
+	%>
+
+		<tr>
+			<td><%= p.nome %></td>
+			<% count_pre = 0 %>	
+			<% check_persona.each do |cp| %>
+		  	<td align="center" width="30">
+		  		<% unless cp.check.blank? %>
+		  		P
+		  		<% count_pre += 1 %>	
+		  		<% else %>
+		  		-
+		  		<% end %>
+	  		</td>
+		  <% end %>
+		  <td width="20" align="center"><b><%= count_pre %></b></td>
+		</tr>
+	<% end %>
+</table>
+<br>
+<% end %>
+
+<style type="text/css">
+	table {
+		border-collapse: collapse;
+		font-size: 10px
+	}
+	td, tr {
+		border: 1px solid black;
+	}
+	
+</style>

@@ -1,0 +1,365 @@
+  <% sql = "SELECT  Q.ANO,Q.MES, SUM(Q.ENTRADA) AS ENTRADA,SUM(Q.SAIDA) AS SAIDA
+FROM    (SELECT date_part('year', S.DATA) AS ANO,
+       date_part('month', S.DATA) AS MES,
+       SUM(S.ENTRADA) AS ENTRADA,
+       CAST(0 AS INTEGER) AS SAIDA
+FROM STOCKS S
+WHERE S.PRODUTO_ID = #{@produto.id} 
+AND S.STATUS = 0
+AND S.DATA > '2016-01-01'
+GROUP BY 1,2
+UNION ALL
+
+SELECT date_part('year', S.DATA) AS ANO,
+       date_part('month', S.DATA) AS MES,
+       CAST(0 AS INTEGER) AS ENTRADA,
+       SUM(S.SAIDA) AS SAIDA
+FROM STOCKS S
+WHERE S.PRODUTO_ID = #{@produto.id}  
+AND S.STATUS = 1
+AND S.DATA > '2016-01-01'
+      GROUP BY 1,2
+      ORDER BY 2) Q 
+      GROUP BY 1,2
+      ORDER BY 2" %>
+
+<% @compras_custo = Stock.find_by_sql(sql) %>
+
+<%
+
+saldo_sql = "SELECT S.DEPOSITO_ID,
+              MAX(U.UNIDADE_NOME) || ' - ' || MAX(D.NOME) AS DEPOSITO_NOME,
+              SUM(S.ENTRADA - S.SAIDA) AS SALDO
+      FROM STOCKS S
+      INNER JOIN DEPOSITOS D
+      ON D.ID = S.DEPOSITO_ID
+      INNER JOIN UNIDADES U
+      ON U.ID = D.UNIDADE_ID
+      WHERE S.PRODUTO_ID = #{@produto.id} 
+      AND DATA <= '2016-06-24'
+      GROUP BY 1
+      HAVING SUM(S.ENTRADA - S.SAIDA) >= 0
+      ORDER BY 1"
+%>
+
+<% @saldo_depositos = Stock.find_by_sql(saldo_sql) %>
+
+
+<%
+ media_venda_sql = "SELECT S.DEPOSITO_ID,
+              MAX(U.UNIDADE_NOME)  || ' - ' ||  MAX(D.NOME) AS DEPOSITO_NOME,
+                      SUM(S.SAIDA) / 180 AS SALDO
+              FROM STOCKS S
+              INNER JOIN DEPOSITOS D
+              ON D.ID = S.DEPOSITO_ID
+              INNER JOIN UNIDADES U
+              ON U.ID = D.UNIDADE_ID
+              WHERE S.PRODUTO_ID = #{@produto.id} 
+              AND S.STATUS = 1
+              AND DATA <= '2016-06-24'
+              GROUP BY 1
+              ORDER BY 1"
+%>
+
+<% @media_venda = Stock.find_by_sql(media_venda_sql) %>
+
+
+<% fact_mes_sql = "SELECT FOO.ANO,
+                           FOO.MES,
+                           SUM(FOO.TOT_FACT) AS TOT_FACT,
+                           SUM(FOO.TOT_GRUPO) AS TOT_GRUPO,
+                           SUM(FOO.TOT_SUB_GRUPO) AS TOT_SUB_GRUPO,
+                           SUM(FOO.TOT_PROD) AS TOT_PROD
+                    FROM (
+                    (SELECT date_part('year', S.DATA) AS ANO, 
+                           date_part('month', S.DATA) AS MES,
+                           SUM(S.SAIDA) AS TOT_FACT,
+                           CAST(0 AS INTEGER) AS TOT_GRUPO,
+                           CAST(0 AS INTEGER) AS TOT_SUB_GRUPO,
+                           CAST(0 AS INTEGER) AS TOT_PROD
+                    FROM STOCKS S 
+                    WHERE S.STATUS = 1 
+                    GROUP BY 1,2
+                    )
+
+                    UNION
+
+                    (SELECT date_part('year', S.DATA) AS ANO,
+                           date_part('month', S.DATA) AS MES,
+                           CAST(0 AS INTEGER) AS TOT_FACT,
+                           SUM(S.SAIDA) AS TOT_GRUPO,
+                           CAST(0 AS INTEGER) AS TOT_SUB_GRUPO,
+                           CAST(0 AS INTEGER) AS TOT_PROD
+                    FROM STOCKS S 
+                    INNER JOIN PRODUTOS P 
+                    ON P.ID = S.PRODUTO_ID
+                    WHERE S.STATUS = 1 
+                    AND P.GRUPO_ID = #{@produto.grupo_id}
+                    GROUP BY 1,2
+                    )
+
+                    UNION
+
+                    (SELECT date_part('year', S.DATA) AS ANO,
+                           date_part('month', S.DATA) AS MES,
+                           CAST(0 AS INTEGER) AS TOT_FACT,
+                           CAST(0 AS INTEGER) AS TOT_GRUPO,
+                           SUM(S.SAIDA) AS TOT_SUB_GRUPO,
+                           CAST(0 AS INTEGER) AS TOT_PROD
+                    FROM STOCKS S 
+                    INNER JOIN PRODUTOS P 
+                    ON P.ID = S.PRODUTO_ID
+                    WHERE S.STATUS = 1 
+                    AND P.SUB_GRUPO_ID = #{@produto.sub_grupo_id}
+                    GROUP BY 1,2
+                    )
+
+                    UNION
+
+                    (SELECT date_part('year', S.DATA) AS ANO,
+                           date_part('month', S.DATA) AS MES,
+                           CAST(0 AS INTEGER) AS TOT_FACT,
+                           CAST(0 AS INTEGER) AS TOT_GRUPO,
+                           CAST(0 AS INTEGER) AS TOT_SUB_GRUPO,
+                           SUM(S.SAIDA) AS TOT_PROD
+                    FROM STOCKS S 
+                    INNER JOIN PRODUTOS P 
+                    ON P.ID = S.PRODUTO_ID
+                    WHERE S.STATUS = 1 
+                    AND S.PRODUTO_ID = #{@produto.id}
+                    GROUP BY 1,2
+                    )
+
+                    ) AS FOO
+                    GROUP BY 1,2
+                    ORDER BY 1 DESC, 2 DESC" %>
+
+<% @fact_mensal = Stock.find_by_sql(fact_mes_sql) %>
+
+<% if params[:deposito_id].present? %>
+  <% sql_historico = "SELECT DATA,
+                             SIGLA_PROC,
+                             ENTRADA,
+                             SAIDA,
+                             SALDO, 
+                             UNITARIO_GUARANI, 
+                             PROMEDIO_GUARANI,
+                             SALDO_GUARANI,
+                             RECALC
+                      FROM STOCKS 
+                      WHERE PRODUTO_ID = #{@produto.id}
+                      AND DEPOSITO_ID = #{params[:deposito_id]} 
+                      ORDER BY data,id,status" %>
+  <% @historico = Stock.find_by_sql(sql_historico) %>
+<% end %>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript">
+  google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(drawChart);
+  function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+      ['Mes', 'Entrada', 'Salida'],
+      <% @compras_custo.each do |cc| %>
+      [<%= cc.mes.to_i %>,  <%= cc.entrada.to_i%>,  <%= cc.saida.to_i%>],
+      <% end %>
+    ]);
+
+    var options = {
+      hAxis: {title: 'Mes',  titleTextStyle: {color: '#333'}},
+      vAxis: {minValue: 0}
+    };
+
+
+    var data_d = google.visualization.arrayToDataTable([
+              ['Deposito', 'Cantidad'],
+              <% @saldo_depositos.each do |cc| %>
+                ['<%= cc.deposito_nome %>',     <%= cc.saldo %>],
+              <% end %>
+            ]);
+
+            var options_d = {
+              pieHole: 0.5,
+              pieSliceTextStyle: {
+                color: 'black',
+              },
+              legend: 'Depositos'
+            };
+
+    var data_m = google.visualization.arrayToDataTable([
+              ['Deposito', 'Cantidad'],
+              <% @media_venda.each do |cc| %>
+                ['<%= cc.deposito_nome %>',     <%= cc.saldo %>],
+              <% end %>
+            ]);
+
+            var options_m = {
+              pieHole: 0.5,
+              pieSliceTextStyle: {
+                color: 'black',
+              },
+              legend: 'Depositos'
+            };
+
+    var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+    var chart_d = new google.visualization.PieChart(document.getElementById('donut_single'));
+    var chart_m = new google.visualization.PieChart(document.getElementById('donut_single_m'));
+    
+    chart.draw(data, options);
+    chart_d.draw(data_d, options_d);
+    chart_m.draw(data_m, options_m);
+  }
+</script>
+
+
+<div class="row">
+  <div class="col-sm-7">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <header class="panel-heading">
+            <%= @produto.id.to_s.rjust(6,'0') %> - <%= @produto.nome %> - Grupo: <%= @produto.grupo.descricao %> - Sub-Grupo: <%= @produto.sub_grupo.descricao %>
+          </header>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">  
+      <div class="col-md-6">
+        <div class="panel">
+          <header class="panel-heading">
+            Saldo por Despositos
+          </header>  
+          <div id="donut_single"></div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="panel">
+          <header class="panel-heading">
+            Média de Venda por dia e depositos
+          </header>  
+          <div id="donut_single_m"></div>
+        </div>
+      </div>  
+    </div>
+
+    <div class="row">  
+      <div class="col-md-12">
+        <div class="panel">
+          <header class="panel-heading">
+            Evolución de Entrada y Salida
+          </header>    
+          <div id="chart_div"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-5">
+    <div class="row">  
+      <div class="col-md-12">
+        <div class="panel">
+          <header class="panel-heading">
+            Participación de Facturación por Mês
+          </header>    
+          <table class="head_grid" border='1'>
+            <tr>
+              <td align="center" width="50" rowspan="2">Mês</td>
+              <td colspan="8" align="center">Facturación</td>
+            </tr>
+
+            <tr>
+              <td width="80" align="right">Total</td>
+              <td width="80" align="right">Grupo</td>
+              <td width="45" align="right">%</td>
+              <td width="80" align="right">Sub-Grupo</td>
+              <td width="45" align="right">%</td>
+              <td width="80" align="right">Producto</td>
+              <td width="45" align="right">%</td>
+            </tr>
+          </table>
+         <div class="rolagem" id="div">
+          <table>
+            <% @fact_mensal.each do |fm| %>
+              <tr class="<%= cycle("cor1", "cor2")%>">
+                <td align="center" width="50"><%= fm.mes %>/<%= fm.ano %></td>
+                <td width="80" align="right"><%= format_decimal(fm.tot_fact) %></td>
+                <td width="80" align="right"><%= format_decimal(fm.tot_grupo) %></td>
+                <% perc_grupo = (fm.tot_grupo.to_f / fm.tot_fact.to_f) * 100 %>
+                <td width="45" align="right"><%= format_decimal(perc_grupo) %>%</td>
+                <td width="80" align="right"><%= format_decimal(fm.tot_sub_grupo) %></td>
+                <% perc_sub_grupo = (fm.tot_sub_grupo.to_f / fm.tot_grupo.to_f) * 100 %>
+                <td width="45" align="right"><%= format_decimal(perc_sub_grupo) %>%</td>
+                <td width="80" align="right"><%= format_decimal(fm.tot_prod) %></td>
+                <% perc_prod = (fm.tot_prod.to_f / fm.tot_sub_grupo.to_f) * 100 %>
+                <td width="45" align="right"><%= format_decimal(perc_prod) %>%</td>
+              </tr>
+            <% end %>
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">  
+      <div class="col-md-12">
+        <div class="panel">
+          <header class="panel-heading">
+            Histórico Producto 
+            <% if params[:deposito_id].present? %>
+              <%= select("busca", "deposito", @depositos.collect {|p| [ p.deposito_nome, p.id ]}, {:selected => params[:deposito_id]}) %>
+            <% else %>
+              <%= select("busca", "deposito", @depositos.collect {|p| [ p.deposito_nome, p.id ]}, {prompt: 'Selecione lo deposito'}) %>
+            <% end %>
+              <%= image_tag("load.gif",
+                          :align => "absmiddle",
+                          :border => 0,
+                          :id => "spinner",
+                          :width => 21,
+                          :height => 21,
+                          :style =>"display: none;" ) %>            
+          </header>    
+          <table class="head_grid">
+            <tr>
+              <td align="center" width="50"><%= t('DATE') %></td>
+              <td align="center" width="50">Proceso</td>
+              <td align="right" width="50">Entrada</td>
+              <td align="right" width="50">Salida</td>
+              <td align="right" width="50">Saldo</td>
+              <td align="right" width="70">Unit</td>
+              <td align="right" width="70">Promedio</td>
+            </tr>          
+          </table>
+          <% if params[:deposito_id].present? %>
+            <div class="rolagem" id="div">
+            <table>
+            <% @historico.each do |h| %>
+              <tr class="<%= cycle("cor1", "cor2")%>">
+                <td align="center" width="50"><%= h.data.to_date.strftime("%d/%m/%y") %></td>
+                <td align="center" width="50"><%= h.sigla_proc %></td>
+                <td align="right" width="50"><%= format_decimal(h.entrada) %></td>
+                <td align="right" width="50"><%= format_decimal(h.saida) %></td>
+                <td align="right" width="50"><b><%= format_decimal(h.saldo) %></b></td>
+                <td align="right" width="70"><%= format_int(h.unitario_guarani) %></td>
+                <td align="right" width="70"><b><%= format_int(h.promedio_guarani) %></b></td>
+                <td align="right" width="70"><b><%= format_int(h.saldo_guarani) %></b></td>
+                <td align="right" width="50"><%= h.recalc %></td>
+              </tr>                     
+            <% end %>
+            </table>
+            </div>
+          <% end %>
+          <header class="panel-heading">
+            <%= link_to 'Recalcular', gera_recalc_recalculos_path(produto_id: @produto.id), class: 'button add' %>
+          </header>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $('select').on('change', function() {
+    $('#spinner').show();
+    window.location.href ='/produtos/'+ <%= @produto.id %> +'/statisticas?deposito_id='+ this.value
+  });
+</script>

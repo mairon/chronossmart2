@@ -1,0 +1,100 @@
+<%= form_for(@produtos_tabela_preco) do |f| %>
+  <% if @produtos_tabela_preco.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@produtos_tabela_preco.errors.count, "error") %> prohibited this produtos_tabela_preco from being saved:</h2>
+
+      <ul>
+      <% @produtos_tabela_preco.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> Tabla de Precio - [<%= t('EDITION') %>]</a></li>
+</ul>
+<%= f.hidden_field :produto_id %>
+<%= f.hidden_field :unidade_id %>
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+                <legend> <b>Producto:</b> <%= @produtos_tabela_preco.produto.fabricante_cod %> - <%= @produtos_tabela_preco.produto.nome %> <b>Unidad:</b> <%=  @produtos_tabela_preco.unidade.unidade_nome %> </legend>
+                <table>
+                  <tr>
+                    <td>
+                      <fieldset>
+                      <legend>Consumidor Final</legend>
+                        <table>
+                          <tr>
+                           <%= field_us 'U$.:',f,:preco_1_us %>
+                           <%= field_gs 'G$.:',f,:preco_1_gs %>
+                           <%= field_us 'R$.:',f,:preco_1_rs %>
+                          </tr>
+                        </table>
+                      </fieldset>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <fieldset>
+                      <legend>Cliente Especial</legend>
+                        <table>
+                          <tr>
+                           <%= field_us 'U$.:',f,:preco_2_us %>
+                           <%= field_gs 'G$.:',f,:preco_2_gs %>
+                           <%= field_us 'R$.:',f,:preco_2_rs %>
+                          </tr>
+                        </table>
+                      </fieldset>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <fieldset>
+                      <legend>Colaboradores</legend>
+                        <table>
+                          <tr>
+                           <%= field_us 'U$.:',f,:preco_3_us %>
+                           <%= field_gs 'G$.:',f,:preco_3_gs %>
+                           <%= field_us 'R$.:',f,:preco_3_rs %>
+                          </tr>
+                        </table>
+                      </fieldset>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <fieldset>
+                      <legend>Tabla 04</legend>
+                        <table>
+                          <tr>
+                           <%= field_us 'U$.:',f,:preco_4_us %>
+                           <%= field_gs 'G$.:',f,:preco_4_gs %>
+                           <%= field_us 'R$.:',f,:preco_4_rs %>
+                          </tr>
+                        </table>
+                      </fieldset>
+                    </td>
+                  </tr>
+
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to t('BACK'), "/produtos/#{@produtos_tabela_preco.produto_id}/tabelas_precos", :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

@@ -1,0 +1,173 @@
+<div class="row">
+  <div class="col-md-8">
+	<div class="row">
+	  <div class="col-md-12">
+	  	<div class="panel">
+  		<div class="panel-content">
+				<h1>Titulos</h1>
+			</div>
+					<table class="head_grid">
+						<tr>
+							<td width="80" align="center"><%= t('DATE') %></td>
+							<td width="80" align="center">Venc</td>
+							<td width="80" align="center">Dias pos <%= t('SALE') %></td>
+							<td width="200" align="center"><%= t('DOC') %></td>
+							<td width="50" align="center"><%= t('SHARE') %></td>
+							<td width="100" align="center">Divida</td>
+							<td width="100" align="center">Anterior</td>
+							<td width="100" align="center">Saldo</td>
+						</tr>
+					</table>
+					<div class="rolagem" dir="div">
+						<table>
+							<% @cliente.each do |cl| %>
+					          <%  anterior_dolar     = Cliente.sum(:cobro_dolar, :conditions => ["persona_id = ? AND documento_numero_01 = ? AND documento_numero_02 = ? AND documento_numero = ? AND cota = ? ",cl.persona_id,cl.documento_numero_01,cl.documento_numero_02,cl.documento_numero,cl.cota]) %>
+		          			  <%  anterior_guarani   = Cliente.sum(:cobro_guarani, :conditions => ["persona_id = ? AND documento_numero_01 = ? AND documento_numero_02 = ? AND documento_numero = ? AND cota = ?",cl.persona_id,cl.documento_numero_01,cl.documento_numero_02,cl.documento_numero,cl.cota]) %>
+		          			  <%  saldo_dolar        = cl.divida_dolar - anterior_dolar   %>
+		          			  <%  saldo_guarani      = cl.divida_guarani - anterior_guarani   %>
+							
+							<tr class = "<%= cycle("cor1", "cor2") %> "
+		              						  onClick="Fecha( 
+		                              '<%= cl.vencimento %>',
+		                              '<%= cl.vendedor_id %>',
+		                              '<%= cl.vendedor_nome %>',
+		                              '<%= cl.documento_numero_01 %>',
+		                              '<%= cl.documento_numero_02 %>',
+		                              '<%= cl.documento_numero %>',
+		                              '<%= cl.cota %>',
+		                              '<%= cl.clase_produto.to_i %>',
+		                              '<%= format_int(saldo_guarani) %>')">
+
+
+								<td width="80" align="center"><%= cl.data.strftime("%d/%m/%Y") %></td>
+								<td width="80" align="center"><%= cl.vencimento.strftime("%d/%m/%Y") %></td>
+								<td width="80" align="center"><%= @nota_credito.data - cl.data %></td>
+								<td width="200" align="center"><%= cl.documento_numero_01 %> - <%= cl.documento_numero_02 %> - <%= cl.documento_numero %></td>
+								<td width="50" align="center"><%= cl.cota %></td>
+								<% if @nota_credito.moeda.to_f == 0 %> 
+									<td width="100" align="right"><%= number_to_currency( cl.divida_dolar,    :format=>' %n ', :separator => ",") %></td>
+		            				<td width="100" align="right"><%= number_to_currency( anterior_dolar, :format=>' %n ', :separator => ',') %></td>
+									<td width="100" align="right"><%= number_to_currency( saldo_dolar,    :format=>' %n ', :separator => ",") %></td>
+
+								<% else %> 
+									<td width="100" align="right"><%= number_to_currency( cl.divida_guarani,    :format=>' %n ', :precision => 0 ) %></td>
+		            				<td width="100" align="right"><%= number_to_currency( anterior_guarani, :format=>' %n ', :precision => 0 ) %></td>
+									<td width="100" align="right"><%= number_to_currency( saldo_guarani,    :format=>' %n ', :precision => 0 ) %></td>
+								<% end %>
+							</tr>
+							<% end %>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+  		<div class="col-md-12">
+				<div class="panel">
+					<%= render :partial=>"/nota_creditos_docs/new_doc", :locals=>{:nota_creditos_doc=>NotaCreditosDoc.new(:nota_credito_id=>@nota_credito.id)} %>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+  		<div class="col-md-12">
+				<div class="panel">
+					<%= render :partial=>"/nota_creditos_docs/index_doc", :locals=>{:nota_creditos_docs => @nota_credito.nota_creditos_docs} %>
+				</div>
+			</div>
+  	</div>
+	</div>
+
+  <div class="col-md-4">
+  	<div class="panel">
+  		<div class="panel-content">
+				<h1>Doc. Fiscal</h1>
+			</div>
+
+      <table class="head_grid">
+        <tr>
+          <td width="100"><%= t('DOC') %></td>
+        </tr>
+      </table>
+
+      <div class="rolagem" dir="div" style="height: 150px">
+        <table>
+          <% @ncs.each do |cobros_nc| %>
+          <% if cobros_nc.status == 2 %>
+            <% color = '#fa3e40' %>
+          <% end %>
+
+
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+
+ 							<%
+
+                    data = {
+                        cdcList: [{
+                            cdc: "#{cobros_nc.cdc}"
+                        }]
+                    };
+
+                   url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/de/estado")
+
+                              http = Net::HTTP.new(url.host, url.port)
+                              http.use_ssl = true
+                              http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+                              request = Net::HTTP::Post.new(url)
+                              request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+                              request["content-type"] = 'application/json'
+                              request.body = data.to_json
+                              response = http.request(request)
+                              puts get_resp = JSON.parse(response.body)
+
+                  %>
+
+
+                  <td  width="60" title="<%= cobros_nc.cdc %>"><small><%= cobros_nc.cdc[38..44] %></small></td>
+                  <td class="bold"><%= get_resp["deList"][0]["respuesta_mensaje"] %></td>
+
+              <td  width="100"  bgcolor="<%=color%>"><%= cobros_nc.doc_01 %>.<%= cobros_nc.doc_02 %>.<%= cobros_nc.doc %></td>
+              <td  width="70"  align="right"  bgcolor="<%=color%>"><%= format_int(cobros_nc.tot_gs) %></td>
+              <% if cobros_nc.status == 1 %>
+                <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(cobros_nc) %></td>
+                <td><%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: cobros_nc.cdc, id: cobros_nc.id) %>
+                <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(cobros_nc, status: '0') %></td>
+              <% end %>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+      <%= render partial: "form_fiscals/attr_forms/nota_cred_update_nc" %>
+		</div>
+  </div>
+</div>
+
+
+<div class="buttons">
+	<a href="/nota_creditos/<%= @nota_credito.id.to_i%>" class="button back"><%= t('BACK') %></a>
+	
+	<a href="/nota_creditos" class="button next">Finalizar</a>
+</div>
+<%= hidden_field_tag :id, @nota_credito.id %>
+<script>
+      function Fecha(vencimento,vendedor_id,vendedor_nome,documento_numero_01,documento_numero_02,documento_numero,cota,clase_produto,saldo)
+  {
+    document.getElementById('nota_creditos_doc_vencimento').value          = vencimento;
+    document.getElementById('nota_creditos_doc_vendedor_id').value         = vendedor_id;
+    document.getElementById('nota_creditos_doc_vendedor_nome').value       = vendedor_nome;
+    document.getElementById('nota_creditos_doc_documento_numero_01').value = documento_numero_01;
+    document.getElementById('nota_creditos_doc_documento_numero_02').value = documento_numero_02;
+    document.getElementById('nota_creditos_doc_documento_numero').value    = documento_numero;
+    document.getElementById('nota_creditos_doc_cota').value                = cota;
+    document.getElementById('nota_creditos_doc_clase_produto').value       = clase_produto;
+    document.getElementById('nota_creditos_doc_valor_guarani').value       = saldo;
+    document.getElementById("nota_creditos_doc_valor_guarani").focus()
+  }
+
+  function ComprovanteNC(id){
+    window.open('/form_fiscals/nc?id=' + id +'', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+  }
+
+</script>
+

@@ -1,0 +1,49 @@
+<table>
+	<% stock     = 0 %>
+	<% p_comp    = 0 %>
+	<% p_vend    = 0 %>
+	<% a_comprar = 0 %>
+	<% a_vender  = 0 %>
+
+	<% @stocks.each do |s| %>
+	<tr class = "<%= cycle("cor1", "cor2") %>">
+		<td width="80"><%= s.produto_id %>/<%= s.fabricante_cod %></td>
+		<td width="300"><%= s.produto_nome %></td>
+		<td width="180"><%= s.cor %></td>
+		<td width="40"><%= s.tamanho %></td>
+		<td width="40" align="right"><%= s.stock.to_i %></td>
+		<td width="40" align="right"><%= s.p_compra.to_i %></td>
+		<td width="40" align="right"><%= s.p_venda.to_i %></td>
+		<% if  ((s.stock.to_i + s.p_compra.to_i) - s.p_venda.to_i) < 0  %>
+			<td width="60" align="right"><%= ((s.stock.to_i + s.p_compra.to_i) - s.p_venda.to_i) %></td>
+			<td width="60" align="right">0</td>
+			<td width="60" align="right">A comprar</td>
+			<% a_comprar += ((s.stock.to_i + s.p_compra.to_i) - s.p_venda.to_i) %>
+		<% elsif ((s.stock.to_i + s.p_compra.to_i) - s.p_venda.to_i) == 0 %>
+			<td width="60" align="right">0</td>
+			<td width="60" align="right">0</td>
+			<td width="60" align="right">OK</td>
+		<% elsif ((s.stock.to_i + s.p_compra.to_i) - s.p_venda.to_i) > 0 %>
+			<td width="60" align="right">0</td>
+			<td width="60" align="right"><%= ((s.stock.to_i + s.p_compra.to_i) - s.p_venda.to_i) %></td>
+			<td width="60" align="right">A vender</td>
+			<% a_vender  += ((s.stock.to_i + s.p_compra.to_i) - s.p_venda.to_i) %>
+		<% end %>
+
+		<% stock += s.stock.to_i %>
+		<% p_comp += s.p_compra.to_i %>
+		<% p_vend += s.p_venda.to_f %>
+	</tr>
+	<% end %>
+	<tr class="head">
+		<td colspan="4"></td>
+		<td align="right"><%= stock.to_i %></td>
+		<td align="right"><%= p_comp.to_i %></td>
+		<td align="right"><%= p_vend.to_i %></td>
+		<td align="right"><%= a_comprar.to_i %></td>
+		<td align="right"><%= a_vender.to_i %></td>
+	</tr>
+	<tr>
+		<td></td>
+	</tr>
+</table>

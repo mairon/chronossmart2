@@ -1,0 +1,180 @@
+<body onload="window.print()">
+
+
+  <table align="left" valign="top">
+    <tr>
+      <td colspan="4" align="center">
+        <FONT FACE="times new roman" size="3">
+          ------------------------------------------------------------------------------------------------------------------------------
+        </FONT>
+      </td>
+    </tr>
+
+    <tr>
+      <td >
+          <FONT FACE="times new roman" size="4">
+            <%= current_unidade.nome_sys %>
+          </FONT>
+     </td>
+      <td align="right">
+          <FONT FACE="times new roman" size="4">
+            COMPROVANTE DE VIATICO N.:<%= @viatico.id.to_s.rjust(6,'0') %>
+          </FONT>
+     </td>
+    </tr>
+
+    <tr>       
+
+      <td align="right" colspan="2">
+          <FONT FACE="times new roman" size="3">
+             Fecha :<%= @viatico.data.strftime("%d/%m/%Y") %>
+          </FONT>
+       </td>
+    </tr>
+    <tr>
+
+      <td align="right" colspan="2">
+          <FONT FACE="times new roman" size="3">
+             Hora :<%= Time.now.strftime("%H:%M:%S")%>
+          </FONT>
+       </td>
+    </tr>
+
+    <tr>
+      <td colspan="4" align="center">
+        <FONT FACE="times new roman" size="3">
+          ------------------------------------------------------------------------------------------------------------------------------
+        </FONT>
+      </td>
+    </tr>
+
+    <tr>
+      <td align="left" colspan="2">
+        <table>
+          <tr>
+            <td>
+              <FONT FACE="times new roman" size="3">
+                Cuenta : <%= @viatico.conta.nome %>
+              </FONT>
+            </td>
+             <% if @viatico.moeda == 0 %>
+               <% in_moeda = 'DOLAR'%>               
+             <% else %>  
+               <% in_moeda = 'GUARANIES'%>
+             <% end %>  
+            <td align="left">
+                <FONT FACE="times new roman" size="3">
+                  Moneda : <%= in_moeda %>
+                </FONT>
+            </td>
+
+            <td align="left">
+                <FONT FACE="times new roman" size="3">
+                  Cheque : <%= @viatico.cheque %>
+                </FONT>
+            </td>
+
+          </tr>          
+          <tr>
+          	<td colspan="3">Monto :
+             <% if @viatico.moeda == 0 %>
+              <%= number_to_currency(@viatico.valor_us, :format=>' %n ', :separeitor => ',')  %>
+             <% else %> 
+              <%= number_to_currency(@viatico.valor_gs, :format=>' %n ', :precision => 0)  %>
+             <% end %> 
+          	
+          	</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+   	 <tr>
+       <td colspan="4" align="center">
+        <FONT FACE="times new roman" size="3">
+          ------------------------------------------------------------------------------------------------------------------------------
+        </FONT>
+      </td>
+    </tr>
+
+     <tr>
+       <td colspan="4">
+        <FONT FACE="times new roman" size="3">
+          Nombre: <%= @viatico.persona_nome %> 
+        </FONT>
+      </td>
+    </tr>
+
+    
+     <tr>
+       <td colspan="4">
+        <FONT FACE="times new roman" size="3">
+          <% cc = Rodado.find_by_id(@viatico.rodado_cv_id) %>
+          Chapa Cavalito: <%= cc.placa unless cc.nil? %>
+        </FONT>
+      </td>
+    </tr>
+
+      <tr>
+       <td colspan="4">
+        <FONT FACE="times new roman" size="3">
+          <% cr = Rodado.find_by_id(@viatico.rodado_cr_id) %>
+          Chapa Carreta: <%= cr.placa unless cr.nil? %> 
+        </FONT>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" colspan="4">
+        <FONT FACE="times new roman" size="3">
+          ------------------------------------------------------------------------------------------------------------------------------
+        </FONT>
+      </td>
+    </tr>
+
+    <tr height="180">
+      <td valign="top" colspan="2">
+        <FONT FACE="times new roman" size="3">
+        	Concepto : <%= @viatico.obs %>
+        </FONT>
+      </td>
+    </tr>
+
+  
+    <tr>
+      <td  colspan="2">
+        <FONT FACE="times new roman" size="3">
+        -------------------------------------------
+        </FONT>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="2">
+              <FONT FACE="times new roman" size="3">
+                <%=  current_user.usuario_nome %>
+              </FONT>
+            </td>
+    </tr>
+
+    <tr>
+      <td align="center" colspan="4">
+        <FONT FACE="times new roman" size="3">
+          ------------------------------------------------------------------------------------------------------------------------------
+        </FONT>
+      </td>
+    </tr>
+
+  
+      <td align="center" colspan="4">
+        <FONT FACE="times new roman" size="3">
+        </FONT>
+      </td>
+
+  </table>
+
+</body>
+
+
+
+
+

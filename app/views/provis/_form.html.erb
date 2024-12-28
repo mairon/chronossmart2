@@ -1,0 +1,183 @@
+<%= form_for(@provi) do |f| %>
+  <% if @provi.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@provi.errors.count, "error") %> prohibited this provi from being saved:</h2>
+
+      <ul>
+      <% @provi.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> Provisionamento de Costo - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                    <td align="right"><%= t('DATE') %> :</td>                    
+                    <td><%= f.date_select :data %></td>
+
+
+                   <td align="right"> Moneda :</td>
+                    <td colspan="4">
+                      <fieldset>
+                        <%= f.radio_button :moeda, 1,  :Checked => "True" %> Gs.
+                        <%= f.radio_button :moeda, 0 %> Dolar
+                        <%= f.radio_button :moeda, 2 %> Real
+                      </fieldset>
+                    </td>
+                  </tr>
+
+                   <tr>
+                    <td align="right">Cotizacion Gs :</td>
+                      <td> <%= text_field  :provi, :cotacao,
+                        :size     => 10,
+                        :value    => @provi.cotacao.to_i,
+                        :onfocus  => " $.ajax({url: '/buscas/cotz_us_compra',
+                                          type: 'POST',
+                                          data: 'data=' + $('#provi_data_3i').val()+'/'+
+                                          $('#provi_data_2i').val()+'/'+
+                                          $('#provi_data_1i').val(),
+                                          success: function(data){
+                                            $('#provi_cotacao').val(data);} })"%>
+                    </td>
+
+                    <td align="right">R$ :</td>
+                    <td colspan="4"> <%= text_field :provi,:cotacao_real ,
+                                                  :size     => 10,
+                                                  :value    => @provi.cotacao_real.to_i,
+                                                  :onfocus  => " $.ajax({url: '/buscas/cotz_rs_compra',
+                                                                 type: 'POST',
+                                                                 data: 'data=' + $('#provi_data_3i').val()+'/'+
+                                                                 $('#provi_data_2i').val()+'/'+
+                                                                 $('#provi_data_1i').val(),
+                                                                 success: function(data){
+                                                                   $('#provi_cotacao_real').val(data);} })"%>
+
+                                                 
+                    </td>
+                  </tr>
+                  <tr>             
+                    <td align="right"><%= t('DATE') %> Pagamento :</td>                    
+                    <td><%= f.date_select :data_pag %></td>
+
+                    <td align="right">Vencimento :</td>                    
+                    <td colspan="4"><%= f.date_select :vencimento %></td>
+                  </tr>
+                  <tr>
+                    <td align="right">Proveedor :</td>
+                    <td colspan="6"><%= f.collection_select :persona_id, Persona.all( :select => 'id,nome', :conditions => ["tipo_fornecedor = 1"], :order  => 'nome' ), :id,
+                          :nome,{:prompt => 'Selecione lo Proveedor'},{:class => "selc_medium"} %></td>
+                  </tr>
+
+
+                  <tr>
+                    <td align="right">Centro de Costo :</td>
+                    <td colspan="6"><%= f.collection_select :centro_custo_id, CentroCusto.all( :select => 'id,nome',
+                          :order  => 'nome' ), :id,
+                          :nome,{:prompt => 'Selecione lo CC'},{:class => "selc_medium"} %></td>
+                  </tr>
+                  <tr>
+                    <td align="right">Cuenta:</td>
+                    <td colspan="6"><%= f.collection_select :rubro_grupo_id, 
+                             PlanoDeConta.all( :select => 'id,descricao',
+                                        :conditions => ["length(codigo) = 8"],
+                                        :order  => '2' ),:id,
+                                        :descricao,{:prompt => 'Selecione lo Grupo'},{:class => "selc_medium"} %>
+                      <%= image_tag("load.gif",
+                                      :align => "absmiddle",
+                                      :border => 0,
+                                      :id => "spinner",
+                                      :width => 21,
+                                      :height => 21,
+                                      :style =>"display: none;" ) %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="right">Rubro :</td>
+                    <td colspan="6"><%= f.collection_select :rubro_id, Rubro.all( :select => 'id,descricao',
+                          :order  => 'descricao' ), :id,
+                          :descricao,{},{:class => "selc_medium"} %></td>
+                  </tr>
+                  <tr>
+                    <td align="right">Perido :</td>
+                    <td><%= f.text_field :periodo, :size => 16, :maxlength => 3 %><small>Ex. 12 meses</small></td>
+                  </tr>
+                  <tr>
+                     <%= field_gs 'Valor Gs.:',f,:valor_gs,
+                     :onchange   => "GsToUsRs('provi_cotacao','provi_cotacao_real','provi_valor_gs','provi_valor_us','provi_valor_rs')" %>
+
+                     <%= field_us 'Valor U$:',f,:valor_us,
+                           :onchange   => "UsToGsRs('provi_cotacao','provi_cotacao_real','provi_valor_us','provi_valor_gs','provi_valor_rs')" %>
+
+                     <%= field_us 'Valor R$:',f,:valor_rs,
+                     :onchange   => "RsToUsGs('provi_cotacao','provi_cotacao_real','provi_valor_gs','provi_valor_us','provi_valor_rs')" %>
+
+                  </tr>
+
+                  <tr>
+                     <td align="right" valign="top">Concepto :</td>
+                     <td colspan="6"><%= f.text_area :obs, :cols => 115, :rows => 5 %></td>
+                  </tr>
+      
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <% if params[:action].to_s == 'edit' %>
+          <%= f.submit :value => " Actulizar ", :class => "button", data: { confirm: "Esta seguro que deseja atulizar os provisionamentos?" } %>
+
+          <%= link_to 'Visualizar', provi_path(@provi), :class => "button next" %>
+        <% else %>
+            <%= f.submit :value => t('SAVE'), :class => "button", data: { confirm: "Esta seguro que deseja atulizar os provisionamentos?" } %>
+
+        <% end%>
+
+        <%= link_to t('BACK'), provis_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>
+<script type="text/javascript">
+ $(document).ready(function() {
+
+    $('#provi_data_3i').focus();
+  
+      $("#provi_rubro_grupo_id").change(function() {
+        var data=$('#provi_rubro_grupo_id').val();
+        $.ajax({
+          type: "GET",
+           url: "/provis/dynamic_rubro_grupo/"+data,
+          data: data,
+          beforeSend: function()
+          {
+              $('#spinner').show();
+          },
+
+          success: function(response)
+          {
+            $('#spinner').hide();
+          }
+
+        });
+    });
+
+  });
+
+
+</script>

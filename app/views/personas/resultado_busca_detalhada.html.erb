@@ -1,0 +1,78 @@
+<h1 id="header">Personas Multiples Atulizaciónes</h1>
+
+
+  <div class="group">
+    <h2>
+      <%= form_tag resultado_busca_detalhada_personas_path, :method => "get" do%>
+      Tipo:
+      <%= select_tag(:per, options_for_select(
+                [
+                  ['', ''],
+                  ['CLIENTE', 'CLIENTE'],
+                  ['CORPORATIVO', 'CORPORATIVO'],
+                  ['DESPACHANTE', 'DESPACHANTE'],
+                  ['EMPLEADO', 'EMPLEADO'],
+                  ['FABRICANTE', 'FABRICANTE'],
+                  ['MAYORISTA', 'MAYORISTA'],
+                  ['PROVEEDOR', 'PROVEEDOR'],
+                  ['VENDEDOR', 'VENDEDOR']
+                ], :selected => params[:per])) %>
+        <%= submit_tag 'Filtrar', class: 'button' %>
+      <% end %>
+    </h2>
+  </div>
+
+<style type="text/css">
+
+.rolagem_horiz
+{
+    border: 1px solid #cccccc;
+    background: white;
+    overflow-y:auto;
+    padding: 1px 1px 1px 1px;
+}
+</style>
+<div class="rolagem_horiz" id="div">
+<table class="head_grid">
+   <tr>
+      <td width="50">Bloqueado</td>
+      <td width="50"align="center">Cod.</td>
+      <td width="50">RUC/CI.</td>
+      <td width="350">Nombre Fantasia</td>
+      <td width="350">Razao Social</td>
+      <td width="100"align="center">Tel</td>
+      <td width="100">Direción</td>
+      <td width="100">Vendedor Resposable</td>
+      <td></td>
+      <td width="100">Limit Credito G$</td>
+
+   </tr>
+   <%= form_tag update_multiple_personas_path :method => :put do %>
+    <%= submit_tag "Atulizar Datos" , :class => "button delete", :disable_with => "Aguarde..." %>
+     <% @personas.each do |persona| %>
+     <%= fields_for "personas[]", persona do |f| %>
+      <tr class = "<%= cycle("cor1", "cor2")%>">
+        <td width="80" align="center"><%= f.check_box :estado %></td>
+        <td width="50"align="center"><%=h persona.id.to_s.rjust(6,'0') %></td>
+        <td width="100"> <%= f.text_field :ruc, size: 20 %></td>
+        <td width="100"> <%= f.text_field :nome, size: 60 %></td>
+        <td width="100"> <%= f.text_field :nome_fatura, size: 60 %></td>
+        <td width="100"> <%= f.text_field :telefone, size: 15 %></td>
+        <td>
+          <%= f.collection_select :cidade_id, Cidade.all(:select => 'id,nome',
+                                                        :order => '2'), :id, :nome, {prompt: 'Selecione a cidade'},{:class => "selc_medium"} %>
+
+        </td>
+        <td> <%= f.collection_select :vend_responsavel_id, Persona.all( :select => ' id,nome,tipo_vendedor',
+                  :conditions => ["tipo_vendedor = 1"],
+                  :order      => '2'),:id,:nome,
+                  { prompt: 'Selecione lo Vendedor Responsable' },{:class => "selc_medium"} %></td>
+          <%= field_gs '',f,:limite_credito %>
+        <td>
+     </tr>
+     <% end %>
+     <% end %>
+   <% end %>
+   </table>
+
+

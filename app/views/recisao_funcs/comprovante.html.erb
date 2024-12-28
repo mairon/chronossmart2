@@ -1,0 +1,143 @@
+<br>
+
+<table>
+  <tr>
+    <td align="left" style="padding-left: 50px"><%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 60) %></td>
+    <td width="550">
+      <h3 align="center">
+        LIQUIDACION POR TERMINO DE RELACION
+      </h3>
+    </td>
+  </tr>
+</table>
+
+<div class="group" align="center">
+  <table class="bord">
+    <tr>
+      <td width="350">Nombre y Apellido:</td>
+      <td width="300"><%= @recisao_func.persona.nome %></td>
+    </tr>
+    <tr>
+      <td>Fecha de Ingreso:</td>
+      <td width="300"><%= @recisao_func.data_entrada.strftime('%d/%m/%y') %></td>
+    </tr>
+
+    <tr>
+      <td>Fecha de Salida:</td>
+      <td width="300"><%= @recisao_func.data_saida.strftime('%d/%m/%y') %></td>
+    </tr>
+
+    <tr>
+      <td>Antigüedad:</td>
+      <td width="300"><%= @recisao_func.antiguedad_ano %> años, <%= @recisao_func.antiguedad_meses %> meses, <%= @recisao_func.antiguedad_dias %> días.</td>
+    </tr>
+
+    <tr>
+      <td>Motivo:</td>
+      <td width="300">
+        <% if @recisao_func.motivo.to_i == 0 %>
+          Renuncia
+        <% elsif @recisao_func.motivo.to_i == 1 %>
+          Retiro Justificado
+        <% elsif @recisao_func.motivo.to_i == 2 %>
+          Despido Justificado
+        <% elsif @recisao_func.motivo.to_i == 3 %>
+          Despido Injustificado
+        <% end %>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="2" ><hr></td>
+    </tr>
+
+    <tr>
+      <td width="300">SALARIO MENSUAL ACTUAL:</td>
+      <td width="300"><%= format_int(@recisao_func.salario_mensal) %></td>
+    </tr>
+
+    <tr>
+      <td width="300">SALARIO DIARIO ACTUAL:</td>
+      <td width="300"><%= format_int(@recisao_func.salario_diario) %></td>
+    </tr>
+    <% if @recisao_func.antiguedad_meses.to_i >= 6 %>
+
+      <tr>
+        <% inicio =  "#{@recisao_func.data_saida.to_date.strftime('%Y')}-#{@recisao_func.data_saida.to_date.strftime('%m').to_i - 1}-01".to_date - 5.month%>
+        <td width="300">PROMEDIO DIARIO 6 ULTIMOS MESES:</td>
+        <% last_6_moths = SueldosDetalhe.where("tipo = 'SUELDO' and persona_id = #{@recisao_func.persona_id} AND data BETWEEN '#{inicio}'  and '#{@recisao_func.data_saida.to_date.strftime('%Y')}-#{@recisao_func.data_saida.to_date.strftime('%m').to_i - 1}-1'").sum("credito_gs")%>
+        <td width="300"><%= format_int( (last_6_moths.to_f / 6) / 30 ) %></td>
+      </tr>
+    <% end %>
+
+    <tr>
+      <td colspan="2" ><hr></td>
+    </tr>
+  </table>
+
+  <% if @recisao_func.motivo.to_i == 0 %>
+    <%= render 'renuncia' %>
+  <% elsif @recisao_func.motivo.to_i == 1 %>
+    RETIRO JUSTIFICADO
+  <% elsif @recisao_func.motivo.to_i == 2 %>
+    <%= render 'retiro_injustificado' %>
+  <% elsif @recisao_func.motivo.to_i == 3 %>
+    <%= render 'despito_injustificado' %>
+  <% end %>
+  <table>
+    <tr>
+      <td align="justify" style="padding: 20px 40px">
+
+        Recibí en fecha <%= l(@recisao_func.data_saida, :format => '%d de %B de %Y', :locale => 'es') %>, la suma de GUARANIES <%= I18n.with_locale(:es) { @saldo.to_i.to_words.upcase }%> (G$ <%= format_int(@saldo) %>), de conformidad a la liquidación que antecede, con motivo del saldo de la relación laboral mi
+        <% if @recisao_func.motivo.to_i == 0 %>
+          Renuncia,
+        <% elsif @recisao_func.motivo.to_i == 1 %>
+          Retiro Justificado,
+        <% elsif @recisao_func.motivo.to_i == 2 %>
+          Despido Justificado,
+        <% elsif @recisao_func.motivo.to_i == 3 %>
+          Despido Injustificado,
+        <% end %> manifestando que los datos de antigüedad y salario expresados en la liquidación son correctos y verídicos. Declaro no tener nada que reclamar a MERCOSUR CAMBIOS S.A., a sus directores y/o Representantes, en ningún otro concepto, judicial ni extrajudicialmente.
+
+      </td>
+    </tr>
+  </table>
+
+  <br>
+  <br>
+  <br>
+  <br>
+
+  <table align="right" style="float:right">
+    <tr>
+      <td align="center">
+        ________________________________________________________ <br>
+        <%= @recisao_func.persona.nome %> <br>
+        <%= @recisao_func.persona.ruc %>
+      </td>
+
+    </tr>
+  </table>
+
+</div>
+
+
+<style type="text/css">
+  .bord {
+    border-collapse: collapse;
+    font-size: 12px
+  }
+  td{font-size: 12px}
+@font-face {
+  font-family: 'prox';
+  src: url("/assets/fonts/proxima-nova.otf") format("opentype");
+}
+
+  body {
+    font-family: 'prox';
+
+  }
+
+
+</style>
+

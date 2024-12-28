@@ -1,0 +1,73 @@
+<%= form_for(@controle_visitum) do |f| %>
+  <% if @controle_visitum.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@controle_visitum.errors.count, "error") %> prohibited this controle_visitum from being saved:</h2>
+
+      <ul>
+      <% @controle_visitum.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <ul class="tabs">
+      <li><a href="#tab1">Controle de Visita. - [<%= t('EDITION') %>]</a></li>
+   </ul>
+
+   <div class="tab_container">
+      <div id="tab1" class="tab_content">
+
+        <table >
+              <tr>
+                <td width="1000">
+                  <fieldset >
+                    <table >
+                      <tr>
+                        <td align="right"><%= t('DATE') %> :</td>
+                        <td colspan="4"><%= f.date_select :data %></td>                        
+                      
+                         <td align="right">Consultor :</td>
+                         <td ><%= f.collection_select :consultor_id, Persona.where("tipo_vendedor = 1", :select => ' id,nome',
+                               :order  => '2' ), :id,
+                              :nome %></td>
+                      </tr>
+
+                       <tr>
+                         <td align="right">Cliente :</td>
+                         <td colspan="4"><%= f.collection_select :persona_id, Persona.all( :select => ' id,nome',
+                               :order  => '2' ), :id,
+                              :nome %></td>
+                      
+
+                         <td align="right">Serviço :</td>
+                         <td colspan="4"><%= f.collection_select :servico_id, Servico.all(:select => ' id,nome',
+                               :order  => '2', ), :id,
+                              :nome %></td>
+                      </tr>
+
+                      <tr>
+                         <td align="right">NC :</td>
+                         <td><%= f.text_field :nc, :size => 10 %></td>
+
+                         <td align="right" colspan="4">Ciudad :</td>
+                         <td><%= f.collection_select :cidade_id, Cidade.all(:select => 'id,nome',
+                                                     :order => '2'),:id,
+                                                     :nome, {:onkeypress => "return bloqEnter(event)"} %></td>
+
+                      </tr>
+
+                      <td align="right" valign="top">Concepto :</td>
+                      <td colspan="6"><%= f.text_area :obs, :rows => 5, :cols => 115 %></td>
+                       </table>
+                  </fieldset>                    
+                </td>
+              </tr>
+        </table>
+      </div>
+      <div class="buttons">
+        <%= f.submit :value => t('SAVE'), :class => "button" %>
+        <%= link_to 'Back', controle_visita_path, :class => "button back" %>
+      </div>
+      <% end %>
+    </div>

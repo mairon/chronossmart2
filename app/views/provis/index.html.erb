@@ -1,0 +1,41 @@
+<h1 id="header">Provisionamento de Costo</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_provi_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+     <td width="50" align="center">Laz.</td>
+     <td width="80" align="center"><%= t('DATE') %></td>
+     <td width="150">CC</td>
+     <td width="250">Classificación</td>
+     <td width="50" align="center"><%= t('COIN') %></td>
+     <td width="100" align="right"><%= t('VALUE') %></td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @provis.each do |provi| %>
+      <tr class="<%= cycle("cor1", "cor2")%>">
+       <td width="50" align="center"><%= provi.id.to_s.rjust(6,'0') %></td>
+       <td width="80" align="center"><%= provi.data.strftime("%d/%m/%y") %></td>
+       <td width="150"><%= provi.centro_custo.nome %></td>
+       <td width="250"><%= provi.rubro.descricao %></td>
+       <% if provi.moeda == 0 %>
+          <td width="50" align="center">U$</td>
+          <td width="100" align="right"><%= format_decimal( provi.valor_us )%></td>
+       <% elsif provi.moeda == 1 %>
+          <td width="50" align="center">G$</td>
+          <td width="100" align="right"><%= format_int( provi.valor_gs )%></td>
+       <% else %>
+          <td width="50" align="center">R$</td>
+          <td width="100" align="right"><%= format_decimal( provi.valor_rs )%></td>
+       <% end %>
+        <td><%= link_to 'Editar', edit_provi_path(provi) %></td>
+        <td><%= link_to t('DELETE'), provi, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

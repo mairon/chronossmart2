@@ -1,0 +1,56 @@
+<%= form_for(@persona_feria) do |f| %>
+  <% if @persona_feria.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@persona_feria.errors.count, "error") %> prohibited this persona_feria from being saved:</h2>
+
+      <ul>
+      <% @persona_feria.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<div class="panel">
+  <h1 id="header">Vacacciones</h1>
+</div>
+
+<div class="panel">
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-3">
+        <label>Inicio</label>
+        <%= f.date_select :inicio %>
+      </div>
+      <div class="col-md-3">
+        <label>Final</label>
+        <%= f.date_select :final %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <label>Tipo</label>
+        <%= f.text_field :tipo %>
+      </div>
+      <div class="col-md-3">
+        <label>Año Ref.</label>
+        <%= f.text_field :ano_ref, required: true %>
+      </div>
+
+      <div class="col-md-2">
+        <label>Dias</label>
+        <%= f.number_field :dias %>
+      </div>
+      <div class="col-md-2">
+        <div class="padding-btn">
+          <%= f.check_box :status %> Generado na Escala
+        </div>
+      </div>  
+    </div>
+  </div>
+  <div class="panel-footer">
+      <%= f.submit :value => " Grabar ", :class => "btn btn-green" %>
+      <%= link_to 'Volver', persona_ferias_path, :class => "button back" %>
+    </div>
+  <% end %>
+</div>

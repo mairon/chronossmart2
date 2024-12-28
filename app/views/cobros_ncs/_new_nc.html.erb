@@ -1,0 +1,29 @@
+<%= form_for(cobros_nc) do |f| %>
+  <% if cobros_nc.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(cobros_nc.errors.count, "error") %> prohibited this cobros_nc from being saved:</h2>
+
+      <ul>
+      <% cobros_nc.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= f.hidden_field :cobro_id %>
+  <table>
+    <tr>                                      
+      <td align="right">Doc.:</td>                    
+      <td colspan="2"><%= f.text_field :documento_numero_01, size: 5 %>-<%= f.text_field :documento_numero_02, size: 5 %>-<%= f.text_field :documento_numero, size: 13 %></td>
+      </tr>
+      	
+      <tr>
+      <% if @cobro.moeda.to_i == 0 %>
+      	<%= field_us 'U$:',f,:valor_us %>
+      <% elsif @cobro.moeda.to_i == 1 %>
+      	<%= field_us 'G$:',f,:valor_gs, value: format_int(@tot_des_gs.to_f - CobrosNc.sum(:valor_gs, conditions: ["cobro_id = #{@cobro.id} and status = 0"])) %>
+      <% end %>
+      <td><%= f.submit :value => t('SAVE'), :class => "button" %></td>
+    </tr>                 
+  </table>
+<% end %>

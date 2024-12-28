@@ -1,0 +1,15 @@
+<% if params[:detalhe] == "2" %>
+  <%= render :partial => 'resumo_pagar' %>
+  <% elsif params[:detalhe] == "3" %>
+    <%= render :partial => 'extrato_prov' %>
+    
+<% else %>
+  <% if params[:moeda] == "1" %>
+    <%= render :partial => 'contas_pagar_guarani' %>
+  <% elsif params[:moeda] == "2" %>
+    <%= render :partial => 'contas_pagar_real' %>
+  <% else %>
+    <%= render :partial => 'contas_pagar_dolar' %>
+  <% end %>
+<% end %>
+

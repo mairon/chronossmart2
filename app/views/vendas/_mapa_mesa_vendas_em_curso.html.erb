@@ -1,0 +1,37 @@
+<table class="head_grid">
+  <tr>
+    <td width="45" align="center">Código</td>
+    <td width="60" align="center">Apertura</td>
+    <td width="60" align="center">CM</td>
+    <td width="160">Sector</td>
+    <td width="150">Cliente</td>
+    <td width="20" align="right">Ctd</td>
+    <td width="70" align="right">Monto</td>
+    <td width="80"></td>
+  </tr>
+</table>
+<div class="rolagem" dir="div" style="height: 345px;">
+	<table>
+		<% @vendas.each do |v| %>
+      <% if v.op == false %>
+        <% st = " op-false" %>
+      <% end %>
+      <tr class = "<%= cycle("cor1", "cor2") %> <%= st %>"  >
+        <td width="45" align="center"><%= v.id.to_s.rjust(6,'0') %></td>
+        <td align="center" width="60"><%= v.data.strftime("%d/%m") %> <%= v.created_at.strftime("%H:%M") %></td>
+        <td width="60" align="center"><%= v.cartao_nome %></td>
+        <td width="160"><small><%= v.setor_nome %></small></td>
+        <td width="150"><small>
+          <%= v.obs %><br>
+          <%= v.persona_nome %> 
+        </small></td>
+        <td width="20" align="right"><%= v.qtd.to_i %></td>
+        <td width="55" align="right"><%= format_int(v.tot_gs) %></td>
+        <td><%= link_to image_tag("add.png"), venda_path(v) %></td>
+        <% if @venda_config.caixa_separado.to_i == 0 %>
+          <td><%= link_to image_tag("dinheiro.png"), vendas_financa_venda_path(v) %></td>
+        <% end %>
+      </tr>
+		<% end %>
+	</table>
+</div>

@@ -1,0 +1,85 @@
+   <table>
+     <tr >
+       <td colspan="2">
+         <fieldset>
+            <table>
+             <tr>
+              <td>
+                Stock Atual : <%= @quantidade %>  |
+              </td>
+              <td align="right">
+                  <a href="javascript:void(0)" onClick="AbrirHistoricoPreco('<%= @produto.id.to_i %>')">Hist. Precio</a>
+              </td>
+             </tr>
+           </table>
+         </fieldset>
+       </td>
+     </tr>
+
+     <tr>
+       <td valign="top">
+         <fieldset>
+           <legend>Ult. <%= t('PURCHASE') %></legend>
+           <table>
+             <tr>
+               <td><%= t('DATE') %> Ult. Compra :</td>
+               <td><%= @produto.compras_produtos.last ? @produto.compras_produtos.last.data.strftime("%d/%m/%Y") : "00/00/0000" %></td>
+             </tr>
+             <tr>
+               <td>Cantidad Compra :</td>
+               <td><%= @produto.compras_produtos.last ? @produto.compras_produtos.last.quantidade : "0.000" %></td>
+             </tr>
+             <tr>
+               <td>Unit. U$ :</td>
+               <td><%= @produto.compras_produtos.last ? @produto.compras_produtos.last.unitario_dolar : "0.000" %></td>
+             </tr>
+             <tr>
+               <td>Unit. Gs.:</td>
+               <td><%= @produto.compras_produtos.last ? @produto.compras_produtos.last.unitario_guarani : "0.000" %></td>
+             </tr>
+
+             <tr>
+               <td>Proveedor:</td>
+               <td><%= @produto.vendas_produtos.last ? @produto.vendas_produtos.last.persona_nome : "----" %></td>
+             </tr>
+
+           </table>
+         </fieldset>
+       </td>
+
+       <!-- ULTIMA VENDA   ---------------------------------------------------- !-->
+       <td valign="top">
+         <fieldset>
+           <legend>Ult. <%= t('SALES') %></legend>
+
+           <table>
+             <tr>
+               <td><%= t('DATE') %> Ult. Venta :</td>
+               <td><%= @produto.vendas_produtos.last ? @produto.vendas_produtos.last.data.strftime("%d/%m/%Y") : "00/00/0000" %></td>
+             </tr>
+             <tr>
+               <td>Cantidad Venta :</td>
+               <td><%= @produto.vendas_produtos.last ? @produto.vendas_produtos.last.quantidade : "0.000" %></td>
+             </tr>
+             <tr>
+               <td>Unit. U$ :</td>
+               <td><%= @produto.vendas_produtos.last ? @produto.vendas_produtos.last.unitario_dolar : "0.000" %></td>
+             </tr>
+             <tr>
+               <td>Unit. Gs.:</td>
+               <td><%= @produto.vendas_produtos.last ? @produto.vendas_produtos.last.unitario_guarani : "0.000" %></td>
+             </tr>
+
+             <tr>
+               <td>Cliente:</td>
+               <td><%= @produto.vendas_produtos.last ? @produto.vendas_produtos.last.persona_nome : "----" %></td>
+             </tr>
+
+           </table>
+         </fieldset>
+       </td>
+     </tr>
+   </table>
+
+
+

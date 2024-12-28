@@ -1,0 +1,53 @@
+<h1 id="header">Transferencia entre Cuentas</h1>
+<div class="acessos">
+  <%= link_to t('NEW'), new_transferencia_conta_path, :class => 'button add' %>
+</div>
+<div class="group">
+     <h2>
+    <%= form_tag busca_transferencia_contas_path, :method => "get" do%>
+        <table>
+          <tr>
+            <!--FILTRO_DATA!-->
+            <td align="right">De:</td>
+            <td colspan="2">
+              <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+              <div class="input-group-addon-f">
+                <span class="icon-calendar"></span>
+              </div>
+            <td style="padding-left: 10px"><%= t('TO') %></td>
+            <td>
+              <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+              <div class="input-group-addon-f">
+                <span class="icon-calendar"></span>
+              </div>
+            </td>
+            <td>
+              <select name="tipo" id="tipo">
+                <option>CODIGO</option>
+                <option>CONTA ORIGEM</option>
+                <option>CONTA DESTINO</option>
+              </select>
+            </td>
+            <td colspan="4">
+              <input id="busca" name="busca" type="text" onkeyup = "pesquisa(this.value),f(this)"onkeydown = "f(this)" size="35"/>
+            </td>
+            <td>
+              <input type="button" class="btn btn-blue" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar"/>
+
+              <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;") %>
+
+            </td>
+          </tr>
+        </table>
+    <% end %>
+  </h2>
+</div>
+
+<div id="pagina"></div>
+<script language="javascript">
+  function pesquisa(valor){
+    url="/transferencia_contas/busca?" + $('form').serialize();
+    ajax(url);
+  }
+</script>
+<%= javascript_include_tag 'busca_ajax' %>

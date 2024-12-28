@@ -1,0 +1,10 @@
+<table>
+	<% @personas.each do |p| %>
+	<tr class = "<%= cycle("cor1", "cor2")%>">
+		<td width="60" align="center"><%= p.id.to_s.rjust(6,'0') %></td>
+		<td width="150"><%= p.turma_nome %></td>
+		<td width="250"><%= p.nome %></td>
+		<td width="250"><%= p.responsavel_nome %></td>
+	</tr>
+	<% end %>
+</table>

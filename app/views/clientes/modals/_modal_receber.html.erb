@@ -1,0 +1,159 @@
+<div class="modal fade" id="modal-receber-pg" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary">
+        <h1 style="font-size: 15px; font-weight: bold; padding: 0px !important; color: #fff">Recebir Titulo #<span id="pg-data-id"></span> -
+          <span id="data_doc_01"></span>-<span id="data_doc_02"></span>-<span id="data_doc"></span>
+           - Cota <span id="data_cota">
+        </h1>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 5px 20px 20px 20px">
+        <%= form_for(Cliente.new) do |fr| %>
+        <%= hidden_field_tag :origin, 'painel-receber' %>
+        <%= fr.hidden_field :sigla_proc, value: 'CLR' %>
+        <%= fr.hidden_field :finan, value: true %>
+        <%= fr.hidden_field :cota, class: 'pg_cliente_cota' %>
+        <%= fr.hidden_field :vencimento, class: 'pg_cliente_vencimento' %>
+        <%= fr.hidden_field :documento_numero, class: 'cl_doc' %>
+        <%= fr.hidden_field :documento_numero_01, class: 'cl_doc_01' %>
+        <%= fr.hidden_field :documento_numero_02, class: 'cl_doc_02' %>
+        <%= fr.hidden_field :descricao, class: 'pg_cliente_descricao' %>
+        <%= fr.hidden_field :rubro_id, class: 'pg_cliente_rubro_id' %>
+        <%= fr.hidden_field :tot_cotas, class: 'pg_cliente_tot_cotas' %>
+        <%= fr.hidden_field :persona_id, class: 'pg_cliente_persona_id' %>
+        <%= fr.hidden_field :saldo_gs, class: 'pg_cliente_saldo_gs' %>
+        <%= fr.hidden_field :saldo_rs, class: 'pg_cliente_saldo_rs' %>
+        <%= fr.hidden_field :saldo_us, class: 'pg_cliente_saldo_us' %>
+        <%= fr.hidden_field :titulo, class: 'pg_cliente_titulo' %>
+        <div class="row">
+          <div class="col-md-12">
+            <br>
+            <span id="pg-data-descricao"></span>
+            <hr>
+          </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-6">
+              <label>Fecha</label>
+                <%= fr.text_field :data, value: Time.now.strftime("%d/%m/%Y"), size: 12, class: "input-addon date", onkeyup: "Formatadata(this,event)", autocomplete: 'off', required: true %>
+                <div class="input-group-addon-f">
+                  <span class="icon-calendar"></span>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+              <label>Cuenta</label>
+              <%= fr.collection_select :conta_id,
+                     Conta.where(unidade_id: current_unidade.id).select('id,nome').order(2), :id, :nome, {:prompt => 'Selecione la Cuenta'}, {required: true, class: 'panel-field pg_cliente_conta_id'} %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-5">
+              <label>Moneda</label>
+              <%= fr.select :moeda, options_for_select([['Dolar', 0], ['Guaranies', 1], ['Reales', 2]]), {}, {class: 'panel-field, rece-moeda pg_cliente_moeda'} %>
+            </div>
+            <div class="col-md-7" align="right">
+              <div class="rece-divida-us">
+                <%= field_us_label 'Monto U$', fr, :divida_dolar, class: 'money_us pg_cliente_divida_dolar' %>
+              </div>
+              <div class="rece-divida-gs" hidden>
+                <%= field_gs_label 'Monto Gs.', fr, :divida_guarani, class: 'money_gs pg_cliente_divida_guarani' %>
+              </div>
+              <div class="rece-divida-rs" hidden>
+                <%= field_us_label 'Monto R$', fr, :divida_real, class: 'money_us pg_cliente_divida_real' %>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12 footer-buttons" >
+              <%= fr.submit "Grabar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+$('.rece-moeda').change(function(){
+
+  if ($('.rece-moeda').val() == '0') {
+    $(".rece-divida-us").show();
+    $(".rece-divida-gs").hide();
+    $(".rece-divida-rs").hide();
+  } else if ($('.rece-moeda').val() == '1') {
+    $(".rece-divida-us").hide();
+    $(".rece-divida-gs").show();
+    $(".rece-divida-rs").hide();
+  } else if ($('.rece-moeda').val() == '2') {
+    $(".rece-divida-us").hide();
+    $(".rece-divida-gs").hide();
+    $(".rece-divida-rs").show();
+  };
+})
+
+</script>
+
+<script type="text/javascript">
+
+  $('#modal-receber-pg').on('shown.bs.modal', function(event) {
+     $("#pg-data-id").text($(event.relatedTarget).data('pg-id'));
+     $("#pg-data-descricao").text($(event.relatedTarget).data('pg-descricao'));
+     $(".pg_cliente_conta_id").val($(event.relatedTarget).data('pg-conta-id'));
+     $(".pg_cliente_moeda").val($(event.relatedTarget).data('pg-moeda'));
+
+     $(".pg_cliente_divida_dolar").val($(event.relatedTarget).data('pg-saldo-us'));
+     $(".pg_cliente_divida_guarani").val($(event.relatedTarget).data('pg-saldo-gs'));
+     $(".pg_cliente_divida_real").val($(event.relatedTarget).data('pg-saldo-rs'));
+     $(".pg_cliente_cota").val($(event.relatedTarget).data('pg-cota'));
+
+     $(".pg_cliente_saldo_us").val($(event.relatedTarget).data('pg-saldo-us'));
+     $(".pg_cliente_saldo_gs").val($(event.relatedTarget).data('pg-saldo-gs'));
+     $(".pg_cliente_saldo_rs").val($(event.relatedTarget).data('pg-saldo-rs'));
+
+
+     $(".cl_doc").val($(event.relatedTarget).data('pg-documento-numero'));
+     $(".cl_doc_01").val($(event.relatedTarget).data('pg-documento-numero-01'));
+     $(".cl_doc_02").val($(event.relatedTarget).data('pg-documento-numero-02'));
+
+     $("#data_doc").text($(event.relatedTarget).data('pg-documento-numero'));
+     $("#data_doc_01").text($(event.relatedTarget).data('pg-documento-numero-01'));
+     $("#data_doc_02").text($(event.relatedTarget).data('pg-documento-numero-02'));
+     $("#data_cota").text($(event.relatedTarget).data('pg-cota'));
+
+     $(".pg_cliente_rubro_id").val($(event.relatedTarget).data('pg-rubro-id'));
+     $(".pg_cliente_vencimento").val($(event.relatedTarget).data('pg-vencimento'));
+     $(".pg_cliente_tot_cotas").val($(event.relatedTarget).data('pg-tot-cotas'));
+     $(".pg_cliente_descricao").val($(event.relatedTarget).data('pg-descricao'));
+     $(".pg_cliente_persona_id").val($(event.relatedTarget).data('pg-persona-id'));
+     $(".pg_cliente_titulo").val($(event.relatedTarget).data('pg-titulo'));
+
+
+
+      if ($(event.relatedTarget).data('pg-moeda') == '0') {
+        $(".rece-divida-us").show();
+        $(".rece-divida-gs").hide();
+        $(".rece-divida-rs").hide();
+      } else if ($(event.relatedTarget).data('pg-moeda') == '1') {
+        $(".rece-divida-us").hide();
+        $(".rece-divida-gs").show();
+        $(".rece-divida-rs").hide();
+      } else if ($(event.relatedTarget).data('pg-moeda') == '2') {
+        $(".rece-divida-us").hide();
+        $(".rece-divida-gs").hide();
+        $(".rece-divida-rs").show();
+      };
+
+  })
+
+
+</script>

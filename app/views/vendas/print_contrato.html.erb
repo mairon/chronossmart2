@@ -1,0 +1,96 @@
+<br>
+<p align="right" style="float:right;margin-top: 0px"><%= image_tag(current_unidade.avatar.url, :height => 40) %>	</p>
+<br>
+<br>
+<%=raw @venda.dados_contrato %>
+<br>
+<br>
+<br>
+	<% if @venda.persona.tipo.to_i  == 0 %>
+	<table style="font-family: arial;font-size: 10px;">
+		<tr>
+			<td width="600">Firma:____________________________________________________________</td>
+			<% unless @venda.persona.persona_contatos.blank? %>
+				<td>Firma:____________________________________________________________</td> 
+			<% end %>
+		</tr>
+
+		<tr>
+			<td>Deudor: <%= @venda.persona.nome %></td>
+			<% unless @venda.persona.persona_contatos.blank? %>
+				<td>Co-Deudor: <%= @venda.persona.persona_contatos.last.nome %></td>
+			<% end %>
+		</tr>
+		<tr>
+		<td>RUC/CI: <%= @venda.persona.ruc %> </td>
+			<% unless @venda.persona.persona_contatos.blank? %>
+				<td>RUC/CI: <%= @venda.persona.persona_contatos.last.ramal_01 %> </td>
+			<% end %>
+		</tr> 
+		<tr>
+			<td height="20"></td>
+		</tr>
+	</table>
+	<table style="font-family: arial; font-size: 10px;">
+		<tr>
+			<td width="600">Firma:____________________________________________________________</td> 
+			<td>Firma:____________________________________________________________</td> 
+		</tr>
+
+		<tr>
+			<td>Co-Deudor: <%= @venda.plano_venda.solicitude_creditos.last.garantia_01_nome %></td>
+			<td>Co-Deudor: <%= @venda.plano_venda.solicitude_creditos.last.garantia_02_nome %></td>
+		</tr>
+		<tr>
+			<td>RUC/CI: <%= @venda.plano_venda.solicitude_creditos.last.garantia_01_documento %> </td>
+			<td>RUC/CI: <%= @venda.plano_venda.solicitude_creditos.last.garantia_02_documento %> </td>
+		</tr> 
+		<tr>
+			<td><br></td>
+		</tr>
+		<tr>
+			<td>Firma:____________________________________________________________</td> 
+		</tr>
+		<tr>
+			<td>Vendedor</td>	
+		</tr>
+		<tr>
+			<td height="20"></td>
+		</tr>
+	</table>	
+	<% else %>
+		<table style="font-family: arial; font-size: 10px;">
+			<tr>
+				<td width="600">Firma:____________________________________________________________</td> 
+				<td>Firma:____________________________________________________________</td> 
+			</tr>
+
+			<tr>
+				<td>Deudor: <%= @venda.persona.nome_fatura %></td>
+				<td>Co-Deudor: <%= @venda.plano_venda.solicitude_creditos.last.garantia_02_nome %></td>
+			</tr>
+			<tr>
+				<td>RUC/CI: <%= @venda.persona.ruc %> </td>
+				<td>RUC/CI: <%= @venda.plano_venda.solicitude_creditos.last.garantia_02_documento %> </td>
+			</tr> 		
+		</table>
+		<br>
+		<table style="font-family: arial; font-size: 10px;">
+		<tr>
+			<td width="600">Firma:____________________________________________________________</td> 
+			<td>Firma:____________________________________________________________</td> 
+		</tr>
+
+		<tr>
+			<td>Co-Deudor: <%= @venda.plano_venda.solicitude_creditos.last.garantia_01_nome %></td>			
+			<td>Vendedor</td>			
+		</tr>
+		<tr>
+			<td>RUC/CI: <%= @venda.plano_venda.solicitude_creditos.last.garantia_01_documento %> </td>
+		</tr> 
+		<tr>
+			<td height="20"></td>
+		</tr>
+	</table>
+	<% end %>
+</body>
