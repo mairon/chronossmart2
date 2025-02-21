@@ -2,9 +2,11 @@ source 'http://rubygems.org'
 
 gem 'googlecharts'
 
+gem 'dotenv-rails'
+
 gem 'rails', '3.2.22.5'
 gem 'pg', '~> 0.18'
-gem 'auditor', :path => './vendor/gems/auditor-master'
+gem 'auditor'
 gem "simple_calendar"
 #gem 'thin'
 gem 'unicorn'
@@ -52,6 +54,8 @@ gem 'bigdecimal', '1.3.5'
 #gem 'aws-sdk-s3'
 #gem 'activerecord-oracle_enhanced-adapter', '~> 1.4.0'
 #gem 'ruby-oci8', '2.2.9'
+
+gem 'test-unit', '~> 3.0'
 group :development do
 	gem "rails3-generators"
 	#gem "debugger"
