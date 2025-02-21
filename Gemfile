@@ -56,10 +56,23 @@ gem 'bigdecimal', '1.3.5'
 #gem 'ruby-oci8', '2.2.9'
 
 gem 'test-unit', '~> 3.0'
+
+
+gem 'rubocop', require: false
+gem "rubycritic", require: false
+
+
+
+gem 'simplecov', require: false, group: :test
+
 group :development do
 	gem "rails3-generators"
 	#gem "debugger"
 	#gem 'brakeman', :require => false
+
+
+  gem 'bundler-audit'
+  gem 'brakeman', require: false
 end
 # Gems used only for assets and not required
 # in production environments by default.
@@ -73,4 +86,8 @@ group :assets do
 	gem 'jquery-rails'
 	gem 'jquery-ui-rails'
 	gem 'jquery-ui-themes'
+end
+
+group :development, :test do
+  gem 'rspec-rails', '~> 3.9.1'
 end

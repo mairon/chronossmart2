@@ -1,6 +1,7 @@
 *.rbc
 capybara-*.html
 .rspec
+.pg_data/
 /log
 /app-bc
 /tmp
@@ -28,6 +29,10 @@ config/initializers/secret_token.rb
 /vendor
 /test
 
+
+rubocop_report.html
+gems_outdated.html
+report.html
 
 # these should all be checked in to normalize the environment:
 # Gemfile.lock, .ruby-version, .ruby-gemset
