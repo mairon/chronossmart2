@@ -9,16 +9,14 @@ class WhatsappService
     @filepath = Rails.root.join(filepath)
   end
 
-  # WhatsappService
-  #   .new(
-  #     cellphone: '5511991938027',
-  #     filepath: 'spec/fixtures/test-documentation.pdf')
-  #   .send_pdf
+   #WhatsappService.new(cellphone: '5511991938027', filepath: 'spec/fixtures/test-documentation.pdf').send_pdf
 
   def send_pdf
     response = RestClient.post(media_url, params.to_json, headers)
 
-    raise StandardError, response.body unless response.code == 200
+    result = JSON.parse(response.body)
+
+    raise StandardError, result['message'] unless (result['error'] == false && response.code == 200)
   end
 
   private

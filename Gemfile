@@ -86,5 +86,6 @@ group :assets do
 end
 
 group :development, :test do
+  gem 'pry-rails'
   gem 'rspec-rails', '~> 3.9.1'
 end
