@@ -57,12 +57,9 @@ gem 'bigdecimal', '1.3.5'
 
 gem 'test-unit', '~> 3.0'
 
-
+gem 'rest-client'
 gem 'rubocop', require: false
 gem "rubycritic", require: false
-
-
-
 gem 'simplecov', require: false, group: :test
 
 group :development do
