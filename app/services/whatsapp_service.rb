@@ -4,6 +4,7 @@
 class WhatsappService
   attr_reader :cellphone, :filepath
 
+  # The initializer should contain cellphone, title and content
   def initialize(cellphone:, filepath:)
     @cellphone = cellphone
     @filepath = Rails.root.join(filepath)
@@ -28,10 +29,10 @@ class WhatsappService
   def params
     { "messageData":
       { "to": "#{cellphone}@s.whatsapp.net",
-	      "base64": "data:application/pdf;base64,#{converted_file}",
-        "fileName": filename,
+	      "base64": "data:application/pdf;base64,#{converted_file}", #content
+        "fileName": filename, #title
         "type": "document",
-        "caption": filename,
+        "caption": filename, #title
         "gifPlayback": false,
         "mimeType": "application/pdf" } }
   end
