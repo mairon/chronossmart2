@@ -1,5 +1,5 @@
-﻿Zetta::Application.routes.draw do  
-  
+﻿Zetta::Application.routes.draw do
+
   resources :modelo_contratos
 
 
@@ -7,7 +7,7 @@
 
 
   resources :painel_preparos do
-  	collection do 
+  	collection do
   		get 'status_preparo'
   		get 'preparo_pendentes'
   	end
@@ -20,15 +20,15 @@
   resources :plano_venda_docs
 
 
-  resources :transf_produtos do 
+  resources :transf_produtos do
   	collection do
   		get 'busca'
   	end
 
   end
 
-  resources :solicitude_creditos do 
-  	member do 
+  resources :solicitude_creditos do
+  	member do
   		get 'comprovante'
   	end
   	collection do
@@ -53,9 +53,9 @@
 				post 'draggable'
 				post 'update_status'
 				get 'update_task'
-			end  		
+			end
   	end
-	  resources :pipelines do 
+	  resources :pipelines do
 	  	member do
 	  		get 'configs'
 	  	end
@@ -72,12 +72,12 @@
   resources :plano_venda_conds
 
 
-  resources :plano_vendas do 
+  resources :plano_vendas do
   	collection do
   		post 'update_individual'
-  		
+
   	end
-  	member do 
+  	member do
   		get 'comprovante'
   	end
   end
@@ -86,7 +86,7 @@
   resources :devices
 
 
-  resources :transacoes do 
+  resources :transacoes do
   	collection do
   		get 'busca'
   	end
@@ -97,7 +97,7 @@
   resources :conta_cheques
 
 
-  resources :venda_compras do 
+  resources :venda_compras do
   	collection do
   		get 'lista_gastos'
   		post 'baixa_gasto'
@@ -105,7 +105,7 @@
   end
 
 
-  resources :venda_devolucaos do 
+  resources :venda_devolucaos do
   	collection do
   		get 'busca_vendas'
   	end
@@ -113,7 +113,7 @@
   end
 
 
-  resources :venda_romaneios do 
+  resources :venda_romaneios do
   	collection do
   		get 'lista_romaneios'
   		post 'baixa_romaneio'
@@ -140,7 +140,7 @@
   resources :presupuesto_cotas
 
   resources :viaticos do
-  	collection do 
+  	collection do
   		get 'busca_viatico'
   	end
 
@@ -165,12 +165,12 @@
   resources :mov_vantagens
 
 
-  resources :evento_convidados do 
+  resources :evento_convidados do
 		member do
 			get 'qrcode'
-			get 'confirm'			
+			get 'confirm'
 		end
-		collection do 
+		collection do
 			get 'controle_tickets'
 			get 'ticket_detalhe'
 		end
@@ -203,9 +203,9 @@
 
   resources :persona_ferias do
 		collection do
-			get 'add_escala'			
+			get 'add_escala'
 		end
-		member do 
+		member do
 			get 'comprovante'
 			get 'retorno_empleado'
 		end
@@ -525,7 +525,7 @@
 	resources :boca_cxes
 
 
-	resources :promos do 
+	resources :promos do
 		collection do
 			get 'gera_cashback_produtos'
 		end
@@ -791,7 +791,7 @@
 	resources :material_analisados
 
 	resources :tabela_precos do
-		collection do 
+		collection do
 			get 'gera_tabela_produtos'
 		end
 	end
@@ -1348,7 +1348,7 @@ resources :analizes_financas
 		collection do
 			get :gerar_perfil
       get :historico_acesso
-      get :resultado_historico_acesso			
+      get :resultado_historico_acesso
 		end
 	end
 	resources :unidades
@@ -1426,7 +1426,7 @@ resources :analizes_financas
 			get 'decla_jurada'
 			get 'print_funcionario'
 			get 'historico_vendas'
-			get 'busca_historico_vendas'			
+			get 'busca_historico_vendas'
 		end
 	end
 	resources :produtos do
@@ -1761,7 +1761,7 @@ resources :pagares_detalhe
 			get 'gerador_produtos'
 			get 'comprovante_entrega'
 			get 'valida_processo'
-			get 'visualizacao'			
+			get 'visualizacao'
 			post 'add_produto_sugeridos'
 			get 'devolucaos'
 			get 'certificado_venda'
@@ -1775,7 +1775,7 @@ resources :pagares_detalhe
 	resources :vendas_produtos do
 		collection do
 			get 'busca_nota_credito_produto'
-			get 'modal_update'			
+			get 'modal_update'
 		end
 		member do
 			get 'formula'
@@ -1802,11 +1802,11 @@ resources :pagares_detalhe
 	resources :recepcao_nota_remicaos
 	resources :nota_remicao_produtos
 
-	resources :nota_remicaos do 
+	resources :nota_remicaos do
 		member do
 			get 'comprovante'
 			get 'detalhes_produtos_print'
-		end		
+		end
 	end
 
 	resources :nota_creditos_detalhes
@@ -1913,7 +1913,7 @@ resources :pagares_detalhe
 		collection do
 			get 'gerar_sueldos'
 			get 'result_gerar_sueldos'
-			get 'busca'			
+			get 'busca'
 		end
 		member do
 			get 'form_sueldos_detalhes'
@@ -2227,4 +2227,7 @@ end
 resources :rubros
 resources :plano_de_contas
 
+  get '/whatsapp/status' => 'whatsapps#status'
+  get '/whatsapp/qrcode' => 'whatsapps#create_qr_code'
+  get '/whatsapp/logout' => 'whatsapps#logout'
 end
