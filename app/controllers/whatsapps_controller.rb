@@ -3,7 +3,7 @@
 # class responsible for the whatsapps controller
 class WhatsappsController < ApplicationController
   def status
-    result = Whatsapp::Status.new(token: params[:token], instance: params[:instance]).connected?
+    result = Whatsapp::Status.new(token: params['token'], instance: params['instance']).connected?
 
     render json: result, status: :ok
   rescue StandardError => error
@@ -13,7 +13,7 @@ class WhatsappsController < ApplicationController
   end
 
   def create_qrcode
-    result = Whatsapp::Qrcode.new(token: params[:token], instance: params[:instance]).create
+    result = Whatsapp::Qrcode.new(token: params['token'], instance: params['instance']).create
 
     render json: result, status: :ok
   rescue StandardError => error
@@ -23,7 +23,7 @@ class WhatsappsController < ApplicationController
   end
 
   def logout
-    result = Whatsapp::Connection.new(token: params[:token], instance: params[:instance]).disconnect
+    result = Whatsapp::Connection.new(token: params['token'], instance: params['instance']).disconnect
 
     render json: result, status: :ok
   rescue StandardError => error
