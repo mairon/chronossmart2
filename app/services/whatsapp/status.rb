@@ -15,9 +15,11 @@ module Whatsapp
 
       result = JSON.parse(response.body)
 
-      result['instance']['status'] == 'connected'
-    rescue StandardError, RestClient::Unauthorized
-      false
+      { message: result['instance']['status'] }
+    rescue StandardError, RestClient::Unauthorized => error
+      Rails.logger.error("#Message: #{error.message} - Backtrace: #{error.backtrace}")
+
+      { message:  'Error to check status' }
     end
 
     private

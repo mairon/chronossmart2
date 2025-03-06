@@ -32,11 +32,11 @@ module Whatsapp
 
       raise StandardError if result['error']
 
-      { message: result['message'] }
+      { error: false, message: result['message'] }
     rescue StandardError, RestClient::Forbidden, RestClient::Unauthorized => error
       Rails.logger.error("Message: #{error.message} - Backtrace: #{error.backtrace}")
 
-      { message: 'Error logging out instance' }
+      { error: true, message: 'Error logging out instance' }
     end
 
     private

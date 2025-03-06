@@ -14,7 +14,9 @@ RSpec.describe Whatsapp::Status do
 
       result = described_class.new(token: token, instance: instance).connected?
 
-      expect(result).to eq(true)
+      expected_result = { message: 'connected' }
+
+      expect(result).to eq(expected_result)
     end
 
     it 'returns \'false\' when instance isn\'t connected' do
@@ -29,7 +31,9 @@ RSpec.describe Whatsapp::Status do
 
       result = described_class.new(token: token, instance: instance).connected?
 
-      expect(result).to eq(false)
+      expected_result = { message: 'disconnected' }
+
+      expect(result).to eq(expected_result)
     end
 
     it 'returns \'false\' when occurs errors' do
@@ -40,7 +44,9 @@ RSpec.describe Whatsapp::Status do
 
       result = described_class.new(token: token, instance: instance).connected?
 
-      expect(result).to eq(false)
+      expected_result = { message: 'Error to check status' }
+
+      expect(result).to eq(expected_result)
     end
   end
 end

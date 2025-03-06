@@ -2228,6 +2228,6 @@ resources :rubros
 resources :plano_de_contas
 
   get '/whatsapp/status' => 'whatsapps#status'
-  get '/whatsapp/qrcode' => 'whatsapps#create_qr_code'
+  get '/whatsapp/qrcode' => 'whatsapps#create_qrcode'
   get '/whatsapp/logout' => 'whatsapps#logout'
 end

@@ -13,13 +13,13 @@ class WhatsappsController < ApplicationController
   end
 
   def create_qrcode
-    result = WhatsappQrcode.new(token: params[:token], instance: params[:instance]).create
+    result = Whatsapp::Qrcode.new(token: params[:token], instance: params[:instance]).create
 
     render json: result, status: :ok
   rescue StandardError => error
     Rails.logger.error("Message: #{error.message} - Backtrace: #{error.backtrace}")
 
-    render json: result, status: :internal_server_error
+    render json: {}, status: :internal_server_error
   end
 
   def logout
@@ -29,6 +29,6 @@ class WhatsappsController < ApplicationController
   rescue StandardError => error
     Rails.logger.error("Message: #{error.message} - Backtrace: #{error.backtrace}")
 
-    render json: result, status: :internal_server_error
+    render json: {}, status: :internal_server_error
   end
 end

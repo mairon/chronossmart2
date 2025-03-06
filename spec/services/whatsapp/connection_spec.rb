@@ -93,7 +93,7 @@ RSpec.describe Whatsapp::Connection do
 
       result = described_class.new(token: token, instance: instance).disconnect
 
-      expected_result = { message: message }
+      expected_result = { error: false, message: message }
 
       expect(result).to eq(expected_result)
     end
@@ -109,7 +109,7 @@ RSpec.describe Whatsapp::Connection do
 
       result = described_class.new(token: token, instance: instance).disconnect
 
-      expected_result = { message: 'Error logging out instance' }
+      expected_result = { error: true, message: 'Error logging out instance' }
 
       expect(result).to eq(expected_result)
     end
@@ -125,7 +125,7 @@ RSpec.describe Whatsapp::Connection do
 
       result = described_class.new(token: token, instance: instance).disconnect
 
-      expected_result = { message: 'Error logging out instance' }
+      expected_result = { error: true, message: 'Error logging out instance' }
 
       expect(result).to eq(expected_result)
     end
@@ -142,7 +142,7 @@ RSpec.describe Whatsapp::Connection do
 
       result = described_class.new(token: token, instance: instance).disconnect
 
-      expected_result = { message: 'Error logging out instance' }
+      expected_result = { error: true, message: 'Error logging out instance' }
 
       expect(result).to eq(expected_result)
     end
