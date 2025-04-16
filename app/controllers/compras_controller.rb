@@ -1,6 +1,115 @@
 class ComprasController < ApplicationController
 	before_filter :authenticate
 
+	def add_produtos_cadastro
+		@compra = Compra.find(params[:id])
+		prods = Produto.where(doc: @compra.documento_numero )
+		prods.each do |pp|
+			ComprasProduto.create(  compra_id:                 @compra.id,
+															data:                      @compra.data,
+															moeda:                     @compra.moeda,
+															tipo_compra:               0,
+															deposito_id:               1,
+															produto_id:                pp.id,
+															produto_nome:              pp.nome,
+															persona_id:                @compra.persona_id,
+															persona_nome:              @compra.persona_nome,
+															quantidade:                1,
+															custo_guarani:             pp.custo_base_gs.to_f,
+															promedio_guarani:          pp.custo_base_gs.to_f,
+															unitario_guarani:          pp.custo_base_gs.to_f,
+															total_guarani:             pp.custo_base_gs.to_f,
+													)
+			end
+
+			redirect_to("/compras/" << params[:id].to_s)
+	end
+
+	def add_prod_import
+		@compra = Compra.find(params[:compra_id])
+		compra_import = FaturaImportProduto.where(fatura_import_id: params[:busca]["impor"])
+		compra_import.each do |pp|
+
+			pd = Produto.where("fabricante_cod = '#{pp.dcodint}' and nome = '#{pp.ddesproser} TM #{pp.tamanho}'").last
+			ComprasProduto.create(  compra_id:                 @compra.id,
+															data:                      @compra.data,
+															moeda:                     @compra.moeda,
+															tipo_compra:               0,
+															deposito_id:               1,
+															produto_id:                pd.id,
+															produto_nome:              pd.nome,
+															persona_id:                @compra.persona_id,
+															persona_nome:              @compra.persona_nome,
+															quantidade:                pp.dcantproser.to_f,
+															custo_guarani:             pp.dtotopeitem.to_f,
+															promedio_guarani:          pp.dtotopeitem.to_f,
+															unitario_guarani:          pp.dtotopeitem.to_f,
+															total_guarani:             pp.dtotopeitem.to_f * pp.dcantproser.to_f,
+													)
+			end
+
+			redirect_to("/compras/" << params[:compra_id].to_s)
+	end
+
+	def lista_viaticos
+
+        sql = "SELECT C.ID,
+                      C.PERSONA_ID,
+                      C.PERSONA_NOME,
+                      C.VENDEDOR_ID,
+                      C.VENDEDOR_NOME,
+                      C.COD_PROC,
+                      C.SIGLA_PROC,
+                      C.LIQUIDACAO,
+                      C.MOEDA,
+                      C.TIPO,
+                      C.DATA,
+                      C.VENCIMENTO,
+                      C.VENDA_ID,
+                      P.NOME AS ALUNO_NOME,
+                      C.DOCUMENTO_NUMERO,
+                      C.COTA,
+                      C.ORIGINAL,
+                      C.DIVIDA_DOLAR,
+                      C.DIVIDA_GUARANI,
+                      C.DIVIDA_REAL,
+                      C.COBRO_DOLAR,
+                      C.COBRO_GUARANI,
+                      C.COBRO_REAL,
+                      C.DESCRICAO,
+                      C.DOCUMENTO_NUMERO_01,
+                      C.documento_numero_02,
+                      U.UNIDADE_NOME,
+                      C.TOT_COTAS,
+                      CC.NOME AS CC_NOME,
+                      C.CENTRO_CUSTO_ID,
+                      V.COTACAO AS COTACAO_VENDA,
+                      ARRAY(SELECT (VP.PRODUTO_NOME) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = C.VENDA_ID) AS array_venda_produtos,
+                      (SELECT SUM(AT.COBRO_DOLAR) FROM CLIENTES AT WHERE AT.UNIDADE_ID = #{current_unidade.id} AND AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_US,
+                      (SELECT SUM(AT.COBRO_GUARANI) FROM CLIENTES AT WHERE AT.UNIDADE_ID = #{current_unidade.id} AND AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_GS,
+                      (SELECT SUM(AT.COBRO_REAL) FROM CLIENTES AT WHERE AT.UNIDADE_ID = #{current_unidade.id} AND AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_RS
+            FROM CLIENTES C
+
+            LEFT JOIN VENDAS V
+            ON C.VENDA_ID = V.ID
+
+            LEFT JOIN UNIDADES U
+            ON C.UNIDADE_ID = U.ID
+
+            INNER JOIN PERSONAS P
+            ON P.ID = C.PERSONA_ID
+
+            LEFT JOIN CENTRO_CUSTOS CC
+            ON C.CENTRO_CUSTO_ID = CC.ID
+
+            WHERE C.UNIDADE_ID = #{current_unidade.id} AND C.PERSONA_ID = #{params[:persona_id]} AND C.LIQUIDACAO = 0 AND (C.DIVIDA_GUARANI + C.DIVIDA_DOLAR + C.DIVIDA_REAL ) > 0
+            ORDER BY 12,16
+                      "
+
+		@viaticos = Cliente.find_by_sql(sql)
+		render layout: false
+	end
+
 	def valida_processo
 
 		@compra = Compra.find(params[:id])
@@ -123,10 +232,18 @@ class ComprasController < ApplicationController
 		@compra = Compra.find(params[:id])
 		@prov_produtos  = ComprasFinanca.where(compra_id: @compra.id).order('cota')
 		@fts = FormFiscal.where("sigla_proc = 'CP' AND cod_proc = #{@compra.id} AND STATUS != 0").select("cdc, tipo_emissao, ruc, persona_nome, id,impressao, cod_proc, tot_gs, doc_01, doc_02, doc, status, autorizacao").order('id desc ')
-		@sum_dolar   = ( ( @compra.total_dolar.to_f - @compra.retencao_us.to_f) - @compra.desconto_dolar.to_f) - ComprasFinanca.sum(:valor_dolar, :conditions => ['compra_id = ?',params[:id]] ).to_f
-		@sum_guarani = ( ( @compra.total_guarani.to_f - @compra.retencao_gs.to_f) - @compra.desconto_guarani.to_f) - ComprasFinanca.sum(:valor_guarani, :conditions => ['compra_id = ?',params[:id]] )
-		@sum_real    = ( ( @compra.total_real.to_f) - @compra.desconto_real.to_f) - ComprasFinanca.sum(:valor_real, :conditions => ['compra_id = ?',params[:id]] ).to_f
-		@sum_euro    = (@compra.total_euro.to_f) - ComprasFinanca.sum(:valor_euro, :conditions => ['compra_id = ?',params[:id]] ).to_f
+		if @compra.tipo_rateio == 0
+			@sum_dolar   = ( ( @compra.total_dolar.to_f - @compra.retencao_us.to_f) - @compra.desconto_dolar.to_f) - ComprasFinanca.sum(:valor_dolar, :conditions => ['compra_id = ?',params[:id]] ).to_f
+			@sum_guarani = ( ( @compra.total_guarani.to_f - @compra.retencao_gs.to_f) - @compra.desconto_guarani.to_f) - ComprasFinanca.sum(:valor_guarani, :conditions => ['compra_id = ?',params[:id]] )
+			@sum_real    = ( ( @compra.total_real.to_f) - @compra.desconto_real.to_f) - ComprasFinanca.sum(:valor_real, :conditions => ['compra_id = ?',params[:id]] ).to_f
+			@sum_euro    = (@compra.total_euro.to_f) - ComprasFinanca.sum(:valor_euro, :conditions => ['compra_id = ?',params[:id]] ).to_f
+		else
+			@sum_dolar   = ( (( @compra.total_dolar.to_f - @compra.retencao_us.to_f) + @compra.frete_dolar.to_f + @compra.outros_dolar.to_f) - @compra.desconto_dolar.to_f) - ComprasFinanca.sum(:valor_dolar, :conditions => ['compra_id = ?',params[:id]] ).to_f
+			@sum_guarani = ( (( @compra.total_guarani.to_f - @compra.retencao_gs.to_f) + @compra.frete_guarani.to_f + @compra.outros_guarani.to_f) - @compra.desconto_guarani.to_f) - ComprasFinanca.sum(:valor_guarani, :conditions => ['compra_id = ?',params[:id]] )
+			@sum_real    = ( (( @compra.total_real.to_f) - @compra.desconto_real.to_f) + @compra.frete_real.to_f + @compra.outros_real.to_f ) - ComprasFinanca.sum(:valor_real, :conditions => ['compra_id = ?',params[:id]] ).to_f
+			@sum_euro    = (@compra.total_euro.to_f) - ComprasFinanca.sum(:valor_euro, :conditions => ['compra_id = ?',params[:id]] ).to_f
+		end
+
 		if session[:modal] == 'true'
 			render layout: 'modal'
 		end
@@ -292,7 +409,7 @@ class ComprasController < ApplicationController
 							:footer => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
 													:font_size  => 7,
 													:right      => "Pagina [page] de [toPage]",
-													:left       => "MercoSys Zetta - #{t('DATE')} de la imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
+													:left       => "Chronos Software - #{t('DATE')} de la imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
 		end
 		end
 	end
@@ -449,6 +566,8 @@ class ComprasController < ApplicationController
 										C.SEGURO_REAL,
 										C.DESPACHO_REAL,
 										C.OUTROS_REAL,
+										C.PROMEDIO_GUARANI,
+										C.PROMEDIO_DOLAR,
 										(SELECT P.PRECO_1_GS FROM PRODUTOS_TABELA_PRECOS P WHERE P.PRODUTO_ID = C.PRODUTO_ID AND  P.UNIDADE_ID = #{current_unidade.id} ORDER BY P.ID LIMIT 1) AS PRECO_VENDA_GS,
 										(SELECT P.PRECO_1_US FROM PRODUTOS_TABELA_PRECOS P WHERE P.PRODUTO_ID = C.PRODUTO_ID AND  P.UNIDADE_ID = #{current_unidade.id} ORDER BY P.ID LIMIT 1) AS PRECO_VENDA_US,
 										(SELECT P.PRECO_1_RS FROM PRODUTOS_TABELA_PRECOS P WHERE P.PRODUTO_ID = C.PRODUTO_ID AND  P.UNIDADE_ID = #{current_unidade.id} ORDER BY P.ID LIMIT 1) AS PRECO_VENDA_RS
@@ -458,12 +577,6 @@ class ComprasController < ApplicationController
 					ON P.ID = C.PRODUTO_ID
 					WHERE C.COMPRA_ID = #{@compra.id}
 					ORDER BY C.ID DESC"
-
-		if @compra.tipo_compra == 2
-			@frete_us    = ComprasDocumento.sum(:total_dolar, conditions: ["tipo_documento = 'FLETES' and compra_id = ?", @compra.id] )
-			@despacho_us = ComprasDocumento.sum(:total_dolar, conditions: ["tipo_documento = 'DESPACHO' and compra_id = ?", @compra.id] )
-			@seguro_us   = ComprasDocumento.sum(:total_dolar, conditions: ["tipo_documento = 'SEGUROS' and compra_id = ?", @compra.id] )
-		end
 
 
 		@compras_produto = ComprasProduto.find_by_sql(sql)
@@ -481,6 +594,8 @@ class ComprasController < ApplicationController
 			@pedidos_pendentes = PedidoCompra.find_by_sql(sql)
 			@pedidos_faturas   = ComprasPedido.where("compra_id = #{@compra.id}")
 		end
+
+		render layout: 'chart'
 	end
 
 	def new
@@ -506,7 +621,7 @@ class ComprasController < ApplicationController
 
 		respond_to do |format|
 			if @compra.save
-				Compra.modal_gasto(@compra) if params[:modelo_form] == "modalv2"
+
 				#compra produto e bens
 				if @compra.tipo_compra == 0 || @compra.tipo_compra == 3
 						format.html { redirect_to(@compra) }
@@ -515,6 +630,7 @@ class ComprasController < ApplicationController
 				else
 					#gasto
 					if Empresa.last.gasto_detalhado == false
+						Compra.modal_gasto(@compra) if params[:modelo_form] == "modalv2"
 						format.html { redirect_to(index_gasto_compras_url) }
 					else
 						format.html { redirect_to "/compras/#{@compra.id}/compras_custos" }

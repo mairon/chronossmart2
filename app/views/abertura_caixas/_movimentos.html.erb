@@ -1,0 +1,323 @@
+<div class="panel">
+	<h1 id="header">
+		Abertuta y Cierre de Caja #<%= @abertura_caixa.id.to_s.rjust(6,'0') %>
+		<div class="pull-right">
+			<%= form_for(@abertura_caixa) do |f| %>
+				<% if @abertura_caixa.status == true %>
+					<%= f.hidden_field :status, value: false %>
+					<%= f.submit :value => 'Cerrar Caja', :class => "btn btn-danger", :disable_with => "Aguarde..." %>
+					<%= link_to 'Imprimir', '#', onclick: "window.print(.5)", :class => "btn btn-blue btn-print" %>
+					<%= link_to 'Salir', abertura_caixas_url, class: 'btn btn-blue' %>
+				<% else %>
+					<%= f.hidden_field :status, value: true %>
+					<%= f.submit :value => 'Re-Abrir Caja', :class => "btn btn-success", :disable_with => "Aguarde..." %>
+					<%= link_to 'Imprimir', '#', onclick: "window.print(.5)", :class => "btn btn-blue btn-print" %>
+					<%= link_to 'Salir', abertura_caixas_url, class: 'btn btn-blue' %>
+				<% end %>
+			<% end %>
+
+		</div>
+	</h1>
+	<div class="panel-content">
+		<% if @abertura_caixa.status == true %>
+			<h2 align="center"><span class="btn btn-success">Abierto</span></h2>
+		<% else %>
+			<h2 align="center"><span class="btn btn-danger">Cerrado</span></h2>
+		<% end %>
+		<!-- Saldos Anterior Efetivos !-->
+
+		<% sql_saldo_anterior_gs = "SELECT
+		  SUM(COALESCE(F.ENTRADA_GUARANI,0) - COALESCE(F.SAIDA_GUARANI,0)) AS ANTERIOR_GS FROM FINANCAS F
+		  INNER JOIN CONTAS C
+		  ON C.ID = F.CONTA_ID
+		  LEFT JOIN CONTAS_FORMA_PAGOS CFP
+		  ON C.ID = CFP.CONTA_ID
+		  WHERE CFP.FORMA_PAGO_ID = 1 AND F.CONTROLE_CAIXA = #{@abertura_caixa.id} AND F.MOEDA = 1"
+		  saldo_anterior_gs = Financa.find_by_sql(sql_saldo_anterior_gs)
+		%>
+
+		<% sql_saldo_anterior_us = "SELECT
+		  SUM(COALESCE(F.ENTRADA_DOLAR,0) - COALESCE(F.SAIDA_DOLAR,0)) AS ANTERIOR_US FROM FINANCAS F
+		  INNER JOIN CONTAS C
+		  ON C.ID = F.CONTA_ID
+		  LEFT JOIN CONTAS_FORMA_PAGOS CFP
+		  ON C.ID = CFP.CONTA_ID
+		  WHERE CFP.FORMA_PAGO_ID = 1 AND F.CONTROLE_CAIXA = #{@abertura_caixa.id}  AND F.MOEDA = 0"
+		  saldo_anterior_us = Financa.find_by_sql(sql_saldo_anterior_us)
+		%>
+
+		<% sql_saldo_anterior_rs = "SELECT
+		  SUM(COALESCE(F.ENTRADA_REAL,0) - COALESCE(F.SAIDA_REAL,0)) AS ANTERIOR_RS FROM FINANCAS F
+		  INNER JOIN CONTAS C
+		  ON C.ID = F.CONTA_ID
+		  LEFT JOIN CONTAS_FORMA_PAGOS CFP
+		  ON C.ID = CFP.CONTA_ID
+		  WHERE CFP.FORMA_PAGO_ID = 1 AND F.CONTROLE_CAIXA = #{@abertura_caixa.id}  AND F.MOEDA = 2"
+		  saldo_anterior_rs = Financa.find_by_sql(sql_saldo_anterior_rs)
+		%>
+
+		<!-- Saldos Efetivos !-->
+		<% sql_saldo_dia_gs = "SELECT
+		  SUM(COALESCE(F.ENTRADA_GUARANI,0) - COALESCE(F.SAIDA_GUARANI,0)) AS MOV_DIA_GS FROM FINANCAS F
+		  INNER JOIN CONTAS C
+		  ON C.ID = F.CONTA_ID
+		  LEFT JOIN CONTAS_FORMA_PAGOS CFP
+		  ON C.ID = CFP.CONTA_ID
+		  WHERE CFP.FORMA_PAGO_ID = 1 AND F.CONTROLE_CAIXA = #{@abertura_caixa.id} AND F.MOEDA = 1"
+		  saldo_dia_gs = Financa.find_by_sql(sql_saldo_dia_gs)
+		%>
+
+		<% sql_saldo_dia_us = "SELECT
+		  SUM(COALESCE(F.ENTRADA_DOLAR,0) - COALESCE(F.SAIDA_DOLAR,0)) AS MOV_DIA_US FROM FINANCAS F
+		  INNER JOIN CONTAS C
+		  ON C.ID = F.CONTA_ID
+		  LEFT JOIN CONTAS_FORMA_PAGOS CFP
+		  ON C.ID = CFP.CONTA_ID
+		  WHERE CFP.FORMA_PAGO_ID = 1 AND F.CONTROLE_CAIXA = #{@abertura_caixa.id}  AND F.MOEDA = 0"
+		  saldo_dia_us = Financa.find_by_sql(sql_saldo_dia_us)
+		%>
+
+		<% sql_saldo_dia_rs = "SELECT
+		  SUM(COALESCE(F.ENTRADA_REAL,0) - COALESCE(F.SAIDA_REAL,0)) AS MOV_DIA_RS FROM FINANCAS F
+		  INNER JOIN CONTAS C
+		  ON C.ID = F.CONTA_ID
+		  LEFT JOIN CONTAS_FORMA_PAGOS CFP
+		  ON C.ID = CFP.CONTA_ID
+		  WHERE CFP.FORMA_PAGO_ID = 1 AND F.CONTROLE_CAIXA = #{@abertura_caixa.id}  AND F.MOEDA = 2"
+		  saldo_dia_rs = Financa.find_by_sql(sql_saldo_dia_rs)
+		%>
+		<table>
+		<tr>
+		  <td colspan="10">
+		    <table class="border">
+		      <tr>
+		        <td width="200"><b class="bold">Efectivo</b></td>
+		        <td width="200" align="right"><b class="bold">Gs.</b></td>
+		        <td width="200" align="right"><b class="bold">U$</b></td>
+		        <td width="200" align="right"><b class="bold">R$</b></td>
+		      </tr>
+		      <tr>
+		        <td width="200">Saldo Anterior</td>
+		        <td align="right"><%= format_int(@abertura_caixa.saldo_gs) %></td>
+		        <td align="right"><%= format_decimal(@abertura_caixa.saldo_us) %></td>
+		        <td align="right"><%= format_decimal(@abertura_caixa.saldo_rs) %></td>
+		      </tr>
+		      <tr>
+		        <td width="200">Movimiento del Dia</td>
+		        <td align="right"><%= format_int(saldo_dia_gs[0].mov_dia_gs.to_f + @transf_saldo.where(moeda: 1).sum(:valor)) %></td>
+		        <td align="right"><%= format_decimal(saldo_dia_us[0].mov_dia_us.to_f + @transf_saldo.where(moeda: 0).sum(:valor)) %></td>
+		        <td align="right"><%= format_decimal(saldo_dia_rs[0].mov_dia_rs.to_f + @transf_saldo.where(moeda: 2).sum(:valor)) %></td>
+		      </tr>
+
+		      <tr>
+		        <td width="200" style="background-color: #bbbdbf;"><b class="bold">Saldo Efectivo Final</b></td>
+		        <td align="right" style="background-color: #bbbdbf;">
+		        	<b class="bold">
+		        		<%= format_int(@abertura_caixa.saldo_gs.to_f + saldo_dia_gs[0].mov_dia_gs.to_f + @transf_saldo.where(moeda: 1).sum(:valor)) %>
+		        	</b>
+		        </td>
+
+		        <td align="right" style="background-color: #bbbdbf;">
+		        	<b class="bold">
+		        		<%= format_decimal(@abertura_caixa.saldo_us.to_f + saldo_dia_us[0].mov_dia_us.to_f + @transf_saldo.where(moeda: 0).sum(:valor)) %>
+		        	</b>
+		        </td>
+
+		        <td align="right" style="background-color: #bbbdbf;">
+		        	<b class="bold">
+		        		<%= format_decimal(@abertura_caixa.saldo_rs.to_f + saldo_dia_rs[0].mov_dia_rs.to_f + @transf_saldo.where(moeda: 2).sum(:valor)) %>
+		        	</b>
+		        </td>
+		      </tr>
+		      <tr>
+		        <td width="200"><b>Transfs Saldos</b></td>
+		        <td align="right">-<%= format_int(@transf_saldo.where(moeda: 1).sum(:valor)) %></td>
+		        <td align="right">-<%= format_decimal(@transf_saldo.where(moeda: 0).sum(:valor)) %></td>
+		        <td align="right">-<%= format_decimal(@transf_saldo.where(moeda: 2).sum(:valor)) %></td>
+		      </tr>
+
+		      <tr>
+		        <td width="200" class="bold">Saldo del Dia</td>
+		        <td align="right" class="bold"><%= format_int(@abertura_caixa.saldo_gs.to_f + saldo_dia_gs[0].mov_dia_gs.to_f) %></td>
+		        <td align="right" class="bold"><%= format_decimal(@abertura_caixa.saldo_us.to_f + saldo_dia_us[0].mov_dia_us.to_f) %></td>
+		        <td align="right" class="bold"><%= format_decimal(@abertura_caixa.saldo_rs.to_f + saldo_dia_rs[0].mov_dia_rs.to_f) %></td>
+		      </tr>
+		    </table>
+		  </td>
+		</tr>
+
+		<!--Movimento em Gs!-->
+		<% sql_operacoes_gs =  "SELECT
+		                          F.SIGLA_PROC,
+		                          F.FORMA_PAGO_ID,
+		                          MAX(F.MOEDA) AS MOEDA,
+		                          MAX(FP.NOME) AS FORMA_PAGO_NOME,
+		                          COUNT(F.ID) AS COUNT_REG,
+		                          SUM(COALESCE(F.ENTRADA_GUARANI,0) - COALESCE(F.SAIDA_GUARANI,0)) SALDO_GS
+		                        FROM FINANCAS F
+
+		                        INNER JOIN CONTAS C
+		                        ON C.ID = F.CONTA_ID
+
+		                        INNER JOIN FORMA_PAGOS FP
+		                        ON FP.ID = F.FORMA_PAGO_ID
+
+		                        WHERE C.TERMINAL_ID = 1  AND F.MOEDA = 1 AND F.CONTROLE_CAIXA = #{@abertura_caixa.id}
+		                        GROUP BY 1,2"
+		operacoes_gs = Financa.find_by_sql(sql_operacoes_gs)
+		                      %>
+		<tr>
+		  <td colspan="10">
+		    <table class="border">
+		      <tr>
+		        <td colspan="3"><h2>Movimiento em Gs.</h2></td>
+		      </tr>
+		      <tr class="head">
+		        <td width="200">Origen</td>
+		        <td width="200">Qtd Mov</td>
+		        <td width="200">Forma Pago</td>
+		        <td width="200" align="right">Valor</td>
+		      </tr>
+		      <% operacoes_gs.each do |o_gs| %>
+		      <tr>
+		        <td><%= o_gs.sigla_proc %></td>
+		        <td><%= o_gs.count_reg %></td>
+		        <td><a href="#" data-toggle="modal" data-load-url="<%= modal_detalhe_abertura_caixas_path(abertura_caixa_id: @abertura_caixa.id, forma_pago_id: o_gs.forma_pago_id, moeda: o_gs.moeda) %>" data-target="#ModalMovimento"><%= o_gs.forma_pago_nome %></a></td>
+		        <td align="right"><%= format_int(o_gs.saldo_gs) %></td>
+		      </tr>
+		      <% end %>
+		    </table>
+		  </td>
+		</tr>
+
+		<!--Movimento em Us!-->
+		<% sql_operacoes_us =  "SELECT
+		                          F.SIGLA_PROC,
+		                          F.FORMA_PAGO_ID,
+		                          MAX(F.MOEDA) AS MOEDA,
+		                          MAX(FP.NOME) AS FORMA_PAGO_NOME,
+		                          COUNT(F.ID) AS COUNT_REG,
+		                          SUM(COALESCE(F.ENTRADA_DOLAR,0) - COALESCE(F.SAIDA_DOLAR,0)) SALDO_US
+		                        FROM FINANCAS F
+
+		                        INNER JOIN CONTAS C
+		                        ON C.ID = F.CONTA_ID
+
+		                        INNER JOIN FORMA_PAGOS FP
+		                        ON FP.ID = F.FORMA_PAGO_ID
+
+		                        WHERE C.TERMINAL_ID = 1  AND F.MOEDA = 0 AND F.CONTROLE_CAIXA = #{@abertura_caixa.id}
+		                        GROUP BY 1,2"
+		operacoes_us = Financa.find_by_sql(sql_operacoes_us)
+		                      %>
+		<tr>
+		  <td colspan="10">
+		    <table class="border">
+		      <tr>
+		        <td colspan="3"><h2>Movimiento em U$</h2></td>
+		      </tr>
+		      <tr class="head">
+		        <td width="200">Origen</td>
+		        <td width="200">Qtd Mov</td>
+		        <td width="200">Forma Pago</td>
+		        <td width="200" align="right">Valor</td>
+		      </tr>
+		      <% operacoes_us.each do |o_us| %>
+		      <tr>
+		        <td><%= o_us.sigla_proc %></td>
+		        <td><%= o_us.count_reg %></td>
+		        <td><a href="#" data-toggle="modal" data-load-url="<%= modal_detalhe_abertura_caixas_path(abertura_caixa_id: @abertura_caixa.id, forma_pago_id: o_us.forma_pago_id, moeda: o_us.moeda) %>" data-target="#ModalMovimento"><%= o_us.forma_pago_nome %></a></td>
+		        <td align="right"><%= format_decimal(o_us.saldo_us) %></td>
+		      </tr>
+		      <% end %>
+		    </table>
+		  </td>
+		</tr>
+
+		<!--Movimento em Rs!-->
+		<% sql_operacoes_rs =  "SELECT
+		                          F.SIGLA_PROC,
+		                          F.FORMA_PAGO_ID,
+		                          MAX(F.MOEDA) AS MOEDA,
+		                          MAX(FP.NOME) AS FORMA_PAGO_NOME,
+		                          COUNT(F.ID) AS COUNT_REG,
+		                          SUM(COALESCE(F.ENTRADA_REAL,0) - COALESCE(F.SAIDA_REAL,0)) SALDO_RS
+		                        FROM FINANCAS F
+
+		                        INNER JOIN CONTAS C
+		                        ON C.ID = F.CONTA_ID
+
+		                        INNER JOIN FORMA_PAGOS FP
+		                        ON FP.ID = F.FORMA_PAGO_ID
+
+		                        WHERE C.TERMINAL_ID = 1  AND F.MOEDA = 2 AND F.CONTROLE_CAIXA = #{@abertura_caixa.id}
+		                        GROUP BY 1,2"
+		operacoes_rs = Financa.find_by_sql(sql_operacoes_rs)
+		                      %>
+		<tr>
+		  <td colspan="10">
+		    <table class="border">
+		      <tr>
+		        <td colspan="3"><h2>Movimiento em R$</h2></td>
+		      </tr>
+		      <tr class="head">
+		        <td width="200">Origen</td>
+		        <td width="200">Qtd Mov</td>
+		        <td width="200">Forma Pago</td>
+		        <td width="200" align="right">Valor</td>
+		      </tr>
+		      <% operacoes_rs.each do |o_rs| %>
+		      <tr>
+		        <td><%= o_rs.sigla_proc %></td>
+		        <td><%= o_rs.count_reg %></td>
+		        <td><a href="#" data-toggle="modal" data-load-url="<%= modal_detalhe_abertura_caixas_path(abertura_caixa_id: @abertura_caixa.id, forma_pago_id: o_rs.forma_pago_id, moeda: o_rs.moeda) %>" data-target="#ModalMovimento"><%= o_rs.forma_pago_nome %></a></td>
+		        <td align="right"><%= format_decimal(o_rs.saldo_rs) %></td>
+		      </tr>
+		      <% end %>
+		    </table>
+		  </td>
+		</tr>
+		</table>
+	</div>
+</div>
+
+
+<style type="text/css">
+  .border {
+    border-collapse: collapse;
+    margin-top: 20px !important;
+  }
+ .border  td, .border tr {
+    border: 1px solid black;
+    padding: 5px;
+    font-size: 12px;
+  }
+
+</style>
+
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="ModalMovimento">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h2 class="modal-title" id="myModalLabel" align="center">Detalhe Movimientos</h2>
+      </div>
+      <div class="modal-body-oe" style="padding: 10px">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+	$('#ModalMovimento').on('show.bs.modal', function (e) {
+    var loadurl = $(e.relatedTarget).data('load-url');
+    $(this).find('.modal-body-oe').load(loadurl);
+	});
+
+
+</script>

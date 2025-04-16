@@ -23,7 +23,7 @@ html,body,div,table,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,
 
 .bold-black{
   font-family: 'prox-bold' !important;
-  color: #000 !important;
+  color: #060d25 !important;
 }
 
 
@@ -32,7 +32,7 @@ body,html {
   font-family: 'prox';
   background-color: #eef1f5;
   font-size: 12px;
-  color: #999999;
+  color: #060d25;
 }
 
 div#back{
@@ -45,7 +45,7 @@ div#back{
 
 div#contents{
     font-family: 'prox';
-    color: #999999;
+    color: #060d25;
     height: 100%;
     bottom: 0;
     content: '';
@@ -716,7 +716,7 @@ div.group h2 td{
 }
 
 @media print {
-  body { background-color: #FFF; }
+  body { background-color: #FFF; height: 0% }
     #container {
     width: auto;
     margin: 0;
@@ -728,8 +728,9 @@ div.group h2 td{
     page-break-before: always;
   }
 
- .icon-pencil, .icon-trash, .btn{
+ .icon-pencil, .icon-trash, .btn, a, .no-print{
     display: none;
+    border: none;
   }
 
   .rolagem{
@@ -1253,7 +1254,7 @@ div#back-pdv{
 }
 
 .panel-content{
-  padding: 10px;
+  padding: 15px;
   border-radius: 8px;
   background-color: #fff;
 }
@@ -1269,7 +1270,7 @@ div#back-pdv{
 }
 
 .rolagem td, .listgrid td{
-  padding: 10px;
+  padding: 6px;
   border-bottom: 1px solid #efefef !important;
   cursor: pointer;
 }
@@ -1281,7 +1282,7 @@ div#back-pdv{
 }
 
 .head_grid td {
-  padding: 10px;
+  padding: 6px;
   font-family: 'prox-bold';
   color: #222;
 }
@@ -1293,6 +1294,7 @@ label{
   line-height: 14px;
   display: block;
   margin-top: 10px;
+  color: #060d25;
   font-family: 'prox' !important;
 }
 
@@ -2334,7 +2336,7 @@ a[disabled],a[readonly],input[disabled],input[readonly],fieldset[disabled],selec
 }
 
 .padding-btn{
-  padding-top: 26px;
+  padding-top: 26px !important;
 }
 
 
@@ -2573,4 +2575,19 @@ select[readonly] {
   background: #eee; /*Simular campo inativo - Sugestão @GabrielRodrigues*/
   pointer-events: none;
   touch-action: none;
+}
+
+
+.hidden-select{
+  font-size: 12px;
+  margin-top: 4px;
+  border-width: 0 !important;
+  background: transparent !important;
+  color: #fff;
+  padding: 0px;
+}
+
+
+.panel-content form td{
+  padding: 5px;
 }

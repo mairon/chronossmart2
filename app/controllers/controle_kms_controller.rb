@@ -1,17 +1,15 @@
 class ControleKmsController < ApplicationController
-  # GET /controle_kms
-  # GET /controle_kms.json
   def index
-    @controle_kms = ControleKm.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @controle_kms }
-    end
+    @controle_km = ControleKm.new
+    render layout: 'chart'
   end
 
-  # GET /controle_kms/1
-  # GET /controle_kms/1.json
+  def busca
+    params[:unidade] = current_unidade.id
+    @controle_kms = ControleKm.filtro_busca(params)
+    render :layout => false
+  end
+
   def show
     @controle_km = ControleKm.find(params[:id])
 
@@ -41,14 +39,13 @@ class ControleKmsController < ApplicationController
   # POST /controle_kms.json
   def create
     @controle_km = ControleKm.new(params[:controle_km])
+    @controle_km.unidade_id = current_unidade.id
 
     respond_to do |format|
       if @controle_km.save
-        format.html { redirect_to @controle_km, notice: 'Controle km was successfully created.' }
-        format.json { render json: @controle_km, status: :created, location: @controle_km }
+        format.html { redirect_to controle_kms_url }
       else
         format.html { render action: "new" }
-        format.json { render json: @controle_km.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -60,11 +57,9 @@ class ControleKmsController < ApplicationController
 
     respond_to do |format|
       if @controle_km.update_attributes(params[:controle_km])
-        format.html { redirect_to @controle_km, notice: 'Controle km was successfully updated.' }
-        format.json { head :no_content }
+        format.html { redirect_to controle_kms_url }
       else
         format.html { render action: "edit" }
-        format.json { render json: @controle_km.errors, status: :unprocessable_entity }
       end
     end
   end

@@ -6,7 +6,7 @@
 
 <a href="javascript:void(0)" class="btn btn-blue" onClick="ComprovanteVenda()"><%= t('VOUCHER') %></a>
 <a href="javascript:void(0)" class="btn btn-blue" onClick="PagareVenda()">Pagare</a>
-
+<%= link_to 'Contrato', '#', class: 'btn btn-blue', 'data-toggle' => "modal", 'data-target' => "#modal-dados-contrato", 'data-dismiss' => "modal" %>
 
 
 <script>
@@ -64,8 +64,7 @@
   }
 
   function ComprovanteVenda(){
-        window.open('/vendas/send_print?proc=ticket_comprovante&venda_id=' + <%= @venda.id %> , '', ' SCROLLBARS=YES, TOP=150, LEFT=100, WIDTH=400, HEIGHT=500');
-
+    window.open('/vendas/' + <%= @venda.id %> + '/comprovante' , '', ' SCROLLBARS=YES, TOP=150, LEFT=100, WIDTH=400, HEIGHT=500');
   }
 
 function PagareVenda(){

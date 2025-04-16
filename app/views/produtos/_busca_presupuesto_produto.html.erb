@@ -1,0 +1,172 @@
+<div class="group">
+  <%= form_tag dinamic_busca_presupuesto_produto_produtos_path, :method => "get" do %>
+
+    <div class="row">
+      <div class="col-md-3">
+        <%= select("busca", "tabela_preco_id", TabelaPreco.all(:select => 'id,nome', order: '1').collect {|p| [ p.nome, p.id ] }, {}, {onchange: "pesquisaf2()"}) %>
+      </div>
+      <div class="col-md-6">
+        <div class="input-group">
+          <span class="input-group-btn">
+            <button type="button" class="btn btn-default">
+              <i class="icon-search" aria-hidden="true"></i>
+            </button>
+          </span>
+          <input id="busca_f2" name="busca_f2" type="search" placeholder="Buscar" onKeyUp="pesquisaf2()" autocapitalize="off" autocomplete="off" autocorrect="off" autofocus, class="panel-field" />
+        </div>
+      </div>
+      <div class="col-md-2">
+        <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinnerf2", :width => 21, :height => 21, :style =>"display: none;" ) %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+  <div id="paginaf2"></div>
+
+<script>
+    function Fecha(produto_nome,produto_id,preco_gs,preco_us,preco_rs){
+      $('#presupuesto_produto_produto_nome').val(produto_nome);
+      $('#presupuesto_produto_produto_id').val(produto_id);
+      if (<%= @presupuesto.moeda %> == '0'){
+        $('#presupuesto_produto_unitario_dolar').val(preco_us);
+      }else if (<%= @presupuesto.moeda %> == '1'){
+        $('#presupuesto_produto_unitario_guarani').val(preco_gs);
+      }else{
+        $('#presupuesto_produto_unitario_real').val(preco_rs);
+      }
+      $("#presupuesto_produto_quantidade").focus()
+
+      $("#vendas_produto_quantidade").focus()
+      $('#ModalF2').modal('hide');
+    }
+</script>
+
+  <script language="javascript">
+
+    function pesquisaf2(){
+      count_caract = $("#busca_f2").val().length;
+      if (count_caract > 2) {
+        //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
+
+        urlf2="/produtos/dinamic_busca_presupuesto_produto?deposito_id=1&tabela_preco_id="+ <%= @presupuesto.tabela_preco_id %> +"&data=<%= @presupuesto.data %>&unidade=<%= @presupuesto.unidade_id %>&moeda=<%= @presupuesto.moeda %>&busca="+$("#busca_f2").val();
+        ajaxf2(urlf2);
+      }
+
+    }
+
+    function ajaxf2(urlf2){
+
+      $('#spinnerf2').show();
+
+      req = null;
+
+      // Procura por um objeto nativo (Mozilla/Safari)
+
+      if (window.XMLHttpRequest) {
+
+        req = new XMLHttpRequest();
+
+        req.onreadystatechange = processReqChangef2;
+
+        req.open("GET",urlf2,true);
+
+        req.send(null);
+
+        // Procura por uma versão ActiveX (IE)
+
+      } else if (window.ActiveXObject) {
+
+        req = new ActiveXObject("Microsoft.XMLHTTP");
+
+        if (req) {
+
+          req.onreadystatechange = processReqChangef2;
+
+          req.open("GET",urlf2,true);
+
+          req.send();
+
+        }
+
+      }
+
+    }
+
+
+    function processReqChangef2(){
+
+      // apenas quando o estado for "completado"
+
+      if (req.readyState == 4) {
+
+        // apenas se o servidor retornar "OK"
+
+        if (req.status ==200) {
+
+          // procura pela div id="pagina" e insere o conteudo
+
+          // retornado nela, como texto HTML
+
+          onSuccess:$('#spinnerf2').hide();
+          document.getElementById('paginaf2').innerHTML = req.responseText;
+
+        } else {
+
+          alert("Houve um problema ao obter os dados:n" + req.statusText);
+
+        }
+
+      }
+
+    }
+  </script>
+
+<script>
+
+ $(function () {
+        $(document).keydown(function (e) {
+
+             if((e.which || e.keyCode) == 40){
+
+              valor = parseInt($("#foco").val()) + 1;
+              $("#foco").val(valor)
+               campo     = '#'+ valor
+               c_campo   = '.'+ valor
+               ant_campo = '.'+ (valor - 1)
+              $(campo).focus()
+
+              if ((valor - 1)%2 == 0){
+                $(ant_campo).css('backgroundColor','#fff');
+              }else{
+                $(ant_campo).css('backgroundColor','#f9f9f9');
+              };
+
+              $(c_campo).css('backgroundColor','#e6ebf2');
+             return false;
+
+             }
+
+
+            if((e.which || e.keyCode) == 38){
+
+              valor = parseInt($("#foco").val()) - 1;
+              $("#foco").val(valor)
+               campo     = '#'+ valor
+               c_campo   = '.'+ valor
+               ant_campo = '.'+ (valor + 1)
+              $(campo).focus()
+              if ((valor + 1)%2 == 0){
+                $(ant_campo).css('backgroundColor','#fff');
+              }else{
+                $(ant_campo).css('backgroundColor','#fff');
+              };
+
+              $(c_campo).css('backgroundColor','#e6ebf2');
+             return false;
+             }
+
+        });
+    });
+
+  </script>

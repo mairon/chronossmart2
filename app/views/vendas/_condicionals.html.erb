@@ -1,0 +1,19 @@
+<div class="panel">
+  <div class="panel-content">
+		<table class="head_grid">
+			<tr>
+				<td width="150">Cond.</td>
+			</tr>
+		</table>
+		<div class="rolagem" dir="div" style="height:80px">
+			<table>
+				<% @venda.vendas_cond_liqs.each do |o| %>
+					<tr class = "<%= cycle("cor1", "cor2") %>">
+						<td width="150"><%= o.condicional_id %></td>
+						<td><%= link_to '', o, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+					</tr>
+				<% end %>
+			</table>
+		</div>
+	</div>
+</div>

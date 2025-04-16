@@ -25,7 +25,7 @@
       <% @tarefas.each do |c| %>
 
       <tr class = "<%= cycle("cor1", "cor2") %>">
-        <td width="80"><%= link_to c.negocio_id.to_s.rjust(6,'0'), crm_negocio_path(c.negocio_id) %></td>
+        <td width="80"><%= c.negocio_id.to_s.rjust(6,'0') %></td>
         <td width="80"><%= c.status %></td>
         <td width="80" align="center"><%=raw c.tipo_tarefa.icon %></td>
         <td width="150"> <%= c.usuario.usuario_nome %></td>

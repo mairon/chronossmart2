@@ -1,0 +1,93 @@
+<div class="panel">
+	<h1 id="header">
+		Sangrias/Suministro
+		<div class="pull-right">
+			<% if @abertura_caixa.status == true %>
+				<%= link_to ' Lanz. Efetivo', "#", class: 'btn add acao' %>
+			<% end %>
+		</div>
+	</h1>
+</div>
+
+<% @transf_saldo.each do |ac| %>
+ <div class="panel">
+ 	<div class="panel-content">
+
+ 		<div class="row">
+ 			<div class="col-md-4">
+ 				<label>Origen</label>
+ 				<%= Conta.find(ac.conta_origem_id).nome %>
+ 			</div>
+ 			<div class="col-md-4" align="center">
+ 				<span class="material-symbols-outlined">currency_exchange</span>
+ 				<small><%= ac.created_at.strftime("%d/%m/%y - %H:%M")%></small>
+			</div>
+ 			<div class="col-md-4">
+ 				<label>Destino</label>
+ 				<%= Conta.find(ac.conta_destino_id).nome %>
+			</div>
+ 		</div>
+ 		<h1 align="center" style="padding: 0px">
+ 			<% if ac.moeda == 0 %>
+ 				<span class="us"><%= format_decimal(ac.valor) %>U$</span>
+ 			<% elsif ac.moeda == 1 %>
+ 			<span class="gs"><%= format_int(ac.valor) %>Gs.</span>
+ 			<% elsif ac.moeda == 2 %>
+ 				<span class="rs"><%= format_decimal(ac.valor) %>R$</span>
+ 			<% end %>
+		</h1>
+ 		<p><small><%= ac.obs %></small></p>
+ 		<hr style="margin-top: 0px; margin-bottom: 15px">
+
+		<div class="row">
+			<div class="col-md-6">
+	 			<a href="#" class="btn" onclick="ComprovanteTS(<%= ac.id %>)">
+	 				<span class="material-symbols-outlined">print</span>
+	 			</a>
+			</div>
+			<div class="col-md-6" align="right">
+				<% if @abertura_caixa.status == true %>
+					<%= link_to ac, :confirm => 'Estas Seguro?', :method => :delete, class: 'btn' do %>
+						<span class="material-symbols-outlined">delete</span>
+					<% end %>
+				<% end %>
+			</div>
+		</div>
+ 	</div>
+ </div>
+<% end %>
+
+<script>
+	function ComprovanteTS(id){
+		window.open('/abertura_caixas/print_transf_saldo?id='+ id, 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+	}
+</script>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="myModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel">Nuevo Lanzamiento</h4>
+      </div>
+      <div class="modal-body">
+      	<div class="group">
+        	<%= render :partial=>"fechamento_caixa_dts/new_dt", :locals=>{:fechamento_caixa_dt=>FechamentoCaixaDt.new(:abertura_caixa_id=>@abertura_caixa.id)} %>
+      	</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(".acao").click(function() {
+    $('#myModal').modal('show');
+    $('#myModal').on('shown.bs.modal', function () {
+      $('#cobros_detalhe_cobro_guarani').focus();
+      $('#cobros_detalhe_cobro_guarani').select();
+
+    })
+  });
+</script>

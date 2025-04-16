@@ -1,0 +1,59 @@
+<h1 id="header">Condicional </h1>
+
+<div class="acessos">
+  <%= link_to 'Nuevo', new_condicional_path, :class => "button add" %>
+</div>
+
+<div class="group">
+  <%= form_tag busca_condicionals_path, :method => "get" do%>
+    <table>
+        <tr>
+          <!--FILTRO_DATA!-->
+          <td>Fecha</td>
+          <td colspan="2"> 
+            <%= text_field_tag :inicio,  "01/#{Time.now.strftime("%m/%Y")}", size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+            <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+            </div>
+            <div class="date-separ" style="margin-top: 10px">hasta</div>
+          <td class="date-separ">
+            <%= text_field_tag :final, Time.now.end_of_month.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+            <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+            </div>
+          </td>
+          <td>
+              Status
+              <%= select_tag :status, options_for_select([["PENDIENTE",0], ["BAJADO",1],["CANCELADO",2], ["TODOS",""]]) %>
+          </td>
+
+
+          <td>
+             <select name="tipo" id="tipo">
+               <option>CLIENTE</option>
+               <option>CODIGO</option>
+               <option>RESPONSAVEL</option>
+            </select>
+          </td>
+
+          <td colspan="4">
+            <input id="busca" name="busca" type="text" onkeyup = "pesquisa(this.value),f(this)"onkeydown = "f(this)" size="32"/>
+            <input type="button" class="btn btn-default" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar"/>
+            <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;") %>
+          </td>
+         </tr>
+      </table>
+      <input type="hidden" id="seta" value="0"/>
+     <% end %>
+    <div id="pagina">
+    </div>     
+ 
+<script language="javascript">
+
+  function pesquisa(valor){
+    url="/condicionals/busca?" + $('form').serialize();
+    ajax(url);
+  }
+</script>
+<%= javascript_include_tag 'busca_ajax' %>
+</div>

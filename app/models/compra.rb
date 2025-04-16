@@ -70,7 +70,7 @@
                             diferido:            params.diferido,
                             valor_guarani:       (params.total_guarani.to_f - (params.desconto_guarani.to_f + params.retencao_gs.to_f)),
                             valor_dolar:         (params.total_dolar.to_f - (params.desconto_dolar.to_f + params.retencao_us.to_f)),
-                            valor_real:          (params.total_guarani.to_f - (params.desconto_real.to_f)),
+                            valor_real:          (params.total_real.to_f - (params.desconto_real.to_f)),
                             vencimento:          params.vencimento
                           )
 
@@ -93,7 +93,7 @@
                               cota:                cota,
                               valor_guarani:       ((params.total_guarani.to_f - (params.desconto_guarani.to_f + params.retencao_gs.to_f)) / params.cota.to_i),
                               valor_dolar:         ((params.total_dolar.to_f - (params.desconto_dolar.to_f + params.retencao_us.to_f)) / params.cota.to_i),
-                              valor_real:          ((params.total_guarani.to_f - (params.desconto_real.to_f)) / params.cota.to_i),
+                              valor_real:          ((params.total_real.to_f - (params.desconto_real.to_f)) / params.cota.to_i),
                               vencimento:          params.vencimento.to_date.months_since(venc.to_i) )
         cota += 1
         venc += 1
@@ -221,7 +221,7 @@
                   (SELECT COUNT(ID) FROM COMPRAS_FINANCAS CF WHERE CF.COMPRA_ID = G.ID) AS FINANCEIRO
             FROM COMPRAS G
             LEFT JOIN USUARIOS U
-            ON U.ID = G.USUARIO_CREATED            
+            ON U.ID = G.USUARIO_CREATED
 
             LEFT JOIN PLANO_DE_CONTAS PC
             ON PC.ID = G.PLANO_DE_CONTA_ID
@@ -264,7 +264,7 @@
                   (SELECT COUNT(ID) FROM COMPRAS_FINANCAS CF WHERE CF.COMPRA_ID = G.ID) AS FINANCEIRO
             FROM COMPRAS G
             LEFT JOIN USUARIOS U
-            ON U.ID = G.USUARIO_CREATED                        
+            ON U.ID = G.USUARIO_CREATED
             WHERE #{unidade} AND G.TIPO_COMPRA = 3 #{cond}
             ORDER BY G.DATA DESC, G.ID DESC"
       Compra.paginate_by_sql(sql, page: params[:page], :per_page => 25)
@@ -272,6 +272,13 @@
   end
 
  	def calcs
+
+      if self.tipo.to_i == 1
+        self.retencao_gs = 0
+        self.retencao_us = 0
+      end
+
+
 	    	#tipo_compra = 0 compra normal
 	    	#tipo_compra = 1 gastos
 	    	#tipo_compra = 2 importacao
@@ -351,6 +358,7 @@
   	end
 
   def self.gerador_cotas(params)
+
     cota = 1
     venc = 0
     cp = Compra.find_by_id(params[:id])
@@ -408,6 +416,9 @@
                             fact_an_01:          params[:fact_an_01],
                             fact_an_02:          params[:fact_an_02],
                             fact_an_cota:        params[:fact_an_cota],
+                            total_guarani:       params[:total_guarani],
+                            total_dolar:         params[:total_dolar],
+                            total_real:          params[:total_real],
                             documento_id:        cp.documento_id,
                             documento_nome:      cp.documento_nome,
                             persona_id:          cp.persona_id,
@@ -415,7 +426,7 @@
                             moeda:               params[:moeda],
                             cota:                cp.cota,
                             conta_id:            params[:busca]["conta"],
-                            banco_id:            params[:busca]["banco_id"], 
+                            banco_id:            params[:busca]["banco_id"],
                             titular:             params[:titular],
                             forma_pago_id:       params[:busca]["forma_pago"],
                             cheque_status:       params[:cheque_status],
@@ -477,11 +488,12 @@
   end
 
   def add_prov_gasto_custo
+
   	if self.proveedore_id.to_i > 0
 	  	prov = Proveedore.find_by_id(self.proveedore_id)
 	    venc = 0
 	    prov.rubro.competencia.to_i.times do |rc|
-	      ComprasCusto.create(  
+	      ComprasCusto.create(
 	        :compra_id       => self.id,
 	        :moeda           => self.moeda,
 	        :unidade_id      => self.unidade_id,
@@ -513,8 +525,8 @@
                             diferido:            self.data,
                             valor_guarani:       (self.total_guarani - self.desconto_guarani),
                             valor_dolar:         (self.total_dolar - self.desconto_dolar),
-                            valor_real:          (self.total_real - self.desconto_real),
-                            vencimento:           self.data )	  
+                            valor_real:          (self.total_real.to_f - self.desconto_real.to_f),
+                            vencimento:           self.data )
 		end
   end
 

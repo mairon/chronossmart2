@@ -40,14 +40,14 @@
 
 .receipt-info-column-1 {
     max-width: 390px;
-    padding: 0px 15px;
+    padding: 0px 12px;
     float: left;
 }
 
 .receipt-info-container {
     display: table;
     width: 100%;
-    font-size: 15px;
+    font-size: 12px;
 }
 .receipt-info-column-2 {
     float: right;
@@ -107,8 +107,8 @@
 			<hr class="dotted-line"/>
 
 			<div class="receipt-detail-container">
-				<div class="receipt-details">Recebemos de: <strong><%= @cobro.persona.nome %></strong></div>
-				<div class="receipt-details">A quantia de:
+				<div class="receipt-details">Recibimos de: <strong><%= @cobro.persona.nome %></strong></div>
+				<div class="receipt-details">El monto de:
 				<strong>
 					<% if @cobro.moeda.to_i == 0 %>
 						<span class="gray condensed semi-bold">U$</span> <%= format_decimal(@tot_cobro_us) %></span></td>
@@ -120,8 +120,41 @@
 				</strong>
 			</div>
 
-			<div class="receipt-details" align="right">Correspondente à: <strong><%= @cobro.cobros_financas.last.descricao %></strong></div>
-
+			<div class="receipt-details" align="right">Correspondiente a: <strong><%= @cobro.cobros_financas.last.descricao %></strong></div>
+			<hr class="dotted-line"/>
+			<table>
+				<tr>
+					<td><b>Doc.</b></td>
+					<td align="center"><b>Cuota</b></td>
+					<td><b>Concepto</b></td>
+					<td align="right"><b>Monto</b></td>
+				</tr>
+				<% @detalhes.each do |d| %>
+				<tr>
+					<td width="100"><%= d.documento_numero %></td>
+					<td width="50" align="center"><%= d.cota %></td>
+					<td width="350">
+						<small>
+							<% unless d.venda_id.blank? %>
+								<% VendasProduto.where(venda_id: d.venda_id).each do |vd| %>
+									<li><%= vd.produto_nome %></li>
+								<% end %>
+							<% else %>
+								<%= Cliente.where(documento_numero: d.documento_numero, persona_id: d.persona_id).last.descricao %>
+							<% end %>
+						</small>
+					</td>
+					<% if @cobro.moeda.to_i == 0 %>
+						<td width="70" align="right"><%= format_decimal(d.valor_dolar) %></td>
+					<% elsif @cobro.moeda.to_i == 1 %>
+						<td width="70" align="right"><%= format_int(d.valor_guarani) %></td>
+					<% elsif @cobro.moeda.to_i == 2 %>
+						<td width="70" align="right"><%= format_decimal(d.valor_real) %></td>
+					<% end %>
+				</tr>
+				<% end%>
+			</table>
+			<hr class="dotted-line"/>
 			<br>
 			<br>
 

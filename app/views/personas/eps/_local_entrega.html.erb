@@ -1,0 +1,32 @@
+<div class="panel">
+  <h1 id="header">
+    Local Entregas
+    <div class="pull-right">
+      <a class="btn" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-local"><i class=" icon-plus-sign"></i></a>
+    </div>
+  </h1>
+
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-12">
+        <%= render :partial=>"/persona_locais_entregas/index", :locals=>{:persona_locais_entregas => @persona.persona_locais_entregas} %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade " id="modal-local" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Nuevo Local</h4>
+      </div>
+      <div class="modal-body">
+        <%= render :partial=>"/persona_locais_entregas/new_local", :locals=>{:persona_locais_entrega=>PersonaLocaisEntrega.new(:persona_id=>@persona.id)} %>
+      </div>
+    </div>
+  </div>
+</div>

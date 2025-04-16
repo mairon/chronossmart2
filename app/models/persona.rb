@@ -1,5 +1,5 @@
 ﻿class Persona < ActiveRecord::Base
-  acts_as_taggable
+  #acts_as_taggable
   #audit(:create, :update, :destroy) { |model, user, action| "|#{model.id.to_s.rjust(8,'0')}|Hecho por #{user.usuario_nome}" }
   has_attached_file :picture, :styles => { :medium => "300x300>", :thumb => "100x100>" }, :path => "#{Empresa.last.nome}/system/:class/:attachment/:id_partition/:style/:filename",
       :url => "#{Empresa.last.nome}/system/:class/:attachment/:id_partition/:style/:filename", default_url: 'default.jpg'

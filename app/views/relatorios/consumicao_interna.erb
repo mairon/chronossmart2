@@ -1,58 +1,150 @@
-<h1 id="header"><%= t('LISTING') %> Uso y Consumo </h1>
+<h1 id="header"><%= t('LISTING') %> Uso y Consumo</h1>
   <div class="group">
-      <h2>
-         <%= form_tag resultado_consumicao_interna_relatorios_path, :method => "get" do%>
-            <table>
-              <tr>
-                <td align="right">De:</td>
-                <td colspan="2">
-                  <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
-                  <div class="input-group-addon-f">
-                    <span class="icon-calendar"></span>
-                  </div>
-                <td style="padding-left: 5px"><%= t('TO') %></td>
-                <td>
-                  <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
-                  <div class="input-group-addon-f">
-                    <span class="icon-calendar"></span>
-                  </div>
-                </td>
-              </tr>
+  
+    <%= form_tag resultado_consumicao_interna_relatorios_path, :method => "get" do %>
 
-              <tr>
-                <td align="right"><%= t('COIN') %>:</td>
-                <td colspan="4">
-                  <fieldset>
-                    <%= radio_button_tag :moeda, 0,  :Checked => "True"%>Dolar
-                    <%= radio_button_tag :moeda, 1  %> <%= t('GUARANIS') %>
-                  </fieldset>
-                </td>
-              </tr>
+    <div class="row">
+      <div class="col-md-12">
+        <label><%= t('PERIOD') %></label>
+        <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+        <div class="input-group-addon-f">
+          <span class="icon-calendar"></span>
+        </div>
+        <div class="date-separ"><%= t('TO') %></div>
+        <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+        <div class="input-group-addon-f">
+        <span class="icon-calendar"></span>
+        </div>
+      </td>        
+      </div>
+    </div>    
 
-              <tr>
-                <td></td>
-                <td>
-                     <input  id      = 'button'
-                             class   = 'btn btn-green'
-                             type    = 'submit'
-                             value   = 'Informe'
-                             onclick = 'Tipo('0')'/>
+   
+    <div class="row">
+      <div class="col-md-12">
+          <label>Rodado</label>
+          <%= select("busca", "rodado", Rodado.all.collect {|p| [ p.placa, p.id ] }, { :prompt => 'Selecione' }) %>
+      </div>
+    </div>
 
-                     <input type     = 'submit'
-                            id       = 'button'
-                            class    = 'btn btn-blue'
-                            value    = 'Excel'
-                            onclick  = 'Tipo('1')'/>
-                  </td>
-               </tr>
-               <input type  = "hidden"
-                      name  = "tipo"
-                      id    = "tipo"
-                      size  = "5"
-                      value = "0"/>
+    <div class="row">
+      <div class="col-md-12">
+          <label>Persona</label>
+          <%= select("busca", "persona", Persona.where(tipo_funcionario: 1).collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione' }) %>
+      </div>
+    </div>    
 
-            </table>
-         <% end %>
-      </h2>
-   </div>
-</body>
+
+    <div class="row">
+      <div class="col-md-12">
+          <label>Motivo</label>
+          <%= select("busca", "motivo", Motivo.all.collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione' }) %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+          <label>Motivo</label>
+          <%= select("busca", "cc", CentroCusto.all.collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione' }) %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <fieldset>
+          <legend>Formato</legend>
+          <input type="radio" id="detalhe" name="detalhe" value="0" checked /> Sintético
+          <input type="radio" id="detalhe" name="detalhe" value="1" checked /> Analitico
+        </fieldset>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <fieldset>
+          <legend><%= t('COIN') %></legend>
+          <input type="radio" id="moeda" name="moeda" value="0" <%= 'checked' if current_unidade.moeda.to_i == 0 %> /> <%= t('DOLLARS') %>
+          <input type="radio" id="moeda" name="moeda" value ="1" <%= 'checked' if current_unidade.moeda.to_i == 1 %> /> <%= t('GUARANIS') %>
+          <input type="radio" id="moeda" name="moeda" value="2" <%= 'checked' if current_unidade.moeda.to_i == 2 %> /> <%= t('REAIS') %>
+        </fieldset>
+      </div>
+    </div>    
+
+    <div class="row">
+      <div class="col-md-12 footer-buttons">
+        <input  id="button" class="acao btn btn-green" value="Informe"  style="cursor:pointer;" id="myModalLabel" data-toggle="modal" data-width="500" data-height="781" data-target="#myiframe" data-dismiss="modal" />
+        <input  id="button" type="submit" class="btn btn-blue" value="Excel" onclick = "Tipo('1')"/>
+      </div>
+    </div>
+    <input type="hidden" name="tipo" id="tipo" size="5" value="0"/>
+    <% end %>
+</div>
+
+
+<div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 1100px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('LISTING') %> Consumición Interna</h4>
+      </div>
+      <div class="modal-body" align="center">
+        <div class="embed-responsive embed-responsive-16by9" style="height: 460px">
+          <iframe class="embed-responsive-item" id="iframeModal" frameborder="0 " border="0"></iframe>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="print-nav">Imprimir</button>
+      </div>      
+    </div>
+  </div>
+</div>
+
+
+<script>
+$('#print-nav').on('click', function () {
+  document.getElementById('iframeModal').contentWindow.print();
+});  
+</script>
+
+<script>
+
+  $('select').selectize();
+
+
+
+( function($) {
+
+function iframeModalOpen(){
+
+    $('.acao').on('click', function(e) {
+      var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
+      var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
+
+      var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
+
+      // stampiamo i nostri dati nell'iframe
+      $("#myiframe iframe").attr({
+        'src': '/relatorios/resultado_consumicao_interna?' + $('form').serialize(),
+        'height': height,
+        'width': width,
+        'allowfullscreen':''
+      });
+    });
+
+    // se si chiude la modale resettiamo i dati dell'iframe per impedire ad un video di continuare a riprodursi anche quando la modale è chiusa
+    $('#myiframe').on('hidden.bs.modal', function(){
+      $(this).find('iframe').html("");
+      $(this).find('iframe').attr("src", "");
+    });
+  }
+
+  $(document).ready(function(){
+    iframeModalOpen();
+  });
+
+  } ) ( jQuery );
+
+</script>

@@ -1,0 +1,67 @@
+<h1 class="rs">Saldo</h1>
+<table class="head_grid">
+  <tr>
+    <td width="80">Referencia</td>
+    <% if current_user.tipo.to_i == 0 %>
+      <td width="80">Barra</td>
+    <% end %>
+    <td width="85">Tamaño</td>
+    <td width="230">Color</td>
+    <td width="300" >Producto</td>
+    <td width="60" align="right">Salida</td>
+    <td width="60" align="right">Entrada</td>
+    <td width="60" align="right">Saldo</td>
+    <td width="60" align="right">Unit</td>
+    <td width="60" align="right">Monto</td>
+    <td></td>
+  </tr>
+</table>
+<div class="rolagem" dir="div" style="height: 200px;">
+   <table>
+      <% st = 0 %>
+      <% et = 0 %>
+      <% rt = 0 %>
+      <% vt = 0 %>
+      <% @saldo.each do |os| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td width="80"><small> <%= os.fabricante_cod %></small></td>
+          <% if current_user.tipo.to_i == 0 %>
+            <td width="80"><%= os.barra %></td>
+          <% end %>
+          <td width="85"><%= os.tamanho %></td>
+          <td width="230"><%= os.cor %></td>
+          <td width="300"><small> <%= os.produto_id.to_s.rjust(6,'0') %>-<%= os.nome %></small></td>
+          <td width="60" align="right"><%= os.saida.to_i %></td>
+          <td width="60" align="right"><%= os.entrada.to_i %></td>
+          <td width="60" align="right"><%= os.saida.to_i - os.entrada.to_i %></td>
+          <% if @condicional.moeda.to_i == 0 %>
+            <td width="60" align="right"><%= format_decimal(os.valor_us) %></td>
+            <% vt += (os.valor_us.to_f * (os.saida.to_f - os.entrada.to_f) ) %>
+          <% elsif @condicional.moeda.to_i == 1 %>
+            <td width="60" align="right"><%= format_int(os.valor_gs) %></td>
+            <td width="60" align="right"><%= format_int((os.valor_gs.to_f * (os.saida.to_f - os.entrada.to_f) )) %></td>
+            <% vt += (os.valor_gs.to_f * (os.saida.to_f - os.entrada.to_f) ) %>
+          <% end %>          
+        </tr>
+        <% st += (os.saida.to_f) %>
+        <% et += (os.entrada.to_f) %>
+        <% rt += (os.saida.to_f - os.entrada.to_f) %>
+      <% end %>
+   </table>
+</div>
+   <table>
+     <tr>
+       <td width="860"></td>
+       <td width="60" align="right"><b><%= st.to_i %></b></td>
+       <td width="60" align="right"><b><%= et.to_i %></b></td>
+       <td width="60" align="right"><b><%= rt.to_i %></b></td>
+       <td width="60"></td>
+       <td width="60" align="right">
+        <% if @condicional.moeda.to_i == 1 %>
+          <b><%= format_int(vt.to_i) %></b>
+        <% else %>
+          <b><%= format_decimal(vt.to_f) %></b>
+        <% end %>         
+       </td>
+     </tr>
+   </table>

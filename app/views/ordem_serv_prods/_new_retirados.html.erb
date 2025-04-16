@@ -32,13 +32,13 @@
   <div class="row">
     <div class="col-md-12">
       <label>Producto</label>
-      <%= f.collection_select :produto_id, Produto.all( :select => ' id,nome', :order  => '2' ), :id, :nome,{prompt: 'Selecione lo producto'}, {required: true, class: 'ret_produto_id panel-field'} %>
+      <%= f.collection_select :produto_id, Produto.all( :select => "id, (id || ' - ' || nome) as nome", :order  => '2' ), :id, :nome,{prompt: 'Selecione lo producto'}, {required: true, class: 'ret_produto_id panel-field'} %>
     </div>
   </div>
   <div class="row">
     <div class="col-md-6">
       <label>Cantidad</label>
-      <%= f.number_field :quantidade, required: true %>
+      <%= f.text_field :quantidade, required: true %>
     </div>
     <div class="col-md-6">
       <% if @ordem_serv.moeda.to_i == 0 %>
@@ -61,6 +61,7 @@
 </div>
 
 <script>
+$('.ret_produto_id').selectize();
 
 $("#cod_busca").change(function(){
   $.ajax({url: "/buscas/get_produto",

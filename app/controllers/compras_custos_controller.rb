@@ -52,6 +52,8 @@ class ComprasCustosController < ApplicationController
         :centro_custo_id => @compras_custo.centro_custo_id,
         :rubro_grupo_id  => @compras_custo.rubro_grupo_id,
         :plano_de_conta_id  => @compras_custo.plano_de_conta_id,
+        :ordem_carga_id  => @compras_custo.ordem_carga_id,
+        :pedido_traslado_id  => @compras_custo.pedido_traslado_id,
         :valor_us        => @compras_custo.valor_us / @compras_custo.plano_de_conta.competencia.to_i,
         :valor_gs        => @compras_custo.valor_gs / @compras_custo.plano_de_conta.competencia.to_i,
         :valor_rs        => @compras_custo.valor_rs / @compras_custo.plano_de_conta.competencia.to_i,

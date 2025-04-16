@@ -1,5 +1,60 @@
 class CobrosController < ApplicationController
-    before_filter :authenticate
+  before_filter :authenticate
+
+  def lista_adelantos
+
+        sql = "SELECT C.ID,
+                      C.PERSONA_ID,
+                      C.PERSONA_NOME,
+                      C.VENDEDOR_ID,
+                      C.VENDEDOR_NOME,
+                      C.COD_PROC,
+                      C.SIGLA_PROC,
+                      C.LIQUIDACAO,
+                      C.MOEDA,
+                      C.TIPO,
+                      C.DATA,
+                      C.VENCIMENTO,
+                      C.VENDA_ID,
+                      P.NOME AS ALUNO_NOME,
+                      C.DOCUMENTO_NUMERO,
+                      C.COTA,
+                      C.ORIGINAL,
+                      C.DIVIDA_DOLAR,
+                      C.DIVIDA_GUARANI,
+                      C.DIVIDA_REAL,
+                      C.COBRO_DOLAR,
+                      C.COBRO_GUARANI,
+                      C.COBRO_REAL,
+                      C.DESCRICAO,
+                      C.DOCUMENTO_NUMERO_01,
+                      C.documento_numero_02,
+                      U.UNIDADE_NOME,
+                      C.TOT_COTAS,
+                      CC.NOME AS CC_NOME,
+                      C.CENTRO_CUSTO_ID,
+                      ARRAY(SELECT (VP.PRODUTO_NOME) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = C.VENDA_ID) AS array_venda_produtos,
+                      (SELECT SUM(AT.DIVIDA_DOLAR) FROM CLIENTES AT WHERE AT.UNIDADE_ID = #{current_unidade.id} AND AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_US,
+                      (SELECT SUM(AT.DIVIDA_GUARANI) FROM CLIENTES AT WHERE AT.UNIDADE_ID = #{current_unidade.id} AND AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_GS,
+                      (SELECT SUM(AT.DIVIDA_REAL) FROM CLIENTES AT WHERE AT.UNIDADE_ID = #{current_unidade.id} AND AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_RS
+            FROM CLIENTES C
+
+            LEFT JOIN UNIDADES U
+            ON C.UNIDADE_ID = U.ID
+
+            INNER JOIN PERSONAS P
+            ON P.ID = C.PERSONA_ID
+
+            LEFT JOIN CENTRO_CUSTOS CC
+            ON C.CENTRO_CUSTO_ID = CC.ID
+
+            WHERE C.UNIDADE_ID = #{current_unidade.id} AND  C.TABELA = 'ADELANTO_COTAS'  AND C.PERSONA_ID = #{params[:persona_id]} AND C.LIQUIDACAO = 0 AND (C.COBRO_GUARANI + C.COBRO_DOLAR + C.COBRO_REAL ) > 0
+            ORDER BY 12,16
+                      "
+
+    @adelantos = Cliente.find_by_sql(sql)
+    render layout: false
+  end
 
     def visualizar
       @cobro       = Cobro.find(params[:id])
@@ -38,7 +93,7 @@ class CobrosController < ApplicationController
         @saldo_fina_us = ( ( @fecha_result_us.to_f + @financ_deb_us.to_f ) - @financ_cred_us ) * -1
         @vuelto = 'true'
       else
-        @saldo_fina_us = ( ( @fecha_result_us.to_f + @financ_deb_us.to_f ) - @financ_cred_us )        
+        @saldo_fina_us = ( ( @fecha_result_us.to_f + @financ_deb_us.to_f ) - @financ_cred_us )
       end
 
       if ( ( @fecha_result_gs.to_f + @financ_deb_gs.to_f ) - @financ_cred_gs ) < 0
@@ -74,7 +129,7 @@ class CobrosController < ApplicationController
     def baixa_divida
       @cobro = Cobro.find(params[:id])
       empresa = Empresa.last(:select => "taxa_interes")
-      @dividas = Cliente.find(params[:cobro]["dividas_ids"])      
+      @dividas = Cliente.find(params[:cobro]["dividas_ids"])
         @dividas.each do |d|
           anterior_gs = Cliente.sum(:cobro_guarani, conditions: ["persona_id = #{d.persona_id} and cota = #{d.cota} and documento_numero_01 ='#{d.documento_numero_01}' and documento_numero_02 ='#{d.documento_numero_02}' and documento_numero ='#{d.documento_numero}' "])
           anterior_us = Cliente.sum(:cobro_dolar, conditions: ["persona_id = #{d.persona_id} and cota = #{d.cota} and documento_numero_01 ='#{d.documento_numero_01}' and documento_numero_02 ='#{d.documento_numero_02}' and documento_numero ='#{d.documento_numero}' "])
@@ -146,7 +201,7 @@ class CobrosController < ApplicationController
         @tot_cobro_us = CobrosDetalhe.sum( "(cobro_dolar + interes_dolar) - desconto_dolar",     :conditions => ['cobro_id = ?',params[:id]])
         @tot_cobro_gs = CobrosDetalhe.sum( "(cobro_guarani + interes_guarani) - desconto_guarani",   :conditions => ['cobro_id = ?',params[:id]])
         @tot_cobro_rs = CobrosDetalhe.sum( "(cobro_real + interes_real) - desconto_real",      :conditions => ['cobro_id = ?',params[:id]])
-      
+
         render :layout => false
     end
 
@@ -268,7 +323,7 @@ class CobrosController < ApplicationController
         @saldo_fina_us = ( ( @fecha_result_us.to_f + @financ_deb_us.to_f ) - @financ_cred_us ) * -1
         @vuelto = 'true'
       else
-        @saldo_fina_us = ( ( @fecha_result_us.to_f + @financ_deb_us.to_f ) - @financ_cred_us )        
+        @saldo_fina_us = ( ( @fecha_result_us.to_f + @financ_deb_us.to_f ) - @financ_cred_us )
       end
 
       if ( ( @fecha_result_gs.to_f + @financ_deb_gs.to_f ) - @financ_cred_gs ) < 0
@@ -284,15 +339,15 @@ class CobrosController < ApplicationController
       else
         @saldo_fina_rs = ( ( @fecha_result_rs.to_f + @financ_deb_rs.to_f ) - @financ_cred_rs )
       end
-      
+
       #ficals
-      @ncs = FormFiscal.where("status != 0 and sigla_proc = 'CB' AND cod_proc = #{@cobro.id} and tipo_doc = 3").select("id, tot_gs, doc_01, doc_02, doc, status")
-      @fts = FormFiscal.where("status != 0 and sigla_proc = 'CB' AND cod_proc = #{@cobro.id} and tipo_doc = 1").select("id, tot_gs, doc_01, doc_02, doc, status")
+      @ncs = FormFiscal.where("status != 0 and sigla_proc = 'CB' AND cod_proc = #{@cobro.id} and tipo_doc = 3").select("ruc, persona_nome, cdc, tipo_emissao, id, tot_gs, doc_01, doc_02, doc, status")
+      @fts = FormFiscal.where("status != 0 and sigla_proc = 'CB' AND cod_proc = #{@cobro.id} and tipo_doc = 1").select("id, tot_gs, doc_01, doc_02, doc, status, cdc, tipo_emissao, ruc, persona_nome")
       @rds = FormFiscal.where("status != 0 and sigla_proc = 'CB' AND cod_proc = #{@cobro.id} and tipo_doc = 15").select("id, tot_gs, doc_01, doc_02, doc, status, autorizacao")
       render layout: 'chart'
     end
 
-    def recibo          #
+    def recibo
         @cobro        = Cobro.find(params[:id])
         @cd           = CobrosDetalhe.all(:conditions => ['cobro_id = ?',params[:id]])
         @cf           = CobrosFinanca.all(:conditions => ['cobro_id = ?',params[:id]])
@@ -383,23 +438,23 @@ class CobrosController < ApplicationController
                       (SELECT SUM(AT.COBRO_DOLAR) FROM CLIENTES AT WHERE AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_US,
                       (SELECT SUM(AT.COBRO_GUARANI) FROM CLIENTES AT WHERE AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_GS
             FROM CLIENTES C
-            
+
             LEFT JOIN VENDAS V
             ON C.VENDA_ID = V.ID
-            
+
             LEFT JOIN SUB_GRUPOs SG
             ON V.SUB_GRUPO_ID = SG.ID
-            
+
             LEFT JOIN UNIDADES U
-            ON C.UNIDADE_ID = U.ID 
-            
+            ON C.UNIDADE_ID = U.ID
+
             WHERE C.PERSONA_ID = #{@cobro.persona_id} AND C.LIQUIDACAO = 0 AND (C.DIVIDA_GUARANI + C.DIVIDA_DOLAR ) > 0
             ORDER BY 11,15
-                      "        
+                      "
     @cliente  = Cliente.find_by_sql(sql)
     respond_to do |format|
       format.html do
-        render  :pdf                    => "relatorio_contas_receber",                
+        render  :pdf                    => "relatorio_contas_receber",
                 :layout                 => "layer_relatorios",
                 :formats => [:html],
                 :user_style_sheet       => '/assets/relatorios.css',
@@ -407,7 +462,7 @@ class CobrosController < ApplicationController
                 :margin => {:top        => '0.90in',
                             :bottom     => '0.25in',
                             :left       => '0.10in',
-                            :right      => '0.10in'},        
+                            :right      => '0.10in'},
                 :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
                             :font_size  => 7,
                             :spacing    => 20},
@@ -416,7 +471,7 @@ class CobrosController < ApplicationController
                             :right      => "Pagina [page] de [toPage]",
                             :left       => "MercoSys Enterprise - #{t('DATE')} de la imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
       end
-    end 
+    end
 
     end
 
@@ -425,7 +480,65 @@ class CobrosController < ApplicationController
         @count = CobrosDetalhe.count( :id, :conditions => ['cobro_id = ?',params[:id]])
         ps = Persona.find(@cobro.persona_id)
         if Empresa.last.segmento.to_i != 1
-        sql = "SELECT C.ID,
+
+          sql = "SELECT
+                      C.PERSONA_ID,
+                      C.DOCUMENTO_NUMERO_01 || '-' || C.documento_numero_02 || '-' || C.DOCUMENTO_NUMERO as doc,
+                      C.COTA,
+                      MIN(C.ID) AS ID,
+                      MIN(C.DOCUMENTO_NUMERO_01) AS DOCUMENTO_NUMERO_01,
+                      MIN(C.DOCUMENTO_NUMERO_02) AS DOCUMENTO_NUMERO_02,
+                      MIN(C.DOCUMENTO_NUMERO) AS DOCUMENTO_NUMERO,
+                      MAX(C.PERSONA_NOME) AS PERSONA_NOME,
+                      MIN(C.VENDEDOR_NOME) AS VENDEDOR_NOME,
+                      MIN(C.VENDEDOR_ID) AS VENDEDOR_ID,
+                      MIN(C.VENDEDOR_NOME) AS VENDEDOR_NOME,
+                      MIN(C.COD_PROC) AS COD_PROC,
+                      MIN(C.SIGLA_PROC) AS SIGLA_PROC,
+                      MAX(C.MOEDA) AS MOEDA,
+                      MAX(C.COD_PROC) AS COD_PROC,
+                      MAX(C.SIGLA_PROC) AS SIGLA_PROC,
+                      MIN(C.DATA) AS DATA,
+                      MIN(C.LIQUIDACAO) AS LIQUIDACAO,
+                      MIN(C.DESCRICAO) AS DESCRICAO,
+                      MIN(P.NOME) AS ALUNO_NOME,
+                      MIN(C.TOT_COTAS) AS TOT_COTAS,
+                      MIN(C.VENDA_ID) AS VENDA_ID,
+                      MIN(CC.NOME) AS CC_NOME,
+                      MIN(C.CENTRO_CUSTO_ID) AS CENTRO_CUSTO_ID,
+                      MIN(V.COTACAO) AS COTACAO_VENDA,
+                      ARRAY(SELECT (VP.PRODUTO_NOME) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = MIN(C.VENDA_ID) ) AS array_venda_produtos,
+                      MIN(C.VENCIMENTO) AS VENCIMENTO,
+                      SUM(COALESCE(C.DIVIDA_DOLAR,0)) AS DIVIDA_DOLAR,
+                      SUM(COALESCE(C.DIVIDA_GUARANI,0)) AS DIVIDA_GUARANI,
+                      SUM(COALESCE(C.DIVIDA_REAL,0)) AS DIVIDA_REAL,
+                      SUM(COALESCE(C.COBRO_DOLAR,0)) AS COBRO_DOLAR,
+                      SUM(COALESCE(C.COBRO_GUARANI,0)) AS COBRO_GUARANI,
+                      SUM(COALESCE(C.COBRO_REAL,0)) AS COBRO_REAL,
+                      SUM(COALESCE(C.COBRO_DOLAR,0) ) AS ANTERIOR_US,
+                      SUM(COALESCE(C.COBRO_GUARANI,0)) AS ANTERIOR_GS,
+                      SUM(COALESCE(C.COBRO_REAL,0)) AS ANTERIOR_RS
+
+            FROM CLIENTES C
+
+            LEFT JOIN VENDAS V
+            ON C.VENDA_ID = V.ID
+
+            LEFT JOIN UNIDADES U
+            ON C.UNIDADE_ID = U.ID
+
+            INNER JOIN PERSONAS P
+            ON P.ID = C.PERSONA_ID
+
+            LEFT JOIN CENTRO_CUSTOS CC
+            ON C.CENTRO_CUSTO_ID = CC.ID
+
+            WHERE C.UNIDADE_ID = #{current_unidade.id} AND C.PERSONA_ID = #{@cobro.persona_id} AND C.LIQUIDACAO = 0
+
+            GROUP BY 1,2,3
+            ORDER BY 10,2,3,12"
+
+        sql2 = "SELECT C.ID,
                       C.PERSONA_ID,
                       C.PERSONA_NOME,
                       C.VENDEDOR_ID,
@@ -456,26 +569,27 @@ class CobrosController < ApplicationController
                       CC.NOME AS CC_NOME,
                       C.CENTRO_CUSTO_ID,
                       V.COTACAO AS COTACAO_VENDA,
+                      ARRAY(SELECT (VP.PRODUTO_NOME) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = C.VENDA_ID) AS array_venda_produtos,
                       (SELECT SUM(AT.COBRO_DOLAR) FROM CLIENTES AT WHERE AT.UNIDADE_ID = #{current_unidade.id} AND AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_US,
                       (SELECT SUM(AT.COBRO_GUARANI) FROM CLIENTES AT WHERE AT.UNIDADE_ID = #{current_unidade.id} AND AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_GS,
                       (SELECT SUM(AT.COBRO_REAL) FROM CLIENTES AT WHERE AT.UNIDADE_ID = #{current_unidade.id} AND AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_RS
             FROM CLIENTES C
-            
+
             LEFT JOIN VENDAS V
             ON C.VENDA_ID = V.ID
-            
+
             LEFT JOIN UNIDADES U
-            ON C.UNIDADE_ID = U.ID 
+            ON C.UNIDADE_ID = U.ID
 
             INNER JOIN PERSONAS P
-            ON P.ID = C.PERSONA_ID            
+            ON P.ID = C.PERSONA_ID
 
             LEFT JOIN CENTRO_CUSTOS CC
             ON C.CENTRO_CUSTO_ID = CC.ID
-            
-            WHERE C.UNIDADE_ID = #{current_unidade.id} AND C.PERSONA_ID = #{@cobro.persona_id} AND C.LIQUIDACAO = 0 AND (C.DIVIDA_GUARANI + C.DIVIDA_DOLAR + C.DIVIDA_REAL ) > 0
+
+            WHERE C.UNIDADE_ID = #{current_unidade.id} AND C.PERSONA_ID = #{@cobro.persona_id} AND C.LIQUIDACAO = 0
             ORDER BY 12,16
-                      "               
+                      "
         else
 
 sql = "
@@ -510,31 +624,32 @@ sql = "
                       CC.NOME AS CC_NOME,
                       C.CENTRO_CUSTO_ID,
                       V.COTACAO AS COTACAO_VENDA,
+                      ARRAY(SELECT (VP.PRODUTO_NOME) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = C.VENDA_ID) AS array_venda_produtos,
                       (SELECT SUM(AT.COBRO_DOLAR) FROM CLIENTES AT WHERE AT.UNIDADE_ID = #{current_unidade.id} AND AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_US,
                       (SELECT SUM(AT.COBRO_GUARANI) FROM CLIENTES AT WHERE AT.UNIDADE_ID = #{current_unidade.id} AND AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_GS,
                       (SELECT SUM(AT.COBRO_REAL) FROM CLIENTES AT WHERE AT.UNIDADE_ID = #{current_unidade.id} AND AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_RS
             FROM CLIENTES C
-            
+
             LEFT JOIN VENDAS V
             ON C.VENDA_ID = V.ID
-            
+
             LEFT JOIN UNIDADES U
-            ON C.UNIDADE_ID = U.ID 
+            ON C.UNIDADE_ID = U.ID
 
             INNER JOIN PERSONAS P
             ON P.ID = C.PERSONA_ID
-            
+
             LEFT JOIN CENTRO_CUSTOS CC
             ON C.CENTRO_CUSTO_ID = CC.ID
-            
+
             WHERE C.UNIDADE_ID = #{current_unidade.id} AND P.VEND_RESPONSAVEL_ID = #{@cobro.persona_id} AND C.LIQUIDACAO = 0 AND (C.DIVIDA_GUARANI + C.DIVIDA_DOLAR + C.DIVIDA_REAL ) > 0
 
             ORDER BY 12,16
-                      "   
-          
+                      "
+
         end
 
-             
+
 @cliente  = Cliente.find_by_sql(sql)
 
        render layout: 'chart'
@@ -550,7 +665,7 @@ sql = "
     end
 
     def edit
-        @cobro = Cobro.find(params[:id])        
+        @cobro = Cobro.find(params[:id])
     end
 
     def create
@@ -582,7 +697,7 @@ sql = "
         @cobro.unidade_updated = current_unidade.id
 
         respond_to do |format|
-      
+
             if @cobro.update_attributes(params[:cobro])
                 if @cobro.adelanto == 1
                   format.html { redirect_to("/cobros/#{@cobro.id}/cobro_adelanto") }

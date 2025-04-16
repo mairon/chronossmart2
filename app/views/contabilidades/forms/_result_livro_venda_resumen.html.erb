@@ -39,18 +39,25 @@
       <% sub_imposto_10  = 0 %>
       <% sub_total_guarani = 0 %>
       <% sub_total_us = 0 %>
+      <% find_cotiz   = 0 %>
 
       <% @venda.each do |venda| %>
 		<% if venda.def.to_i == 0 %>
 
 
         <% cotiz = Moeda.find_by_data(venda.data,:select =>'id,data,cotacao_oficial_compra')%>
+
+        <% if cotiz.blank? %>
+          <% find_cotiz = 0 %>
+        <% else %>
+          <% find_cotiz = cotiz.cotacao_oficial_compra.to_f%>
+        <% end %>
         <% per = Persona.find_by_id(venda.persona_id,:select =>'id,ruc' )%>
       
         <tr class = "<%= cycle("cor1", "cor2") %>">
           <td align="center" ><%= venda.data.strftime("%d/%m/%Y") %></td>
           <td align="center" ><%= venda.tabela_id %></td>          
-          <td align="center" ><%= number_to_currency(cotiz.cotacao_oficial_compra.to_f, :format=>' %n ', :precision => 2) unless cotiz.nil? %></td>
+          <td align="center" ><%= number_to_currency(find_cotiz, :format=>' %n ', :precision => 2) unless cotiz.nil? %></td>
           <td align="center" ><%= venda.documento_numero_01 %>-<%= venda.documento_numero_02 %>-<%= venda.documento_numero %> </td>
           <% if venda.tipo == 0 %>
           <td align="center" >FC</td>
@@ -61,15 +68,15 @@
 		  <% if venda.status == 0%>
           	<% if venda.moeda == 0 %>
 			
-          	  <td align="right"  ><%= number_to_currency( ex  = venda.exentas_dolar.to_f * cotiz.cotacao_oficial_compra.to_f,    :format=>' %n ', :precision => 0) %></td>
+          	  <td align="right"  ><%= number_to_currency( ex  = venda.exentas_dolar.to_f * find_cotiz,    :format=>' %n ', :precision => 0) %></td>
 
-              <% g05 =( (  venda.gravadas_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f) - (venda.imposto_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f ) ) %>
+              <% g05 =( (  venda.gravadas_05_dolar.to_f * find_cotiz) - (venda.imposto_05_dolar.to_f * find_cotiz ) ) %>
 
-              <td align="right"  ><%= number_to_currency( g05.to_f + g10 =( ( venda.gravadas_10_dolar.to_f - ( venda.gravadas_10_dolar.to_f  / 11 ) )  * cotiz.cotacao_oficial_compra.to_f ), :format=>' %n ', :precision => 0) %></td>
+              <td align="right"  ><%= number_to_currency( g05.to_f + g10 =( ( venda.gravadas_10_dolar.to_f - ( venda.gravadas_10_dolar.to_f  / 11 ) )  * find_cotiz ), :format=>' %n ', :precision => 0) %></td>
 
-          	   <% i05 = venda.imposto_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f %>
+          	   <% i05 = venda.imposto_05_dolar.to_f * find_cotiz %>
 
-           	   <td align="right"  ><%= number_to_currency( i05.to_f + i10 = ( ( venda.gravadas_10_dolar.to_f  / 11 ) * cotiz.cotacao_oficial_compra.to_f ), :format=>' %n ', :precision => 0) %></td>
+           	   <td align="right"  ><%= number_to_currency( i05.to_f + i10 = ( ( venda.gravadas_10_dolar.to_f  / 11 ) * find_cotiz ), :format=>' %n ', :precision => 0) %></td>
 
            	   <td align="right"  ><%= number_to_currency( tot = ( ex.to_f + g05.to_f + i05.to_f + g10 + i10.to_f ), :format=>' %n ', :precision => 0) %></td>
 
@@ -144,7 +151,7 @@
         <tr class = "<%= cycle("corb1", "corb2") %>">
           <td align="center" ><%= venda.data.strftime("%d/%m/%Y") %></td>
           <td align="center" ><%= venda.id %></td>
-          <td align="center" ><%= number_to_currency(cotiz.cotacao_oficial_compra.to_f, :format=>' %n ', :precision => 2) %></td>          
+          <td align="center" ><%= number_to_currency(find_cotiz, :format=>' %n ', :precision => 2) %></td>          
           <td align="center" ><%= venda.documento_numero_01 %> - <%= venda.documento_numero_02 %> - <%= venda.documento_numero %> </td>
           <% if venda.tipo == 0 %>
           <td align="center" >FC</td>
@@ -155,14 +162,14 @@
 		  <% if venda.status == 0%>
           	<% if venda.moeda == 0 %>
 			
-          	   <td align="right"  ><%= number_to_currency( ex  = venda.exentas_dolar.to_f * cotiz.cotacao_oficial_compra.to_f,    :format=>' %n ', :precision => 0) %></td>
+          	   <td align="right"  ><%= number_to_currency( ex  = venda.exentas_dolar.to_f * find_cotiz,    :format=>' %n ', :precision => 0) %></td>
           	   
-              <% g05 =( (  venda.gravadas_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f) - (venda.imposto_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f ) ) %>
+              <% g05 =( (  venda.gravadas_05_dolar.to_f * find_cotiz) - (venda.imposto_05_dolar.to_f * find_cotiz ) ) %>
 
-               <td align="right"  ><%= number_to_currency( g05.to_f + g10 =( ( venda.gravadas_10_dolar.to_f - ( venda.gravadas_10_dolar.to_f  / 11 ) )  * cotiz.cotacao_oficial_compra.to_f ), :format=>' %n ', :precision => 0) %></td>
+               <td align="right"  ><%= number_to_currency( g05.to_f + g10 =( ( venda.gravadas_10_dolar.to_f - ( venda.gravadas_10_dolar.to_f  / 11 ) )  * find_cotiz ), :format=>' %n ', :precision => 0) %></td>
           	 
-              <% i05 = venda.imposto_05_dolar.to_f * cotiz.cotacao_oficial_compra.to_f %>
-           	  <td align="right"  ><%= number_to_currency( i05.to_f + i10 = ( ( venda.gravadas_10_dolar.to_f  / 11 ) * cotiz.cotacao_oficial_compra.to_f ), :format=>' %n ', :precision => 0) %></td>
+              <% i05 = venda.imposto_05_dolar.to_f * find_cotiz %>
+           	  <td align="right"  ><%= number_to_currency( i05.to_f + i10 = ( ( venda.gravadas_10_dolar.to_f  / 11 ) * find_cotiz ), :format=>' %n ', :precision => 0) %></td>
 
            	  <td align="right"  ><%= number_to_currency( tot = ( ex.to_f + g05.to_f + i05.to_f + g10 + i10.to_f ), :format=>' %n ', :precision => 0) %></td>
 

@@ -1,10 +1,66 @@
 class PersonasController < ApplicationController
 	before_filter :authenticate
 
+def visao_geral_cliente_print
+		@persona = Persona.find(params[:id])
+		@cliente_saldo = Cliente.sum('divida_guarani - cobro_guarani',:conditions => ["liquidacao = 0 and persona_id = ?",@persona.id])
+				sql = "SELECT
+											C.PERSONA_ID,
+											C.DOCUMENTO_NUMERO_01 || '-' || C.documento_numero_02 || '-' || C.DOCUMENTO_NUMERO as doc,
+											C.COTA,
+											MAX(C.PERSONA_NOME) AS PERSONA_NOME,
+											MIN(C.VENDEDOR_NOME) AS VENDEDOR_NOME,
+											MAX(C.MOEDA) AS MOEDA,
+											MAX(C.COD_PROC) AS COD_PROC,
+											MAX(C.SIGLA_PROC) AS SIGLA_PROC,
+											MIN(C.DATA) AS DATA,
+											MIN(C.VENCIMENTO) AS VENCIMENTO,
+											SUM(COALESCE(C.DIVIDA_DOLAR,0) ) AS DIVIDA_DOLAR,
+											SUM(COALESCE(C.DIVIDA_GUARANI,0)) AS DIVIDA_GUARANI,
+											SUM(COALESCE(C.DIVIDA_REAL,0)) AS DIVIDA_REAL,
+											SUM(COALESCE(C.COBRO_DOLAR,0)) AS COBRO_DOLAR,
+											SUM(COALESCE(C.COBRO_GUARANI,0)) AS COBRO_GUARANI,
+											SUM(COALESCE(C.COBRO_REAL,0)) AS COBRO_REAL
+						FROM CLIENTES C
+						WHERE C.PERSONA_ID = #{@persona.id} and C.LIQUIDACAO = 0
+						GROUP BY 1,2,3
+						ORDER BY 10,2,3,12"
+		@cliente  = Cliente.find_by_sql(sql)
+
+
+		  respond_to do |format|
+		    if params[:tipo] == '1'
+		      format.html {
+		        xls = render_to_string :action => "visao_geral_cliente_print", :layout => false
+		        kit = PDFKit.new(xls,
+		                         :encoding => 'UTF-8')
+		        send_data(xls,:filename => "#{@persona.nome}.xls")
+		      }
+		    else
+		        format.html do
+		          render  :pdf                    => "visao_geral_cliente_print",
+		                  :layout                 => "layer_relatorios",
+		                  :margin => {:top        => '0.20in',
+		                              :bottom     => '0.25in',
+		                              :left       => '0.10in',
+		                              :right      => '0.10in'},
+		                 :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
+		                              :font_size  => 7,
+		                              :spacing    => 25},
+		                  :footer => {:font_name  => 'arial, 900',
+		                              :font_size  => 7,
+		                              :right      => "Pagina [page] de [toPage]",
+		                              :left       => "Chronos Software - Fecha de la imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
+		        end
+		      end
+		    end
+	end
+
+
 	def envia_login_app
 		@persona = Persona.find(params[:id])
 		PersonaLogin.mensagem_login(@persona).deliver
-		
+
 		redirect_to(persona_path(@persona))
 	end
 
@@ -15,7 +71,7 @@ class PersonasController < ApplicationController
 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  Codigo        Turma                               Aluno                                                            Responsable                               
+  Codigo        Turma                               Aluno                                                            Responsable
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
         "
@@ -24,7 +80,7 @@ class PersonasController < ApplicationController
 		sql = "SELECT P.ID,
 								  P.NOME,
 								  T.NOME AS TURMA_NOME,
-								  R.NOME AS RESPONSAVEL_NOME	
+								  R.NOME AS RESPONSAVEL_NOME
 
 							FROM PERSONAS P
 
@@ -37,7 +93,7 @@ class PersonasController < ApplicationController
 							WHERE P.TIPO_ALUNO = 1 AND P.UNIDADE_ID = #{current_unidade.id} #{turma} #{per}
 
 							ORDER BY 3,2"
-		@personas = Persona.find_by_sql(sql)							
+		@personas = Persona.find_by_sql(sql)
 
 		respond_to do |format|
 
@@ -102,6 +158,7 @@ class PersonasController < ApplicationController
         produto = "AND S.PRODUTO_NOME ILIKE '%#{params[:busca]}%'"
       end
 
+      busca = "AND to_tsvector(upper((P.NOME)) ) @@ to_tsquery(upper('#{params[:busca].to_s.gsub(/\s/,'&')}:*'))" unless params[:busca].blank?
     sql = "SELECT S.DATA,
             S.COD_PROCESSO,
             S.SIGLA_PROC,
@@ -130,7 +187,7 @@ class PersonasController < ApplicationController
 
         WHERE
           S.PERSONA_ID = #{@persona.id}
-          AND to_tsvector(upper((P.NOME)) ) @@ to_tsquery(upper('#{params[:busca].gsub(/\s/,'&')}:*'))
+          #{busca}
           #{data}
 
         ORDER BY S.DATA DESC, S.ID LIMIT 50"
@@ -190,40 +247,27 @@ class PersonasController < ApplicationController
 	def visao_geral_cliente
 		@persona = Persona.find(params[:id])
 		@cliente_saldo = Cliente.sum('divida_guarani - cobro_guarani',:conditions => ["liquidacao = 0 and persona_id = ?",@persona.id])
-				sql = "SELECT C.ID,
+				sql = "SELECT
 											C.PERSONA_ID,
-											C.PERSONA_NOME,
-											C.VENDEDOR_ID,
-											C.VENDEDOR_NOME,
-											C.COD_PROC,
-											C.SIGLA_PROC,
-											C.LIQUIDACAO,
-											C.MOEDA,
-											C.TIPO,
-											C.DATA,
-											C.VENCIMENTO,
-											C.COTA,
-											C.DIVIDA_DOLAR,
-											C.DIVIDA_GUARANI,
-											C.DIVIDA_REAL,
-											C.COBRO_DOLAR,
-											C.COBRO_GUARANI,
-											C.COBRO_REAL,
-											C.DESCRICAO,
-											C.VENDA_ID,
 											C.DOCUMENTO_NUMERO_01 || '-' || C.documento_numero_02 || '-' || C.DOCUMENTO_NUMERO as doc,
-											U.UNIDADE_NOME,
-											V.COTACAO AS COTACAO_VENDA,
-											(SELECT SUM(AT.COBRO_DOLAR) FROM CLIENTES AT WHERE AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_US,
-											(SELECT SUM(AT.COBRO_GUARANI) FROM CLIENTES AT WHERE AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_GS
+											C.COTA,
+											MAX(C.PERSONA_NOME) AS PERSONA_NOME,
+											MIN(C.VENDEDOR_NOME) AS VENDEDOR_NOME,
+											MAX(C.MOEDA) AS MOEDA,
+											MAX(C.COD_PROC) AS COD_PROC,
+											MAX(C.SIGLA_PROC) AS SIGLA_PROC,
+											MIN(C.DATA) AS DATA,
+											MIN(C.VENCIMENTO) AS VENCIMENTO,
+											SUM(COALESCE(C.DIVIDA_DOLAR,0) ) AS DIVIDA_DOLAR,
+											SUM(COALESCE(C.DIVIDA_GUARANI,0)) AS DIVIDA_GUARANI,
+											SUM(COALESCE(C.DIVIDA_REAL,0)) AS DIVIDA_REAL,
+											SUM(COALESCE(C.COBRO_DOLAR,0)) AS COBRO_DOLAR,
+											SUM(COALESCE(C.COBRO_GUARANI,0)) AS COBRO_GUARANI,
+											SUM(COALESCE(C.COBRO_REAL,0)) AS COBRO_REAL
 						FROM CLIENTES C
-						LEFT JOIN VENDAS V
-						ON C.VENDA_ID = V.ID
-						LEFT JOIN UNIDADES U
-						ON C.UNIDADE_ID = U.ID
-						WHERE C.PERSONA_ID = #{@persona.id} AND C.LIQUIDACAO = 0 AND (C.DIVIDA_GUARANI + C.DIVIDA_DOLAR + c.DIVIDA_REAL ) > 0
-						ORDER BY 11,15
-											"
+						WHERE C.PERSONA_ID = #{@persona.id} and C.LIQUIDACAO = 0
+						GROUP BY 1,2,3
+						ORDER BY 10,2,3,12"
 		@cliente  = Cliente.find_by_sql(sql)
 		render :layout => 'consulta'
 	end
@@ -506,7 +550,7 @@ class PersonasController < ApplicationController
 
 	end
 
-	def busca                       #
+	def busca
 			tipo = "nome" if params[:tipo] == "DESCRIPCION"
 			tipo = "ruc"  if params[:tipo] == "RUC"
 			persona = "AND tipo_fornecedor = 1"    if params[:per] == "PROVEEDOR"
@@ -526,9 +570,9 @@ class PersonasController < ApplicationController
 			end
 
 			@personas = Persona.paginate(select: "escolaridade, data_nascimento,id,obs,cod_impl, data, nome, classificacao,ruc,tipo,estado,telefone,telefone2,nome_fatura,tabela_preco_id,estado_id,cidade_id,direcao,residencia_numero,direcao_complemento",
-					:conditions => ["unidade_id = #{current_unidade.id} and #{tipo} ILIKE ? #{persona} OR NOME_FATURA ILIKE ? #{persona} #{tp}", "%#{params[:busca]}%", "%#{params[:busca]}%"],
+					:conditions => ["#{tipo} ILIKE ? #{persona} OR NOME_FATURA ILIKE ? #{persona} #{tp}", "%#{params[:busca]}%", "%#{params[:busca]}%"],
 					:page     => params[:page],
-					:per_page => 100,
+					:per_page => 40,
 					:order => "nome"
 			)
 			respond_to do |format|

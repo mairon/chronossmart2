@@ -54,7 +54,7 @@
                         :id,:descricao, {prompt: 'Seleccione lo Grupo'}, required: true %>
                 </div>
                 <div class="col-md-4">
-                  <label>Sub-Grupo</label>
+                  <label>Sub-Grupo/Colleción</label>
                   <%= f.collection_select :sub_grupo_id, SubGrupo.all(:select => 'id,descricao',:order => '2'),
                           :id,:descricao, {prompt: 'Seleccione lo Sub-Grupo'}, required: true %>
                 </div>
@@ -78,8 +78,22 @@
                     <label>Tipo</label>
                     <%= f.select :referencia, [['AUTOMATICO', 'AUTOMATICO'],['MECANICO', 'MECANICO']], class: 'panel-field', prompt: 'Selecione' %>
                   </div>
+                </div>  
 
-                </div>              
+                <div class="row">
+                  <div class="col-md-3">
+                    <label>Chapa</label>
+                    <%= f.text_field :placa, class: 'panel-field' %>
+                  </div>
+                  <div class="col-md-3">
+                    <label>Nº Motor</label>
+                    <%= f.text_field :numero_motor, class: 'panel-field' %>
+                  </div>
+                  <div class="col-md-3">
+                    <label>Ex.</label>
+                    <%= f.text_field :ex, class: 'panel-field' %>
+                  </div>                  
+                </div>                            
               <% else %>
 
                 <div class="row">

@@ -17,7 +17,7 @@
                       <small><%= os.data.strftime("%d/%m/%y") %></small><br>
                       <small> <%= os.produto.nome %></small>
                     </td>
-                    <td width="30" align="right"><%= os.quantidade %></td>
+                    <td width="30" align="right"><%= format_peso(os.quantidade) %></td>
                     <% if @ordem_serv.moeda.to_i == 0 %>
                       <td width="70" align="right"><%= format_decimal(os.valor_us) %></td>
                       <% vt += (os.valor_us.to_f * os.quantidade.to_f) %>

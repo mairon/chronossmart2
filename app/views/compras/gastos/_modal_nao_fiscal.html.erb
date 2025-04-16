@@ -9,17 +9,7 @@
     <%= f.hidden_field :cotacao %>
     <%= f.hidden_field :cotacao_real %>
     <%= f.hidden_field :cotacao_rs_us %>
-   
 
-    <% sql = "SELECT PC.ID,
-                     (PG.DESCRICAO || ' > ' || PC.DESCRICAO) AS DESCRICAO
-              FROM PLANO_DE_CONTAS PC
-              LEFT JOIN PLANO_DE_CONTAS PG
-              ON SUBSTRING(PG.CODIGO, 1, 8) = SUBSTRING(PC.CODIGO, 1, 8)
-              WHERE LENGTH(PC.CODIGO) >=12 AND LENGTH(PG.CODIGO) =8
-              ORDER BY 2"
-      plano = PlanoDeConta.find_by_sql(sql)
-    %>
     <div class="row">
       <div class="col-md-5">
         <label>
@@ -45,31 +35,29 @@
         <%= f.date_select :competencia, :discard_day => true %>
       </div>
     </div>
-
-    <div class="row">
-      <div class="col-md-7">
-        <label><%= t('CLASSIFICATION') %></label>
-        <%= f.collection_select :plano_de_conta_id, plano,:id, :descricao,{:prompt => 'Selecione'}, {required: true} %>
+    <% if Empresa.last.gasto_detalhado == false %>
+      <div class="row">
+        <div class="col-md-7">
+          <label><%= t('CLASSIFICATION') %></label>
+          <%= f.collection_select :plano_de_conta_id, PlanoDeConta.list_classificao,:id, :descricao,{:prompt => 'Selecione'}, {required: true} %>
+        </div>
+        <div class="col-md-5">
+          <label><%= t('CENTER_OF_COSTOS') %></label>
+          <%= f.collection_select :centro_custo_id, CentroCusto.all( :select => 'id,nome', :order  => '1' ),:id, :nome, { :prompt => 'Selecione' }, {required: true} %>
+        </div>
       </div>
-      <div class="col-md-5">
-        <label><%= t('CENTER_OF_COSTOS') %></label>
-        <%= f.collection_select :centro_custo_id, CentroCusto.all( :select => 'id,nome', :order  => '1' ),:id, :nome, { :prompt => 'Selecione' }, {required: true} %>
-      </div>
-    </div>
+    <% end %>
 
       <div class="row">
         <div class="col-md-7">
-            <label>Empleado</label>
-            <%= f.collection_select :funcionario_id, Persona.where(tipo_funcionario: 1).select('id,nome'),:id, :nome, { :prompt => 'Selecione' }%>
+        <label>Empleado</label>
+        <%= f.collection_select :funcionario_id, Persona.where(tipo_funcionario: 1).select('id,nome'),:id, :nome, { :prompt => 'Selecione' }%>
         </div>
 
         <div class="col-md-5">
-          <label>Viatico</label>
-          <select id="compra_viatico_id" name="compra[viatico_id]">
-            <option></option>
-          </select>
+        <label>Ref.</label>
+        <%= f.text_field :ob_ref, class: 'panel-field' %>
         </div>
-
       </div>
 
     <% producao = Producao.all( :select => 'id,nome', :order  => '1' ) %>
@@ -88,10 +76,21 @@
     <% unless rodado.blank? %>
 
       <div class="row">
-        <div class="col-md-12">
-            <label>Rodado</label>
-            <%= f.collection_select :rodado_id, rodado,:id, :placa, { :prompt => 'Selecione' } %>
+        <div class="col-md-6">
+          <label>Rodado</label>
+          <%= f.collection_select :rodado_id, rodado,:id, :placa, { :prompt => 'Selecione' } %>
         </div>
+
+        <div class="col-md-3">
+          <label>Litros</label>
+          <%= f.text_field :qtd, value: '000', class: 'panel-field' %>
+        </div>
+
+        <div class="col-md-3">
+          <label>KM</label>
+          <%= f.text_field :km, value: '000', class: 'panel-field' %>
+        </div>
+
       </div>
 
     <% end %>
@@ -206,81 +205,59 @@
 
     <hr>
 
-    <div class="row">
-      <div class="col-md-4">
-        <label><%= t('FORM_OF_PAYMENT') %></label>
-        <%= f.collection_select :forma_pago_id, FormaPago.all(:select => ' id,nome', :conditions => ["gasto = true"],
-              :order => '1'),:id, :nome,{:prompt => 'Selecione'}, {required: true} %>
-        <%= image_tag("select2-spinner.gif", align: "absmiddle", border: 0, id: "spinner-modal", width: 21, height: 21, style: "display: none;") %>
+    <% if Empresa.last.gasto_detalhado == false %>
+      <div class="row">
+        <div class="col-md-4">
+          <label><%= t('FORM_OF_PAYMENT') %></label>
+          <%= f.collection_select :forma_pago_id, FormaPago.all(:select => ' id,nome', :conditions => ["gasto = true"],
+                :order => '1'),:id, :nome,{:prompt => 'Selecione'}, {required: true} %>
+          <%= image_tag("select2-spinner.gif", align: "absmiddle", border: 0, id: "spinner-modal", width: 21, height: 21, style: "display: none;") %>
+        </div>
+
+        <div class="col-md-5 efetivo" hidden>
+          <label><%= t('ACCOUNT') %></label>
+          <% if current_unidade.conta_multi_unidades == true %>
+            <%= f.collection_select :conta_id, Conta.all(:select => ' id,nome', :conditions => ["status = true"], :order => '2'),:id, :nome,{:prompt => 'Selecione'}, {required: true, class: 'conta_id'} %>
+          <% else %>
+            <%= f.collection_select :conta_id, Conta.all(:select => ' id,nome', :conditions => ["status = true and unidade_id = #{current_unidade.id}"], :order => '2'),:id, :nome,{:prompt => 'Selecione'}, {required: true, class: 'conta_id'} %>
+          <% end %>
+        </div>
+
+        <div class="col-md-3 cheque" hidden>
+          <label>Nº Cheque</label>
+          <%= f.text_field :cheque, class: 'panel-field' %>
+        </div>
+
+        <div class="col-md-3 credito" hidden>
+          <label>Cuotas</label>
+          <%= f.text_field :cota, class: 'panel-field', value: '1' %>
+        </div>
+
+        <div class="col-md-3 credito" hidden>
+          <label>Venci.</label>
+          <%= f.text_field :vencimento, value: Time.now.strftime("%d/%m/%Y"), size: 10,  class: "panel-field date" %>
+        </div>
       </div>
 
-      <div class="col-md-5 efetivo" hidden>
-        <label><%= t('ACCOUNT') %></label>
-        <% if current_unidade.conta_multi_unidades == true %>
-          <%= f.collection_select :conta_id, Conta.all(:select => ' id,nome', :conditions => ["status = true"], :order => '2'),:id, :nome,{:prompt => 'Selecione'}, {required: true, class: 'conta_id'} %>          
-        <% else %>
-          <%= f.collection_select :conta_id, Conta.all(:select => ' id,nome', :conditions => ["status = true and unidade_id = #{current_unidade.id}"], :order => '2'),:id, :nome,{:prompt => 'Selecione'}, {required: true, class: 'conta_id'} %>
-        <% end %> 
+      <div class="row">
+        <div class="col-md-3 diferido" hidden>
+          <label>Venci.</label>
+          <%= f.text_field :diferido, value: Time.now.strftime("%d/%m/%Y"), size: 10,  class: "panel-field date" %>
+        </div>
       </div>
-
-      <div class="col-md-3 cheque" hidden>
-        <label>Nº Cheque</label>
-        <%= f.text_field :cheque, class: 'panel-field' %>
-      </div>
-
-      <div class="col-md-3 credito" hidden>
-        <label>Cuotas</label>
-        <%= f.text_field :cota, class: 'panel-field', value: '1' %>
-      </div>
-
-      <div class="col-md-3 credito" hidden>
-        <label>Venci.</label>
-        <%= f.text_field :vencimento, value: Time.now.strftime("%d/%m/%Y"), size: 10,  class: "panel-field date" %>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-3 diferido" hidden>
-        <label>Venci.</label>
-        <%= f.text_field :diferido, value: Time.now.strftime("%d/%m/%Y"), size: 10,  class: "panel-field date" %>
-      </div>
-    </div>
-
+    <% end %>
     <div class="row">
       <div class="col-md-12">
         <%= f.text_area :descricao, class: "panel-field", placeholder: 'Obs.', rows: '3' %>
       </div>
     </div>
-    
+
     <div class="footer-buttons">
       <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
     </div>
 
   <% end %>
 </div>
-
-
-<script>
-  $("#compra_funcionario_id").change(function() {
-      $.ajax({
-        type: "GET",
-         url: "/buscas/busca_viaticos?funcionario_id=" + $("#compra_funcionario_id").val(),
-        beforeSend: function(){
-          $('#spinner-modal').show();
-        },
-        success: function(data){
-          $('#spinner-modal').hide();
-          console.log(data)
-          var $city = $('#compra_viatico_id');
-            $city.empty();
-            $city.append('<option id=' + '' + ' value=' + '' + '>' + '' + '</option>');
-            for (var i = 0; i < data.length; i++) {
-              $city.append('<option id=' + data[i].id + ' value=' + data[i].label + '>' + data[i].label + '</option>');
-            }          
-        }
-      });
-    });
-</script>
 
 <script>
   $(document).ready(function() {
@@ -396,7 +373,7 @@
       $("#compra_conta_id").prop('required', false);
       $("#compra_tipo").val('0');
 
-    
+
     } else if (this.value == '5') {
       $(".efetivo").show();
       $(".credito").hide();
@@ -520,7 +497,7 @@
       var retencao_gs = 0
     };
 
-    
+
 
     $('#compra_total_guarani').val(number_format(tot_gs, 0, ',', '.'));
 
@@ -539,9 +516,9 @@
       var retencao_us = (  (parseFloat(grav_05_us.replace(/\./g, "").replace(",", ".")) / 21) + (parseFloat(grav_10_us.replace(/\./g, "").replace(",", ".")) / 11) ) * 0.70;
     }else{
       var retencao_us = 0;
-      
+
     }
-    
+
     $('#compra_total_dolar').val(number_format(tot_us, 2, ',', '.'));
 
     <% if current_unidade.retencao == true %>

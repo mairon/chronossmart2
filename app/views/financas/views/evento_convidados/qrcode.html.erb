@@ -1,0 +1,19 @@
+<div style="border: 4px solid #fa4736; padding:10px">
+	<div align="center">
+		<%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 100) %>
+	</div>
+	<br>
+	<p align="center"><b><%= @evento_convidado.nome %></b></p>
+	<p align="center"><b><%= @evento_convidado.vendas_produto.produto.nome %></b></p>
+	<div align="center">
+		<img id='barcode' src="https://api.qrserver.com/v1/create-qr-code/?data=https://<%= request.subdomain %>.chronos.com.py:4000/evento_convidados/<%= @evento_convidado.id %>&amp;size=300x300" alt="" title="HELLO" width="300" height="300" />
+	</div>
+	<br>
+</div>
+<style>
+
+p{
+	font-family: arial;
+}	
+</style>
+

@@ -54,6 +54,26 @@ class LoginsController < ApplicationController
     end
   end
 
+  def troca_unidade
+    @unidade = Unidade.find(:first, :select =>'id,nome_sys',:conditions   => ['id = ?',params[:busca]["unidade_id"]])
+    @login   = Usuario.find(:first, :select =>'id,usuario_senha',:conditions => ['id = ?',params[:busca]["usuario_id"]])
+      respond_to do |format|
+        if @unidade and @login
+          session[:unidade]   = params[:busca]["unidade_id"]
+          session[:logged]    = params[:busca]["usuario_id"]
+          flash[:notice]      = 'Logado con Sucesso!'
+          session[:empresa_nome] = @unidade.nome_sys
+
+          format.html {  redirect_to menus_path }
+          format.js
+        else
+          format.html { render :action => "new" }
+          format.js
+        end
+      end
+  end
+
+
   def liberacao
     @liberacao = Login.find(:last,:conditions => ["senha = ?",params[:senha]])
 

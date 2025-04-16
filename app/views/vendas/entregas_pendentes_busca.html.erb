@@ -1,0 +1,45 @@
+<div class="panel">
+	<div class="panel-content">
+		<table class="head_grid">
+			<tr>
+				<td width="50" align="center">Venta</td>
+				<td width="150">Plan de Pagos</td>
+				<td width="250">Cliente</td>
+				<td width="250">Direción</td>
+				<td width="80" align="right">Ctd.</td>
+				<td width="80" align="right">Env.</td>
+				<td width="80" align="right">Saldo</td>
+			</tr>
+		</table>
+		<div class="rolagem" dir="div">
+		<table>
+			<% count = 0 %>
+			<% saldo = 0 %>
+			<% @vendas_pendentes.each do |pp| %>
+
+				<tr class="<%= cycle("cor1", "cor2")%> clickable-row">
+					<td width="50" align="center"><%= pp.id.to_s.rjust(6,'0') %></td>
+					<td width="150"><%= pp.prazo_nome %></td>
+					<td width="250"><small><%= pp.cliente_nome %></small></td>
+					<td width="250"><small><%= pp.direcao %></small></td>
+					<td width="80" align="right"><%= format_peso(pp.qtd.to_f) %></td>
+					<td width="80" align="right"><%=  format_peso(pp.qtd_enviado.to_f) %></td>
+					<td width="80" align="right"><%=  format_peso(pp.qtd.to_f - pp.qtd_enviado.to_f) %></td>
+					<td><a href="#" class="btn" data-toggle="modal" data-load-url="<%= modal_ordem_entrega_venda_path(pp.id) %>" data-target="#ModalOrdemEntrega"><span class="material-symbols-outlined">local_shipping</span></a></td>
+				</tr>
+
+				<% count += 1 %>
+				<% saldo += (pp.qtd.to_f - pp.qtd_enviado.to_f) %>
+
+			<% end %>
+		</table>
+	</div>
+	<table class="head_grid">
+		<tr>
+			<td >Ventas <%= count %></td>
+			<td width="580"></td>
+			<td width="42" align="right"><%= saldo %></td>
+		</tr>
+	</table>
+	</div>
+</div>

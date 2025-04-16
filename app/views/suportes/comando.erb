@@ -1,15 +1,14 @@
 <h1 align="right" id="header">Soporte</h1>
 poner el comando aquí:
-<%= form_tag consulta_suportes_path, :method => "get" do %>
+<%= form_tag consulta_suportes_path, :method => "post" do %>
    <%= text_area_tag :consulta, nil, :rows => 20, :cols => 100 %>
    <br/>
    <%= submit_tag '      Enviar      ' %>
 <% end %>
-
-
 <%
 
-datas = [ '3f',
+datas = [
+'3f',
 'agro_cordillera',
 'baby_shop',
 'beux',
@@ -18,7 +17,6 @@ datas = [ '3f',
 'casa_moeda',
 'cec',
 'chronos_adm',
-'copassam',
 'crescer',
 'dasilva',
 'datasafer',
@@ -28,19 +26,24 @@ datas = [ '3f',
 'doria',
 'ducampo',
 'impactus',
+'itatec',
 'jk_service',
-'labcopassam',
-'labortest',
+'luffe',
+'luz_ma',
 'maxshop',
 'megacenter',
-'muffatao',
+'menegaz',
 'planner',
 'pointer',
 'santa_catalina',
 'santacatalinamt',
 'srvtecnet',
+'teccursos',
 'tecno_tierra',
-'theboss'
+'theboss',
+'thomaze',
+'tork_performace',
+'vmmujer'
 ]
 
 
@@ -48,7 +51,7 @@ datas.each do |db|
    postgres = PG.connect :host => 'db-postgresql-chronos2-do-user-6983944-0.b.db.ondigitalocean.com', :port => 25060, :dbname => db, :user => 'doadmin', :password => 'AVNS_fJ3ugqAKe6m7keYRk-w'
 
 
-   tables = postgres.exec('')
+   tables = postgres.exec("CREATE INDEX idx_produtos_fts ON produtos USING GIN (to_tsvector('portuguese', upper(COALESCE(NOME, '') || ' ' || COALESCE(REFERENCIA, '') || ' ' ||  COALESCE(OBS, '') || ' ' || COALESCE(FABRICANTE_COD, '')  || ' ' || COALESCE(BARRA, '') || ' ' || COALESCE( CAST(ID AS CHARACTER VARYING ), '') )));")
 
    puts "Gerado #{db}"
 

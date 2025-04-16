@@ -11,91 +11,38 @@
     </div>
   <% end %>
   <%= f.hidden_field :persona_id %>
-  <table>
-    <tr>
-      <td align="right">Pais:</td>
-      <td><%= f.collection_select :paise_id, Paise.all(:select => 'id,nome',
-                                                         :order => '2'),:id,
-                                                         :nome, {prompt: 'Selecione o pais'} %>
 
-      <%= image_tag("load.gif",
-          :align => "absmiddle",
-          :border => 0,
-          :id => "spinne",
-          :width => 21,
-          :height => 21,
-          :style =>"display: none;" ) %>                                                         
-      </td>
-      <td align="right">Depart.:</td>
-      <td><%= f.collection_select :estado_id, Estado.all(:select => 'id,nome', :order => '2'),:id, :nome, {prompt: 'Selecione lo Departamento'} %>
+  <div class="row panel-modal-body">
+    <div class="col-md-12">
+      <label>Ciudad</label>
+          <%= f.collection_select :cidade_id, Cidade.find_by_sql("SELECT C.ID, (E.NOME || ' > ' ||  C.NOME || ' > ' || D.NOME) AS NOME FROM CIDADES C
+            INNER JOIN DISTRITOS D
+            ON D.ID = C.DISTRITO_ID
 
-      <%= image_tag("load.gif",
-          :align => "absmiddle",
-          :border => 0,
-          :id => "spinne2",
-          :width => 21,
-          :height => 21,
-          :style =>"display: none;" ) %>                                                         
-      </td>
-    </tr>
-    <tr>
-      <td align="right">Cidade:</td>
-      <td colspan="4"><%= f.collection_select :cidade_id, Cidade.all(:select => 'id,nome',
-                                                         :order => '2'), :id, :nome, {prompt: 'Selecione la Ciudad'} %></td>
-    </tr>
-    <tr>  
-      <td align="right">Direción:</td>
-      <td colspan="4">
-        <%= f.text_field :direcao, :size => 51 %>
-        Nº: <%= f.text_field :nr, :size => 5 %>
-      </td>
-    </tr>
-    <tr>
-      <td align="right"></td>
-      <td colspan="8"><%= f.text_area :obs, :cols => 61, :rows => 3, placeholder: 'Concepto:' %></td>
-    </tr>
-  </table>
+            INNER JOIN ESTADOS E
+            ON E.ID = D.ESTADO_ID
+
+            ORDER BY 2
+            "), :id, :nome, {prompt: 'Selecione a cidade'} %>      
+    </div>
+
+    <div class="col-md-12">
+      <label>Direción</label>
+      <%= f.text_field :direcao, class: "panel-field" %>
+    </div>
+    <div class="col-md-12">
+      <br>
+      <%= f.text_area :obs, :rows => 3, placeholder: 'Complemento', class: "panel-field" %>
+    </div>
+  
+    <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>  
+    </div>
+  </div>
+
 <% end %>
 
 
 <script type="text/javascript">
- $(document).ready(function() {
-      $("#persona_locais_entrega_paise_id").change(function() {
-        var data=$('#persona_locais_entrega_paise_id').val();
-        $.ajax({
-          type: "GET",
-           url: "/personas/dynamic_estados/"+data,
-          data: data,
-          beforeSend: function()
-          {
-              $('#spinner').show();
-          },
-
-          success: function(response)
-          {
-            $('#spinner').hide();
-          }
-
-        });
-    });
-
-      $("#persona_locais_entrega_estado_id").change(function() {
-        var data=$('#persona_locais_entrega_estado_id').val();
-        $.ajax({
-          type: "GET",
-           url: "/personas/dynamic_cidades/"+data,
-          data: data,
-          beforeSend: function()
-          {
-              $('#spinner2').show();
-          },
-
-          success: function(response)
-          {
-            $('#spinner2').hide();
-          }
-
-        });
-    });
-  });
+  $(' #persona_locais_entrega_cidade_id').selectize();
 </script>

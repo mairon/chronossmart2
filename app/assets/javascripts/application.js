@@ -16,7 +16,6 @@
 //= require plusastab.joelpurra
 //= require validation/jquery.validate
 //= require selectize/dist/js/standalone/selectize
-//= require ckeditor/init
 //= require datepicker
 //= require jquery.lineProgressbar
 //= require all
@@ -27,7 +26,7 @@
 
 
 // Make Dropdown Submenus possible
-$( document ).ready(function() {    
+$( document ).ready(function() {
     $('[data-toggle="tooltip"]').tooltip();
 
    // Make Secondary Dropdown on Click
@@ -44,7 +43,7 @@ $( document ).ready(function() {
       $(this).next('ul').toggle();
    });
 
-  
+
 
 });
 
@@ -71,7 +70,7 @@ function simulateSubmitting(event)
 	}
 
 $(document).ready(function() {
-
+    $('.selectize').selectize();
 	$('.pre-selected-options').multiSelect({cssClass:"full_width"});
 		$(".money_us").maskMoney({thousands:".", decimal:","});
 		$(".money_gs").maskMoney({thousands:".", decimal:",", precision:0, defaultZero: true});
@@ -82,7 +81,7 @@ $(document).ready(function() {
 		$(".select").select2();
 		$(".selc_medium").select2();
 		$(".selc_mini").select2();
-        
+
         $( document ).on( 'focus', ':input', function(){
             $('#inicio, #final').attr( 'autocomplete', 'off' );
         });

@@ -1,0 +1,77 @@
+<div class="panel">
+	<h1 id="header">Dados Fiscales</h1>
+	<div class="panel-body">
+  		<table class="list">
+  			<tr class="head_grid">
+  				<td align="right">Ctd</td>
+  				<td>Producto/Servicio</td>
+  				<td align="right">Tasa</td>
+  				<td align="right">Unit.</td>
+  				<td align="right">Gravadas 10%</td>
+  				<td align="right">Impuesto 10%</td>
+  				<td align="right">Gravadas 5%</td>
+  				<td align="right">Impuesto 5%</td>
+  				<td align="right">Exentas</td>
+  				<td align="right">Tot.</td>
+  			</tr>
+  			
+  			<% tot_g_10 = 0 %>
+  			<% tot_g_05 = 0 %>
+  			<% tot_i_10 = 0 %>
+  			<% tot_i_05 = 0 %>
+  			<% tot_ex = 0 %>
+  			<% tot = 0 %>
+
+  			<% VendasProduto.where("venda_id = #{@form_fiscal.cod_proc}").each do |vp| %>
+  			<tr class = "<%= cycle("cor1", "cor2") %>">
+  				<td width="80" align="right"><%= vp.quantidade %></td>
+  				<td width="340"><%= vp.produto_nome %></td>
+  				<td width="80" align="right"><%= vp.taxa.to_i %></td>
+  				<td width="80" align="right"><%= format_int(vp.unitario_guarani) %></td>
+  				<% if vp.taxa.to_i == 10 %>
+						<td width="80" align="right"><%= format_int((vp.total_guarani.to_f) -  (vp.total_guarani.to_f / 11) ) %></td>  				
+						<td width="80" align="right"><%= format_int((vp.total_guarani.to_f / 11) ) %></td>  				
+						<td align="right">0</td>
+						<td align="right">0</td>
+						<td align="right">0</td>
+
+		  			<% tot_g_10 += (vp.total_guarani.to_f) -  (vp.total_guarani.to_f / 11) %>
+		  			<% tot_i_10 += (vp.total_guarani.to_f / 11) %>
+
+  				<% elsif vp.taxa.to_i == 5 %>
+						<td align="right">0</td>
+						<td align="right">0</td>
+						<td width="80" align="right"><%= format_int((vp.total_guarani.to_f) -  (vp.total_guarani.to_f / 21) ) %></td>  				
+						<td width="80" align="right"><%= format_int((vp.total_guarani.to_f / 21) ) %></td>  				
+						<td align="right">0</td>
+
+		  			<% tot_g_05 += (vp.total_guarani.to_f) - (vp.total_guarani.to_f / 21) %>
+		  			<% tot_i_05 += (vp.total_guarani.to_f / 21) %>
+
+  				<% elsif vp.taxa.to_i == 0 %>
+						<td align="right">0</td>
+						<td align="right">0</td>
+						<td align="right">0</td>
+						<td align="right">0</td>
+						<td width="80" align="right"><%= format_int(vp.total_guarani) %></td>
+						<% tot_ex += vp.total_guarani.to_f %>
+  				<% end %>
+  				<td width="80" align="right"><%= format_int(vp.total_guarani) %></td>
+  				<% tot += vp.total_guarani.to_f %>
+  			</tr>
+  			<% end %>
+  			<tr class="head_grid">
+  				<td align="right"></td>
+  				<td></td>
+  				<td align="right"></td>
+  				<td align="right"></td>
+  				<td align="right"><b><%= format_int(tot_g_10) %></b></td>
+  				<td align="right"><b><%= format_int(tot_i_10) %></b></td>
+  				<td align="right"><b><%= format_int(tot_g_05) %></b></td>
+  				<td align="right"><b><%= format_int(tot_i_05) %></b></td>
+  				<td align="right"><b><%= format_int(tot_ex) %></b></td>
+  				<td align="right"><b><%= format_int(tot) %></b></td>
+  			</tr>  			
+  		</table>
+	</div>
+</div>

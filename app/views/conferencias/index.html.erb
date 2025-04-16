@@ -19,7 +19,7 @@
       <tr class = "<%= cycle("cor1", "cor2") %>">
         <td width="60" align="center"><%= conferencia.id.to_s.rjust(6,'0') %></td>
         <td width="60" align="center"><%= conferencia.data.strftime("%d/%m/%y") %></td>
-        <td width="300"><%= conferencia.sub_grupo.descricao unless conferencia.sub_grupo_id.blank? %></td>
+        <td width="300"><%= conferencia.grupo.descricao unless conferencia.grupo_id.blank? %></td>
         <td width="300"><%= conferencia.deposito.nome unless conferencia.deposito_id.blank? %></td>
         <td width="100" align="right"><%= conferencia.conferencia_produtos.count(:id) %></td>
         <td><%= link_to '', edit_conferencia_path(conferencia), class: 'icon-pencil' %></td>

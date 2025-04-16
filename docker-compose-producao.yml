@@ -10,7 +10,7 @@ services:
       - /chronos-smart2/shared/pids
       - /chronos-smart2/shared/sockets
     ports:
-      - "3000:3000"
+      - "4000:4000"
   nginx:
     restart: always
     build: ./nginx/

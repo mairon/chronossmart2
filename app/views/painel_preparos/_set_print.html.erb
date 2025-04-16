@@ -1,27 +1,19 @@
-<script type="text/javascript" src="/qz/js/qz-tray.js"></script>
-<script type="text/javascript" src="/qz/js/dependencies/rsvp-3.1.0.min.js"></script>
-<script src="https://cdn.rawgit.com/kjur/jsrsasign/c057d3447b194fa0a3fdcea110579454898e093d/jsrsasign-all-min.js"></script>
-<script type="text/javascript" src="/qz/js/dependencies/sha-256.min.js"></script>
+<script type="text/javascript" src="/qz-v2/js/qz-tray.js"></script>
 
-<!-- Pollyfills -->
-<script type="text/javascript" src="/qz/js/sample/jquery-1.11.3.min.js"></script>
-<script type="text/javascript" src="/qz/js/sample/bootstrap.min.js"></script>
-
-
-<script type="text/javascript" src="/qz/js/sample/promise-polyfill-8.1.3.min.js"></script>
-<script type="text/javascript" src="/qz/js/sample/whatwg-fetch-3.0.0.min.js"></script>
-<script type="text/javascript" src="/qz/js/sample/padstart-pollyfill.js"></script>
-<script type="text/javascript" src="/qz/js/sample/array-from-pollyfill.js"></script>
-<script src="/qz/assets/signing/sign-message.js"></script>
+<!-- Required scripts -->
+<script type="text/javascript" src="/qz-v2/js/sample/promise-polyfill-8.1.3.min.js"></script>
+<script type="text/javascript" src="/qz-v2/js/sample/whatwg-fetch-3.0.0.min.js"></script>
+<script type="text/javascript" src="/qz-v2/js/sample/padstart-pollyfill.js"></script>
+<script type="text/javascript" src="/qz-v2/js/sample/array-from-pollyfill.js"></script>
 
 <script>
-	qz.websocket.connect();
+  qz.websocket.connect();
 
-	qz.security.setCertificatePromise(function(resolve, reject) {
-	   fetch("/qz/assets/signing/digital-certificate.txt", {cache: 'no-store', headers: {'Content-Type': 'text/plain'}})
-	      .then(function(data) { data.ok ? resolve(data.text()) : reject(data.text()); });
-	});    
- 
+  qz.security.setCertificatePromise(function(resolve, reject) {
+     fetch("../qz-v2/assets/signing/digital-certificate.txt", {cache: 'no-store', headers: {'Content-Type': 'text/plain'}})
+        .then(function(data) { data.ok ? resolve(data.text()) : reject(data.text()); });
+  });
+
 
     /// Connection ///
     function launchQZ() {
@@ -110,28 +102,20 @@
 
             pinMessage("<strong>Network details:</strong><ul>" + list + "</ul>");
         }).catch(displayError);
-    }	
+    }
+
+</script>
+<script>
+  function QzComprovante(){
+
+        var config = qz.configs.create("PDFwriter");               // Exact printer name from OS
+        var data = ['imprimiu'];   // Raw commands (ZPL provided)
+
+        qz.print(config, data).then(function() {
+           alert("Sent data to printer");
+        });
+
+  };
 </script>
 
-
-	<script>	
-		function print1(id, prods){
-
-		  qz.printers.find('POS-80C').then((found) => {
-		    var config = qz.configs.create('POS-80C');
-
- 						var printData = [{
-				          type: 'pixel',
-				          format: 'html',
-				          flavor: 'file',
-				          data: "/vendas/"+ id +"/ticket_cozinha?painel_preparo=<%= @painel_preparo.id %>&vendas_produto_ids=" + JSON.stringify(prods)
-			      }];
-									
-		      return qz.print(config, printData);
-		  }).catch((e) => {
-		      alert(e);
-		  })
-
-		  $("#card-"+ id ).hide();
-		};
-		</script>
+<a href="#" onclick="QzComprovante()">Print</a>

@@ -45,27 +45,53 @@
           <td width="60">  <%= p.fabricante_cod %></td>
           <td width="150" align="left">   <%= truncate( p.persona_nome, :length => 14 ) %> </td>
           <td width="350" align="left">   <%= truncate( p.produto_nome, :length => 38 ) %> </td>
-  	      <% if params[:moeda] == "0" %>
-            <td width="80" align="right"><%=h number_to_currency( p.unitario_dolar.to_f , :format=>' %n ', :separeitor => ',') %> </td>
-            <% if p.entrada.to_f > 0 %>
-              <td width="80" align="right"><%=h number_to_currency( p.unitario_dolar.to_f * ( p.entrada.to_f ).to_f , :format=>' %n ', :separeitor => ',') %> </td>
-              <% toten_us   += ( p.unitario_dolar.to_f * p.entrada.to_f ) %>
+
+          <% if params[:tipo] == '1' %>
+    	      <% if params[:moeda] == "0" %>
+              <td width="80" align="right"><%= ( p.unitario_dolar.to_f) %> </td>
+              <% if p.entrada.to_f > 0 %>
+                <td width="80" align="right"><%= ( p.unitario_dolar.to_f * ( p.entrada.to_f ).to_f) %> </td>
+                <% toten_us   += ( p.unitario_dolar.to_f * p.entrada.to_f ) %>
+              <% else %>
+                <td width="80" align="right"><%= ( p.unitario_dolar.to_f * ( p.saida.to_f ).to_f) %> </td>
+                <% totsa_us   += ( p.unitario_dolar.to_f * p.saida.to_f )%>
+              <% end %>
+    	        <% unit_us    += p.unitario_dolar.to_f %>
+  	        <% else %>
+              <td width="80" align="right">  <%= ( p.unitario_guarani.to_f ) %> </td>
+              <% if p.entrada.to_f > 0 %>
+                <td width="80" align="right">  <%= ( p.unitario_guarani.to_f * (p.entrada.to_f) ) %> </td>
+                <% toten_gs   += ( p.unitario_guarani.to_f * p.entrada.to_f ) %>
+              <% else %>
+                <td width="80" align="right">  <%= ( p.unitario_guarani.to_f * (p.saida.to_f) ) %> </td>
+                <% totsa_gs   += ( p.unitario_guarani.to_f * p.saida.to_f )%>
+              <% end %>
+  			      <% unit_gs    += p.unitario_guarani.to_f %>
+  	        <% end %>
+
+          <% else %>
+            <% if params[:moeda] == "0" %>
+              <td width="80" align="right"><%= format_decimal( p.unitario_dolar.to_f) %> </td>
+              <% if p.entrada.to_f > 0 %>
+                <td width="80" align="right"><%= format_decimal( p.unitario_dolar.to_f * ( p.entrada.to_f ).to_f) %> </td>
+                <% toten_us   += ( p.unitario_dolar.to_f * p.entrada.to_f ) %>
+              <% else %>
+                <td width="80" align="right"><%= format_decimal( p.unitario_dolar.to_f * ( p.saida.to_f ).to_f) %> </td>
+                <% totsa_us   += ( p.unitario_dolar.to_f * p.saida.to_f )%>
+              <% end %>
+              <% unit_us    += p.unitario_dolar.to_f %>
             <% else %>
-              <td width="80" align="right"><%=h number_to_currency( p.unitario_dolar.to_f * ( p.saida.to_f ).to_f , :format=>' %n ', :separeitor => ',') %> </td>
-              <% totsa_us   += ( p.unitario_dolar.to_f * p.saida.to_f )%>
-            <% end %>
-  	        <% unit_us    += p.unitario_dolar.to_f %>
-	        <% else %>
-            <td width="80" align="right">  <%=h number_to_currency( p.unitario_guarani.to_f , :format=>' %n ', :precision => 0 ) %> </td>
-            <% if p.entrada.to_f > 0 %>
-              <td width="80" align="right">  <%=h number_to_currency( p.unitario_guarani.to_f * (p.entrada.to_f), :format=>' %n ', :precision => 0 ) %> </td>
-              <% toten_gs   += ( p.unitario_guarani.to_f * p.entrada.to_f ) %>
-            <% else %>
-              <td width="80" align="right">  <%=h number_to_currency( p.unitario_guarani.to_f * (p.saida.to_f), :format=>' %n ', :precision => 0 ) %> </td>
-              <% totsa_gs   += ( p.unitario_guarani.to_f * p.saida.to_f )%>
-            <% end %>
-			      <% unit_gs    += p.unitario_guarani.to_f %>
-	        <% end %>
+              <td width="80" align="right">  <%=h format_int( p.unitario_guarani.to_f ) %> </td>
+              <% if p.entrada.to_f > 0 %>
+                <td width="80" align="right">  <%=h format_int( p.unitario_guarani.to_f * (p.entrada.to_f) ) %> </td>
+                <% toten_gs   += ( p.unitario_guarani.to_f * p.entrada.to_f ) %>
+              <% else %>
+                <td width="80" align="right">  <%=h format_int( p.unitario_guarani.to_f * (p.saida.to_f) ) %> </td>
+                <% totsa_gs   += ( p.unitario_guarani.to_f * p.saida.to_f )%>
+              <% end %>
+              <% unit_gs    += p.unitario_guarani.to_f %>
+            <% end %>          
+          <% end  %>
 
           <td width="80" align="right">  <%=h format( "%.1f",p.entrada.to_f ) %> </td>
           <td width="80" align="right">  <%=h format( "%.1f",p.saida.to_f ) %> </td>

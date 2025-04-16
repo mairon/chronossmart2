@@ -1,0 +1,56 @@
+<%= form_for(@ordem_entrega) do |f| %>
+  <% if @ordem_entrega.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@ordem_entrega.errors.count, "error") %> prohibited this ordem_entrega from being saved:</h2>
+
+      <ul>
+      <% @ordem_entrega.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> ordem_entregas - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+
+                      <td align="right">venda_id :</td>
+                      <td><%= f.number_field :venda_id %></td>
+
+                      <td align="right">persona_id :</td>
+                      <td><%= f.number_field :persona_id %></td>
+
+                      <td align="right">vendedor_id :</td>
+                      <td><%= f.number_field :vendedor_id %></td>
+
+                      <td align="right">obs :</td>
+                      <td><%= f.text_area :obs %></td>
+
+                      <td align="right">local_retirada :</td>
+                      <td><%= f.number_field :local_retirada %></td>
+                                      </tr>
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', ordem_entregas_path, :class => "button back" %>
+      </div>
+
+    </div>
+<% end %>

@@ -3,7 +3,7 @@ class VendasProdutosController < ApplicationController
     @vendas_produto = VendasProduto.find(params[:vendas_produto_id])
     @vendas_produto.update_attributes(quantidade: params[:update_vendas_produto_qtd])
 
-    respond_to do |format|      
+    respond_to do |format|
       format.js
     end
   end
@@ -75,8 +75,6 @@ class VendasProdutosController < ApplicationController
 
     def destroy
 
-
-
       @vendas_produto = VendasProduto.destroy(params[:id])
         vd = Persona.find(@vendas_produto.venda.vendedor_id)
       Audit.create(
@@ -88,7 +86,6 @@ class VendasProdutosController < ApplicationController
         user_type: 'Usuario',
         action: 'destroy',
         version: 1,
-        vendedor_id: @vendas_produto.venda.vendedor_id,
         unidade_id: current_unidade.id,
         cod_processo: @vendas_produto.venda_id.to_s.rjust(6,'0'),
         comment: "Producto Excluido por #{current_user.usuario_nome}",
@@ -101,7 +98,7 @@ class VendasProdutosController < ApplicationController
         else
           format.html { redirect_to "/vendas/#{@vendas_produto.venda_id}" }
         end
-            
+
       end
     end
 end

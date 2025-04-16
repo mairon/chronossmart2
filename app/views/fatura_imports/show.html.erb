@@ -1,0 +1,129 @@
+<%= form_for(@fatura_import) do |f| %>
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <h1 id="header">
+        Importar Datos
+        <div class="pull-right">
+          <%= f.submit "Atualizar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+        </div>
+      </h1>
+      <div class="panel-content">
+        <div class="row">
+          <div class="col-md-2">
+            <label>Timbrado N°</label>
+            <%= f.text_field :dnumtim, class: 'panel-field' %>
+          </div>
+          <div class="col-md-4">
+            <label>N° de DTE</label>
+            <%= f.text_field :dest, size: 5 %>-<%= f.text_field :dpunexp, size: 5 %>-<%= f.text_field :dnumdoc, size: 10 %>
+          </div>
+
+          <div class="col-md-2">
+            <label>Fecha</label>
+            <%= f.text_field :dfeemide, class: 'panel-field' %>
+          </div>
+
+          <div class="col-md-2">
+            <label>Moneda </label>
+            <%= f.text_field :cmoneope, class: 'panel-field' %>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-2">
+            <label>RUC </label>
+            <%= f.text_field :drucem, size: 13 %> - <%= f.text_field :ddvemi, size: 1 %>
+          </div>
+
+          <div class="col-md-4">
+            <label>Razón Social del Emisor</label>
+            <%= f.text_field :dnomemi, class: 'panel-field' %>
+          </div>
+
+          <div class="col-md-2">
+            <label>Condición de Venta</label>
+            <%= f.text_field :ddcondope, class: 'panel-field' %>
+          </div>
+
+          <div class="col-md-2">
+            <label>Plazo del Crédito </label>
+            <%= f.text_field :dplazocre, class: 'panel-field' %>
+          </div>
+
+          <div class="col-md-2">
+            <label>Total de la Operación </label>
+            <%= f.text_field :dtotgralope, class: "money_gs panel-field", precision: 0, dir: "rtl", step: "any" %>
+          </div>
+
+        </div>        
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content ">
+        <div class="list">
+        <table>
+          <tr class="head_grid">
+            <td align="center" width="80">Status </td>
+            <td>Referencia</td>
+            <td>Descripción</td>
+            <td>Ctd.</td>
+            <td align="right">Unit</td>
+            <td align="right">Total</td>
+
+          </tr>
+          <%= form_tag update_individual_produtos_path :method => :put do %>
+            <% FaturaImportProduto.where(fatura_import_id: @fatura_import.id ).order('ddesproser').each do |fip| %>
+            <%= fields_for "products[]", fip do |f| %>
+            <tr class="<%= cycle("cor1", "cor2")%>">
+              <% pd = Produto.where("fabricante_cod = '#{fip.dcodint}' and nome = '#{fip.ddesproser}'").last %>
+              <td width="80" align="center">
+                <% unless pd.nil? %>
+                  <%= pd.id %>
+                <% else %>
+                  NV
+                <% end %>
+              </td>            
+              <td width="150"><%= fip.dcodint %></td>
+              <td width="450"><%= fip.ddesproser %></td>
+              <td width="80"><%= fip.dcantproser %></td>
+              <td width="80" align="right"><%= format_int(fip.dtotopeitem) %></td>
+              <td width="80" align="right"><%= format_int(fip.dtotopeitem.to_f * fip.dcantproser.to_f) %></td>
+
+
+              <% #fip.update_attribute :produto_id, Produto.where("fabricante_cod = '#{fip.dcodint}' and nome = '#{fip.ddesproser}'").last.id %>
+
+              <%
+                #Produto.create(
+                  #fabricante_cod: fip.dcodint,
+                  #nome: fip.ddesproser,
+                  #taxa: 10,
+                  #tamanho: fip.tamanho,
+                  #doc: @fatura_import.dnumdoc,
+                  #tipo_produto: 0,
+                  #barra: '',
+                  #custo_base_gs: fip.dtotopeitem.to_f,
+                  #clase_id: @fatura_import.clase_id,
+                 # colecao_id: @fatura_import.colecao_id
+
+                #)
+            %>
+              
+              
+            </tr>
+            <% end %>
+            <% end %>
+          <% end %>
+        </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% end %>

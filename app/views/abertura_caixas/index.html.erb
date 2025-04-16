@@ -1,4 +1,4 @@
-<h1 id="header">Apertura de Caja</h1>
+<h1 id="header">Apertura y Cierre de Caja</h1>
 <div class="acessos">
   <%= link_to t('NEW'), new_abertura_caixa_path, :class => "button add" %>
 </div>
@@ -11,7 +11,7 @@
       <td width="150">Usuario</td>
       <td width="150">Turno</td>
       <td width="150">Terminal</td>
-      <td width="150">Status</td>
+      <td width="70" align="center">Status</td>
     </tr>
   </table>
 
@@ -19,18 +19,22 @@
     <table>
       <% @abertura_caixas.each do |abertura_caixa| %>
         <tr class = "<%= cycle("cor1", "cor2") %>">
-          <td width="55" align="center"><%= abertura_caixa.id.to_s.rjust(6,'0') %></td>
+          <td width="55" align="center"><%= link_to abertura_caixa.id.to_s.rjust(6,'0'), abertura_caixa_path(abertura_caixa) %></td>
           <td width="80"><%= abertura_caixa.data.strftime("%d/%m/%y") %></td>
           <td width="150"><%= abertura_caixa.usuario.usuario_nome %></td>
           <td width="150"><%= abertura_caixa.turno.nome unless abertura_caixa.turno_id.blank? %></td>
           <td width="150"><%= abertura_caixa.terminal.nome %></td>
-          <td width="150">
+          <td width="70" align="center">
             <% if abertura_caixa.status == true %>
-              Activo
+              <span class="btn-success">Abierto</span>
             <% else %>
-              Cerrado
+              <span class="btn-danger">Cerrado</span>
             <% end %>
           </td>
+          <% if abertura_caixa.status == true %>
+            <td><%= link_to '', edit_abertura_caixa_path(abertura_caixa), class: 'icon-pencil' %></td>
+            <td><%= link_to '', abertura_caixa, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+          <% end %>
         </tr>
       <% end %>
     </table>

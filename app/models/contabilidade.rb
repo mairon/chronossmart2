@@ -233,11 +233,14 @@ class Contabilidade < ActiveRecord::Base
                   CAST(0 AS numeric(15,2)) AS exentas_dolar,
                   CAST(0 AS numeric(15,2)) AS gravadas_05_dolar,
                   CAST(0 AS numeric(15,2)) AS imposto_05_dolar,
-                  CAST(0 AS numeric(15,2)) AS gravadas_10_dolar,
+                  VFAT.TOT_US AS gravadas_10_dolar,
                   CAST(0 AS numeric(15,2)) AS imposto_10_dolar,
                   1 AS COTAS
          FROM FORM_FISCALS VFAT
+         INNER JOIN COBROS C
+         ON C.ID = VFAT.COD_PROC 
          WHERE  VFAT.STATUS = 1 AND #{filtro_v}
+
          AND  VFAT.TIPO_DOC  = 1 AND VFAT.SIGLA_PROC = 'CB'
 
          UNION ALL

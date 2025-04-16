@@ -1,12 +1,12 @@
 class StocksController < ApplicationController
 
 	def resultado_conferencia
-	
+
     clase     = "AND P.clase_id = #{params[:busca]["clase"]}" unless params[:busca]["clase"].blank?
     grupo     = "AND P.grupo_id = #{params[:busca]["grupo"]}" unless params[:busca]["grupo"].blank?
     sub_grupo = "AND P.sub_grupo_id = #{params[:busca]["sub_grupo"]}" unless params[:busca]["sub_grupo"].blank?
 
-    sql = "SELECT 
+    sql = "SELECT
                   G.DESCRICAO AS GRUPO_NOME,
                   SG.DESCRICAO AS SUB_GRUPO_NOME,
                   P.ID,
@@ -23,7 +23,8 @@ class StocksController < ApplicationController
                   ON G.ID = P.GRUPO_ID
                   LEFT JOIN SUB_GRUPOS SG
                   ON SG.ID = P.SUB_GRUPO_ID
-                  WHERE P.ID > 0 #{clase} #{grupo} #{sub_grupo}
+                  WHERE P.STATUS = TRUE #{clase} #{grupo} #{sub_grupo}
+                  AND (SELECT COUNT(PTB.ID) FROM PRODUTOS_TABELA_PRECOS PTB WHERE PTB.PRODUTO_ID = P.ID AND PTB.UNIDADE_ID = #{current_unidade.unidade_tabela_preco_id} AND PTB.PRECO_1_GS > 0 ) > 0
                   ORDER BY 1,2,4
                   "
     @produtos = Produto.find_by_sql(sql)
@@ -35,7 +36,7 @@ class StocksController < ApplicationController
 		@consumos = Stock.resultado_registro_consumo(params)
 		@consumo_group = Stock.resultado_registro_consumo_agrupado(params)
 		@consumo_group_preco = Stock.resultado_registro_consumo_agrupado_preco(params)
-		
+
 
 				head =
 				"                                                             #{current_unidade.nome_sys}
@@ -53,7 +54,7 @@ class StocksController < ApplicationController
               kit = PDFKit.new(xls, :encoding => 'UTF-8')
               send_data(xls,:filename => "registro-consumo-#{params[:inicio]}-#{params[:final]}.xls")
             }
-          else  
+          else
 				format.html do
 					render  :pdf                    => "resultado_registro_consumo",
 									:layout                 => "layer_relatorios",
@@ -71,7 +72,7 @@ class StocksController < ApplicationController
 															:left       => "CHRONOS SOFTWARE - Fecha de la imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
 				end
 			end
-		end			
+		end
 	end
 
 	def resultado_curva_abc
@@ -118,7 +119,7 @@ class StocksController < ApplicationController
 - Ordenado por: #{order}
 - Parametros curva A: #{params[:a]}% B: #{params[:b]}% C: #{params[:c]}%
 -----------------------------------------------------------------------------------------------------------------------------------------
-Producto                                            Ctd        Margen          Total    Percentual%    Acumulado% 
+Producto                                            Ctd        Margen          Total    Percentual%    Acumulado%
 -----------------------------------------------------------------------------------------------------------------------------------------
 				"
 
@@ -129,7 +130,7 @@ Producto                                            Ctd        Margen          T
               kit = PDFKit.new(xls, :encoding => 'UTF-8')
               send_data(xls,:filename => "curva-abc-#{params[:inicio]}-#{params[:final]}.xls")
             }
-          else  
+          else
 				format.html do
 					render  :pdf                    => "resul_vendas_produto",
 									:layout                 => "layer_relatorios",
@@ -201,14 +202,14 @@ Produto....: #{ produto.to_s.rjust(6,'0') }
               kit = PDFKit.new(xls, :encoding => 'UTF-8')
               send_data(xls,:filename => "CMV-#{params[:inicio]}-#{params[:final]}.xls")
             }
-          else  
+          else
             format.html do
-            render  :pdf                    => "resultado_cmv",                
+            render  :pdf                    => "resultado_cmv",
                     :layout                 => "layer_relatorios",
                     :margin => {:top        => '1.00in',
                                 :bottom     => '0.25in',
                                 :left       => '0.10in',
-                                :right      => '0.10in'},        
+                                :right      => '0.10in'},
                     :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
                                 :font_size  => 7,
                                 :left       => head,
@@ -219,9 +220,9 @@ Produto....: #{ produto.to_s.rjust(6,'0') }
                                 :left       => "CHRONOS SOFTWARE - Fecha de la imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
           end
         end
-      end      
+      end
     end
- 
+
 
 
 		def resultado_resumo_deposito
@@ -444,7 +445,13 @@ Deposito.......: #{ deposito }
 				end
 
 				respond_to do |format|
-						format.xls
+					if params["tipo"] == '1'
+						 format.html {
+		          render :xlsx => "relatorio_stock",
+		          filename: "FichaStock-#{params[:inicio]}-#{params[:final]}"
+		        }
+		      else
+
 						format.html do
 						render  :pdf                    => "resultado_fechamento_caixa",
 										:layout                 => "layer_relatorios",
@@ -460,6 +467,7 @@ Deposito.......: #{ deposito }
 																:font_size  => 7,
 																:right      => "Pagina [page] de [toPage]",
 																:left       => "CHRONOS SOFTWARE - Fecha de la imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
+						end
 					end
 				end
 		end
@@ -531,7 +539,7 @@ Codigo   Grupo               Sub-Grupo          Ref        Producto             
 				respond_to do |format|
 					if params["tipo"] == '1'
  format.html {
-		          render :xlsx => "resultado_pagamentos", 
+		          render :xlsx => "resultado_pagamentos",
 		          filename: "pagamentos-#{params[:inicio]}-#{params[:final]}"
 		        }					else
 					format.html do
@@ -652,55 +660,29 @@ Cod.     Producto                                                               
 
 
 
-		def resultado_rentabilidade
-			params[:unidade] = current_unidade.id
-			#VERIFICA SE  TEM SUBGRUPO E IMPRIME
-			if params[:busca]["vendedor"].blank?
-					vendedor = 'Todos..'
-			else
-					vendedor = params[:busca]["vendedor"].to_s.rjust(6,'0')
-					sb_s = Persona.find_by_id(params[:busca]["vendedor"])
-					sb_desc = ' - ' << sb_s.nome
-			end
-			@cmvs = Stock.rentabilidade(params)
-
-				head =
-"                                                                   #{current_unidade.nome_sys}
-																									               LISTADO RENTABILIDAD
-Periodo #{params[:inicio]} Hasta #{params[:final]}
-Vendedor.: #{ vendedor } #{ sb_desc }
------------------------------------------------------------------------------------------------------------------------------------------
-	 Cod.  Referencia      Producto             Cliente                   Cant.  CMV Unit  CMV Tot  Venta Unit Venta Tot        Dif.  Rent.
------------------------------------------------------------------------------------------------------------------------------------------
-
-				"
-				respond_to do |format|
-					if params["tipo"] == '1'
-
- 						format.html {
-		          render :xlsx => "resultado_rentabilidade", 
-		          filename: "Rentabilidad-#{params[:inicio]}-#{params[:final]}"
-		        }					
-					else
-						format.html do
-						render  :pdf                    => "resultado_cmv",
-										:layout                 => "layer_relatorios",
-										:margin => {:top        => '0.90in',
-																:bottom     => '0.25in',
-																:left       => '0.10in',
-																:right      => '0.10in'},
-										:header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
-																:font_size  => 7,
-																:left       => head,
-																:spacing    => 18},
-										:footer => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
-																:font_size  => 7,
-																:right      => "Pagina [page] de [toPage]",
-																:left       => "CHRONOS SOFTWARE - Fecha de la imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
-					end
-				end
-			end
+	def resultado_rentabilidade
+		params[:unidade] = current_unidade.id
+		#VERIFICA SE  TEM SUBGRUPO E IMPRIME
+		if params[:busca]["vendedor"].blank?
+				vendedor = 'Todos..'
+		else
+				vendedor = params[:busca]["vendedor"].to_s.rjust(6,'0')
+				sb_s = Persona.find_by_id(params[:busca]["vendedor"])
+				sb_desc = ' - ' << sb_s.nome
 		end
+
+		@cmvs = Stock.rentabilidade(params)
+
+
+	  if params[:tipo] == '1'
+      render :xlsx => "resultado_rentabilidade",
+      filename: "Rentabilidad-#{params[:inicio]}-#{params[:final]}"
+	  else
+	  	render :layout => 'relatorio_view'
+	  end
+
+
+	end
 
 def resultado_projecao_compras
 

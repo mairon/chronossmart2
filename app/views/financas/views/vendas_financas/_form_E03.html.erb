@@ -1,0 +1,117 @@
+
+
+<%= form_for(@vendas_financa) do |f| %>
+<ul class="tabs">
+	<li>
+		<a href="#tab1"> Venta - Forma de Pago </a>
+	</li>
+</ul>
+
+<div class="tab_container">
+	<div class="group">
+	  <table>
+	  	<tr>
+	     	<td align="right"> Forma de Pago: </td>
+	     	<td  colspan="3"> <%= f.collection_select :forma_pago_id, FormaPago.all( :select     => ' id,nome', :order      => '2'),:id,:nome, { :include_blank => true },:class => "selc_medium" %></td>
+	  	</tr>
+      <% if @vendas_financa.forma_pago_id == 3 or @vendas_financa.forma_pago_id == 4  %>
+      <tr>
+        <td align="right"> Bandeira:</td>
+        <td  colspan="3"> <%= f.collection_select :cartao_bandeira_id, CartaoBandeira.all(conditions: ["forma_pago_id = #{@vendas_financa.forma_pago_id}"], :select     => ' id,nome', :order      => '2'),:id,:nome, { :include_blank => true },:class => "selc_medium" %>
+              <%= image_tag("load.gif",
+                                :align => "absmiddle",
+                                :border => 0,
+                                :id => "spinner",
+                                :width => 21,
+                                :height => 21,
+                                :style =>"display: none;" ) %>            
+
+        </td>
+      </tr>        
+      <% else %>
+      <tr>
+        <td align="right"> Bandeira:</td>
+        <td  colspan="3"> <%= f.collection_select :cartao_bandeira_id, CartaoBandeira.all(:select     => ' id,nome', :order      => '2'),:id,:nome, { :include_blank => true },:class => "selc_medium" %>
+              <%= image_tag("load.gif",
+                                :align => "absmiddle",
+                                :border => 0,
+                                :id => "spinner",
+                                :width => 21,
+                                :height => 21,
+                                :style =>"display: none;" ) %>            
+
+        </td>
+      </tr>       
+      <% end %>
+
+
+	  	<tr>	  		
+       	<td align="right">Compro. Tarjeta:</td>
+       	<td colspan="4"><%= f.text_field :nr_comprovante,:size => 15 %>
+	  	</tr>
+
+
+	  	<tr>	  		
+       	<td align="right">Doc.:</td>
+       	<td colspan="4"><%= f.text_field :documento_numero,:size => 15 %>
+	  	</tr>
+
+      <tr>        
+        <td align="right">Cheque.:</td>
+        <td colspan="4"><%= f.text_field :cheque, :size => 15 %>Dif.:<%= f.date_select :diferido %></td>
+      </tr>
+
+
+      <tr>
+         <td align="right"> Moneda :</td>
+         <td>
+            <fieldset>
+               <%= f.radio_button :moeda, 1 %> Gs.
+               <%= f.radio_button :moeda, 0 %> Dolar
+               <%= f.radio_button :moeda, 2 %> Real
+               <%= f.radio_button :moeda, 3 %> Peso
+
+            </fieldset>
+         </td>
+      </tr>
+
+	  	<tr>
+        <%=  field_us 'Valor U$:',f,:valor_dolar %>
+        <%=  field_gs 'Valor Gs.:',f,:valor_guarani %>
+        <%=  field_us 'Valor R$:',f,:valor_real %>
+        <%=  field_us 'Valor P$:',f,:valor_peso %>
+
+	  	</tr>
+
+		</table>
+	</div>
+   <div class="buttons">
+      <%= f.submit "   Actulizar  ", :disable_with => "Aguarde...", :class => "button" %> 
+   </div>
+
+</div>
+<% end %>
+
+<script type="text/javascript">
+  $("#vendas_financa_forma_pago_id").change(function() {
+    var data=$('#vendas_financa_forma_pago_id').val();
+    $.ajax({
+
+      type: "POST",
+       url: "/dynamic_bandeira/"+data,
+      data: data +'&edit=1', 
+
+      beforeSend: function()
+      {
+          $('#spinner').show();
+      },
+
+      success: function(response)
+      {
+        $('#spinner').hide();
+      }
+    });
+ });
+
+
+</script>

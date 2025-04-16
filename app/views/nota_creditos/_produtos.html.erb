@@ -1,4 +1,3 @@
-<div class="group">
    <table class="head_grid">
       <tr>
          <td width="80" align="center"><%= t('DATE') %></td>
@@ -13,13 +12,11 @@
 <table>
    <% @vendas_produtos.each do |vp| %>
   <tr class = "<%= cycle("cor1", "cor2") %>"
-      onMouseOver = "javascript:this.style.backgroundColor='#949494'"
-      onMouseOut  = "javascript:this.style.backgroundColor=''"
       onclick     = "Fecha('<%= vp.produto_id %>',
                            '<%= vp.produto_nome %>',
                            '<%= vp.taxa.to_i %>',
                            '<%= vp.fabricante_cod %>',
-                           '<%= vp.quantidade.to_i %>',
+                           '<%= format_peso(vp.quantidade.to_f) %>',
                            '<%= format_decimal( vp.unitario_dolar ) %>',
                            '<%= format_decimal( vp.total_dolar ) %>',
                            '<%= format_decimal( vp.iva_dolar ) %>',
@@ -37,8 +34,8 @@
     <td width="80" align="center"><%= vp.data.strftime("%d/%m/%y") %></td>
     <td width="200"><%= vp.venda.id.to_s.rjust(6,'0') %>/<%= vp.venda.documento_numero.to_s.rjust(6,'0') %></td>
     <td width="450"><%= vp.fabricante_cod %> - <%= vp.produto_nome %></td>
-    <td width="70" align="right"><b><%= vp.quantidade.to_f %></b ></td>
-    <% if @nota_credito.moeda  == '0' %>
+    <td width="70" align="right"><b><%= format_peso(vp.quantidade.to_f) %></b ></td>
+    <% if @nota_credito.moeda.to_i  == 0 %>
       <td width="70" align="right"><%= format_decimal(vp.unitario_dolar ) %></td>
       <td width="70" align="right"><%= format_decimal(vp.total_dolar ) %></td>
     <% else %>
@@ -48,7 +45,6 @@
   </tr>
 <% end %>
 </table>
-</div>
 </div>
 
     <script language="javascript">

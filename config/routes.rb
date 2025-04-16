@@ -1,5 +1,39 @@
-﻿Zetta::Application.routes.draw do  
-  
+﻿Zetta::Application.routes.draw do
+
+  resources :custom_fields
+
+
+  resources :fatura_import_produtos
+
+
+  resources :fatura_imports do
+		collection do
+			post 'update_individual'
+		end
+  end
+
+
+  resources :ordem_entrega_produtos
+
+
+  resources :ordem_entregas do
+  	collection do
+  		get 'modal_add'
+  		get 'modal_status'
+  		get 'modal_endereco'
+  		post 'add_produtos'
+  		get 'modal_consulta'
+  		get 'busca_consulta'
+  	end
+  end
+
+
+  resources :turma_responsavels
+
+
+  resources :turma_personas
+
+
   resources :modelo_contratos
 
 
@@ -7,7 +41,7 @@
 
 
   resources :painel_preparos do
-  	collection do 
+  	collection do
   		get 'status_preparo'
   		get 'preparo_pendentes'
   	end
@@ -20,15 +54,15 @@
   resources :plano_venda_docs
 
 
-  resources :transf_produtos do 
+  resources :transf_produtos do
   	collection do
   		get 'busca'
   	end
 
   end
 
-  resources :solicitude_creditos do 
-  	member do 
+  resources :solicitude_creditos do
+  	member do
   		get 'comprovante'
   	end
   	collection do
@@ -39,6 +73,30 @@
   resources :produto_imagens
 
   resources :tipo_tarefas
+
+  namespace :tms do
+  	resources :ordem_cargas do
+	  	collection do
+	  		get 'busca'
+	  	end
+  	end
+
+  	resources :pedido_traslado_docs
+
+  	resources :pedido_traslados do
+	  	collection do
+	  		get 'busca'
+	  		get 'gera_receber'
+	  	end
+  	end
+  	resources :frota do
+	  	collection do
+	  		get 'busca_frota'
+	  	end
+  	end
+
+  	get "/main" => 'main#index'
+  end
 
 	namespace :crm do
 		get "/main" => 'main#index'
@@ -53,9 +111,9 @@
 				post 'draggable'
 				post 'update_status'
 				get 'update_task'
-			end  		
+			end
   	end
-	  resources :pipelines do 
+	  resources :pipelines do
 	  	member do
 	  		get 'configs'
 	  	end
@@ -72,12 +130,12 @@
   resources :plano_venda_conds
 
 
-  resources :plano_vendas do 
+  resources :plano_vendas do
   	collection do
   		post 'update_individual'
-  		
+
   	end
-  	member do 
+  	member do
   		get 'comprovante'
   	end
   end
@@ -86,7 +144,7 @@
   resources :devices
 
 
-  resources :transacoes do 
+  resources :transacoes do
   	collection do
   		get 'busca'
   	end
@@ -97,7 +155,7 @@
   resources :conta_cheques
 
 
-  resources :venda_compras do 
+  resources :venda_compras do
   	collection do
   		get 'lista_gastos'
   		post 'baixa_gasto'
@@ -105,7 +163,7 @@
   end
 
 
-  resources :venda_devolucaos do 
+  resources :venda_devolucaos do
   	collection do
   		get 'busca_vendas'
   	end
@@ -113,7 +171,7 @@
   end
 
 
-  resources :venda_romaneios do 
+  resources :venda_romaneios do
   	collection do
   		get 'lista_romaneios'
   		post 'baixa_romaneio'
@@ -124,7 +182,13 @@
   resources :romaneio_produtos
 
 
-  resources :turmas
+  resources :turmas do
+  	collection do
+  		get 'busca'
+  	end
+
+  end
+
   resources :romaneios
 
 
@@ -134,13 +198,13 @@
       resources :vendas
       resources :vendas_produtos
       resources :check_points
-      get 'postback', to: 'postback#index'
+      post 'postback', to: 'postback#index'
     end
   end
   resources :presupuesto_cotas
 
   resources :viaticos do
-  	collection do 
+  	collection do
   		get 'busca_viatico'
   	end
 
@@ -165,12 +229,12 @@
   resources :mov_vantagens
 
 
-  resources :evento_convidados do 
+  resources :evento_convidados do
 		member do
 			get 'qrcode'
-			get 'confirm'			
+			get 'confirm'
 		end
-		collection do 
+		collection do
 			get 'controle_tickets'
 			get 'ticket_detalhe'
 		end
@@ -203,9 +267,9 @@
 
   resources :persona_ferias do
 		collection do
-			get 'add_escala'			
+			get 'add_escala'
 		end
-		member do 
+		member do
 			get 'comprovante'
 			get 'retorno_empleado'
 		end
@@ -398,7 +462,7 @@
   end
 
 
-  mount Ckeditor::Engine => '/ckeditor'
+  #mount Ckeditor::Engine => '/ckeditor'
 
   resources :config_printers
 
@@ -443,7 +507,13 @@
 	end
 	resources :boca_cx_produtos
 	resources :produto_sugeridos
-	resources :lista_carga_produtos
+
+	resources :lista_carga_produtos do
+		collection do
+			post 'add_produtos_direto'
+		end
+	end
+
 	resources :lista_cargas_personas
 	resources :plano_regras
 	resources :afericaos
@@ -525,7 +595,7 @@
 	resources :boca_cxes
 
 
-	resources :promos do 
+	resources :promos do
 		collection do
 			get 'gera_cashback_produtos'
 		end
@@ -619,6 +689,11 @@
 	resources :abastecidas do
 		collection do
 			post 'atualiza_abastecida'
+			get 'get_api'
+			get 'update_status'
+			get 'get_abastecidas_sql'
+			get 'modal_abastecidas'
+			get 'busca'
 		end
 
 	end
@@ -633,10 +708,13 @@
 			post 'cobro_update_fc'
 			post 'cobro_update_rd'
 			post 'venda_update_ft'
+			post 'contrato_update_ft'
 			post 'fact_indep_update_ft'
 			get 'cliente_update_ft'
 			post 'nota_cred_update_nc'
 			post 'anula_nc'
+			post 'inutilizacion'
+			post 'cancelacion'
 			post 'retencao_update_cp'
 			post 'adelanto_update_rd'
 			get 'nc'
@@ -646,11 +724,14 @@
 			get 'transmite_de'
 			get 'gera_pdf_cdc'
 			post 'compra_update_af'
+			get 'reenviar'
 
 		end
 		member do
 			get 'form_anula_nc'
 			get 'impressao_ft'
+			get 'impressao_rc'
+			get 'impressao_rc_adelanto'
 			get 'fatura_matricial'
 			post 'update_impressao'
 		end
@@ -746,7 +827,11 @@
 	resources :recibos
 
 
-	resources :controle_kms
+	resources :controle_kms do
+		collection do
+			get 'busca'
+		end
+	end
 
 
 	resources :persona_rodados
@@ -767,7 +852,12 @@
 	resources :persona_produtos
 
 
-	resources :abertura_caixas
+	resources :abertura_caixas do
+		collection do
+			get 'print_transf_saldo'
+			get 'modal_detalhe'
+		end
+	end
 	resources :turnos
 
 	resources :terminals
@@ -791,7 +881,7 @@
 	resources :material_analisados
 
 	resources :tabela_precos do
-		collection do 
+		collection do
 			get 'gera_tabela_produtos'
 		end
 	end
@@ -976,6 +1066,8 @@
 		end
 		member do
 			get 'print_comprovante'
+			get 'comprovante'
+			get 'entrada'
 		end
 	end
 
@@ -1091,6 +1183,7 @@
 	get "relatorios/dynamic_rubro_grupo/:id" => "relatorios#dynamic_rubro_grupo"
 	post "busca_deposito_unidade/:id" => "stocks#busca_deposito_unidade"
 	post "afericao_deposito_destino/:id" => "afericaos#afericao_deposito_destino"
+	get "dynamic_condicional_empaque_produto" => "condicionals#dynamic_condicional_empaque_produto"
 
 
 	get "crm/clientes_sem_venda" => "crm#clientes_sem_venda"
@@ -1174,7 +1267,7 @@
 	resources :suportes do
 		collection do
 			get 'comando'
-			get 'consulta'
+			post 'consulta'
 		end
 	end
 
@@ -1291,6 +1384,7 @@ resources :analizes_financas
 		match 'get_moeda_conta'       => "buscas#get_moeda_conta", :via => :get
 		match 'gera_cotas_cota_path'  => "buscas#gera_cotas_cota_path", :via => :get
 		match 'busca_tipo_contas'  => "buscas#busca_tipo_contas", :via => :get
+		match 'busca_pedido_traslado'  => "buscas#busca_pedido_traslado", :via => :get
 		match 'proveedor_pagar'       => "buscas#proveedor_pagar", :via => :post
 		match 'autoriza_acao_venda'       => "buscas#autoriza_acao_venda", :via => :get
 		match 'busca_cartao'       => "buscas#busca_cartao", :via => :get
@@ -1298,6 +1392,7 @@ resources :analizes_financas
 		match 'busca_default_produto'       => "buscas#busca_default_produto", :via => :get
 		match 'busca_produto_tabela_preco'  => "buscas#busca_produto_tabela_preco", :via => :get
 		match 'busca_viaticos'  => "buscas#busca_viaticos", :via => :get
+		match 'busca_custo'  => "buscas#busca_custo", :via => :get
 
 
 	end
@@ -1312,6 +1407,7 @@ resources :analizes_financas
 			get 'acesso'
 			get 'liberacao'
 			post 'logar'
+			post 'troca_unidade'
 			post 'get_unidade'
 		end
 	end
@@ -1348,7 +1444,7 @@ resources :analizes_financas
 		collection do
 			get :gerar_perfil
       get :historico_acesso
-      get :resultado_historico_acesso			
+      get :resultado_historico_acesso
 		end
 	end
 	resources :unidades
@@ -1408,6 +1504,7 @@ resources :analizes_financas
 			get 'listado_aluno'
 			get 'resultado_listado_aluno'
 			get 'envia_login_app'
+			get 'comprovante_dividas'
 
 		end
 		member do
@@ -1426,7 +1523,8 @@ resources :analizes_financas
 			get 'decla_jurada'
 			get 'print_funcionario'
 			get 'historico_vendas'
-			get 'busca_historico_vendas'			
+			get 'busca_historico_vendas'
+			get 'visao_geral_cliente_print'
 		end
 	end
 	resources :produtos do
@@ -1573,7 +1671,10 @@ resources :analizes_financas
 			get 'pedido_compras'
 			get  'gerar_cotas_credito'
 			post 'add_pedidos'
+			get 'lista_viaticos'
 			post 'agregar_produtos'
+			get 'add_prod_import'
+			get 'add_produtos_cadastro'
 		end
 		member do
 			get 'compras_custos'
@@ -1651,6 +1752,7 @@ resources :pagares_detalhe
 		end
 		member do
 			get 'comprovante'
+			get 'comprovante_ticket'
 		end
 
 		resources :consumicao_interna_produtos
@@ -1712,10 +1814,7 @@ resources :pagares_detalhe
 			post 'add_cond_liqs'
 			post 'update_individual'
 			get 'abastecidas'
-			get 'busca_tintometria'
-			get 'result_tintometria'
 			get 'busca_placas'
-			get 'tintometria_qtd'
 			put 'update_venda'
 			get 'busca_endereco'
 			get 'mapa_mesas'
@@ -1739,6 +1838,8 @@ resources :pagares_detalhe
 			post 'send_mult_prods'
 			get 'tela_preparo'
 			get 'status_preparo'
+			get 'entregas_pendentes'
+			get 'entregas_pendentes_busca'
 
 		end
 		member do
@@ -1761,13 +1862,14 @@ resources :pagares_detalhe
 			get 'gerador_produtos'
 			get 'comprovante_entrega'
 			get 'valida_processo'
-			get 'visualizacao'			
+			get 'visualizacao'
 			post 'add_produto_sugeridos'
 			get 'devolucaos'
 			get 'certificado_venda'
 			get 'print_contrato'
 			get 'pagare_escritura'
 			get 'pagare_usado'
+			get 'modal_ordem_entrega'
 		end
 	end
 	resources :vendas_financas
@@ -1775,7 +1877,7 @@ resources :pagares_detalhe
 	resources :vendas_produtos do
 		collection do
 			get 'busca_nota_credito_produto'
-			get 'modal_update'			
+			get 'modal_update'
 		end
 		member do
 			get 'formula'
@@ -1802,11 +1904,11 @@ resources :pagares_detalhe
 	resources :recepcao_nota_remicaos
 	resources :nota_remicao_produtos
 
-	resources :nota_remicaos do 
+	resources :nota_remicaos do
 		member do
 			get 'comprovante'
 			get 'detalhes_produtos_print'
-		end		
+		end
 	end
 
 	resources :nota_creditos_detalhes
@@ -1836,6 +1938,7 @@ resources :pagares_detalhe
 			get 'busca'
 			get 'nova_cota'
 			get 'cheque_terceiros'
+			get 'lista_adelantos'
 		end
 		member do
 			get 'filtro_busca_cliente'
@@ -1913,7 +2016,7 @@ resources :pagares_detalhe
 		collection do
 			get 'gerar_sueldos'
 			get 'result_gerar_sueldos'
-			get 'busca'			
+			get 'busca'
 		end
 		member do
 			get 'form_sueldos_detalhes'
@@ -1921,6 +2024,7 @@ resources :pagares_detalhe
 			get 'financas'
 			get 'liquidacao'
 			post 'baixa_divida'
+			get 'print_cheque'
 
 		end
 	end
@@ -2101,8 +2205,8 @@ resources :pagares_detalhe
 			get 'resultado_compras_x_vendas'
 			get 'vendas_turno'
 			get 'resultado_vendas_turno'
-			get 'km_veiculos'
-			get 'resultado_km_veiculos'
+			get 'controle_km'
+			get 'resultado_controle_km'
 			get 'faturamento'
 			get 'resultado_faturamento'
 			get 'entregas'
@@ -2131,6 +2235,8 @@ resources :pagares_detalhe
 			get 'resultado_entrada_modal'
 			get 'rodados'
 			get 'resultado_rodados'
+      get 'km_veiculos'
+      get 'resultado_km_veiculos'
 
 		end
 	end

@@ -1,10 +1,13 @@
 <table>
   <tr>
-    <td align="left"></td>
+    <td width="600"><%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 60) %></td>
+    <td width="600" align="center">
+      <h1><%= current_unidade.razao_social %> </h1>
+      <h1>Presupuesto Nº <%= @presupuesto.id.to_s.rjust(6,'0')%></h1>
+    </td>
   </tr>
 </table>
-<h1 align="center"><%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 60) %></h1>
-<h1 align="center">PRESUPUESTO</h1>
+
 
 <style>
   .border1{
@@ -13,16 +16,15 @@
   }
 
   .border1 table{
-    margin: 15px;
   }
 
   .border1 td{
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .border1 label{
     color: #999;
-    font-size: 14px;
+    font-size: 12px;
   }
 
   h2{
@@ -67,8 +69,8 @@
       </td>
 
       <td>
-        <label>Control</label><br>
-        <b><%= @presupuesto.id.to_s.rjust(6,'0') %></b>
+        <label>Local</label><br>
+        <b><%= @presupuesto.entrega %></b>
       </td>
 
     </tr>    
@@ -82,9 +84,11 @@
   
 <table class="grid"> 
   <tr style="font-weight: bold;background-color: #999;">
-    <td align="center" width="30">#</td>
-    <td align="center" width="100">Referencia</td>
-    <td width="555">Producto</td>
+    <td align="center" width="20">#</td>
+    <td align="center" width="80">Referencia</td>
+    <td align="center" width="20">UM</td>
+    <td align="center" width="100">Img</td>
+    <td width="400">Producto/Servicios</td>
     <td align="right" width="50">Cantidad</td>
     <td align="right" width="70">Unit.</td>
     <td align="right" width="70">Tot.</td>
@@ -92,12 +96,28 @@
       <% qtd    = 0 %>
       <% tot    = 0 %>
       <% indice = 1 %>
-      <% @presupuesto_produto.each do |pc|%>
+      <% quebra     = '' %>
+      <% PresupuestoProduto.joins(:produto).where("presupuesto_produtos.presupuesto_id = #{@presupuesto.id}").order("produtos.grupo_id").each do |pc|%>
+           <% if quebra != pc.produto.grupo.descricao %>
+            <% if quebra != "" %>
+              <tr>
+                <td></td>
+              </tr>
+            <% end %>
+            <tr>
+              <td colspan="4" style="background: #b0b0b0;"></td>
+              <td class="head" colspan="4" style="background: #b0b0b0;"><%= quebra = pc.produto.grupo.descricao %></td>
+            </tr>
+
+           <% end %>
+
       <tr class="<%= cycle("cor1", "cor2")%>">
-        <td align="center" width="30"><%= indice %></td>
-        <td align="center" width="100"><%= pc.produto.fabricante_cod %></td>
-        <td align="left" width="555"><%= pc.produto_id.to_s.rjust(6,'0') %>-<%= pc.produto.nome %></td>
-        <td align="right" width="50"><%= pc.quantidade %></td>
+        <td align="center" width="20"><%= indice %></td>
+        <td align="center" width="80"><%= pc.produto.fabricante_cod %></td>
+        <td align="center" width="80"><%= pc.produto.unidade_medida.sigla unless pc.produto.unidade_medida.blank? %></td>
+        <td width="100" align="center"><%= wicked_pdf_image_tag(pc.produto.produto_imagens.last.foto.url, :height => 60) unless pc.produto.produto_imagens.blank? %></td>
+        <td align="left" width="400"><%= pc.produto_id.to_s.rjust(6,'0') %>-<%= pc.produto.nome %></td>
+        <td align="right" width="50"><%= format_peso(pc.quantidade) %></td>
         <% if @presupuesto.moeda.to_i == 0 %>
           <td align="right" width="70"><%= format_decimal(pc.unitario_dolar) %></td>
           <td align="right" width="70"><%= format_decimal(pc.total_dolar) %></td>
@@ -109,11 +129,11 @@
         <% end %>
       </tr>
       <% qtd    += pc.quantidade %>
-      <% indice + 1 %>
+      <% indice += 1 %>
      <% end %>
      <tr class="head">
-      <td colspan="3" align="right">Total</td>
-      <td align="right"> <%= qtd.to_f %></td>
+      <td colspan="5" align="right">Total</td>
+      <td align="right"> <%= format_peso(qtd.to_f) %></td>
       <td></td>
       <% if @presupuesto.moeda.to_i == 0 %>
         <td align="right" width="70"><%= format_decimal(tot) %></td>

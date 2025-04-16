@@ -1,32 +1,38 @@
 class SueldosController < ApplicationController
-    before_filter :authenticate
+  before_filter :authenticate
 
-    def baixa_divida
-      @sueldo = Sueldo.find(params[:id])
-      @dividas = Cliente.find(params[:cobro]["dividas_ids"])      
-        @dividas.each do |d|
-          anterior_gs = Cliente.sum(:cobro_guarani, conditions: ["persona_id = #{d.persona_id} and cota = #{d.cota} and documento_numero_01 ='#{d.documento_numero_01}' and documento_numero_02 ='#{d.documento_numero_02}' and documento_numero ='#{d.documento_numero}' "])
-          anterior_us = Cliente.sum(:cobro_dolar, conditions: ["persona_id = #{d.persona_id} and cota = #{d.cota} and documento_numero_01 ='#{d.documento_numero_01}' and documento_numero_02 ='#{d.documento_numero_02}' and documento_numero ='#{d.documento_numero}' "])
-          anterior_rs = Cliente.sum(:cobro_real, conditions: ["persona_id = #{d.persona_id} and cota = #{d.cota} and documento_numero_01 ='#{d.documento_numero_01}' and documento_numero_02 ='#{d.documento_numero_02}' and documento_numero ='#{d.documento_numero}' "])
+  def print_cheque
+   @sueldo = Sueldo.find(params[:id])
 
-          SueldosDetalhe.create(  sueldo_id:    @sueldo.id,
-                                persona_id:  d.persona_id,
-                                documento_numero_01: d.documento_numero_01,
-                                documento_numero_02: d.documento_numero_02,
-                                documento_numero:    d.documento_numero,
-                                tipo: 'BAJA DEUDA',
-                                cota:                d.cota,
-                                data:                @sueldo.data_inicio,
-                                moeda:               @sueldo.moeda,                           
-                                debito_us:          d.divida_dolar.to_f  - anterior_us.to_f,
-                                debito_gs:          d.divida_guarani.to_f - anterior_gs.to_f,
-                                debito_rs:          d.divida_real.to_f - anterior_rs.to_f,
-                                descricao: 'BAJA DEUDA'
-                                )
-        end
+   @sueldo_financa = SueldoPago.find(params[:pf])
+  end
 
-      redirect_to(sueldo_path(@sueldo))
-    end
+  def baixa_divida
+    @sueldo = Sueldo.find(params[:id])
+    @dividas = Cliente.find(params[:cobro]["dividas_ids"])
+      @dividas.each do |d|
+        anterior_gs = Cliente.sum(:cobro_guarani, conditions: ["persona_id = #{d.persona_id} and cota = #{d.cota} and documento_numero_01 ='#{d.documento_numero_01}' and documento_numero_02 ='#{d.documento_numero_02}' and documento_numero ='#{d.documento_numero}' "])
+        anterior_us = Cliente.sum(:cobro_dolar, conditions: ["persona_id = #{d.persona_id} and cota = #{d.cota} and documento_numero_01 ='#{d.documento_numero_01}' and documento_numero_02 ='#{d.documento_numero_02}' and documento_numero ='#{d.documento_numero}' "])
+        anterior_rs = Cliente.sum(:cobro_real, conditions: ["persona_id = #{d.persona_id} and cota = #{d.cota} and documento_numero_01 ='#{d.documento_numero_01}' and documento_numero_02 ='#{d.documento_numero_02}' and documento_numero ='#{d.documento_numero}' "])
+
+        SueldosDetalhe.create(  sueldo_id:    @sueldo.id,
+                              persona_id:  d.persona_id,
+                              documento_numero_01: d.documento_numero_01,
+                              documento_numero_02: d.documento_numero_02,
+                              documento_numero:    d.documento_numero,
+                              tipo: 'BAJA DEUDA',
+                              cota:                d.cota,
+                              data:                @sueldo.data_inicio,
+                              moeda:               @sueldo.moeda,
+                              debito_us:          d.divida_dolar.to_f  - anterior_us.to_f,
+                              debito_gs:          d.divida_guarani.to_f - anterior_gs.to_f,
+                              debito_rs:          d.divida_real.to_f - anterior_rs.to_f,
+                              descricao: d.descricao
+                              )
+      end
+
+    redirect_to(sueldo_path(@sueldo))
+  end
 
     def busca
       params[:unidade] = current_unidade.id

@@ -1,12 +1,139 @@
+<div class="panel">
+  <h1 id="header">
+    Turma - <%= @turma.id.to_s.rjust(6,'0') %> <%= @turma.nome %>
+    <div class="pull-right">
+      <%= link_to 'Editar', edit_turma_path(@turma), :class => "btn btn-blue back" %>
+      <%= link_to 'Salir', turmas_path, :class => "btn btn-blue" %>
+      <%= link_to 'Imprimir', '#', onclick: "window.print(.5)", :class => "btn btn-blue btn-print" %>
+    </div>
+  </h1>
+</div>
+<div class="row">
+  <div class="col-md-7">
 
-<p>
-  <strong>Nome:</strong>
-  <%= @turma.nome %>
-</p>
+    <div class="panel">
+      <h1 id="header">
+        Alunos - <%= @turma.turma_personas.count(:id) %>
+        <div class="pull-right">
+          <%= link_to 'Add', '#', class: 'btn add', 'data-toggle' => "modal", 'data-target' => "#form_modal_aluno", 'data-dismiss' => "modal", 'aria-labe' => "Close" %>
+        </div>
+      </h1>
+      <div class="panel-content">
+        <table class="list">
+          <% seq = 0 %>
+          <% @turma.turma_personas.joins(:persona).order("personas.nome").each do |tp| %>
+          <% seq += 1 %>
+          <tr>
+            <td><%= seq %></td>
+            <td width="280"><%= tp.persona.nome %></td>
+            <td width="100" align="center">
+              <% vd = Venda.where(persona_id: tp.persona_id, turma_id: @turma.id).last %>
+              <%= vd.id.to_s.rjust(6, '0') unless vd.blank?  %>
+            </td>
+            <td>
+              <% if tp.status == true %>
+                <span class="btn-success"><%= t('ACTIVE_S') %></span>
+              <% else %>
+                <span class="btn-danger">Bloqueado</span>
+              <% end %>
+            </td>
+            <td>
+              <%= link_to '', edit_turma_persona_path(tp), class: 'icon-pencil' %>
+              <%= link_to '', tp, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %>
+            </td>
+          </tr>
+          <% end %>
+        </table>
+      </div>
+    </div>
 
-<p>
-  <strong>Status:</strong>
-  <%= @turma.status %>
-</p>
+  </div>
+  <div class="col-md-5">
+    <div class="panel">
+      <h1 id="header">
+        Responsável
+        <div class="pull-right">
+          <%= link_to 'Add', '#', class: 'btn add', 'data-toggle' => "modal", 'data-target' => "#form_modal", 'data-dismiss' => "modal", 'aria-labe' => "Close" %>
+        </div>
+      </h1>
+      <div class="panel-content">
+        <table class="list">
+          <% @turma.turma_responsavels.each do |tp| %>
+          <tr>
+            <td><%= tp.persona.nome %></td>
+            <td class="no-print"><%= format_decimal(tp.comissao) %>%</td>
+            <td>
+              <%= link_to '', edit_turma_responsavel_path(tp), class: 'icon-pencil' %>
+              <%= link_to '', tp, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %>
+            </td>
+          </tr>
+          <% end %>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
 
+<div class="modal fade" id="form_modal_aluno" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" >
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('NEW') %> <span class="cota"></span></h4>
+      </div>
+      <div class="modal-body group">
+        <%= form_for TurmaPersona.new do |fo| %>
+          <%= fo.hidden_field :turma_id, value:  @turma.id %>
+          <div class="row">
+            <div class="col-md-12">
+              <label>Aluno</label>
+              <%= fo.collection_select :persona_id, Persona.where(tipo_cliente: 1), :id, :nome, { prompt: ''}, {required: true, class: 'selectize'} %>
+            </div>
+
+            <div class="col-md-12">
+              <label>Status</label>
+              <%= fo.select :status, [['Activo', true], ['Bloqueado', false] ] %>
+            </div>
+          </div>
+          <div class="footer-buttons">
+            <%= fo.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="form_modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" >
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('NEW') %> <span class="cota"></span></h4>
+      </div>
+      <div class="modal-body group">
+        <%= form_for TurmaResponsavel.new do |tr| %>
+          <%= tr.hidden_field :turma_id, value:  @turma.id %>
+          <div class="row">
+            <div class="col-md-12">
+              <label>Responsáble</label>
+              <%= tr.collection_select :persona_id, Persona.where(tipo_funcionario: 1), :id, :nome, { prompt: ''}, {required: true, class: 'selectize'} %>
+            </div>
+
+            <div class="col-md-12">
+              <%= field_us_label 'Comisión',tr,:comissao %>
+            </div>
+          </div>
+          <div class="footer-buttons">
+            <%= tr.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

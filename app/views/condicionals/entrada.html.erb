@@ -1,0 +1,55 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+     <header class="panel-heading link-prod">
+      <%= image_tag("001-download.png", width: '18px', style: 'margin-top: -6px') %> Condicional Entrada  - <%= @condicional.id.to_s.rjust(6,'0') %>
+
+      <div style="float:right"> 
+        <% if @condicional.status == 0 %>     
+          <%= link_to 'Facturar', new_venda_path(tipo_venda: 0, condicional: true, persona_id: @condicional.persona_id, persona_nome: @condicional.persona_nome, vendedor_id: @condicional.vendedor_id, tabela_preco_id: @condicional.persona.tabela_preco_id), class: 'btn btn-green' %>
+        <% end %>
+        <%= link_to 'Salir', condicionals_url, class: 'btn btn-info next' %>
+      </div>
+     </header> 
+      <div class="panel-content">
+        <i class="icon-user"></i> Cliente: <%= @condicional.persona_nome %> 
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content">
+        <%= render 'saldo' %>        
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-body">
+      <% if @condicional.status == 0 %>
+          <%= render partial: "/condicional_produtos/new_devolvidos", locals: {condicional_produto: CondicionalProduto.new(condicional_id: @condicional.id)} %>
+        <% else %>
+          <div class="alert alert-success" align="center" style="margin: 10px">
+            <font color="green"><h1> <b>Condicional ya Bajado</b></h1></font>
+          </div>
+      <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content">
+        <%= render 'devolvidos' %>        
+      </div>
+    </div>
+  </div>
+</div>

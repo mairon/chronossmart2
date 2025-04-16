@@ -1,0 +1,64 @@
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="30" align="center"></td>
+      <td width="80" align="center">Ref.</td>
+      <td width="350" >Producto</td>
+      <td width="200">Color</td>
+      <td width="50">Tamanho</td>
+      <td width="70" align="right">Cantidad</td>
+      <td width="100" align="right">Unid. </td>
+      <td width="100" align="right">Total</td>
+    </tr>
+  </table>
+
+
+<div class="rolagem" dir="div">
+  <table>
+    <% indice = 1 %>
+    <% tot_us = 0 %>
+    <% tot_gs = 0 %>
+    <% qtd    = 0 %>
+    <% condicional_produtos.each do |pp| %>
+      <tr class = "<%= cycle("cor1", "cor2") %>">
+        <td width="30"  align="center">  <%= indice %></td>
+        <td width="80"  align="center">  <%= pp.fabricante_cod %></td>
+        <td width="350" align="left">    <%= pp.produto_nome %></td>
+        <td width="200" align="left">    <%= pp.cor_nome %></td>
+        <td width="50" align="left">    <%= pp.tamanho_nome %></td>
+        <td width="70"  align="right"><b><%= pp.quantidade %></b></td>
+        <% if @condicional.moeda == 0 %>
+          <td width="100" align="right"><%= number_to_currency( pp.unitario_us, :format =>' %n ', :separator => ",")   %></td>
+          <td width="100" align="right"><%= number_to_currency( pp.total_us, :format =>' %n ', :separator => ",")   %></td>
+          <% tot_us += pp.total_us %>
+        <% elsif @condicional.moeda == 1 %>
+          <td width="100" align="right"><%= number_to_currency( pp.unitario_gs, :format =>' %n ', :precision => 0 )   %></td>
+          <td width="100" align="right"><%= number_to_currency( pp.total_gs, :format =>' %n ', :precision => 0 )   %></td>
+          <% tot_gs += pp.total_gs %>
+        <% end %>
+        <td><%= link_to 'Editar', edit_condicional_produto_path(pp) %></td>
+        <td><%= link_to 'Borrar', pp, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+      <% indice += 1 %>
+      <% qtd += pp.quantidade %>
+    <% end %>
+  </table>
+</div>
+  <table class="head_grid">
+    <tr>
+      <td align="right" width="680"></td>
+        <td width="100" align="right"><b><%= qtd %></b> </td>
+        <td  width="100"></td>
+        <td width="100" align="right">
+          <b>
+          <% if @condicional.moeda == 0 %>
+            <%= number_to_currency( tot_us, :format =>' %n ', :separator => ",")   %>
+          <% elsif @condicional.moeda == 1 %>
+            <%= number_to_currency( tot_gs, :format =>' %n ', :precision => 0 )   %>
+          <% else %>
+            <%= number_to_currency( tot_rs, :format =>' %n ', :separator => "," )   %>
+          <% end %>
+          </b>
+        </td>
+    </tr>
+  </table>

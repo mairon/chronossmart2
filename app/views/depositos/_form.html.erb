@@ -33,12 +33,20 @@
           <%= f.text_field :capacidade, class: 'panel-field' %>
         </td>
       </tr>
-      <tr>        
+      <tr>
         <td>
           <label><%= t('UNIT') %></label>
           <%= f.collection_select :unidade_id, Unidade.all(:select => 'id,unidade_nome',:order => '2'),:id ,:unidade_nome,{}, { class: 'panel-field'} %></td>
 
       </tr>
+
+      <tr>
+        <td>
+          <label>Producto</label>
+          <%= f.collection_select :produto_id, Produto.all(:select => 'id,nome',:order => '2'),:id ,:nome,{prompt: ''}, { class: 'panel-field'} %></td>
+
+      </tr>
+
     </table>
     <div class="footer-buttons">
       <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>

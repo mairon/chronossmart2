@@ -44,7 +44,7 @@ class VendasCondLiqsController < ApplicationController
 
     respond_to do |format|
       if @vendas_cond_liq.save
-        format.html { redirect_to "/vendas/#{@vendas_cond_liq.venda_id}/cond_liqs" }
+        format.html { redirect_to "/vendas/#{@vendas_cond_liq.venda_id}" }
         format.json { render json: @vendas_cond_liq, status: :created, location: @vendas_cond_liq }
       else
         format.html { render action: "new" }
@@ -60,7 +60,7 @@ class VendasCondLiqsController < ApplicationController
 
     respond_to do |format|
       if @vendas_cond_liq.update_attributes(params[:vendas_cond_liq])
-        format.html { redirect_to "/vendas/#{@vendas_cond_liq.venda_id}/cond_liqs" }
+        format.html { redirect_to "/vendas/#{@vendas_cond_liq.venda_id}" }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }
@@ -76,7 +76,7 @@ class VendasCondLiqsController < ApplicationController
     @vendas_cond_liq.destroy
 
     respond_to do |format|
-      format.html { redirect_to "/vendas/#{@vendas_cond_liq.venda_id}/cond_liqs" }
+      format.html { redirect_to "/vendas/#{@vendas_cond_liq.venda_id}" }
       format.json { head :no_content }
     end
   end

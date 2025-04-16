@@ -116,11 +116,11 @@ nombres/es personal/es o Razon social que representamos en el Registro de Moroso
 
 		<tr>
 			<td>Deudor: <%= @venda.persona.nome %></td>
-			<td>Co-Deudor: <%= @venda.persona.persona_contatos.last.nome %></td>
+			<td>Co-Deudor: <%= @venda.persona.persona_contatos.last.nome unless @venda.persona.persona_contatos.blank? %></td>
 		</tr>
 		<tr>
-		<td>RUC/CI: <%= @venda.persona.ruc %> </td>
-			<td>RUC/CI: <%= @venda.persona.persona_contatos.last.ramal_01 %> </td>
+			<td>RUC/CI: <%= @venda.persona.ruc %> </td>
+			<td>RUC/CI: <%= @venda.persona.persona_contatos.last.ramal_01 unless @venda.persona.persona_contatos.blank? %> </td>
 		</tr> 
 		<tr>
 			<td height="20"></td>
@@ -148,7 +148,7 @@ nombres/es personal/es o Razon social que representamos en el Registro de Moroso
 		</tr> 
 	<% @venda.vendas_produtos.each do |vp| %>
 		<tr>
-			<td colspan="2"><%= vp.produto_nome %></td>
+			<td colspan="2"><br><%= vp.obs %></td>
 		</tr>
 		<% end %>		
 		<tr>
@@ -163,7 +163,7 @@ nombres/es personal/es o Razon social que representamos en el Registro de Moroso
 			</tr>
 
 			<tr>
-				<td>Deudor: <%= @venda.persona.nome_fatura %></td>
+				<td>-Deudor: <%= @venda.persona.nome_fatura %></td>
 				<td>Co-Deudor: <%= @venda.plano_venda.solicitude_creditos.last.garantia_02_nome %></td>
 			</tr>
 			<tr>
@@ -185,7 +185,7 @@ nombres/es personal/es o Razon social que representamos en el Registro de Moroso
 		</tr> 
 		<% @venda.vendas_produtos.each do |vp| %>
 		<tr>
-			<td colspan="2"><%= vp.produto_nome %></td>
+			<td colspan="2"><br><%= vp.obs %></td>
 		</tr>
 		<% end %>		
 		<tr>

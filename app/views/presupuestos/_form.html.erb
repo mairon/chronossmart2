@@ -22,17 +22,23 @@
 				<label><%= t('DATE') %></label>
 				<%= f.date_select :data,{},{:onblur => "DataCotacao('presupuesto_data_3i','presupuesto_data_2i','presupuesto_data_1i')"}  %>
 			</td>
-			<td> 
+			<td>
 				<label>Cotiz G$xU$</label>
 				<%= text_field  :presupuesto, :cotacao, size: 10, value: @presupuesto.cotacao.to_i %>
 			</td>
 
-			<td> 
+			<td>
 				<label>G$XR$</label>
 					<%= text_field :presupuesto,:cotacao_real, size: 10, value: @presupuesto.cotacao_real.to_i %>
 				</td>
 			</tr>
-			
+			<tr>
+				<td>
+					<label><%= t('DATE') %> Entrega</label>
+					<%= f.date_select :prazo_entrega %>
+				</td>
+
+			</tr>
 			<tr>
 				<td colspan="4">
 				 <fieldset>
@@ -40,10 +46,10 @@
 						<%= f.radio_button :moeda, 0 %> U$
 						<%= f.radio_button :moeda, 1, :Checked => "True"  %> Gs
 						<%= f.radio_button :moeda, 2 %> R$
-				 </fieldset>					
+				 </fieldset>
 				</td>
 			</tr>
-			
+
 			<tr>
 				<td colspan="4">
 					<label>Vendedor</label>
@@ -67,11 +73,11 @@
           <%= f.hidden_field :persona_id %>
         </td>
       <tr>
-			
+
       <tr>
         <td colspan="4">
           <label>Ctd Dependentes</label>
-          <%= f.text_field :qtd_dependentes, required: true, class: 'panel-field' %>          
+          <%= f.text_field :qtd_dependentes, required: true, class: 'panel-field' %>
         </td>
       <tr>
 
@@ -81,7 +87,7 @@
 					<%= f.text_area :obs, rows: 3, cols: 55 %>
 				</td>
 			</tr>
-			
+
 		 </table>
     <div class="footer-buttons">
       <%= f.submit "Seguir", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
@@ -114,21 +120,21 @@
 			}
 		});
 	});
-		
+
   $('#presupuesto_vendedor_id, #presupuesto_tabela_preco_id, #presupuesto_prazo_id, #presupuesto_indicador_id, #presupuesto_plano_id').selectize();
  </script>
 
 <% if params[:action] == 'new' %>
 <script>
 $(document).ready(function() {
-  $.ajax({url: '/buscas/cotz_us_compra', 
+  $.ajax({url: '/buscas/cotz_us_compra',
   	type: 'POST',
 		data: 'data=' + $('#presupuesto_data_3i').val()+'/'+
 			$('#presupuesto_data_2i').val()+'/'+
 			$('#presupuesto_data_1i').val(),
 		success: function(data){
 			$('#presupuesto_cotacao').val(number_format( data,0, ',', '.'));
-		} 
+		}
 	})
 
 	$.ajax({url: '/buscas/cotz_rs_compra',
@@ -138,7 +144,7 @@ $(document).ready(function() {
 			$('#presupuesto_data_1i').val(),
 		success: function(data){
 		 $('#presupuesto_cotacao_real').val(number_format( data,0, ',', '.'));
-		} 
+		}
 	})
 
 });

@@ -14,7 +14,7 @@ class PresupuestosController < ApplicationController
           persona_id: pp.persona_id,
           produto_id: pp.produto_id,
           cuotas: cota,
-          vencimento: params[:vencimento].to_date.months_since(venc.to_i),
+          vencimento: pp.vencimento.to_date.months_since(venc.to_i),
           valor_gs: (  (pp.total_guarani.to_f - (pp.total_guarani.to_f * (pp.desconto.to_f / 100))) / pp.cuotas.to_i)
           )
         venc += 1
@@ -26,7 +26,7 @@ class PresupuestosController < ApplicationController
 
     redirect_to presupuesto_path(params[:presupuesto_id])
   end
-  
+
   def print_presupuesto
       @presupuesto = Presupuesto.find(params[:id])
 
@@ -35,12 +35,12 @@ class PresupuestosController < ApplicationController
 
     respond_to do |format|
           format.html do
-            render  :pdf                    => "presupuesto-#{@presupuesto.id}",                
+            render  :pdf                    => "presupuesto-#{@presupuesto.id}",
                     :layout                 => "layer_relatorios",
                     :margin => {:top        => '0.20in',
                                 :bottom     => '0.25in',
                                 :left       => '0.10in',
-                                :right      => '0.10in'},        
+                                :right      => '0.10in'},
                     :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
                                 :font_size  => 7,
                                 :spacing    => 19},
@@ -73,7 +73,7 @@ class PresupuestosController < ApplicationController
       tipo = "P.NOME"            if params[:tipo] == "DESCRIPCION"
       tipo = "P.FABRICANTE_COD"  if params[:tipo] == "REFERENCIA"
       sql = "
-      SELECT 
+      SELECT
              P.ID AS PRODUTO_ID,
              P.NOME AS NOME,
              P.FABRICANTE_COD,
@@ -128,6 +128,7 @@ class PresupuestosController < ApplicationController
   end
 
   def show
+    @venda_config = VendasConfig.where(unidade_id: current_unidade.id).last
     @presupuesto = Presupuesto.find(params[:id])
     render layout: 'chart'
   end

@@ -34,7 +34,14 @@
                 </span>
               </div>
           </div>
-        </div>      
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <label>Grupo</label>
+            <%= select("busca", "grupo", Grupo.select('id,descricao').order('descricao').collect {|p| [ p.descricao, p.id ] },{prompt: 'Todos..'}) %>
+          </div>
+        </div>
 
         <div class="row">
           <div class="col-md-12">
@@ -92,7 +99,7 @@
     document.getElementById('tipo').value = d
   }
 
-  $('#busca_terminal').selectize();
+  $('#busca_terminal, #busca_grupo').selectize();
   $('#busca_vendedor').selectize();
   $('#busca_clase').selectize();
   $('#busca_colecao').selectize();
@@ -205,7 +212,6 @@ $("#produto_id").change(function(){
 
 </script>
 
-
 <div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog " role="document" style=" width: 1100px !important; ">
     <div class="modal-content">
@@ -213,16 +219,25 @@ $("#produto_id").change(function(){
         <div class="close-button">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </div>
-        <h4 class="modal-title" id="myModalLabel">Listado de Rentabilidad</h4>
+        <h4 class="modal-title" id="myModalLabel"><%= t('LISTING') %> Listado de Rentabilidad</h4>
       </div>
       <div class="modal-body" align="center">
         <div class="embed-responsive embed-responsive-16by9" style="height: 460px">
           <iframe class="embed-responsive-item" id="iframeModal" frameborder="0 " border="0"></iframe>
         </div>
       </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="print-nav">Imprimir</button>
+      </div>
     </div>
   </div>
 </div>
+
+<script>
+  $('#print-nav').on('click', function () {
+    document.getElementById('iframeModal').contentWindow.print();
+  });
+</script>
 
 <script>
       $(function() {

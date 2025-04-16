@@ -38,7 +38,7 @@
 
     <tr>
       <td>CARGO:</td>
-      <td><%= @sueldo.persona.cargo.nome %></td>
+      <td><%= @sueldo.persona.cargo.nome unless @sueldo.persona.cargo.blank? %></td>
       <td>MÊS DE PAGO:</td>
       <td><%= l @sueldo.data_inicio, :format => :mes  %>/<%= @sueldo.data_inicio.strftime("%Y")  %></td>
     </tr>
@@ -177,7 +177,7 @@
 
     <tr>
       <td>CARGO:</td>
-      <td><%= @sueldo.persona.cargo.nome %></td>
+      <td><%= @sueldo.persona.cargo.nome unless @sueldo.persona.cargo.blank?  %></td>
       <td>MÊS DE PAGO:</td>
       <td><%= l @sueldo.data_inicio, :format => :mes  %>/<%= @sueldo.data_inicio.strftime("%Y")  %></td>
     </tr>

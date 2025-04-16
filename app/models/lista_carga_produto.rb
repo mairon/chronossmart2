@@ -7,9 +7,9 @@ class ListaCargaProduto < ActiveRecord::Base
 
 
 	def saldo_pedido 
-		saldo_pedido = PresupuestoProduto.where(presupuesto_id: self.presupuesto_id).sum(:quantidade)
-		saldo_lista  = ListaCargaProduto.where(presupuesto_id: self.presupuesto_id).sum(:quantidade)
-		pedido = Presupuesto.find_by_id(self.presupuesto_id)
+		saldo_pedido = VendasProduto.where(venda_id: self.venda_id).sum(:quantidade)
+		saldo_lista  = ListaCargaProduto.where(venda_id: self.venda_id).sum(:quantidade)
+		pedido = Venda.find_by_id(self.venda_id)
 		if saldo_pedido.to_f == saldo_lista.to_f
 			pedido.update_attribute :status, 3
 		elsif saldo_lista.to_f == 0

@@ -1,0 +1,65 @@
+<div class="panel">
+  <div class="panel-body">
+  
+    <table class="head_grid">
+      <tr>
+        <td width="60">Cod Ext. Pedido</td>
+        <td width="60">Cod Ext.</td>
+        <td width="180">Doc.</td>
+        <td width="70">Data</td>
+        <td width="80">Rodado</td>
+        <td width="150">Motorista</td>
+        <td width="150">Produto</td>
+        <td width="85" align="right">Valor</td>
+        <td width="80" >Status</td>
+        <td width="150" >Classif.</td>
+
+      </tr>
+    </table>
+
+    <div class="rolagem" dir="div">
+      <table>
+        <% @ordem_cargas.each do |oc| %>
+          <tr>
+            <td width="60"><%= oc.pt_cod_ext %></td>
+            <td width="60"><%= oc.cod_ext %></td>
+            <td width="180">
+              <% if oc.tipo.to_i == 0 || oc.tipo.to_i == 1 %>
+                CRT <%= oc.crt %> <br> MIC <%= oc.mic %>
+              <% else %>
+                CTe <%= oc.cte %> <br> Manif. <%= oc.manif %>
+              <% end %>
+            </td>
+            <td width="70"><%= oc.data.strftime("%d/%m/%y") unless oc.data.blank? %></td>
+            <td width="80"><%= oc.placa_cv %> <%= oc.placa_cr %></td>
+            <td width="150"><%= oc.motorista_nome %></td>
+            <td width="150"><%= oc.produto_nome %></td>
+            <td width="80" align="right">
+              <% if oc.moeda.to_i == 0 %>
+                U$ <%= format_decimal(oc.valor_frete_us) %>
+              <% elsif oc.moeda.to_i == 1 %>
+                Gs. <%= format_int(oc.valor_frete_gs) %>
+              <% elsif oc.moeda.to_i == 2 %>
+                R$ <%= format_decimal(oc.valor_frete_rs) %>
+              <% end %>          
+            </td>
+            <td width="85">
+                <% if oc.status.to_i == 0 %>
+                  Em Aberto
+                <% elsif oc.status.to_i == 1 %>
+                  Em Curso
+                <% elsif oc.status.to_i == 1 %>
+                  Cancelado
+                <% elsif oc.status.to_i == 1 %>
+                  Finzalido
+                 <% end %>          
+            </td>
+            <td width="150"><%= oc.plano_de_conta_nome %></td>
+            <td><%= link_to '', edit_tms_ordem_carga_path(oc), class: 'icon-pencil' %></td>
+            <td><%= link_to '', [:tms, oc], :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,25 @@
+<table class="head_grid">
+  <tr>
+    <td width="200">Ciudad</td>
+    <td width="200">Direción</td>
+    <td width="200">Comple.</td>
+  </tr>
+</table>
+
+<div class="list" dir="div">
+  <table>
+    <% @persona_locais_entregas.each do |ple| %>
+      <tr class="<%= cycle("cor1", "cor2")%>"  
+        onClick="FechaLE('<%= ple.cidade.nome unless ple.cidade_id.blank? %>',
+            '<%= ple.direcao %>',
+            '<%= ple.obs %>',
+            '<%= ple.cidade_id %>',
+        )">
+        <td width="200"><%= ple.cidade.nome unless ple.cidade_id.blank? %></td>
+        <td width="200"><%= ple.direcao %></td>
+        <td width="200"><%= ple.obs %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

@@ -15,7 +15,7 @@
           <div class="col-md-3">
           <label>Grupo</label>
             <%= select("filtro", "grupo", Grupo.all(:select => 'id,descricao').collect {|p| [ p.descricao, p.id ] }, { :prompt => 'Todos' }) %>
-          </div>        
+          </div>
 
           <div class="col-md-3 padding-btn">
             <div class="input-group">
@@ -24,12 +24,12 @@
                   <i class="icon-search" aria-hidden="true"></i>
                 </button>
               </span>
-              <input id="busca" name="busca" type="search" placeholder="Buscar" autocapitalize="off" autocomplete="off" autocorrect="off" autofocus, class="panel-field" />              
+              <input id="busca" name="busca" type="search" placeholder="Buscar" autocapitalize="off" autocomplete="off" autocorrect="off" autofocus, class="panel-field" />
             </div>
           </div>
 
           <div class="col-md-3" style="padding-top: 25px;">
-            <input type="button" class="btn btn-blue" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar"/>
+            <input type="button" class="btn btn-blue" onclick="pesquisa(document.getElementById('busca').value)" placeholder="Cliente" value="Buscar"/>
             <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinner", :width => 21, :height => 21, :style =>"display: none;" ) %>
             <input type="hidden" id="modelo" value=""/>
           </div>
@@ -51,7 +51,7 @@
 
   $('#filtro_clase').selectize();
   $('#filtro_grupo').selectize();
-        
+
   function GeraPdf(v){
     $('#modelo').val(v);
     url="/produtos/index_print?" + $('form').serialize();

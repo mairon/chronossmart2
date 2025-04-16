@@ -1,0 +1,61 @@
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel">
+				<h1 id="header">
+					Historial Ticket <%= @persona.nome %> - <%= @persona.escolaridade %>
+
+					<div class="pull-right">
+						<%=  link_to 'Volver', controle_tickets_evento_convidados_path, class: 'btn btn-blue' %>
+					</div>
+				</h1>			
+			
+		<div class="panel-content">
+				<style>
+          td{
+            padding: 12px 5px 12px 5px !important;
+            border-bottom: 1px solid #efefef !important;
+          }
+
+        </style>
+
+      <table class="head_grid">
+        <tr>
+        	<td width="50">Venta</td>          
+          <td width="350">Producto</td>          
+          <td width="100" align="center">Generado</td>
+          <td width="100" align="center">Consumido</td>
+        </tr>
+      </table>           
+			<table>
+				<% count = 0 %>
+				<% consu = 0 %>
+				<% @tickets.each do |t| %>
+					<% count += 1 %>
+					<tr class="<%= cycle("cor1", "cor2")%>">		
+						<td width="50"><%= t.vendas_produto.venda_id.to_s.rjust(6,'0') %></td>
+						<td width="350"><%= t.vendas_produto.produto.nome %>
+							<% unless t.comple.blank? %>
+								- Baja Manual <%= t.comple %> por <%= t.doc %>
+							
+							<% end %>
+						 </td>
+						<td width="100" align="center"><%= t.created_at.strftime("%d/%m/%y - %H:%M") %></td>
+						<td width="100" align="center">
+							<% if t.presente == true %>
+								<%= t.updated_at.to_datetime.in_time_zone('America/Asuncion').strftime("%d/%m/%y - %H:%M") %>
+							<% else %>
+								<%= link_to 'Bajar Manual', edit_evento_convidado_path(t.id) %>
+							<% end %>
+							</td>
+						<% if t.presente == true %>
+							<% consu += 1 %>
+						<% end %>
+					</tr>
+				<% end %>
+			</table>
+			</div>
+			<h2 align="center" class="bold"> Generado: <%= count %> | Consumido: <%= consu %> | Saldo <%= (count.to_i - consu.to_i) %></h2>
+		</div>
+	</div>
+</div>

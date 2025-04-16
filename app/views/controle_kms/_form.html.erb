@@ -1,62 +1,40 @@
-<%= form_for(@controle_km) do |f| %>
-  <% if @controle_km.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@controle_km.errors.count, "error") %> prohibited this controle_km from being saved:</h2>
+<div class="group">
+  <%= form_for(@controle_km) do |f| %>
+    <div class="row">
+      <div class="col-md-6">
+        <label><%= t('DATE') %></label>
+        <%= f.date_select :data %>    
+      </div>      
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <label>Chofer</label>
+        <%= f.collection_select :persona_id, Persona.where(tipo_funcionario: 1).select('id,nome'), :id, :nome, { :prompt => 'Seleccione' }, {class: 'selectize'} %>
+      </div>
+    </div>
 
-      <ul>
-      <% @controle_km.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
+    <div class="row">
+      <div class="col-md-12">
+        <label><%= t('VEHICLES') %></label>
+        <%= f.collection_select :rodado_id, Rodado.all( :select => 'id,placa', :order  => '2' ),:id,:placa, { :prompt => 'Seleccione' }, {class: 'selectize'} %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label>KM</label>
+        <%= f.text_field :km, class: 'panel-field' %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <br>
+        <%= f.text_area :obs, class: 'panel-field', placeholder: 'Concepto', rows: '3' %>
+      </div>
+    </div>
+    <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
     </div>
   <% end %>
-
-<ul class="tabs">
-      <li><a href="#tab1"> controle_kms - [<%= t('EDITION') %>]</a></li>
-</ul>
-
-<div class="tab_container">
-      <div id="tab1" class="tab_content">
-        <table>
-          <tr>
-            <td width="1000">
-              <fieldset>
-
-                <table>
-                  <tr>
-                                      
-                      <td align="right">rodado_id :</td>                    
-                      <td><%= f.number_field :rodado_id %></td>
-                                      
-                      <td align="right">km :</td>                    
-                      <td><%= f.number_field :km %></td>
-                                      
-                      <td align="right">tabela :</td>                    
-                      <td><%= f.text_field :tabela %></td>
-                                      
-                      <td align="right">tabela_id :</td>                    
-                      <td><%= f.number_field :tabela_id %></td>
-                                      
-                      <td align="right">cod_proc :</td>                    
-                      <td><%= f.number_field :cod_proc %></td>
-                                      
-                      <td align="right">sigla_proc :</td>                    
-                      <td><%= f.text_field :sigla_proc %></td>
-                                      
-                      <td align="right"><%= t('DATE') %> :</td>                    
-                      <td><%= f.date_select :data %></td>
-                                      </tr>                 
-                </table>
-              </fieldset>
-            </td>
-          </tr>
-        </table>
-      </div>
-      
-      <div class="buttons">
-        <%= f.submit :value => t('SAVE'), :class => "button" %>
-        <%= link_to t('BACK'), controle_kms_path, :class => "button back" %>        
-      </div>
-
-    </div>
-<% end %>
+</div>

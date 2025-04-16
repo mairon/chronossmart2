@@ -3,11 +3,6 @@ class FormsController < ApplicationController
 
   def index
     @forms = Form.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render :xml => @forms }
-    end
   end
 
   def show
@@ -30,7 +25,6 @@ class FormsController < ApplicationController
 
   def edit
     @form = Form.find(params[:id])
-    render layout: false
   end
 
   def create
@@ -38,7 +32,7 @@ class FormsController < ApplicationController
 
     respond_to do |format|
       if @form.save
-        format.html { redirect_to(@form, :notice => 'Form was successfully created.') }
+        format.html { redirect_to(forms_url) }
       else
         format.html { render :action => "new" }
       end
@@ -50,7 +44,7 @@ class FormsController < ApplicationController
 
     respond_to do |format|
       if @form.update_attributes(params[:form])
-        format.html { redirect_to(@form, :notice => 'Form was successfully updated.') }
+        format.html { redirect_to(forms_url) }
       else
         format.html { render :action => "edit" }
       end

@@ -1,0 +1,68 @@
+<%= form_for(@fatura_import_produto) do |f| %>
+  <% if @fatura_import_produto.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@fatura_import_produto.errors.count, "error") %> prohibited this fatura_import_produto from being saved:</h2>
+
+      <ul>
+      <% @fatura_import_produto.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> fatura_import_produtos - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">fatura_import_id :</td>                    
+                      <td><%= f.number_field :fatura_import_id %></td>
+                                      
+                      <td align="right">dcodint :</td>                    
+                      <td><%= f.text_field :dcodint %></td>
+                                      
+                      <td align="right">ddesproser :</td>                    
+                      <td><%= f.text_field :ddesproser %></td>
+                                      
+                      <td align="right">ddesunimed :</td>                    
+                      <td><%= f.text_field :ddesunimed %></td>
+                                      
+                      <td align="right">dcantproser :</td>                    
+                      <td><%= f.text_field :dcantproser %></td>
+                                      
+                      <td align="right">dpuniproser :</td>                    
+                      <td><%= f.text_field :dpuniproser %></td>
+                                      
+                      <td align="right">ddescitem :</td>                    
+                      <td><%= f.text_field :ddescitem %></td>
+                                      
+                      <td align="right">dtotopeitem :</td>                    
+                      <td><%= f.text_field :dtotopeitem %></td>
+                                      
+                      <td align="right">produto_id :</td>                    
+                      <td><%= f.number_field :produto_id %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', fatura_import_produtos_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

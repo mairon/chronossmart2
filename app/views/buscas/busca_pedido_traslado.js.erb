@@ -1,0 +1,5 @@
+$('.b_pedido_traslado').empty();
+$('.b_pedido_traslado').append('<option value="">Selecione</option>');
+<% for ne in @pedido %>
+  $('.b_pedido_traslado').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.cod_ext %>').change());
+<% end %>

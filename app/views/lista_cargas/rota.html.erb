@@ -1,4 +1,4 @@
-<body onload="window.print()">
+<body #onload="window.print()">
 
   <style type="text/css">
     body {
@@ -11,7 +11,7 @@
       font-family: arial;
       font-size:9px;
       letter-spacing:2px
-    } 
+    }
 
   </style>
 
@@ -22,20 +22,20 @@
       +
         <% 62.times do |t| %>
           -
-        <% end %>      
+        <% end %>
       +
       </td>
     </tr>
     <tr>
-      <td style="padding-left:7px;letter-spacing:1px">| 
+      <td style="padding-left:7px;letter-spacing:1px">|
       <%= current_unidade.nome_sys %>
-        <%= @lista_carga.data_emisao.strftime("%d")%> de <%= l @lista_carga.data_emisao, :format => :mes %>  de <%= @lista_carga.data_emisao.strftime("%Y")%> | Horas: <%= @lista_carga.created_at.strftime("%H:%M")%>
+        <%= @lista_carga.data.strftime("%d")%> de <%= l @lista_carga.data, :format => :mes %>  de <%= @lista_carga.data.strftime("%Y")%> | Horas: <%= @lista_carga.created_at.strftime("%H:%M")%>
 
 
       </td>
       <td align="right" style="padding-right:7px;letter-spacing:1px">
 
-       
+
         Rota
         Nº: <%= @lista_carga.id.to_s.rjust(6,'0') %>
         |
@@ -43,13 +43,13 @@
     </tr>
     <tr>
        <td colspan="8">
-         <table >
+         <table width="620">
             <tr>
               <td colspan='8' align="center">
               +
                 <% 62.times do |t| %>
                   -
-                <% end %>      
+                <% end %>
               +
               </td>
             </tr>
@@ -86,10 +86,10 @@
                 <% end %>
                 <tr>
                   <td>| Cliente: <%= quebra = pc.persona_nome %> - Direción: </td>
-                </tr>                
+                </tr>
              <% end %>
             <tr>
-              <td width="440" style="padding-left:10px;letter-spacing:1px;">| <%= pc.produto_nome %></td>              
+              <td width="440" style="padding-left:10px;letter-spacing:1px;">| <%= pc.produto_nome %></td>
               <td width="70" style="letter-spacing:1px" align="right"><%= pc.quantidade.to_f %> |</td>
             </tr>
               <% qtd += pc.quantidade.to_f %>
@@ -98,7 +98,7 @@
             <tr class="head" height="15" valign="top">
               <td width="440" style="padding-left:10px;letter-spacing:1px;">| <b>Sub-Total: <%= quebra %></b></td>
               <td width="70" style="letter-spacing:1px" align="right"><b><%= sub_qtd %></b> |</td>
-            </tr>                  
+            </tr>
 
           <tr>
             <td colspan='8' align="center" >

@@ -32,7 +32,7 @@
 
     <tr>
       <td>CARGO:</td>
-      <td><%= @adelanto.persona.cargo.nome %></td>
+      <td><%= @adelanto.persona.cargo.nome unless @adelanto.persona.cargo.blank? %></td>
       <td>MÊS DE PAGO:</td>
       <td><%= l @adelanto.data, :format => :mes  %>/<%= @adelanto.data.strftime("%Y")  %></td>
     </tr>

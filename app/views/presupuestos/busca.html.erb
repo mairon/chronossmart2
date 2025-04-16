@@ -30,13 +30,13 @@
               <td width="60" align="center"><%= presupuesto.data.strftime("%d/%m/%y") %></td>
               <td width="100" align="left">
                 <% if presupuesto.status == 0 %>
-                  PENDIENTE
+                  Pendiente
                 <% elsif presupuesto.status == 1 %>
-                  EN PROCESO
+                  Aprovado
                 <% elsif presupuesto.status == 2 %>
-                  PARCIAL
-                <% elsif presupuesto.status == 3 %>                  
-                  FINALIZADO
+                  Entrege Parcial
+                <% elsif presupuesto.status == 3 %>
+                  Finalizado
                 <% end %>
               </td>
               <td width="80" align="left"><%= presupuesto.tabela_preco_nome %></td>
@@ -44,11 +44,16 @@
               <td width="280" align="left"><%= truncate(presupuesto.persona_nome, length: 38) %></td>
               <td width="30" align="right"><b><%= presupuesto.qtd.to_i %></b></td>
               <td width="70" align="right"><b><%= format_int(presupuesto.total_gs.to_f) %></b></td>
-              <td><%= link_to '', edit_presupuesto_path(presupuesto), class: 'icon-pencil' %></td>
-              <td><%= link_to '', presupuesto, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
-              <td><%= link_to '', print_presupuesto_presupuesto_path(presupuesto), target: "_blank",  class: 'icon-fullscreen' %></td>
-              <td><%= link_to 'Gerar Contrato', new_contrato_path(persona_id: presupuesto.persona_id, persona_nome: presupuesto.persona_nome, presupuesto_id: presupuesto, plano_id: presupuesto.plano_id, vendedor_id: presupuesto.vendedor_id), target: "_blank" %></td>
+                <% if presupuesto.contrato_id.to_i == 0  %>
 
+                <td><%= link_to '', edit_presupuesto_path(presupuesto), class: 'icon-pencil' %></td>
+                <td><%= link_to '', presupuesto, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+                <td><%= link_to '', print_presupuesto_presupuesto_path(presupuesto), target: "_blank",  class: 'icon-fullscreen' %></td>
+
+              <td><%= link_to 'Gerar Contrato', new_contrato_path(persona_id: presupuesto.persona_id, persona_nome: presupuesto.persona_nome, presupuesto_id: presupuesto, plano_id: presupuesto.plano_id, vendedor_id: presupuesto.vendedor_id), target: "_blank" %></td>
+              <% else %>
+                <td colspan="4"><%= link_to "Contracto: #{presupuesto.contrato_id.to_s.rjust(6,'0')}", contrato_path(presupuesto.contrato_id), target: '_blank?'%></td>
+              <% end %>
             </tr>
           <% end %>
       </table>

@@ -10,7 +10,7 @@ before_filter :authenticate
   def add_docs
     @nota_credito_proveedor = NotaCreditoProveedor.find(params[:id])
 
-      @docs = Compra.find(params[:nota_credito_proveedors]["ids"])      
+      @docs = Compra.find(params[:nota_credito_proveedors]["ids"])
         @docs.each do |d|
           NcProveedorFatura.create(  nota_credito_proveedor_id: @nota_credito_proveedor.id,
                                 		compra_id:           d.id,
@@ -22,7 +22,7 @@ before_filter :authenticate
         end
 
       redirect_to(cobro_path(@cobro))
-    end  
+    end
 
   def filtro_busca_faturas
     @faturas = Compra.all(:select => 'id,persona_id,persona_nome,documento_numero_01,documento_numero_02,documento_numero,data',:conditions => ["persona_id = ? AND documento_numero LIKE ?",params[:busca],"%#{params[:filtro]}%"],
@@ -30,7 +30,7 @@ before_filter :authenticate
 
     render :layout => false
   end
-   
+
 
   def busca_produtos
 
@@ -39,7 +39,7 @@ before_filter :authenticate
 
   def nc_proveedor_produtos
     @nota_credito_proveedor = NotaCreditoProveedor.find(params[:id])
-    
+
     produtos_id = ComprasProduto.select('produto_id').where("persona_id = #{@nota_credito_proveedor.persona_id}").group('produto_id').collect{|d| d.produto_id}.join("', '")
     sql = "SELECT S.PRODUTO_ID,
 									S.DEPOSITO_ID,
@@ -98,7 +98,7 @@ before_filter :authenticate
                 ON V.SUB_GRUPO_ID = SG.ID
                 WHERE C.UNIDADE_ID = #{current_unidade.id} and C.PERSONA_ID = #{@nota_credito_proveedor.persona_id} AND C.LIQUIDACAO = 0 AND (C.DIVIDA_GUARANI + C.DIVIDA_DOLAR ) > 0
                 ORDER BY 8,12
-                          "        
+                          "
                 @dividas  = Proveedore.find_by_sql(sql)
 
 
@@ -107,6 +107,7 @@ before_filter :authenticate
     @valor_total_gs = NotaCreditoProveedorProduto.sum('total_guarani',:conditions => ["nota_credito_proveedor_id = ? ",@nota_credito_proveedor.id])
     @valor_total_rs = NotaCreditoProveedorProduto.sum('total_real',:conditions => ["nota_credito_proveedor_id = ? ",@nota_credito_proveedor.id])
 
+    render layout: 'chart'
   end
 
     def comprovante
@@ -121,7 +122,7 @@ before_filter :authenticate
                 :margin => {:top        => '0.20in',
                             :bottom     => '0.25in',
                             :left       => '0.10in',
-                            :right      => '0.10in'},        
+                            :right      => '0.10in'},
                 :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
                             :font_size  => 7,
                             :left       => '',
@@ -136,7 +137,7 @@ before_filter :authenticate
 
   def nc_proveedor_financa
     @nota_credito_proveedor = NotaCreditoProveedor.find(params[:id])
-    
+
     @valor_total_us = NcProveedorFatura.sum('valor_dolar',:conditions => ["nota_credito_proveedor_id = ? ",@nota_credito_proveedor.id])
 
     @valor_total_gs = NcProveedorFatura.sum('valor_guarani',:conditions => ["nota_credito_proveedor_id = ? ",@nota_credito_proveedor.id])
@@ -150,30 +151,28 @@ before_filter :authenticate
 
   def show
     @nota_credito_proveedor = NotaCreditoProveedor.find(params[:id])
-    
-    produtos_id = ComprasProduto.select('produto_id').where("tipo_compra = 0 and persona_id = #{@nota_credito_proveedor.persona_id}").group('produto_id').collect{|d| d.produto_id}.join(",")
-    sql = "SELECT S.PRODUTO_ID,
-									S.DEPOSITO_ID,
-									MAX(P.NOME) AS PRODUTO_NOME,
-									MAX(U.UNIDADE_NOME) AS UNIDADE_NOME,
-									MAX(D.NOME) AS DEPOSITO_NOME,
-									(SELECT SS.PROMEDIO_GUARANI FROM STOCKS SS WHERE SS.STATUS = 0 AND SS.ENTRADA > 0 AND SS.PRODUTO_ID = S.PRODUTO_ID AND SS.DATA <= '#{@nota_credito_proveedor.data}'  ORDER BY SS.DATA DESC, SS.TABELA_ID DESC  LIMIT 1) CUSTO_MEDIO_GS,
-									(SELECT SS.PROMEDIO_DOLAR FROM STOCKS SS WHERE SS.STATUS = 0 AND SS.ENTRADA > 0 AND SS.PRODUTO_ID = S.PRODUTO_ID AND SS.DATA <= '#{@nota_credito_proveedor.data}'  ORDER BY SS.DATA DESC, SS.TABELA_ID DESC  LIMIT 1) CUSTO_MEDIO_US,
-								  SUM(S.ENTRADA - S.SAIDA) STOCK
-								FROM STOCKS S
-								INNER JOIN PRODUTOS P
-								ON P.ID = S.PRODUTO_ID
-								INNER JOIN DEPOSITOS D
-								ON D.ID = S.DEPOSITO_ID
-								INNER JOIN UNIDADES U
-								ON U.ID = D.UNIDADE_ID
+    unless @nota_credito_proveedor.tabela_id.blank?
+      sql = "SELECT CP.PRODUTO_ID,
+  									CP.DEPOSITO_ID,
+  									P.NOME AS PRODUTO_NOME,
+  									D.NOME AS DEPOSITO_NOME,
+  									(SELECT SS.PROMEDIO_GUARANI FROM STOCKS SS WHERE SS.STATUS = 0 AND SS.ENTRADA > 0 AND SS.PRODUTO_ID = CP.PRODUTO_ID AND SS.DATA <= '#{@nota_credito_proveedor.data}'  ORDER BY SS.DATA DESC, SS.TABELA_ID DESC  LIMIT 1) CUSTO_MEDIO_GS,
+  									(SELECT SS.PROMEDIO_DOLAR FROM STOCKS SS WHERE SS.STATUS = 0 AND SS.ENTRADA > 0 AND SS.PRODUTO_ID = CP.PRODUTO_ID AND SS.DATA <= '#{@nota_credito_proveedor.data}'  ORDER BY SS.DATA DESC, SS.TABELA_ID DESC  LIMIT 1) CUSTO_MEDIO_US,
+  								  CP.QUANTIDADE AS STOCK
+  								FROM COMPRAS_PRODUTOS CP
 
-								WHERE S.PRODUTO_ID IN (#{produtos_id})
-								AND S.DATA <= '#{@nota_credito_proveedor.data}'
-								GROUP BY 1,2
-								HAVING SUM(S.ENTRADA - S.SAIDA) > 0
-								ORDER BY 1"
-    @produtos = ComprasProduto.find_by_sql(sql)
+  								INNER JOIN PRODUTOS P
+  								ON P.ID = CP.PRODUTO_ID
+
+  								INNER JOIN DEPOSITOS D
+  								ON D.ID = CP.DEPOSITO_ID
+
+  								WHERE CP.COMPRA_ID = #{@nota_credito_proveedor.tabela_id}"
+      @produtos = ComprasProduto.find_by_sql(sql)
+    end
+
+    render layout: 'chart'
+
   end
 
   def new
@@ -196,7 +195,7 @@ before_filter :authenticate
 
     respond_to do |format|
       if @nota_credito_proveedor.save
-        if @nota_credito_proveedor.operacao == 0
+        if @nota_credito_proveedor.operacao.in?([0, 2])
           format.html { redirect_to(@nota_credito_proveedor) }
         else
           format.html { redirect_to "/nota_credito_proveedors/#{@nota_credito_proveedor.id}/nc_proveedor_aplic" }
@@ -213,7 +212,7 @@ before_filter :authenticate
     respond_to do |format|
       if @nota_credito_proveedor.update_attributes(params[:nota_credito_proveedor])
 
-        if @nota_credito_proveedor.operacao == 0
+        if @nota_credito_proveedor.operacao.in?([0, 2])
           format.html { redirect_to(@nota_credito_proveedor) }
         else
           format.html { redirect_to "/nota_credito_proveedors/#{@nota_credito_proveedor.id}/nc_proveedor_aplic" }

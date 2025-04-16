@@ -50,6 +50,13 @@
         </td>
       </tr>
 
+      <tr>
+        <td>
+          <label>Terminal</label>
+          <%= f.collection_select :terminal_id, Terminal.where(unidade_id: current_unidade.id).select('id,nome').order('nome'), :id, :nome ,{:prompt => 'Selecione'}%>
+        </td>
+      </tr>
+
 			<tr>
 				<td style="padding-bottom: 15px"> 
 					<label>Tipo Economico</label><br>
@@ -108,5 +115,5 @@
 
 
 <script>
-  $('#consumicao_interna_motivo_id, #consumicao_interna_rodado_id, #consumicao_interna_centro_custo_id').selectize();
+  $('#consumicao_interna_motivo_id, #consumicao_interna_rodado_id, #consumicao_interna_centro_custo_id, #consumicao_interna_terminal_id').selectize();
 </script>

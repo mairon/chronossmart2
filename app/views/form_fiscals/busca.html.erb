@@ -1,20 +1,20 @@
+<div class="panel">
 <table class="head_grid" >
   <tr>
-    <td width="50">UN</td>
-    <td width="50">TM</td>
-    <td width="80">Status</td>
+    <td width="30" align="center">UN</td>
+    <td width="30" align="center">TM</td>
+    <td width="80">Status Sis</td>
     <td width="80">Tipo Doc.</td>
-    <td width="80">Fecha</td>
-    <td width="80">Venc.</td>
-    <td width="100">Doc</td>
+    <td width="65">Fecha</td>
+    <td width="90">Doc</td>
     <td width="70">Timbrado</td>
-    <td width="50">Tipo</td>
-    <td width="100">Ruc</td>
-    <td width="300">Nombre</td>
-    <td width="20">Cod proc</td>
-    <td width="20">Sigla proc</td>
+    <td width="40">Tipo</td>
+    <td width="80">RUC/CI</td>
+    <td width="300">Razón Social</td>
+    <td width="80">Origen</td>
+
     <% if params[:tipo_emissao] == '1' %>
-    <td width="80">Situacion</td>
+      <td width="80">Situacion</td>
       <td width="80">Estado SET</td>
     <% end%>
 
@@ -25,22 +25,20 @@
   <table>
     <% @form_fiscals.each do |form_fiscal| %>
       <tr class = "<%= cycle("cor1", "cor2") %>">
-        <td width="50"><%= form_fiscal.unidade_id %></td>
-        <td width="50"><%= form_fiscal.terminal_id %></td>
-        <% if form_fiscal.status == 0 %>
-          <td width="80" style="background: green; color: #fff">
-            <b>Pendente</b>
-          </td>
-        <% elsif form_fiscal.status == 1 %>
-          <td width="80" style="background: yellow">
-            <b>Activo</b>
-          </td>
-        <% elsif form_fiscal.status == 2 %>
-          <td width="80" style="background: red;color: #fff">
-            <b>Anulado</b>
-          </td>
-        <% end %>
-        
+        <td width="30" align="center"><%= form_fiscal.unidade_id %></td>
+        <td width="30" align="center"><%= form_fiscal.terminal_id %></td>
+        <td width="80">
+          <% if form_fiscal.status == 0 %>
+              <span class="btn-secondary">Pendiente</span>
+          <% elsif form_fiscal.status == 1 %>
+            <span class="btn-success">Activo</span>
+          <% elsif form_fiscal.status == 2 %>
+            <span class="btn-danger">Cancelado</span>
+          <% elsif form_fiscal.status == 3 %>
+            <span class="btn-warning">Inutilizado</span>
+          <% end %>
+        </td>
+
         <td width="80">
           <% if form_fiscal.tipo_doc == 1 %>
             Factura
@@ -68,15 +66,13 @@
             Nota de Retención
           <% end %>
           </td>
-        <td width="80"><%= form_fiscal.data.strftime("%d/%m/%y") %></td>
-        <td width="80"><%= form_fiscal.vencimento.strftime("%d/%m/%y") %></td>
-        <td width="100"><%= form_fiscal.doc_01 %>.<%= form_fiscal.doc_02 %>.<%= form_fiscal.doc %></td>
+        <td width="65"><%= form_fiscal.data.strftime("%d/%m/%y") unless  form_fiscal.data.blank? %></td>
+        <td width="90"><%= form_fiscal.doc_01 %>.<%= form_fiscal.doc_02 %>.<%= form_fiscal.doc %></td>
         <td width="70"><%= form_fiscal.timbrado %></td>
-        <td width="50"><%= form_fiscal.tipo %></td>
-        <td width="100"><%= form_fiscal.ruc %></td>
+        <td width="40"><%= form_fiscal.tipo %></td>
+        <td width="80"><%= form_fiscal.ruc %></td>
         <td width="300"><small><%= form_fiscal.persona_nome %></small></td>
-        <td width="20"><%= form_fiscal.cod_proc %></td>
-        <td width="20"><%= form_fiscal.sigla_proc %></td>        
+        <td width="80"><%= form_fiscal.sigla_proc %>•<%= form_fiscal.cod_proc.to_s.rjust(6,'0') %></td>
 
         <% if params[:tipo_emissao] == '1' %>
 
@@ -96,37 +92,40 @@
                         response = http.request(request)
                         puts get_resp = JSON.parse(response.body)
 
-            
 
-          %> 
-        
-        <td>
+
+          %>
+
+        <td width="80">
           <% if get_resp["deList"][0]["situacion"].to_s == '0' %>
             Generado DE
           <% elsif get_resp["deList"][0]["situacion"].to_s == '1' %>
             Enviado en un Lote
           <% elsif get_resp["deList"][0]["situacion"].to_s == '2' %>
-            Aprobado
+            <span class="us">Aprobado</span>
           <% elsif get_resp["deList"][0]["situacion"].to_s == '3' %>
             Aprobado con observacion
           <% elsif get_resp["deList"][0]["situacion"].to_s == '4' %>
-            <span style="color: red">Rechazado</span>
+            <span class="gs">Rechazado</span>
           <% elsif get_resp["deList"][0]["situacion"].to_s == '98' %>
             Inexistente
           <% elsif get_resp["deList"][0]["situacion"].to_s == '99' %>
-            Cancelado
+            <span class="gs">Cancelado</span>
           <% end %>
         </td>
         <td class="bold" width="80"><%= get_resp["deList"][0]["respuesta_mensaje"] %></td>
+        <% end %>
         <td>
-          <% if get_resp["deList"][0]["situacion"].to_s == '4' %>
-            <%= link_to 'Re-Enviar', reenviar_form_fiscals_path(id: form_fiscal), target: '_blank' %>
+          <%= link_to form_fiscal_path(form_fiscal), target: '_blank?' do %>
+            <span class="material-symbols-outlined">more_vert</span>
           <% end %>
         </td>
-
-        <% end %>
-        <td><%= link_to 'Editar', edit_form_fiscal_path(form_fiscal) %></td>
       </tr>
     <% end %>
   </table>
+</div>
+  <div class="head_grid">
+    <%= will_paginate @form_fiscals %>
+  </div>
+
 </div>

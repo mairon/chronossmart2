@@ -14,7 +14,7 @@
       <td width="120">Tipo</td>
       <td width="100">Color</td>
       <td width="100">Anõ</td>
-      <td width="150">Chasis</td>      
+      <td width="150">Chasis</td>
     <% else %>
       <td width="150">Cod. Fabri.</td>
       <td width="150">Barra</td>
@@ -26,24 +26,16 @@
 <div class="rolagem" id="div">
   <table>
     <% @produtos.each do |p| %>
-    <%
-        #ProdutosTabelaPreco.create( :produto_id       => p.id,
-        #                            :unidade_id       => 1,
-        #                            :tabela_preco_id  => 10
-        #                       )
-
-
-    %>  
-    <% #p.update_attribute :updated_at, '2024-11-07' %>  
+    <% #p.update_attribute :updated_at, '2024-03-12' %>
       <tr class = "<%= cycle("cor1", "cor2")%>">
         <td width="55" align="center"><%= link_to p.id.to_s.rjust(6, '0'), produto_path(p) %>
-        <td width="150"> <small><%= p.clase.descricao unless p.clase_id.blank?  %></small></td>
+        <td width="150"> <small><%= p.clase.descricao unless p.clase.blank?  %></small></td>
         <td width="150"> <small><%= p.grupo.descricao unless p.grupo.nil? %></small></td>
         <% if ep == 2 %>
           <td width="120"><small><%= p.referencia %></small></td>
           <td width="100"><small><%= p.cor %></small></td>
-          <td width="100"><small><%= p.ano %></small></td>          
-          <td width="150"><small><%= p.chassi %></small></td>          
+          <td width="100"><small><%= p.ano %></small></td>
+          <td width="150"><small><%= p.chassi %></small></td>
         <% else %>
           <td width="150"><small><%= p.fabricante_cod %></small></td>
           <td width="150"><small><%= p.barra %></small></td>

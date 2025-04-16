@@ -22,6 +22,12 @@
   <%= f.hidden_field :plano_de_conta_id %>
   <%= f.hidden_field :centro_custo_id %>
   <%= f.hidden_field :tot_cotas %>
+  <%= f.hidden_field :retencao_gs %>
+  <%= f.hidden_field :imposto_gs %>
+  <%= f.hidden_field :retencao_us %>
+  <%= f.hidden_field :imposto_us %>
+  <%= f.hidden_field :tot_cotas %>
+
   <%= hidden_field_tag :cotacao, @pago.cotacao.to_i %>
   <table>
     <tr>
@@ -135,3 +141,18 @@
     </tr>  
   </table>
 <% end %>
+
+
+<script>
+
+  $("#pagos_detalhe_pago_guarani").change(function(){   // 1st way
+    var valor_gs    = parseFloat($("#pagos_detalhe_valor_guarani").val().replace(/\./g, "").replace(",", "."))
+    var saldo_gs    = parseFloat($("#pagos_detalhe_pago_guarani").val().replace(/\./g, "").replace(",", "."))
+    var retencao_gs = parseFloat($("#pagos_detalhe_retencao_gs").val().replace(/\./g, "").replace(",", "."))
+    var imposto_gs = parseFloat($("#pagos_detalhe_imposto_gs").val().replace(/\./g, "").replace(",", "."))
+
+    var propr = ((saldo_gs / valor_gs ) * 100)
+    var propr_ret = ((saldo_gs / valor_gs ) * 100)
+
+  });  
+</script>

@@ -17,17 +17,17 @@
 		<%= f.hidden_field :tipo_compra, value: 1 %>
 		<%= f.hidden_field :fiscal, value: '1' %>
 		<%= hidden_field_tag :moeda, '1' %>
-	<% else %>	
+	<% else %>
 		<%= hidden_field_tag :moeda, @compra.moeda %>
 	<% end %>
 			<table>
 				<tr>
-					<td> 
+					<td>
 						<label><%= t('DATE') %></label>
 						<%= f.date_select :data %>
 					</td>
             <td>
-            	<fieldset> 
+            	<fieldset>
             		<legend><%= t('COIN') %></legend>
                 <%= f.radio_button  :moeda, 1, Checked: "True", onfocus: "MoedaCompra('1')" %> Gs.
                 <%= f.radio_button :moeda, 0, onfocus: "MoedaCompra('0')"%> Dolar
@@ -40,10 +40,10 @@
 						    <%= f.radio_button :tipo, 0, Checked: "True" %> Contado
 						    <%= f.radio_button :tipo, 1 %> Credito
 					    </fieldset>
-						</td>									
+						</td>
 					</tr>
 				<tr>
-          <td> 
+          <td>
           	<label>Competência</label>
           	<%= f.date_select :competencia, :discard_day => true %>
           </td>
@@ -70,7 +70,7 @@
 						 <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
 			      <%= f.hidden_field :persona_id %>
 			     </td>
-			  <tr>                   
+			  <tr>
           <td colspan="4">
           <label>Rodados</label>
           	<%= f.collection_select :rodado_id,
@@ -103,7 +103,7 @@
                        { :prompt => 'Seleccione lo Viatico' } %>
           </td>
 
-        </tr>								
+        </tr>
 				<tr>
 					<td colspan="2">
 					<label>Número</label>
@@ -127,6 +127,10 @@
 						<%= field_gs_label 'Gravadas 10% Gs.:',f, :gravadas_10_guarani %>
 					</tr>
 					<tr>
+						<%= field_gs_label 'Retención Gs.:',f, :retencao_gs %>
+					</tr>
+
+					<tr>
 						<%= field_gs_label 'Total Descuento Gs.:',f,:desconto_guarani %>
 						<%= field_gs_label 'Total Gs.:',f,:total_guarani, readonly: 'readonly' %>
 					</tr>
@@ -142,6 +146,10 @@
 					<tr>
 						<%= field_us_label 'Gravadas 10% U$:',f, :gravadas_10_dolar %>
 					</tr>
+					<tr>
+						<%= field_gs_label 'Retención U$:',f, :retencao_us %>
+					</tr>
+
 					<tr>
 						<%= field_us_label 'Total Descuento U$:',f,:desconto_dolar %>
 						<%= field_us_label 'Total U$:',f,:total_dolar, readonly: 'readonly' %>
@@ -212,8 +220,8 @@
 		});
 	</script>
 	<% if params[:prov_gasto] == 'true' %>
-		
-		<script> 
+
+		<script>
 		$(document).ready(function() {
 	    $.ajax({url: '/buscas/proveedor_pagar',
 	            type: 'POST',
@@ -245,7 +253,7 @@
 							    $(".valores-gs").hide();
 							    $("#compra_moeda_2").attr('checked', 'checked');
 							    $('#compra_total_real').val(number_format(data["prov"].divida_real, 2, ',', '.'));
-						   	}						          
+						   	}
 	        		} });
 			});
 		</script>
@@ -274,7 +282,7 @@
 	}
 
   //calc valores
-  $( "#compra_exentas_guarani, #compra_gravadas_05_guarani, #compra_gravadas_10_guarani" ).blur(function() {  
+  $( "#compra_exentas_guarani, #compra_gravadas_05_guarani, #compra_gravadas_10_guarani" ).blur(function() {
   	var exentas_gs = $('#compra_exentas_guarani').val();
   	var grav_05_gs = $('#compra_gravadas_05_guarani').val();
   	var grav_10_gs = $('#compra_gravadas_10_guarani').val();
@@ -282,7 +290,7 @@
   	$('#compra_total_guarani').val(number_format(tot_gs, 0, ',', '.'));
   });
 
-  $( "#compra_exentas_dolar, #compra_gravadas_05_dolar, #compra_gravadas_10_dolar" ).blur(function() {  
+  $( "#compra_exentas_dolar, #compra_gravadas_05_dolar, #compra_gravadas_10_dolar" ).blur(function() {
   	var exentas_us = $('#compra_exentas_dolar').val();
   	var grav_05_us = $('#compra_gravadas_05_dolar').val();
   	var grav_10_us = $('#compra_gravadas_10_dolar').val();
@@ -290,7 +298,7 @@
   	$('#compra_total_dolar').val(number_format(tot_us, 2, ',', '.'));
   });
 
-  $( "#compra_exentas_real, #compra_gravadas_05_real, #compra_gravadas_10_real" ).blur(function() {  
+  $( "#compra_exentas_real, #compra_gravadas_05_real, #compra_gravadas_10_real" ).blur(function() {
   	var exentas_rs = $('#compra_exentas_real').val();
   	var grav_05_rs = $('#compra_gravadas_05_real').val();
   	var grav_10_rs = $('#compra_gravadas_10_real').val();

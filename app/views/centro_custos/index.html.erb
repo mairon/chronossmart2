@@ -1,7 +1,10 @@
-<h1 id="header"><%= t('CENTER_OF_COSTOS') %></h1>
-<div class="acessos">
-  <%= link_to t('NEW'), new_centro_custo_path,:class => 'button add' %>
-</div>
+<h1 id="header">
+  <%= t('CENTER_OF_COSTOS') %>  
+  <div class="pull-right">
+    <i class="icon-question-sign" id="help-link"></i> <%= link_to t('NEW'), new_centro_custo_path,:class => 'button add' %>
+  </div>
+
+</h1>
 
 <div class="group">
   <table class="head_grid">
@@ -30,3 +33,13 @@
   </div>
 </div>
 
+
+<script>
+  $("#help-link").click(function() {
+    Gleap.openHelpCenterArticle("1", false);  
+  })
+
+  
+
+
+</script>

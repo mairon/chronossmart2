@@ -1,7 +1,7 @@
 <h1 id="header">
   <%= t('CHARGE') %>s
   <div class="pull-right">
-      <%= link_to t('NEW'), new_cobro_path, :class => "button add" %>    
+      <%= link_to t('NEW'), new_cobro_path, :class => "button add" %>
   </div>
 </h1>
 <div class="group">
@@ -10,11 +10,11 @@
         <tr>
           <!--FILTRO_DATA!-->
           <td align="right"><%= t('DATE') %>:</td>
-          <td colspan="2"> 
+          <td colspan="2">
             <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
             <div class="input-group-addon-f">
               <span class="icon-calendar"></span>
-            </div> 
+            </div>
           <td style="padding-left: 10px"><%= t('TO') %>:</td>
           <td>
             <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
@@ -36,7 +36,7 @@
     <% end %>
     <div id="pagina">
     </div>
-</div>    
+</div>
 <script language="javascript">
   function pesquisa(valor){
     url="/cobros/busca?" + $('form').serialize();

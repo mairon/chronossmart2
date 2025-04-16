@@ -323,7 +323,7 @@ class Cliente < ActiveRecord::Base
         if params[:tipo_data].to_s == 'emicao'
             #FITRO POR DATA FATURACAO
             cond = "#{unidade} C.data  BETWEEN  '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'  #{liq_open} #{liq_close} #{liq_all} #{moeda} #{vend} #{cliente_status} #{clase_produto} #{filtro_saldo_periodo} #{setor} #{regiao} #{doc} #{direcao} #{classif} #{cc} #{find_valor} #{tipo_persona} #{consumo} #{tutor}"
-            orden = '4,2,13,14,1'
+            orden = '4,19,13,14,1'
         else
             #FITRO POR DATA FATURACAO VENCIMENTO
             cond = "#{unidade}C.vencimento  BETWEEN  '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{liq_open} #{liq_close} #{liq_all} #{moeda} #{vend} #{cliente_status} #{clase_produto} #{filtro_saldo_periodo} #{setor} #{regiao} #{doc} #{direcao} #{classif} #{cc} #{find_valor} #{tipo_persona} #{consumo} #{tutor}"
@@ -366,6 +366,7 @@ class Cliente < ActiveRecord::Base
                                    CD.NOME AS CIDADE_NOME,
                                    C.TOT_COTAS,
                                    C.COD_PROC,
+                                   C.sigla_proc,
                                    CC.NOME AS CENTRO_CUSTO_NOME
 
                               FROM CLIENTES C
@@ -387,7 +388,7 @@ class Cliente < ActiveRecord::Base
                               LEFT JOIN CIDADES CD
                               ON P.CIDADE_ID = CD.ID
 
-                              WHERE #{cond} #{pers}" )
+                              WHERE #{cond} #{pers} ORDER BY #{orden}" )
     end
 
     def self.resultado_extracto_funcionario(params)
@@ -457,6 +458,7 @@ class Cliente < ActiveRecord::Base
                                    P.CLASSIFICACAO,
                                    P.DIRECAO,
                                    C.cod_proc,
+                                   C.SIGLA_PROC,
                                    CD.NOME AS CIDADE_NOME
 
                               FROM CLIENTES C
@@ -788,7 +790,6 @@ class Cliente < ActiveRecord::Base
                       MAX(U.UNIDADE_NOME),
                       MIN(C.TOT_COTAS) AS TOT_COTAS,
                       MIN(CC.NOME) AS CENTRO_CUSTO_NOME,
-                      
                       ARRAY(SELECT (json_build_object('produto_nome', VP.PRODUTO_NOME)) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = MIN(C.VENDA_ID) ) AS array_venda_produtos,
                       MAX(C.DATA) AS PG_DATA
             FROM CLIENTES C

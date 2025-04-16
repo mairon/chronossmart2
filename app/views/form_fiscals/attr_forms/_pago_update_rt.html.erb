@@ -1,7 +1,7 @@
 <%= form_tag "/form_fiscals/retencao_update_cp" do %>
 	<%= hidden_field_tag :cod_proc, @pago.id %>
 	<%= hidden_field_tag :sigla_proc, 'PG' %>
-	<%= hidden_field_tag :data, @pago.data %>
+	<%= hidden_field_tag :data, Time.now.strftime("%Y-%m-%d") %>
 	<%= hidden_field_tag :status, 1 %>
 	<%= hidden_field_tag :tipo, 1 %>
 	<%= hidden_field_tag :ruc, @pago.persona.ruc %>

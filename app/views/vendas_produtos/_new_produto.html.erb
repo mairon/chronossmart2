@@ -9,13 +9,32 @@
         </div>
       </div>
     <% end %>
+    <% if @empresa.segmento.to_i == 4 %>
+      <div class="row">
 
-    <div class="row">
-      <div class="col-md-12">
-        <label></label>
-        <%= f.text_field :produto_nome, style: 'width: 100%', placeholder: 'Producto' %>
+        <div class="col-md-1">
+          <a href="#" class="btn btn-blue" data-toggle="modal" style="margin-top: 10px" data-load-url="<%= modal_abastecidas_abastecidas_path(venda_id: @venda.id) %>" data-target="#ModalAbastecidas"><span class="material-symbols-outlined" style="color: #fff">local_gas_station</span></a>
+        </div>
+
+        <div class="col-md-3">
+          <label></label>
+          <%= f.collection_select :bico_id, Bico.where(unidade_id: current_unidade.id).select('id,nome').order('nome'), :id, :nome, {prompt: 'Pico'}, {class: 'selectize'} %>
+        </div>
+
+        <div class="col-md-8">
+          <label></label>
+          <%= f.text_field :produto_nome, style: 'width: 100%', placeholder: 'Producto' %>
+        </div>
       </div>
-    </div>
+    <% else %>
+      <div class="row">
+        <div class="col-md-12">
+          <label></label>
+          <%= f.text_field :produto_nome, style: 'width: 100%', placeholder: 'Producto' %>
+        </div>
+      </div>
+
+    <% end %>
 
     <% if @venda.moeda.to_i == 1 %>
 
@@ -80,10 +99,11 @@
 
   </div>
 
-<%= f.hidden_field :deposito_id, value: Deposito.where(unidade_id: @venda.unidade_id, seta_produto: 1).first.id %>
+<%= f.hidden_field :deposito_id, value: @venda.terminal.deposito_id %>
 <%= f.hidden_field :produto_id %>
 <%= f.hidden_field :data, value: @venda.data %>
 <%= f.hidden_field :moeda, value: @venda.moeda %>
+<%= f.hidden_field :tabela_preco_id, value: @venda.tabela_preco_id %>
 
 <%= hidden_field_tag :unidade, nil, value: current_unidade.unidade_tabela_preco_id %>
 <%= hidden_field_tag :tipo_venda, nil, value: @venda.tipo_venda %>
@@ -91,11 +111,26 @@
 <%= hidden_field_tag :persona_id, nil, value: @venda.persona_id %>
 
 <% end %>
-<script type="text/javascript">
 
-  $("#vendas_produto_quantidade").blur(function(){
-    $('#new_vendas_produto').submit();
-  });
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="ModalF2">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel" align="center">Buscar Producto</h4>
+      </div>
+      <div class="modal-body" style="padding: 10px 0px 25px 0px">
+        <%= render 'busca_produtos_f2' %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
 
     $("<%= @venda_config.focus_first %>").focus();
 
@@ -141,7 +176,7 @@
         }
       });
 
-        
+
     });
 
     //busca por descricao produto
@@ -213,21 +248,18 @@
         };
       });
 
-    function CalcResultQtd(unit,qtd,tot)                                      //
-    {
+    function CalcResultQtd(unit,qtd,tot){
         var result_qtd = eval( parseFloat( document.getElementById(tot).value.replace(/\./g, "").replace(",", ".") ) / parseFloat( document.getElementById(unit).value.replace(/\./g, "").replace(",", ".") ) )  ;
         $("#vendas_produto_quantidade").val(number_format(result_qtd,3, ',', '.'));
     }
 
 
-    function CalcQtdDescimal(unit,qtd,tot)                                      //
-    {
+    function CalcQtdDescimal(unit,qtd,tot){
         var total = eval( parseFloat( document.getElementById(unit).value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById(qtd).value.replace(/\./g, "").replace(",", ".") ) )  ;
         document.getElementById(tot).value = ( number_format(total,2, ',', '.') );
     }
 
-    function CalcQtd(unit,qtd,tot)                                      //
-    {
+    function CalcQtd(unit,qtd,tot){
         var total = eval( parseFloat( document.getElementById(unit).value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById(qtd).value.replace(/\./g, "").replace(",", ".") ) )  ;
         document.getElementById(tot).value = ( number_format(total,0, ',', '.') );
     }
@@ -237,7 +269,10 @@
     //LISTA DE PRODUTOS
 
     if(e.which == 113){ //F2
-      window.open('/produtos/busca_venda_produto?tipo_venda=<%= @venda.tipo_venda %>&data=<%= @venda.data %>&moeda=<%= @venda.moeda %>&cliente='+ $("#tabela_preco_id").val() +'&deposito_id='+$("#vendas_produto_deposito_id").val()+'&unidade='+<%= current_unidade.unidade_tabela_preco_id %>+'', 'Pagina', ' SCROLLBARS=YES, TOP=0, LEFT=50, WIDTH=1000, HEIGHT=650');
+      $('#ModalF2').modal('show');
+      $('#ModalF2').on('shown.bs.modal', function () {
+          $('#busca_f2').focus();
+      })
     };
 
     if(e.which == 115){ //F4
@@ -269,4 +304,89 @@
     }
   }
 
+
+$("#vendas_produto_bico_id").change(function(){
+  $.ajax({url: "/buscas/busca_bico",
+          type: 'GET',
+          beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+          data: "cod=" + escape($("#vendas_produto_bico_id").val()),
+          error: function(XMLHttpRequest, textStatus, errorThrown) {
+                  alert('Producto no Encontrado');
+                  $('#vendas_produto_bico_id').focus();
+                  $('#vendas_produto_bico_id').val('');
+              },
+          success: function(bc){
+            $('#vendas_produto_produto_nome').val(bc["produto"].produto_nome);
+            $('#vendas_produto_produto_id').val(bc["produto"].produto_id);
+            $('#vendas_produto_deposito_id').val(bc["produto"].deposito_id);
+            $('#vendas_produto_unitario_guarani').val(number_format( bc["produto"].preco_gs, 0, ',', '.'));
+            $('#vendas_produto_preco_guarani').val(number_format( bc["produto"].preco_gs, 0, ',', '.'));
+            $('#vendas_produto_total_guarani').val( number_format( parseFloat(bc["produto"].preco_gs), 0, ',', '.') );
+        }
+      });
+});
+
+</script>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="ModalAbastecidas">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content" style="height: 720px; width: 400px">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h2 class="modal-title" id="myModalLabel" align="center">Abastecidas </h2>
+      </div>
+      <div class="modal-body-abastecidas" style="padding: 10px" align="center">
+        <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner-b", width: 21, height: 21, style: "display: none;") %>
+
+        <script type="text/javascript">
+          function AddVenda(id, produto_id, litros, preco, total, deposito_id, bico_id, produto_nome, data){
+            $.ajax({
+                type: "POST",
+                url: '/vendas_produtos',
+                dataType: 'script',
+                data : {"vendas_produto": {"venda_id"     : <%= @venda.id %>,
+                                           "produto_id"   : produto_id,
+                                           "produto_nome" : produto_nome,
+                                           "unitario_guarani" : preco,
+                                           "bico_id" : bico_id,
+                                           "quantidade" :  number_format( litros,4, ',', '.'),
+                                           "total_guarani" : total,
+                                           "deposito_id" : deposito_id,
+                                           "data" : <%= @venda.data %>,
+                                           "moeda" : '1',
+                                           "abastecida_id" : id,
+                                           "preco_guarani" : preco} }
+            })
+            $('#' + id).hide("slow");
+            $('#ModalAbastecidas').modal('hide');
+          }
+        </script>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.onkeyup = function(c) {
+    if(c.which == 187){
+      $('#spinner-b').show();
+      $("#ModalAbastecidas").modal("show");
+      $('.modal-body-abastecidas').load('<%= modal_abastecidas_abastecidas_path(venda_id: @venda.id) %>', function(){
+        $('#spinner-b').hide("slow");
+      });
+    }
+
+  }
+
+  $('#ModalAbastecidas').on('show.bs.modal', function (e) {
+    $('#spinner-b').show();
+    var loadurl = $(e.relatedTarget).data('load-url');
+    $(this).find('.modal-body-abastecidas').load(loadurl, function(){
+      $('#spinner-b').hide("slow");
+    });
+  });
 </script>

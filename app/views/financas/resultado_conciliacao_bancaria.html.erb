@@ -1,126 +1,72 @@
+<%= form_tag resultado_conciliacao_bancaria_financas_path, :method => :get do %>
+<input name="filtro"  id="filtro"   size="10" type="hidden" value="0"/></td>
 <div class="row">
   <div class="col-md-12">
     <div class="panel">
-     <header class="panel-heading link-prod">
-      Conciliação Bancaria
-
+     <header class="panel-heading">
+        Conciliação Bancaria
      </header>
       <div class="panel-content">
-         <%= form_tag resultado_conciliacao_bancaria_financas_path, :method => :get do %>
-            <table>
-							<tr>
-                <td>
-                  <label>Filtro Data</label>
-                  <% if params[:filtro_data] == 'data' %>
-	                    <%= radio_button_tag :filtro_data, 'data', checked: true %> Data Lanç.
-	                    <%= radio_button_tag :filtro_data, 'data_conciliacao' %> Data Conf. Cliente
-                    <% else %>
-	                    <%= radio_button_tag :filtro_data, 'data' %> Data Lanç.
-	                    <%= radio_button_tag :filtro_data, 'data_conciliacao', checked: true %> Data Conf. Cliente
-                    <% end %>
-                </td>
-                <td colspan="4">
-                  <label>Periodo</label>
-                  <%= text_field_tag :inicio, params[:inicio], size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
-                  <div class="input-group-addon-f">
-                    <span class="icon-calendar"></span>
-                  </div>
-                  <div class="date-separ"><%= t('TO') %></div>
-                  <%= text_field_tag :final, params[:final], size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
-                  <div class="input-group-addon-f">
-                  <span class="icon-calendar"></span>
-                  </div>
-                </td>
-							</tr>
-              <tr>
-                <input name="filtro"  id="filtro"   size="10" type="hidden" value="0"/></td>
+        <div class="row">
+          <div class="col-md-2">
+            <label>Tipo Fecha</label>
+            <%= select_tag :filtro_data, options_for_select([["Fecha Lanz","data"],["Fecha Concil.","data_conciliacao"]], selected: params[:filtro_data]) %>
+          </div>
+          <div class="col-md-4">
+            <label>Periodo</label>
+            <%= text_field_tag :inicio, params[:inicio], size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+            <div class="input-group-addon-f" >
+              <span class="icon-calendar"></span>
+            </div>
+            <div class="date-separ"><%= t('TO') %></div>
+            <%= text_field_tag :final, params[:final], size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+            <div class="input-group-addon-f" >
+            <span class="icon-calendar"></span>
+            </div>            
+          </div>
+          <div class="col-md-2">
+            <label>Tipo</label>
+              <%= select_tag :entrada_saida, options_for_select([["Todos",""], ["Entrada","entrada"],["Salida","saida"]], selected: params[:entrada_saida]) %>            
+          </div>    
 
-								<td>
-                  <label style="color: #fff">.</label>
-                  <fieldset>
-                  	<% if params[:entrada_saida] == 'entrada' %>
-	                    <%= radio_button_tag :entrada_saida, 'entrada',  :Checked => "True" %> Entrada
-	                    <%= radio_button_tag :entrada_saida, 'saida' %> Saida
-	                    <%= radio_button_tag :entrada_saida, '' %> Todos
-	                   <% elsif params[:entrada_saida] == 'saida' %>
-	                    <%= radio_button_tag :entrada_saida, 'entrada' %> Entrada
-	                    <%= radio_button_tag :entrada_saida, 'saida',  :Checked => "True" %> Saida
-	                    <%= radio_button_tag :entrada_saida, '' %> Todos
-	                  <% else %>
-	                    <%= radio_button_tag :entrada_saida, 'entrada' %> Entrada
-	                    <%= radio_button_tag :entrada_saida, 'saida' %> Saida
-	                    <%= radio_button_tag :entrada_saida, '',  :Checked => "True" %> Todos
-	                   <% end -%>
-
-                  </fieldset>
-                </td>
-                <td style="padding:0px 10px;">
-                  <label style="color: #fff">.</label>
-                  <fieldset>
-                    <% if params[:conciliacao] == 'false' %>
-                      <%= radio_button_tag :conciliacao, 'false',  :Checked => "True"%> Pendentes
-                      <%= radio_button_tag :conciliacao, 'true' %> Conciliados
-                      <%= radio_button_tag :conciliacao, '' %> Todos
-                      <input name="tipo_data"  id="tipo_data"   size="10" type="hidden" value="0"/></td>
-                    <% elsif params[:conciliacao] == 'true' %>
-                      <%= radio_button_tag :conciliacao, 'false'%> Pendentes
-                      <%= radio_button_tag :conciliacao, 'true',  :Checked => "True" %> Conciliados
-                      <%= radio_button_tag :conciliacao, '' %> Todos
-                      <input name="tipo_data"  id="tipo_data"   size="10" type="hidden" value="0"/></td>
-                    <% else %>
-                      <%= radio_button_tag :conciliacao, 'false'%> Pendentes
-                      <%= radio_button_tag :conciliacao, 'true' %> Conciliados
-                      <%= radio_button_tag :conciliacao, '',  :Checked => "True" %> Todos
-                      <input name="tipo_data"  id="tipo_data"   size="10" type="hidden" value="0"/></td>
-                    	
-                    <% end %>
-                  </fieldset>
-                </td>
-                <td style="padding-right:5px;">
-                  <label><%= t('ACCOUNT') %></label>
-                    <%= select("busca", "conta", 
-                      Conta.all(:select => 'id,nome', conditions: 'tipo = 1', order: 'nome').collect {|p| [ p.nome, p.id ] },
-                      {:selected => params[:busca]["conta"], :prompt => 'Todos'},{:style => "width:250px"}) %>
-                </td>
-                <td style="padding-right:5px;">
-                  <label>Cliente</label>
-                  <%= select("busca", "persona",
-                    Persona.all(:select => 'id,nome', conditions: 'tipo_cliente = 1', order: 'nome').collect {|p| [ p.nome, p.id ] },
-                    {:selected => params[:busca]["persona"], :prompt => 'Todos'})   %>
-                </td>
-
-                <td>
-                  <label style="color: #fff">.</label>
-                  <%= submit_tag 'Filtrar', class: 'btn btn-blue' %>
-                </td>
-               </tr>
-            <% end %>
-        </table>
+          <div class="col-md-2">
+            <label>Status</label>
+              <%= select_tag :conciliacao, options_for_select([["Pendentes","false"],["Conciliados","true"],["Todos",""]], selected: params[:conciliacao]) %>            
+          </div>  
+          <div class="col-md-6">
+            <label><%= t('ACCOUNT') %></label>
+            <%= select("busca", "conta",
+                Conta.all(:select => 'id,nome', conditions: 'tipo = 1', order: 'nome').collect {|p| [ p.nome, p.id ] },
+                {selected: params[:busca]["conta"]},{class: "selectize", required: true }) %>
+          </div>  
+          <div class="col-md-2 padding-btn">            
+            <%= submit_tag 'Filtrar', class: 'btn btn-blue' %>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
+<% end %>
 
-<div class="row header">
-  <div class="col-md-12">
+<div class=" header head_grid">
     <div class="panel">
 			<table>
-	      <tr class="header" style="background-color: #E5E5EF;">
+	      <tr>
 		      <td width="120" align="center"><%= t('DOC') %></td>
-		      <td width="140" align="center"><%= t('DATE') %> Conf. Cliente</td>
-		      <td width="70" align="center"><%= t('DATE') %> Lanç.</td>
+		      <td width="140" align="center"><%= t('DATE') %> Conciliación</td>
+		      <td width="70" align="center"><%= t('DATE') %> Lanz.</td>
 		      <td width="80" align="right">Credito</td>
-		      <td width="90" align="right">Debito</td>
+		      <td width="80" align="right">Debito</td>
+		      <td width="80">Cheque</td>
 		      <% if params[:conciliacao] == 'true' %>
 		      	<td width="80" align="right"><b>Saldo</b></td>
 		      <% end %>
-		      <td width="180">Conta</td>
-		      <td width="150">Cliente</td>
-		      <td width="300">Obs.</td>
+		      <td width="250">Cliente</td>
+		      <td width="320">Concepto</td>
 		    </tr>
 	    </table>
 		</div>
-	</div>
 </div>
 
 <div class="row">
@@ -188,6 +134,7 @@
 				            <td width="120" align="center">
 				            	<%= b.id %>
 				            	<span class="label label-success"><small><%= b.usuario_nome %></small></span>
+
 				            	</td>
 				            <td width="20" align="center"><%= f.check_box :conciliacao, {onclick:"diferido(#{b.id})", class: "#{quebra}"} %></td>
 				            <td width="80">
@@ -228,20 +175,13 @@
 											<% end %>
 
 				            <% end %>
-
-											<td width="180"><small><%= b.conta_nome %></small></td>
-											<td width="150"><small><%= b.persona_nome %></small></td>
-										  <td width="300" align="left" style="padding: 5px">
-										  	<small><%= h b.concepto %></small>
-										  </td>
+				            	<td width="80"><small><%= b.cheque %></small></td>
+											<td width="250"><small><%= b.persona_nome %></small></td>
+										  <td width="400"><small><%= b.concepto %></small></td>
 
 				         </tr>
 				        <% end %>
-				      <% end %>
-				      <tr>
-				      	<td colspan="5" align="right"> <b> Saldo ==></b></td>
-				      	<td class="b"> <b> <%= format_decimal(saldo_rs) %></b></td>
-				      </tr>
+				      <% end %>				      
 			      </table>
 				      <br>
 				      <br>
@@ -315,6 +255,7 @@ $(window).scroll(function () {
 .fixed {
     position:fixed;
     top:0;
+    margin-top: 51px;
     z-index: 999999;
     background-color: #fff;
     font-weight: bold;

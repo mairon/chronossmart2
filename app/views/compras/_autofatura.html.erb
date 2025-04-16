@@ -1,14 +1,12 @@
-<div class="row">
-  <div class="col-md-7">
-  	<div class="row">
-  		<div class="col-md-12">
 		    <div class="panel">
-		    	<header class="panel-heading" style="font-family: 'prox'; font-size: 18px; padding-bottom: 10px;">
-		    		Factura
-		    		<div style="float: right">
-		    		</div>
-		    	</header>
+          <h1 id="header">
+            Auto Factura
+            <div class="pull-right">
+              <a href="#" data-toggle="modal" data-target="#modal-faturamento" class="btn btn-green" style="height: 37px;"><i class="icon-white icon-plus-sign"></i></a>    
+            </div>
+          </h1>
 
+          <div class="panel-body">
 		      <table class="head_grid">
 		        <tr>
 		          <td width="70">Lanz.</td>
@@ -78,98 +76,25 @@
                     <% end %>                    
 		              <% end %>
 		            </tr>
-
-
-                  <div class="modal fade" id="detalhe-doc-<%= ft.id %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                      <div class="modal-content modal-sm">
-                        <div class="modal-header">
-                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                          </button>
-                          <h4 class="modal-title" id="myModalLabel">Resumen Factura</h4>
-                        </div>
-                        <div class="modal-body" style="padding: 5px 20px 20px 20px">
-                          <div class="group" >
-                            <div class="row">
-                              <div class="col-md-12">
-                                <label>RUC/CI</label>
-                                <%= ft.ruc %>
-                              </div>
-
-                              <div class="col-md-12">
-                                <label>Nombre</label>
-                                <%= ft.persona_nome %>
-                              </div>
-
-                              <div class="col-md-12">
-                                <label>CDC</label>
-                                <%= ft.cdc %>
-                              </div>
-                              <div class="col-md-12">
-                                <label>Nº</label>
-                                <%= get_resp["deList"][0]["numero"] %>
-                              </div>
-                              <div class="col-md-12">
-                                <label>Status</label>
-                                <% if ft.status == 1 %>
-                                  <span class="btn-success">Activo</span>
-                                <% else %>
-                                  <span class="btn-danger">Anulado</span>
-                                <% end %>
-                              </div>
-                              <div class="col-md-12">
-                                <label class="bold">Estado SET</label>
-                                <%= get_resp["deList"][0]["respuesta_codigo"] %>-<%= get_resp["deList"][0]["respuesta_mensaje"] %>
-                              </div>
-                              <div class="col-md-12">
-                                <label class="bold">Situacion SET</label>
-                                <% case get_resp["deList"][0]["situacion"].to_s %>
-                                <% when '-1' %>
-                                  -1 = Borrador
-                                <% when '0' %>
-                                  0 = Generado DE
-                                <% when '1' %>
-                                  1 = Enviado en un Lote
-                                <% when '2' %>
-                                  2 = Aprobado (Caso sea sincrono es inmediato)
-                                <% when '3' %>
-                                  3 = Aprobado con observacion
-                                <% when '4' %>
-                                  4 = Rechazado
-                                <% when '98' %>
-                                  98 = Inexistente
-                                <% when '99' %>
-                                  99 = Cancelado
-                                <% else %>
-                                  --
-                                <% end %>                                                            
-                              </div>
-
-
-
-
-
-                            </div>
-                          </div>
-                        </div>                        
-                      </div>
-                    </div>
-                  </div>
-
 		          <% end %>
 		        </table>
 		      </div>
 		    </div>
   		</div>
 
-  		<div class="col-md-12">
-				<div class="panel">
+  <div class="modal fade" id="modal-faturamento" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="close-button">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <h1 id="myModalLabelf">Datos de la Factura</h1>
+        </div>
+
+        <div class="modal-body">
          <% unless @fts.present? %>
             <div class="group">
-               <div class="alert alert-danger" role="alert">
-                  Atualize a Cidade do Cadastro <%= link_to 'Aqui', edit_persona_path(@compra.persona_id), target: '_blank' %>
-               </div>
               <%= render partial: "form_fiscals/attr_forms/compra_update_af" %>
             </div>
           <% else %>
@@ -210,9 +135,6 @@
             <% end %>
             <% end %>
 				</div>
-  		</div>
-  	</div>
+      </div>
+    </div>
   </div>
-
-
-</div>

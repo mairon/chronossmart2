@@ -1,3 +1,4 @@
+<%  empresa = Empresa.last.segmento %>
 <h1 id="header">Contrato - [<%= t('EDITION') %>]</h1>
  <div class="group">
 
@@ -14,16 +15,24 @@
     </div>
   <% end %>
   <%= f.hidden_field :unidade_id, value: current_unidade.id %>
+  <%= f.hidden_field :presupuesto_id, value: params[:presupuesto_id] %>
         <table>
           <tr>
             <td>
                 <table>
                   <tr>
-                    <td colspan="2">
+                    <td >
                     <label><%= t('DATE') %></label>
                       <%= f.date_select :data %>
                     </td>
                     <td colspan="2">
+                    <label><%= t('DATE') %> Entrega</label>
+                      <%= f.date_select :data_final %>
+                    </td>
+                  </tr>
+                  <tr>
+
+                    <td>
                       <fieldset>
                         <legend><%= t('COIN') %></legend>
                         <% if current_unidade.moeda.to_i == 0 %>
@@ -42,24 +51,41 @@
                         <% end %>
                       </fieldset>
                     </td>
-                  </tr>
-                  <tr>
                     <td><br>
                       <%= f.check_box :gerar_financas %> General Titulos</td>
                   </tr>
 
                   <tr>
-                    <td colspan="4">
+                    <td colspan="5">
                     <label>Cliente</label>
-                    <%= text_field_tag :persona_nome, "#{@contrato.persona.nome unless @contrato.persona_id.nil?}", size: '100%', required: true, class: 'autocomplete', autofocus: true, placeholder: 'Digite o nome do Cliente' %>
-                      <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
-                    <%= f.hidden_field :persona_id %></td>
+                    <% if params[:action] == 'new' %>
+
+                      <%= text_field_tag :persona_nome, "#{params[:persona_nome]}", size: '100%', required: true, class: 'autocomplete', autofocus: true, placeholder: 'Digite o nome do Cliente' %>
+                      <%= f.hidden_field :persona_id, value: params[:persona_id] %>
+
+                    <% else %>
+                      <%= text_field_tag :persona_nome, "#{@contrato.persona.nome unless @contrato.persona_id.nil?}", size: '100%', required: true, class: 'autocomplete', autofocus: true, placeholder: 'Digite o nome do Cliente' %>
+                      <%= f.hidden_field :persona_id %>
+                    <% end %>
+                    
+                    <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+
+                    </td>
                   </tr>
+                  <% if empresa.to_i == 3 %>
+                  <tr>
+                    <td colspan="2">
+                    <label>Pedido Traslado</label>
+                    <%= f.collection_select :pedido_traslado_id,
+                        PedidoTraslado.all( :select => 'id,cod_ext', :order  => '2' ), :id, :cod_ext, {:prompt => 'Selecione la Cuenta'},{class: 'b_pedido_traslado'} %>
+                    </td>
+                  </tr>
+                  <% end %>
 
                   <tr>
                     <td colspan="2">
                     <label>Conta p/ Recebimento</label>
-                    <%= f.collection_select :conta_id, 
+                    <%= f.collection_select :conta_id,
                                Conta.all( :select => 'id,nome', :order  => '2' ),:id, :nome,{:prompt => 'Selecione la Cuenta'}, {required: true} %>
                     </td>
                     <td colspan="2">
@@ -73,7 +99,7 @@
                     <td colspan="2">
                     <label>Vendedor</label>
                     <%= f.collection_select :vendedor_id, 
-                               Persona.where(tipo_vendedor: 1).select('id,nome').order('2'),:id, :nome,{:prompt => 'Selecione lo Vendedor'} %>
+                               Persona.where(tipo_vendedor: 1).select('id,nome').order('2'),:id, :nome,{:prompt => 'Selecione lo Vendedor', selected: params[:vendedor_id]} %>
                     </td>
 
                     <td colspan="2">
@@ -84,7 +110,7 @@
                   </tr>
                   <tr>
                     <td colspan="2">
-                    	<fieldset> 
+                    	<fieldset>
                     		<legend>Tipo</legend>
 		                    <%= f.radio_button  :tipo, 0, Checked: "True" %> Recurrente
 		                    <%= f.radio_button  :tipo, 1 %> Valor Fijo
@@ -126,9 +152,11 @@
                 </table>
             </td>
           </tr>
-        	<tr> 
+          
+        	<tr>
 	        	<td>
-	        	 <div class="group">	
+              <% if params[:presupuesto_id].blank? %>
+	        	 <div class="group">
 		        	 	<table>
 		        				<tr class="head_grid">
 		        					<td width="220"><%= t('PRODUCT') %>/Serviço</td>
@@ -140,27 +168,30 @@
 		        				</tr>
 						        <%= f.fields_for :contrato_servicos do |builder| %>
 						          <%= render "contrato_servico_fields", f: builder %>
-						        <% end %>						        
+						        <% end %>
 		        		</table>
 		        		<p class="tots-prod">
 		        			<%= link_to_add_fields "Add #{t('PRODUCT')}/Servi.", f, :contrato_servicos %>
 		        			<h1 align="right" class="total">
 										Valor total <span class="resultado">0</span>
-										<%= f.hidden_field :valor_us %> 
+										<%= f.hidden_field :valor_us %>
 										<%= f.hidden_field :valor_rs %>
 										<%= f.hidden_field :valor_gs %>
-										<%= f.hidden_field :cotacao %> 
-										<%= f.hidden_field :cotacao_real %> 
+										<%= f.hidden_field :cotacao %>
+										<%= f.hidden_field :cotacao_real %>
 									</h1>
 		        		</p>
 
 
 	        		</div>
+              <% end %>
 	        	</td>
         	</tr>
+          
 	      <tr>
-	        <td colspan="4"><%= f.text_area :obs, rows: 3, cols: 10, placeholder: 'Obs' %></td>
-	      </tr>                                      
+	        <td colspan="4"> <br>
+            <%= f.text_area :obs, rows: 3, cols: 10, placeholder: 'Obs' %></td>
+	      </tr>
 			</table>
    <div class="footer-buttons">
       <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
@@ -192,7 +223,7 @@
               $('#contrato_cotacao_real').val(number_format(data, 0, ',', '.'));} });
 
     });
-  </script>  
+  </script>
 <% else %>
   <%= hidden_field_tag :moeda, @contrato.moeda %>
 <% end %>
@@ -214,7 +245,7 @@
         $(".valores-rs").show();
         $(".valores-us").hide();
         $(".valores-gs").hide();
-      }           
+      }
     });
   </script>
 
@@ -266,6 +297,19 @@
       minLength: 2,
       change: function( event, ui ) {
         $('#contrato_persona_id').val(ui.item.id);
+        <% if empresa.to_i == 3 %>
+          $.ajax({
+            type: "GET",
+             url: "/buscas/busca_pedido_traslado?persona_id=" + ui.item.id,
+            beforeSend: function(){
+              $('#sppiner').show();
+            },
+            success: function(response){
+              $('#sppiner').hide();
+            }
+          });
+        <% end %>
+
         return false;
       }
     });
@@ -284,19 +328,19 @@
 </script>
 
 <script type="text/javascript">
-  
+
   function add_fields(link, association, content) {
 
     var new_id = new Date().getTime();
     var regexp = new RegExp("new_" + association, "g")
-    $(link).up().insert({    	
+    $(link).up().insert({
 	    before: content.replace(regexp, new_id)
-    });    
+    });
   }
 
   $('form').on('click', '.remove_field', function(event) {
     $(this).prev('input[type=hidden]').val('1');
-    $(this).closest('tr').hide();    
+    $(this).closest('tr').hide();
     return event.preventDefault();
   });
 

@@ -7,7 +7,6 @@ PATH
 GEM
   remote: http://rubygems.org/
   specs:
-    RedCloth (4.3.3)
     actionmailer (3.2.22.5)
       actionpack (= 3.2.22.5)
       mail (~> 2.5.4)
@@ -39,6 +38,9 @@ GEM
       activerecord (>= 3.2, < 5)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
+    ar-octopus (0.8.6)
+      activerecord (>= 3.2.0)
+      activesupport (>= 3.2.0)
     arel (3.0.3)
     aws-eventstream (1.1.1)
     aws-partitions (1.493.0)
@@ -262,8 +264,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  RedCloth
   acts-as-taggable-on
+  ar-octopus
   arel
   auditor!
   aws-eventstream (= 1.1.1)

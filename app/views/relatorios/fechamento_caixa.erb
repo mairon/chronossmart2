@@ -1,32 +1,42 @@
-   <h1 id="header">Cierre de Caja</h1>   
+   <h1 id="header">Cierre de Caja</h1>
    <div class="group">
          <%= form_tag resultado_fechamento_caixa_relatorios_path, :method => "get" do %>
             <table>
 
-               <tr>
-                  <td>
-                    <label>Fecha</label>
-                    <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
-                    <div class="input-group-addon-f">
-                      <span class="icon-calendar"></span>
-                    </div>
+             <tr>
+                <td>
+                  <label>Fecha</label>
+                  <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+                  <div class="input-group-addon-f">
+                    <span class="icon-calendar"></span>
+                  </div>
 
-                  </td>
-               </tr>
+                </td>
+             </tr>
 
-               <tr>
-                  <td>
-                    <label>Terminal</label>
-                    <%= select("busca", "terminal", Terminal.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Selecione lo Terminal'}) %>
-                  </td>
-               </tr>
+             <tr>
+                <td>
+                  <label>Terminal</label>
+                  <%= select("busca", "terminal", Terminal.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Selecione lo Terminal'},{class: "selectize", required: true }) %>
+                </td>
+             </tr>
 
-               <tr>
-                  <td>
-                    <label>Usuario</label>
-                    <%= select("busca", "usuario", Usuario.all(:select => 'id,usuario_nome',:order => 'usuario_nome').collect {|p| [ p.usuario_nome, p.id ] }, { prompt: 'Todos'}) %>
-                  </td>
-               </tr>
+             <tr>
+                <td>
+                  <label>Usuario</label>
+                  <%= select("busca", "usuario", Usuario.all(:select => 'id,usuario_nome',:order => 'usuario_nome').collect {|p| [ p.usuario_nome, p.id ] }, { prompt: 'Todos'},{class: "selectize"}) %>
+                </td>
+             </tr>
+              <tr>
+                <td>
+                  <fieldset>
+                    <legend>Formato</legend>
+                    <input id="format_print" name="format_print" type="radio" value="0"  checked/>A4
+                    <input id="format_print" name="format_print" type="radio" value="1"/> Ticket
+                  </fieldset>
+
+                </td>
+              </tr>
 
           <tr>
             <td colspan="4" class="footer-buttons">
@@ -39,25 +49,33 @@
      <% end %>
 </div>
 
-
 <div class="modal fade" id="myiframe" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog " role="document" style=" width: 1100px !important; ">
     <div class="modal-content">
       <div class="modal-header">
         <div class="close-button">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        </div>  
+        </div>
         <h4 class="modal-title" id="myModalLabel">Listado de Cierre de Caja</h4>
       </div>
       <div class="modal-body" align="center">
         <div class="embed-responsive embed-responsive-16by9" style="height: 460px">
           <iframe class="embed-responsive-item" id="iframeModal" frameborder="0 " border="0"></iframe>
         </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="print-nav">Imprimir</button>
       </div>      
     </div>
   </div>
 </div>
 
+
+<script>
+$('#print-nav').on('click', function () {
+  document.getElementById('iframeModal').contentWindow.print();
+});  
+</script>
 <script>
   $('#busca_proveedor').selectize();
 
@@ -101,15 +119,15 @@
   });
 
 ( function($) {
-  
+
 function iframeModalOpen(){
 
     $('.acao').on('click', function(e) {
       var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
       var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
-      
+
       var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
-      
+
       // stampiamo i nostri dati nell'iframe
       $("#myiframe iframe").attr({
         'src': '/relatorios/resultado_fechamento_caixa?' + $('form').serialize(),
@@ -125,11 +143,11 @@ function iframeModalOpen(){
       $(this).find('iframe').attr("src", "");
     });
   }
-  
+
   $(document).ready(function(){
     iframeModalOpen();
   });
-  
+
   } ) ( jQuery );
 
 </script>

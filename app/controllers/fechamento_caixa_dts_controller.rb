@@ -43,11 +43,9 @@ class FechamentoCaixaDtsController < ApplicationController
 
     respond_to do |format|
       if @fechamento_caixa_dt.save
-        format.html { redirect_to "/fechamento_caixas/#{@fechamento_caixa_dt.fechamento_caixa_id}" }
-        format.json { render json: @fechamento_caixa_dt, status: :created, location: @fechamento_caixa_dt }
+        format.html { redirect_to(:back) }
       else
         format.html { render action: "new" }
-        format.json { render json: @fechamento_caixa_dt.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -75,7 +73,7 @@ class FechamentoCaixaDtsController < ApplicationController
     @fechamento_caixa_dt.destroy
 
     respond_to do |format|
-      format.html { redirect_to "/fechamento_caixas/#{@fechamento_caixa_dt.fechamento_caixa_id}" }
+      format.html { redirect_to(:back) }
       format.json { head :no_content }
     end
   end

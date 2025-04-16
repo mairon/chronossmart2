@@ -10,34 +10,22 @@
     <%= f.hidden_field :vendedor_nome %>
     <%= f.hidden_field :clase_produto %>
 	  <%= hidden_field_tag :cotacao, nil, :value => @nota_credito.cotacao.to_i %>
-	
+
 
 	<table>
 		<tr>
 			<td align="right">Doc. N.: </td>
 			<td><%= f.text_field :documento_numero_01, :size => 5, :value => '000' %> -
-				<%= f.text_field :documento_numero_02, :size => 5, :value => '000' %> - 
+				<%= f.text_field :documento_numero_02, :size => 5, :value => '000' %> -
 				<%= f.text_field :documento_numero, :size => 15, :value => "NC#{@nota_credito.id}" %> </td>
 
 			<td align="right">Cuota : </td>
 			<td><%= f.text_field :cota, :size => 5, :value => '0' %></td>
-			<% if @nota_credito.operacao == 0 %>
-
 				<% if @nota_credito.moeda == 0 %>
-	          <%=  field_us 'Valor U$:',f,:valor_dolar, :value => number_to_currency(@total_nota_dolar.to_f - @total_doc_dolar.to_f,    :format=>' %n ', :separator => ",") %>
+          <%= field_us 'Valor U$:',f,:valor_dolar, :value => number_to_currency(@total_nota_dolar.to_f - @total_doc_dolar.to_f,    :format=>' %n ', :separator => ",") %>
 				<% else %>
-	        <%=  field_gs 'Valor Gs.:',f,:valor_guarani, :value => number_to_currency(@total_nota_guarani.to_f - @total_doc_guarani.to_f,    :format=>' %n ', :precision => 0) %>
-					
+	        <%= field_gs 'Valor Gs.:',f,:valor_guarani, :value => number_to_currency(@total_nota_guarani.to_f - @total_doc_guarani.to_f,    :format=>' %n ', :precision => 0) %>
 				<% end %>
-
-			<% else %>
-			<% if @nota_credito.moeda == 0 %>
-          <%=  field_us 'Valor U$:',f,:valor_dolar %>
-			<% else %>
-        <%=  field_gs 'Valor Gs.:',f,:valor_guarani %>
-				
-			<% end %>
-			<% end %>
 
 		</tr>
 		<tr>
@@ -51,6 +39,6 @@
 				<td colspan="2" align="right">
 					<%= f.submit t('SAVE'), :class => 'button' %>
 				</td>
-		</tr>				
+		</tr>
 	</table>
 <% end %>

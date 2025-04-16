@@ -16,7 +16,7 @@
       <tr>
         <td style="padding: 0px 10px; width: 300px">
         	<label><%= t('UNIT') %></label>
-        	<%= f.collection_select :unidade_id, 
+        	<%= f.collection_select :unidade_id,
                   Unidade.all( :select => 'id,unidade_nome',
                                :order  => '1' ),:id,
                                :unidade_nome, { :prompt => 'Selecione la Unidad' },{autofocus: true, required: true} %>
@@ -26,44 +26,64 @@
                             :id => "spinner2",
                             :width => 21,
                             :height => 21,
-                            :style =>"display: none;" ) %>                               
+                            :style =>"display: none;" ) %>
         </td>
+
         <td style="padding: 0px 10px; width: 300px">
           <label><%= t('CENTER_OF_COSTOS') %></label>
-          <%= f.collection_select :centro_custo_id, 
+          <%= f.collection_select :centro_custo_id,
                     CentroCusto.all( :select => 'id,nome',
                                  :order  => '1' ),:id,
                                  :nome, { :prompt => 'Selecione lo centro de costo' }, {required: true} %>
+        </td>
+        <% if Empresa.last.segmento.to_i == 3 %>
+          <td style="padding: 0px 10px; width: 300px">
+            <label>Ordem Carga</label>
+            <% sqlos = "SELECT OC.ID AS ID,
+            CAST((COALESCE(PTD.CRT, ' ') || ' ' || COALESCE(PTD.MIC, ' ') || ' ' ||  COALESCE(PTD.CTE, ' ' ) || ' ' ||  COALESCE(PTD.MANIF, ' ')) AS  VARCHAR) AS DOC
+            FROM ORDEM_CARGAS OC
+                  INNER JOIN pedido_traslado_docs PTD
+                  ON PTD.ID = OC.pedido_traslado_doc_ID ORDER BY 2"
+            list_os = OrdemCarga.find_by_sql(sqlos)
+            %>
+            <%= f.collection_select :ordem_carga_id, list_os, :id, :doc, { :prompt => 'Selecione ' } %>
           </td>
+        <% end %>
+
+
+        <% if Empresa.last.segmento.to_i == 3 %>
+          <td style="padding: 0px 10px; width: 300px">
+            <label>Pedido Traslado</label>
+            <%= f.collection_select :pedido_traslado_id, PedidoTraslado.select('id,cod_ext'), :id, :cod_ext, { :prompt => 'Selecione ' } %>
+          </td>
+        <% end %>
+
       </tr>
 
       <tr>
         <td style="padding: 0px 10px; width: 300px">
           <label>Rodados</label>
-          <%= f.collection_select :rodado_id, 
+          <%= f.collection_select :rodado_id,
                   Rodado.all( :select => 'id,placa',
                                :order  => '1' ),:id,
                                :placa, { :prompt => 'Selecione la Rodado' } %>
-                                          
+
         </td>
         <td style="padding: 0px 10px; width: 300px">
           <label>Empleado</label>
-          <%= f.collection_select :funcionario_id, 
+          <%= f.collection_select :funcionario_id,
                     Persona.where(tipo_funcionario: 1).select('id,nome'), :id,
                                  :nome, { :prompt => 'Selecione lo Empleado' } %>
           </td>
-      </tr>
- <% sql = "SELECT PC.ID,
+
+        <% sql = "SELECT PC.ID,
                      (PG.DESCRICAO || ' > ' || PC.DESCRICAO) AS DESCRICAO
               FROM PLANO_DE_CONTAS PC
               LEFT JOIN PLANO_DE_CONTAS PG
               ON SUBSTRING(PG.CODIGO, 1, 8) = SUBSTRING(PC.CODIGO, 1, 8)
               WHERE LENGTH(PC.CODIGO) >=12 AND LENGTH(PG.CODIGO) =8
               ORDER BY 2"
-      plano = PlanoDeConta.find_by_sql(sql)
-    %>
-
-      <tr>
+              plano = PlanoDeConta.find_by_sql(sql) %>
 
       	<td style="padding: 1px 10px; width: 300px;">
       	<label><%= t('CLASSIFICATION') %></label>
@@ -80,17 +100,19 @@
 
         <td align="right" style="padding-top: 24px; padding-bottom: 4px"><%= f.submit t('SAVE'), :class => "button add", :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %></td>
       </tr>
-    </table> 
+    </table>
   <% end %>
 
 <script type="text/javascript">
-  
+
 $(document).ready(function() {
   $('#compras_custo_centro_custo_id').selectize();
   $('#compras_custo_plano_de_conta_id').selectize();
   $('#compras_custo_rodado_id').selectize();
   $('#compras_custo_funcionario_id').selectize();
- 
+  $('#compras_custo_ordem_carga_id').selectize();
+  $('#compras_custo_pedido_traslado_id').selectize();
+
   $('#compras_custo_unidade_id').selectize();
   $('#compras_custo_unidade_id')[0].selectize.focus();
   var xhr;
@@ -124,11 +146,11 @@ $select_state = $('#compras_custo_rubro_grupo_id').selectize({
 
         });
      });
-  }, 
+  },
     sortField: {
         field: 'text',
         direction: 'asc'
-    },    
+    },
     dropdownParent: 'body'
 });
 

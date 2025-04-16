@@ -1,0 +1,166 @@
+<body onload="window.print()">
+<style type="text/css">
+td{font-size: 10px}
+@font-face {
+  font-family: 'prox';
+	src: url("/assets/fonts/proxima-nova.otf") format("opentype");  
+}
+
+	body {
+		font-family: 'prox';
+
+	}
+
+	table {border-collapse: collapse;}
+	.page-break { display:block; clear:both; page-break-after:always;  }
+
+</style>
+<% count_credito = VendasFinanca.where("venda_id = #{@venda.id} and forma_pago_id = 2").count(:id) %>
+<% ind  = 1 %>
+<% @venda.vendas_financas(forma_pago_id: 2).each do |vf| %>
+<% if vf.forma_pago_id.to_i == 2 %>
+<% if ind % 2 === 0 %>
+	<div class="page-break">
+<% else %>
+	<div>
+<% end %>
+
+<table>
+<h3 align="center">PAGARE A LA ORDEN</h3>
+</table>
+<table>
+	<tr> 
+		<td>
+			<div class="border" border='1'>
+				<table height="20">
+					<tr> 
+						<td width="490" colspan="5"><%=l @venda.data.to_date, :format => :long %> </td>
+					</tr>
+					<tr>
+						<td>Controle Nº: </td>
+						<td> <%= @venda.id.to_s.rjust(6,"0") %></td> 
+						<td style="font-size: 18px" align="right">Cuota: <b> <%= ind %>/<%= count_credito %> - Venci.: <%= vf.vencimento.strftime("%d/%m/%y") %></b></td>
+					</tr>
+					<tr>
+						<td >Señor(a): </td>
+						<td> <%= @venda.persona_nome %> </td>
+					</tr>
+					<tr>
+						<td >Moneda: </td>
+						<td>
+							<% if vf.moeda.to_i == 0 %>
+								Dolares
+							<% elsif vf.moeda.to_i == 1 %>
+								Guaranies
+							<% else %>
+								Reales
+							<% end %>
+						</td>
+						<td width="400" style="font-size: 18px" align="right"><b>
+							<% if vf.moeda.to_i == 1 %>
+								Gs.<%= format_int(vf.valor_guarani )%>
+							<% else %>
+								U$.<%= format_decimal(vf.valor_dolar )%>
+							<% end %>
+							</b></td>
+					</tr>
+				</table>
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<p>
+				El dia: <%=l vf.vencimento.to_date, :format => :default %>
+ 			</p>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<p>
+				Pagare a: <%= current_unidade.nome_sys %>
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<p>La suma de: 
+				<% if  vf.moeda.to_i == 0 %>
+										<% real,cents=("%.2f" % vf.valor_dolar.to_f).split(/\./).map{ |m| m.to_i}
+									      valor_cents=Extenso.por_extenso(cents%100)
+									      valor_cents+= case cents.to_i%100
+									      when 0 then ""
+									      when 1 then " "
+									      when 2..99 then " "
+									      end %>
+										<%= I18n.with_locale(:es) { (vf.valor_dolar.to_f).to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s + '/100 DOLARES AMERICANOS' %>
+									<% else %>
+										<%= I18n.with_locale(:es) { (vf.valor_guarani.to_f).to_i.to_words.upcase }%>
+									<% end %>
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td height="10"></td>
+	</tr>
+</table>
+  
+<div class="border">
+	<% empresa = Empresa.last(:select => "taxa_interes") %>
+	<table>
+		<tr>
+			<td colspan="4" style="text-align: justify; font-size: 9px"> 
+				<br>
+			El día <%=l vf.vencimento.to_date %> PAGARÉ(MOS) a <%= current_unidade.nome_sys %> con RUC.: <%= current_unidade.ruc %> la cantidad de <%= I18n.with_locale(:es) { (vf.valor_guarani.to_f).to_i.to_words.upcase } %>, GUARANIES **********
+          a mi (nuestra) entera satisfación. Queda expresamente convenido que la falta de pago de este pagare me(nos) constituirá en mora automáticamente, sin necesidad de interpelación judicial o extrajudicial alguna devengando durante el tiempo de la mora un interés del <%= (empresa.taxa_interes * 30).to_i %>% Asimismo, me(nos) obligamos a pagar cualquier gasto en que incurra el acreedor del presente instrumento obligacional, con relacion a este prestamo, en caso de que el mismo sea reclamado por via judicial o extrajudicial El simple vencimiento establecerá la mora, autorizando la inclusión de mi nombre Personal o razón Social que represento en la base de datos de INFORCONF, conforme a loestablecido en la jurisdicción de los tribunales de la circunscripción judicial, renunciando a cualquier otra que pudiera corresponder. Las partes constituyen domicilio especial en los lugares indicados en el presente documento.			</td>
+		</tr>
+		<tr>
+			<td height="20"></td>
+		</tr>
+	</table>
+
+	<table>
+		<tr>
+			<td>Nombre: <%= @venda.persona.nome %></td>
+			<td>Co-Deudor Nombre:_____________________________________</td>
+		</tr>
+		<tr>
+			<td>Domicilio: <%= @venda.persona.direcao %> </td>
+			<td>Co-Deudor Domicilio: _____________________________________ </td>
+		</tr> 
+		<tr>
+			<td>Cedula de Identidad nro: <%= @venda.persona.doc_titular %> </td>
+			<td>Co-Deudor Cedula de Identidad nro: _____________________________________ </td>
+		</tr> 
+		<tr>
+			<td height="20"></td>
+		</tr>
+
+		<tr>
+			<td width="500" align="center">____________________________________________________________</td>
+			<td width="50%" align="center">____________________________________________________________</td> 
+		</tr>
+		<tr>
+			<td width="50%" align="center">____________________________________________________________</td>
+			<td width="50%" align="center">____________________________________________________________</td> 
+		</tr>
+		<tr>
+			<td align="center">Firma</td>
+			<td align="center">Firma</td> 
+		</tr>
+		<tr> 
+			<td align="center">Aclaración</td>
+			<td align="center">Aclaración</td> 
+		</tr>
+		<tr> 
+			<td align="center" >Documento</td>
+			<td align="center" >Documento</td>
+		</tr>
+	</table>
+</div>
+	<hr style="margin: 40px 0px">
+</div>
+
+<% ind  += 1 %>
+<% end %>
+<% end %>

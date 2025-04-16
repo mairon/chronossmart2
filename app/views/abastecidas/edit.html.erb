@@ -1,0 +1,5 @@
+<% if params[:pendente] == true %>
+	<%= render 'form', :pendente => true %>
+<% else %>
+	<%= render 'form' %>
+<% end %>

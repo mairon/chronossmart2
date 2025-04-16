@@ -28,7 +28,7 @@
         <%= f.date_select :data %>
       </td>
 
-      <td> 
+      <td>
         <label>Cotz. GsxU$</label>
         <%= f.text_field  :cotacao, size: 10, precision: 0, autofocus: true %>
       </td>
@@ -53,10 +53,14 @@
                  CentroCusto.all( :select => 'id,nome',
                             :order  => '2' ),:id,
                             :nome,{:prompt => 'Seleccione lo Centro de Costo'}, {required: true} %>
-      </td>      
+      </td>
+
+      <td>
+        <label><%= t('CLASSIFICATION') %></label>
+        <%= f.collection_select :plano_de_conta_id, PlanoDeConta.where("lower((DESCRICAO)) similar to '%(prestamo|emprestimo|adelanto|EMPRÉSTIMOS)%' ") ,:id, :descricao,{:prompt => 'Selecione'}, {required: true} %>
+      </td>
 
     </tr>
-
     <tr>
       <td>
         <label><%= t('DOC') %></label>
@@ -81,7 +85,7 @@
         </td>
       </tr>
 
-      <tr hidden class="valores-gs">
+     <tr hidden class="valores-gs">
         <%= field_gs_label 'Monto Gs',f,:valor_guarani,
          :onblur   => "GsToUsRs('adelanto_cotacao','adelanto_cotacao_real','adelanto_valor_guarani','adelanto_valor_dolar','adelanto_valor_real')", required: true  %>
       </tr>
@@ -91,7 +95,7 @@
       </tr>
       <tr hidden class="valores-rs">
          <%= field_us_label 'R$',f,:valor_real,
-         :onblur   => "RsToUsGs('adelanto_cotacao','adelanto_cotacao_real','adelanto_valor_guarani','adelanto_valor_dolar','adelanto_valor_real')", required: true  %>        
+         :onblur   => "RsToUsGs('adelanto_cotacao','adelanto_cotacao_real','adelanto_valor_guarani','adelanto_valor_dolar','adelanto_valor_guarani')", required: true  %>
       </tr>
 
 
@@ -150,7 +154,7 @@
       $(".valores-rs").show();
       $(".valores-us").hide();
       $(".valores-gs").hide();
-    }  
+    }
   });
 
   </script>
@@ -182,10 +186,10 @@
           $(".valores-rs").show();
           $(".valores-us").hide();
           $(".valores-gs").hide();
-        }  
+        }
       }
     });
-       
+
   });
 
   $(document).ready(function () {

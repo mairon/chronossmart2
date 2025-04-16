@@ -3,7 +3,9 @@
   <div class="col-md-12">
     <div class="panel">
       <header class="panel-heading" style="font-family: 'prox'; font-size: 18px; padding-bottom: 10px;">
-        Contrato #<%= @contrato.id.to_s.rjust(6,'0') %> - <%= @contrato.documento_numero %> Status: <%= @contrato.status %>
+        Contrato #<%= @contrato.id.to_s.rjust(6,'0') %>
+        - <%= @contrato.documento_numero %> Status: <%= @contrato.status %>
+        - <%= @contrato.pedido_traslado.cod_ext unless @contrato.pedido_traslado.blank? %>
 
 				<span class="resultado" style="float: right">
 			 <%= link_to 'Gerar Titulos', gera_titulos_contratos_path(id: @contrato.id)%>
@@ -14,10 +16,8 @@
 	      <i class="icon-user"></i> Cliente: <%= @contrato.persona.nome unless  @contrato.persona_id.blank? %> |
         <%= t("DATE") %>: <b> <%= @contrato.data.to_date.strftime("%d/%m/%y") unless  @contrato.data.blank? %></b>|
         <%= t("DATE") %> Final: <b><%= @contrato.data_final.to_date.strftime("%d/%m/%y") unless  @contrato.data_final.blank? %></b> |
+        Presupuesto: <%= @contrato.presupuesto_id %>
         Obs.: <%= @contrato.obs %>
-        <% if ep.segmento.to_i == 1 %>
-          Presupuesto: <%= link_to @contrato.presupuesto_id, presupuesto_path(@contrato.presupuesto_id), target: '_blank?' %>
-        <% end %>
 	    </div>
     </div>
   </div>
@@ -46,7 +46,7 @@
 
     <div class="row">
       <div class="col-md-12" style="margin-top: 5px">
-        <a class="btn btn-blue" data-toggle="modal" data-width="800" data-height="781" data-target="#modal-item">Nuevo</a>        
+        <a class="btn btn-blue" data-toggle="modal" data-width="800" data-height="781" data-target="#modal-item">Nuevo</a>
         <%= link_to  edit_contrato_path(:id => @contrato.id), :class => "btn btn-default " do %>
           <i class="icon-pencil"></i> Editar
         <% end %>
@@ -73,7 +73,7 @@
             Terminal
           </a>
         <% end %>
-        
+
         <%= link_to 'Cancelar Contrato', cancelar_contrato_path(@contrato.id), class: 'btn btn-danger', :confirm => 'Esta acción es única, Estas Seguro?' %>
 
         <%= link_to 'Finalizar', contratos_url, class: 'btn btn-info next' %>
@@ -107,12 +107,21 @@
 
   <div class="col-md-5">
     <div class="panel">
-      
+
 		</div>
 
     <div class="panel">
       <%= render partial: 'produtos' %>
     </div>
+
+    <div class="panel">
+        <% if current_unidade.environment_production_fiscal == true %>
+          <%= render 'faturamento_eletronico' %>
+        <% else %>
+          <%= render 'faturamento' %>
+        <% end %>
+    </div>
+
 
     <div class="panel">
       <%= render partial: 'despesas_relacionadas' %>

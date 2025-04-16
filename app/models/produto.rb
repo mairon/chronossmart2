@@ -19,10 +19,10 @@ class Produto < ActiveRecord::Base
 
   has_attached_file :picture, :path => "#{Empresa.last.nome}/system/:attachment/:filename",
       :url => "#{Empresa.last.nome}/system/:attachment/:filename", default_url: 'default.jpg'
-  
+
   validates_attachment_content_type :picture, :content_type => /\Aimage\/.*\Z/
 
-  
+
   validates_presence_of :nome, :taxa, :clase_id
   validates_uniqueness_of :nome, scope: [:chassi], message: " ja cadastrado."
   validates_uniqueness_of :barra, :allow_blank => true, :allow_nil => true, message: " ja cadastrado."
@@ -45,7 +45,7 @@ class Produto < ActiveRecord::Base
   def gera_cod_barra_id
 
     ProdutoBarra.create( produto_id: self.id, barra: self.barra )
-    
+
   end
 
   def self.busca_produto(params)
@@ -56,11 +56,11 @@ class Produto < ActiveRecord::Base
 
     params_search = "#{params[:busca].gsub(/\s/,':*&')}:*" unless params[:busca].blank?
     cond  = "AND to_tsvector(upper(COALESCE(NOME, '') || ' ' || COALESCE(CHASSI, '') || ' ' || COALESCE(REFERENCIA, '') || ' ' || COALESCE(COR, '') || ' ' ||  COALESCE(ANO, '') || ' ' ||  COALESCE(OBS, '') || ' ' || COALESCE(FABRICANTE_COD, '') || ' '  || ' ' || COALESCE(BARRA, '') || ' ' || COALESCE( CAST(ID AS CHARACTER VARYING ), '') )) @@ to_tsquery(upper('#{params_search}'))" unless params[:busca].blank?
-    
+
 
     Produto.paginate(select: 'id,cor,chassi, ano, referencia, nome,clase_id,grupo_id,fabricante_cod,usuario_created, barra, preco_venda_guarani',
         conditions: ["id > 0 #{cond} #{data} #{clase} #{grupo} #{sub_grupo}"],page: params[:page],
-        per_page: 1000000,).order('clase_id,grupo_id,nome').includes(:clase).includes(:grupo).includes(:sub_grupo)
+        per_page: 10000).order('clase_id,grupo_id,nome').includes(:clase).includes(:grupo).includes(:sub_grupo)
 
   end
 
@@ -99,7 +99,7 @@ class Produto < ActiveRecord::Base
       cond  = "AND to_tsvector(upper(NOME)) @@ to_tsquery(upper('#{params_search}'))" unless params[:busca].blank?
     end
 
-    sql = "SELECT 
+    sql = "SELECT
                   G.DESCRICAO AS GRUPO_NOME,
                   SG.DESCRICAO AS SUB_GRUPO_NOME,
                   P.ID,

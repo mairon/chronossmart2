@@ -1,6 +1,5 @@
 
 <%= form_for(compras_produto) do |f| %>
-<hr>
 		<% if compras_produto.errors.any? %>
 		<div id="error_explanation">
 			<h2><%= pluralize(compras_produto.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
@@ -14,7 +13,6 @@
 			</ul>
 		</div>
 	<% end %>
-
 	<%= f.hidden_field :compra_id %>
 	<%= f.hidden_field :unidade_id,    :value => @compra.unidade_id  %>
 	<%= f.hidden_field :status,    :value => @compra.status %>
@@ -30,10 +28,13 @@
 				 	<label>Producto</label>
 						<%= text_field :cod, :busca,
                 :onkeypress  => "return bloqEnter(event)",
-                :size        => 20, :placeholder => 'Ref. / Cod. Barra', :autofocus   => true %>				 		
+                :size        => 20, :placeholder => 'Ref. / Cod. Barra', :autofocus   => true %>
 					 <%= f.text_field :produto_nome, :size => 60, class: 'autocomplete', required: true, autofocus: true %>
 					 <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
-					 <%= f.hidden_field :produto_id %> 
+					 <%= f.hidden_field :produto_id %>
+					 Ultimo Custo <span id="ultimo_custo"></span>
+					 Fecha <span id="ultimo_custo_data"></span>
+					 Promedio <span id="ultimo_custo_promedio"></span>
 				 </td>
 				</tr>
 
@@ -42,7 +43,7 @@
 						<label>Cantidad</label>
 						<%= f.telephone_field :quantidade, size: 9, value: 1 %>
 					</td>
-					<% if @compra.moeda.to_i == 0  %>						
+					<% if @compra.moeda.to_i == 0  %>
 						<%= field_us_label 'Unit. U$', f, :unitario_dolar %>
 						<%= field_us_label 'Desc. U$', f, :desconto_dolar %>
 						<%= field_us_label 'Total U$', f, :total_dolar %>
@@ -63,7 +64,7 @@
 					<td  colspan="2">
 					<label>Deposito</label>
 					<%= f.collection_select :deposito_id, Deposito.where(unidade_id: current_unidade.id).select("id,nome"),:id, :nome %></td>
-					<td>
+					<td class="padding-btn">
 						<%= f.submit t('SAVE'), :disable_with => "Aguarde...", :class => "btn btn-green", "data-plus-as-tab" => "false" %>
 					</td>
 				</tr>
@@ -78,8 +79,8 @@ $("#cod_busca").change(function(){
           beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
           data: "cod=" + escape($("#cod_busca").val()) +
                 "&id="+ $("#id").val(),
-          error: function(XMLHttpRequest, textStatus, errorThrown) { 
-                  alert('Producto no Encontrado'); 
+          error: function(XMLHttpRequest, textStatus, errorThrown) {
+                  alert('Producto no Encontrado');
                   $('#cod_busca').focus();
                   $('#cod_busca').val('');
               },
@@ -113,13 +114,38 @@ $(function() {
 			$("#compras_produto_produto_id").val("");
 			$( "#compras_produto_produto_nome" ).val(ui.item.label);
 			$('#compras_produto_produto_id').val(ui.item.id);
-			return false;
+
+  		$.ajax({url: "/buscas/busca_custo",
+          type: 'GET',
+          beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+          data: "produto_id=" + escape($('#compras_produto_produto_id').val()),
+          error: function(XMLHttpRequest, textStatus, errorThrown) {
+                  alert('Producto no Encontrado');
+                  $('#cod_busca').focus();
+                  $('#cod_busca').val('');
+              },
+          success: function(grade){
+          	<% if @compra.moeda.to_i == 0 %>
+		          $('#ultimo_custo').text(number_format(grade["custo"].unitario_dolar, 2, ',', '.'));
+		          $('#ultimo_custo_data').text($.datepicker.formatDate( "dd/mm/yy", new Date(grade["custo"].data)) );
+		          $('#ultimo_custo_promedio').text(number_format(grade["custo"].promedio_dolar, 2, ',', '.'));
+          	<% elsif @compra.moeda.to_i == 1 %>
+		          $('#ultimo_custo').text(number_format(grade["custo"].unitario_guarani, 0, ',', '.'));
+		          $('#ultimo_custo_data').text($.datepicker.formatDate( "dd/mm/yy", new Date(grade["custo"].data)) );
+		          $('#ultimo_custo_promedio').text(number_format(grade["custo"].promedio_guarani, 0, ',', '.'));
+          	<% elsif @compra.moeda.to_i == 2 %>
+		          $('#ultimo_custo').text(number_format(grade["custo"].unitario_real, 2, ',', '.'));
+		          $('#ultimo_custo_data').text($.datepicker.formatDate( "dd/mm/yy", new Date(grade["custo"].data)) );
+		          $('#ultimo_custo_promedio').text(number_format(grade["custo"].promedio_real, 2, ',', '.'));
+          	<% end %>
+        }
+      });
 		}
 	});
 });
 
   //calc valores gs
-  $( "#compras_produto_unitario_guarani, #compras_produto_desconto_guarani" ).blur(function() {  
+  $( "#compras_produto_unitario_guarani, #compras_produto_desconto_guarani" ).blur(function() {
   	var qtd = $('#compras_produto_quantidade').val();
   	var unit_gs = $('#compras_produto_unitario_guarani').val();
   	var desc_gs = $('#compras_produto_desconto_guarani').val();
@@ -138,7 +164,7 @@ $(function() {
   });
 
   //calc valores us
-  $( "#compras_produto_unitario_dolar, #compras_produto_desconto_dolar" ).blur(function() {  
+  $( "#compras_produto_unitario_dolar, #compras_produto_desconto_dolar" ).blur(function() {
   	var qtd = $('#compras_produto_quantidade').val();
   	var unit_us = $('#compras_produto_unitario_dolar').val();
   	var desc_us = $('#compras_produto_desconto_dolar').val();
@@ -157,7 +183,7 @@ $(function() {
   });
 
 	//calc valores rs
-  $( "#compras_produto_unitario_real, #compras_produto_desconto_real" ).blur(function() {  
+  $( "#compras_produto_unitario_real, #compras_produto_desconto_real" ).blur(function() {
   	var qtd = $('#compras_produto_quantidade').val();
   	var unit_rs = $('#compras_produto_unitario_real').val();
   	var desc_rs = $('#compras_produto_desconto_real').val();

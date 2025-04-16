@@ -4,7 +4,7 @@
     <div class="row">
       <div class="col-md-3">
         <label>Periodo</label>
-        <%= select_tag 'tipo_data', options_for_select([['Emición','emicao'],['Vencimiento','vencimento']]), autofocus: true %>
+        <%= select_tag 'tipo_data', options_for_select([['Vencimiento','vencimento'],['Emición','emicao']]), autofocus: true %>
       </div>
 
         <div class="col-md-3">
@@ -32,7 +32,7 @@
   ON PT.ID = P.vend_responsavel_id
 WHERE P.UNIDADE_ID = #{current_unidade.id} AND P.vend_responsavel_id IS NOT NULL ORDER BY 2
 ").collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...'}) %>
-          
+
         </div>
       </div>
 
@@ -65,7 +65,7 @@ WHERE P.UNIDADE_ID = #{current_unidade.id} AND P.vend_responsavel_id IS NOT NULL
           <%= select("busca", "cc", CentroCusto.where("unidade_id = #{current_unidade.id}").select('id,nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...'}) %>
       </div>
     </div>
-    
+
     <div class="row">
       <div class="col-md-3">
         <label>Doc.</label>
@@ -105,7 +105,7 @@ WHERE P.UNIDADE_ID = #{current_unidade.id} AND P.vend_responsavel_id IS NOT NULL
         </fieldset>
       </div>
     </div>
-    
+
     <div class="row">
       <div class="col-md-12">
         <fieldset>
@@ -194,7 +194,7 @@ WHERE P.UNIDADE_ID = #{current_unidade.id} AND P.vend_responsavel_id IS NOT NULL
           }
         });
       });
-  </script>   
+  </script>
  <% end %>
 
 
@@ -263,7 +263,7 @@ WHERE P.UNIDADE_ID = #{current_unidade.id} AND P.vend_responsavel_id IS NOT NULL
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" id="print-nav">Imprimir</button>
-      </div>      
+      </div>
     </div>
   </div>
 </div>
@@ -272,5 +272,5 @@ WHERE P.UNIDADE_ID = #{current_unidade.id} AND P.vend_responsavel_id IS NOT NULL
 <script>
 $('#print-nav').on('click', function () {
   document.getElementById('iframeModal').contentWindow.print();
-});  
+});
 </script>

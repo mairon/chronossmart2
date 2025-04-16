@@ -1,0 +1,31 @@
+<div class="panel">
+	<div class="panel-content">
+		<%= form_for(@ordem_entrega, remote: true) do |foe| %>
+			<div class="row">
+				<div class="col-md-12">
+					<label class="bold"> Local Retirar: <%= foe.radio_button :local_retirada, 0, required: true %> Showroom <%= foe.radio_button :local_retirada, 1, required: true %> Ret. Deposito <%= foe.radio_button :local_retirada, 2, required: true %> Entregar</label>
+				</div>
+				<div class="col-md-10">
+					<%= foe.collection_select :persona_locais_entrega_id, PersonaLocaisEntrega.list_locais(persona_id: @ordem_entrega.persona_id), :id, :direcao, { prompt: 'Selecione lo Local' }, {class: 'selectize'} %>
+				</div>
+				<div class="col-md-2 ">
+					<a href="#" class="btn" data-toggle="modal" data-target="#ModalOeEndereco"><span class="material-symbols-outlined">add_location_alt</span></a>
+				</div>
+
+			</div>
+			<div class="row">
+				<div class="col-md-10">
+					<br>
+					<%= foe.text_area :obs, rows: 2, class: 'panel-field', placeholder: "Obs." %>
+				</div>
+				<div class="col-md-2">
+					 <%= foe.button'<span class="material-symbols-outlined" style="color: #fff">save</span>'.html_safe, class: "btn btn-green bt-gravar-entrega", style: "padding: 20px 10px; margin-top: 16px" %>
+				</div>
+			</div>
+		<% end %>
+	</div>
+</div>
+
+<script>
+	$('#ordem_entrega_persona_locais_entrega_id').selectize();
+</script>

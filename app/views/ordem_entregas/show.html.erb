@@ -1,0 +1,130 @@
+<div class="panel">
+  <h1 id="header">
+    #<%= @ordem_entrega.id.to_s.rjust(6,'0') %>/<%= @ordem_entrega.venda_id.to_s.rjust(6,'0') %>
+    <div class="pull-right">
+      <%= link_to 'Salir', ordem_entregas_url, class: 'btn btn-blue' %>
+      <% if @ordem_entrega.print_comprovante == true %>
+        <a href="javascript:void(0)" disabled="disabled" class="btn btn-blue" onClick="QzComprovante()" id="btn-print"><%= image_tag('printer.png') %> Matricial</a>
+      <% else %>
+        <a href="javascript:void(0)" class="btn btn-blue" onClick="QzComprovante()" id="btn-print"><%= image_tag('printer.png') %> Matricial</a>
+      <% end %>
+    </div>
+  </h1>
+  <div class="panel-content">
+    <%= form_for(@ordem_entrega) do |f| %>
+    <div class="row">
+
+      <div class="col-md-4">
+        <label>Status</label>
+        <%= f.select :status, [['Pediente', 0],['Separación', 1],['En Rota', 2], ['Finalizado', 3]] %>
+      </div>
+
+      <div class="col-md-4">
+        <label>Rodado</label>
+        <% if @ordem_entrega.status.to_i > 0 %>
+          <%= f.collection_select :rodado_id, Rodado.all( :select => ' id, placa', :order  => '2' ), :id, :placa,{:prompt => 'Selecione'} %>
+        <% end %>
+      </div>
+
+      <div class="col-md-4">
+        <label>Print</label>
+        <% if current_user.tipo.in?([0, 1])  %>
+          <%= f.check_box :print_comprovante %> Impresición Executada
+        <% end %>
+      </div>
+    <% end %>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-md-4">
+        <label><span class="material-symbols-outlined">person</span></label>
+          <%= @ordem_entrega.persona.nome %>
+      </div>
+
+      <div class="col-md-4">
+        <label><span class="material-symbols-outlined">supervisor_account</span></label>
+          <%= Persona.find(@ordem_entrega.vendedor_id).nome %>
+      </div>
+
+      <div class="col-md-4">
+        <label><span class="material-symbols-outlined">inventory_2</span></label>
+          <%= format_peso(@ordem_entrega.ordem_entrega_produtos.sum(:quantidade)) %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4">
+        <label><span class="material-symbols-outlined">location_on</span></label>
+        <%= @ordem_entrega.persona_locais_entrega.cidade.nome unless @ordem_entrega.persona_locais_entrega.blank? %> - <%= @ordem_entrega.persona_locais_entrega.direcao unless @ordem_entrega.persona_locais_entrega.blank? %> - <%= @ordem_entrega.persona_locais_entrega.obs unless @ordem_entrega.persona_locais_entrega.blank? %> - <% @ordem_entrega.obs %>
+      </div>
+      <div class="col-md-4">
+        <label><span class="material-symbols-outlined">local_atm</span></label>
+        <%= @ordem_entrega.venda.plano.condicao unless  @ordem_entrega.venda.plano.nil? %>
+      </div>
+
+      <div class="col-md-4">
+        <label>Retirar </label>
+        <% if @ordem_entrega.local_retirada == 0 %>
+          Showroom
+        <% elsif @ordem_entrega.local_retirada == 1 %>
+          Ret. Deposito
+        <% elsif @ordem_entrega.local_retirada == 2 %>
+          Entregar
+        <% end %>
+      </div>
+    </div>
+
+    <div class="row">
+     <div class="col-md-4">
+        <label>Obs</label>
+          <%= @ordem_entrega.obs %>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="panel">
+  <div class="panel-content">
+  <table class="head_grid">
+    <tr>
+      <td width="450">Producto</td>
+      <td width="70" align="right">Peso</td>
+      <td width="70" align="right">Cantidad</td>
+    </tr>
+  </table>
+
+  <div class="rolagem" dir="div" style="height: 282px" >
+    <table>
+      <% ps = 0 %>
+      <% qtd  = 0 %>
+      <% @ordem_entrega.ordem_entrega_produtos.each do |p| %>
+        <tr class="<%= cycle("cor1", "cor2")%>">
+          <td width="450"><%= p.produto.nome %></td>
+          <td width="70" align="right"><%= (p.produto.peso.to_f *  p.quantidade.to_f) %></td>
+          <td width="70" align="right"><%= p.quantidade.to_i %></td>
+          <% ps += (p.produto.peso.to_f *  p.quantidade.to_f) %>
+          <% qtd  += p.quantidade.to_i %>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+    <table>
+      <tr class="head_grid">
+        <td width="460"><%= link_to '', @ordem_entrega, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+        <td width="70" align="right"><b><%= ps %></b></td>
+        <td width="70" align="right"><b><%= qtd.to_i %></b></td>
+        <td width="55"></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#ordem_entrega_status, #ordem_entrega_print_comprovante, #ordem_entrega_rodado_id').change(function() {
+        $("#edit_ordem_entrega_<%= @ordem_entrega.id %>").submit();
+    });
+  });
+</script>
+
+<%= render 'set_print' %>

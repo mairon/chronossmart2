@@ -4,8 +4,8 @@ class Adelanto < ActiveRecord::Base
 		belongs_to :persona
 		belongs_to :centro_custo
 		validates_presence_of :cotacao,:valor_dolar,:valor_guarani,:status
-		before_save :finds
-		before_save :gera_cod
+		before_save :finds, :gera_cod
+
 		def gera_cod
 			if self.documento_numero == ''
 				if self.tipo == 2
@@ -29,9 +29,6 @@ class Adelanto < ActiveRecord::Base
 
 			conta = Conta.find_by_id(self.conta_id);
 			self.conta_nome = conta.nome.to_s;
-
-			documento = Documento.find_by_id(self.documento_id);
-			self.documento_nome = documento.nome.to_s;
 
 			per = Persona.find_by_id(self.banco_id)
 			self.banco   = per.nome.to_s unless self.banco_id.blank?

@@ -8,7 +8,7 @@ class ComprasProdutosController < ApplicationController
     end
 
     def index                  #
-      @compras_produtos = ComprasProduto.where('deposito_id = 1 AND MOEDA = 2').order('produtos_grade_id,data,id')
+      @compras_produtos = ComprasProduto.order('data,produto_id,id')
 
       respond_to do |format|
         format.html # index.html.erb

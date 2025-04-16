@@ -1,10 +1,12 @@
-<h1 id="header"><%= t('PAYMENTS') %></h1>
-<div class="acessos">
-  <%= link_to t('NEW'), new_pago_path, :class => "button add" %>
-</div>
-<div class="group">
+<div class="panel">
+<h1 id="header">
+  <%= t('PAYMENTS') %>
+  <div class="pull-right">
+    <%= link_to t('NEW'), new_pago_path, :class => "button add" %>
+  </div>
+</h1>
 
-  <h2>
+  <div class="panel-content">
     <%= form_tag busca_pagos_path, :method => "get" do%>
       <table>
         <tr>
@@ -34,10 +36,11 @@
       </table>
     <input type="hidden" id="seta" value="0"/>
     <% end %>
-  </h2>
-    <div id="pagina">
     </div>
 </div>
+
+<div id="pagina"></div>
+
 <script language="javascript">
   function pesquisa(valor){
     url="/pagos/busca?" + $('form').serialize();

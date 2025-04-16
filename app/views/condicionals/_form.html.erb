@@ -1,0 +1,77 @@
+<div class="panel">
+  <h1 id="header">
+    Condicional
+  </h1>
+  <%= form_for(@condicional) do |f| %>
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-md-7">
+          <label><%= t('DATE') %></label>
+          <%= f.date_select :data %>
+        </div>
+        <div class="col-md-2">
+          <label>Cotz.</label>
+         <%= f.text_field :cotacao, :size  => 8, :dir   => "rtl", :class => "money_gs", :required => true %>
+        </div>
+
+        <div class="col-md-2">
+          <label><%= t('COIN') %></label>
+          <%= f.select :moeda, [['Gs.', 1], ['U$', 0], ['R$', 2]], :selected => current_unidade.moeda.to_i %>
+        </div>
+      </div>
+      <% if params[:action] == 'edit' %>
+      <div class="row">
+        <div class="col-md-12">
+          <label>Status</label>
+          <%= f.select :status,([["PENDIENTE", 0], ["CANCELADO", 2]]) %>
+        </div>
+      </div>
+      <% end %>
+      <div class="row">
+        <div class="col-md-12">
+          <label>Deposito</label>
+          <%= f.collection_select :deposito_id, Deposito.where(unidade_id: current_unidade.id).select('id,nome').order('2'), :id, :nome,{prompt: 'Seleccione o Deposito'}, {required: true, class: 'selectize' } %>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <label>Cliente</label>
+          <%= f.collection_select :persona_id, Persona.all( :select => 'id,nome', :conditions => ["tipo_cliente = 1"], :order  => '2' ), :id,:nome, {:prompt => 'Selecione lo Cliente'},{required: true, :class => "selectize"} %>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <label>Vendedor</label>
+          <%= f.collection_select :vendedor_id, Persona.all( :select => 'id,nome', :order  => '2', :conditions => ["tipo_vendedor = 1 and unidade_id = #{current_unidade.id}"] ),:id,:nome, {:prompt => 'Selecione lo Vendedor'},{required: true, :class => "selectize"} %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <br>
+          <%= f.text_area :obs, rows: '4', class: 'panel-field', placeholder: 'Concepto' %>
+        </div>
+      </div>
+
+      <div class="footer-buttons">
+        <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      </div>
+    </div>
+    <% end %>
+</div>
+
+    <script>
+
+      //busca cotacao dolar
+        $(document).ready(function() {
+          $.ajax({url: '/buscas/cotz_us_compra',
+                  type: 'POST',
+                  beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+                  data: 'data=' + $('#compra_data_1i').val()+'-'+
+                                  $('#compra_data_2i').val()+'-'+
+                                  $('#compra_data_3i').val(),
+                  success: function(data){
+                  $('#condicional_cotacao').val(number_format( data,0, ',', '.'));} })
+        });
+
+    </script>

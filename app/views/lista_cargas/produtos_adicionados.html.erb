@@ -14,7 +14,7 @@
       
       <table class="head_grid">
         <tr>
-          <td width="55" align="center">Pedido</td>
+          <td width="55" align="center">Venta</td>
           <td width="450">Producto</td>
           <td width="70" align="right">Peso</td>
           <td width="70" align="right">Cantidad</td>
@@ -28,7 +28,7 @@
           <% qtd  = 0 %>
           <% @lista_carga_produtos.each do |p| %>
             <tr class="<%= cycle("cor1", "cor2")%>">
-              <td width="55" align="center"><%= p.presupuesto_id.to_s.rjust(6,'0') %></td>
+              <td width="55" align="center"><%= p.venda_id.to_s.rjust(6,'0') %></td>
               <td width="450"><%= p.produto.nome %></td>
               <td width="70" align="right"><%= (p.produto.peso.to_f *  p.quantidade.to_f) %></td>
               <td width="70" align="right"><%= p.quantidade.to_f %></td>

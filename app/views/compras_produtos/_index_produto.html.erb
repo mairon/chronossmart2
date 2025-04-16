@@ -1,68 +1,115 @@
 <table class="head_grid">
 	 <tr>
 		<td width="30" >DP</td>
-		<td width="120" >Referencia</td>
-		<td width="380" >Producto</td>
-		<td width="50" align="right">Cant.</td>
-		<td width="50" align="right">%</td>
+		<td width="260" >Producto</td>
+		<td width="100" align="right">Cant.</td>
+		<td width="65" align="right">%</td>
 		<td width="80" align="right">Unit</td>
-		<td width="80" align="right">Desc.</td>
-		<td width="80" align="right">Frete</td>
-		<td width="80" align="right">Outros</td>
-		<td width="80" align="right">Unit Rat.</td>
+		<td width="70" align="right">Desc.</td>
+		<td width="70" align="right">Frete</td>
+		<td width="70" align="right">Outros</td>
+		<td width="70" align="right">Unit Rat.</td>
 		<td width="80" align="right">Total</td>
 		<td width="80" align="right">Precio <%= t('SALE') %></td>
-		<td width="140"></td>
+		<td width="70" align="right">Custo Promed.</td>
 	 </tr>
 </table>
-<div class="rolagem" dir="div" style="height: 200px">
+<div class="rolagem" dir="div" style="height: 250px">
 	<table>
 		<% indice = 1 %>
 		<% qtd    = 0 %>
 		<% cust   = 0 %>
 		<% unit   = 0 %>
 		<% desc   = 0 %>
+		<% outr   = 0 %>
 		<% tot    = 0 %>
 		<% fret   = 0 %>
+
+		<% sum  = ComprasProduto.where(compra_id: @compra.id).sum("unitario_guarani * quantidade") %>
 		<% @compras_produto.each do |cp| %>
 
-						<% if params[:rateio] == 'true' %>
-							<% porcentagem    = ( ( (cp.custo_guarani * cp.quantidade ) * 100 ) / (@compra.total_guarani.to_f - @compra.desconto_guarani.to_f).to_f ) %>
+            <% if params[:rateio] == 'true' %>
 
-              <% porcentagem    = ( ( (cp.custo_guarani * cp.quantidade ) * 100 ) / (@compra.total_guarani.to_f - @compra.desconto_guarani.to_f).to_f ) %>
-
-              <!-- Frete !-->
-              <% frete_guarani       = ( ( ( @compra.frete_guarani.to_f * porcentagem ) / 100 ) / cp.quantidade.to_f ) %>
-              <% cp.update_attribute :frete_guarani, frete_guarani.to_f %>
-
-              <!-- Outros !-->
-              <% outros_guarani       = ( ( ( @compra.outros_guarani.to_f * porcentagem ) / 100 )  / cp.quantidade.to_f) %>
-              <% cp.update_attribute :outros_guarani, outros_guarani.to_f %>
-
-							<!-- Desc. !-->
-              <% desconto_guarani       = ( ( ( @compra.desconto_guarani.to_f * porcentagem ) / 100 )  / cp.quantidade.to_f) %>
-              <% cp.update_attribute :desconto_guarani, desconto_guarani.to_f %>
-
-              <% cp.update_attribute :unitario_guarani, ((cp.custo_guarani.to_f + frete_guarani.to_f + outros_guarani.to_f ) - desconto_guarani.to_f) %>
-
-              <% cp.update_attribute :total_guarani, (((cp.custo_guarani.to_f + frete_guarani.to_f + outros_guarani.to_f ) - desconto_guarani.to_f) * cp.quantidade.to_f) %>
+              <% porcentagem    = ( ( (cp.unitario_guarani.to_f * cp.quantidade.to_f ) * 100 ) / sum.to_f ) %>
 
               <% cp.update_attribute :porcen, porcentagem.to_f %>
 
+              <!-- Frete !-->
+              <% if (@compra.frete_dolar.to_f + @compra.frete_guarani.to_f + @compra.frete_real.to_f ) > 0 %>
+                <% frete_dolar      = ( ( ( @compra.frete_dolar.to_f * porcentagem ) / 100 ) /  cp.quantidade.to_f ) %>
+                <% frete_guarani    = ( ( ( @compra.frete_guarani.to_f * porcentagem ) / 100 ) /  cp.quantidade.to_f ) %>
+                <% frete_real       = ( ( ( @compra.frete_real.to_f * porcentagem ) / 100 ) /  cp.quantidade.to_f ) %>
+
+                <% cp.update_attribute :frete_dolar, frete_dolar.to_f %>
+                <% cp.update_attribute :frete_guarani, frete_guarani.to_f %>
+                <% cp.update_attribute :frete_real, frete_real.to_f %>
+              <% end %>
+
+              <!-- Despacho !-->
+              <% if (@compra.despacho_dolar.to_f + @compra.despacho_guarani.to_f + @compra.despacho_real.to_f ) > 0 %>
+                <% despacho_dolar       = ( ( ( @compra.despacho_dolar.to_f * porcentagem ) / 100 ) /  cp.quantidade.to_f ) %>
+                <% despacho_guarani       = ( ( ( @compra.despacho_guarani.to_f * porcentagem ) / 100 ) /  cp.quantidade.to_f ) %>
+                <% despacho_real       = ( ( ( @compra.despacho_real.to_f * porcentagem ) / 100 ) /  cp.quantidade.to_f ) %>
+
+                <% cp.update_attribute :despacho_dolar, despacho_dolar.to_f %>
+                <% cp.update_attribute :despacho_guarani, despacho_guarani.to_f %>
+                <% cp.update_attribute :despacho_real, despacho_real.to_f %>
+              <% end %>
+
+              <!-- Seguro !-->
+              <% if (@compra.seguro_dolar.to_f + @compra.seguro_guarani.to_f + @compra.seguro_real.to_f) > 0 %>
+                <% seguro_dolar      = ( ( ( @compra.seguro_dolar.to_f * porcentagem ) / 100 ) /  cp.quantidade.to_f ) %>
+                <% seguro_guarani    = ( ( ( @compra.seguro_guarani.to_f * porcentagem ) / 100 ) /  cp.quantidade.to_f ) %>
+                <% seguro_real       = ( ( ( @compra.seguro_real.to_f * porcentagem ) / 100 ) /  cp.quantidade.to_f ) %>
+
+                <% cp.update_attribute :seguro_dolar, seguro_dolar.to_f %>
+                <% cp.update_attribute :seguro_guarani, seguro_guarani.to_f %>
+                <% cp.update_attribute :seguro_real, seguro_real.to_f %>
+              <% end %>
+
+              <!-- Outros !-->
+              <% if (@compra.outros_dolar.to_f + @compra.outros_guarani.to_f + @compra.outros_real.to_f) > 0 %>
+                <% outros_dolar      = ( ( ( @compra.outros_dolar.to_f * porcentagem ) / 100 ) /  cp.quantidade.to_f ) %>
+                <% outros_guarani    = ( ( ( @compra.outros_guarani.to_f * porcentagem ) / 100 ) /  cp.quantidade.to_f ) %>
+                <% outros_real       = ( ( ( @compra.outros_real.to_f * porcentagem ) / 100 ) /  cp.quantidade.to_f ) %>
+                <% cp.update_attribute :outros_dolar, outros_dolar.to_f %>
+                <% cp.update_attribute :outros_guarani, outros_guarani.to_f %>
+                <% cp.update_attribute :outros_real, outros_real.to_f %>
+              <% end %>
+
+              <!-- Desconto !-->
+              <% if (@compra.desconto_dolar.to_f + @compra.desconto_guarani.to_f + @compra.desconto_real.to_f) > 0 %>
+                <% desconto_dolar      = ( ( ( @compra.desconto_dolar.to_f * porcentagem ) / 100 ) /  cp.quantidade.to_f ) %>
+                <% desconto_guarani    = ( ( ( @compra.desconto_guarani.to_f * porcentagem ) / 100 ) /  cp.quantidade.to_f ) %>
+                <% desconto_real       = ( ( ( @compra.desconto_real.to_f * porcentagem ) / 100 ) /  cp.quantidade.to_f ) %>
+                <% cp.update_attribute :desconto_dolar, desconto_dolar.to_f %>
+                <% cp.update_attribute :desconto_guarani, desconto_guarani.to_f %>
+                <% cp.update_attribute :desconto_real, desconto_real.to_f %>
+              <% end %>
+
+              <% cp.update_attribute :unitario_guarani, ((cp.custo_guarani.to_f + frete_guarani.to_f + outros_guarani.to_f ) - cp.desconto_guarani.to_f) %>
+              <% cp.update_attribute :total_guarani, (((cp.custo_guarani.to_f + frete_guarani.to_f + outros_guarani.to_f ) - cp.desconto_guarani.to_f) * cp.quantidade.to_f) %>
+
+
+              <% cp.update_attribute :unitario_dolar, ((cp.custo_dolar.to_f + frete_dolar.to_f + outros_dolar.to_f ) - cp.desconto_dolar.to_f) %>
+              <% cp.update_attribute :total_dolar, (((cp.custo_dolar.to_f + frete_dolar.to_f + outros_dolar.to_f ) - cp.desconto_dolar.to_f) * cp.quantidade.to_f) %>
+
+              <% cp.update_attribute :unitario_real, ((cp.custo_real.to_f + frete_real.to_f + outros_real.to_f ) - cp.desconto_real.to_f) %>
+              <% cp.update_attribute :total_real, (((cp.custo_real.to_f + frete_real.to_f + outros_real.to_f ) - cp.desconto_real.to_f) * cp.quantidade.to_f) %>
 
             <% end %>
 
 			  <tr class = "<%= cycle("cor1", "cor2") %>">
 					<td width="30" align="left" title="<%= cp.deposito_nome %>"><%= cp.deposito_id %></td>
-					<td width="120" align="left"><%= cp.produto.fabricante_cod %></td>
-					<td width="380" align="left"><small><%= cp.produto_nome %></small></td>
-					<td width="50"  align="right"><b><%= cp.quantidade.to_i %></b></td>
-					<td width="50"  align="right"><b><%= format_decimal(cp.porcen) %></b></td>
+					<td width="260" align="left"><small><%= cp.produto_nome %></small></td>
+					<td width="100"  align="right"><b><%= format_peso(cp.quantidade.to_f) %></b></td>
+					<td width="65"  align="right"><b><%= format_peso(cp.porcen) %></b></td>
 					<% if @compra.moeda == 0 %>
+						<td width="80" align="right"><%= format_decimal(cp.custo_dolar) %></td>
 						<td width="80" align="right"><%= format_decimal(cp.unitario_dolar) %></td>
-						<td width="80" align="right"><%= format_decimal(cp.desconto_dolar) %></td>
-						<td width="80" align="right"><%= format_decimal(cp.frete_dolar) %></td>
-						<td width="80" align="right"><%= format_decimal(cp.outros_dolar) %></td>
+						<td width="70" align="right"><%= format_decimal(cp.desconto_dolar) %></td>
+						<td width="70" align="right"><%= format_decimal(cp.frete_dolar) %></td>
+						<td width="70" align="right"><%= format_decimal(cp.outros_dolar) %></td>
 
 						<td width="80" align="right"><%= format_decimal(cp.total_dolar) %></td>
 						<td width="80" align="right"><%= format_decimal(cp.preco_venda_us) %></td>
@@ -70,16 +117,18 @@
 						<% desc   += cp.desconto_dolar.to_f %>
 					<% elsif @compra.moeda == 1 %>
 						<td width="80" align="right"><%= format_int(cp.custo_guarani) %></td>
-						<td width="80" align="right"><%= format_int(cp.desconto_guarani) %></td>
-						<td width="80" align="right"><%= format_int(cp.frete_guarani) %></td>
-						<td width="80" align="right"><%= format_decimal(cp.outros_guarani) %></td>
-						<td width="80" align="right"><%= format_int(cp.unitario_guarani) %></td>
+						<td width="70" align="right"><%= format_int(cp.desconto_guarani) %></td>
+						<td width="70" align="right"><%= format_int(cp.frete_guarani) %></td>
+						<td width="70" align="right"><%= format_decimal(cp.outros_guarani) %></td>
+						<td width="70" align="right"><%= format_int(cp.unitario_guarani) %></td>
 						<td width="80" align="right"><%= format_int(cp.total_guarani) %></td>
 						<td width="80" align="right"><%= format_int(cp.preco_venda_gs) %></td>
+						<td width="70" align="right"><%= format_int(cp.promedio_guarani) %></td>
 
 						<% tot    += cp.total_guarani.to_f %>
 						<% desc   += cp.desconto_guarani.to_f %>
 						<% fret += (cp.frete_guarani.to_f * cp.quantidade.to_f) %>
+						<% outr += (cp.outros_guarani.to_f * cp.quantidade.to_f) %>
 					<% else %>
 						<td width="80" align="right"><%= format_decimal(cp.unitario_real) %></td>
 						<td width="80" align="right"><%= format_decimal(cp.desconto_real) %></td>
@@ -88,7 +137,7 @@
 						<% tot    += cp.total_real.to_f %>
 						<% desc   += cp.desconto_real.to_f %>
 					<% end %>
-					<td><a href="#" onclick="AtulizadaPreco(<%= cp.produto_id %>, <%= cp.unitario_guarani.to_i %>)" >Actulizar Precio</a> </td>
+					<td><a href="#" onclick="AtulizadaPreco(<%= cp.produto_id %>)" title="Actulizar Precio"><%= image_tag('price-tag.png', height: '22') %></a> </td>
           <td><%= link_to '', edit_compras_produto_path(cp), class: 'icon-pencil' %></td>
           <td><%= link_to '', cp, :confirm => 'Estas Seguro?', :method => :delete , class: 'icon-trash'%></td>
 					<% indice += 1 %>
@@ -100,21 +149,19 @@
 <!-- RESULTDOS!-->
 <table  class="head_grid">
 	 <tr>
-		<td width="530"></td>
-		<td width="50" align="right"><%= qtd.to_i %></td>
-		<td width="50"></td>
-		<td width="80"></td>
+		<td width="291"></td>
+		<td width="100" align="right"><%= format_peso(qtd.to_f) %></td>
+		<td width="145"></td>
 		<% if @compra.moeda == 1  %>
-			<td width="82" align="right"><%=format_int(desc)%></td>
-			<td width="82" align="right"><%=format_int(fret)%></td>
-			<td width="80"></td>
-			<td width="80"></td>
+			<td width="70" align="right"><%=format_int(desc)%></td>
+			<td width="70" align="right"><%=format_int(fret)%></td>
+			<td width="70" align="right"><%=format_int(outr)%></td>
+			<td width="70"></td>
 			<td width="80" align="right"><%=format_int(tot)%></td>
 		<% else %>
-			<td width="110" align="right"><%=format_decimal(desc)%></td>
+			<td width="80" align="right"><%=format_decimal(desc)%></td>
 			<td width="80" align="right"><%=format_decimal(tot)%></td>
 		<% end %>
-			<td width="220"></td>
 	 </tr>
 </table>
 

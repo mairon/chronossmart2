@@ -1,11 +1,3 @@
-<style type="text/css">
-  .rolagem td, .head_grid td, .acessos a, label{
-    cursor:pointer;
-    color: #000 !important;
-    font-size: 14px;
-  }
-</style>
-
 <h1 style="font-size: 22px;" class="bold">
   <b>Venta <%= @venda.id.to_s.rjust(6,'0')%> <%= "| Vendedor: #{Persona.find(@venda.vendedor_id).nome}" unless @venda.vendedor_id.blank? %></b>
 </h1>
@@ -15,7 +7,7 @@
     <div class="panel">
       <div class="panel-content">
         <h1>
-          Cliente: <%= @venda.persona_nome %> <%= "| Comanda: #{@venda.cartao.nome}" unless @venda.cartao.blank? %> 
+          Cliente: <%= @venda.persona_nome %> <%= "| Comanda: #{@venda.cartao.nome}" unless @venda.cartao.blank? %>
           <div class="pull-right" style="margin-top: -10px">
             <%= form_for(@venda) do |vdc| %>
               <%= hidden_field_tag :tela, 'financas' %>
@@ -27,13 +19,13 @@
                         $("#edit_venda_<%= @venda.id %>").submit();
                     });
                   });
-                </script>              
+                </script>
             <% end %>
           </div>
         </h1>
       </div>
     </div>
-  
+
     <%= render 'cashback' %>
       <% if @venda_config.caixa_separado == true %>
         <% @abertura = AberturaCaixa.last(:conditions => ["status = true and usuario_id = #{current_user.id} and unidade_id = #{current_unidade.id}"])%>
@@ -47,7 +39,7 @@
             <% end %>
           </div>
 
-          
+
         <% else %>
           <div class="alert alert-danger"  role="alert">
            Es necesario acier la apertura de Caja para seguir! <strong><a href="/abertura_caixas" target="_blank" class="alert-link">Abrir</a></strong>
@@ -55,19 +47,24 @@
         <% end %>
       <% else %>
         <%= render 'forma_pago' %>
-        
+        <!--! Verifica se já tem algum movimento e não deixa mais faturar -->
 
-        <div class="partial-fatuamento" hidden>
-          <% if current_unidade.environment_production_fiscal == true %>
-            <%= render 'faturamento_eletronico' %>
-          <% else %>
-            <%= render 'faturamento' %>
-          <% end %>
-        </div>
-        
+        <% @mov_cl =  Cliente.where(persona_id: @venda.persona_id, documento_numero: @venda.documento_numero.to_s).sum("cobro_guarani + cobro_dolar") %>
+        <% if @mov_cl.to_f == 0 %>
+          <div class="partial-fatuamento" hidden>
+            <% if current_unidade.environment_production_fiscal == true %>
+              <%= render 'faturamento_eletronico' %>
+            <% else %>
+              <%= render 'faturamento' %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="alert alert-danger"  role="alert">Este Documiento ja tiene aplicaciones, Faturación no diponible </div>
+        <% end %>
+
       <% end %>
   </div>
-  
+
   <div class="col-md-6">
     <div class="row">
       <div class="col-md-12">
@@ -81,16 +78,13 @@
           <%= render 'financeiro_produtos' %>
         </div>
       </div>
-    <% end %> 
-
-
-    
+    <% end %>
       <div class="row">
         <div class="col-md-12">
           <%= render 'financeiro_list_forma_pagos' %>
         </div>
       </div>
-    
+
     <% unless @venda.plano_venda.blank? %>
       <div class="row">
         <div class="col-md-12">
@@ -105,9 +99,9 @@
           <%= render 'financeiro_gastos' %>
         </div>
       </div>
-    <% end %> 
+    <% end %>
 
-  </div>  
+  </div>
 </div>
 
 

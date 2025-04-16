@@ -1,44 +1,105 @@
 <div class="panel">
   <h1 id="header">
-    Pedido Venta Productos - [<%= t('EDITION') %>]
+    Presupuesto #<%= @presupuesto.id.to_s.rjust(6,'0') %>
     <div class="pull-right">
       <%= link_to t('BACK'), edit_presupuesto_path(@presupuesto),:class =>'btn btn-default' %>
       <%= link_to 'Generar (PDF)', print_presupuesto_presupuesto_path(@presupuesto, tipo: '0'),:class =>'btn btn-blue  btn-print' %>
-      <%= link_to '(PDF) - INTERNO', print_presupuesto_presupuesto_path(@presupuesto, tipo: '1'),:class =>'btn btn-blue btn-print' %> 
+      <%= link_to '(PDF) - INTERNO', print_presupuesto_presupuesto_path(@presupuesto, tipo: '1'),:class =>'btn btn-blue btn-print' %>
+      <% if @venda_config.modelo_cp.to_i == 1 %>
+        <a href="javascript:void(0)" class="btn btn-blue" onClick="QzComprovante()"><%= image_tag('printer.png') %> Matricial</a>
+      <% end %>
       <%= link_to 'Finalizar', presupuestos_path,:class =>'btn' %>
-      
+
     </div>
   </h1>
- <div class="acessos" style="padding-left: 30px">
-  Cliente: <%= @presupuesto.persona_nome %>
-  | Condición de Pago: <%= @presupuesto.plano.condicao unless @presupuesto.plano_id.blank? %>
-  | Tabla de Precio: <%= @presupuesto.tabela_preco.nome unless @presupuesto.tabela_preco_id.blank? %>
-  </div>  
+  <div class="panel-content">
+    <div class="row">
+      <div class="col-md-3">
+      <%= form_for(@presupuesto) do |f| %>
+        <label>Status</label>
+        <%= f.select :status, [['Pendiente', 0],['Aprovado', 1],['Entrege Parcial', 2], ['Finalizado', 3]] %>
+      <% end %>
+      </div>
+      <div class="col-md-3">
+        <label>Cliente</label>
+        <br>
+        <%= @presupuesto.persona_nome %>
+      </div>
+      <div class="col-md-3">
+        <label>Condición de Pago</label>
+        <br>
+        <%= @presupuesto.plano.condicao unless @presupuesto.plano_id.blank? %>
+      </div>
+      <div class="col-md-3">
+        <label>Tabla de Precio</label>
+        <br>
+        <%= @presupuesto.tabela_preco.nome unless @presupuesto.tabela_preco_id.blank? %>
+      </div>
+    </div>
+    <div class="row">
+      <% CustomField.where(tabela: 'PRESUPUESTOS').each.each do |field| %>
+        <div class="col-md-3">
+          <label><%= field.label %></label>
+          <%= @presupuesto.custom_fields[field.internal_name] %>
+        </div>
+      <% end %>
+    </div>
+  </div>
 </div>
 
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#presupuesto_status').change(function() {
+        $("#edit_presupuesto_<%= @presupuesto.id %>").submit();
+    });
+  });
+</script>
+
+
 <div class="panel">
-  <div class="group">
+  <div class="panel-content">
   <%= render :partial=>"presupuesto_produtos/index_comercial", :locals=>{:presupuesto => @presupuesto,:presupuesto_produtos => @presupuesto.presupuesto_produtos} %>
   </div>
 </div>
 <div class="panel">
-  <div class="group">
-  <%= render :partial=>"presupuesto_produtos/new_produto_comercial" , :locals=>{:presupuesto => @presupuesto, :presupuesto_produto => PresupuestoProduto.new} %>  
+  <div class="panel-content">
+  <%= render :partial=>"presupuesto_produtos/new_produto_comercial" , :locals=>{:presupuesto => @presupuesto, :presupuesto_produto => PresupuestoProduto.new} %>
+  </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="ModalF2">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel" align="center">Buscar Producto</h4>
+      </div>
+      <div class="modal-body" style="padding: 10px 5px 25px 5px">
+        <%= render '/produtos/busca_presupuesto_produto' %>
+      </div>
+    </div>
   </div>
 </div>
 
 <script type="text/javascript">
 
-  document.onkeydown=function(e){
-    //LISTA DE PRODUTOS
-    var moeda   = document.getElementById('presupuesto_produto_moeda').value
-    if(e.which == 113)
-      window.open('/produtos/busca_presupuesto_produto?tabela_preco='+<%= @presupuesto.tabela_preco_id %>+'&unidade='+<%= @presupuesto.unidade_id %>+'&persona_id='+<%= @presupuesto.persona_id %>+'&moeda='+moeda+'', 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=2500, HEIGHT=700');
 
+
+  document.onkeydown=function(e){
+    if(e.which == 113){ //F2
+      $('#ModalF2').modal('show');
+      $('#ModalF2').on('shown.bs.modal', function () {
+          $('#busca_f2').focus();
+      })
+    };
   }
 
-  function BuscaTintometria(m,p){
-    window.open("/vendas/busca_tintometria?marca="+ m + "&persona_id=" + p , '', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=2500, HEIGHT=600');
-  };
-
 </script>
+
+
+<% if @venda_config.modelo_cp.to_i == 1 %>
+  <%= render 'set_print' %>
+<% end %>

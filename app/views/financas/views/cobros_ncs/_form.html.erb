@@ -1,0 +1,46 @@
+<%= form_for(@cobros_nc) do |f| %>
+  <% if @cobros_nc.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@cobros_nc.errors.count, "error") %> prohibited this cobros_nc from being saved:</h2>
+
+      <ul>
+      <% @cobros_nc.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> <%= t('CHARGE') %> Nota de Credito - [<%= t('EDITION') %>]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td>
+              <fieldset>
+
+                <table>
+                  <tr>
+                    <td>
+                      <%= f.radio_button :status, 0 %>Activo
+                      <%= f.radio_button :status, 1,  :Checked => "True" %>Anular
+                    </td>
+                    <td><%= f.submit :value => t('SAVE'), :class => "button" %></td>
+                  </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        
+        <%= link_to t('BACK'), cobro_final_cobro_path(@cobros_nc.cobro_id), :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

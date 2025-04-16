@@ -1,0 +1,52 @@
+
+<div class="panel">
+  <div class="panel-content">
+    <table class="head_grid">
+      <tr>
+        <td width="70" align="center">OE</td>
+        <td width="70" align="center">Venta</td>
+        <td width="70" align="center">Fecha OE</td>
+        <td width="220">Vendedor</td>
+        <td width="220">Cliente</td>
+        <td width="100" align="center">Status</td>
+        <td width="100" align="center">LR</td>
+        <td width="280">Direción</td>
+      </tr>
+    </table>
+    <div class="rolagem" dir="div">
+    	<table>
+    	<% @ordem_entregas.each do |oe| %>
+			<tr class = "<%= cycle("cor1", "cor2") %>">
+				<td width="70" align="center"><%= link_to oe.id.to_s.rjust(6,'0'), ordem_entrega_path(oe.id) %></td>
+				<td width="70" align="center"><%= oe.venda_id.to_s.rjust(6,'0') %></td>
+				<td width="70" align="center"><%= oe.created_at.strftime("%d/%m/%y") %></td>
+				<td width="220"><small><%= oe.vendedor_nome %></small></td>
+				<td width="220"><small><%= oe.persona_nome %></small></td>
+				<td width="100" align="center">
+					<%= case oe.status
+							when 0
+								'Pendente'
+							when 1
+								'En Separación'
+							when 2
+								'En Curso'
+							when 3
+								'Finalizado'
+							end
+						%>
+				</td>
+				<td width="100" align="center">
+	        <% case oe.status when 0 %>
+	          Showroom
+	        <% when 1 %>
+	          Ret. Deposito
+	        <% when 2 %>
+	          Entregar
+	        <% end %>
+				</td>
+				<td width="280"><small><%= oe.direcao %></small></td>
+			</tr>
+			<% end %>
+		</table>
+	</div>
+</div>

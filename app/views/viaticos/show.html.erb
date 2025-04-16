@@ -1,42 +1,98 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <h1 id="header">
+        <div class="row">
+          <div class="col-md-4">
+            Viatico #<%= @viatico.id.to_s.rjust(6,'0') %>
+          </div>
 
-<p>
-  <strong>Data:</strong>
-  <%= @viatico.data %>
-</p>
+          <div class="col-md-4 text-center">
+            <% if @viatico.moeda == 0 %>
+              <% if @extrato.sum("divida_dolar - cobro_dolar").to_f == 0 %>
+                <span class="btn-success">Finalizado</span>
+              <% else %>
+                <span class="btn-warning">Pendente</span>
+              <% end %>
+            <% elsif @viatico.moeda == 1 %>
+              <% if @extrato.sum("divida_guarani - cobro_guarani").to_f == 0 %>
+                <span class="btn-success">Finalizado</span>
+              <% else %>
+                <span class="btn-warning">Pendente</span>
+              <% end %>
+            <% elsif @viatico.moeda == 2 %>
+              <% if @extrato.sum("divida_real - cobro_real").to_f == 0 %>
+                <span class="btn-success">Finalizado</span>
+              <% else %>
+                <span class="btn-warning">Pendente</span>
+              <% end %>
+            <% end %>
 
-<p>
-  <strong>Persona:</strong>
-  <%= @viatico.persona_id %>
-</p>
+          </div>
 
-<p>
-  <strong>Valor gs:</strong>
-  <%= @viatico.valor_gs %>
-</p>
+          <div class="col-md-4">
+            <div class="pull-right">
+              <%= link_to 'Comprobante', comprovante_viatico_path(@viatico.id), target: '_blank?', class: 'btn btn-blue' %>
+              <%= link_to 'Sair', viaticos_url, class: 'btn btn-blue' %>
+              <%= link_to 'Editar', edit_viatico_path(@viatico.id), class: 'btn btn-blue' %>
+            </div>
+          </div>
+        </div>
+      </h1>
+      <div class="panel-content">
+        <div class="row">
+          <div class="col-md-3">
+            <label><%= t('DATE') %></label>
+            <%= @viatico.data.strftime("%d/%m/%y") %>
+          </div>
 
-<p>
-  <strong>Valor rs:</strong>
-  <%= @viatico.valor_rs %>
-</p>
+          <div class="col-md-3">
+            <label>Favorecido</label>
+            <%= @viatico.persona.nome %>
+          </div>
 
-<p>
-  <strong>Valor us:</strong>
-  <%= @viatico.valor_us %>
-</p>
+          <div class="col-md-3">
+            <label><%= t('COIN')%></label>
+            <% if @viatico.moeda == 0 %>
+              <span class="us">U$</span>
+            <% elsif @viatico.moeda == 1 %>
+              <span class="gs">Gs.</span>
+            <% else %>
+              <span class="rs">R$</span>
+            <% end %>
+          </div>
 
-<p>
-  <strong>Obs:</strong>
-  <%= @viatico.obs %>
-</p>
+          <div class="col-md-3">
+            <label>Valor</label>
+            <% if @viatico.moeda == 0 %>
+              <span class="us"><%= format_decimal(@viatico.valor_us) %></span>
+            <% elsif @viatico.moeda == 1 %>
+              <span class="gs"><%= format_int(@viatico.valor_gs) %></span>
+            <% else %>
+              <span class="rs"><%= format_decimal(@viatico.valor_rs) %></span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-<p>
-  <strong>Forma pago:</strong>
-  <%= @viatico.forma_pago_id %>
-</p>
 
-<p>
-  <strong>Conta:</strong>
-  <%= @viatico.conta_id %>
-</p>
+<div class="row">
+  <div class="col-md-8">
+    <div class="row">
+      <div class="col-md-12">
+        <%= render 'extrato' %>
+      </div>
 
+      <div class="col-md-12">
+        <%= render 'aplicacao_viaticos' %>
+      </div>
+    </div>
+  </div>
 
+  <div class="col-md-4">
+    <%= render 'rebolso_saldo' %>
+  </div>
+</div>

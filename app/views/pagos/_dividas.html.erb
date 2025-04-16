@@ -56,6 +56,10 @@
                                   '<%= c.plano_de_conta_id %>',
                                   '<%= c.centro_custo_id %>',
                                   '<%= c.tot_cotas %>',
+                                  '<%= c.imposto_us.to_f.round(2) %>',
+                                  '<%= c.imposto_gs.to_f.round(0) %>',
+                                  '<%= c.retencao_us.to_f.round(2) %>',
+                                  '<%= c.retencao_gs.to_f.round(0) %>',
                                   '<%= format_decimal(c.divida_dolar.to_f) %>',
                                   '<%= format_decimal(c.anterior_us.to_f) %>',
                                   '<%= format_decimal(saldo_guarani.to_f) %>',
@@ -122,7 +126,11 @@
                                   '<%= c.cota %>',
                                   '<%= c.plano_de_conta_id %>',
                                   '<%= c.centro_custo_id %>',
-                                  '<%= c.tot_cotas %>',                                  
+                                  '<%= c.tot_cotas %>',  
+                                  '<%= c.imposto_us.to_f.round(2) %>',
+                                  '<%= c.imposto_gs.to_f.round(0) %>',
+                                  '<%= c.retencao_us.to_f.round(2) %>',
+                                  '<%= c.retencao_gs.to_f.round(0) %>',
                                   '<%= format_int(c.divida_guarani.to_f ) %>',
                                   '<%= format_int(c.anterior_gs.to_f ) %>',
                                   '<%= format_decimal(saldo_dolar.to_f ) %>',
@@ -135,7 +143,7 @@
 
             <td width="20" align="center"><%= check_box_tag "pago[dividas_ids][]", c.id, false, { :class => 'm', onclick: "soma(this)"  } %></td>
             
-            <td class="acao" width="60"  align="center"><%= c.data.strftime("%d/%m/%y")%></td>
+            <td class="acao" width="60"  align="center"><%= c.data %></td>
             <% if c.moeda.to_i == 0 %>
               <td width="50" align="left">U$</td>
             <% elsif c.moeda.to_i == 1 %>
@@ -193,7 +201,7 @@
 
 <% if @pago.moeda.to_i == 0 %>
 <script>
-  function Fecha(vencimento3,vencimento2,vencimento1,documento_numero_01,documento_numero_02,documento_numero,cota,plano_de_conta_id,centro_custo_id,tot_cotas,valor_dolar,anterior_dolar,saldo_guarani,saldo_real,saldo_dolar)
+  function Fecha(vencimento3,vencimento2,vencimento1,documento_numero_01,documento_numero_02,documento_numero,cota,plano_de_conta_id,centro_custo_id,tot_cotas,imposto_us,imposto_gs, retencao_us, retencao_gs,valor_dolar,anterior_dolar,saldo_guarani,saldo_real,saldo_dolar)
   {
     document.getElementById('pagos_detalhe_vencimento_3i').value        = vencimento3;
     document.getElementById('pagos_detalhe_vencimento_2i').value        = vencimento2;
@@ -205,6 +213,15 @@
     document.getElementById('pagos_detalhe_plano_de_conta_id').value             = plano_de_conta_id;
     document.getElementById('pagos_detalhe_centro_custo_id').value      = centro_custo_id;
     document.getElementById('pagos_detalhe_tot_cotas').value            = tot_cotas;
+    document.getElementById('pagos_detalhe_imposto_us').value           = imposto_us;
+    document.getElementById('pagos_detalhe_imposto_gs').value           = imposto_gs;
+    <% if current_unidade.retencao == true %>
+      document.getElementById('pagos_detalhe_retencao_us').value          = retencao_us;
+      document.getElementById('pagos_detalhe_retencao_gs').value          = retencao_gs;      
+    <% else %>
+      document.getElementById('pagos_detalhe_retencao_us').value          = 0;
+      document.getElementById('pagos_detalhe_retencao_gs').value          = 0;      
+    <% end %>
     document.getElementById('pagos_detalhe_valor_dolar').value          = valor_dolar;
     document.getElementById('pagos_detalhe_anterior_guarani').value     = anterior_dolar;
     document.getElementById('pagos_detalhe_pago_guarani').value         = saldo_guarani;
@@ -241,7 +258,7 @@
 <% else %>
 
 <script>
-  function Fecha(vencimento3,vencimento2,vencimento1,documento_numero_01,documento_numero_02,documento_numero,cota,plano_de_conta_id,centro_custo_id,tot_cotas,valor_guarani,anterior_guarani,saldo_dolar,saldo_guarani,saldo_real)
+  function Fecha(vencimento3,vencimento2,vencimento1,documento_numero_01,documento_numero_02,documento_numero,cota,plano_de_conta_id,centro_custo_id,tot_cotas,imposto_us,imposto_gs, retencao_us, retencao_gs,valor_guarani,anterior_guarani,saldo_dolar,saldo_guarani,saldo_real)
   {
     document.getElementById('pagos_detalhe_vencimento_3i').value          = vencimento3;
     document.getElementById('pagos_detalhe_vencimento_2i').value          = vencimento2;
@@ -252,7 +269,16 @@
     document.getElementById('pagos_detalhe_cota').value                   = cota;
     document.getElementById('pagos_detalhe_plano_de_conta_id').value             = plano_de_conta_id;
     document.getElementById('pagos_detalhe_centro_custo_id').value      = centro_custo_id;
-    document.getElementById('pagos_detalhe_tot_cotas').value            = tot_cotas;    
+    document.getElementById('pagos_detalhe_tot_cotas').value            = tot_cotas;  
+    document.getElementById('pagos_detalhe_imposto_us').value           = imposto_us;
+    document.getElementById('pagos_detalhe_imposto_gs').value           = imposto_gs;
+    <% if current_unidade.retencao == true %>
+      document.getElementById('pagos_detalhe_retencao_us').value          = retencao_us;
+      document.getElementById('pagos_detalhe_retencao_gs').value          = retencao_gs;      
+    <% else %>
+      document.getElementById('pagos_detalhe_retencao_us').value          = 0;
+      document.getElementById('pagos_detalhe_retencao_gs').value          = 0;      
+    <% end %>
     document.getElementById('pagos_detalhe_valor_guarani').value          = valor_guarani;
     document.getElementById('pagos_detalhe_anterior_guarani').value       = anterior_guarani;
     document.getElementById('pagos_detalhe_pago_dolar').value             = saldo_dolar;

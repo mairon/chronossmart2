@@ -1,0 +1,34 @@
+<div class="panel">
+  <div class="panel-content">
+  	<div class="row">
+  		<div class="col-md-12" align="center">
+  			<span class="material-symbols-outlined">account_circle</span>
+  			RUC/CI <%= @persona.ruc %> <br>
+  			<%= @persona.id.to_s.rjust(6,'0')%>-<%= @persona.nome %>
+<% if @persona.tipo_cliente.to_i == 1 %>
+ 				<span style="background-color: #91DC5A;" class="panel-tag">Cliente</span>
+ 			<% end %>
+ 			<% if @persona.tipo_fornecedor.to_i == 1 %>
+ 				<span style="background-color: #933EC5;" class="panel-tag">Proveedor</span>
+				<% end %>
+				<% if @persona.tipo_banco.to_i == 1 %>
+ 				<span style="background-color: #006DF0;" class="panel-tag">Banco</span>
+				<% end %>
+				<% if @persona.tipo_funcionario.to_i == 1 %>
+					<span style="background-color: #D80027;" class="panel-tag">Empleado</span>
+ 			<% end %>
+				<% if @persona.tipo_vendedor.to_i == 1 %>
+ 				<span style="background-color: #FFDA44;" class="panel-tag">Vendedor</span>
+ 			<% end %>
+ 			<% if @persona.tipo_indicador.to_i == 1 %>
+ 				<span style="background-color: #00CAD9;" class="panel-tag">Indicador</span>
+ 			<% end %>
+  		</div>
+  	</div>
+  	<hr>
+ 		<label><span class="material-symbols-outlined">mail</span> <%= @persona.email %></label>
+ 		<label><span class="material-symbols-outlined">call</span> <%= @persona.telefone %> <%= @persona.telefone2 %></label>
+ 		<label><span class="material-symbols-outlined">pin_drop</span><small><%= @persona.direcao %></small></label>
+ 		<label>Obs.: <small style="margin-top: 3px;margin-left: 5px"><%= @persona.observacao %></small></label>
+</div>
+</div>

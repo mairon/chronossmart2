@@ -5,6 +5,7 @@ RUN apt-get install -y vim-common
 RUN apt-get install -y nodejs
 RUN apt-get install -y wkhtmltopdf
 RUN apt-get install -y openssl
+RUN apt-get install -y graphviz
 
 ENV TZ="America/Asuncion"
 RUN date

@@ -1,137 +1,235 @@
-
-<html>
-<head>
-  <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-
-  <title>Impressao BalcÃ£o</title>
-</head>
-
 <!-- Required scripts -->
+<script type="text/javascript" src="/qz/js/qz-tray.js"></script>
 <script type="text/javascript" src="/qz/js/dependencies/rsvp-3.1.0.min.js"></script>
+<script src="https://cdn.rawgit.com/kjur/jsrsasign/c057d3447b194fa0a3fdcea110579454898e093d/jsrsasign-all-min.js"></script>
 <script type="text/javascript" src="/qz/js/dependencies/sha-256.min.js"></script>
 
-<script type="text/javascript" src="/qz/js/qz-tray.js"></script>
-
-
 <!-- Pollyfills -->
+<script type="text/javascript" src="/qz/js/sample/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/qz/js/sample/bootstrap.min.js"></script>
+
+
 <script type="text/javascript" src="/qz/js/sample/promise-polyfill-8.1.3.min.js"></script>
 <script type="text/javascript" src="/qz/js/sample/whatwg-fetch-3.0.0.min.js"></script>
 <script type="text/javascript" src="/qz/js/sample/padstart-pollyfill.js"></script>
 <script type="text/javascript" src="/qz/js/sample/array-from-pollyfill.js"></script>
-
-<!-- Page styling -->
-<script type="text/javascript" src="/qz/js/sample/jquery-1.11.3.min.js"></script>
-<script type="text/javascript" src="/qz/js/sample/bootstrap.min.js"></script>
-<link rel="stylesheet" href="/qz/css/font-awesome.min.css" />
-<link rel="stylesheet" href="/qz/css/bootstrap.min.css" />
-<link rel="stylesheet" href="/qz/css/style.css" />
-
-<style type="text/css">
-  @media print {
-    @page {
-      size:240mm 150mm;
-    }
-  }
-
-  td{
-    font-family: Verdana;
-    letter-spacing: 3px;
-    font-size: 11px;
-    margin: 0 !important;
-    padding: 0 !important;
-    text-transform: uppercase;
-  }
-
-  .header{
-    font-size: 15px;
-  }
-</style>
-
-<body id="qz-page" role="document">
-
-  <div id="qz-alert" style="position: fixed; width: 60%; margin: 0 4% 0 36%; z-index: 900;"></div>
-  <div id="qz-pin" style="position: fixed; width: 30%; margin: 0 66% 0 4%; z-index: 900;"></div>
-
-  <div class="container" role="main">
-
-    <% printers = ConfigPrinter.find_by_sql("select descricao, printer from config_printers where processo = 'COMPROVANTE' order by ordem") %>
-
-    <div class="row spread">
-      <div class="col-md-4">
-        <div id="qz-connection" class="panel panel-default" hidden="hidden">
-          <div class="panel-heading2">
-            <button class="close tip" data-toggle="tooltip" title="Launch QZ" id="launch" href="#" onclick="launchQZ();" style="display: none;">
-              <i class="fa fa-external-link"></i>
-            </button>
-            <h3 class="panel-title">
-              Connection: <span id="qz-status" class="text-muted" style="font-weight: bold;">Unknown</span>
-            </h3>
-          </div>
-
-        </div>
-
-        <hr />
-
-        <div class="panel panel-primary">
-          <div class="panel-heading">
-            <h3 class="panel-title">Impressoras</h3>
-          </div>
-
-
-          <% if @venda.vendas_produtos.present? %>
-
-            <div class="panel-body" id="a_imprimir">
-              <div class="form-group">
-
-                <input type="hidden" id="printerSearch" name="printerSearch">
-
-
-                <% printers.each do |p| %>
-                  <button class="set_printer btn btn-info" value="<%= p.printer %>" style="margin: 5px; width: 250px"><%= p.descricao %></button>
-                  <br />
-                <% end %>
-
-              </div>
-            </div>
-
-            <div class="panel-body" id="imprimindo" hidden="hidden">
-              <div class="form-group">
-                <p>Imprimindo...</p>
-              </div>
-            </div>
-          <% else %>
-            <div class="panel-body" id="imprimindo">
-              <div class="form-group">
-                <p>Esta venda nÃ£o possui produtos.</p>
-              </div>
-            </div>
-          <% end %>
-
-        </div>
-      </div>
-    </div>
-  </div>
-</body>
-
+<script src="/qz/assets/signing/sign-message.js"></script>
 
 <script>
-qz.websocket.connect();
-function print(){
-    qz.printers.find("PDFCreator").then((found) => {
-        var config = qz.configs.create(found);
-        var data = [{
-            type: 'pixel',
-            format: 'html',
-            flavor: 'plain',
-            data: "<%= render :partial => "/vendas/eps/comprovante_E05" %>"
-        }];
-        return qz.print(config, data);
-    }).catch((e) => {
-        alert(e);
-    })
-}   
+  qz.websocket.connect();
+
+
+
+  qz.security.setCertificatePromise(function(resolve, reject) {
+     fetch("/qz/assets/signing/digital-certificate.txt", {cache: 'no-store', headers: {'Content-Type': 'text/plain'}})
+        .then(function(data) { data.ok ? resolve(data.text()) : reject(data.text()); });
+  });    
+ 
+
+    /// Connection ///
+    function launchQZ() {
+        if (!qz.websocket.isActive()) {
+            window.location.assign("qz:launch");
+            //Retry 5 times, pausing 1 second between each attempt
+            startConnection({ retries: 5, delay: 1 });
+        }
+    }
+
+    function startConnection(config) {
+        var host = $('#connectionHost').val().trim();
+        var usingSecure = $("#connectionUsingSecure").prop('checked');
+
+        // Connect to a print-server instance, if specified
+        if (host != "" && host != 'localhost') {
+            if (config) {
+                config.host = host;
+                config.usingSecure = usingSecure;
+            } else {
+                config = { host: host, usingSecure: usingSecure };
+            }
+        }
+
+        if (!qz.websocket.isActive()) {
+            updateState('Waiting', 'default');
+
+            qz.websocket.connect(config).then(function() {
+                updateState('Active', 'success');
+                findVersion();
+            }).catch(handleConnectionError);
+        } else {
+            displayMessage('An active connection with QZ already exists.', 'alert-warning');
+        }
+    }
+
+    function endConnection() {
+        if (qz.websocket.isActive()) {
+            qz.websocket.disconnect().then(function() {
+                updateState('Inactive', 'default');
+            }).catch(handleConnectionError);
+        } else {
+            displayMessage('No active connection with QZ exists.', 'alert-warning');
+        }
+    }
+
+
+    function listNetworkDevices() {
+        var listItems = function(obj) {
+            var html = '';
+            var labels = { mac: 'MAC', ip: 'IP', up: 'Up', ip4: 'IPv4', ip6: 'IPv6', primary: 'Primary' };
+
+            Object.keys(labels).forEach(function(key) {
+                if (!obj.hasOwnProperty(key)) { return; }
+                if (key !== 'ip' && obj[key] == obj['ip']) { return; }
+
+                var value = obj[key];
+                if (key === 'mac') { value = obj[key].match(/.{1,2}/g).join(':'); }
+                if (typeof obj[key] === 'object') { value = value.join(', '); }
+
+                html += '<li><strong>' + labels[key] + ':</strong> <code>' + value + '</code></li>';
+            });
+
+            return html;
+        };
+
+        qz.networking.devices().then(function(data) {
+            var list = '';
+
+            for(var i = 0; i < data.length; i++) {
+                var info = data[i];
+
+                if (i == 0) {
+                    list += "<li>" +
+                        "   <strong>Hostname:</strong> <code>" + info.hostname + "</code>" +
+                        "</li>" +
+                        "<li>" +
+                        "   <strong>Username:</strong> <code>" + info.username + "</code>" +
+                        "</li>";
+                }
+                list += "<li>" +
+                    "   <strong>Interface:</strong> <code>" + (info.name || "UNKNOWN") + (info.id ? "</code> (<code>" + info.id + "</code>)" : "</code>") +
+                    "   <ul>" + listItems(info) + "</ul>" +
+                    "</li>";
+            }
+
+            pinMessage("<strong>Network details:</strong><ul>" + list + "</ul>");
+        }).catch(displayError);
+    }
+
+</script>
+<% #impressoes de ticket para cozinha multi destino de impressoras %>
+<% if params[:proc] == 'ticket_cozinha_multi_print' %>
+
+<% set_prints = VendasProduto.joins(:produto).select("produtos.set_print").where("produtos.set_print is not null and produtos.preparacao = true and vendas_produtos.venda_id = #{params[:venda_id]} and vendas_produtos.print = false").group("1") %>
+<div class="row" align="center">
+  <div class="col-md-12">
+    <h1>Impressoras</h1>
+
+    <% ind = 1 %>
+    <% set_prints.each do |sp| %>
+      <p><input type="text" name="" value="<%= sp.set_print %>" id="printere<%= ind %>"></p>
+      <% a = "print#{ind}()" %>
+      <script>  
+        function <%= a %>{
+          qz.printers.find($("#printere<%= ind %>").val()).then((found) => {
+              var config = qz.configs.create(found);
+              var data = [{
+                  type: 'pixel',
+                  format: 'html',
+                  flavor: 'file',
+                  data: "/vendas/<%= params[:venda_id] %>/ticket_cozinha?set_print=" + $("#printere<%= ind %>").val()
+              }];
+              return qz.print(config, data);
+          }).catch((e) => {
+              alert(e);
+          })
+        };
+      </script>
+      <% ind += 1 %>
+    <% end %>
+  </div>
+</div>
+<div class="row" align="center">
+  <div class="col-md-12">
+    <br>
+    <button id="btn-print" class="btn btn-blue">Imprimir</button>   
+  </div>
+</div>
+
+
+<script>  
+  $('#btn-print').click(function() {
+    <% ind = 1 %>
+    <% set_prints.each do |sp| %>
+        <% a = "print#{ind}();" %>
+        <%= a %>
+        <% ind += 1 %>
+    <% end %>
+
+    $.ajax({
+      url: "/vendas/update_set_print",
+      dataType: "json",
+      data: {
+        venda_id: <%= params[:venda_id] %>
+      },
+      success: function( data ) {
+        $.each(data["produtos"], function(index, val) { 
+          window.opener.$("#opener"+ val.id).show();
+                    window.opener.$("#borrar"+ val.id).hide();
+          console.log(val.id)
+        });
+      },
+    });   
+  }); 
+</script>
+<% #impressoes de ticker comprovante venda %>
+<% elsif params[:proc] == 'ticket_comprovante' %>
+
+<% set_prints = ConfigPrinter.where(processo: 'COMPROVANTE_VENDA', unidade_id: current_unidade.id) %>
+<div class="row" align="center">
+    <div class="col-md-12">
+        <h1>Impressoras</h1>
+
+        <% ind = 1 %>
+        <% set_prints.each do |sp| %>
+            <p><input type="text" name="" value="<%= sp.printer %>" id="printere<%= ind %>"></p>
+            <% a = "print#{ind}()" %>
+            <script>    
+                function <%= a %>{
+                  qz.printers.find($("#printere<%= ind %>").val()).then((found) => {
+                      var config = qz.configs.create(found);
+                      var data = [{
+                          type: 'pixel',
+                          format: 'html',
+                          flavor: 'file',
+                          data: "/vendas/<%= params[:venda_id] %>/comprovante01"
+                      }];
+                      return qz.print(config, data);
+                  }).catch((e) => {
+                      alert(e);
+                  })
+                };
+            </script>
+            <% ind += 1 %>
+        <% end %>
+    </div>
+</div>
+<div class="row" align="center">
+    <div class="col-md-12">
+        <br>
+        <button id="btn-print" class="btn btn-blue">Imprimir</button>       
+    </div>
+</div>
+
+
+<script>    
+  $('#btn-print').click(function() {
+      <% ind = 1 %>
+      <% set_prints.each do |sp| %>
+          <% a = "print#{ind}();" %>
+          <%= a %>
+          <% ind += 1 %>
+      <% end %>    
+  });   
 </script>
 
-<button onclick="print();"></button>
-</html>
-
+<% end %>

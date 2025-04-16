@@ -1,0 +1,101 @@
+<div class="panel">
+	<div class="panel-content">
+<%= form_tag "/form_fiscals/contrato_update_ft" do %>
+	<%= hidden_field_tag :cod_proc, @contrato.id %>
+	<%= hidden_field_tag :sigla_proc, 'CT' %>
+	<%= hidden_field_tag :status, 1 %>
+	<%= hidden_field_tag :tipo, 1 %>
+	<%= hidden_field_tag :persona_id, @contrato.persona_id %>
+	<%= hidden_field_tag :cota, 1 %>
+	<%= hidden_field_tag :tipo_op, 9 %>
+	<%= hidden_field_tag :moeda, @contrato.moeda %>
+	<%= hidden_field_tag :data, Time.now.strftime("%d/%m/%Y"), onkeyup: "Formatadata(this,event)", size: 10, required: true %>
+	
+	<% if @contrato.persona.nome_fatura != 'CONSUMIDOR FINAL' or @contrato.persona.nome_fatura != 'CLIENTE OCASIONAL' %>
+		<% ruc = @contrato.persona.ruc %>
+		<% nome = @contrato.persona.nome_fatura %>
+	<% else %>
+		<% ruc = '' %>
+		<% nome = '' %>
+	<% end %>
+	<div class="row">
+		<div class="col-md-3">
+			<label>RUC</label>
+			<%= text_field_tag :ruc, ruc, required: true, class: 'panel-field' %>
+		</div>
+		<div class="col-md-9">
+			<label>Nombre</label>
+			<%= text_field_tag :persona_nome, nome , required: true, class: 'panel-field' %>
+			<%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner-add-prod", width: 21, height: 21, style: "position: relative; left: 300px; top: -34px; display: none;") %>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-3">
+			<label>Monto</label>
+			<%= text_field_tag :tot_gs, @produto_sum_gs.to_i, class: 'panel-field' %>
+		</div>
+
+		<div class="col-md-6">
+			<label>Nº Factura</label>
+			<%= select("busca", "doc", FormFiscal.all(:select => 'id,doc,doc_01,doc_02',:conditions => ["tipo_doc = 1 and status = 0  and terminal_id = #{@contrato.terminal_id} and unidade_id = #{@contrato.unidade_id}"],limit: 100,:order => 'CAST(doc as integer)').collect {|p| [ p.doc_01 << '.' << p.doc_02 << '.' << p.doc, p.id ] },:class => "panel-field") %>
+		</div>
+		<div class="col-md-12">
+			<br>
+			<%= submit_tag " Facturar ", :disable_with => "Aguarde...", :class => "btn btn-green", "data-plus-as-tab" => "false", id: "submit_fatura"  %>
+		</div>
+	</div>
+<% end %>
+
+
+<script>
+  $().ready(function() {
+    // validate signup form on keyup and submit
+    $("form").validate({
+      rules: {
+        ruc: "required",
+        persona_nome: "required"
+        }
+    });
+  });
+
+  $('#modal-faturamento').on('shown.bs.modal', function() {
+    $('#ruc').focus();
+  })
+
+
+
+  	$("#ruc").change(function(){
+  		$("#spinner-add-prod").show("fast")
+      $.ajax({
+          type: 'GET',
+          url:  '/buscas/busca_ruc?ruc=' + $("#ruc").val(),
+          dataType: "JSON",
+          success: function(data) {
+            console.log(data);
+            if (data["fe"]["success"] == true) {
+            	if (data["fe"]["result"].respuesta_codigo == '0502') {
+            		$("#persona_nome").val(data["fe"]["result"].razon_social);
+            	}else{
+            		alert(data["fe"]["result"].respuesta_mensaje)
+            	}
+            }else{
+            	alert(data["fe"]["error"])
+            }
+            $("#spinner-add-prod").hide("fast");
+          }
+      });  		
+  	});
+
+  </script>
+
+  <style>
+  label.error {
+    margin: 0px 10px 0px 10px;
+    width: auto;
+    color: red;
+  }
+  </style>
+
+</div>
+</div>

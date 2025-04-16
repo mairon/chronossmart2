@@ -1,0 +1,51 @@
+<h1 id="header">fatura_imports</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_fatura_import_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Data xml</t>
+            <td>Dnumtim</t>
+            <td>Dest</t>
+            <td>Dpunexp</t>
+            <td>Dnumdoc</t>
+            <td>Dfeemide</t>
+            <td>Cmoneope</t>
+            <td>Drucem</t>
+            <td>Ddvemi</t>
+            <td>Dnomemi</t>
+            <td>Icondope</t>
+            <td>Ddcondope</t>
+            <td>Dplazocre</t>
+            <td>Dtotgralope</t>
+            <td>Persona</t>
+            <td>Colecao</t>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @fatura_imports.each do |fatura_import| %>
+      <tr>
+                  <td><%= fatura_import.dest %></td>
+                  <td><%= fatura_import.dpunexp %></td>
+                  <td><%= fatura_import.dnumdoc %></td>
+                  <td><%= fatura_import.dfeemide %></td>
+                  <td><%= fatura_import.cmoneope %></td>
+                  <td><%= fatura_import.drucem %></td>
+                  <td><%= fatura_import.ddvemi %></td>
+                  <td><%= fatura_import.dnomemi %></td>
+                  <td><%= fatura_import.icondope %></td>
+                  <td><%= fatura_import.ddcondope %></td>
+                  <td><%= fatura_import.dplazocre %></td>
+                  <td><%= fatura_import.dtotgralope %></td>
+                  <td><%= fatura_import.persona_id %></td>
+                  <td><%= fatura_import.colecao_id %></td>
+                <td><%= link_to 'Editar', edit_fatura_import_path(fatura_import) %></td>
+        <td><%= link_to 'Borrar', fatura_import, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

@@ -4,7 +4,7 @@ before_filter :authenticate
 
    def faturas_en_abertas
            @faturas = Cliente.all(:conditions => ["persona_id = ? and liquidacao = 0 and tabela = 'VENDAS_FINANCAS'",params[:persona_id]])
-           render :layout => 'consulta' 
+           render :layout => 'consulta'
     end
 
 
@@ -27,29 +27,44 @@ before_filter :authenticate
         @nota_credito = NotaCredito.find(params[:id])
 
         vendedor = "AND V.VENDEDOR_ID = #{@nota_credito.vendedor_id}"
-        sql = "SELECT VP.id,
-                      V.data,
-                      ((VP.quantidade) - (SELECT SUM(NCD.QUANTIDADE) FROM NOTA_CREDITOS_DETALHES NCD WHERE  NCD.PRODUTO_ID = VP.PRODUTO_ID AND NCD.VENDA_ID = VP.VENDA_ID AND NCD.NOTA_CREDITO_ID = #{@nota_credito.id})) AS QUANTIDADE ,
-                      VP.produto_id,
-                      VP.produto_nome,
-                      VP.taxa,
-                      VP.fabricante_cod,
-                      VP.unitario_dolar,
-                      VP.total_dolar,
-                      VP.iva_dolar,
-                      VP.unitario_guarani,
-                      VP.total_guarani,
-                      VP.iva_guarani,
-                      VP.deposito_id,
-                      VP.deposito_nome,
-                      VP.venda_id 
-            FROM VENDAS_PRODUTOS VP
-            INNER JOIN VENDAS V
-            ON V.ID = VP.VENDA_ID
-            WHERE V.PERSONA_ID = #{@nota_credito.persona_id}
-            ORDER BY V.DATA DESC"
-        
-       @vendas_produtos = VendasProduto.find_by_sql(sql)
+
+        if @nota_credito.origem_proc.to_i == 0
+        unless @nota_credito.documento_id.blank?
+          if @nota_credito.fiscal == 1
+            ff = FormFiscal.where(id: @nota_credito.documento_id).last
+            vd = Venda.where(id: ff.cod_proc).last.id
+          else
+            vd = @nota_credito.documento_id
+          end
+
+          sql = "SELECT VP.id,
+                        V.data,
+                        (COALESCE(VP.quantidade,0) - COALESCE((SELECT SUM(NCD.QUANTIDADE) FROM NOTA_CREDITOS_DETALHES NCD WHERE  NCD.PRODUTO_ID = VP.PRODUTO_ID AND NCD.VENDA_ID = VP.VENDA_ID AND NCD.NOTA_CREDITO_ID = #{@nota_credito.id}),0)) AS QUANTIDADE ,
+                        VP.produto_id,
+                        VP.produto_nome,
+                        VP.taxa,
+                        VP.fabricante_cod,
+                        VP.unitario_dolar,
+                        VP.total_dolar,
+                        VP.iva_dolar,
+                        VP.unitario_guarani,
+                        VP.total_guarani,
+                        VP.iva_guarani,
+                        VP.deposito_id,
+                        VP.deposito_nome,
+                        VP.venda_id
+              FROM VENDAS_PRODUTOS VP
+              INNER JOIN VENDAS V
+              ON V.ID = VP.VENDA_ID
+              WHERE V.PERSONA_ID = #{@nota_credito.persona_id}
+              AND V.ID = #{vd}
+              ORDER BY V.DATA DESC"
+
+              @vendas_produtos = VendasProduto.find_by_sql(sql)
+            end
+          end
+
+
 
       render layout: 'chart'
     end
@@ -64,7 +79,7 @@ before_filter :authenticate
 
     def documentos
         @nota_credito = NotaCredito.find(params[:id])
-        @ncs = FormFiscal.where("sigla_proc = 'CBP' AND cod_proc = #{@nota_credito.id} and status != 0 ").select("id, tot_gs, doc_01, doc_02, doc, status, autorizacao,cdc")
+        @ncs = FormFiscal.where("sigla_proc = 'CBP' AND cod_proc = #{@nota_credito.id} and status != 0 ").select("updated_at, id, tot_gs, doc_01, doc_02, doc, status, autorizacao,cdc")
 
         @total_nota_dolar   = NotaCreditosDetalhe.sum(:total_dolar,   :conditions => ['nota_credito_id = ?',params[:id]])
         @total_nota_guarani = NotaCreditosDetalhe.sum(:total_guarani, :conditions => ['nota_credito_id = ?',params[:id]])
@@ -72,7 +87,7 @@ before_filter :authenticate
         @total_doc_dolar   = NotaCreditosDoc.sum(:valor_dolar,   :conditions => ['nota_credito_id = ?',params[:id]])
         @total_doc_guarani = NotaCreditosDoc.sum(:valor_guarani,   :conditions => ['nota_credito_id = ?',params[:id]])
 
-        if @nota_credito.operacao == 0 
+        if @nota_credito.operacao == 0
           documentos_id = ""
           cond = ""
         end
@@ -159,7 +174,7 @@ before_filter :authenticate
 
         respond_to do |format|
             if @nota_credito.update_attributes(params[:nota_credito])
-              format.html { redirect_to(@nota_credito) }            
+              format.html { redirect_to(@nota_credito) }
             else
               format.html { render :action => "edit" }
             end

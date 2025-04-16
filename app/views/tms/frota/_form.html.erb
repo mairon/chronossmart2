@@ -1,0 +1,52 @@
+
+<div class="group">
+  <%= form_for [:tms, Frotum.new] do |f| %>
+    <div class="row">
+      <div class="col-md-12">
+        <label>Tipo</label>
+        <%= f.radio_button :tipo, 0,  :Checked => "True" %> Proprio
+        <%= f.radio_button :tipo, 1 %> Tercerizado
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label><%= t("owner") %></label>
+        <%= f.collection_select :proprietario_id, Persona.where(tipo_fornecedor: 1).select('id,nome').order('2'), :id, :nome, {:include_blank => true}, {required: true} %>
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <div class="col-md-12">
+        <label><%= t("driver") %></label>
+        <%= f.collection_select :motorista_id, Persona.where(tipo_chofer: 1).select('id,nome').order('2'), :id, :nome, {:include_blank => true}, {required: true} %>
+      </div>
+
+    </div>
+    <div class="row">
+
+      <div class="col-md-12">
+        <label><%= t("plate-horse") %></label>
+        <%= f.collection_select :rodado_cv_id, Rodado.where(tipo: 0).select('id,placa').order('2'), :id, :placa, {:include_blank => true}, {required: true} %>
+      </div>
+
+      <div class="col-md-12">
+        <label><%= t("plate-trailer")%></label>
+        <%= f.collection_select :rodado_cr_id, Rodado.where(tipo: 1).select('id,placa').order('2'), :id, :placa, {:include_blank => true}, {required: true} %>
+      </div>
+
+    </div>    
+   
+    
+    <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to 'Volver', tms_frota_path, :class => "btn back" %>
+    </div>
+
+  <% end %>
+</div>
+<script>
+  $('#frotum_proprietario_id, #frotum_motorista_id, #frotum_rodado_cv_id, #frotum_rodado_cr_id').selectize();
+</script>

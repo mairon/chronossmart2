@@ -1,0 +1,33 @@
+<div class="panel">
+  <h1 id="header">Factura</h1>
+  <table class="head_grid">
+    <tr>
+      <td width="100"><%= t('DOC') %></td>
+      <td width="70" align="right"><%= t('VALUE') %></td>
+    </tr>
+  </table>
+
+  <div class="rolagem" dir="div" style="height: 100px">
+    <table>
+      <% @fts.each do |cobros_nc| %>
+      <% if cobros_nc.status == 2 %>
+        <% color = '#fa3e40' %>
+      <% end %>
+
+        <tr class = "<%= cycle("cor1", "cor2") %>">
+          <td  width="100"  bgcolor="<%=color%>"><%= cobros_nc.doc_01 %>.<%= cobros_nc.doc_02 %>.<%= cobros_nc.doc %></td>
+          <td  width="70"  align="right"  bgcolor="<%=color%>"><%= format_int(cobros_nc.tot_gs) %></td>
+          <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(cobros_nc) %></td>
+          <td><%= link_to 'Impri.', "#",  :onclick => "ComprovanteFC(#{cobros_nc.id})" %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+  <div class="group">
+    <% if Empresa.last.segmento.to_i == 2 %>
+      <%= render partial: "form_fiscals/attr_forms/cobro_update_fc_interes" %>
+    <% else %>
+      <%= render partial: "form_fiscals/attr_forms/cobro_update_fc" %>
+    <% end %>
+  </div>
+</div>

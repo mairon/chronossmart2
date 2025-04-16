@@ -1,54 +1,41 @@
-<style type="text/css">
-  td{
-    font-size: 10px;
-  }
-  .clickable-row{
-    cursor: pointer;
-  }
-</style>
-  <ul class="tabs">
-    <li><a href="#tab1">Lista de Carga - <%= @lista_carga.id.to_s.rjust(6,'0') %></a></li>
-  </ul>
-  <div class="tab_container">
-    <div id="tab1" class="tab_content">
-      <div class="group">
-        <h2 style="padding: 10px">
-          Rodado: <%= @lista_carga.rodado.placa %> | 
-          Capacidad: <%= @lista_carga.rodado.capacidade %> | 
-          Peso Itens: <%= tot_itens = @lista_carga.lista_carga_produtos.joins(:produto).sum("lista_carga_produtos.quantidade * produtos.peso").to_f %> |
-          Capacidad Disponible:
-          <% if @lista_carga.rodado.capacidade.to_f >=  tot_itens.to_f %>
-            <span class="btn-success" ><%= (@lista_carga.rodado.capacidade.to_f - tot_itens.to_f) %></span>
-          <% else %>
-            <span class="btn-danger"><%= (@lista_carga.rodado.capacidade.to_f - tot_itens.to_f) %></span>
-          <% end %>
-          <div style="float:right; margin-top: -8px">
-            <%= link_to 'Adicionar Cobranças', '', class: 'button' %>
-          </div>
-        </h2>
-      </div>
-      <br>
-      <div>
-        <table>
-          <tr>
-           	<td valign="top"><%= render 'pedidos' %></td>
-            <td valign="top"><%= render 'pedido_produtos' %></td>
-         	</tr>
-          <tr>
-            <td colspan="4">
-              <div class="group">
-                <%= render "pedidos_adicionados" %>
-              </div>
-            </td>
-          </tr>
-        </table>
-      </div>
-    </div> 	
-  </div> 	
-  <div class="buttons">
-    <%= link_to 'Editar', edit_lista_carga_path(@lista_carga), :class => "button back" %>
-    <%= link_to 'Rota', '#', :class => "button print", onclick: "ComprovanteRota()" %>
-		<%= link_to 'Finalizar', lista_cargas_path, :class => "button next" %>
+<div class="panel">
+  <h1 id="header">
+    Lista de Carga - <%= @lista_carga.id.to_s.rjust(6,'0') %>
+    <div class="pull-right">
+      <%= link_to 'Editar', edit_lista_carga_path(@lista_carga), :class => "btn btn-blue back" %>
+      <%= link_to 'Rota', '#', :class => "btn btn-blue", onclick: "ComprovanteRota()" %>
+      <%= link_to 'Finalizar', lista_cargas_path, :class => "btn btn-blue  next" %>
+
+      <%= link_to 'Adicionar Cobranças', '', class: 'btn btn-blue ' %>
+    </div>
+  </h1>
+  <div class="panel-content">
+    Rodado: <%= @lista_carga.rodado.placa %> |
+    Capacidad: <%= @lista_carga.rodado.capacidade %> |
+    Peso Itens: <%= tot_itens = @lista_carga.lista_carga_produtos.joins(:produto).sum("lista_carga_produtos.quantidade * produtos.peso").to_f %> |
+    Capacidad Disponible:
+    <% if @lista_carga.rodado.capacidade.to_f >=  tot_itens.to_f %>
+      <span class="btn-success" ><%= (@lista_carga.rodado.capacidade.to_f - tot_itens.to_f) %></span>
+    <% else %>
+      <span class="btn-danger"><%= (@lista_carga.rodado.capacidade.to_f - tot_itens.to_f) %></span>
+    <% end %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-7">
+    <%= render 'pedidos' %>
+  </div>
+  <div class="col-md-5">
+    <% if params[:presupuesto_id].present? %>
+      <%= render 'pedido_produtos' %>
+    <% end %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <%= render "pedidos_adicionados" %>
   </div>
 </div>
 
@@ -63,7 +50,7 @@ function DetalhePedido(pedido){
     window.open('/lista_cargas/' + <%= @lista_carga.id %> + '/produtos_adicionados?pedido=' + pedido, 'Produtos Adicionados', ' SCROLLBARS=YES, TOP=50, LEFT=50, WIDTH=950, HEIGHT=540');
   }
 
-  
+
   function ComprovanteSeparacao(pedido){
     window.open('/lista_cargas/' + <%= @lista_carga.id %> + '/separacao?pedido=' + pedido, 'Separación', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=650, HEIGHT=400');
   }

@@ -12,7 +12,7 @@ class UsersController < ApplicationController
 
 
   def auth
-    @user = User.find_by_email_and_mobile_auth(params[:login], params[:mobile_auth])
+    @user = User.where(email: params[:login], mobile_auth: params[:mobile_auth]).first
     if @user
       render json: {
           status: 'Autenticado',

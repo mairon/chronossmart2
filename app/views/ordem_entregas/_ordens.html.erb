@@ -1,0 +1,39 @@
+<%= link_to ordem_entrega_path(n) do %>
+<div class="card-stepp"  id="card-<%= n.id %>">
+  <div class="card-title" style="border-bottom: 1px solid #000; margin-bottom: 3px;">
+     #<%= n.id.to_s.rjust(6,'0') %>/<%= n.venda_id.to_s.rjust(6,'0') %>
+    <% if n.print_comprovante == true %>
+    <div class="pull-left">
+      <span class="material-symbols-outlined">print_lock</span>
+    </div>
+    <% end %>
+    <div class="card-time"><%= n.created_at.to_datetime.strftime("%d/%m/%y - %H:%M") %></div>
+  </div>
+  <div class="card-cliente">
+    <div class="row">
+      <div class="col-md-6 bold"><%= n.venda.plano.condicao unless n.venda.plano.blank? %></div>
+      <div class="col-md-6 bold" align="right">
+        <% if n.local_retirada == 0 %>
+          Showroom
+        <% elsif n.local_retirada == 1 %>
+          Ret. Deposito
+        <% elsif n.local_retirada == 2 %>
+          Entregar
+        <% end %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6"><span class="material-symbols-outlined">person</span><%= n.persona.nome unless n.persona.blank? %></div>
+      <div class="col-md-6" align="right"><span class="material-symbols-outlined">local_shipping</span><%= n.rodado.placa unless n.rodado.blank? %></div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6"><span class="material-symbols-outlined">supervisor_account</span><%= Persona.find(n.vendedor_id).nome %></div>
+      <div class="col-md-6" align="right"><span class="material-symbols-outlined">inventory_2</span><%= format_peso(n.ordem_entrega_produtos.sum(:quantidade)) %></div>
+    </div>
+
+    <span class="material-symbols-outlined">location_on</span><%= n.persona_locais_entrega.cidade.nome unless n.persona_locais_entrega.blank? %> - <%= n.persona_locais_entrega.direcao unless n.persona_locais_entrega.blank? %> - s<%= n.persona_locais_entrega.obs unless n.persona_locais_entrega.blank? %>
+  </div>
+
+</div>
+<% end %>

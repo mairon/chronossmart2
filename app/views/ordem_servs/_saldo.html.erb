@@ -17,7 +17,7 @@
             <small><%= os.produto.nome %></small>
           </td>
           <% retirado =  OrdemServProd.where(status: false, ordem_serv_id: @ordem_serv.id, produto_id: os.produto_id).sum(:quantidade) %>
-          <td width="30" align="right"><%= (os.quantidade.to_i - retirado.to_i) %></td>
+          <td width="30" align="right"><%= format_peso(os.quantidade.to_f - retirado.to_f) %></td>
           <% if @ordem_serv.moeda.to_i == 0 %>
             <td width="60" align="right"><%= format_decimal(os.valor_us) %></td>
             <% vt += (os.valor_us.to_f * os.quantidade.to_f) %>
@@ -37,7 +37,7 @@
   <div class="col-md-6">
   </div>
   <div class="col-md-6" align="right">
-    <b style="padding-right: 68px"><%= rt.to_i %></b>
+    <b style="padding-right: 68px"><%= format_peso(rt.to_f) %></b>
     <% if @ordem_serv.moeda.to_i == 1 %>
       <b style="padding-right: 38px"><%= format_int(vt.to_i) %></b>
     <% else %>

@@ -1,10 +1,11 @@
    <table class="head_grid">
       <tr>
-        <td width="120">Ref.</td>
+        <td width="100">Ref.</td>
+        <td width="180">Grupo</td>
         <td width="450" >Producto</td>
-        <td width="70" align="right">Cantidad</td>
-        <td width="100" align="right">Unid.</td>
-        <td width="100" align="right">Total</td>
+        <td width="40" align="right">Ctd</td>
+        <td width="80" align="right">Unid.</td>
+        <td width="80" align="right">Total</td>
       </tr>
    </table>
    <div class="rolagem" dir="div">
@@ -18,39 +19,38 @@
          <% presupuesto_produtos.each do |pp| %>
 
             <tr class = "<%= cycle("cor1", "cor2") %>">
-              <td width="120">  <%= pp.fabricante_cod %></td>
+              <td width="100">  <%= pp.produto.fabricante_cod %></td>
+              <td width="180">  <%= pp.produto.grupo.descricao %></td>
               <td width="450" align="left">    <%= pp.produto_nome %></td>
-              <td width="70"  align="right"><b><%= pp.quantidade %></b></td>
+              <td width="70"  align="right"><b><%= format_peso(pp.quantidade) %></b></td>
                <% if @presupuesto.moeda == 0 %>
-                 <td width="100" align="right"><%= format_decimal( pp.unitario_dolar ) %></td>
-                 <td width="100" align="right"><%= format_decimal( pp.total_dolar ) %></td>
+                 <td width="80" align="right"><%= format_decimal( pp.unitario_dolar ) %></td>
+                 <td width="80" align="right"><%= format_decimal( pp.total_dolar ) %></td>
                  <% tot_us += pp.total_dolar %>
                <% elsif @presupuesto.moeda == 1 %>
-                 <td width="100" align="right"><%= format_int( pp.unitario_guarani) %></td>
-                 <td width="100" align="right"><%= format_int( pp.total_guarani) %></td>
+                 <td width="80" align="right"><%= format_int( pp.unitario_guarani) %></td>
+                 <td width="80" align="right"><%= format_int( pp.total_guarani) %></td>
                  <% tot_gs += pp.total_guarani.to_f %>
                  <% tot_cus_gs += (pp.promedio_guarani.to_f * pp.quantidade) %>
                <% else %>
-                 <td width="100" align="right"><%= format_decimal( pp.unitario_real ) %></td>
-                 <td width="100" align="right"><%= format_decimal( pp.total_real ) %></td>
+                 <td width="80" align="right"><%= format_decimal( pp.unitario_real ) %></td>
+                 <td width="80" align="right"><%= format_decimal( pp.total_real ) %></td>
                   <% tot_rs += pp.total_real %>
                <% end %>
-               <td><%= link_to 'Editar', edit_presupuesto_presupuesto_produto_path(presupuesto,pp) %></td>
-
-               <td><%= link_to 'Borrar', [presupuesto,pp], :confirm => 'Tiene Certeza?', :method => :delete %></td>
+                <td><%= link_to '', edit_presupuesto_presupuesto_produto_path(presupuesto,pp), class: 'icon-pencil' %></td>
+                <td><%= link_to '', [presupuesto,pp], :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
                <% qtd += pp.quantidade.to_f %>
             </tr>
             <% indice += 1 %>
          <% end %>
       </table>
-   </div>
-<table class="head_grid">
-  <tr>
-    <td align="right" width="540"></td>
-    <td width="100" align="right"><b><%= qtd %></b> </td>
-    <td width="140" align="right">Total:</td>
-    <td  align="right" width="60">
-      <b>
+    </div>
+    <table class="head_grid">
+      <tr>
+        <td align="right" width="740"></td>
+        <td width="40" align="right"><%= format_peso(qtd) %></td>
+        <td width="80" align="right">Total:</td>
+        <td align="right" width="80">
         <% if @presupuesto.moeda == 0 %>
           <%= format_decimal( tot_us) %>
         <% elsif @presupuesto.moeda == 1 %>
@@ -58,7 +58,6 @@
         <% else %>
           <%= format_decimal( tot_rs )   %>
         <% end %>
-      </b>
-    </td>
-  </tr>
-</table>
+        </td>
+      </tr>
+    </table>

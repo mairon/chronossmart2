@@ -1,0 +1,56 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+        <h1 id="header">Importar Datos</h1>
+
+        <div class="panel-content">
+
+          <%= form_for(@fatura_import) do |f| %>
+            <% if @fatura_import.errors.any? %>
+              <div id="error_explanation">
+                <h2><%= pluralize(@fatura_import.errors.count, "error") %> prohibited this fatura_import from being saved:</h2>
+
+                <ul>
+                <% @fatura_import.errors.full_messages.each do |msg| %>
+                  <li><%= msg %></li>
+                <% end %>
+                </ul>
+              </div>
+            <% end %>
+            <div class="row">
+              <div class="col-md-12">
+                <%= f.text_area :data_xml, placeholder: 'Cole aqui o XML', rows: 10, cols: 50 %>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <label>Marcas</label>
+                <%= f.collection_select :clase_id, Clase.all(:select => 'id,descricao',:order => '2'),
+                      :id,:descricao, {prompt: 'Seleccione la Marca'}, required: true %>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <label><%= t'Colleción' %></label>
+                <%= f.collection_select :colecao_id, SubGrupo.all(:select => 'id,descricao',:order => '2'),
+                        :id,:descricao, {prompt: 'Seleccione la Coleccion'} %>
+              </div>
+            </div>
+
+
+            <div class="footer-buttons">
+              <%= f.submit "Seguir", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+              <%= link_to 'Volver', fatura_imports_path, :class => "btn btn-back" %>
+            </div>
+
+          <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $('#fatura_import_clase_id').selectize();
+  $('#fatura_import_colecao_id').selectize();
+
+</script>

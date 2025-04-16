@@ -18,7 +18,7 @@
 		<%= f.hidden_field :tipo_compra, value: 0 %>
 		<%= f.hidden_field :fiscal, value: '1' %>
 		<%= hidden_field_tag :moeda, '1' %>
-	<% else %>	
+	<% else %>
 		<%= hidden_field_tag :moeda, @compra.moeda %>
 	<% end %>
     <% sql = "SELECT PC.ID,
@@ -30,7 +30,7 @@
               ORDER BY 2"
       plano = PlanoDeConta.find_by_sql(sql)
     %>
-	
+
 
 		<table>
 			<tr>
@@ -79,10 +79,10 @@
         		<label><%= t('CENTER_OF_COSTOS') %></label>
         		<%= f.collection_select :centro_custo_id, CentroCusto.all( :select => 'id,nome', :order  => '1' ),:id, :nome, { :prompt => 'Selecione' } %>
 					</td>
-					
+
 					<td colspan="2">
 		        <label><%= t('CLASSIFICATION') %></label>
-		        <%= f.collection_select :plano_de_conta_id, plano,:id, :descricao,{:prompt => 'Selecione'} %>						
+		        <%= f.collection_select :plano_de_conta_id, plano,:id, :descricao,{:prompt => 'Selecione'} %>
 					</td>
 				</tr>
 
@@ -101,16 +101,17 @@
 				<table class="valores-gs">
 					<tr>
 						<%= field_gs_label 'Exentas Gs',f,:exentas_guarani, style: 'margin-right: 70px' %>
-					</tr>
-					<tr>
 						<%= field_gs_label 'Gravadas 5% Gs',f,:gravadas_05_guarani %>
-					</tr>
-					<tr>
 						<%= field_gs_label 'Gravadas 10% Gs',f, :gravadas_10_guarani %>
 					</tr>
 					<tr>
 						<%= field_gs_label 'Descuento Gs',f,:desconto_guarani %>
+						<% if current_unidade.retencao == true %>
+							<%= field_gs_label 'Retención Gs',f,:retencao_gs %>
+						<% end %>
 						<%= field_gs_label 'Total Gs',f,:total_guarani, readonly: 'readonly' %>
+					</tr>
+					<tr>
 						<%= field_gs_label 'Frete Gs',f,:frete_guarani %>
 						<%= field_gs_label 'Outros Gs',f,:outros_guarani %>
 					</tr>
@@ -119,19 +120,19 @@
 				<table hidden class="valores-us">
 					<tr>
 						<%= field_us_label 'Exentas U$',f,:exentas_dolar, style: 'margin-right: 70px' %>
-					</tr>
-					<tr>
 						<%= field_us_label 'Gravadas 5% U$',f,:gravadas_05_dolar %>
-					</tr>
-					<tr>
 						<%= field_us_label 'Gravadas 10% U$',f, :gravadas_10_dolar %>
 					</tr>
 					<tr>
 						<%= field_us_label 'Descuento U$',f,:desconto_dolar %>
+						<% if current_unidade.retencao == true %>
+							<%= field_us_label 'Retención U$',f,:retencao_us %>
+						<% end %>
 						<%= field_us_label 'Total U$',f,:total_dolar, readonly: 'readonly' %>
+					</tr>
+					<tr>
 						<%= field_us_label 'Frete U$',f,:frete_dolar %>
 						<%= field_us_label 'Outros U$',f,:outros_dolar %>
-
 					</tr>
 				</table>
 
@@ -151,8 +152,13 @@
 						<%= field_us_label 'Frete R$',f,:frete_real %>
 						<%= field_us_label 'Outros R$',f,:outros_real %>
 					</tr>
-				</table>				
+				</table>
 			<table width="100%">
+				<tr>
+					<td>
+						<%= f.check_box :tipo_rateio %> Somar todos los Costos?
+					</td>
+				</tr>
 				<tr>
 					<td>
 						<%= f.text_area :descricao, :rows => 4, placeholder: 'Concepto:', class: 'panel-field' %>
@@ -168,7 +174,7 @@
 
 
 <% if params[:action] == 'new' %>
-	
+
 	<script>
 	  //cotacao
 		$(document).ready(function() {
@@ -222,7 +228,7 @@
 		    $(".valores-rs").show();
 		    $(".valores-us").hide();
 		    $(".valores-gs").hide();
-	   	}			
+	   	}
 		});
 	</script>
 
@@ -250,23 +256,48 @@
 	}
 
   //calc valores
-  $( "#compra_exentas_guarani, #compra_gravadas_05_guarani, #compra_gravadas_10_guarani" ).blur(function() {  
+  $( "#compra_exentas_guarani, #compra_gravadas_05_guarani, #compra_gravadas_10_guarani" ).blur(function() {
   	var exentas_gs = $('#compra_exentas_guarani').val();
   	var grav_05_gs = $('#compra_gravadas_05_guarani').val();
   	var grav_10_gs = $('#compra_gravadas_10_guarani').val();
   	var tot_gs = (parseFloat(exentas_gs.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_05_gs.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_10_gs.replace(/\./g, "").replace(",", ".")) );
   	$('#compra_total_guarani').val(number_format(tot_gs, 0, ',', '.'));
+
+    if (tot_gs >= 1073000){
+      var retencao_gs = ((parseFloat(grav_05_gs.replace(/\./g, "").replace(",", ".")) / 21) + (parseFloat(grav_10_gs.replace(/\./g, "").replace(",", ".")) / 11) ) * 0.70;
+    }else{
+      var retencao_gs = 0
+    };
+
+    <% if current_unidade.retencao == true %>
+      $('#compra_retencao_gs').val(number_format(retencao_gs, 0, ',', '.'));
+    <% end %>
+
   });
 
-  $( "#compra_exentas_dolar, #compra_gravadas_05_dolar, #compra_gravadas_10_dolar" ).blur(function() {  
+  $( "#compra_exentas_dolar, #compra_gravadas_05_dolar, #compra_gravadas_10_dolar" ).blur(function() {
   	var exentas_us = $('#compra_exentas_dolar').val();
   	var grav_05_us = $('#compra_gravadas_05_dolar').val();
   	var grav_10_us = $('#compra_gravadas_10_dolar').val();
   	var tot_us = (parseFloat(exentas_us.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_05_us.replace(/\./g, "").replace(",", ".")) + parseFloat(grav_10_us.replace(/\./g, "").replace(",", ".")) );
   	$('#compra_total_dolar').val(number_format(tot_us, 2, ',', '.'));
+
+
+
+    if (tot_us >= (1073000 / parseFloat($('#compra_cotacao').val().replace(/\./g, "").replace(",", "."))) ) {
+      var retencao_us = (  (parseFloat(grav_05_us.replace(/\./g, "").replace(",", ".")) / 21) + (parseFloat(grav_10_us.replace(/\./g, "").replace(",", ".")) / 11) ) * 0.70;
+    }else{
+      var retencao_us = 0;
+
+    }
+
+    <% if current_unidade.retencao == true %>
+      $('#compra_retencao_us').val(number_format(retencao_us, 2, ',', '.'));
+    <% end %>
+
   });
 
-  $( "#compra_exentas_real, #compra_gravadas_05_real, #compra_gravadas_10_real" ).blur(function() {  
+  $( "#compra_exentas_real, #compra_gravadas_05_real, #compra_gravadas_10_real" ).blur(function() {
   	var exentas_rs = $('#compra_exentas_real').val();
   	var grav_05_rs = $('#compra_gravadas_05_real').val();
   	var grav_10_rs = $('#compra_gravadas_10_real').val();

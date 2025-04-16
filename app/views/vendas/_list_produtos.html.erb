@@ -1,0 +1,84 @@
+<table class="head_grid">
+	<tr>
+		<td width="320">Productos/Servicios</td>
+		<td width="40" align="right">Ctd</td>
+		<td width="80" align="right">Unit </td>
+		<td width="80" align="right">Total </td>
+	</tr>
+</table>
+
+<div class="rolagem lista-produtos" dir="div" style="height:360px">
+	<div id="vendas_produtos">
+		<%  @venda.vendas_produtos.each do |vendas_produto|%>
+		<%= render 'vendas_produtos/vendas_produto', vendas_produto: vendas_produto %>
+		<% end %>
+	</div>
+</div>
+
+<%= render 'sub_totais' %>
+
+<% if @venda.op == false %>
+<script>
+	function OpenUpdateVendasProdutos(id,produto_nome,qtd,unit_gs){
+		$("#ModalUpdateVendasProdutos").modal('show');
+
+		$('#ModalUpdateVendasProdutos').on('shown.bs.modal', function() {
+		  $("#vendas_produto_id").val(id);
+		  $("#label-produto-nome").text(produto_nome);
+		  $("#update_vendas_produto_qtd").val(qtd);
+		  $("#update_vendas_produto_unit_gs").val(unit_gs);
+		  $("#update_vendas_produto_qtd").select();
+
+
+		})
+
+		$("#form_modal_update").submit( function(){
+			$('#qtd_vendas_produtos_' + id).text(number_format($("#update_vendas_produto_qtd").val(),0, ',', '.'));
+			$('#input_quantidade_' + id).val(number_format($("#update_vendas_produto_qtd").val(),0, ',', '.'));
+
+			var tot_gs = ( parseFloat( $("#update_vendas_produto_qtd").val().replace(/\./g, "")) * parseFloat( $("#update_vendas_produto_unit_gs").val().replace(/\./g, "")))
+
+			$('#total_gs_vendas_produtos_' + id).text(number_format(tot_gs,0, ',', '.'));
+			$('#ModalUpdateVendasProdutos').modal('hide');
+		})
+	}
+</script>
+<% end %>
+
+<div class="modal fade" id="ModalUpdateVendasProdutos" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header btn-primary">
+        <h1 style="font-size: 16px; font-weight: bold; color: #fff">
+        <span id="label-produto-nome"></span>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff">
+          <span aria-hidden="true">&times;</span>
+        </button>
+
+      </h1>
+      </div>
+      <div class="modal-body" style="padding: 5px 20px 20px 20px" align="center">
+        <%= form_tag modal_update_vendas_produtos_path, :method => "get", id: "form_modal_update", remote: true do %>
+          <%= hidden_field_tag :vendas_produto_id, nil %>
+
+          <div class="row">
+          	<div class="col-md-12">
+          		<label>Cantidad</label>
+          		<%= text_field_tag :update_vendas_produto_qtd, nil, class: "panel-field" %>
+          		<%= hidden_field_tag :update_vendas_produto_unit_gs, nil %>
+          	</div>
+          </div>
+
+          <div class="row">
+          	<div class="col-md-12">
+          		<br>
+          		<%= submit_tag 'Grabar', id: "submit-update-vendas-produtos", "data-plus-as-tab" => "false", class: 'btn btn-green' %>
+          	</div>
+          </div>
+
+        <% end %>
+					       
+      </div>
+    </div>
+  </div>
+</div>

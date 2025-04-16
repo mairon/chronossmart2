@@ -1,7 +1,6 @@
 
 <% if @venda_config.caixa_separado.to_i == 1 #venda balcao caixa separado %>
 	<a href="javascript:void(0)" class="btn btn-blue" onclick="FechaTela()" id="fecha-venda">Finalizar <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner-fecha-venda", width: 21, height: 21, style: "position: relative; display: none;") %></a>
-
   <% if current_user.tipo.to_i <= 1 %>
     <%= link_to 'Financeiro', financas_venda_path(@venda.id) , :class => "btn btn-default next" %>
   <% end %>
@@ -9,12 +8,48 @@
 	<%= link_to 'Seguir', financas_venda_path(@venda.id) , :class => "btn btn-default next" %>
 <% end %>
 
-<% if @venda.op == true and current_user.tipo != 1 %>
+<% if @venda.op == true %>
   <%= link_to 'Re-Abrir', valida_processo_venda_path(@venda.id) , :class => "btn btn-danger" %>
 <% end %>
+
 <a href="javascript:void(0)" class="btn btn-blue" onClick="ComprovanteVenda()"><%= image_tag('printer.png') %> Comprovante</a>
-<a href="javascript:void(0)" class="btn btn-blue" onClick="TicketCozinha()">Enviar Cocina</a>
-<a class="acao_pedido btn btn-default">Pedidos</a>
+<% if @venda_config.modelo_cp.to_i == 1 %>
+  <a href="javascript:void(0)" class="btn btn-blue" onClick="QzComprovante()"><%= image_tag('printer.png') %> Matricial</a>
+<% end %>
+
+<% if @venda_config.pdv_cozinha == true %>
+  <a href="javascript:void(0)" class="btn btn-blue" onClick="TicketCozinha()">Enviar Cocina</a>
+<% end %>
+
+<% if @venda_config.pedido == true %>
+  <a class="acao_pedido btn btn-default">Pedidos</a>
+
+  <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="myModalPedido">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="close-button">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <h4 class="modal-title us" id="myModalLabel" align="center">Add Pedido</h4>
+        </div>
+        <div class="modal-body" style="padding: 10px 0px 25px 0px">
+          <%= render partial: "/vendas_pedidos/form", locals: {vendas_pedido: VendasPedido.new(venda_id: @venda.id)} %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    $(".acao_pedido").click(function() {
+      $('#myModalPedido').modal('show');
+      $('#myModalPedido').on('shown.bs.modal', function () {
+        $('#vendas_pedido_presupuesto_id').focus();
+      })
+    });
+  </script>
+
+<% end %>
 
 <% if @venda_config.romaneio == true %>
   <a class="acao_rm btn btn-default">Romaneios</a>
@@ -33,8 +68,6 @@
       </div>
     </div>
   </div>
-
-
 <% end %>
 
 
@@ -67,45 +100,41 @@
 
 <% end %>
 
-
-<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="myModalPedido">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="close-button">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+<% if @venda_config.condicional == true %>
+  <a class="acao btn btn-default">Condicional</a>
+  <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="myModal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="close-button">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <h4 class="modal-title us" id="myModalLabel" align="center">Add Condicional</h4>
         </div>
-        <h4 class="modal-title us" id="myModalLabel" align="center">Add Pedido</h4>
-      </div>
-      <div class="modal-body" style="padding: 10px 0px 25px 0px">
-        <%= render partial: "/vendas_pedidos/form", locals: {vendas_pedido: VendasPedido.new(venda_id: @venda.id)} %>
+        <div class="modal-body" style="padding: 10px 0px 25px 0px">
+          <%= render partial: "/vendas_cond_liqs/form", locals: {vendas_cond_liq: VendasCondLiq.new(venda_id: @venda.id)} %>
+        </div>
       </div>
     </div>
   </div>
-</div>
+
+  <script>
+    $(".acao").click(function() {
+      $('#myModal').modal('show');
+      $('#myModal').on('shown.bs.modal', function () {
+        $('#ordem_serv_prod_produto_id').focus();
+      })
+    });
+  </script>
+
+<% end %>
+
 
 <script>
-  $(".acao_pedido").click(function() {
-    $('#myModalPedido').modal('show');
-    $('#myModalPedido').on('shown.bs.modal', function () {
-      $('#vendas_pedido_presupuesto_id').focus();
-    })
-  });
+	function ComprovanteVenda(){
+    window.open('/vendas/' + <%= @venda.id %> + '/comprovante' , '', ' SCROLLBARS=YES, TOP=150, LEFT=100, WIDTH=400, HEIGHT=500');
+	}
 </script>
-
-<% if @venda_config.modelo_cp.to_i == 0 %>
-	<script>
-		function ComprovanteVenda(){
-			window.open('/vendas/' + <%= @venda.id %> + '/comprovante01', '', ' SCROLLBARS=YES, TOP=150, LEFT=100, WIDTH=300, HEIGHT=500');
-		}
-	</script>
-<% else %>
-	<script>
-		function ComprovanteVenda(){
-			window.open('/vendas/' + <%= @venda.id %> + '/comprovante', '', ' SCROLLBARS=YES, TOP=150, LEFT=100, WIDTH=300, HEIGHT=500');
-		}
-	</script>
-<% end %>
 
 <script>
   function TicketCozinha(){
@@ -113,21 +142,21 @@
   }
 
   function FechaTela() {
-    $("#fecha-venda").prop('disabled',true); 
+    $("#fecha-venda").prop('disabled',true);
     $("#spinner-fecha-venda").show("fast");
 
     if ( ($("#venda_cartao_nome").val() == '') ) {
       alert('Agrege la Comanda!');
       $("#venda_cartao_nome").focus();
-    }else if ( ($("#venda_vendedor_id").val() == '' )) {   
+    }else if ( ($("#venda_vendedor_id").val() == '' )) {
       alert('Agrege lo Vendedor!');
-      $("#venda_vendedor_id").focus();    
+      $("#venda_vendedor_id").focus();
     }else{
           $.ajax({url: "/vendas/<%= @venda.id %>/valida_processo",
             type: 'GET',
             beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
             success: function(){
-              window.location.href='/vendas/mapa_mesas'
+              window.location.href='/vendas/new?tipo_venda=0'
             }
         });
     }

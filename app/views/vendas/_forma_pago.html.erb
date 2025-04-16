@@ -28,7 +28,7 @@
 
     <div class="panel-content" align="center" >
       <div class="row">
-        
+
         <div class="col-md-12 content-btns"  align="left">
           <% if @venda_config.caixa_separado == 1 %>
             <a href="/vendas/painel_cobranca_venda" class="btn btn-blue"><%= t('BACK') %></a>
@@ -36,16 +36,16 @@
             <a href="/vendas/<%= @venda.id.to_i %>" class="btn btn-blue"><%= t('BACK') %></a>
           <% end %>
           <%= link_to "Productos", venda_path(@venda.id), class: 'btn btn-blue' %>
-          
+
           <% if Empresa.last.segmento.to_i == 2 %>
             <a href="javascript:void(0)" class="btn btn-blue" onClick="CertificadoVenda()">Certificado Venta</a>
             <a href="javascript:void(0)" class="btn btn-blue" onClick="PagareEscritura()">Pagare Escritura</a>
             <a href="javascript:void(0)" class="btn btn-blue" onClick="PagareUsado()">Pagare Usado</a>
-            <%= link_to 'Contrato', '#', class: 'btn btn-blue', 'data-toggle' => "modal", 'data-target' => "#modal-dados-contrato", 'data-dismiss' => "modal" %>            
+            <%= link_to 'Contrato', '#', class: 'btn btn-blue', 'data-toggle' => "modal", 'data-target' => "#modal-dados-contrato", 'data-dismiss' => "modal" %>
           <% end %>
         </div>
         <div class="col-md-12 content-btns" hidden align="left">
-          <%= render 'btn-financa' %>          
+          <%= render 'btn-financa' %>
         </div>
       </div>
     </div>
@@ -135,7 +135,7 @@
                         <input type="text" class="padrao_height" name="tot_cotas" id="tot_cotas" value="<%= @venda.plano_venda.tot_cotas %>" size="2" />
                       <% else %>
                         /
-                        <input type="text" class="padrao_height" name="tot_cotas" id="tot_cotas" value="1" size="2" />                      
+                        <input type="text" class="padrao_height" name="tot_cotas" id="tot_cotas" value="1" size="2" />
                       <% end %>
                     </div>
                     <div class="col-md-4">
@@ -173,7 +173,7 @@
                 <div class="col-md-12"  id="tr-obs">
                   <br>
                   <%= text_area_tag :obs, nil, placeholder: 'Concepto'  %>
-                </div>                
+                </div>
                 <div class="col-md-12">
                   <br>
                   <%= submit_tag t('SAVE'), :class=>'button add', :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %>
@@ -196,7 +196,7 @@
   }
 
 
-  
+
 
 
   document.onkeydown= function(e) {
@@ -464,6 +464,22 @@ if(e.which == 120){ //F9
 <script>
   function fp(v) {
     $("#forma_pg").val(v);
+
+    if ($("#moeda").val() == '0'){
+      $("#tr-us").show();
+      $("#tr-gs").hide();
+      $("#tr-rs").hide();
+    } else if ($("#moeda").val() == '1'){
+      $("#tr-us").hide();
+      $("#tr-gs").show();
+      $("#tr-rs").hide();
+    }else if ($("#moeda").val() == '2'){
+      $("#tr-us").hide();
+      $("#tr-gs").hide();
+      $("#tr-rs").show();
+    }else if ($("#moeda").val() == '3'){
+    }
+
     if( v == '2'){ // credito
       $('#modal-forma-pagamento').modal('show');
       $('.modal-title').text('CREDITO');
@@ -933,8 +949,8 @@ if(e.which == 120){ //F9
       $("#tr-credito").show();
       $("#tr-local-pago").show();
 
-      $("#cota").val('1');
-      $("#tot_cotas").val('1');
+      $("#cota").val('0');
+      $("#tot_cotas").val('0');
       $("#cheque_status").val('0');
 
       $("#tr-btn-bandeira").hide();

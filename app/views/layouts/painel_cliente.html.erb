@@ -27,8 +27,8 @@
             </button>
             <a href="/painel_cliente" class="navbar-brand"><%= image_tag "logo-bi-w.png", class: 'brand-l' %></a>
         </div>
-        <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">						
-						     	
+        <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
+
 						<ul class="nav navbar-nav navbar-right">
 						  <li class="divider-vertical"></li>
 						  <li class="dropdown">
@@ -62,14 +62,14 @@
       <div>
         <div class="to-print" align="center">
           <%= image_tag "logo-login.png", width: '100' %>
-          <br>          
+          <br>
         </div>
 
         <%= yield :layout %>
         <% session[:modal] = "false" %>
       </div>
     </div>
-    
+
     <div class="footer">
       Copyright © 2011 - <%= Time.now.strftime("%Y") %> - Chronos - Powered by <a href="http://chronos.com.py">Chronos</a>
     </div>

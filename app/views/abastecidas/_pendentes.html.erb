@@ -1,0 +1,40 @@
+  <h2>Pendentes</h2>
+  <div class="acessos">
+    <%= link_to 'Bajados', abastecidas_path(status: '1'), class: 'button' %>
+  </div>
+  <table class="head_grid">
+    <tr>
+      <td width="35"></td>
+      <td width="80">Códgo</td>
+      <td width="80" align="center">Fecha</td>
+      <td width="80" align="center">Hora</td>
+      <td width="300">Frentista</td>
+      <td width="50">Bico</td>
+      <td width="70" align="right">Litros</td>
+      <td width="70" align="right">Precio</td>
+      <td width="70" align="right">Total</td>
+    </tr>
+  </table>
+  <%= form_tag :action => 'atualiza_abastecida', st: '1'  do %>
+  <div class="rolagem" dir="div">
+    <table>
+      <% @abastecidas_pendentes.each do |abastecida| %>
+        <tr class="<%= cycle("cor1", "cor2")%>">
+          <td width="15"><%= check_box_tag "lanz_ids[]", abastecida.id %></td>
+          <td width="80" ><%= abastecida.id.to_s.rjust(6,'0') %></td>
+          <td width="80" align="center"><%= abastecida.data.strftime("%d/%m/%y") %></td>
+          <td width="80" align="center"><%= abastecida.hora.strftime("%H:%M") %></td>
+          <td width="250"><%= abastecida.frentista_nome %></td>
+          <td width="50"><%= abastecida.bico_nome %></td>
+          <td width="70" align="right"><%= abastecida.litros %></td>
+          <td width="70" align="right"><%= number_to_currency(abastecida.preco, :format=>'%n', :precision => 3) %></td>
+          <td width="70" align="right"><%= format_int((abastecida.preco.to_f) * abastecida.litros.to_f) %></td>
+          <% if current_user.tipo == 0 %>
+          <td><%= link_to 'Editar', edit_abastecida_path(abastecida, :pendente => true) %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+  <%= submit_tag "Bajar", class: 'button', :disable_with => "Aguarde..." %>
+  <% end %>

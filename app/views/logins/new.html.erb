@@ -3,7 +3,7 @@
 		<div class="message errormsg" align="center">
 			<a class="close" data-dismiss="alert"></a>
 			<%= flash[:notice] %>
-		</div>	
+		</div>
 	<% end %>
 	<% mult_unidade = Unidade.count(:id) %>
 	<% if Empresa.last.modulo_producao == true %>
@@ -13,9 +13,9 @@
 		</div>
 
 	<% else %>
-	<% if mult_unidade.to_i > 1 %>
+	<% if mult_unidade.to_i > 1 %>ˇ
 	<p>
-		<label><%= t('UNIT') %>:</label><br/>
+		<label>Unidad:</label><br/>
 		<%= text_field_tag( 'unidade',nil,
 	                                    :id       => "unidade",
 	                                    :class    => "text_seach",
@@ -24,9 +24,9 @@
          																										data: 'unidade=' + this.value,
            																									success: function(data){
              																								$('#busca_unidade_id').val(data);} })") %>
-             	
+
 	<%= select( "busca","unidade_id", Unidade.all( :select => 'id,unidade_nome',
-								:order  => 'unidade_nome').collect {|p| [ p.unidade_nome, p.id ] }, 
+								:order  => 'unidade_nome').collect {|p| [ p.unidade_nome, p.id ] },
 	                           												{ :include_blank => true},
 	                           												{:required => true } ) %>
 	</p>
@@ -38,7 +38,7 @@
 		<label>Usuário</label><br />
 		<%= text_field_tag( 'usuario', nil,
 	                                 :id       => "unidade",
-	                                 :class    => "text_seach focus",	                                    
+	                                 :class    => "text_seach focus",
 	                                 :onchange => " $.ajax({url: '/buscas/get_usuario',
 	                                   	 										type: 'POST',
          																									data: 'usuario=' + this.value,
@@ -46,8 +46,8 @@
              																							$('#busca_usuario_id').val(data);} })") %>
 
 	<%= select( "busca", "usuario_id", Usuario.all( :select => 'id,usuario_nome',
-																										 :order  => 'usuario_nome').collect {|p| [ p.usuario_nome, p.id ] }, 
-	                           												 { :include_blank => true},			                      
+																										 :order  => 'usuario_nome').collect {|p| [ p.usuario_nome, p.id ] },
+	                           												 { :include_blank => true},
 		                         												 { :class => '', :required => true } )   %>
 	</p>
 
@@ -61,7 +61,7 @@
 			<%= submit_tag 'Entrar', 'data-disable-with' => "Aguarde...", class: "btn btn-green", id: "submit", "data-plus-as-tab" => "false"  %>
 	</p>
 <% end %>
-		<small style="float:right; margin-top:8px;" > <span class="style3">Powered by</span> <b>Chronos</b>		
+		<small style="float:right; margin-top:8px;" > <span class="style3">Powered by</span> <b>Chronos</b>
 
 <% end %>
 

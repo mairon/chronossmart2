@@ -1,0 +1,94 @@
+<body onload="window.print()">
+<style type="text/css">
+
+	table {
+		font-family: arial;
+		font-size: 12px;
+	}
+</style>
+
+<style type="text/css">
+  .border {
+    border-collapse: collapse;
+    margin-top: 20px !important;
+  }
+ .border  td, .border tr {
+    border: 1px solid black;
+    padding: 5px;
+    font-size: 12px;
+  }
+
+</style>
+
+
+<table  class="border">
+	<tr>
+		<td colspan="2" align="center"><b style="font-size: 18px">Tranf. Saldo <%= @transf_saldo.id.to_s.rjust(6,'0') %></b></td>
+	</tr>
+	<tr>
+		<td colspan="2">Control Caja: <%= @transf_saldo.abertura_caixa_id %></td>
+	</tr>
+
+	<tr>
+		<td colspan="2">Responsable: <%= AberturaCaixa.find( @transf_saldo.abertura_caixa_id).usuario.usuario_nome %></td>
+	</tr>
+
+	<tr>
+		<td colspan="2">Turno: <%= AberturaCaixa.find( @transf_saldo.abertura_caixa_id).turno.nome %></td>
+	</tr>
+
+	<tr>
+		<td width="150">
+			<label>Origin</label><br>
+			<%= Conta.find(@transf_saldo.conta_origem_id).nome %>
+		</td>
+
+		<td width="150">
+			<label>Destino</label><br>
+			<%= Conta.find(@transf_saldo.conta_destino_id).nome %>
+		</td>
+	</tr>
+
+	<tr>
+		<td colspan="2" align="center">
+			<label>Monto</label><br>
+			<b style="font-size: 18px">
+	 			<% if @transf_saldo.moeda == 0 %>
+	 				<span class="us"><%= format_decimal(@transf_saldo.valor) %>U$</span>
+	 			<% elsif @transf_saldo.moeda == 1 %>
+	 			<span class="gs"><%= format_int(@transf_saldo.valor) %>Gs.</span>
+	 			<% elsif @transf_saldo.moeda == 2 %>
+	 				<span class="rs"><%= format_decimal(@transf_saldo.valor) %>R$</span>
+	 			<% end %>
+ 			</b>
+
+ 			<br>
+ 			<br>
+ 			<br>
+ 			<br>
+ 			<br>
+ 			<br>
+ 			________________________________
+ 			<br>
+ 			Firma
+ 			<br>
+ 			<br>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<%= @transf_saldo.obs %>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<label>Hecho por</label><br>
+			<%= Usuario.find(@transf_saldo.usuario_created).usuario_nome %>
+		</td>
+
+
+		<td align="center">
+			<%= @transf_saldo.created_at.strftime("%d/%m/%y - %H:%M")%>
+		</td>
+	</tr>
+</table>

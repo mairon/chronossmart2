@@ -1,0 +1,37 @@
+<%= form_for(PersonaLocaisEntrega.new, remote: true) do |f| %>
+  <%= hidden_field_tag :tabela, 'ORDEM_ENTREGA' %>
+  <%= hidden_field_tag :venda_id, @venda.id %>
+  <%= f.hidden_field :persona_id, value: persona_id %>
+
+  <div class="row">
+    <div class="col-md-12">
+      <label>Ciudad</label>
+          <%= f.collection_select :cidade_id, Cidade.lista_cidade, :id, :nome, {prompt: 'Selecione a cidade'}, {class: 'selectize', required: true} %>
+    </div>
+
+    <div class="col-md-12">
+      <label>Direción</label>
+      <%= f.text_field :direcao, class: "panel-field", required: true %>
+    </div>
+
+    <div class="col-md-12">
+      <br>
+      <%= f.text_area :obs, :rows => 3, placeholder: 'Complemento', class: "panel-field" %>
+    </div>
+
+    <div class="col-md-12">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+    </div>
+  </div>
+
+<% end %>
+<script>
+  $(function () {
+      $('.btn-close').on('click', function () {
+          $('#ModalOeEndereco').hide();
+      })
+  })
+
+  $('#persona_locais_entrega_cidade_id').selectize();
+
+</script>

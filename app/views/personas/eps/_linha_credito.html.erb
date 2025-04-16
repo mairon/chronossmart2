@@ -1,16 +1,12 @@
 <div class="panel">
-  <div class="panel-body">
-    <div class="row">
-      <div class="col-md-10">
-        <h3><%= t('LINE') %> de Credito</h3>
-      </div>
-      <div class="col-md-2">
-        <a class="modalButton-frma panel-icon-right" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-linha-credito">
-          <%= image_tag("icon-edit.png", width: '13') %>
-        </a>
-      </div>
+  <h1 id="header">
+    <%= t('LINE') %> de Credito
+    <div class="pull-right">
+      <a class="btn " data-toggle="modal" data-width="500" data-height="781" data-target="#modal-linha-credito"><i class="icon-plus-sign"></i></a>
     </div>
+  </h1>
 
+  <div class="panel-body">   
     <div class="row">
       <div class="col-md-3">
         <label><%= t('LINE') %></label>

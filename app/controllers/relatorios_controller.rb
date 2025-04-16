@@ -1,22 +1,28 @@
 class RelatoriosController < ApplicationController
 
-    def resultado_rodados
+  def resultado_controle_km
+    params[:unidade] = current_unidade.id
+    @controle_kms = Relatorios.controle_km(params)
+    render :layout => 'relatorio_view'
+  end
 
-        respond_to do |format|
-          format.html do
-            render  :pdf                    => "resultado_rodados",
-                    :layout                 => "layer_relatorios",
-                    :margin => {:top        => '0.90in',
-                                :bottom     => '0.25in',
-                                :left       => '0.10in',
-                                :right      => '0.10in'},
-                    :footer => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
-                                :font_size  => 7,
-                                :right      => "Pagina [page] de [toPage]",
-                                :left       => "CHRONOS SOFTWARE - Fecha de la imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
-          end
+  def resultado_rodados
+
+      respond_to do |format|
+        format.html do
+          render  :pdf                    => "resultado_rodados",
+                  :layout                 => "layer_relatorios",
+                  :margin => {:top        => '0.90in',
+                              :bottom     => '0.25in',
+                              :left       => '0.10in',
+                              :right      => '0.10in'},
+                  :footer => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
+                              :font_size  => 7,
+                              :right      => "Pagina [page] de [toPage]",
+                              :left       => "CHRONOS SOFTWARE - Fecha de la imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
         end
-    end
+      end
+  end
 
 
   def resultado_entrada_modal
@@ -51,33 +57,8 @@ class RelatoriosController < ApplicationController
   end
 
   def resultado_fechamento_caixa
-
-                head = ""
-
-                respond_to do |format|
-                    if params[:tipo] == '1'
-                        format.xls { send_data @condicinais.to_xls }
-                     else
-                        format.html do
-                            render  :pdf                    => "resultado_fechamento_caixa",
-                                            :layout                 => "layer_relatorios",
-
-                                            :margin => {:top        => '0.90in',
-                                                                    :bottom     => '0.25in',
-                                                                    :left       => '0.10in',
-                                                                    :right      => '0.10in'},
-                                            :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
-                                                                    :font_size  => 7,
-                                                                    :left       => head,
-                                                                    :spacing    => 25},
-                                            :footer => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
-                                                                    :font_size  => 7,
-                                                                    :right      => "Pagina [page] de [toPage]",
-                                                                    :left       => "Chronos Smart - Fecha de la imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
-                        end
-                    end
-                end
-        end
+    render :layout => 'relatorio_view'
+  end
 
 	def resultado_ferias
         respond_to do |format|
@@ -1266,7 +1247,7 @@ CC....: #{cc_desc_title}
 		params[:unidade] = current_unidade.id
 
 		@vendas = Relatorios.vendas_produto(params)
-    		
+
 	  if params[:tipo] == '1'
       respond_to do |format|
   	    format.html {
@@ -2144,6 +2125,13 @@ head =
 
 	def resultado_consumicao_interna
 
+
+    if params[:detalhe] == '0'
+      params[:unidade] = current_unidade.id
+      @consumicao_interna = Relatorios.consumicao_interna(params)
+
+    else
+
 			if params[:moeda].to_s == '0'
 					moeda = 'AND MOEDA = 0'
 					md = 'Dolar'
@@ -2154,6 +2142,7 @@ head =
 
 			@consumicao = ConsumicaoInterna.all(:conditions => ["DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{moeda}"])
 
+    end
 
 				head =
 "                                                        #{current_unidade.nome_sys}
@@ -2167,12 +2156,10 @@ head =
 				"
 		respond_to do |format|
 		  if params[:tipo] == '1'
-		    format.html {
-		      xls = render_to_string :action => "resultado_consumicao_interna", :layout => false
-		      kit = PDFKit.new(xls,
-		                       :encoding => 'UTF-8')
-		      send_data(xls,:filename => "resultado_consumicao_interna.xls")
-		    }
+        format.html {
+          render :xlsx => "resultado_consumicao_interna",
+          filename: "Consumicion-Interna-#{params[:inicio]}-#{params[:final]}"
+        }
 		  else
 
 			format.html do
@@ -2198,50 +2185,18 @@ head =
 
 
 
-		def resultado_comissoes
-			params[:unidade] = current_unidade.id
-            @comissaos = Relatorios.comissao(params)
+	def resultado_comissoes
+		params[:unidade] = current_unidade.id
+    @comissaos = Relatorios.comissao(params)
 
-        head =
-                "                                                   #{current_unidade.nome_sys}
-                                                                                                                            Comision 
-- Fecha....: #{params[:inicio]} hasta #{params[:final]}
-
-----------------------------------------------------------------------------------------------------------------------------------------
-    Proceso     Codigo   Doc.          Fech OP      Fecha     Cliente                                             Monto      Comision
------------------------------------------------------------------------------------------------------------------------------------------
-"
-
-
-        respond_to do |format|
-          if params[:tipo] == '1'
-            format.html {
-              xls = render_to_string :action => "resultado_comissoes", :layout => false
-              kit = PDFKit.new(xls,
-                               :encoding => 'UTF-8')
-              send_data(xls,:filename => "resultado_comissoes.xls")
-            }
-          else
-
-            format.html do
-                render  :pdf                    => "resultado_comissoes",
-                                :layout                 => "layer_relatorios",
-                                :margin => {:top        => '1.20in',
-                                                        :bottom     => '0.25in',
-                                                        :left       => '0.10in',
-                                                        :right      => '0.10in'},
-                                :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
-                                                        :font_size  => 7,
-                                                        :left       => head,
-                                                        :spacing    => 25},
-                                :footer => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
-                                                        :font_size  => 7,
-                                                        :right      => "Pagina [page] de [toPage]",
-                                                        :left       => "Chronos Smart - Fecha de la imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
-                end
-            end
-            end
+    if params[:tipo] == '1'
+      render :xlsx => "resultado_rentabilidade",
+      filename: "Rentabilidad-#{params[:inicio]}-#{params[:final]}"
+    else
+      render :layout => 'relatorio_view'
     end
+
+  end
 
 	def resultado_folha_de_pagamento
 		@sueldo = Relatorios.sueldo(params)
@@ -2359,6 +2314,7 @@ head =
     end
 		def resultado_adelantos
 			params[:unidade] = current_unidade.id
+
 			@adelantos = Relatorios.adelantos(params)
 			if params[:status] == '0'
 				if params[:tipo_adelanto] == '0'
@@ -2399,7 +2355,7 @@ else
 end
 respond_to do |format|
 			format.html do
-				render  :pdf                    => "resultado_#{t('DATE')}mento_caixa",
+				render  :pdf                    => "resultado_adelantos",
 								:layout                 => "layer_relatorios",
 								:margin => {:top        => '0.95in',
 														:bottom     => '0.25in',
@@ -2602,7 +2558,7 @@ Cliente                                                           Pedido      Fa
 					 moeda  = 'GUARANIES'
 				end
 
-				
+
 				unless params[:busca]["rodado"].blank?
 					 rd = Rodado.last(:conditions => ["id = #{params[:busca]["rodado"]}"])
 				end
@@ -2617,7 +2573,7 @@ Cliente                                                           Pedido      Fa
 - #{t('DATE')}...: #{params[:inicio]}  #{t('TO')} #{params[:final]}
 - #{t('COIN')}..: #{moeda}
 - Rodado..: #{rd.placa unless params[:busca]["rodados"].blank? }
----------------------------------------------------------------------------------------------------------------------------------------------------------------  
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
 	Cod.     #{t('DATE')}     Doc.              Centro Costo            #{t('PROVIDER')}               #{t('CLASSIFICATION')}                                     Rodado       Valor
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 				"
@@ -2657,7 +2613,7 @@ Cliente                                                           Pedido      Fa
 		respond_to do |format|
       if params[:tipo] == '1'
         format.html {
-          render :xlsx => "resultado_gastos", 
+          render :xlsx => "resultado_gastos",
           filename: "gastos-#{params[:inicio]}-#{params[:final]}"
         }
       else

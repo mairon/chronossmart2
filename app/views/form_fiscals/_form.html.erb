@@ -1,95 +1,82 @@
-<%= form_for(@form_fiscal) do |f| %>
-  <% if @form_fiscal.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@form_fiscal.errors.count, "error") %> prohibited this form_fiscal from being saved:</h2>
+<%= form_for(@form_fiscal) do |f| %>  
+<div class="panel">
+  <h1 id="header">Form Fiscal - [Edicion]</h1>
+  <div class="panel-body">
 
-      <ul>
-      <% @form_fiscal.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-<ul class="tabs">
-      <li><a href="#tab1"> form_fiscals - [Edicion]</a></li>
-</ul>
-
-<div class="tab_container">
-      <div id="tab1" class="tab_content">
-        <table>
-          <tr>
-            <td width="1000">
-              <fieldset>
-
-                <table>
-                  <tr>                                      
-                    <td align="right">Fecha :</td>                    
-                    <td><%= f.date_select :data %></td>
-                                    
-                    <td align="right">Vencimiento :</td>                    
-                    <td><%= f.date_select :vencimento %></td>
-                  </tr>
-                  <tr>
-                      <td align="right">Moneda:</td>                    
-                      <td>
-                      	<%= f.radio_button :moeda, 0 %>U$
-                      	<%= f.radio_button :moeda, 1 %>G$
-                      	<%= f.radio_button :moeda, 2 %>R$
-                      </td>
-                  </tr>
-                  <tr>                
-                      <td align="right">Doc:</td>                    
-                      <td><%= f.text_field :doc_01, size: 5 %>-<%= f.text_field :doc_02, size: 5 %>-<%= f.text_field :doc, size: 15 %></td>
-
-                      <td align="right">timbrado :</td>                    
-                      <td><%= f.text_field :timbrado, size: 15 %></td>
-                  </tr>
-                  <tr>
-                      <td align="right">Status:</td>                    
-                      <td>
-                      	<%= f.radio_button :status, 0 %>Pendente
-                      	<%= f.radio_button :status, 1 %>Activo
-                      	<%= f.radio_button :status, 2 %>Cancelado
-                      </td>
-                                      
-                      <td align="right">Tipo:</td>                    
-                      <td>
-                      	<%= f.radio_button :tipo, 0 %>Contado
-                      	<%= f.radio_button :tipo, 1 %>Credito
-                      </td>
-                  </tr>
-
-                  <tr>
-                      <td align="right">Ruc:</td>                    
-                      <td><%= f.text_field :ruc %></td>
-                                      
-                      <td align="right">Nombre:</td>                    
-                      <td colspan="4"><%= f.text_field :persona_nome, size: 60 %><%= f.number_field :persona_id, size: 5 %></td>
-									</tr>
-									<tr>                                      
-                      <td align="right">Cod Proc:</td>                    
-                      <td><%= f.text_field :cod_proc, size: 5 %></td>
-                                      
-                      <td align="right">Sigla Proc:</td>                    
-                      <td><%= f.text_field :sigla_proc, size: 8 %></td>
-									</tr>
-										
-									<tr>                                      
-                      <td align="right">Grav. 10 G$:</td>                    
-                      <td><%= f.text_field :gv_10_gs, size: 15 %></td>
-                  </tr>                 
-                </table>
-              </fieldset>
-            </td>
-          </tr>
-        </table>
+    <div class="row">
+      <div class="col-md-6">
+        <label>Fecha</label>
+        <%= f.date_select :data %>
       </div>
-      
-      <div class="buttons">
-        <%= f.submit :value => " Grabar ", :class => "button" %>
-        <%= link_to 'Volver', form_fiscals_path, :class => "button back" %>        
+      <div class="col-md-6">
+        <label>Vencimiento</label>
+        <%= f.date_select :vencimento %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <label>Moneda</label>
+        <%= f.radio_button :moeda, 0 %> U$
+        <%= f.radio_button :moeda, 1 %> Gs.
+        <%= f.radio_button :moeda, 2 %> R$
+
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <label>Doc.</label>
+        <%= f.text_field :doc_01, size: 5 %>-<%= f.text_field :doc_02, size: 5 %>-<%= f.text_field :doc, size: 15 %>
+      </div>
+      <div class="col-md-6">
+        <label>Timbrado</label>
+        <%= f.text_field :timbrado, class: 'panel-field' %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <label>Status</label>
+        <%= f.radio_button :status, 0 %> Pendente
+        <%= f.radio_button :status, 1 %> Activo
+        <%= f.radio_button :status, 2 %> Cancelado
       </div>
 
+      <div class="col-md-6">
+        <label>Tipo</label>
+        <%= f.radio_button :tipo, 0 %> Contado
+        <%= f.radio_button :tipo, 1 %> Credito        
+      </div>
     </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <label>RUC/CI</label>
+        <%= f.text_field :ruc, class: 'panel-field' %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <label>Razon Social</label>
+        <%= f.text_field :persona_id, size: 5 %><%= f.text_field :persona_nome, size: '65%' %>        
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <label>Cod Proc.</label>
+        <%= f.text_field :cod_proc, class: 'panel-field' %>
+      </div>
+      <div class="col-md-6">
+        <label>Sigla Proc.</label>
+        <%= f.text_field :sigla_proc, class: 'panel-field' %>
+      </div>
+    </div>
+
+    <div class="footer-buttons">
+      <%= f.submit "Grabar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), form_fiscals_path, :class => "btn btn-back" %>
+    </div>
+  </div>
+</div>
 <% end %>

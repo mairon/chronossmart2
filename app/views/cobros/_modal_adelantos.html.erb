@@ -1,0 +1,63 @@
+
+<div class="group">
+	<div id="pagina"></div>
+</div>
+<script language="javascript">
+  $(".acao_rm").click(function() {
+  	$('#modal_adelantos').modal('show');
+    url="/cobros/lista_adelantos?persona_id=" + <%= @cobro.persona_id %>;
+    ajax(url);  	
+  });
+</script>
+<%= hidden_field_tag :cp_gs, format_int(@fecha_result_gs) %>
+<%= hidden_field_tag :cp_us, format_decimal(@fecha_result_us) %>
+<%= hidden_field_tag :cp_rs, format_decimal(@fecha_result_rs) %>
+<script>
+  function Fecha(saldo_rs, saldo_gs, saldo_us, doc_01, doc_02, doc, moeda){
+
+    if (moeda == '0') {
+      if (eval( parseFloat( $("#cp_us").val().replace(/\./g, "").replace(",", ".") ) < parseFloat( saldo_us.replace(/\./g, "").replace(",", ".") ) )){
+        $('#cobros_financa_valor_guarani').val( $("#cp_gs").val());
+        $('#cobros_financa_valor_dolar').val( $("#cp_us").val());
+        $('#cobros_financa_valor_real').val( $("#cp_rs").val());
+      }else{
+        $('#cobros_financa_valor_guarani').val(saldo_gs);
+        $('#cobros_financa_valor_dolar').val(saldo_us);
+        $('#cobros_financa_valor_real').val(saldo_rs);
+      }
+
+    } else if (moeda == '1') {
+      if (eval( parseFloat( $("#cp_gs").val().replace(/\./g, "").replace(",", ".") ) < parseFloat( saldo_gs.replace(/\./g, "").replace(",", ".") ) )){
+        $('#cobros_financa_valor_guarani').val( $("#cp_gs").val());
+        $('#cobros_financa_valor_dolar').val( $("#cp_us").val());
+        $('#cobros_financa_valor_real').val( $("#cp_rs").val());
+      }else{
+        $('#cobros_financa_valor_guarani').val(saldo_gs);
+        $('#cobros_financa_valor_dolar').val(saldo_us);
+        $('#cobros_financa_valor_real').val(saldo_rs);
+      }
+       
+    } else if (moeda == '2') {
+      if (eval( parseFloat( $("#cp_rs").val().replace(/\./g, "").replace(",", ".") ) < parseFloat( saldo_rs.replace(/\./g, "").replace(",", ".") ) )){
+        $('#cobros_financa_valor_guarani').val( $("#cp_gs").val());
+        $('#cobros_financa_valor_dolar').val( $("#cp_us").val());
+        $('#cobros_financa_valor_real').val( $("#cp_rs").val());
+      }else{
+        $('#cobros_financa_valor_guarani').val(saldo_gs);
+        $('#cobros_financa_valor_dolar').val(saldo_us);
+        $('#cobros_financa_valor_real').val(saldo_rs);
+      }
+       
+
+    };
+    
+    $('#cobros_financa_documento_numero_01').val(doc_01);
+    $('#cobros_financa_documento_numero_02').val(doc_02);
+    $('#cobros_financa_documento_numero').val(doc);
+
+    $('#modal_adelantos').modal('hide');
+   }
+</script>
+
+<%= javascript_include_tag 'busca_ajax' %>
+

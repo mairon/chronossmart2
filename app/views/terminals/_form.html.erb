@@ -32,7 +32,7 @@
 				<tr>
 					<td>
 						<label>Deposito</label>
-						<%= f.collection_select :deposito_id, Deposito.all(:select => 'id,nome', conditions: "unidade_id = #{current_unidade.id} and seta_produto = 0",:order => '2'),:id,:nome, {prompt: 'Seleccione el Deposito'} %>
+						<%= f.collection_select :deposito_id, Deposito.all(:select => 'id,nome', conditions: "unidade_id = #{current_unidade.id}",:order => '2'),:id,:nome, {prompt: 'Seleccione el Deposito'} %>
 					</td>
 				</tr>
 

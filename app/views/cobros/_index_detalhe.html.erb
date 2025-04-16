@@ -6,11 +6,11 @@
       <td width="80" align="center"><%= t('QUOTA') %></td>
       <td width="80" align="center">Venc.</td>
       <td width="120" align="center">Tipo</td>
-      <td width="70" align="right"><%= t('VALUE') %></td>
-      <td width="70" align="right"><%= t('INTEREST') %></td>
-      <td width="70" align="right">Desc.</td>
-      <td width="70" align="right">Saldo</td>
-      <td width="70" align="right">Valor</td>
+      <td width="80" align="right"><%= t('VALUE') %></td>
+      <td width="80" align="right"><%= t('INTEREST') %></td>
+      <td width="80" align="right">Desc.</td>
+      <td width="80" align="right">Saldo</td>
+      <td width="80" align="right">Valor</td>
     </tr>
   </table>
   <div class="rolagem" dir="div" style="height: 150px">
@@ -27,7 +27,7 @@
         <% end %>
         <tr class = "<%= cycle( "cor1", "cor2" )%>">              
           <td width="80"  align="center"><%= cobros_detalhe.data.strftime("%d/%m/%y")%></td>          
-          <td width="100"><%= cobros_detalhe.documento_numero %></td>
+          <td width="100"><%= cobros_detalhe.documento_numero_01 %>•<%= cobros_detalhe.documento_numero_02 %>•<%= cobros_detalhe.documento_numero %></td>
           <td width="80"  align="center"><%= cobros_detalhe.cota %></td>
           <td width="80"  align="center"><%= cobros_detalhe.vencimento.strftime("%d/%m/%y") %></td>
           <td width="120"  align="center">
@@ -38,33 +38,33 @@
             <% end %> 
           </td>
           <% if @cobro.moeda == 0 %>
-             <td width="70" align="right"><%= number_to_currency( cobros_detalhe.valor_dolar, :format =>' %n ', :separator => "," ) %></td>
-             <td width="70" align="right"><%= number_to_currency( cobros_detalhe.interes_dolar, :format =>' %n ', :separator => "," ) %></td>
-             <td width="70" align="right"><%= number_to_currency( cobros_detalhe.desconto_dolar, :format =>' %n ', :separator => "," ) %></td>
-             <td width="70" align="right"><%= number_to_currency( cobros_detalhe.cobro_dolar, :format =>' %n ', :separator => "," ) %></td>
-             <td width="70" align="right"><%= number_to_currency( ((cobros_detalhe.cobro_dolar.to_f + cobros_detalhe.interes_dolar.to_f) - cobros_detalhe.desconto_dolar.to_f), :format =>' %n ', :separator => "," ) %></td>
-             <td width="70" align="right"><%= format_decimal(cobros_detalhe.saldo_perc) %>%</td>
+             <td width="80" align="right"><%= number_to_currency( cobros_detalhe.valor_dolar, :format =>' %n ', :separator => "," ) %></td>
+             <td width="80" align="right"><%= number_to_currency( cobros_detalhe.interes_dolar, :format =>' %n ', :separator => "," ) %></td>
+             <td width="80" align="right"><%= number_to_currency( cobros_detalhe.desconto_dolar, :format =>' %n ', :separator => "," ) %></td>
+             <td width="80" align="right"><%= number_to_currency( cobros_detalhe.cobro_dolar, :format =>' %n ', :separator => "," ) %></td>
+             <td width="80" align="right"><%= number_to_currency( ((cobros_detalhe.cobro_dolar.to_f + cobros_detalhe.interes_dolar.to_f) - cobros_detalhe.desconto_dolar.to_f), :format =>' %n ', :separator => "," ) %></td>
+             <td width="80" align="right"><%= format_decimal(cobros_detalhe.saldo_perc) %>%</td>
              <% valor += cobros_detalhe.valor_dolar.to_f %>
              <% @int   += cobros_detalhe.interes_dolar.to_f %>
              <% desc  += cobros_detalhe.desconto_dolar.to_f %>
              <% saldo += cobros_detalhe.cobro_dolar.to_f %>
           <% elsif @cobro.moeda == 1 %>
-             <td width="70" align="right"><%= number_to_currency( cobros_detalhe.valor_guarani, :format =>' %n ', :precision => 0  ) %></td>
-             <td width="70" align="right"><%= number_to_currency( cobros_detalhe.interes_guarani, :format =>' %n ', :precision => 0  ) %></td>
-             <td width="70" align="right"><%= number_to_currency( cobros_detalhe.desconto_guarani, :format =>' %n ', :precision => 0  ) %></td>
-             <td width="70" align="right"><%= number_to_currency( cobros_detalhe.cobro_guarani, :format =>' %n ', :precision => 0 ) %></td>
-             <td width="70" align="right"><%= number_to_currency( ((cobros_detalhe.cobro_guarani.to_f + cobros_detalhe.interes_guarani.to_f) - cobros_detalhe.desconto_guarani.to_f), :format =>' %n ', :precision => 0 ) %></td>
-             <td width="70" align="right"><%= format_decimal(cobros_detalhe.saldo_perc) %>%</td>
+             <td width="80" align="right"><%= number_to_currency( cobros_detalhe.valor_guarani, :format =>' %n ', :precision => 0  ) %></td>
+             <td width="80" align="right"><%= number_to_currency( cobros_detalhe.interes_guarani, :format =>' %n ', :precision => 0  ) %></td>
+             <td width="80" align="right"><%= number_to_currency( cobros_detalhe.desconto_guarani, :format =>' %n ', :precision => 0  ) %></td>
+             <td width="80" align="right"><%= number_to_currency( cobros_detalhe.cobro_guarani, :format =>' %n ', :precision => 0 ) %></td>
+             <td width="80" align="right"><%= number_to_currency( ((cobros_detalhe.cobro_guarani.to_f + cobros_detalhe.interes_guarani.to_f) - cobros_detalhe.desconto_guarani.to_f), :format =>' %n ', :precision => 0 ) %></td>
+             <td width="80" align="right"><%= format_decimal(cobros_detalhe.saldo_perc) %>%</td>
              <% valor += cobros_detalhe.valor_guarani.to_f %>
              <% @int   += cobros_detalhe.interes_guarani.to_f %>
              <% desc  += cobros_detalhe.desconto_guarani.to_f %>
              <% saldo += cobros_detalhe.cobro_guarani.to_f %>
           <% else %>
-             <td width="70" align="right"><%= number_to_currency( cobros_detalhe.valor_real, :format =>' %n ', :separator => "," ) %></td>
-             <td width="70" align="right"><%= number_to_currency( cobros_detalhe.interes_real, :format =>' %n ', :separator => "," ) %></td>
-             <td width="70" align="right"><%= number_to_currency( cobros_detalhe.desconto_real, :format =>' %n ', :separator => "," ) %></td>
-             <td width="70" align="right"><%= number_to_currency( cobros_detalhe.cobro_real, :format =>' %n ', :separator => "," ) %></td>
-             <td width="70" align="right"><%= number_to_currency( ((cobros_detalhe.cobro_real.to_f + cobros_detalhe.interes_real.to_f) - cobros_detalhe.desconto_real), :format =>' %n ', :separator => "," ) %></td>
+             <td width="80" align="right"><%= number_to_currency( cobros_detalhe.valor_real, :format =>' %n ', :separator => "," ) %></td>
+             <td width="80" align="right"><%= number_to_currency( cobros_detalhe.interes_real, :format =>' %n ', :separator => "," ) %></td>
+             <td width="80" align="right"><%= number_to_currency( cobros_detalhe.desconto_real, :format =>' %n ', :separator => "," ) %></td>
+             <td width="80" align="right"><%= number_to_currency( cobros_detalhe.cobro_real, :format =>' %n ', :separator => "," ) %></td>
+             <td width="80" align="right"><%= number_to_currency( ((cobros_detalhe.cobro_real.to_f + cobros_detalhe.interes_real.to_f) - cobros_detalhe.desconto_real), :format =>' %n ', :separator => "," ) %></td>
              <% valor += cobros_detalhe.valor_real %>
              <% @int  += cobros_detalhe.interes_real %>
              <% desc  += cobros_detalhe.desconto_real %>
@@ -81,16 +81,16 @@
         <td width="540"></td>
         <% if @cobro.moeda == 1 %>
              
-             <td width="70" align="right"><%= number_to_currency( @int, :format =>' %n ', :precision => 0  ) %></td>
-             <td width="70" align="right"><%= number_to_currency( desc, :format =>' %n ', :precision => 0  ) %></td>
-             <td width="70" align="right"><%= number_to_currency( saldo, :format =>' %n ', :precision => 0 ) %></td>
-             <td width="70" align="right"><%= number_to_currency( (saldo.to_f + @int.to_f) - desc.to_f, :format =>' %n ', :precision => 0 ) %></td>
+             <td width="80" align="right"><%= number_to_currency( @int, :format =>' %n ', :precision => 0  ) %></td>
+             <td width="80" align="right"><%= number_to_currency( desc, :format =>' %n ', :precision => 0  ) %></td>
+             <td width="80" align="right"><%= number_to_currency( saldo, :format =>' %n ', :precision => 0 ) %></td>
+             <td width="80" align="right"><%= number_to_currency( (saldo.to_f + @int.to_f) - desc.to_f, :format =>' %n ', :precision => 0 ) %></td>
         <% else %>
              
-             <td width="70" align="right"><%= number_to_currency( @int, :format =>' %n ', :separator => "," ) %></td>
-             <td width="70" align="right"><%= number_to_currency( desc, :format =>' %n ', :separator => "," ) %></td>
-             <td width="70" align="right"><%= number_to_currency( saldo, :format =>' %n ', :separator => "," ) %></td>
-             <td width="70" align="right"><%= number_to_currency( (saldo.to_f + @int.to_f) - desc.to_f, :format =>' %n ', :separator => ",") %></td>
+             <td width="80" align="right"><%= number_to_currency( @int, :format =>' %n ', :separator => "," ) %></td>
+             <td width="80" align="right"><%= number_to_currency( desc, :format =>' %n ', :separator => "," ) %></td>
+             <td width="80" align="right"><%= number_to_currency( saldo, :format =>' %n ', :separator => "," ) %></td>
+             <td width="80" align="right"><%= number_to_currency( (saldo.to_f + @int.to_f) - desc.to_f, :format =>' %n ', :separator => ",") %></td>
         <% end %>    
       </tr>
   </table>

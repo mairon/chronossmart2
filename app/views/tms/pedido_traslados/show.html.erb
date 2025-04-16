@@ -1,0 +1,87 @@
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel">
+        <h1 id="header">
+          Pedido Traslado #<%= @pedido_traslado.cod_ext %>
+          <div class="pull-right">
+            <%= link_to image_tag("icon-edit.png", width: '13'), edit_tms_pedido_traslado_path(@pedido_traslado.id), class: 'btn btn-default' %>
+
+            <%= link_to  tms_pedido_traslados_path, :class => "btn btn-blue" do %>
+              <i class="icon-white icon-chevron-right"></i>
+            <% end %>
+          </div>
+        </h1>
+
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-3">
+              <label>Data Emissão</label>
+              <%= @pedido_traslado.data.strftime("%d/%m/%y") %>
+            </div>
+
+            <div class="col-md-3">
+              <label>Cliente</label>
+              <%= @pedido_traslado.persona.nome %>
+            </div>
+
+            <div class="col-md-3">
+              <label>Moeda</label>
+              <% if @pedido_traslado.moeda.to_i == 0 %>
+                U$
+              <% elsif @pedido_traslado.moeda.to_i == 1 %>
+                Gs.
+              <% elsif @pedido_traslado.moeda.to_i == 2 %>
+                R$.
+              <% end %>
+            </div>
+
+            <div class="col-md-3">
+              <label>Valor</label>
+              <% if @pedido_traslado.moeda.to_i == 0 %>
+                <%=  format_decimal(@pedido_traslado.valor_us) %>
+              <% elsif @pedido_traslado.moeda.to_i == 1 %>
+                <%= format_int(@pedido_traslado.valor_gs) %>
+              <% elsif @pedido_traslado.moeda.to_i == 2 %>
+                <%=  format_decimal(@pedido_traslado.valor_rs) %>
+              <% end %>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-3">
+              <label>Origem</label>
+              <%= Cidade.find(@pedido_traslado.origem_id).nome %>
+            </div>
+
+            <div class="col-md-3">
+              <label>Destino</label>
+              <%= Cidade.find(@pedido_traslado.destino_id).nome %>
+            </div>
+
+            <div class="col-md-3">
+              <label>Tipo</label>
+              <b>
+              <% if @pedido_traslado.tipo == 0 %>
+                Importação
+              <% elsif @pedido_traslado.tipo == 1 %>
+                Exportação
+              <% elsif @pedido_traslado.tipo == 2 %>
+                Nacional
+              <% elsif @pedido_traslado.tipo == 3 %>
+                Frete Terceiro
+              <% end %>
+              </b>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-7">
+      <%= render 'tms/pedido_traslados/ordem_cargas' %>
+    </div>
+    <div class="col-md-5">
+      <%= render 'tms/pedido_traslados/faturar' %>
+      <%= render 'tms/pedido_traslados/doc' %>
+    </div>
+  </div>

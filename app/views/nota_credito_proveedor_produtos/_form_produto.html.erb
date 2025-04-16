@@ -7,28 +7,73 @@
   <%= f.hidden_field :deposito_id %>
   <%= f.hidden_field :deposito_nome %>
   <%= f.hidden_field :unitario_dolar %>
-  <%= f.hidden_field :unitario_guarani %>
   <%= f.hidden_field :unitario_real %>
   <%= f.hidden_field :total_dolar %>
-  <%= f.hidden_field :total_guarani %>
   <%= f.hidden_field :total_real %>
   <%= hidden_field_tag :max_qtd, nil %>
 
   <div class="group">
     <table>
    	  <tr>
-        <td>Producto:</td>
-        <td><%= f.text_field :produto_nome, :size => 85 %></td>
-        <td>Cantidad:</td>
-        <td><%= f.text_field :quantidade, :size => 10, onblur: "ValidMaxQtd()" %></td>
-        <td><%= f.submit t('SAVE'), class: 'btn btn-info' %></td>
+        <td>
+          <label>Producto</label>
+          <%= f.text_field :produto_nome, :size => 65 %>
+        </td>
+        <td>
+          <label>Cantidad</label>
+          <%= f.text_field :quantidade, :size => 10, onblur: "ValidMaxQtd()" %>
+        </td>
+        <% if @nota_credito_proveedor.operacao == 2 %>
+          <td>
+            <label>Desc. Gs</label>
+            <%= f.text_field :desconto_gs, :size => 10, class: "money_gs", dir: "rtl" %>
+          </td>
+
+          <td>
+            <label>Costo Gs</label>
+            <%= f.text_field :custo_gs, :size => 10, class: "money_gs", dir: "rtl" %>
+          </td>
+          <% else %>
+            <%= f.hidden_field :custo_gs, :size => 10, class: "money_gs", dir: "rtl" %>
+          <% end %>
+          <td>
+            <label>Unit. Gs.</label>
+            <%= f.text_field :unitario_guarani, :size => 10, class: "money_gs", dir: "rtl" %>
+          </td>
+          <td>
+            <label>Tot Gs.</label>
+            <%= f.text_field :total_guarani, :size => 10, class: "money_gs", dir: "rtl" %>
+          </td>
+        <td class="padding-btn"><%= f.submit t('SAVE'), class: 'btn btn-info' %></td>
       </tr>
     </table>
   </div>
 <% end %>
 
 <script>
-	
+  <% if @nota_credito_proveedor.operacao == 2 %>
+  $('#nota_credito_proveedor_produto_desconto_gs').change(function() {
+    var custo_gs = eval( parseFloat( $("#nota_credito_proveedor_produto_custo_gs").val().replace(/\./g, "") ) );
+    var desc_gs  = eval( parseFloat( $("#nota_credito_proveedor_produto_desconto_gs").val().replace(/\./g, "") ) );
+    var qtd      = eval( parseFloat( $("#nota_credito_proveedor_produto_quantidade").val().replace(/\./g, "") ) );
+
+    var desc_unit = (desc_gs / qtd)
+
+    $("#nota_credito_proveedor_produto_unitario_guarani").val(  number_format(  (custo_gs - desc_unit),0, ',', '.') );
+    $("#nota_credito_proveedor_produto_total_guarani").val(  number_format(  ((custo_gs - desc_unit) * qtd),0, ',', '.') );
+  });
+  <% else %>
+
+    $('#nota_credito_proveedor_produto_quantidade').change(function() {
+      var custo_gs = eval( parseFloat( $("#nota_credito_proveedor_produto_unitario_guarani").val().replace(/\./g, "") ) );
+      var qtd      = eval( parseFloat( $("#nota_credito_proveedor_produto_quantidade").val().replace(/\./g, "") ) );
+
+      $("#nota_credito_proveedor_produto_total_guarani").val(  number_format(  (custo_gs * qtd ),0, ',', '.') );
+    });
+
+  <% end %>
+
+
 	function ValidMaxQtd(){
 		var max = document.getElementById('max_qtd').value
 		var valor = document.getElementById('nota_credito_proveedor_produto_quantidade').value
@@ -36,6 +81,6 @@
 			alert('Cantidad Major que lo Maximo permitido!');
 			document.getElementById('nota_credito_proveedor_produto_quantidade').value = max
 			document.getElementById('nota_credito_proveedor_produto_quantidade').focus();
-		}		
+		}
 	}
 </script>

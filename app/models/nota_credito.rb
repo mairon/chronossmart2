@@ -34,10 +34,18 @@ class NotaCredito < ActiveRecord::Base
 
 
     def finds
-      s = FormFiscal.find_by_id(self.documento_id);
-      self.documento_numero_01 = s.doc_01.to_s unless self.documento_id.blank?
-      self.documento_numero_02 = s.doc_02.to_s unless self.documento_id.blank?
-      self.documento_numero = s.doc.to_s unless self.documento_id.blank?
+      if self.fiscal.to_i == 1
+        s = FormFiscal.find_by_id(self.documento_id);
+        self.documento_numero_01 = s.doc_01.to_s unless self.documento_id.blank?
+        self.documento_numero_02 = s.doc_02.to_s unless self.documento_id.blank?
+        self.documento_numero = s.doc.to_s unless self.documento_id.blank?
+      else
+        s = Venda.find_by_id(self.documento_id);
+        self.documento_numero_01 = s.documento_numero_01.to_s unless self.documento_id.blank?
+        self.documento_numero_02 = s.documento_numero_01.to_s unless self.documento_id.blank?
+        self.documento_numero = s.documento_numero.to_s unless self.documento_id.blank?
+
+      end
 
     end
 

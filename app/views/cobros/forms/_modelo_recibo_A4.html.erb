@@ -67,15 +67,15 @@
 
 					<td width="350" colspan="2" align="center">
 						<h1><b>RECIBO DE DINERO</b><br></h1>
-						<h2><b><%= @cobro.documento_numero_01 %>-<%= @cobro.documento_numero_02 %>-<%= @cobro.documento_numero.to_s.rjust(8,'0') %></b></h2>
+						<h2><b><%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc.to_s.rjust(8,'0') %></b></h2>
 						<br>
 						<br>	
 						<h1>
 							
 							<% if @cobro.moeda == 0 %>							
-								<b>USD <%= format_decimal(@total_us.to_f) %></b>
+								<b>USD <%= format_decimal(@total_us.to_f - @tot_int_us.to_f) %></b>
 							<% else %>
-								<b>Gs. <%= format_int(@tot_cobro_gs.to_f - @tot_des_gs.to_f )%></b>
+								<b>Gs. <%= format_int(@tot_cobro_gs.to_f - (@tot_des_gs.to_f + @tot_int_gs.to_f) )%></b>
 							<% end %>
 
 						</h1>
@@ -213,9 +213,9 @@
 								</td>
 								<td colspan="2" align="right" width="350">
 									<% if @cobro.moeda == 0 %>							
-								<b><%= format_decimal(@total_us.to_f) %></b>
+								<b><%= format_decimal(@total_us.to_f - @tot_int_us.to_f) %></b>
 							<% else %>
-								<b><%= format_int(@tot_cobro_gs.to_f - @tot_des_gs.to_f )%></b>
+								<b><%= format_int(@tot_cobro_gs.to_f - (@tot_des_gs.to_f + @tot_int_gs.to_f) )%></b>
 							<% end %>
 
 								</td>
@@ -248,31 +248,31 @@
 										<!-- Transf. Bancaria -->
 										<% if cf.forma_pago_id == 15 %>
 											<% if cf.moeda == 0 %>
-											<% tra_u = tra_u + cf.valor_dolar %>
+											<% tra_u = ((tra_u + cf.valor_dolar) - @tot_int_us.to_f ) %>
 											<% else %>
-											<% tra_g = tra_g + cf.valor_guarani %>
+											<% tra_g = ((tra_g + cf.valor_guarani) - @tot_int_gs.to_f ) %>
 											<% end %>
 
 										<!-- Contado -->
 										<% elsif cf.forma_pago_id == 1 %>
 											<% if cf.moeda == 0 %>
-											<% efe_u = efe_u + cf.valor_dolar %>
+											<% efe_u = ((efe_u + cf.valor_dolar) - @tot_int_us.to_f) %>
 											<% else %>
-											<% efe_g = efe_g + cf.valor_guarani %>
+											<% efe_g = ((efe_g + cf.valor_guarani) - @tot_int_gs.to_f) %>
 											<% end %>
 
 										<!-- Cheque ao dia ou cheque diferido -->
 										<% elsif cf.forma_pago_id == 5 or cf.forma_pago_id == 6 %>
 											<% if cf.moeda == 0 %>
-											<% che_u = che_u + cf.valor_dolar %>
+											<% che_u = ((che_u + cf.valor_dolar) - @tot_int_us.to_f) %>
 											<% else %>
-											<% che_g = che_g + cf.valor_guarani %>
+											<% che_g = ((che_g + cf.valor_guarani) - @tot_int_gs.to_f) %>
 											<% end %>
 
 										<!-- Tarjeta credito ou debito -->
 										<% elsif cf.forma_pago_id == 3 or cf.forma_pago_id == 4 %>
 											
-											<% tar_g = tar_g + cf.valor_guarani %>
+											<% tar_g = ((tar_g + cf.valor_guarani) - @tot_int_gs.to_f) %>
 											
 										<% end %>
 								

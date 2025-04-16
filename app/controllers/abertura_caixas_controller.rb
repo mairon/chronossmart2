@@ -1,6 +1,16 @@
 class AberturaCaixasController < ApplicationController
-  # GET /abertura_caixas
-  # GET /abertura_caixas.json
+
+  def modal_detalhe
+    @financas = Financa.where(controle_caixa: params[:abertura_caixa_id], forma_pago_id: params[:forma_pago_id], moeda: params[:moeda]).order(:id)
+
+    render layout: false
+  end
+
+  def print_transf_saldo
+    @transf_saldo = FechamentoCaixaDt.find(params[:id])
+    render :layout => false
+  end
+
   def index
     @abertura_caixas = AberturaCaixa.paginate(:page => params[:page], :per_page => 20).where("unidade_id = #{current_unidade.id} ").order('id desc')
 
@@ -14,30 +24,14 @@ class AberturaCaixasController < ApplicationController
   # GET /abertura_caixas/1.json
   def show
     @abertura_caixa = AberturaCaixa.find(params[:id])
-    sql = "SELECT C.ID,
-                  C.NOME,
-                  C.MOEDA,
-                  (SELECT SUM(F.ENTRADA_DOLAR - F.SAIDA_DOLAR) FROM FINANCAS F WHERE F.MOEDA = C.MOEDA AND F.CONTA_ID = C.ID AND DATA <= '#{@abertura_caixa.data}') AS SALDO_US,
-                  (SELECT SUM(F.ENTRADA_GUARANI - F.SAIDA_GUARANI) FROM FINANCAS F WHERE F.MOEDA = C.MOEDA AND F.CONTA_ID = C.ID AND DATA <= '#{@abertura_caixa.data}') AS SALDO_GS,
-                  (SELECT SUM(F.ENTRADA_REAL - F.SAIDA_REAL) FROM FINANCAS F WHERE F.MOEDA = C.MOEDA AND F.CONTA_ID = C.ID AND DATA <= '#{@abertura_caixa.data}') AS SALDO_RS
-            FROM CONTAS C
-          WHERE C.TERMINAL_ID = #{@abertura_caixa.terminal_id} "
-    @caixas = Financa.find_by_sql(sql)
-    respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @abertura_caixa }
-    end
+    @transf_saldo = FechamentoCaixaDt.where(abertura_caixa_id: @abertura_caixa.id).order("id desc")
+    render layout: 'chart'
   end
 
   # GET /abertura_caixas/new
   # GET /abertura_caixas/new.json
   def new
     @abertura_caixa = AberturaCaixa.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @abertura_caixa }
-    end
   end
 
   # GET /abertura_caixas/1/edit
@@ -53,7 +47,7 @@ class AberturaCaixasController < ApplicationController
 
     respond_to do |format|
       if @abertura_caixa.save
-        format.html { redirect_to abertura_caixas_url }
+        format.html { redirect_to abertura_caixa_path(@abertura_caixa) }
         format.json { render json: @abertura_caixa, status: :created, location: @abertura_caixa }
       else
         format.html { render action: "new" }
@@ -69,7 +63,7 @@ class AberturaCaixasController < ApplicationController
 
     respond_to do |format|
       if @abertura_caixa.update_attributes(params[:abertura_caixa])
-        format.html { redirect_to abertura_caixas_url }
+        format.html { redirect_to abertura_caixa_path(@abertura_caixa) }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }

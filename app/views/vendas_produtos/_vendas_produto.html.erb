@@ -10,7 +10,7 @@
 				<%= image_tag 'icon_print_black.png'%>
 			<% end %>
 			
-			<%= link_to vendas_produto.produto_nome, '#', onclick: "OpenUpdateVendasProdutos(#{vendas_produto.id},'#{vendas_produto.produto_nome}', $('#input_quantidade_#{vendas_produto.id}').val(), $('#input_unit_gs_#{vendas_produto.id}').val() )" %>
+			<%= link_to  "#{vendas_produto.tabela_preco_id} #{vendas_produto.produto_nome}", '#', onclick: "OpenUpdateVendasProdutos(#{vendas_produto.id},'#{vendas_produto.produto_nome}', $('#input_quantidade_#{vendas_produto.id}').val(), $('#input_unit_gs_#{vendas_produto.id}').val() )" %>
 		</td>
 		<td width="20" style="padding:0px !important">
 			<% unless vendas_produto.promo_id.nil? %>

@@ -4,12 +4,13 @@ class FechamentoCaixaDt < ActiveRecord::Base
 	belongs_to :cartao_bandeira
 	before_update :transfere_valores
 
-	#after_create :send_forma_pago_efetivo	
+	#after_create :send_forma_pago_efetivo
 	before_create :finds
+	after_create :send_transf_efetivo
 	before_destroy :destroy_tranf_efetivo
 
 	def destroy_tranf_efetivo
-		if self.forma_pago_id == 1
+		if self.forma_pago_id == 1 or self.forma_pago_id == 17
 			Financa.destroy_all("tabela = 'FECHAMENTO_CAIXAS' and tabela_id = #{self.id} " )
 		end
 	end
@@ -18,6 +19,82 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		if self.forma_pago_id == 17
 			c = Conta.find_by_id(self.conta_origem_id)
 			self.moeda = c.moeda.to_i
+		end
+	end
+
+	def send_transf_efetivo
+		if self.forma_pago_id == 17
+	    if self.moeda.to_i == 0
+	      var_us = self.valor.to_f
+	      var_gs = 0
+	      var_rs = 0
+	      var_ps = 0
+
+	    elsif self.moeda.to_i == 1
+	      var_us = 0
+	      var_gs = self.valor.to_f
+	      var_rs = 0
+	      var_ps = 0
+
+	  	elsif self.moeda.to_i == 2
+	      var_us = 0
+	      var_gs = 0
+	      var_rs = self.valor.to_f
+	      var_ps = 0
+
+	  	elsif self.moeda.to_i == 3
+	      var_us = 0
+	      var_gs = 0
+	      var_rs = 0
+	      var_ps = self.valor.to_f
+	  	end
+
+			ac = AberturaCaixa.find(self.abertura_caixa_id)
+
+				Financa.create(
+ 					cod_proc:        self.abertura_caixa_id,
+					sigla_proc:      'FCS',
+					controle_caixa: self.abertura_caixa_id,
+	        tabela:        'FECHAMENTO_CAIXAS',
+	        tabela_id:     self.id,
+	        data:          ac.data,
+	        diferido:   	 ac.data,
+	        cheque_status: 0,
+	        estado:        0,
+	        status:        1,
+	        conta_id:      self.conta_origem_id,
+	        moeda:         self.moeda,
+	        saida_dolar:   var_us.to_f,
+	      	saida_guarani: var_gs.to_f,
+	    		saida_real:    var_rs.to_f,
+	    		saida_peso:    var_ps.to_f,
+	    		forma_pago_id: 17,
+	    		documento_numero: self.abertura_caixa_id.to_s,
+	      	concepto:      self.obs
+	      )
+
+				Financa.create(
+ 					cod_proc:        self.abertura_caixa_id,
+					sigla_proc:      'FCS',
+					controle_caixa: self.abertura_caixa_id,
+	        tabela:        'FECHAMENTO_CAIXAS',
+	        tabela_id:     self.id,
+	        data:          ac.data,
+	        diferido:   	 ac.data,
+	        cheque_status: 0,
+	        estado:        0,
+	        status:        1,
+	        conta_id:      self.conta_destino_id,
+	        moeda:         self.moeda,
+	        entrada_dolar:   var_us.to_f,
+	      	entrada_guarani: var_gs.to_f,
+	    		entrada_real:    var_rs.to_f,
+	    		entrada_peso:    var_ps.to_f,
+	    		forma_pago_id: 17,
+	    		documento_numero: self.abertura_caixa_id.to_s,
+	      	concepto:      self.obs
+	      )
+
 		end
 	end
 
@@ -64,13 +141,13 @@ class FechamentoCaixaDt < ActiveRecord::Base
 	      var_sis_gs = 0
 	      var_sis_rs = 0
 	      var_sis_ps = self.valor_sis.to_f
-	  	end	
+	  	end
 
 
-				Financa.create( 
+				Financa.create(
  					cod_proc:        fechamento_caixa.id,
 					sigla_proc:      'FCS',
-					controle_caixa: fechamento_caixa.abertura_caixa_id, 
+					controle_caixa: fechamento_caixa.abertura_caixa_id,
 	        tabela:        'FECHAMENTO_CAIXAS',
 	        tabela_id:     self.id,
 	        data:          fechamento_caixa.abertura_caixa.data,
@@ -85,13 +162,13 @@ class FechamentoCaixaDt < ActiveRecord::Base
 	    		saida_real:    var_rs.to_f,
 	    		saida_peso:    var_ps.to_f,
 	    		forma_pago_id: 1,
-	      	concepto:      "TRANSF. SALDO CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+	      	concepto:      "TRANSF. SALDO CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 	      )
 
-				Financa.create( 
+				Financa.create(
 					cod_proc:        fechamento_caixa.id,
-					sigla_proc:      'FCS',					
-					controle_caixa: fechamento_caixa.abertura_caixa_id,  
+					sigla_proc:      'FCS',
+					controle_caixa: fechamento_caixa.abertura_caixa_id,
 	        tabela:          'FECHAMENTO_CAIXAS',
 	        tabela_id:       self.id,
 	        data:            fechamento_caixa.abertura_caixa.data,
@@ -106,7 +183,7 @@ class FechamentoCaixaDt < ActiveRecord::Base
 	      	entrada_guarani: var_gs.to_f,
 	    		entrada_real:    var_rs.to_f,
 	    		entrada_peso:    var_ps.to_f,
-	      	concepto:        "TRANSF. SALDO CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+	      	concepto:        "TRANSF. SALDO CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 	      )
 
 
@@ -114,7 +191,7 @@ class FechamentoCaixaDt < ActiveRecord::Base
 	end
 
 	def transfere_valores
-		if self.valor.to_f > 0 
+		if self.valor.to_f > 0
 			Financa.destroy_all("tabela = 'FECHAMENTO_CAIXAS' and tabela_id = #{self.id} " )
 	    if self.moeda.to_i == 0
 	      var_us = self.valor.to_f
@@ -156,15 +233,15 @@ class FechamentoCaixaDt < ActiveRecord::Base
 	      var_sis_gs = 0
 	      var_sis_rs = 0
 	      var_sis_ps = self.valor_sis.to_f
-	  	end	
+	  	end
 
 
 			if self.forma_pago_id.to_i == 1 #transf saldo caixa
 
-				Financa.create(  
+				Financa.create(
 					cod_proc:        fechamento_caixa.id,
 					sigla_proc:      'FC',
-					controle_caixa: fechamento_caixa.abertura_caixa_id, 
+					controle_caixa: fechamento_caixa.abertura_caixa_id,
 	        tabela:        'FECHAMENTO_CAIXAS',
 	        tabela_id:     self.id,
 	        data:          fechamento_caixa.data,
@@ -178,13 +255,13 @@ class FechamentoCaixaDt < ActiveRecord::Base
 	      	saida_guarani: var_gs.to_f,
 	    		saida_real:    var_rs.to_f,
 	    		saida_peso:    var_ps.to_f,
-	      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+	      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 	      )
 
-				Financa.create( 
+				Financa.create(
 					cod_proc:        fechamento_caixa.id,
 					sigla_proc:      'FC',
-					controle_caixa: fechamento_caixa.abertura_caixa_id,  
+					controle_caixa: fechamento_caixa.abertura_caixa_id,
 	        tabela:          'FECHAMENTO_CAIXAS',
 	        tabela_id:       self.id,
 	        data:            fechamento_caixa.data,
@@ -198,15 +275,15 @@ class FechamentoCaixaDt < ActiveRecord::Base
 	      	entrada_guarani: var_gs.to_f,
 	    		entrada_real:    var_rs.to_f,
 	    		entrada_peso:    var_ps.to_f,
-	      	concepto:        "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+	      	concepto:        "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 	      )
 
         if self.valor.to_f != self.valor_sis.to_f
         	if self.valor_sis.to_f > self.valor.to_f
-						Financa.create( 
+						Financa.create(
 							cod_proc:        fechamento_caixa.id,
 							sigla_proc:      'FC',
-							controle_caixa: fechamento_caixa.abertura_caixa_id,  
+							controle_caixa: fechamento_caixa.abertura_caixa_id,
 			        tabela:          'FECHAMENTO_CAIXAS',
 			        tabela_id:       self.id,
 			        data:            fechamento_caixa.data,
@@ -220,15 +297,15 @@ class FechamentoCaixaDt < ActiveRecord::Base
 			      	saida_guarani:   var_sis_gs.to_f - var_gs.to_f,
 			    		saida_real:      var_sis_rs.to_f - var_rs.to_f,
 			    		saida_peso:      var_sis_ps.to_f - var_ps.to_f,
-			      	concepto:        "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+			      	concepto:        "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 			      )
 					end
 
-        	if self.valor.to_f > self.valor_sis.to_f 
-						Financa.create( 
+        	if self.valor.to_f > self.valor_sis.to_f
+						Financa.create(
 							cod_proc:        fechamento_caixa.id,
 							sigla_proc:      'FC',
-							controle_caixa: fechamento_caixa.abertura_caixa_id,  
+							controle_caixa: fechamento_caixa.abertura_caixa_id,
 			        tabela:          'FECHAMENTO_CAIXAS',
 			        tabela_id:       self.id,
 			        data:            fechamento_caixa.data,
@@ -242,17 +319,17 @@ class FechamentoCaixaDt < ActiveRecord::Base
 			      	entrada_guarani:   var_gs.to_f - var_sis_gs.to_f,
 			    		entrada_real:      var_rs.to_f - var_sis_rs.to_f,
 			    		entrada_peso:      var_ps.to_f - var_sis_ps.to_f,
-			      	concepto:        "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+			      	concepto:        "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 			      )
 					end
 				end
-			#PAGO ANTECIPADO 
+			#PAGO ANTECIPADO
 			elsif self.forma_pago_id.to_i == 16
 
-				Financa.create(  
+				Financa.create(
 					cod_proc:        fechamento_caixa.id,
 					sigla_proc:      'FC',
-					controle_caixa: fechamento_caixa.abertura_caixa_id, 
+					controle_caixa: fechamento_caixa.abertura_caixa_id,
 	        tabela:        'FECHAMENTO_CAIXAS',
 	        tabela_id:     self.id,
 	        data:          fechamento_caixa.data,
@@ -266,13 +343,13 @@ class FechamentoCaixaDt < ActiveRecord::Base
 	      	saida_guarani: var_gs.to_f,
 	    		saida_real:    var_rs.to_f,
 	    		saida_peso:    var_ps.to_f,
-	      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+	      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 	      )
 
-				Financa.create( 
+				Financa.create(
 					cod_proc:        fechamento_caixa.id,
 					sigla_proc:      'FC',
-					controle_caixa: fechamento_caixa.abertura_caixa_id,  
+					controle_caixa: fechamento_caixa.abertura_caixa_id,
 	        tabela:          'FECHAMENTO_CAIXAS',
 	        tabela_id:       self.id,
 	        data:            fechamento_caixa.data,
@@ -286,16 +363,16 @@ class FechamentoCaixaDt < ActiveRecord::Base
 	      	entrada_guarani: var_gs.to_f,
 	    		entrada_real:    var_rs.to_f,
 	    		entrada_peso:    var_ps.to_f,
-	      	concepto:        "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+	      	concepto:        "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 	      )
 
 
 	    #transfere giro
 			elsif self.forma_pago_id.to_i == 18
-				#vendas 
+				#vendas
 				lista_cartao = VendasFinanca.joins(:venda).where("vendas.controle_caixa = #{fechamento_caixa.abertura_caixa_id} and vendas_financas.forma_pago_id = 18")
 				lista_cartao.each do |lc|
-					Financa.create( 
+					Financa.create(
 						cod_proc:        fechamento_caixa.id,
 						sigla_proc:      'FC',
 						documento_numero: lc.nr_comprovante,
@@ -313,10 +390,10 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        saida_dolar:   lc.valor_dolar.to_f,
 		      	saida_guarani: lc.valor_guarani.to_f,
 		    		saida_real:    lc.valor_real.to_f,
-		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 		      )
 
-					Financa.create(  
+					Financa.create(
 						cod_proc:        fechamento_caixa.id,
 						sigla_proc:      'FC',
 						documento_numero: lc.nr_comprovante,
@@ -325,7 +402,7 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        tabela_id:       self.id,
 		        data:            fechamento_caixa.data,
 		        diferido:   		 fechamento_caixa.data,
-		        cartao_bandeira_id: lc.cartao_bandeira_id,    
+		        cartao_bandeira_id: lc.cartao_bandeira_id,
 		        cheque_status:   0,
 		        estado:          0,
 		        status:          1,
@@ -334,14 +411,14 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        entrada_dolar:   lc.valor_dolar.to_f,
 		      	entrada_guarani: lc.valor_guarani.to_f,
 		    		entrada_real:    lc.valor_real.to_f,
-		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 		      )
 	      end
 
-				#cobros 
+				#cobros
 				lista_cartao = CobrosFinanca.joins(:cobro).where("cobros.terminal_id = #{fechamento_caixa.abertura_caixa.terminal_id} and cobros.data = '#{fechamento_caixa.abertura_caixa.data}' and cobros_financas.forma_pago_id = 18")
 				lista_cartao.each do |lc|
-					Financa.create( 
+					Financa.create(
 						cod_proc:        fechamento_caixa.id,
 						sigla_proc:      'FC',
 						documento_numero: lc.nr_comprovante,
@@ -359,10 +436,10 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        saida_dolar:   lc.valor_dolar.to_f,
 		      	saida_guarani: lc.valor_guarani.to_f,
 		    		saida_real:    lc.valor_real.to_f,
-		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 		      )
 
-					Financa.create(  
+					Financa.create(
 						cod_proc:        fechamento_caixa.id,
 						sigla_proc:      'FC',
 						documento_numero: lc.nr_comprovante,
@@ -371,7 +448,7 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        tabela_id:       self.id,
 		        data:            fechamento_caixa.data,
 		        diferido:   		 fechamento_caixa.data,
-		        cartao_bandeira_id: lc.cartao_bandeira_id,	        
+		        cartao_bandeira_id: lc.cartao_bandeira_id,
 		        cheque_status:   0,
 		        estado:          0,
 		        status:          1,
@@ -380,17 +457,17 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        entrada_dolar:   lc.valor_dolar.to_f,
 		      	entrada_guarani: lc.valor_guarani.to_f,
 		    		entrada_real:    lc.valor_real.to_f,
-		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 		      )
 	      end
 
-				
+
 	    #transfere  cartao credito
 			elsif self.forma_pago_id.to_i == 3
-				#vendas 
+				#vendas
 				lista_cartao = VendasFinanca.joins(:venda).where("vendas.controle_caixa = #{fechamento_caixa.abertura_caixa_id} and vendas_financas.forma_pago_id = 3  AND vendas_financas.cartao_bandeira_id = #{self.cartao_bandeira_id}")
 				lista_cartao.each do |lc|
-					Financa.create( 
+					Financa.create(
 						cod_proc:        fechamento_caixa.id,
 						sigla_proc:      'FC',
 						documento_numero: lc.nr_comprovante,
@@ -408,10 +485,10 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        saida_dolar:   lc.valor_dolar.to_f,
 		      	saida_guarani: lc.valor_guarani.to_f,
 		    		saida_real:    lc.valor_real.to_f,
-		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 		      )
 
-					Financa.create(  
+					Financa.create(
 						cod_proc:        fechamento_caixa.id,
 						sigla_proc:      'FC',
 						documento_numero: lc.nr_comprovante,
@@ -420,7 +497,7 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        tabela_id:       self.id,
 		        data:            fechamento_caixa.data,
 		        diferido:   		 fechamento_caixa.data,
-		        cartao_bandeira_id: lc.cartao_bandeira_id,	        
+		        cartao_bandeira_id: lc.cartao_bandeira_id,
 		        cheque_status:   0,
 		        estado:          0,
 		        status:          1,
@@ -429,14 +506,14 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        entrada_dolar:   lc.valor_dolar.to_f,
 		      	entrada_guarani: lc.valor_guarani.to_f,
 		    		entrada_real:    lc.valor_real.to_f,
-		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 		      )
 	      end
 
-				#cobros 
+				#cobros
 				lista_cartao = CobrosFinanca.joins(:cobro).where("cobros.terminal_id = #{fechamento_caixa.abertura_caixa.terminal_id} and cobros.data = '#{fechamento_caixa.abertura_caixa.data}' and cobros_financas.forma_pago_id = 3 AND cobros_financas.cartao_bandeira_id = #{self.cartao_bandeira_id}")
 				lista_cartao.each do |lc|
-					Financa.create( 
+					Financa.create(
 						cod_proc:        fechamento_caixa.id,
 						sigla_proc:      'FC',
 						documento_numero: lc.nr_comprovante,
@@ -454,10 +531,10 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        saida_dolar:   lc.valor_dolar.to_f,
 		      	saida_guarani: lc.valor_guarani.to_f,
 		    		saida_real:    lc.valor_real.to_f,
-		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 		      )
 
-					Financa.create(  
+					Financa.create(
 						cod_proc:        fechamento_caixa.id,
 						sigla_proc:      'FC',
 						documento_numero: lc.nr_comprovante,
@@ -466,7 +543,7 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        tabela_id:       self.id,
 		        data:            fechamento_caixa.data,
 		        diferido:   		 fechamento_caixa.data,
-		        cartao_bandeira_id: lc.cartao_bandeira_id,	        
+		        cartao_bandeira_id: lc.cartao_bandeira_id,
 		        cheque_status:   0,
 		        estado:          0,
 		        status:          1,
@@ -475,7 +552,7 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        entrada_dolar:   lc.valor_dolar.to_f,
 		      	entrada_guarani: lc.valor_guarani.to_f,
 		    		entrada_real:    lc.valor_real.to_f,
-		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 		      )
 	      end
 
@@ -486,7 +563,7 @@ class FechamentoCaixaDt < ActiveRecord::Base
 
 				lista_cartao = VendasFinanca.joins(:venda).where("vendas.controle_caixa = #{fechamento_caixa.abertura_caixa_id} and vendas_financas.forma_pago_id = 4  AND vendas_financas.cartao_bandeira_id = #{self.cartao_bandeira_id}")
 				lista_cartao.each do |lc|
-					Financa.create( 
+					Financa.create(
 						cod_proc:        fechamento_caixa.id,
 						sigla_proc:      'FC',
 						documento_numero: lc.nr_comprovante,
@@ -504,10 +581,10 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        saida_dolar:   lc.valor_dolar.to_f,
 		      	saida_guarani: lc.valor_guarani.to_f,
 		    		saida_real:    lc.valor_real.to_f,
-		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 		      )
 
-					Financa.create(  
+					Financa.create(
 						cod_proc:        fechamento_caixa.id,
 						sigla_proc:      'FC',
 						documento_numero: lc.nr_comprovante,
@@ -516,7 +593,7 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        tabela_id:       self.id,
 		        data:            fechamento_caixa.data,
 		        diferido:   		 fechamento_caixa.data,
-		        cartao_bandeira_id: lc.cartao_bandeira_id,	        
+		        cartao_bandeira_id: lc.cartao_bandeira_id,
 		        cheque_status:   0,
 		        estado:          0,
 		        status:          1,
@@ -525,14 +602,14 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        entrada_dolar:   lc.valor_dolar.to_f,
 		      	entrada_guarani: lc.valor_guarani.to_f,
 		    		entrada_real:    lc.valor_real.to_f,
-		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 		      )
 	      end
 
       	#cobros
 				lista_cartao = CobrosFinanca.joins(:cobro).where("cobros.terminal_id = #{fechamento_caixa.abertura_caixa.terminal_id} and cobros.data = '#{fechamento_caixa.abertura_caixa.data}' AND cobros_financas.forma_pago_id = 4 AND cobros_financas.cartao_bandeira_id = #{self.cartao_bandeira_id}")
 				lista_cartao.each do |lc|
-					Financa.create( 
+					Financa.create(
 						cod_proc:        fechamento_caixa.id,
 						sigla_proc:      'FC',
 						documento_numero: lc.nr_comprovante,
@@ -550,10 +627,10 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        saida_dolar:   lc.valor_dolar.to_f,
 		      	saida_guarani: lc.valor_guarani.to_f,
 		    		saida_real:    lc.valor_real.to_f,
-		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 		      )
 
-					Financa.create(  
+					Financa.create(
 						cod_proc:        fechamento_caixa.id,
 						sigla_proc:      'FC',
 						documento_numero: lc.nr_comprovante,
@@ -562,7 +639,7 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        tabela_id:       self.id,
 		        data:            fechamento_caixa.data,
 		        diferido:   		 fechamento_caixa.data,
-		        cartao_bandeira_id: lc.cartao_bandeira_id,	        
+		        cartao_bandeira_id: lc.cartao_bandeira_id,
 		        cheque_status:   0,
 		        estado:          0,
 		        status:          1,
@@ -571,7 +648,7 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        entrada_dolar:   lc.valor_dolar.to_f,
 		      	entrada_guarani: lc.valor_guarani.to_f,
 		    		entrada_real:    lc.valor_real.to_f,
-		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+		      	concepto:      "TRANSF. CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 		      )
 	      end
 
@@ -581,7 +658,7 @@ class FechamentoCaixaDt < ActiveRecord::Base
 
 				lista_cartao = VendasFinanca.joins(:venda).where("vendas.controle_caixa = #{fechamento_caixa.abertura_caixa_id} and vendas_financas.forma_pago_id = 15")
 				lista_cartao.each do |lc|
-					Financa.create( 
+					Financa.create(
 						cod_proc:        fechamento_caixa.id,
 						sigla_proc:      'FC',
 						documento_numero: lc.nr_comprovante,
@@ -598,10 +675,10 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        saida_dolar:   lc.valor_dolar.to_f,
 		      	saida_guarani: lc.valor_guarani.to_f,
 		    		saida_real:    lc.valor_real.to_f,
-		      	concepto:      "TRANSF BANCARIA #{lc.persona_nome} CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+		      	concepto:      "TRANSF BANCARIA #{lc.persona_nome} CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 		      )
 
-					Financa.create(  
+					Financa.create(
 						cod_proc:        fechamento_caixa.id,
 						sigla_proc:      'FC',
 						documento_numero: lc.nr_comprovante,
@@ -618,14 +695,14 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        entrada_dolar:   lc.valor_dolar.to_f,
 		      	entrada_guarani: lc.valor_guarani.to_f,
 		    		entrada_real:    lc.valor_real.to_f,
-		      	concepto:      "TRANSF BANCARIA #{lc.persona_nome} CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+		      	concepto:      "TRANSF BANCARIA #{lc.persona_nome} CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 		      )
 	      end
 
       	#cobros
 				lista_cartao = CobrosFinanca.joins(:cobro).where("cobros.terminal_id = #{fechamento_caixa.abertura_caixa.terminal_id} and cobros.data = '#{fechamento_caixa.abertura_caixa.data}' AND cobros_financas.forma_pago_id = 15")
 				lista_cartao.each do |lc|
-					Financa.create( 
+					Financa.create(
 						cod_proc:        fechamento_caixa.id,
 						sigla_proc:      'FC',
 						documento_numero: lc.nr_comprovante,
@@ -642,10 +719,10 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        saida_dolar:   lc.valor_dolar.to_f,
 		      	saida_guarani: lc.valor_guarani.to_f,
 		    		saida_real:    lc.valor_real.to_f,
-		      	concepto:      "TRANSF BANCARIA #{lc.persona_nome} CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+		      	concepto:      "TRANSF BANCARIA #{lc.persona_nome} CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 		      )
 
-					Financa.create(  
+					Financa.create(
 						cod_proc:        fechamento_caixa.id,
 						sigla_proc:      'FC',
 						documento_numero: lc.nr_comprovante,
@@ -662,7 +739,7 @@ class FechamentoCaixaDt < ActiveRecord::Base
 		        entrada_dolar:   lc.valor_dolar.to_f,
 		      	entrada_guarani: lc.valor_guarani.to_f,
 		    		entrada_real:    lc.valor_real.to_f,
-		      	concepto:      "TRANSF BANCARIA #{lc.persona_nome} CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome 
+		      	concepto:      "TRANSF BANCARIA #{lc.persona_nome} CIERRE DE CAJA " << fechamento_caixa.abertura_caixa_id.to_s << " RESPONSABLE " << fechamento_caixa.abertura_caixa.usuario.usuario_nome
 		      )
 	      end
 

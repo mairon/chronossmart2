@@ -1,6 +1,26 @@
 ﻿class VendasController < ApplicationController
   before_filter :authenticate, :except => [:ticket_cozinha, :comprovante01]
 
+  def entregas_pendentes
+    render layout: 'chart'
+  end
+
+  def entregas_pendentes_busca
+    params[:unidade_id] = current_unidade.id
+    @vendas_pendentes = ListaCarga.pedido_pendentes(params)
+    render layout: false
+  end
+
+  def modal_ordem_entrega
+    @venda  = Venda.find(params[:id])
+    params[:presupuesto_id] = @venda.id
+    params[:data] = @venda.data
+    @pedido_produtos = ListaCarga.pedido_produtos(params)
+    @lista_carga_produtos = ListaCargaProduto.where(venda_id: @venda.id)
+
+    render layout: false
+  end
+
   def pagare_usado
     @venda           = Venda.find(params[:id])
     @produtos        = VendasProduto.all(:conditions => ['venda_id = ?',params[:id]],:order => 'id' )
@@ -39,7 +59,7 @@
                 :footer => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
                             :font_size  => 7}
       end
-    end    
+    end
   end
 
   def certificado_venda
@@ -75,7 +95,7 @@
     @venda = Venda.find(params[:id])
     render :layout => false
   end
-  
+
   def devolucaos
     @venda = Venda.find(params[:id])
 
@@ -109,10 +129,11 @@
     vp = []
     params["itens"].each do |p|
 
-     vp_create = VendasProduto.create(venda_id: params[:venda_id], 
-        moeda: params[:moeda], 
+     vp_create = VendasProduto.create(venda_id: params[:venda_id],
+        moeda: params[:moeda],
         data: params[:data],
-        deposito_id: Deposito.where(unidade_id: current_unidade.id, seta_produto: 1).first.id,
+        op: false,
+        deposito_id: Deposito.where(unidade_id: current_unidade.id, seta_produto: 0).first.id,
         produto_id: p.last["produto_id"],
         produto_nome: p.last["produto_nome"],
         quantidade: p.last["quantidade"],
@@ -121,7 +142,7 @@
         total_guarani: (p.last["preco"].to_f *  p.last["quantidade"].to_f ),
 
       )
-     
+
      vp += [vp_create.id]
 
      puts "___________#{vp}"
@@ -208,12 +229,12 @@
     @vendas_pendentes = Venda.paginate_by_sql(sql, page: params[:page], :per_page => 35)
   end
 
-  def painel_cobranca_venda   
+  def painel_cobranca_venda
   end
- 
+
 
   def busca_painel_cobranca_venda
-    cm = "AND CT.NOME = '#{params[:filtro_comanda]}'" unless params[:filtro_comanda].blank?
+    cm = "AND V.ID = '#{params[:filtro_comanda]}'" unless params[:filtro_comanda].blank?
     sql = "SELECT V.ID,
                   VD.NOME AS VENDEDOR,
                   V.DATA,
@@ -247,7 +268,7 @@
 
     @venda = Venda.find_by_sql("SELECT SUM(TOTAL_GUARANI) AS TOT_GUARANI,
                                        SUM(TOTAL_DOLAR) AS TOT_DOLAR
-                                FROM VENDAS_PRODUTOS 
+                                FROM VENDAS_PRODUTOS
                                 WHERE VENDA_ID = #{params[:venda_id]}").first
 
     persona = "SELECT C.DOCUMENTO_NUMERO_01,
@@ -257,8 +278,8 @@
                 SUM(C.COBRO_DOLAR) AS COBRO_DOLAR,
                 SUM(C.DIVIDA_GUARANI) AS DIVIDA_GUARANI,
                 SUM(C.COBRO_GUARANI) AS COBRO_GUARANI
-            FROM CLIENTES C  
-            
+            FROM CLIENTES C
+
             WHERE C.LIQUIDACAO = 0
             AND C.FORMA_PAGO_ID = 12
             AND C.PERSONA_ID = #{params[:persona_id]}
@@ -271,7 +292,7 @@
 
   def verifica_financas
     fin = Venda.find_by_sql("SELECT COUNT(ID) FROM VENDAS_FINANCAS WHERE VENDA_ID = #{params[:venda_id]}").first
- 
+
     return render :text => fin.count
   end
 
@@ -300,7 +321,6 @@
                V.CREATED_AT,
                V.NOME_REF,
                CT.NOME AS CARTAO_NOME,
-               S.NOME AS SETOR_NOME,
                (SELECT SUM(VF.ID) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID) AS FIN,
                (SELECT SUM(VP.QUANTIDADE) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID) AS QTD,
                (SELECT SUM(VP.TOTAL_GUARANI) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID) AS TOT_GS,
@@ -312,10 +332,6 @@
         LEFT JOIN CARTAOS CT
         ON CT.ID = V.CARTAO_ID
 
-        LEFT JOIN SETORS S
-        ON S.ID = V.SETOR_ID
-
-
         WHERE CT.UNIDADE_ID = #{current_unidade.id} and coalesce((SELECT SUM(VP.QUANTIDADE) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID),0) > 0
         AND coalesce((SELECT SUM(VF.ID) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID),0) = 0
 
@@ -326,7 +342,7 @@
 
     if current_unidade.id.to_i == 1
     sql = "
-          SELECT V.ID, 
+          SELECT V.ID,
                  C.NOME AS CARTAO_NOME,
                  VP.PRODUTO_NOME,
                  VP.QUANTIDADE,
@@ -343,16 +359,16 @@
 
           INNER JOIN PRODUTOS P
           ON P.ID = VP.PRODUTO_ID
-            
+
           WHERE V.UNIDADE_ID = 10 AND VP.STATUS_PREPARO IN (0,1)
           AND P.PREPARACAO = TRUE
           AND V.OP = TRUE
-          ORDER BY 5 
+          ORDER BY 5
 
-    "      
+    "
     else
     sql = "
-          SELECT V.ID, 
+          SELECT V.ID,
                  C.NOME AS CARTAO_NOME,
                  VP.PRODUTO_NOME,
                  VP.QUANTIDADE,
@@ -369,13 +385,13 @@
 
           INNER JOIN PRODUTOS P
           ON P.ID = VP.PRODUTO_ID
-            
+
           WHERE V.UNIDADE_ID = #{current_unidade.id} AND VP.STATUS_PREPARO IN (0,1)
           AND P.PREPARACAO = TRUE
           AND V.OP = TRUE
-          ORDER BY 5 
+          ORDER BY 5
 
-    "      
+    "
     end
 
     @produtos = VendasProduto.find_by_sql(sql)
@@ -386,24 +402,21 @@
   def valida_processo
 
     @venda = Venda.find(params[:id])
-    
+
     if @venda.op == true #re-abre venda
       @venda.update_attributes(op: false)
+      VendasProduto.where(venda_id: @venda.id, op: true ).update_all(op: false)
       redirect_to :back
     else
-    
-      @venda.update_attributes(op: true) #fecha venda
-      vd_prod = VendasProduto.where(venda_id: @venda.id, op: false )
 
-      vd_prod.each do |vdp|
-        vdp.update_attributes(op: true)
-      end
+      @venda.update_attributes(op: true) #fecha venda
+      VendasProduto.where(venda_id: @venda.id, op: false ).update_all(op: true)
 
       #se não tiver nenhum produto, reseta o cartão
       if VendasProduto.where(venda_id: @venda.id ).count(:id).to_i == 0
         unless @venda.cartao_id.nil?
           @venda.cartao.update_attributes(status_op: 0, venda_id: 0)
-          @venda.update_attributes(cartao_id: 0, cartao_nome: '')  
+          @venda.update_attributes(cartao_id: 0, cartao_nome: '')
         end
       end
 
@@ -689,7 +702,7 @@
     @venda = Venda.find(params[:id])
     unless params[:painel_preparo].blank?
       pp = PainelPreparo.find(params[:painel_preparo])
-      grupos = "AND P.SUB_GRUPO_ID IN (#{pp.grupo_ids}) AND VP.ID = ANY(ARRAY#{params[:vendas_produto_ids]})" 
+      grupos = "AND P.GRUPO_ID IN (#{pp.grupo_ids}) AND VP.ID = ANY(ARRAY#{params[:vendas_produto_ids]})"
     else
       grupos = ""
     end
@@ -793,25 +806,13 @@
   end
 
   def index
-    sql = "SELECT COUNT(V.ID) AS COUNT_VENDAS
-            FROM VENDAS V
-            INNER JOIN PERSONAS C
-            ON C.ID = V.PERSONA_ID
 
-            INNER JOIN PERSONAS VD
-            ON VD.ID = V.VENDEDOR_ID
-
-            WHERE V.UNIDADE_ID = #{current_unidade.id}
-            AND (SELECT COUNT(VF.ID) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID) = 0
-            AND (SELECT SUM(VP.QUANTIDADE) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID) > 0
-            AND V.FINALIDADE = 0"
-
-    @em_curso = Venda.find_by_sql(sql)
   end
 
   def busca_vendas
     params[:unidade] = current_unidade.id
     @vendas = Venda.filtro_vendas(params)
+    @venda_config = VendasConfig.where(unidade_id: current_unidade.id).last
     respond_to do |format|
         format.html { render :layout => false}
         format.js { render :layout => false }
@@ -859,13 +860,10 @@
 
   def show
     @venda = Venda.find(params[:id])
+    @empresa = Empresa.last
     @venda_config = VendasConfig.where(unidade_id: current_unidade.id).last
-    @vp  =  VendasProduto.find_all_by_venda_id(params[:id],:select =>'id,moeda,fabricante_cod,deposito_nome,produto_nome,quantidade,unitario_dolar,total_dolar,unitario_guarani,total_guarani,total_desconto,iva_dolar,iva_guarani',:order => 'id')
-
-    @total_produto     =  VendasProduto.sum(:quantidade,    :conditions => ['venda_id = ?',params[:id]])
-    @total_dolar       =  VendasProduto.sum(:total_dolar,   :conditions => ['venda_id = ?',params[:id]])
-    @total_guarani     =  VendasProduto.sum(:total_guarani, :conditions => ['venda_id = ?',params[:id]])
-    @total_real        =  VendasProduto.sum(:total_real, :conditions => ['venda_id = ?',params[:id]])
+    @vp  =  VendasProduto.find_all_by_venda_id(params[:id],:select =>'id,moeda,fabricante_cod,deposito_nome,produto_nome,quantidade,unitario_dolar,total_dolar,unitario_guarani,total_guarani,total_desconto,iva_dolar,iva_guarani,op',:order => 'id')
+    @totais = VendasProduto.where(venda_id: params[:id] ).select("SUM(quantidade) as total_produto, SUM(total_dolar) as total_dolar, SUM(total_guarani) as total_guarani, SUM(total_real) as total_real").first
 
     render :layout => 'layout_vendas_produtos'
   end

@@ -1,6 +1,21 @@
 class ListaCargaProdutosController < ApplicationController
-  # GET /lista_carga_produtos
-  # GET /lista_carga_produtos.json
+
+  def add_produtos_direto
+
+    if params[:logistica] == 'true'
+      ListaCargaProduto.where(venda_id: params[:venda_id]).update_all(status: params[:status_entrega])
+      params[:id] = params[:venda_id]
+    else
+      ListaCargaProduto.create(params[:products].values)
+    end
+
+    respond_to do |format|
+      format.html { redirect_to(:back) }
+      format.js
+    end
+
+  end
+
   def index
     @lista_carga_produtos = ListaCargaProduto.all
 
@@ -45,6 +60,7 @@ class ListaCargaProdutosController < ApplicationController
     respond_to do |format|
       if @lista_carga_produto.save
         format.html { redirect_to lista_carga_path( @lista_carga_produto.lista_carga_id) }
+        format.js
       else
         format.html { render action: "new" }
       end
@@ -70,10 +86,11 @@ class ListaCargaProdutosController < ApplicationController
   def destroy
     @lista_carga_produto = ListaCargaProduto.find(params[:id])
     @lista_carga_produto.destroy
-
+    params[:venda_id] = @lista_carga_produto.venda_id
     respond_to do |format|
-      format.html { redirect_to "/lista_cargas/#{@lista_carga_produto.lista_carga_id}/produtos_adicionados?pedido=#{@lista_carga_produto.presupuesto_id}" }
+      format.html { redirect_to "/lista_cargas/#{@lista_carga_produto.lista_carga_id}/produtos_adicionados?pedido=#{@lista_carga_produto.venda_id}" }
       format.json { head :no_content }
+      format.js
     end
   end
 end

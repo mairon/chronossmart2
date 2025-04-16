@@ -18,6 +18,12 @@
           <td align="right"><%= t('ADVANCE') %> Aplicados (-):</td>
           <td align="right"><%= format_decimal( @tot_ade_us.to_f ) %></td>
         </tr>
+          <% if current_unidade.retencao == true %>
+            <tr>
+              <td align="right">Retención (-):</td>
+              <td align="right"><%= format_decimal( @tot_ret_us.to_f ) %></td>
+            </tr>
+          <% end %>
         <tr>
           <td align="right"><b>Saldo Pagar:</b></td>
           <td align="right"><strong><%= format_decimal( @fecha_result_us.to_f ) %></strong></td>
@@ -37,6 +43,14 @@
             <td align="right"> <%= t('INTEREST') %> (+):</td>
             <td align="right"><%= format_int( @tot_int_gs.to_f ) %></td>
           </tr>
+
+          <% if current_unidade.retencao == true %>
+            <tr>
+              <td align="right">Retención (-):</td>
+              <td align="right"><%= format_int( @tot_ret_gs.to_f ) %></td>
+            </tr>
+          <% end %>
+
           <tr>
             <td align="right"><strong>Saldo Pagar:</strong></td>
             <td align="right"><strong><%= format_int( @fecha_result_gs.to_f ) %></strong></td>

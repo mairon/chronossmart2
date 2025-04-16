@@ -29,7 +29,7 @@
     <tr>
       <td style="padding-left:7px;letter-spacing:1px">| 
       <%= current_unidade.nome_sys %>
-        <%= @lista_carga.data_emisao.strftime("%d")%> de <%= l @lista_carga.data_emisao, :format => :mes %>  de <%= @lista_carga.data_emisao.strftime("%Y")%> | Horas: <%= @lista_carga.created_at.strftime("%H:%M")%>
+        <%= @lista_carga.data.strftime("%d")%> de <%= l @lista_carga.data, :format => :mes %>  de <%= @lista_carga.data.strftime("%Y")%> | Horas: <%= @lista_carga.created_at.strftime("%H:%M")%>
 
 
       </td>

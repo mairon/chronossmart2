@@ -2,7 +2,7 @@ class FormaPagosController < ApplicationController
   # GET /forma_pagos
   # GET /forma_pagos.json
   def index
-    @forma_pagos = FormaPago.all
+    @forma_pagos = FormaPago.order(:id)
 
     respond_to do |format|
       format.html # index.html.erb

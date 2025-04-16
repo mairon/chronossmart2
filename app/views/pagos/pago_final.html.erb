@@ -7,7 +7,7 @@
             <%= t('DATE') %> <%= @pago.data.strftime("%d/%m/%Y")%> |
             <%= @pago.persona_nome %>
             | Cot. U$:
-            <%= format_int( @pago.cotacao ) %> 
+            <%= format_int( @pago.cotacao ) %>
             R$.: <%= format_int( @pago.cotacao_real ) %>
             R$xU$: <%= format_decimal( @pago.cotacao_rs_us ) %>
           </h1>
@@ -46,7 +46,7 @@
           <% end %>
 
 
-          <div class="footer-buttons">             
+          <div class="footer-buttons">
             <% if @pago.moeda == 0 %>
               <input type="hidden" id="sum" value="<%= format_decimal( @fecha_result_us.to_f ) %>">
               <input type="hidden" id="tot" value="<%= format_decimal( (@financ_cred_us.to_f - @financ_deb_us.to_f) ) %>">
@@ -71,13 +71,13 @@
               <% if @fecha_result_rs.to_f.round(2) != (@financ_cred_rs.to_f - @financ_deb_rs.to_f).round(2) %>
                 <h1 style="color:red; float:left; font-size:32px" ><%= t('PENDING') %></h1>
               <% else %>
-                <a href="#" class="btn btn-green" onclick="ValidCompra()" >Finalizar</a> 
+                <a href="#" class="btn btn-green" onclick="ValidCompra()" >Finalizar</a>
               <% end %>
             <% end %>
 
             <a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"><%= image_tag('printer.png') %> <%= t('VOUCHER') %></a>
-            <a href="/pagos/<%=params[:id]%>" class="btn btn-back" ><%= t('BACK') %></a> 
-          </div>          
+            <a href="/pagos/<%=params[:id]%>" class="btn btn-back" ><%= t('BACK') %></a>
+          </div>
         </div>
       </div>
     <%= hidden_field_tag :id, @pago.id %>

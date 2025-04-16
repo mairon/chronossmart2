@@ -17,6 +17,17 @@
 	<ul class="tabs">
 		<li><a href="#tab1">Gasto NO Fiscal - [<%= t('EDITION') %>]</a></li>
 	</ul>
+
+  <% sql = "SELECT PC.ID,
+                   (PG.DESCRICAO || ' > ' || PC.DESCRICAO) AS DESCRICAO
+            FROM PLANO_DE_CONTAS PC
+            LEFT JOIN PLANO_DE_CONTAS PG
+            ON SUBSTRING(PG.CODIGO, 1, 8) = SUBSTRING(PC.CODIGO, 1, 8)
+            WHERE LENGTH(PC.CODIGO) >=12 AND LENGTH(PG.CODIGO) =8
+            ORDER BY 2"
+    plano = PlanoDeConta.find_by_sql(sql)
+  %>
+
 	<% if params[:action] == 'new_bens' %>
 		<%= f.hidden_field :tipo_compra, value: 3 %>
 		<%= f.hidden_field :fiscal, value: '0' %>
@@ -112,9 +123,19 @@
 									</td>
 								</tr>
 								<tr>
+									<td></td>
+									<td>
+										<label><%= t('CLASSIFICATION') %></label>
+        						<%= f.collection_select :plano_de_conta_id, plano,:id, :descricao,{:prompt => 'Selecione'}, {required: true, class: 'selectize'} %>			
+										
+									</td>
+								</tr>
+								<tr>
 									<td align="right">Numero:</td>
 									<td>
-									<%= f.text_field :documento_numero, size: 25, maxlength: 25, required: true, placeholder: '0000001' %>
+										<%= f.text_field :documento_numero_01, value: '000', size: 5 %>-
+										<%= f.text_field :documento_numero_02, value: '000', size: 5 %>-
+										<%= f.text_field :documento_numero, size: 25, maxlength: 25, required: true, placeholder: '0000001' %>
 									</td>
 								</tr>
 							</table>

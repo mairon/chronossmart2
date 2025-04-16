@@ -8,7 +8,8 @@ class ContratosController < ApplicationController
 	end
   def gera_titulos
   	@contrato = Contrato.find(params[:id])
-    ContratoServico.destroy_all(contrato_id: @contrato.id)    
+    ContratoServico.destroy_all(contrato_id: @contrato.id)
+    Cliente.destroy_all(cod_proc: @contrato.id, sigla_proc: 'CT')
     venc = 0
     cota = 1
     PresupuestoProduto.where(presupuesto_id: @contrato.presupuesto_id).each do |pp|
@@ -18,50 +19,50 @@ class ContratosController < ApplicationController
     		persona_id: pp.persona_id,
     		produto_id: pp.produto_id,
     		quantidade: pp.quantidade,
-    		unitario_gs: pp.unitario_guarani,
-    		total_gs: pp.total_guarani
+    		unitario_gs: (pp.total_guarani.to_f - (pp.total_guarani.to_f * (pp.desconto.to_f / 100))) / pp.quantidade.to_f,
+    		total_gs: (pp.total_guarani.to_f - (pp.total_guarani.to_f * (pp.desconto.to_f / 100)))
     	)
 
         venc = 0
         cota = 1
     end
 
-		PresupuestoCota.where(presupuesto_id: @contrato.presupuesto_id).each do |pc|
-			Cliente.create( persona_id: pc.persona_id,
-			            titulo: (Cliente.last.id.to_i + 1),
-			            cota: pc.cuotas,
-			            unidade_id: @contrato.unidade_id,
-			            moeda: @contrato.moeda,
-			            liquidacao: 0,
-			            divida_guarani: pc.valor_gs,
-			            divida_dolar: 0,
-			            divida_real: 0,
-			            data: Time.now,
-			            documento_numero: @contrato.id.to_s,
-			            documento_numero_01: '000',
-			            documento_numero_02: '000',
-			            tabela_id: @contrato.id,
-			            tabela: 'CONTRATOS',
-			            cod_proc: @contrato.id,
-			            sigla_proc: 'CT',
-			            conta_id: @contrato.conta_id,
-			            descricao: pc.produto.nome,
-			            taxa: pc.produto.taxa,
-			            tot_cotas: pc.cuotas,
-			            vencimento: pc.vencimento.to_date,
-			            centro_custo_id: pc.centro_custo_id )
+			PresupuestoCota.where(presupuesto_id: @contrato.presupuesto_id).each do |pc|
+				Cliente.create( persona_id: pc.persona_id,
+				            titulo: (Cliente.last.id.to_i + 1),
+				            cota: pc.cuotas,
+				            unidade_id: @contrato.unidade_id,
+				            moeda: @contrato.moeda,
+				            liquidacao: 0,
+				            divida_guarani: pc.valor_gs,
+				            divida_dolar: 0,
+				            divida_real: 0,
+				            data: Time.now,
+				            documento_numero: "#{@contrato.id.to_s}-#{pc.id.to_s}",
+				            documento_numero_01: '000',
+				            documento_numero_02: '000',
+				            tabela_id: @contrato.id,
+				            tabela: 'CONTRATOS',
+				            cod_proc: @contrato.id,
+				            sigla_proc: 'CT',
+				            conta_id: @contrato.conta_id,
+				            descricao: pc.produto.nome,
+				            taxa: pc.produto.taxa,
+				            tot_cotas: pc.cuotas,
+				            vencimento: pc.vencimento.to_date,
+				            centro_custo_id: pc.centro_custo_id )
 
-		end
+			end
 
 
     redirect_to contrato_path(@contrato.id)
   end
 
-	def cancelar 
+	def cancelar
 		@contrato = Contrato.find(params[:id])
 		@contrato.update_attributes(status: 'Cancelado')
-		
-		cotas_cont = Cliente.where(tabela: 'CONTRATOS', tabela_id: @contrato.id, liquidacao: 0 ).order(:id)		
+
+		cotas_cont = Cliente.where(tabela: 'CONTRATOS', tabela_id: @contrato.id, liquidacao: 0 ).order(:vencimento)
 
 		cotas_cont.each do |t|
 					t.update_attributes(liquidacao: 1)
@@ -89,7 +90,7 @@ class ContratosController < ApplicationController
             descricao: (t.descricao + " CANCELADO"),
             tot_cotas: t.tot_cotas.to_i,
             vencimento: t.vencimento,
-            centro_custo_id: t.centro_custo_id )			
+            centro_custo_id: t.centro_custo_id )
 		end
 
 		redirect_to contrato_path(@contrato)
@@ -155,6 +156,8 @@ class ContratosController < ApplicationController
 		@contrato = Contrato.find(params[:id])
     @cotas_cont = Cliente.where(tabela: 'CONTRATOS', tabela_id: @contrato.id).order('cota,id')
     @contra_servis = ContratoServico.where(contrato_id: @contrato.id).order(:id)
+    @fts = FormFiscal.where("sigla_proc = 'CT' AND cod_proc = #{@contrato.id} AND STATUS != 0").select("updated_at,ruc,persona_nome,tipo_emissao,cdc,id,impressao, cod_proc, tot_gs, doc_01, doc_02, doc, status, autorizacao").order('id desc ')
+    @produto_sum_gs = ContratoServico.where(contrato_id: @contrato.id).sum(:total_gs)
 
     render layout: 'chart'
 	end
@@ -171,8 +174,8 @@ class ContratosController < ApplicationController
 			end
 
 
-    3.times do 
-    	contrato_servicos =  @contrato.contrato_servicos.build     
+    3.times do
+    	contrato_servicos =  @contrato.contrato_servicos.build
     end
 	end
 
@@ -180,8 +183,8 @@ class ContratosController < ApplicationController
 	def edit
 		@contrato = Contrato.find(params[:id])
 
-    1.times do 
-    	contrato_servicos =  @contrato.contrato_servicos.build     
+    1.times do
+    	contrato_servicos =  @contrato.contrato_servicos.build
     end
 
 	end

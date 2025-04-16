@@ -1,0 +1,69 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+     <header class="panel-heading link-prod">
+      <%= image_tag("002-upload.png", width: '18px', style: 'margin-top: -6px') %> Condicional Salida  - <%= @condicional.id.to_s.rjust(6,'0') %>
+
+      <div style="float:right">
+        <%= link_to 'Volver', edit_condicional_path(@condicional.id), class: 'btn btn-blue' %>
+        <%= link_to 'Comprovante', comprovante_condicional_path(@condicional.id), class: 'btn btn-blue',:onclick=>"window.open(this.href,'Comprovante', 'height=600, width=600');return false;" %>
+        <%= link_to 'Finalizar', condicionals_url, class: 'btn btn-info next' %>
+      </div>
+     </header> 
+      <div class="panel-content">
+        <i class="icon-user"></i> Cliente: <%= @condicional.persona_nome %> 
+        <% cliente_saldo = Cliente.sum('divida_guarani - cobro_guarani',:conditions => ["liquidacao = 0 and persona_id = ?", @condicional.persona_id]) %>
+
+        <i class="icon-fire"></i> Limite Credito: <%= format_int( limite = @condicional.persona.limite_credito.to_f) %> 
+        <% saldo = @condicional.persona.limite_credito.to_f - (cliente_saldo.to_f) %>
+        Saldo: 
+        <% if  saldo.to_f <= 0 %>
+          <font color='red'><%= format_int(saldo) %></font>
+        <% else %>
+          <font color='green'><%= format_int(saldo) %></font>
+        <% end %>
+
+        <i class="icon-tag"></i>Tags</label>
+        <%= raw @condicional.persona.tag_list.map { |t| link_to t, tag_path(t), class: "panel-tag", style: 'background-color: #43A2F1; padding: 5px; display: -webkit-inline-box'}.join(" ") %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-content">
+        <%= render 'retirados' %>        
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <div class="panel-body">
+
+        <% if @condicional.status == 0 %>
+            <% if limite.to_f > 0 %>
+              <% if saldo.to_f <= 0 %>
+                <div class="alert alert-alert" align="center" style="margin: 10px">
+                  <font color="red"><h1> <b>Limite de Credito insuficiente</b></h1></font>
+                </div>
+              <% else %>
+                <%= render partial: "/condicional_produtos/new_retirados", locals: {condicional_produtos: CondicionalProduto.new(condicional_id: @condicional.id)} %>
+              <% end %>
+            <% else %>
+              <%= render partial: "/condicional_produtos/new_retirados", locals: {condicional_produto: CondicionalProduto.new(condicional_id: @condicional.id)} %>
+            <% end %>
+          <% else %>
+            <div class="alert alert-success" align="center" style="margin: 10px">
+              <font color="green"><h1> <b>Condicional ya Bajado</b></h1></font>
+            </div>
+        <% end %>
+
+      </div>
+    </div>
+  </div>
+</div>

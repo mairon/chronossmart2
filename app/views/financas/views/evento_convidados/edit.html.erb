@@ -1,0 +1,48 @@
+<%= form_for(@evento_convidado) do |f| %>
+  <% if @evento_convidado.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@evento_convidado.errors.count, "error") %> prohibited this evento_convidado from being saved:</h2>
+
+      <ul>
+      <% @evento_convidado.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+	<div class="row">
+	  <div class="col-md-12">
+	    <div class="panel">
+	      <h1 id="header">
+	      </h1>
+	      <div class="panel-content">
+	        <div class="row">
+	          <div class="col-md-12">
+	            <label>Motivo</label>
+	            <%= f.text_area :comple, rows: 4, required: true %>
+	          </div>
+	        </div>
+	        <div class="row">
+	          <div class="col-md-12">
+	            <label>Usuario</label>
+	            <%= f.text_field :doc, value: current_user.usuario_nome, readonly: true %>
+	          </div>
+	        </div>
+
+	        <div class="row">
+	          <div class="col-md-12">
+	            <label>Bajar</label>
+	            <%= f.check_box :presente %>
+	          </div>
+	        </div>                
+	      </div>
+	    </div>
+	    <div style="padding: 10px" align="center">
+	      <%= f.submit "Salvar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+	      <%= link_to t('BACK'), ticket_detalhe_evento_convidados_path(persona_id: @evento_convidado.persona_id), :class => "btn btn-back" %>
+	    </div>      
+	  </div>
+	</div>
+
+<% end %>

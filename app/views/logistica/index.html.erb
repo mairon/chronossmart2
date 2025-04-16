@@ -1,113 +1,79 @@
-<h1 id="header">Logistica - Lista de Carga</h1>
-<div class="group">
-  <h2>    
-    <table>
-      <tr>
-        <td>
-          <div class="group">
-          <h2>Filtros</h2>
-          <%= form_tag busca_presupuestos_path, :method => "get" do %>
-            <table>
-              <tr>
-                <!--FILTRO_DATA!-->
-                <td><input   id= "filtro" name="filtro" type="radio" value= "0" checked onfocus="SetaFiltro('0')"/></td>
+<div class="panel">
+  <h1 id="header">Logistica - Lista de Carga Simplificada</h1>
+  <div class="panel-content">
+    <%= form_tag busca_presupuestos_path, :method => "get" do %>
+      <table>
+        <tr>
+          <td>
+            <select name="tipo" id="tipo">
+              <option>CLIENTE</option>
+              <option>CODIGO</option>
+              <option><%= t('DOC').upcase %></option>
+            </select>
+          </td>
+          <td colspan="4">
+            <input id="busca" name="busca" type="text" onkeyup = "pesquisa(this.value),f(this)"onkeydown = "f(this)" size="35" autocomplete="off"/>
+          </td>
+          <td>
+            <select name="status_entrega" id="status_entrega">
+              <option value="0">Pediente</option>
+              <option value="1">Separación</option>
+              <option value="2">En Rota</option>
+              <option value="3">Finalizado</option>
+            </select>
+          </td>
+          <td>
+            <input type="button" class="btn btn-blue" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar" />
 
-                <td align="right">De:</td>
-                <td><input name="inicio" id="inicio" type="text" size="10" onkeyup="Formatadata(this,event)" />
-                Hasta
-                <input name="final" id="final" type="text" size="10" onkeyup="Formatadata(this,event)"/></td>
-              </tr>
+            <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;") %>
 
-              <tr>
-                <td></td>
-                <td align="right">Status:</td>
-                <td colspan="7">
-                <fieldset>
-                  <input id="status" name="status" type="radio" value="0" onfocus="SetaStatus('0')" /> PENDENTE
-                  <input id="status" name="status" type="radio" value="1" onfocus="SetaStatus('1')" /> EN SEPARACIÓN
-                  <input id="status" name="status" type="radio" value="1" onfocus="SetaStatus('3')" /> FACTURADO
-                  <input id="status" name="status" type="radio" value="" onfocus="SetaStatus('')" /> TODOS
-                </fieldset>
-                </td>
-              </tr>
-
-              <!--FILTRO_CLIENTE!-->
-              <tr>
-                <td><input id="filtro" name="filtro" type="radio" value="1" onfocus= "SetaFiltro('1')" /></td>
-                <td><select name="tipo" id="tipo">
-                    <option>NOMBRE</option>
-                    <option>VENDEDOR</option>
-                    <option>CODIGO</option>
-                  </select>:</td>
-                <td colspan="3">
-                  <input id="busca" name="busca" type="text" onkeyup = "pesquisa(),f(this)"onkeydown = "f(this)" onkeypress ="return bloqEnter(event)" size="50" />
-                  <input type="button" class="button" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar"/>
-                </td>
-                <td width="25"><%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;" ) %></td>
-              </tr>
-            </table>
-            <input type="hidden" id="seta" value="0"/>
-            <input type="hidden" id="f_status" value=""/>
-          <% end %>
-          </div>
-        </td>
-
-        <td>
-          <div class="group">
-          <h2>Lista de Cargas</h2>
-            <div class="rolagem" dir="div" style="height: 110px">
-              <table>
-                <% @listas_cargas.each do |lc| %>
-                  <tr class = "<%= cycle("cor1", "cor2") %>" onMouseOver="javascript:this.style.backgroundColor='#949494'"
-                      onMouseOut="javascript:this.style.backgroundColor=''"
-                      onclick="pesquisa(<%= lc.id %>)" style="cursor:pointer;">
-                    <td width="40"><%= lc.id.to_s.rjust(6,'0') %></td>
-                    <td width="180"><%= lc.rodado.placa %> - <%= truncate(lc.rodado.responsavel, length: 15) %></td>
-                    <td width="120"><%= lc.cidade.nome %></td>
-                    <td width="40" align="right"><%= format_int(lc.rodado.capacidade) %></td>
-                    <td width="15" align="right"><%= lc.vendas.count(:id)%></td>
-                    <td><%= link_to 'Impr. Lista' %></td>
-                    <td><%= link_to 'Add Cobros' %></td>
-                    <td><%= link_to 'Cerrar Lista' %></td>
-                  </tr>  
-                <% end %>
-              </table>
-            </div>
-          </div>
-        </td>
-      </tr>
-    </table>
-  </h2>
+          </td>
+        </tr>
+      </table>
+    <% end %>
+  </div>
 </div>
-
 <div id="pagina"></div>
 
 </div>
 <script language="javascript">
-  function pesquisa(lista_carga){
-    if (lista_carga == ''){
-      url="/logistica/busca?" + $('form').serialize();  
-    }else{
-      url="/logistica/busca?lista_carga_id="+ lista_carga + "&" + $('form').serialize();
-    }
+
+    $(document).ready(function() {
+      url="/logistica/busca?" + $('form').serialize();
+      ajax(url);
+    });
+
+  function pesquisa(valor){
+    url="/logistica/busca?" + $('form').serialize();
     ajax(url);
   }
+
 </script>
 
-<%= javascript_include_tag 'busca_ajax' %> 
+<%= javascript_include_tag 'busca_ajax' %>
 
-<script type="text/javascript">
-  function Separacao(id){
-    window.open("/logistica/separacao/" + id, 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=2500, HEIGHT=750');
-  }
-  function Carregar(id){
-    window.open("/vendas/"+ id, '', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=2500, HEIGHT=750');
-  }
 
-  function Comprovante(id){
-    window.open("/presupuestos/" + id + "/print_presupuesto", 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=500, HEIGHT=800');
-  }
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="ModalOrdemEntrega">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h2 class="modal-title" id="myModalLabel" align="center">Ordem Entrega <span class="btn btn-danger">No Liberado</span></h2>
+      </div>
+      <div class="modal-body-oe" style="padding: 10px">
 
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $('#ModalOrdemEntrega').on('show.bs.modal', function (e) {
+    var loadurl = $(e.relatedTarget).data('load-url');
+    $(this).find('.modal-body-oe').load(loadurl);
+  });
 </script>
 
 

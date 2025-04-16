@@ -1,0 +1,46 @@
+<h1 id="header">Custom Fields - [<%= t('EDITION') %>]</h1>
+<div class="group">
+<%= form_for(@custom_field) do |f| %>
+  <% if @custom_field.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@custom_field.errors.count, "error") %> prohibited this custom_field from being saved:</h2>
+
+      <ul>
+      <% @custom_field.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+
+
+  <table>
+    <tr>
+      <td>
+        <label>Label</label>
+        <%= f.telephone_field :label %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label>Internal Name</label>
+        <%= f.telephone_field :internal_name %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label>Tabela</label>
+        <%= f.telephone_field :tabela %>
+      </td>
+    </tr>
+
+  </table>
+   <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), custom_fields_path, :class => "btn btn-back" %>
+   </div>
+<% end %>
+</div>

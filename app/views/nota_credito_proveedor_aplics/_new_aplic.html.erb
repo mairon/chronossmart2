@@ -17,10 +17,10 @@
         <td align="right">Cuota :</td>
         <td><%= f.text_field :cota, :size => 5,:value=> 0, :readonly => "readonly" %></td>
 
-	       <%= field_gs 'Valor Gs.:',f,:valor_guarani, :value => format_int(@valor_total_gs.to_f - (NotaCreditoProveedorAplic.where(nota_credito_proveedor_id: @nota_credito_proveedor.id).sum(:valor_guarani)).to_f),
+	       <%= field_gs 'Valor Gs.:',f,:valor_guarani, :value => format_int(@nota_credito_proveedor.total_guarani.to_f - (NotaCreditoProveedorAplic.where(nota_credito_proveedor_id: @nota_credito_proveedor.id).sum(:valor_guarani)).to_f),
 	       :onchange   => "GsToUsRs('cotacao','cotacao_real','nota_credito_proveedor_aplic_valor_guarani','nota_credito_proveedor_aplic_valor_dolar','nota_credito_proveedor_aplic_valor_real')" %>
 
-	       <%= field_us 'Valor U$:',f,:valor_dolar, :value => format_decimal(@valor_total_us.to_f - (NotaCreditoProveedorAplic.where(nota_credito_proveedor_id: @nota_credito_proveedor.id).sum(:valor_dolar)).to_f),
+	       <%= field_us 'Valor U$:',f,:valor_dolar, :value => format_decimal(@nota_credito_proveedor.total_dolar.to_f - (NotaCreditoProveedorAplic.where(nota_credito_proveedor_id: @nota_credito_proveedor.id).sum(:valor_dolar)).to_f),
 	             :onchange   => "UsToGsRs('cotacao','cotacao_real','nota_credito_proveedor_aplic_valor_dolar','nota_credito_proveedor_aplic_valor_guarani','nota_credito_proveedor_aplic_valor_real')" %>
 
 	       <%= field_us 'Valor R$:',f,:valor_real, :value => format_decimal(@valor_total_rs.to_f - (NotaCreditoProveedorAplic.where(nota_credito_proveedor_id: @nota_credito_proveedor.id).sum(:valor_real)).to_f),

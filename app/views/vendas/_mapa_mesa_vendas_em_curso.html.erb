@@ -3,7 +3,6 @@
     <td width="45" align="center">Código</td>
     <td width="60" align="center">Apertura</td>
     <td width="60" align="center">CM</td>
-    <td width="160">Sector</td>
     <td width="150">Cliente</td>
     <td width="20" align="right">Ctd</td>
     <td width="70" align="right">Monto</td>
@@ -20,7 +19,6 @@
         <td width="45" align="center"><%= v.id.to_s.rjust(6,'0') %></td>
         <td align="center" width="60"><%= v.data.strftime("%d/%m") %> <%= v.created_at.strftime("%H:%M") %></td>
         <td width="60" align="center"><%= v.cartao_nome %></td>
-        <td width="160"><small><%= v.setor_nome %></small></td>
         <td width="150"><small>
           <%= v.obs %><br>
           <%= v.persona_nome %> 

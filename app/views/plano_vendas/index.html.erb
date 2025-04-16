@@ -51,8 +51,10 @@
               <% else %>
                 <td width="60"></td>
               <% end %>
-              <td><%= link_to '', edit_plano_venda_path(nota), class: 'icon-pencil' %></td>
-              <td><%= link_to '', nota, confirm: 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+              <% if nota.solicitude_creditos.blank? %>
+                <td><%= link_to '', edit_plano_venda_path(nota), class: 'icon-pencil' %></td>
+                <td><%= link_to '', nota, confirm: 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+              <% end %>
              
             </tr>
          <% end %>

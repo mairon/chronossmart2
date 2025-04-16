@@ -1,0 +1,73 @@
+
+<div class="group">
+	<div id="pagina"></div>
+</div>
+<script language="javascript">
+  $(".acao_rm").click(function() {
+  	$('#modal_viatico').modal('show');
+    url="/compras/lista_viaticos?persona_id=" + <%= @compra.funcionario_id%>;
+    ajax(url);  	
+  });
+</script>
+<%= hidden_field_tag :cp_gs, format_int(@compra.total_guarani) %>
+<%= hidden_field_tag :cp_us, format_decimal(@compra.total_dolar) %>
+<%= hidden_field_tag :cp_rs, format_decimal(@compra.total_real) %>
+<script>
+  function Fecha(saldo_rs, saldo_gs, saldo_us, doc_01, doc_02, doc, moeda){
+
+    if (moeda == '0') {
+      $(".valores-us").show();
+      $(".valores-rs").hide();
+      $(".valores-gs").hide();
+
+
+      if (eval( parseFloat( $("#cp_gs").val().replace(/\./g, "").replace(",", ".") ) < parseFloat( saldo_gs.replace(/\./g, "").replace(",", ".") ) )){
+        $('#valor_us').val( $("#cp_us").val());
+        $('#total_dolar').val( $("#cp_us").val()); 
+      }else{
+        $('#valor_us').val(saldo_us);
+        $('#total_dolar').val(saldo_us);
+      }
+
+    } else if (moeda == '1') {
+      $(".valores-gs").show();
+      $(".valores-rs").hide();
+      $(".valores-us").hide();
+
+      if (eval( parseFloat( $("#cp_gs").val().replace(/\./g, "").replace(",", ".") ) < parseFloat( saldo_gs.replace(/\./g, "").replace(",", ".") ) )){
+        $('#valor_gs').val( $("#cp_gs").val());
+        $('#total_guarani').val( $("#cp_gs").val());
+      }else{
+        $('#valor_gs').val(saldo_gs);
+        $('#total_guarani').val(saldo_gs);
+      }
+       
+    } else if (moeda == '2') {
+
+      $(".valores-rs").show();
+      $(".valores-us").hide();
+      $(".valores-gs").hide();
+
+      if (eval( parseFloat( $("#cp_rs").val().replace(/\./g, "").replace(",", ".") ) < parseFloat( saldo_rs.replace(/\./g, "").replace(",", ".") ) )){
+        $('#valor_rs').val( $("#cp_rs").val());
+        $('#total_real').val( $("#cp_rs").val());
+      }else{
+        $('#valor_rs').val(saldo_rs);
+        $('#total_real').val(saldo_rs);
+      }
+       
+
+    };
+    
+    $('#fact_an_01').val(doc_01);
+    $('#fact_an_02').val(doc_02);
+    $('#fact_an').val(doc);
+    $('#fact_an_cota').val(1)
+    $('#moeda').val(moeda)
+
+    $('#modal_viatico').modal('hide');
+   }
+</script>
+
+<%= javascript_include_tag 'busca_ajax' %>
+

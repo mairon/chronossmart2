@@ -2,7 +2,9 @@
 <ul class="nav navbar-nav navbar-right">
   <li><a href="/tarefas"><i class="icon-white icon-calendar"></i></a></li>
   <li class="divider-vertical"></li>
-  <li><a href="#"><i class="icon-white icon-th"></i> <%= current_unidade.unidade_nome %></a></li>
+  <li><i class="icon-white icon-th"></i>
+    <%= select("busca", "unidade", UnidadesUsuario.joins(:unidade).where("unidades_usuarios.usuario_id = #{current_user.id}").all(:select => 'unidades_usuarios.id, (unidades.unidade_nome) as unidade_nome, unidades_usuarios.unidade_id').collect {|p| [ p.unidade_nome, p.unidade_id ] }, {selected: current_unidade.id  }, {class: 'hidden-select'}) %>
+</a></li>
   <li class="dropdown">
   	<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
   		<i class="icon-white icon-user"></i> <%= current_user.usuario_nome %> <small>(<%= I18n.locale %>)</small> <span class="caret"></span>
@@ -15,3 +17,16 @@
   	</ul>
   </li>
 </ul>
+
+<script>
+$('#busca_unidade').change(function() {
+            $.ajax({url: "/logins/troca_unidade",
+              type: 'POST',
+              data: { 'busca[unidade_id]':  $('#busca_unidade').val(), 'busca[usuario_id]': <%= current_user.id %> },
+              beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+              success: function(){
+                  window.location.reload();
+                }
+            });             
+          });  
+</script>

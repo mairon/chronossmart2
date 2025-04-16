@@ -73,11 +73,7 @@
 
 		def atualizar_precos
 				@produto = Produto.find(params[:id])
-			if current_unidade.id == 1
 				@unidades_tabelas = ProdutosTabelaPreco.where('produto_id = ?', @produto.id).order('id')
-			else
-				@unidades_tabelas = ProdutosTabelaPreco.where('produto_id = ? and unidade_id = ?', @produto.id, current_unidade.id).order('id')
-			end
 			render :layout => 'consulta'
 		end
 
@@ -378,7 +374,7 @@
 		end
 
 		def busca_venda_produto
-				render :layout => 'consulta'
+			render :layout => false
 		end
 
 		def dinamic_busca_venda_produtos_faturados
@@ -412,31 +408,32 @@
 
     def dinamic_busca_venda_produto
 
-        tipo = " (P.BARRA || P.FABRICANTE_COD || P.NOME) ILIKE '%#{params[:busca]}%'"            if params[:tipo] == "DESCRIPCION"
-        tipo = "P.FABRICANTE_COD ILIKE '%#{params[:busca]}%'"  if params[:tipo] == "REFERENCIA"
-        tipo = "CAST(P.ID AS VARCHAR) = '#{params[:busca]}'"             if params[:tipo] == "CODIGO"
-        subg = "AND P.SUB_GRUPO_ID = #{params[:sub_grupo]}"     unless params[:sub_grupo].blank?
-        sql = "
+      tipo = " (P.BARRA || P.FABRICANTE_COD || P.NOME) ILIKE '%#{params[:busca]}%'"            if params[:tipo] == "DESCRIPCION"
+      tipo = "P.FABRICANTE_COD ILIKE '%#{params[:busca]}%'"  if params[:tipo] == "REFERENCIA"
+      tipo = "CAST(P.ID AS VARCHAR) = '#{params[:busca]}'"             if params[:tipo] == "CODIGO"
+      subg = "AND P.SUB_GRUPO_ID = #{params[:sub_grupo]}"     unless params[:sub_grupo].blank?
+      sql = "
 
-        SELECT DISTINCT( P.ID ) AS PRODUTO_ID,
-               P.NOME AS NOME,
-               P.BARRA,
-               P.FABRICANTE_COD,
-               TB.PRECO_1_US,
-               TB.PRECO_1_GS,
-               TB.PRECO_1_RS,
-               (SELECT SUM(entrada - saida) AS sum_id FROM stocks s WHERE ( s.deposito_id = #{params[:deposito_id]} and s.produto_id = P.ID AND s.data <= '#{params[:data]}' ) ) AS STOCK
-        FROM PRODUTOS P
-        INNER JOIN PRODUTOS_TABELA_PRECOS TB
-        ON P.ID = TB.PRODUTO_ID
-        WHERE  P.STATUS = TRUE
-        AND TB.TABELA_PRECO_ID = #{params[:cliente]}
-        AND TB.UNIDADE_ID = #{params[:unidade]}
-        AND to_tsvector(upper((P.NOME)) ) @@ to_tsquery(upper('#{params[:busca].gsub(/\s/,'&')}:*'))
-        ORDER BY 2,3 LIMIT 50"
+      SELECT DISTINCT( P.ID ) AS PRODUTO_ID,
+             SIMILARITY('#{params[:busca].gsub(/\s/,'|')}', (upper( COALESCE(P.NOME,'') || ' ' || COALESCE(P.FABRICANTE_COD,'') || ' ' || COALESCE(P.BARRA,'') || ' ' || COALESCE(P.OBS,'') ) )),
+             P.NOME AS NOME,
+             P.BARRA,
+             P.FABRICANTE_COD,
+             TB.PRECO_1_US,
+             TB.PRECO_1_GS,
+             TB.PRECO_1_RS,
+             (SELECT SUM(entrada - saida) AS sum_id FROM stocks s WHERE ( s.deposito_id = #{params[:deposito_id]} and s.produto_id = P.ID AND s.data <= '#{params[:data]}' ) ) AS STOCK
+      FROM PRODUTOS P
+      INNER JOIN PRODUTOS_TABELA_PRECOS TB
+      ON P.ID = TB.PRODUTO_ID
+      WHERE  P.STATUS = TRUE
+      AND TB.TABELA_PRECO_ID = #{params[:tabela_preco_id]}
+      AND TB.UNIDADE_ID = #{params[:unidade]}
+      AND  to_tsvector(upper( COALESCE(P.NOME,'') || ' ' || COALESCE(P.FABRICANTE_COD,'') || ' ' || COALESCE(P.BARRA,'') || ' ' || COALESCE(P.OBS,'') ) ) @@ to_tsquery(upper('#{params[:busca].gsub(/\s/,'|')}'))
+      ORDER BY 2 desc,3 LIMIT 50"
 
-        @produtos = Produto.find_by_sql(sql)
-        render :layout => false
+      @produtos = Produto.find_by_sql(sql)
+      render :layout => false
     end
 
 		def busca_os_produto
@@ -548,38 +545,31 @@
 		end
 
 		def dinamic_busca_presupuesto_produto
-				tipo = "P.NOME"            if params[:tipo] == "DESCRIPCION"
-				tipo = "P.FABRICANTE_COD"  if params[:tipo] == "REFERENCIA"
-				tipo = "PB.BARRA"             if params[:tipo] == "CODIGO"
-				sql = "
-				SELECT P.ID AS PRODUTO_ID,
-							 P.NOME AS NOME,
-							 P.COR,
-							 P.TAMANHO,
-							 P.FABRICANTE_COD,
-							 P.PROMEDIO_GUARANI,
-							 P.PROMEDIO_DOLAR,
-							 C.DESCRICAO AS MARCA_NOME,
-							 TB.TABELA_PRECO_ID,
-							 TB.PRECO_1_US,
-							 TB.PRECO_1_GS,
-							 TB.PRECO_1_RS,
-							 (SELECT SUM(entrada - saida) AS sum_id FROM stocks s WHERE (  s.produto_id = P.ID ) ) AS STOCK
-				FROM PRODUTOS P
-				LEFT JOIN PRODUTOS_TABELA_PRECOS TB
-				ON P.ID = TB.PRODUTO_ID
+      tipo = " (P.BARRA || P.FABRICANTE_COD || P.NOME) ILIKE '%#{params[:busca]}%'"            if params[:tipo] == "DESCRIPCION"
+      tipo = "P.FABRICANTE_COD ILIKE '%#{params[:busca]}%'"  if params[:tipo] == "REFERENCIA"
+      tipo = "CAST(P.ID AS VARCHAR) = '#{params[:busca]}'"             if params[:tipo] == "CODIGO"
+      subg = "AND P.SUB_GRUPO_ID = #{params[:sub_grupo]}"     unless params[:sub_grupo].blank?
+      sql = "
 
-				LEFT JOIN PRODUTO_BARRAS PB
-				ON PB.PRODUTO_ID = P.ID
+      SELECT DISTINCT( P.ID ) AS PRODUTO_ID,
+             P.NOME AS NOME,
+             P.BARRA,
+             P.FABRICANTE_COD,
+             TB.PRECO_1_US,
+             TB.PRECO_1_GS,
+             TB.PRECO_1_RS,
+             (SELECT SUM(entrada - saida) AS sum_id FROM stocks s WHERE ( s.deposito_id = #{params[:deposito_id]} and s.produto_id = P.ID AND s.data <= '#{params[:data]}' ) ) AS STOCK
+      FROM PRODUTOS P
+      INNER JOIN PRODUTOS_TABELA_PRECOS TB
+      ON P.ID = TB.PRODUTO_ID
+      WHERE  P.STATUS = TRUE
+      AND TB.TABELA_PRECO_ID = #{params[:tabela_preco_id]}
+      AND TB.UNIDADE_ID = #{params[:unidade]}
+      AND to_tsvector(upper(COALESCE(P.NOME, '') || ' ' || COALESCE(P.CHASSI, '') || ' ' || COALESCE(P.REFERENCIA, '') || ' ' || COALESCE(P.COR, '') || ' ' ||  COALESCE(P.ANO, '') || ' ' ||  COALESCE(P.OBS, '') || ' ' || COALESCE(P.FABRICANTE_COD, '') || ' '  || ' ' || COALESCE(P.BARRA, '') || ' ' || COALESCE( CAST(P.ID AS CHARACTER VARYING ), '') )) @@ to_tsquery(upper('#{params[:busca].gsub(/\s/,'&')}:*'))
+      ORDER BY 2,3 LIMIT 50"
 
-				LEFT JOIN CLASES C
-				ON P.CLASE_ID = C.ID
-
-				WHERE TB.TABELA_PRECO_ID = #{params[:tabela_preco]} AND (P.NOME ILIKE '%#{params[:busca]}%' OR P.FABRICANTE_COD ILIKE '%#{params[:busca]}%')  AND P.STATUS = TRUE
-				ORDER BY 2,3 LIMIT 50"
-
-				@produtos = Produto.find_by_sql(sql)
-				render :layout => false
+      @produtos = Produto.find_by_sql(sql)
+      render :layout => false
 		end
 
 		def busca_remicao_produto
@@ -656,6 +646,7 @@
 
 					SELECT P.ID AS PRODUTO_ID,
 							 P.NOME AS NOME,
+							 SIMILARITY('#{params[:busca]}', (upper( COALESCE(P.NOME,'') || ' ' || COALESCE(P.FABRICANTE_COD,'') || ' ' || COALESCE(P.BARRA,'') || ' ' || COALESCE(P.OBS,'') ) )),
 							 P.FABRICANTE_COD,
 							 P.BARRA,
 							 P.LOCACAO,
@@ -678,9 +669,9 @@
 
 					LEFT JOIN GRUPOS G
 					ON G.ID = P.GRUPO_ID
-					WHERE to_tsvector( upper( COALESCE(P.NOME,'') || ' ' || COALESCE(P.FABRICANTE_COD,'') || ' ' || COALESCE(P.BARRA,'') || ' ' || COALESCE(P.OBS,'') ) ) @@ to_tsquery(upper('#{params[:busca].gsub(/\s/,'&')}:*'))
+					WHERE to_tsvector(upper( COALESCE(P.NOME,'') || ' ' || COALESCE(P.FABRICANTE_COD,'') || ' ' || COALESCE(P.BARRA,'') || ' ' || COALESCE(P.OBS,'') ) ) @@ to_tsquery(upper('#{params[:busca].gsub(/\s/,'|')}'))
 
-					ORDER BY 2,1
+					ORDER BY 3 desc ,2,1
 					LIMIT  50
 				"
 				@produtos = Produto.find_by_sql(sql)

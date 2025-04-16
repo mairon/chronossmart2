@@ -1,66 +1,64 @@
-<div class="group">
-	<h2>Pedidos Pendentes
-	  <div style="float: right; margin-top: -2px">
-			<div style="margin-right:4px; border-radius: 4px; padding: 2px; background-color: #9ce5ab;float: right">Pendente</div>
-			<div style="margin-right:4px;border-radius: 4px; padding: 2px; background-color: #f2f296;float: right">Parcial</div>
+<div class="panel">
+	<h1 id="header">
+		Ventas Pendentes
+		<div class="pull-right">
 		</div>
-	</h2>
+	</h1>
+	<div class="panel-content">
+		<span class="btn-success">Pendente</span>
+		<span class="btn-warning">Parcial</span>
+	</div>
+	<div class="panel-content">
+		<table class="head_grid">
+			<tr>
+				<td width="50" align="center"><%= t('CODE') %></td>
+				<td width="200">Cliente</td>
+				<td width="200">Direción</td>
+				<td width="40" align="right">Ctd.</td>
+				<td width="40" align="right">Env.</td>
+				<td width="40" align="right">Saldo</td>
+			</tr>
+		</table>
+		<div class="rolagem" dir="div" style="height: 160px">
+		<table>
+			<% count = 0 %>
+			<% saldo = 0 %>
+			<% @pedidos_pendentes.each do |pp| %>
+				<% if pp.status.to_i == 0 %>
+					<% color = '#9ce5ab'%>
+				<% elsif pp.status == 2 %>
+					<% color = '#f2f296'%>
+				<% end %>
+
+				<tr class="<%= cycle("cor1", "cor2")%> clickable-row" style="background-color: <%= color %>;" data-href="/lista_cargas/<%= @lista_carga.id %>?presupuesto_id=<%= pp.id %>&data=<%= @lista_carga.data %>">
+					<td width="50" align="center"><%= pp.id.to_s.rjust(6,'0') %></td>
+					<td width="200"><%= pp.cliente_nome %></td>
+					<td width="200"><%= pp.direcao %></td>
+					<td width="40" align="right"><%= pp.qtd.to_f %></td>
+					<td width="40" align="right"><%= pp.qtd_enviado.to_f %></td>
+					<td width="40" align="right"><%= pp.qtd.to_f - pp.qtd_enviado.to_f %></td>
+				</tr>
+
+				<% count += 1 %>
+				<% saldo += (pp.qtd.to_f - pp.qtd_enviado.to_f) %>
+
+			<% end %>
+		</table>
+	</div>
 	<table class="head_grid">
 		<tr>
-			<td width="40" align="center">Origin</td>
-			<td width="50" align="center"><%= t('CODE') %></td>
-			<td width="200">Cliente</td>
-			<td width="200">Direción</td>
-			<td width="40" align="right">Ctd.</td>
-			<td width="40" align="right">Env.</td>
-			<td width="40" align="right">Saldo</td>
+			<td >Ventas <%= count %></td>
+			<td width="480"></td>
+			<td width="42" align="right"><%= saldo %></td>
 		</tr>
 	</table>
-	<div class="rolagem" dir="div" style="height: 160px">
-	<table>
-		<% count = 0 %>
-		<% saldo = 0 %>
-		<% @pedidos_pendentes.each do |pp| %>
-			<% if pp.status.to_i == 0 %>
-				<% color = '#9ce5ab'%>
-			<% elsif pp.status == 2 %>
-				<% color = '#f2f296'%>
-			<% end %>
-
-			<tr class="<%= cycle("cor1", "cor2")%> clickable-row" style="background-color: <%= color %>;" data-href="/lista_cargas/<%= @lista_carga.id %>?presupuesto_id=<%= pp.id %>&data=<%= @lista_carga.data_emisao %>">
-        <td width="40" align="center" height="20">
-          <% if pp.origem == 1 %>
-            <span style="background:green; color: #fff; border-radius: 4px;padding:4px;">EXT</span>
-          <% else %>
-            <span style="background:#ffb600; color: #fff; border-radius: 4px;padding:4px;">INT</span>
-          <% end %>
-        </td>			
-				<td width="50" align="center"><%= pp.id.to_s.rjust(6,'0') %></td>
-				<td width="200"><%= pp.cliente_nome %></td>
-				<td width="200"><%= pp.direcao %> - <%= pp.entrega %></td>
-				<td width="40" align="right"><%= pp.qtd.to_f %></td>
-				<td width="40" align="right"><%= pp.qtd_enviado.to_f %></td>
-				<td width="40" align="right"><%= pp.qtd.to_f - pp.qtd_enviado.to_f %></td>
-			</tr>
-
-			<% count += 1 %>
-			<% saldo += (pp.qtd.to_f - pp.qtd_enviado.to_f) %>
-
-		<% end %>
-	</table>
-</div>
-<table class="head_grid">
-	<tr>
-		<td style="padding: 13px;"><b>Pedidos <%= count %></b></td>
-		<td width="496"></td>
-		<td width="42" align="right"><b><%= saldo %></b></td>
-	</tr>
-</table>
+	<br>
+	</div>
 </div>
 <script>
 	jQuery(document).ready(function($) {
 	    $(".clickable-row").click(function() {
 	        window.document.location = $(this).data("href");
 	    });
-	});	
+	});
 </script>

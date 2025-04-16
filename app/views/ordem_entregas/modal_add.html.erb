@@ -1,0 +1,31 @@
+<div class="row">
+	<div class="col-md-6">
+		<div class="panel">
+			<h1 id="header">Pendiente de Entrega</h1>
+			<%= render 'pendente_entrega' %>
+		</div>
+	</div>
+	<div class="col-md-6">
+		<%= render 'lista_ordem_entrega_produtos' %>
+		<%= render 'local_entrega' %>
+	</div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="ModalOeEndereco">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close  btn-close" data-dismiss="modal2" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h2 class="modal-title" id="myModalLabel" align="center">Local Entrega</h2>
+      </div>
+      <div class="modal-body-oe-endereco">
+      	<div class="group">
+      		<%= render :partial=>"modal_new_endereco", locals: {persona_id: @ordem_entrega.persona_id} %>
+      	</div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -254,6 +254,8 @@
           <td>
           	<% if current_unidade.id == 1 %>
           		<%= link_to 'Re-imprimir', "#",  :onclick => "MultiplaFaturaVenda(#{ft.id})" %>
+          	<% elsif current_unidade.id == 4 %>
+          		<%= link_to 'Re-imprimir', "#",  :onclick => "MultiplaFaturaVenda(#{ft.id})" %>
           	<% else %>
           		<%= link_to 'Re-imprimir', "#",  :onclick => "print1(#{ft.id})" %>
           	<% end %>
@@ -286,7 +288,7 @@
 						<% end %>
 
 						<!-- controle de impressao !-->
-						<% if @fts.first.status.to_i == 1 and @fts.first.impressao.to_i == 0 and @fts.first.autorizacao == true %>
+						<% if @fts.first.status.to_i == 1 and @fts.first.impressao.to_i == 0 %>
 							<script type="text/javascript">
 								function MultiplaFaturaVenda(){
 									window.open('/form_fiscals/' + <%= @fts.first.id %> +'/impressao_ft', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');

@@ -9,10 +9,24 @@
   }
 </style>
 <table>
+  <tr>
+    <td colspan="3"><h2><%= current_unidade.nome_sys %></h2></td>
+  </tr>
+  <tr>
+    <td colspan="3"><%= Time.now.strftime("%d/%m/%Y - %H:%M") %></td>
+  </tr>
+  <tr>
+    <td colspan="3">Usuario: <%= current_user.usuario_nome %></td>
+  </tr>
+  <tr>
+    <td colspan="3"><hr></td>
+  </tr>
+
+
         <tr>
-          <td width="30">Codigo</td>
-          <td width="150">Produto</td>
-          <td width="40" align="right">Cantidad</td>
+          <td width="30"><b>Codigo</b></td>
+          <td width="150"><b>Produto</b></td>
+          <td width="40" align="right"><b>Cantidad</b></td>
         </tr>
 
       <% quebra = "" %>

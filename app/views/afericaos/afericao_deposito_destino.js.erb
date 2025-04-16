@@ -1,0 +1,9 @@
+$('#afericao_deposito_origem_id').val(<%= @produto.last.deposito_id %>);
+$('#afericao_produto_id').val(<%= @produto.last.produto_id %>);
+$('#afericao_quantidade').val(<%= @produto.last.litros %>);
+$('#afericao_bico_id').val(<%= @produto.last.bico_id %>);
+$('#afericao_deposito_id').empty();
+$('#afericao_deposito_id').append('<option value="">Selecione lo Deposito</option>');
+<% for ne in @depositos %>
+  $('#afericao_deposito_id').append($("<option></option>").attr("value",<%= ne.id %>).text('<%= ne.nome %>').change());
+<% end %>

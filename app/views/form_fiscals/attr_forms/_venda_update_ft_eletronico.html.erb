@@ -1,7 +1,7 @@
 <%= form_tag "#", remote: true, id: "send_fatura" do %>
 	<%= hidden_field_tag :cod_proc, @venda.id %>
 	<%= hidden_field_tag :sigla_proc, 'VT' %>
-	<%= hidden_field_tag :data, @venda.data %>
+	<%= hidden_field_tag :data, Time.now.strftime("%d/%m/%Y") %>
 	<%= hidden_field_tag :status, 1 %>
 	<%= hidden_field_tag :tipo, @venda.tipo %>
 	<%= hidden_field_tag :persona_id, @venda.persona_id %>
@@ -12,7 +12,7 @@
 	<table>
 		<% if @venda.persona.cidade.blank? %>
 	   <div class="alert alert-danger" role="alert">
-	      Atualize a Cidade do Cadastro <%= link_to 'Aqui', "#", onclick: "OpenPersonaEdit()" %>    
+	      Atualize a Cidade do Cadastro <%= link_to 'Aqui', "#", onclick: "OpenPersonaEdit()" %>
 	   </div>
    <% end %>
 
@@ -24,7 +24,7 @@
 		<% nome = '' %>
 	<% end %>
 	<tr>
-		
+
 		<% if (PersonaProduto.where(persona_id: @venda.persona_id).count(:id).to_i == 0) %>
 			<td colspan="2">
 				<label>RUC</label>
@@ -40,7 +40,7 @@
 
 	</tr>
 	<tr>
-		
+
 		<% if (PersonaProduto.where(persona_id: @venda.persona_id).count(:id).to_i == 0) %>
 			<td colspan="2">
 				<label>Nombre</label>
@@ -74,7 +74,7 @@
 			</td>
 		</tr>
 	</table>
-<% end %>          
+<% end %>
 
 
 <div class="modal fade" id="ModalStatusFe" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -184,7 +184,7 @@
             }
             $("#spinner-add-prod").hide("fast");
           }
-      });  		
+      });
   	});
 
 
@@ -207,7 +207,7 @@
             }
             $("#spinner-add-prod").hide("fast");
           }
-      });  		
+      });
   	});
   </script>
 

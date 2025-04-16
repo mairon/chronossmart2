@@ -1,29 +1,24 @@
+<script type="text/javascript" src="/qz-v2/js/qz-tray.js"></script>
+
 <!-- Required scripts -->
-<script type="text/javascript" src="/qz/js/qz-tray.js"></script>
-<script type="text/javascript" src="/qz/js/dependencies/rsvp-3.1.0.min.js"></script>
-<script src="https://cdn.rawgit.com/kjur/jsrsasign/c057d3447b194fa0a3fdcea110579454898e093d/jsrsasign-all-min.js"></script>
-<script type="text/javascript" src="/qz/js/dependencies/sha-256.min.js"></script>
+<script type="text/javascript" src="/qz-v2/js/sample/promise-polyfill-8.1.3.min.js"></script>
+<script type="text/javascript" src="/qz-v2/js/sample/whatwg-fetch-3.0.0.min.js"></script>
+<script type="text/javascript" src="/qz-v2/js/sample/padstart-pollyfill.js"></script>
+<script type="text/javascript" src="/qz-v2/js/sample/array-from-pollyfill.js"></script>
 
-<!-- Pollyfills -->
-<script type="text/javascript" src="/qz/js/sample/jquery-1.11.3.min.js"></script>
-<script type="text/javascript" src="/qz/js/sample/bootstrap.min.js"></script>
-
-
-<script type="text/javascript" src="/qz/js/sample/promise-polyfill-8.1.3.min.js"></script>
-<script type="text/javascript" src="/qz/js/sample/whatwg-fetch-3.0.0.min.js"></script>
-<script type="text/javascript" src="/qz/js/sample/padstart-pollyfill.js"></script>
-<script type="text/javascript" src="/qz/js/sample/array-from-pollyfill.js"></script>
-<script src="/qz/assets/signing/sign-message.js"></script>
+<!-- Page styling -->
+<script type="text/javascript" src="/qz-v2/js/sample/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/qz-v2/js/sample/bootstrap.min.js"></script>
 
 <script>
-	qz.websocket.connect();
+  qz.websocket.connect();
 
 
 
-	qz.security.setCertificatePromise(function(resolve, reject) {
-	   fetch("/qz/assets/signing/digital-certificate.txt", {cache: 'no-store', headers: {'Content-Type': 'text/plain'}})
-	      .then(function(data) { data.ok ? resolve(data.text()) : reject(data.text()); });
-	});    
+  qz.security.setCertificatePromise(function(resolve, reject) {
+     fetch("/qz/assets/signing/digital-certificate.txt", {cache: 'no-store', headers: {'Content-Type': 'text/plain'}})
+        .then(function(data) { data.ok ? resolve(data.text()) : reject(data.text()); });
+  });    
  
 
     /// Connection ///
@@ -116,73 +111,6 @@
     }
 
 </script>
-<% #impressoes de ticket para cozinha multi destino de impressoras %>
-<% if params[:proc] == 'ticket_cozinha_multi_print' %>
-
-<% set_prints = VendasProduto.joins(:produto).select("produtos.set_print").where("produtos.set_print is not null and produtos.preparacao = true and vendas_produtos.venda_id = #{params[:venda_id]} and vendas_produtos.print = false").group("1") %>
-<div class="row" align="center">
-	<div class="col-md-12">
-		<h1>Impressoras</h1>
-
-		<% ind = 1 %>
-		<% set_prints.each do |sp| %>
-			<p><input type="text" name="" value="<%= sp.set_print %>" id="printere<%= ind %>"></p>
-			<% a = "print#{ind}()" %>
-			<script>	
-				function <%= a %>{
-				  qz.printers.find($("#printere<%= ind %>").val()).then((found) => {
-				      var config = qz.configs.create(found);
-				      var data = [{
-				          type: 'pixel',
-				          format: 'html',
-				          flavor: 'file',
-				          data: "/vendas/<%= params[:venda_id] %>/ticket_cozinha?set_print=" + $("#printere<%= ind %>").val()
-				      }];
-				      return qz.print(config, data);
-				  }).catch((e) => {
-				      alert(e);
-				  })
-				};
-			</script>
-			<% ind += 1 %>
-		<% end %>
-	</div>
-</div>
-<div class="row" align="center">
-	<div class="col-md-12">
-		<br>
-		<button id="btn-print" class="btn btn-blue">Imprimir</button>		
-	</div>
-</div>
-
-
-<script>	
-  $('#btn-print').click(function() {
-		<% ind = 1 %>
-		<% set_prints.each do |sp| %>
-				<% a = "print#{ind}();" %>
-				<%= a %>
-				<% ind += 1 %>
-		<% end %>
-
-    $.ajax({
-      url: "/vendas/update_set_print",
-      dataType: "json",
-      data: {
-        venda_id: <%= params[:venda_id] %>
-      },
-      success: function( data ) {
-				$.each(data["produtos"], function(index, val) { 
-					window.opener.$("#opener"+ val.id).show();
-                    window.opener.$("#borrar"+ val.id).hide();
-				  console.log(val.id)
-				});
-      },
-    });		
-  });	
-</script>
-<% #impressoes de ticker comprovante venda %>
-<% elsif params[:proc] == 'ticket_comprovante' %>
 
 <% set_prints = ConfigPrinter.where(processo: 'COMPROVANTE_VENDA', unidade_id: current_unidade.id) %>
 <div class="row" align="center">
@@ -197,13 +125,20 @@
                 function <%= a %>{
                   qz.printers.find($("#printere<%= ind %>").val()).then((found) => {
                       var config = qz.configs.create(found);
-                      var data = [{
-                          type: 'pixel',
-                          format: 'html',
-                          flavor: 'file',
-                          data: "/vendas/<%= params[:venda_id] %>/comprovante01"
-                      }];
-                      return qz.print(config, data);
+                               var printData = [
+                                    '\x1B' + '\x69' + '\x61' + '\x00' + '\x1B' + '\x40',
+                                    '\x1B' + '\x4D' + '\x31', // normal text
+                                    '\x1B' + '\x61' + '\x30', // left align
+                                    '---------------------------------------------------' + '\x0A',
+                                    '<%= params[:venda_id] %>' + '\x0A',
+                                    '---------------------------------------------------' + '\x0A',
+
+                                    '\x0A \x0A \x0A \x0A \x0A',
+                                    '\x0A ',
+                                    '\x0C'
+
+                                    ];
+                      return qz.print(config, printData);
                   }).catch((e) => {
                       alert(e);
                   })
@@ -231,5 +166,3 @@
       <% end %>    
   });   
 </script>
-
-<% end %>

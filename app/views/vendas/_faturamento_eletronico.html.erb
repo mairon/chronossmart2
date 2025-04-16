@@ -24,6 +24,7 @@
 		      <div class="rolagem" dir="div" style="height: 180px">
 		        <table>
 		          <% @fts.each do |ft| %>
+              <%= render partial: "/form_fiscals/consulta_estado", locals: {cdc: ft.cdc} %>
 		          <% if ft.status == 2 %>
 		            <% anulada  = 'li-ft' %>
 		          <% end %>
@@ -35,33 +36,62 @@
                     <% end %>
                   </td>
 		              <td  width="100"><%= ft.doc_01 %>.<%= ft.doc_02 %>.<%= ft.doc %></td>
-                  
 
-                  <td  width="60" title="<%= ft.cdc %>"><small></small></td>
-                  <td class="bold"></td>
+
+                  <td width="60" title="<%= ft.cdc %>"><small><%= ft.cdc.to_s[38..44] %></small></td>
+                  <td>
+                    <%= @get_resp["deList"][0]["situacion"].to_s %> -
+                    <% if @get_resp["deList"][0]["situacion"].to_s == '0' %>
+                      Generado DE
+                    <% elsif @get_resp["deList"][0]["situacion"].to_s == '1' %>
+                      Enviado en un Lote
+                    <% elsif @get_resp["deList"][0]["situacion"].to_s == '2' %>
+                      Aprobado
+                    <% elsif @get_resp["deList"][0]["situacion"].to_s == '3' %>
+                      Aprobado con observacion
+                    <% elsif @get_resp["deList"][0]["situacion"].to_s == '4' %>
+                      <span style="color: red">Rechazado</span>
+                    <% elsif @get_resp["deList"][0]["situacion"].to_s == '98' %>
+                      Inexistente
+                    <% elsif @get_resp["deList"][0]["situacion"].to_s == '99' %>
+                      Cancelado
+                    <% end %><br>
+                    <%= @get_resp["deList"][0]["respuesta_mensaje"] %>
+                  </td>
 		              <% if ft.status == 1 %>
                     <td><span class="btn-success">Activo</span></td>
-		                <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(ft, status: '2', modal: 'true') %></td>
-                    
-                    <% if current_user.tipo.to_i == 0  %>
-		                  <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>
-                    <% end %>
-                    
-                    <% if ft.tipo_emissao.to_i == 0 %>
-                      <td><%= link_to 'Re-imprimir', "#",  :onclick => "MultiplaFaturaVenda(#{ft.id})" %></td>
-                    <% else %>
+                    <% if ft.tipo_emissao.to_i == 1 %>
+                      <% if @get_resp["deList"][0]["situacion"].to_s == '2' %>
+                        <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(ft, status: '2', modal: 'true') %></td>
+                      <% else %>
+                        <td>
+                          <%= link_to  "Inutilizar", "#", "data-toggle" => "modal", "data-target" =>"#modal-inutilizacion" %>
+                          <%= render partial: "form_fiscals/eventos/inutilizacion", locals: { form_fiscal: ft } %>
+                        </td>
+                      <% end %>
                       <td><%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: ft.cdc, id: ft.id) %></td>
+                    <% else %>
+                      <% if current_user.tipo.to_i == 0  %>
+                        <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>
+                      <% end %>
+                      <td><%= link_to 'Re-imprimir', "#",  :onclick => "MultiplaFaturaVenda(#{ft.id})" %></td>
                     <% end %>
-		              <% else %>
+
+		              <% elsif ft.status == 2 %>
 		                <td><span class="btn-danger">Anulado</span></td>
-                    
+
                     <% if current_user.tipo.to_i == 0  %>
 		                  <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>
                     <% end %>
 
                     <% if ft.tipo_emissao.to_i == 1 %>
                       <td><%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: ft.cdc, id: ft.id) %></td>
-                    <% end %>                    
+                    <% end %>
+                  <% elsif ft.status == 3 %>
+                    <td><span class="btn-warning">Inutilizado</span></td>
+                    <% if ft.tipo_emissao.to_i == 1 %>
+                      <td><%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: ft.cdc, id: ft.id) %></td>
+                    <% end %>
 		              <% end %>
 		            </tr>
 
@@ -94,7 +124,7 @@
                               </div>
                               <div class="col-md-12">
                                 <label>Nº</label>
-                                
+
                               </div>
                               <div class="col-md-12">
                                 <label>Status</label>
@@ -106,15 +136,15 @@
                               </div>
                               <div class="col-md-12">
                                 <label class="bold">Estado SET</label>
-                                
+
                               </div>
                               <div class="col-md-12">
                                 <label class="bold">Situacion SET</label>
-                                                         
+
                               </div>
                             </div>
                           </div>
-                        </div>                        
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -126,13 +156,13 @@
     </div>
 <% unless @fts.present? %>
 	<div class="group">
-    <%= render partial: "form_fiscals/attr_forms/venda_update_ft_eletronico" %> 
+    <%= render partial: "form_fiscals/attr_forms/venda_update_ft_eletronico" %>
 	</div>
 <% else %>
 	<% if @fts.first.status.to_i != 1 %>
 
 	<div class="group">
-		<%= render partial: "form_fiscals/attr_forms/venda_update_ft_eletronico" %> 
+		<%= render partial: "form_fiscals/attr_forms/venda_update_ft_eletronico" %>
 	</div>
 	<% end %>
 
@@ -142,4 +172,3 @@
 			}
 		</script>
 <% end %>
-

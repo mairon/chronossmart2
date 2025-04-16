@@ -6,10 +6,12 @@ class Venda < ActiveRecord::Base
   has_many :vendas_pedidos,   :order => 1, :dependent => :destroy
   has_many :venda_romaneios,   :order => 1, :dependent => :destroy
   has_many :vendas_ordem_servs,   :order => 1, :dependent => :destroy
+  has_many :vendas_cond_liqs,   :order => 1, :dependent => :destroy
   has_many :venda_devolucaos,   :order => 1, :dependent => :destroy
   has_many :vendas_faturas
   has_many :venda_compras
   has_many :evento_convidados
+  has_many :ordem_entregas
   belongs_to :persona
   belongs_to :terminal
   belongs_to :usuario
@@ -18,11 +20,14 @@ class Venda < ActiveRecord::Base
   belongs_to :cartao
   belongs_to :tabela_preco
   belongs_to :plano_venda
+  belongs_to :unidade
+  belongs_to :setor
+  belongs_to :plano
 
   before_save :finds
 
-  validates_presence_of :persona_id, :tabela_preco_id, :moeda, :tipo_venda
-  validate  :block_cliente
+  #validates_presence_of :persona_id, :tabela_preco_id, :moeda, :tipo_venda
+  #validate  :block_cliente
   before_destroy :destroy_cartao
 
   def destroy_cartao
@@ -161,7 +166,6 @@ class Venda < ActiveRecord::Base
     if forma_de_pagamento.tipo.to_i == 0
 
       if params[:forma_pg] == '15' #transf bancaria
-        puts 'aquiiiii'
         VendasFinanca.create( :venda_id        => params[:id],
                                 :forma_pago_id   => params[:forma_pg],
                                 :cartao_bandeira_id => params[:busca]["cartao_bandeiras"],
@@ -192,13 +196,13 @@ class Venda < ActiveRecord::Base
                                 :nr_comprovante  => params[:nr_comprovante],
                                 :desconto        => params[:desc_gs].to_f,
                                 :usuario_id      => params[:usuario_id],
+                                :usuario_created => params[:usuario_id],
                                   :fact_ad_01      => params[:fact_ad_01],
                                   :fact_ad_02      => params[:fact_ad_02],
                                   :fact_ad      => params[:fact_ad],
                                   :obs          => params[:obs]
                )
       else
-        puts 'não aquiiii'
         VendasFinanca.create( :venda_id        => params[:id],
                                 :forma_pago_id   => params[:forma_pg],
                                 :cartao_bandeira_id => params[:busca]["cartao_bandeiras"],
@@ -228,6 +232,7 @@ class Venda < ActiveRecord::Base
                                 :nr_comprovante  => params[:nr_comprovante],
                                 :desconto        => params[:desc_gs].to_f,
                                 :usuario_id      => params[:usuario_id],
+                                :usuario_created => params[:usuario_id],
                                   :fact_ad_01      => params[:fact_ad_01],
                                   :fact_ad_02      => params[:fact_ad_02],
                                   :fact_ad      => params[:fact_ad],
@@ -266,6 +271,7 @@ class Venda < ActiveRecord::Base
                               :valor_peso      => vuel_ps,
                               :cred_deb        => 1,
                               :usuario_id      => params[:usuario_id],
+                              :usuario_created => params[:usuario_id],
                                 :fact_ad_01      => params[:fact_ad_01],
                                 :fact_ad_02      => params[:fact_ad_02],
                                 :fact_ad      => params[:fact_ad],
@@ -317,6 +323,7 @@ class Venda < ActiveRecord::Base
                                 :valor_peso      => parc_ps.to_f,
                                 :desconto        => params[:desc_gs].to_f,
                                 :usuario_id      => params[:usuario_id],
+                                :usuario_created => params[:usuario_id],
                                 :fact_ad_01      => params[:fact_ad_01],
                                 :fact_ad_02      => params[:fact_ad_02],
                                 :fact_ad      => params[:fact_ad],
@@ -373,7 +380,7 @@ class Venda < ActiveRecord::Base
                    V.DOCUMENTO_NUMERO_01 || '-' || V.DOCUMENTO_NUMERO_02 || '-' || V.DOCUMENTO_NUMERO AS DOC, 
                    (SELECT SUM(VF.ID) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID) AS FIN,
                    (SELECT SUM(VP.QUANTIDADE) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID) AS QTD,
-                   (SELECT SUM(VP.TOTAL_GUARANI) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID) AS TOT_GS,
+                   ((SELECT SUM(VP.TOTAL_GUARANI) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID) - v.desconto_gs) AS TOT_GS,
                    (SELECT SUM(VP.TOTAL_DOLAR) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID) AS TOT_US,
                    (SELECT SUM(VP.TOTAL_REAL) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID) AS TOT_RS
             FROM VENDAS V
@@ -395,11 +402,6 @@ class Venda < ActiveRecord::Base
   end
 
   def finds
-    vendedor = Persona.find_by_id(self.vendedor_id);
-    self.vendedor_nome = vendedor.nome.to_s unless  self.vendedor_id.blank?
-
-    per = Persona.find_by_id(self.persona_id);
-    self.persona_nome = per.nome unless  self.persona_id.blank?
     md =  Moeda.last(:select => 'dolar_compra,rs_us_compra,real_compra,ps_gs_compra')
     self.cotacao = md.dolar_compra
     self.cotacao_real = md.real_compra

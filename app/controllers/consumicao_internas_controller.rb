@@ -20,6 +20,13 @@ class ConsumicaoInternasController < ApplicationController
     render layout: 'chart'
   end
 
+  def comprovante_ticket
+    @consumicao_interna = ConsumicaoInterna.find(params[:id])
+    @consumicao_interna_produtos = ConsumicaoInternaProduto.where("consumicao_interna_id = #{@consumicao_interna.id}").order('id')
+
+    render :layout => false
+  end
+
   def comprovante
     @consumicao_interna = ConsumicaoInterna.find(params[:id])
     @consumicao_interna_produtos = ConsumicaoInternaProduto.where("consumicao_interna_id = #{@consumicao_interna.id}").order('id')

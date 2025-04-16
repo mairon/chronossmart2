@@ -1,34 +1,32 @@
 <%= form_tag gerar_cotas_credito_adelantos_path, :method => "get" do %>
-  <%= hidden_field_tag :id, @adelanto.id %>    
-    <table>
-      <tr>
-        <td align="right"> Primeiro Venc.:</td>
-        <td>
-          <%= text_field_tag :venci, @adelanto.data.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)", autofocus: true %>
-          <div class="input-group-addon-f">
-            <span class="icon-calendar"></span>
-          </div> 
-        </td>
-        <td align="right"> Cuotas:</td>
-        <td>
-        <input type="text"  name="cotas" id="cotas" min="1"  size="10" value="1" />
-        </td>
-        <% if @adelanto.moeda == 0 %>
-          <td>
-          <input  type="hidden"  name="valor_us" id="valor_us"  size="15" value="<%= @adelanto.valor_dolar %>" class = "money_gs" dir   = "rtl" />
-          </td>
-        <% elsif @adelanto.moeda == 1 %>
-          <td>
-          <input  type="hidden"  name="valor_gs" id="valor_gs"  size="15" value="<%= (@adelanto.valor_guarani.to_f) %>" class = "money_gs" dir   = "rtl" />
-          </td>
-        <% else %>
-          <td>
-          <input  type="text"  name="valor_rs" id="valor_rs"  size="15" value="<%= @adelanto.valor_real %>" class = "money_rs" dir   = "rtl" />
-          </td>
+  <%= hidden_field_tag :id, @adelanto.id %>
+  <div class="row">
+    <div class="col-md-3">
+      <label>Primeiro Venc.</label>
+      <%= text_field_tag :venci, @adelanto.data.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)", autofocus: true %>
+      <div class="input-group-addon-f">
+        <span class="icon-calendar"></span>
+      </div>       
+    </div>
 
-        <% end %>
-        <td colspan='2' align="right"><%= submit_tag t('SAVE'), class: 'btn btn-green', disable_with: "Aguarde...", "data-plus-as-tab" => "false" %></td>
-      </tr>
-    </table>
+    <div class="col-md-3">
+      <label>Cuotas</label>
+      <input type="text"  name="cotas" id="cotas" min="1" value="1" class="panel-field" />
+    </div>
+
+    <div class="col-md-3">
+      <label>Valor</label>
+      <% if @adelanto.moeda == 0 %>
+        <input type="hidden"  name="valor_us" id="valor_us" value="<%= @adelanto.valor_dolar %>" class = "money_gs panel-field" dir="rtl" />
+      <% elsif @adelanto.moeda == 1 %>
+        <input type="hidden"  name="valor_gs" id="valor_gs" value="<%= (@adelanto.valor_guarani.to_f) %>" class = "money_gs panel-field" dir   = "rtl" />
+      <% else %>
+        <input type="text"  name="valor_rs" id="valor_rs" value="<%= @adelanto.valor_real %>" class = "money_rs panel-field" dir="rtl" />
+      <% end %>
+    </div>
+
+    <div class="col-md-3 padding-btn">
+      <%= submit_tag t('SAVE'), class: 'btn btn-green', disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>      
+    </div>    
+  </div> 
 <% end %>
-

@@ -1,119 +1,103 @@
-<%= form_for(@dev_cheque_cliente) do |f| %>
-  <% if @dev_cheque_cliente.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@dev_cheque_cliente.errors.count, "error") %> prohibited this dev_cheque_cliente from being saved:</h2>
+  <div class="panel">
+    <h1 id="header">
+      Devolución de Cheque Cliente
+    </h1>      
+    <%= form_for(@dev_cheque_cliente) do |f| %>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-7">
+            <label><%= t('DATE') %></label>
+            <%= f.date_select :data %>
+          </div>
+          <div class="col-md-2">
+            <label>Cotz.</label>
+           <%= f.text_field :cotacao, :size  => 8, :dir   => "rtl", :class => "money_gs", :required => true %>
+          </div> 
+          <div class="col-md-2">
+            <label>R$xG$</label>
+            <%= f.text_field :cotacao_real, :size  => 8, :dir   => "rtl", :class => "money_gs", :required => true %>           
+          </div>   
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <label>Motivo</label>
+            <%= f.collection_select :motivos_dev_cheque_id, MotivosDevCheque.all( :select => ' id,nome', :order  => '2' ), :id, :nome,{:prompt => 'Seleccione el Motivo'},{onchange: "fp(this.options[this.selectedIndex].value)", :class => "selectize"} %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <label>Cliente</label>
+            <%= f.collection_select :persona_id, Persona.all( :select => ' id,nome', :conditions => ["tipo_cliente = 1"], :order  => '2' ), :id, :nome,{:prompt => 'Seleccione el Cliente'},{:class => "selectize"} %>
+          </div>
+        </div>
 
-      <ul>
-      <% @dev_cheque_cliente.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
+        <div class="row">
+          <div class="col-md-12">
+            <label>Cuenta</label>
+            <%= f.collection_select :conta_id, Conta.all( :select => ' id,nome', :conditions => ["unidade_id = #{current_unidade.id}"], :order  => '2' ), :id, :nome,{:prompt => 'Seleccione la Cuenta'}, { class: "selectize"} %>           
+          </div>
+        </div>
+
+        <div class="row vueldo" hidden>
+          <div class="col-md-12">
+            <label>Cuenta Vuelto</label>
+            <%= f.collection_select :vuelto_conta_id, Conta.all( :select => ' id,nome', :conditions => ["unidade_id = #{current_unidade.id} and tipo = 0 "], :order  => '2' ), :id, :nome,{:prompt => 'Seleccione la Cuenta'}, { class: "selectize"} %>
+          </div>    
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <br>
+            <%= f.text_area :obs, rows: '4', class: 'panel-field', placeholder: 'Concepto' %>            
+          </div>
+        </div>
+
+      <div class="footer-buttons">
+        <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      </div>    
     </div>
-  <% end %>
+    <% end %>
+</div>
 
-<ul class="tabs">
-      <li><a href="#tab1"> Devolución de Cheque Cliente - [<%= t('EDITION') %>]</a></li>
-</ul>
+<% if params[:action] == 'new' %>
+  <script type="text/javascript">
+    $.ajax({url: '/buscas/cotz_us_compra',
+            type: 'POST',
+            beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+            data: 'data=' + $('#cobro_data_3i').val()+'/'+
+                            $('#cobro_data_2i').val()+'/'+
+                            $('#cobro_data_1i').val(),
+            success: function(data){
+            $('#dev_cheque_cliente_cotacao').val(number_format( data,0, ',', '.') );} });
 
-<div class="tab_container">
-      <div id="tab1" class="tab_content">
-        <table>
-          <tr>
-            <td width="1000">
-              <fieldset>
+    $.ajax({url: '/buscas/cotz_rs_compra',
+            type: 'POST',
+            beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+            data: 'data=' + $('#cobro_data_3i').val()+'/'+
+                            $('#cobro_data_2i').val()+'/'+
+                            $('#cobro_data_1i').val(),
+            success: function(data){
+            $('#dev_cheque_cliente_cotacao_real').val(number_format( data,0, ',', '.'));} });
 
-                <table>
-                  <tr>
-                    <td align="right"><%= t('DATE') %>:</td>
-                    <td><%= f.date_select :data %></td>
-                  </tr>
-
-                  <tr>
-                    <td align="right">Cotización :</td>
-                      <td> <%= text_field  :dev_cheque_cliente, :cotacao,
-                        :size     => 10,
-                        :value    => @dev_cheque_cliente.cotacao.to_i,
-                        :onfocus  => " $.ajax({url: '/buscas/cotz_us_compra',
-                                          type: 'POST',
-                                          data: 'data=' + $('#dev_cheque_cliente_data_3i').val()+'/'+
-                                          $('#dev_cheque_cliente_data_2i').val()+'/'+
-                                          $('#dev_cheque_cliente_data_1i').val(),
-                                          success: function(data){
-                                            $('#dev_cheque_cliente_cotacao').val(data);} })"%>
-                    </td>
-
-                    <td align="right">Cotización :</td>
-                    <td> <%= text_field :dev_cheque_cliente,:cotacao_real ,
-                                                  :size     => 10,
-                                                  :value    => @dev_cheque_cliente.cotacao_real.to_i,
-                                                  :onfocus  => " $.ajax({url: '/buscas/cotz_rs_compra',
-                                                                 type: 'POST',
-                                                                 data: 'data=' + $('#dev_cheque_cliente_data_3i').val()+'/'+
-                                                                 $('#dev_cheque_cliente_data_2i').val()+'/'+
-                                                                 $('#dev_cheque_cliente_data_1i').val(),
-                                                                 success: function(data){
-                                                                   $('#dev_cheque_cliente_cotacao_real').val(data);} })"%>
+  </script>
+<% end %>
 
 
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td align="right">Motivo:</td>
-                    <td colspan="4"><%= f.collection_select :motivos_dev_cheque_id, MotivosDevCheque.all( :select => ' id,nome', :order  => '2' ), :id, :nome,{:prompt => 'Seleccione el Motivo'},{onchange: "fp(this.options[this.selectedIndex].value)", :class => "selc_medium"} %></td>
-                  </tr>
-
-                  <tr>
-                    <td align="right">Nombre :</td>
-                    <td colspan="4"><%= f.collection_select :persona_id, Persona.all( :select => ' id,nome', :conditions => ["tipo_cliente = 1"], :order  => '2' ), :id, :nome,{:prompt => 'Seleccione el Cliente'},{:class => "selc_medium"} %></td>
-                  </tr>
-
-                  <tr>
-                    <td align="right">Cuenta :</td>
-                    <td><%= f.collection_select :conta_id, Conta.all( :select => ' id,nome', :conditions => ["unidade_id = #{current_unidade.id}"], :order  => '2' ), :id, :nome,{:prompt => 'Seleccione la Cuenta'} %></td>
-                  </tr>
-
-                  <tr>
-                    <td align="right"> <span  class="title_vuelto" style="display:none">Cuenta Vuelto:</span></td>
-                    <td><span   class="des_vuelto" style="display:none"><%= f.collection_select :vuelto_conta_id, Conta.all( :select => ' id,nome', :conditions => ["unidade_id = #{current_unidade.id} and tipo = 0 "], :order  => '2' ), :id, :nome,{:prompt => 'Seleccione la Cuenta'} %></span></td>
-                  </tr>
 
 
-                  <tr>
-                    <td align="right" valign="top">Concepto :</td>
-                    <td colspan="5"><%= f.text_area   :obs,:cols => 65, :rows => 5 %></td>
-                  </tr>
-
-                </table>
-              </fieldset>
-            </td>
-          </tr>
-        </table>
-      </div>
-
-      <div class="buttons">
-        <%= f.submit :value => " Seguir ", :class => "button" %>
-        <%= link_to t('BACK'), dev_cheque_clientes_path, :class => "button back" %>
-      </div>
-    </div>
     <script type="text/javascript">
-    $("#dev_cheque_cliente_data_3i").focus();
 
     function fp(v){
       $.ajax({url: '/dev_cheque_clientes/dynamic_motivo_dev_cheque',
         type: 'POST',
         data: 'id=' + v,
         success: function(data){
-          if(data == '1'){
-          $(".des_vuelto").css('display','block');
-          $(".title_vuelto").css('display','block');
+          if(data == 'false'){
+          $(".vueldo").show();
         }else{
-          $(".des_vuelto").css('display','none');
-          $(".title_vuelto").css('display','none');
-
+          $(".vueldo").hide();
         };
         }
       });
     }
     </script>
-<% end %>

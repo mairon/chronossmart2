@@ -1,10 +1,15 @@
 class TurmasController < ApplicationController
-  # GET /turmas
-  # GET /turmas.json
+
+  def busca
+    params[:unidade] = current_unidade.id
+    @turmas = Turma.filtro_busca(params)
+    render :layout => false
+  end
+
   def index
     @turmas = Turma.where(unidade_id: current_unidade.id).order(:id)
-    @turma = Turma.new 
-    
+    @turma = Turma.new
+
     render layout: 'chart'
   end
 
@@ -13,10 +18,7 @@ class TurmasController < ApplicationController
   def show
     @turma = Turma.find(params[:id])
 
-    respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @turma }
-    end
+    render layout: 'chart'
   end
 
   # GET /turmas/new
@@ -58,7 +60,7 @@ class TurmasController < ApplicationController
 
     respond_to do |format|
       if @turma.update_attributes(params[:turma])
-        format.html { redirect_to turmas_url }        
+        format.html { redirect_to turmas_url }
       else
         format.html { render action: "edit" }
       end

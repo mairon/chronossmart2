@@ -30,13 +30,13 @@
               </td>
               <td colspan="4">
                 <% if @vuelto == 'true' %>
-                  <h4 style="color:red; float:left;" >Selecione un Tipo de Vuelto para Cerrar lo Lanzamiento!</h4>  
+                  <h4 style="color:red; float:left;" >Selecione un Tipo de Vuelto para Cerrar lo Lanzamiento!</h4>
                 <% end %>
-                
+
               </td>
             </tr>
 
-            <tr> 
+            <tr>
               <td>
                 <label><%= t('ACCOUNT') %></label>
 
@@ -47,13 +47,13 @@
                 <% end %>
 
 
-                
+
               <a href="javascript:void(0)" class="button cheque_terc" onClick="busca_cheque_terceiros()" style="display:none; width: 80px;">Buscar <%= t('CHECKS') %></a>
               </td>
 
                   <%= field_us_label 'Total U$:',f,:valor_dolar, :value => format_decimal( @saldo_fina_us.to_f ), :onchange   => "UsToGsRsCtRs('cotacao','cotacao_real','cotacao_rs_us','pagos_financa_valor_dolar','pagos_financa_valor_guarani','pagos_financa_valor_real')" %>
 
-                 <%= field_gs_label 'Total Gs.:',f,:valor_guarani, 
+                 <%= field_gs_label 'Total Gs.:',f,:valor_guarani,
                                                :value => format_int( @saldo_fina_gs.to_f ), :onchange => "GsToUsRs('cotacao','cotacao_real','pagos_financa_valor_guarani','pagos_financa_valor_dolar','pagos_financa_valor_real')" %>
 
                   <%= field_us_label 'Total Rs.:',f,:valor_real, :value => format_decimal( @saldo_fina_rs.to_f ),
@@ -68,19 +68,19 @@
         <td colspan="4">
           <div class="group cheque" style="display:none; padding: 0px 10px 10px 0px">
             <table>
-              <tr>                 
+              <tr>
                 <td>
                   <label>Numero</label>
                   <%= f.text_field :cheque, style: 'width: 100%' %>
                 </td>
                 <td>
                   <label>Banco</label>
-                  <%= f.collection_select :banco_id, Persona.all( :select => ' id, nome', 
+                  <%= f.collection_select :banco_id, Persona.all( :select => ' id, nome',
                   :conditions => ["tipo_banco = 1"], :order  => '2' ), :id, :nome, {:prompt => "Selecione lo Banco"} %>
-                </td>                
+                </td>
                 <td>
-                  <label>Titular</label>
-                  <%= f.text_field :titular, style: "width: 100%;" %>
+                  <label>Favorecido</label>
+                  <%= f.text_field :titular, style: "width: 100%;", value: @pago.persona.nome %>
                 </td>
               </tr>
               <tr>
@@ -143,7 +143,7 @@ function RsToUsGsCtRs(ct,ctrs,ctusrs,gs,us,rs){
 </script>
 <script>
 
-  function Comprovante() 
+  function Comprovante()
   {
     window.open('/pagos/' + document.getElementById('id').value + '/comprovante', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
   }
@@ -172,7 +172,7 @@ $("#pagos_financa_conta_id").change(function() {
     },
     success: function(data){
       $('#moeda').val(data);
-      d = $('#moeda').val(); 
+      d = $('#moeda').val();
     }
   });
 });
@@ -196,32 +196,32 @@ function fp(v) {
     $(".titulo_data_dif").css('display','block');
     $("#pagos_financa_cheque_status").val('1');
     $(".campo_data_dif").css('display','block');
-    $("#pagos_financa_cred_deb").val('0');  
+    $("#pagos_financa_cred_deb").val('0');
     $(".cheque_terc").css('display','none');
 
   } else if( v == '1'){
     $(".cheque").css('display','none');
     $(".titulo_data_dif").css('display','none');
-    $(".conta").css('background','#bdefbd');    
+    $(".conta").css('background','#bdefbd');
     $(".campo_data_dif").css('display','none');
     $("#pagos_financa_cheque_status").val('0');
-    $("#pagos_financa_cred_deb").val('0');   
-    $(".cheque_terc").css('display','none'); 
+    $("#pagos_financa_cred_deb").val('0');
+    $(".cheque_terc").css('display','none');
   } else if( v == '3'){
     $(".cheque").css('display','none');
     $(".titulo_data_dif").css('display','none');
-    $(".conta").css('background','#bdefbd');    
+    $(".conta").css('background','#bdefbd');
     $(".campo_data_dif").css('display','none');
-    $("#pagos_financa_cheque_status").val('0');  
-    $("#pagos_financa_cred_deb").val('0');  
+    $("#pagos_financa_cheque_status").val('0');
+    $("#pagos_financa_cred_deb").val('0');
     $(".cheque_terc").css('display','none');
   } else if( v == '8'){
     $(".cheque").css('display','none');
     $(".cheque").css('background','#ff6d6d');
-    $(".conta").css('background','#ff6d6d');    
-    $(".titulo_data_dif").css('display','none');    
+    $(".conta").css('background','#ff6d6d');
+    $(".titulo_data_dif").css('display','none');
     $(".campo_data_dif").css('display','none');
-    $("#pagos_financa_cheque_status").val('0'); 
+    $("#pagos_financa_cheque_status").val('0');
     $("#pagos_financa_cred_deb").val('1');
     $(".cheque_terc").css('display','none');
 
@@ -229,29 +229,29 @@ function fp(v) {
   } else if( v == '9'){
     $(".cheque").css('display','block');
     $(".cheque").css('background','#ff6d6d');
-    $(".conta").css('background','#ff6d6d');    
-    $(".titulo_data_dif").css('display','block');    
+    $(".conta").css('background','#ff6d6d');
+    $(".titulo_data_dif").css('display','block');
     $(".campo_data_dif").css('display','block');
     $("#pagos_financa_cred_deb").val('1');
-    $("#pagos_financa_cheque_status").val('1'); 
-    $(".cheque_terc").css('display','none');   
+    $("#pagos_financa_cheque_status").val('1');
+    $(".cheque_terc").css('display','none');
   } else if( v == '11'){
     $(".cheque").css('display','block');
     $(".cheque").css('background','#bdefbd');
-    $(".conta").css('background','#bdefbd');    
+    $(".conta").css('background','#bdefbd');
     $(".titulo_data_dif").css('display','block');
     $(".cheque_terc").css('display','block');
     $(".campo_data_dif").css('display','block');
     $("#pagos_financa_cred_deb").val('0');
-    $("#pagos_financa_cheque_status").val('1'); 
-    
+    $("#pagos_financa_cheque_status").val('1');
+
 
   } else{
     $("#cheque_status").val('0');
     $(".title_venc").css('display','none');
     $(".content_venc").css('display','none');
-    $("#pagos_financa_cred_deb").val('0');  
-    $(".cheque_terc").css('display','none'); 
+    $("#pagos_financa_cred_deb").val('0');
+    $(".cheque_terc").css('display','none');
   }
 }
 
@@ -260,7 +260,7 @@ $('#pagos_financa_vuelto').click(function() {
     $(".tipo_vuelto").css('display','block');
   } else {
     $(".tipo_vuelto").css('display','none');
-  } 
+  }
 });
 
 function abre_vuelto(v) {
@@ -271,7 +271,7 @@ function abre_vuelto(v) {
   }else{
     $(".box_vuelto").css('display','block');
     $(".vuelto_cheque").css('display','block');
-    
+
   };
 }
 

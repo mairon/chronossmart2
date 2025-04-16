@@ -1,14 +1,15 @@
 <%= form_tag "/cobros/#{@cobro.id}/baixa_divida" do %>
-<div class="group">
+<div class="panel">
+  <div class="panel-content">
   <% empresa = Empresa.last(:select => "taxa_interes,segmento") %>
    <table class="head_grid" >
       <tr>
         <td width="20" align="center"><input type="checkbox" id="selectAllM" value="selectAllM"></td>
         <td width="60" align="center"><%= t('DATE') %></td>
-        <td width="40"></td>
+        <td width="30"></td>
         <td width="50"></td>
         <td width="100"><%= t('SOURCE_S') %></td>
-        <td width="150">CC</td>
+        <td width="250">CC</td>
         <% if empresa.segmento.to_i == 1 %>
           <td width="150">Aluno</td>
         <% end %>
@@ -43,13 +44,13 @@
 
               <!-- calculo de interes -->
               <%  dias = Date.today - c.vencimento.to_date if c.liquidacao == 0  %>
-              <%  if dias >= 0  %>           
-                  <%  interes_us = ( ( dias.to_i * empresa.taxa_interes.to_f ) * saldo_dolar.to_f) / 100 %>          
+              <%  if dias >= 0  %>
+                  <%  interes_us = ( ( dias.to_i * empresa.taxa_interes.to_f ) * saldo_dolar.to_f) / 100 %>
               <% else %>
-                 <%  interes_us = 0  %>          
+                 <%  interes_us = 0  %>
               <% end %>
               <% saldo_guarani = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
-              <tr title="<%= c.descricao %>" class = "<%= cycle( "cor1", "cor2" ) %>"                  
+              <tr title="<%= c.descricao %>" class = "<%= cycle( "cor1", "cor2" ) %>"
                   onMouseOver="javascript:this.style.backgroundColor='#e6ebf2'"
                   onMouseOut="javascript:this.style.backgroundColor=''"
                   onClick="Fecha( '<%= c.vencimento.strftime("%d").to_i %>',
@@ -73,7 +74,7 @@
                                   '<%= c.venda_id %>')">
 
             <% elsif @cobro.moeda.to_i == 1 %>
-             
+
               <% if c.moeda.to_i == 1 %>
                 <% saldo_guarani = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
                 <% saldo_guarani_original = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
@@ -84,10 +85,10 @@
 
               <!-- calculo de interes -->
               <%  dias = Date.today - c.vencimento.to_date if c.liquidacao == 0  %>
-              <%  if dias >= 0  %>           
-                  <%  interes_gs = ( ( dias.to_i * empresa.taxa_interes.to_f ) * saldo_guarani.to_f) / 100  %>      
+              <%  if dias >= 0  %>
+                  <%  interes_gs = ( ( dias.to_i * empresa.taxa_interes.to_f ) * saldo_guarani.to_f) / 100  %>
               <% else %>
-                 <%  interes_gs = 0  %>    
+                 <%  interes_gs = 0  %>
               <% end %>
 
               <% saldo_dolar = (c.divida_dolar.to_f - c.anterior_us.to_f) %>
@@ -122,17 +123,19 @@
               <% if c.moeda.to_i == 2 %>
                 <% saldo_real = (c.divida_real.to_f - c.anterior_rs.to_f) %>
                 <% saldo_real_original = (c.divida_real.to_f - c.anterior_rs.to_f) %>
+              <% elsif c.moeda.to_i == 1 %>
+                <% saldo_real = ((c.divida_guarani.to_f - c.anterior_gs.to_f) / @cobro.cotacao_real.to_f) %>
+                <% saldo_real_original = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
               <% end %>
 
               <!-- calculo de interes -->
               <%  dias = Date.today - c.vencimento.to_date if c.liquidacao == 0  %>
-              <%  if dias >= 0  %>           
-                  <%  interes_rs = ( ( dias.to_i * empresa.taxa_interes.to_f ) * saldo_real.to_f) / 100 %>          
+              <%  if dias >= 0  %>
+                  <%  interes_rs = ( ( dias.to_i * empresa.taxa_interes.to_f ) * saldo_real.to_f) / 100 %>
               <% else %>
-                 <%  interes_rs = 0  %>          
+                 <%  interes_rs = 0  %>
               <% end %>
-              <% saldo_guarani = (c.divida_guarani.to_f - c.anterior_gs.to_f) %>
-              <tr title="<%= c.descricao %>" class = "<%= cycle( "cor1", "cor2" ) %>"                  
+              <tr title="<%= c.descricao %>" class = "<%= cycle( "cor1", "cor2" ) %>"
                   onMouseOver="javascript:this.style.backgroundColor='#e6ebf2'"
                   onMouseOut="javascript:this.style.backgroundColor=''"
                   onClick="Fecha( '<%= c.vencimento.strftime("%d").to_i %>',
@@ -152,10 +155,10 @@
                                   '<%= number_to_currency(saldo_real.to_f, :format=>'%n', :separeitor => ',') %>',
                                   '<%= c.venda_id %>')">
             <% end %>
-           
+
 
             <td width="20" align="center"><%= check_box_tag "cobro[dividas_ids][]", c.id, false, { :class => 'm', onclick: "soma(this)" }  %>
-            
+
             </td>
             <td width="60"  align="center" class="acao"><%= c.data.strftime("%d/%m/%y") %></td>
             <td width="30" align="left" class="acao">
@@ -167,14 +170,25 @@
                 <span class='rs'>R$</span>
               <% end %>
             </td>
-            <td class="acao" width="40" align="right"><%= format_int(c.cotacao_venda ) %></td>
+            <td class="acao" width="50" align="right"><%= format_int(c.cotacao_venda ) %></td>
             <td class="acao" width="100" align="left"><%= c.sigla_proc %>.<%= c.cod_proc.to_s.rjust(5,'0')%></td>
-            <td class="acao" width="150"><small><b><%= c.cc_nome ? c.cc_nome : 'No Informado' %></b></small></td>
+
             <% if empresa.segmento.to_i == 1 %>
+              <td class="acao" width="250">
+                <small><b style="display: block;"><%= c.cc_nome ? c.cc_nome : 'No Informado' %></b></small>
+                <small><%=raw c.array_venda_produtos.to_s.gsub('"', '').gsub('{', '').gsub('}', '') %><%= c.descricao %></small>
+              </td>
               <td class="acao" width="150"><small><%= c.aluno_nome %></small></td>
+            <% else %>
+
+              <td class="acao" width="250">
+                <small><b><%= c.cc_nome ? c.cc_nome : 'No Informado' %></b></small>
+                <small><br><%=raw c.array_venda_produtos.to_s.gsub(',', '<br/>').gsub('"', '').gsub('{', '').gsub('}', '') %> <%= c.descricao %></small>
+              </td>
+
             <% end %>
-            
-            <td class="acao" width="100"><%= c.documento_numero_01 %>•<%= c.documento_numero_02%>•<%= c.documento_numero%></td>
+
+            <td class="acao" width="100"><%= c.documento_numero_01 %>•<%= c.documento_numero_02 %>•<%= c.documento_numero %></td>
             <td class="acao" width="50"  align="center"><%= c.cota %></td>
             <td class="acao" width="80"  align="center"><%= c.vencimento.strftime("%d/%m/%y")%></td>
             <td class="acao" width="40" align="center">
@@ -218,20 +232,22 @@
     </div>
     <table>
       <tr class="head_grid">
-        <td width="870" align="right"></td>
+        <td width="795">Suma <input type="text" name="valor" id="valor" value="0" size="11" style="border: none; font-size: 12px; padding:0px"></td>
         <% if @cobro.moeda == 1 %>
-        <td width="60" align="right"><span class="bold"><%= format_int(tot_interes_gs.to_f) %></span></td>
-        <td width="70"><b class="bold"><%= format_int(tot_divida_gs.to_f) %></b></td>
+          <td width="70" align="right"><%= format_int(tot_interes_gs.to_f) %></td>
+          <td width="70" align="right"></td>
+          <td width="70" align="right"></td>
+          <td width="70"><%= format_int(tot_divida_gs.to_f) %></td>
         <% else %>
         <% end %>
       </tr>
       <tr>
         <td><%= submit_tag "Aplicar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %></td>
         <td></td>
-        <td align="right"><input type="text" name="valor" id="valor" value="0" size="11" style="border: none; font-size: 12px; padding:0px"></td>
+        <td align="right"></td>
       </tr>
     </table>
-
+  </div>
 </div>
   <% if @cobro.moeda.to_i == 0 %>
   <script>
@@ -329,26 +345,26 @@ $('#selectAllM').click(function() {
       $('.m').each(function() {
            this.checked = false;
        });
-   } 
+   }
 });
 </script>
 
-<script LANGUAGE="JavaScript">  
- <!--  
- var total     = 0;  
- function soma(campo) { 
+<script LANGUAGE="JavaScript">
+ <!--
+ var total     = 0;
+ function soma(campo) {
   var valor = document.getElementById( 'valor_' + campo.value).value;
 
   if (campo.checked)  {
     total     += eval( valor.replace(/\./g, "").replace(",", ".") );
-    
+
   } else {
     total     -= eval( valor.replace(/\./g, "").replace(",", ".") );
   }
   document.getElementById('valor').value = ( number_format( total,2, ',', '.') );
- }  
- //-->  
- </SCRIPT>  
+ }
+ //-->
+ </SCRIPT>
 
  <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="myModal">
   <div class="modal-dialog" role="document">
@@ -356,7 +372,7 @@ $('#selectAllM').click(function() {
       <div class="modal-header">
         <div class="close-button">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        </div>  
+        </div>
         <h4 class="modal-title" id="myModalLabel" align="center">Titulo</h4>
       </div>
       <div class="modal-body" align="center" style="padding: 10px 0px 25px 0px">
@@ -372,10 +388,10 @@ $('#selectAllM').click(function() {
     $('#myModal').on('shown.bs.modal', function () {
       $('#cobros_detalhe_cobro_guarani').focus();
       $('#cobros_detalhe_cobro_guarani').select();
-        
+
     })
   });
 </script>
 
 
- 
+

@@ -32,7 +32,7 @@
               <tr>
                 <td>
                   <label>Tabela de preço limite</label>
-                  <%= f.collection_select :tabela_preco_id_limite, TabelaPreco.select('id,nome').order('2'), :id, :nome, { prompt: 'Selecione la unidad' } %></td>                  
+                  <%= f.collection_select :tabela_preco_id_limite, TabelaPreco.select('id,nome').order('2'), :id, :nome, { prompt: 'Selecione la unidad' } %></td>
                 </td>
               </tr>
 
@@ -46,6 +46,10 @@
 
               <tr>
                 <td><%= f.check_box :controle_caixa %> Abertura de Caixa Obrigatório?</td>
+              </tr>
+
+              <tr>
+                <td><%= f.check_box :modelo_cp %> Impressão Matricial</td>
               </tr>
 
 
@@ -62,20 +66,57 @@
               </tr>
 
               <tr>
-                <td><%= f.check_box :os %> Orden Servicio?</td>
-              </tr>
-
-              <tr>
-                <td><%= f.check_box :romaneio %> Romaneios?</td>
-              </tr>
-             
-              <tr>
                 <td><%= f.check_box :altera_vendedor_obrig %> Alterar Vendedor Obrigatório</td>
               </tr>
 
               <tr>
                 <td><%= f.check_box :multi_moeda %> Multi Moedas</td>
               </tr>
+
+              <tr>
+                <td><%= f.check_box :pdv_cozinha %> Comprovante Cocina</td>
+              </tr>
+
+              <tr><td><hr></td></tr>
+
+              <tr><td><h1 class="bold">Processos Vinculados</h1></td></tr>
+              <tr>
+                <td><%= f.check_box :os %> Orden Servicio</td>
+              </tr>
+
+              <tr>
+                <td><%= f.check_box :condicional %> Condicional</td>
+              </tr>
+
+              <tr>
+                <td><%= f.check_box :romaneio %> Romaneios</td>
+              </tr>
+
+              <tr>
+                <td><%= f.check_box :plano %> Plano</td>
+              </tr>
+
+              <tr>
+                <td><%= f.check_box :centro_custo %> Centro Custo</td>
+              </tr>
+
+              <tr>
+                <td><%= f.check_box :setor %> Setor</td>
+              </tr>
+
+              <tr>
+                <td><%= f.check_box :cartao %> Cartão/Comanda</td>
+              </tr>
+
+              <tr>
+                <td><%= f.check_box :pedido %> Pedido/Presupuesto</td>
+              </tr>
+
+              <tr>
+                <td><%= f.check_box :turma %> Turma</td>
+              </tr>
+
+             <tr><td><hr></td></tr>
 
               <tr>
                 <%= field_us_label 'Max Desc.:',f,:max_desc %>
@@ -115,7 +156,7 @@
                   </tr>
 
                   <tr>
-                    <td><%= f.check_box :add_produto_direto %> Add produto direto quando le o código de barras</td>
+                    <td><%= f.check_box :add_produto_direto %> Add produto direto quando ler o código de barras</td>
                   </tr>
 
                   <tr>
@@ -153,7 +194,7 @@
                 <table>
                   <tr>
                     <td><%= f.check_box :vincula_gasto %> Vincula Gastos/Compras</td>
-                  </tr>                  
+                  </tr>
                 </table>
               </div>
               <div class="footer-buttons">

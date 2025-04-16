@@ -1,15 +1,13 @@
 class ViaticosController < ApplicationController
-
-
   def comprovante
     @viatico = Viatico.find(params[:id])
 
     render :layout => false 
   end
 
-
   def index
     @viatico = Viatico.new
+    render layout: 'chart'
   end
 
   def busca_viatico
@@ -21,11 +19,39 @@ class ViaticosController < ApplicationController
 
   def show
     @viatico = Viatico.find(params[:id])
+    sql = "SELECT C.ID, 
+                  C.DATA,
+                  C.DOCUMENTO_NUMERO,
+                  C.PERSONA_NOME,
+                  C.MOEDA,
+                  CC.NOME AS CENTRO_CUSTO_NOME,
+                  PL.DESCRICAO AS PLANO_DE_CONTA_NOME,
+                  CCT.VALOR_US,
+                  CCT.VALOR_GS,
+                  CCT.VALOR_RS,
+                  CF.FACT_AN
+              FROM COMPRAS_CUSTOS CCT
 
-    respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @viatico }
-    end
+              INNER JOIN COMPRAS C
+              ON C.ID = CCT.COMPRA_ID
+
+              LEFT JOIN CENTRO_CUSTOS CC
+              ON CC.ID = CCT.CENTRO_CUSTO_ID
+
+              LEFT JOIN PLANO_DE_CONTAS PL
+              ON PL.ID = CCT.PLANO_DE_CONTA_ID
+
+              INNER JOIN COMPRAS_FINANCAS CF
+              ON CF.COMPRA_ID = CCT.COMPRA_ID
+
+              WHERE C.FUNCIONARIO_ID = #{@viatico.persona_id} AND C.FORMA_PAGO_ID = 25 AND CF.FACT_AN = '#{@viatico.id}'
+              ORDER BY C.DATA"
+    
+    @aplicacao_viatico = ComprasCusto.find_by_sql(sql)
+
+    @extrato = Cliente.where(persona_id: @viatico.persona_id, documento_numero_01: 'V00', documento_numero: "#{@viatico.id}" )
+
+    render layout: 'chart'
   end
 
   # GET /viaticos/new
@@ -49,6 +75,7 @@ class ViaticosController < ApplicationController
   def create
     @viatico = Viatico.new(params[:viatico])
     @viatico.unidade_id = current_unidade.id
+    @viatico.usuario_created = current_unidade.usuario_created
 
     respond_to do |format|
       if @viatico.save

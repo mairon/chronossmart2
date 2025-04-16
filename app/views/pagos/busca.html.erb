@@ -1,64 +1,63 @@
-<div class="group">
-  <table class="head_grid">
-    <tr>
-      <td width="80" align="center"><%= t('CODE') %></td>
-      <td width="40" align="center">US</td>
-      <td width="70" align="center"><%= t('DATE') %></td>
-      <td width="215"><%= t('PROVIDER') %></td>
-      <td width="215">Detalhe</td>
-      <td width="250">Obs</td>
-      <td width="150"><%= t('ACCOUNT') %></td>
-      <td width="50" align="center"></td>
-      <td width="70" align="right"><%= t('VALUE') %></td>
+<div class="panel">
+  <div class="panel-content">
 
-    </tr>
-  </table>
-  <div class="rolagem" dir="div">
-    <table>
-      <% @pagos.each do |cobro| %>
-        <tr class= "<%= cycle( "cor1", "cor2" )%>">
-          <td width="80"  align="center"><%= cobro.id.to_s.rjust(6,'0') %></td>
-          <td width="40" align="center" title="<%= cobro.usuario_nome %>"><%= cobro.usuario_created.to_s.rjust(3,'0')  %></td>
-          <td width="70"  align="center"><%= cobro.data.strftime("%d/%m/%y")%></td>
-          <td width="215" align="left"><%= cobro.persona_nome %></td>
-          <td width="215" align="left">
-            <small>
-            <% cobro.pagos_detalhes.each do |pd| %>
-              <ul >
-                <li>• <%= pd.rubro.descricao unless pd.rubro.nil? %> | <%= pd.cota %>/<%= pd.tot_cotas %></li>
-              </ul>            
-            <% end %>
-            </small>
-          </td>
-          <td width="250" align="left"><small><%= cobro.descricao %></small></td>
-          <td width="150" align="left"><%= cobro.conta_nome %></td>
+    <table class="head_grid">
+      <tr>
+        <td width="80" align="center"><%= t('CODE') %></td>
+        <td width="40" align="center">US</td>
+        <td width="70" align="center"><%= t('DATE') %></td>
+        <td width="215"><%= t('PROVIDER') %></td>
+        <td width="215">Detalhe</td>
+        <td width="250">Obs</td>
+        <td width="150"><%= t('ACCOUNT') %></td>
+        <td width="50" align="center"></td>
+        <td width="70" align="right"><%= t('VALUE') %></td>
 
-          <% if cobro.moeda.to_i == 1 %>
-            <td width="50"  align="center"><span class="gs">Gs</span></td>
-            <td width="70" align="right"><%= format_int( cobro.valor_gs) %></td>
-          <% elsif cobro.moeda.to_i == 0 %>
-            <td width="50"  align="center"><span class="us">U$</span></td>
-            <td width="70" align="right"><%= format_int( cobro.valor_us) %></td>
-          <% else %>
-            <td width="50"  align="center"><span class="rs">R$</span></td>
-            <td width="70" align="right"><%= format_decimal( cobro.valor_rs) %></td>
-          <% end %>
-          <% if cobro.status_block == 't' %>
-            <td colspan="2" align="center" title="Lanzamiento Bloqueado"><%= image_tag("locked-padlock.png", height: 16) %></td>
-          <% else %>
-            <td><%= link_to '', edit_pago_path(cobro), class: 'icon-pencil' %></td>
-            <td><%= link_to '', cobro, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
-            <td><%= link_to '', comprovante_pago_path(cobro), target: "_blank",  class: 'icon-fullscreen' %></td>
-          <% end %>
-        </tr>
-      <% end %>
+      </tr>
     </table>
+    <div class="rolagem" dir="div">
+      <table>
+        <% @pagos.each do |cobro| %>
+          <tr class= "<%= cycle( "cor1", "cor2" )%>">
+            <td width="80"  align="center"><%= cobro.id.to_s.rjust(6,'0') %></td>
+            <td width="40" align="center" title="<%= cobro.usuario_nome %>"><%= cobro.usuario_created.to_s.rjust(3,'0')  %></td>
+            <td width="70"  align="center"><%= cobro.data.strftime("%d/%m/%y")%></td>
+            <td width="215" align="left"><%= cobro.persona_nome %></td>
+            <td width="215" align="left">
+              <small>
+              <% cobro.pagos_detalhes.each do |pd| %>
+                <ul >
+                  <li>• <%= pd.rubro.descricao unless pd.rubro.nil? %> | <%= pd.cota %>/<%= pd.tot_cotas %></li>
+                </ul>
+              <% end %>
+              </small>
+            </td>
+            <td width="250" align="left"><small><%= cobro.descricao %></small></td>
+            <td width="150" align="left"><%= cobro.conta_nome %></td>
+
+            <% if cobro.moeda.to_i == 1 %>
+              <td width="50"  align="center"><span class="gs">Gs</span></td>
+              <td width="70" align="right"><%= format_int( cobro.valor_gs) %></td>
+            <% elsif cobro.moeda.to_i == 0 %>
+              <td width="50"  align="center"><span class="us">U$</span></td>
+              <td width="70" align="right"><%= format_int( cobro.valor_us) %></td>
+            <% else %>
+              <td width="50"  align="center"><span class="rs">R$</span></td>
+              <td width="70" align="right"><%= format_decimal( cobro.valor_rs) %></td>
+            <% end %>
+            <% if cobro.status_block == 't' %>
+              <td colspan="2" align="center" title="Lanzamiento Bloqueado"><%= image_tag("locked-padlock.png", height: 16) %></td>
+            <% else %>
+              <td><%= link_to '', edit_pago_path(cobro), class: 'icon-pencil' %></td>
+              <td><%= link_to '', cobro, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+              <td><%= link_to '', comprovante_pago_path(cobro), target: "_blank",  class: 'icon-fullscreen' %></td>
+            <% end %>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  </div>
+  <div class="head_grid">
+    <%= will_paginate @cobros, "data-remote" => "true" %>
   </div>
 </div>
-<div class="head_grid">
-  <%= will_paginate @cobros, "data-remote" => "true" %>
-</div>
-
-
-
-

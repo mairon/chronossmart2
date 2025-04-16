@@ -1,0 +1,17 @@
+<div class="modal-body group">
+  <%= form_for @turma_responsavel do |tr| %>
+    <div class="row">
+      <div class="col-md-12">
+        <label>Responsáble</label>
+        <%= tr.collection_select :persona_id, Persona.where(tipo_funcionario: 1), :id, :nome, { prompt: ''}, {required: true, class: 'selectize'} %>
+      </div>
+
+      <div class="col-md-12">
+        <%= field_us_label 'Comisión',tr,:comissao %>
+      </div>
+    </div>
+    <div class="footer-buttons">
+      <%= tr.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    </div>
+  <% end %>
+</div>

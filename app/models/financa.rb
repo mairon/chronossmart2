@@ -3,6 +3,60 @@ class Financa < ActiveRecord::Base
   belongs_to :conta
   belongs_to :cartao_bandeira
 
+  after_create :trigger_viatico_cliente
+  after_destroy :trigger_viatico_cliente_destroy
+
+  def trigger_viatico_cliente
+
+    Cliente.create(
+        tabela_id: self.id,
+        tabela: 'VIATICO_DEV',
+        documento_numero_01: self.documento_numero_01,
+        documento_numero_02: self.documento_numero_02,
+        documento_numero: self.documento_numero,
+        cota: 1,
+        divida_guarani: 0,
+        divida_dolar: 0,
+        divida_real: 0,
+        cobro_guarani: self.entrada_guarani.to_f,
+        cobro_dolar: self.entrada_dolar.to_f,
+        cobro_real: self.entrada_real.to_f,
+        liquidacao: 0,
+        moeda: self.moeda,
+        sigla_proc: self.sigla_proc,
+        cod_proc: self.cod_proc,
+        unidade_id: self.conta.unidade_id,
+        data: self.data,
+        descricao: self.concepto,
+        vencimento: self.data,
+        persona_id: self.persona_id,
+
+      )
+
+      extrato = Cliente.where(persona_id: self.persona_id, documento_numero_01: 'V00', documento_numero: self.documento_numero )
+      if self.moeda == 0
+         if extrato.sum('divida_dolar - cobro_dolar') == 0 
+            extrato.update_all(liquidacao: 1)
+         end
+
+      elsif self.moeda == 1
+         if extrato.sum('divida_guarani - cobro_guarani').to_f == 0 
+            extrato.update_all(liquidacao: 1)
+         end
+
+      elsif self.moeda == 2
+         if extrato.sum('divida_real - cobro_real').to_f == 0 
+            extrato.update_all(liquidacao: 1)
+         end
+      end
+  end
+
+  def trigger_viatico_cliente_destroy
+
+    Cliente.where(tabela_id: self.id, tabela: 'VIATICO_DEV' ).destroy_all
+    extrato = Cliente.where(persona_id: self.persona_id, documento_numero_01: 'V00', documento_numero: self.documento_numero )
+    extrato.update_all(liquidacao: 0)
+  end
 
   def self.resultado_recebimentos(params)
     unidade = "AND C.UNIDADE_ID  = #{params[:unidade]}"
@@ -497,7 +551,7 @@ class Financa < ActiveRecord::Base
         end
 
         unless params[:cheque].blank?
-          find_cheque  = "F.cheque LIKE ? %#{params[:cheque]}%"
+          find_cheque  = "AND F.cheque LIKE ? %#{params[:cheque]}%"
         end
 
 

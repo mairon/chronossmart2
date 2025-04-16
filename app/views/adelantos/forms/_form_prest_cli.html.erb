@@ -22,17 +22,6 @@
   <%= f.hidden_field :tipo, value: 1 %>
   <%= f.hidden_field :status, value: 1 %>
 
-<% sql = "SELECT PC.ID,
-                     (PG.DESCRICAO || ' > ' || PC.DESCRICAO) AS DESCRICAO
-              FROM PLANO_DE_CONTAS PC
-              LEFT JOIN PLANO_DE_CONTAS PG
-              ON SUBSTRING(PG.CODIGO, 1, 8) = SUBSTRING(PC.CODIGO, 1, 8)
-              WHERE LENGTH(PC.CODIGO) >=12 AND LENGTH(PG.CODIGO) =8
-              AND lower((PG.DESCRICAO || ' > ' || PC.DESCRICAO)) similar to '%(prestamo|emprestimo|adelanto)%'  
-              ORDER BY 2"
-      plano = PlanoDeConta.find_by_sql(sql)
-    %>
-
   <table width="750">
     <tr>
       <td>
@@ -67,9 +56,8 @@
       </td>
 
       <td>
-      <label><%= t('CLASSIFICATION') %></label>
         <label><%= t('CLASSIFICATION') %></label>
-        <%= f.collection_select :plano_de_conta_id, plano,:id, :descricao,{:prompt => 'Selecione'}, {required: true} %>
+        <%= f.collection_select :plano_de_conta_id, PlanoDeConta.where("lower((DESCRICAO)) similar to '%(prestamo|emprestimo|adelanto|EMPRESTIMO)%' ") ,:id, :descricao,{:prompt => 'Selecione'}, {required: true} %>
       </td>
 
     </tr>
@@ -98,7 +86,7 @@
         </td>
       </tr>
 
-      <tr hidden class="valores-gs">
+     <tr hidden class="valores-gs">
         <%= field_gs_label 'Monto Gs',f,:valor_guarani,
          :onblur   => "GsToUsRs('adelanto_cotacao','adelanto_cotacao_real','adelanto_valor_guarani','adelanto_valor_dolar','adelanto_valor_real')", required: true  %>
       </tr>
@@ -108,7 +96,7 @@
       </tr>
       <tr hidden class="valores-rs">
          <%= field_us_label 'R$',f,:valor_real,
-         :onblur   => "RsToUsGs('adelanto_cotacao','adelanto_cotacao_real','adelanto_valor_guarani','adelanto_valor_dolar','adelanto_valor_real')", required: true  %>        
+         :onblur   => "RsToUsGs('adelanto_cotacao','adelanto_cotacao_real','adelanto_valor_guarani','adelanto_valor_dolar','adelanto_valor_guarani')", required: true  %>
       </tr>
 
 

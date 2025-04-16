@@ -11,7 +11,6 @@ class SolicitudeCreditosController < ApplicationController
             vendedor_id: pedido_venda.vendedor_id,
             tabela_preco_id: pedido_venda.tabela_preco_id,
             usuario_id: current_user.id,
-            unidade_id: current_unidade.id,
             terminal_id: 1,
             unidade_id: current_unidade.id,
             status_op: 0,

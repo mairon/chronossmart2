@@ -1,0 +1,24 @@
+<%= form_tag add_prod_import_compras_path, :method => "get" do %>
+<div class="panel">
+  <div class="panel-content">
+    <div class="group">
+      <div class="row">
+        <div class="col-md-10" >
+          <input type="hidden" name="compra_id" id="compra_id" size="5" value="<%= @compra.id %>"/>
+          <label>Importación</label>
+            <%= select("busca", "impor", FaturaImport.order("id desc").collect {|p| [ p.dnumdoc, p.id ] }, { prompt: 'Todos...', required: true}) %>
+        </div>
+        <div class="col-md-2" style="margin-top: 27px">
+          <input type="submit" class="btn  btn-green" value="Informe"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% end %>
+
+
+<script>
+  $('#busca_impor').selectize();
+</script>

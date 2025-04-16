@@ -207,3 +207,8 @@ pt-BR:
   driver: 'Motorista'
   lost: 'Perdido'
   win: 'Ganho'
+  owner: 'Proprietario'
+  driver: 'Motorista'
+  plate-horse: 'Placa Cavalo'
+  plate-trailer: 'Placa Carreta'  
+  fleet: 'Frota'

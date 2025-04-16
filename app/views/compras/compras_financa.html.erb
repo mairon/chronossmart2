@@ -1,12 +1,6 @@
 <div class="row">
 	<div class="col-md-8">
-		<% if session[:modal] == 'true' %>
-			<%= render :partial => "/compras/eps/modal_compras_financa" %>
-		<% else %>
-			<%= render :partial => "/compras/eps/compras_financa" %>	
-		<% end %>
-
-		
+		<%= render :partial => "/compras/eps/compras_financa" %>	
 	</div>
 	<div class="col-md-4">
 		<%= render :partial => "/compras/autofatura" %>	

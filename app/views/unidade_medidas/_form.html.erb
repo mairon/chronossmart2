@@ -23,8 +23,8 @@
               <fieldset>
 
                 <table>
-                  <tr>                                      
-                    <td align="right">Nombre :</td>                    
+                  <tr>
+                    <td align="right">Nombre :</td>
                     <td><%= f.text_field :nome, size: 30, maxlength: 100, autofocus: true %></td>
                     <td align="right">Sigla :</td>
                     <td><%= f.text_field :sigla, maxlength: 5 %></td>
@@ -37,10 +37,10 @@
           </tr>
         </table>
       </div>
-      
+
       <div class="buttons">
         <%= f.submit :value => t('SAVE'), :class => "button" %>
-        <%= link_to t('BACK'), unidade_medidas_path, :class => "button back" %>        
+        <%= link_to t('BACK'), unidade_medidas_path, :class => "button back" %>
       </div>
 
     </div>

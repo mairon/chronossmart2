@@ -1,50 +1,49 @@
 <table class="head_grid">
   <tr>
-    <td width="35"></td>
-    <td width="120">Marca</td>
-    <td width="120">Ref.</td>
+    <td width="60"></td>
+    <td width="100">Referencia</td>
+    <td width="150">Barra</td>
     <td width="450">Producto</td>
-    <td width="70" align="right">Precio</td>
-    <td width="70" align="right">Comision BC</td>
-    <td width="70" align="right">Stock</td>
-
+    <td width="80" align="right">Precio</td>
+    <td width="80" align="right">Stock</td>
   </tr>
 </table>
-
-<div class="rolagem" id="div" style="height: 550px">
+<div class="rolagem" id="div">
   <table>
     <% count = 0 %>
     <% @produtos.each do |p| %>
+
       <tr class = "<%= cycle( "cor1", "cor2" )%>"
-          onMouseOver="javascript:this.style.backgroundColor='#949494'"
-          onMouseOut="javascript:this.style.backgroundColor=''"
-           onclick="Fecha(        
-                            '<%= p.nome %>',
-                            '<%= p.produto_id %>',
-                            '<%= number_to_currency(p.preco_1_us, :format=>'%n', :separator => ",")  %> ',
-                            '<%= number_to_currency(p.preco_1_gs, :format=>'%n', :precision => 0)  %> ',
-                            '<%= number_to_currency(p.preco_1_rs, :format=>'%n', :separator => ",")  %> ' )"  >
+          onclick="Fecha( '<%= p.nome %>',
+                                    '<%= p.produto_id %>',
+                                    '<%= number_to_currency(p.preco_1_gs, :format=>'%n', :precision => 0)  %> ',
+                                    '<%= number_to_currency(p.preco_1_us, :format=>'%n', :separator => ",")  %>',
+                                    '<%= number_to_currency(p.preco_1_rs, :format=>'%n', :separator => ",")  %>' )" data-plus-as-tab="false"
+          >
+      <td width="60" class="<%= count %>"><input type="text" id="<%= count %>" class="<%= count %>" value="<%= count %>" size="1" style="border: none;"
+          onkeypress="Fecha( '<%= p.nome %>',
+                                    '<%= p.produto_id %>',
+                                    '<%= number_to_currency(p.preco_1_gs, :format=>'%n', :precision => 0)  %>',
+                                    '<%= number_to_currency(p.preco_1_us, :format=>'%n', :separator => ",")  %>',
+                                    '<%= number_to_currency(p.preco_1_rs, :format=>'%n', :separator => ",")  %>' )" data-plus-as-tab="false"></td>
 
-      <td  width="35" class="<%= count %>"><input type="text" id="<%= count %>" value="<%= count %>" size="2" style="border: none;"
-                onkeypress="Fecha( 
-                              '<%= p.nome %>',
-                              '<%= p.produto_id %>',
-                              '<%= number_to_currency(p.preco_1_us, :format=>'%n', :separator => ",")  %> ',
-                              '<%= number_to_currency(p.preco_1_gs, :format=>'%n', :precision => 0)  %> ',
-                              '<%= number_to_currency(p.preco_1_rs, :format=>'%n', :separator => ",")  %> ' )" data-plus-as-tab="false" ></td>
-
-        <td width="120" class="<%= count %>"> <%= p.marca_nome %></td>                                    
-        <td width="120" class="<%= count %>"> <%= p.fabricante_cod %></td>
-        <td width="450" class="<%= count %>"> <%= p.nome %> </td>
+        <td width="100" class="<%= count %>"> <%= p.fabricante_cod %> </td>
+        <td width="150" class="<%= count %>"> <%= p.barra %> </td>
+        <td width="450" class="<%= count %>"> <%= p.produto_id.to_s.rjust(6,'0')%>-<%= p.nome %></td>
         <% if params[:moeda].to_s == '0' %>
-          <td width="71" align="right" class="<%= count %>"><b><%= number_to_currency(p.preco_1_us, :format=>' %n ', :separator => ",")  %></b></td>
+          <td width="80" align="right" class="<%= count %>"><b><%= number_to_currency(p.preco_1_us, :format=>' %n ', :separator => ",")  %></b></td>
         <% elsif params[:moeda].to_s == '1' %>
-          <td width="71" align="right" class="<%= count %>"><b> <%= number_to_currency(p.preco_1_gs, :format=>' %n ', :precision => 0)  %></b></td>
+          <td width="80" align="right" class="<%= count %>"><b> <%= number_to_currency(p.preco_1_gs, :format=>' %n ', :precision => 0)  %></b></td>
         <% else %>
-          <td width="71" align="right" class="<%= count %>"><b> <%= number_to_currency(p.preco_1_rs, :format=>' %n ', :separator => ",")  %></b></td>
+          <td width="80" align="right" class="<%= count %>"><b> <%= number_to_currency(p.preco_1_rs, :format=>' %n ', :separator => ",")  %></b></td>
         <% end %>
-        <td width="71" align="right" class="<%= count %>"> <%= p.comissao_bc.to_f %> </td>
-        <td width="71" align="right" class="<%= count %>"> <%= p.stock.to_f %> </td>
+        <td width="80" align="right" class="<%= count %>">
+          <% if p.stock.to_f <= 0 %>
+            <span class="gs"><b> <%= p.stock.to_f %></b></span>
+          <% else %>
+            <span class="us"><b><%= p.stock.to_f %></b></span>
+          <% end %>
+        </td>
 
       </tr>
       <% count += 1 %>

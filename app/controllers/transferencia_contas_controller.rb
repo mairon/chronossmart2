@@ -33,7 +33,30 @@ class TransferenciaContasController < ApplicationController
     def resultado_busca_diferido   #
         @transferencia_conta = TransferenciaConta.find(params[:id])
 
-        @diferido  = Financa.find(params[:diferido_ids])
+      sql = "SELECT 
+                   CHEQUE,
+                   MAX(COD_PROC) AS COD_PROC,
+                   MAX(SIGLA_PROC) AS SIGLA_PROC,
+                   MAX(DATA) AS DATA,
+                   MAX(MOEDA) AS MOEDA,
+                   MAX(DIFERIDO) AS DIFERIDO,
+                   MAX(TITULAR) AS TITULAR,
+                   MAX(PERSONA_ID) AS PERSONA_ID,
+                   MAX(CHEQUE_STATUS) AS CHEQUE_STATUS,
+                   MAX(BANCO) AS BANCO,
+                   MAX(PERSONA_NOME) AS PERSONA_NOME,
+                   MAX(CONTA_NOME) AS CONTA_NOME,
+                   SUM(ENTRADA_DOLAR) AS ENTRADA_DOLAR,
+                   SUM(ENTRADA_GUARANI) AS ENTRADA_GUARANI,
+                   SUM(ENTRADA_REAL) AS ENTRADA_REAL,
+                   MAX(ID) AS ID
+            FROM FINANCAS
+            WHERE CHEQUE IN (?) AND CHEQUE_STATUS IN (1,3) and CONTA_ID = #{@transferencia_conta.ingreso_id} 
+            GROUP BY 1
+            ORDER BY 5,4"
+
+        @diferido  = Financa.find_by_sql([sql, params[:diferido_ids]])
+
         TransferenciaContasDetalhe.destroy_all("transferencia_conta_id = #{params[:id]} AND cheque_status = 1 " )
         @diferido.each do |df|
           if @transferencia_conta.deposito == 2

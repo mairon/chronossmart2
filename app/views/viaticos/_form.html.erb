@@ -12,12 +12,20 @@
     </div>
     <div class="col-md-3">
       <label><%= t('DATE') %></label>
-      <%= f.text_field :data, value: Time.now.strftime("%d/%m/%Y"), size: 10,  class: "panel-field date", autofocus: true %>
+      <% if params[:action] == 'index' %>
+        <%= f.text_field :data, value: Time.now.strftime("%d/%m/%Y"), size: 10,  class: "panel-field date", autofocus: true %>
+      <% else %>
+        <%= f.text_field :data, size: 10,  class: "panel-field date", autofocus: true %>
+      <% end %>
     </div>
 
     <div class="col-md-2">
       <label><%= t('COIN') %></label>
-      <%= f.select :moeda, [['Gs.', 1], ['U$', 0], ['R$', 2]], :selected => current_unidade.moeda.to_i %>
+      <% if params[:action] == 'index' %>
+        <%= f.select :moeda, [['Gs.', 1], ['U$', 0], ['R$', 2]], selected: current_unidade.moeda %>
+      <% else %>
+        <%= f.select :moeda, [['Gs.', 1], ['U$', 0], ['R$', 2]] %>
+      <% end %>
     </div>
   </div>
 
@@ -25,12 +33,12 @@
     <div class="col-md-6">
       <label>Chapa Cavalito</label>
       <%= f.collection_select :rodado_cv_id, Rodado.where(tipo: 0).select('id,placa').order('2'), :id, :placa, {:include_blank => true} %>
-      
+
     </div>
     <div class="col-md-6">
       <label>Chapa Carreta</label>
       <%= f.collection_select :rodado_cr_id, Rodado.where(tipo: 1).select('id,placa').order('2'), :id, :placa, {:include_blank => true} %>
-      
+
     </div>
   </div>
 
@@ -46,10 +54,10 @@
 
       <div class="col-md-5 efetivo" hidden>
         <label><%= t('ACCOUNT') %></label>
-        <%= f.collection_select :conta_id, Conta.all(:select => ' id,nome', :conditions => ["unidade_id = #{current_unidade.id}"], :order => '2'),:id, :nome,{:prompt => 'Selecione'}, {required: true, class: 'conta_id'} %>
+        <%= f.collection_select :conta_id, Conta.all(:select => ' id,nome', :conditions => ["unidade_id = #{current_unidade.id}"], :order => '2'),:id, :nome,{:prompt => 'Selecione'}, {required: true, class: 'conta_id panel-field'} %>
       </div>
 
-      <div class="col-md-3 valores-gs">
+      <div class="col-md-3 valores-gs" hidden>
         <%= panel_field_gs_label 'Valor Gs.',f,:valor_gs %>
       </div>
 
@@ -64,7 +72,7 @@
       <div class="col-md-3 cheque" hidden>
         <label>Nº Cheque</label>
         <%= f.text_field :cheque, class: 'panel-field' %>
-      </div>     
+      </div>
     </div>
 
     <div class="row">
@@ -75,14 +83,21 @@
     </div>
 
     <div class="row">
+      <div class="col-md-12 proveedor" hidden>
+        <label><%= t('PROVIDER') %></label>
+        <%= f.collection_select :proveedor_id, Persona.where(tipo_fornecedor: 1).select('id,nome').order('nome'),:id,:nome,{:prompt => 'Selecione '} %>
+      </div>
+    </div>
+
+    <div class="row">
       <div class="col-md-12">
         <%= f.text_area :obs, class: "panel-field", placeholder: 'Obs.', rows: '3' %>
       </div>
     </div>
-    
+
     <div class="footer-buttons">
       <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
-    </div>    
+    </div>
 <% end %>
 </div>
 
@@ -107,7 +122,60 @@
             success: function(data){
             $('#viatico_cotacao_real').val(number_format(data, 0, ',', '.'));} });
 
-  
+    if ($("#viatico_forma_pago_id").val() == '1' || $("#viatico_forma_pago_id").val() == '3' || $("#viatico_forma_pago_id").val() == '4') {
+      $(".efetivo").show();
+      $(".cheque").hide();
+      $(".credito").hide();
+      $(".diferido").hide();
+      $("#viatico_cheque").prop('required', false);
+      $("#viatico_conta_id").prop('required', true);
+      $(".diferido").hide();
+
+    } else if ($("#viatico_forma_pago_id").val() == '2') {
+      $(".efetivo").hide();
+      $(".credito").show();
+      $(".cheque").hide();
+      $(".diferido").hide();
+      $("#viatico_cheque").prop('required', false);
+      $("#viatico_conta_id").prop('required', false);
+      $(".diferido").hide();
+
+    } else if ($("#viatico_forma_pago_id").val() == '5') {
+      $(".efetivo").show();
+      $(".credito").hide();
+      $(".cheque").show();
+      $("#viatico_cheque").prop('required', true);
+      $("#viatico_conta_id").prop('required', true);
+      $(".diferido").hide();
+
+
+    } else if ($("#viatico_forma_pago_id").val() == '6') {
+      $(".efetivo").show();
+      $(".credito").hide();
+      $(".cheque").show();
+      $(".diferido").show();
+      $("#viatico_cheque").prop('required', true);
+      $("#viatico_conta_id").prop('required', true);
+      $(".diferido").hide();
+
+    } else if ($("#viatico_forma_pago_id").val() == '26') {
+      $(".efetivo").hide();
+      $(".credito").hide();
+      $(".proveedor").show();
+      $(".diferido").hide();
+      $("#viatico_cheque").prop('required', false);
+      $("#viatico_conta_id").prop('required', false);
+
+    } else if ($("#viatico_forma_pago_id").val() == '15') {
+      $(".efetivo").show();
+      $(".credito").hide();
+      $(".cheque").hide();
+      $(".diferido").hide();
+      $("#viatico_cheque").prop('required', false);
+      $("#viatico_conta_id").prop('required', true);
+      $(".diferido").hide();
+    }
+
   });
 
   $("#viatico_moeda").change(function() {
@@ -129,7 +197,10 @@
       };
   });
 
-  $("#viatico_forma_pago_id").change(function() {
+
+  $('#viatico_moeda').trigger('change');
+
+  $("#viatico_forma_pago_id").bind('change', function() {
     if (this.value == '1' || this.value == '3' || this.value == '4') {
       $(".efetivo").show();
       $(".cheque").hide();
@@ -137,7 +208,7 @@
       $(".diferido").hide();
       $("#viatico_cheque").prop('required', false);
       $("#viatico_conta_id").prop('required', true);
-      $("#viatico_tipo").val('0');
+      $(".diferido").hide();
 
       $.ajax({
         type: "GET",
@@ -157,7 +228,7 @@
       $(".diferido").hide();
       $("#viatico_cheque").prop('required', false);
       $("#viatico_conta_id").prop('required', false);
-      $("#viatico_tipo").val('1');
+      $(".diferido").hide();
 
     } else if (this.value == '5') {
       $(".efetivo").show();
@@ -165,7 +236,7 @@
       $(".cheque").show();
       $("#viatico_cheque").prop('required', true);
       $("#viatico_conta_id").prop('required', true);
-      $("#viatico_tipo").val('0');
+      $(".diferido").hide();
 
       $.ajax({
         type: "GET",
@@ -185,11 +256,11 @@
       $(".diferido").show();
       $("#viatico_cheque").prop('required', true);
       $("#viatico_conta_id").prop('required', true);
-      $("#viatico_tipo").val('0');
+      $(".diferido").hide();
 
       $.ajax({
         type: "GET",
-         url: "/buscas/busca_tipo_contas?tipo=1",
+         url: "/buscas/busca_tipo_contas?unidade_id=<%= current_unidade.id %>&tipo=1",
         beforeSend: function(){
           $('#spinner-modal').show();
         },
@@ -197,6 +268,13 @@
           $('#spinner-modal').hide();
         }
       });
+    } else if (this.value == '26') {
+      $(".efetivo").hide();
+      $(".credito").hide();
+      $(".proveedor").show();
+      $(".diferido").hide();
+      $("#viatico_cheque").prop('required', false);
+      $("#viatico_conta_id").prop('required', false);
 
     } else if (this.value == '15') {
       $(".efetivo").show();
@@ -205,18 +283,17 @@
       $(".diferido").hide();
       $("#viatico_cheque").prop('required', false);
       $("#viatico_conta_id").prop('required', true);
-      $("#viatico_tipo").val('0');
-
-      $.ajax({
-        type: "GET",
-         url: "/buscas/busca_tipo_contas?tipo=1",
-        beforeSend: function(){
-          $('#spinner-modal').show();
-        },
-        success: function(response){
-          $('#spinner-modal').hide();
-        }
-      });
+      $(".diferido").hide();
+        $.ajax({
+          type: "GET",
+           url: "/buscas/busca_tipo_contas?unidade_id=<%= current_unidade.id %>&tipo=1",
+          beforeSend: function(){
+            $('#spinner-modal').show();
+          },
+          success: function(response){
+            $('#spinner-modal').hide();
+          }
+        });
     }
   });
 
@@ -256,7 +333,7 @@
   });
 
 
-  $('#viatico_rodado_cv_id').selectize();
+  $('#viatico_rodado_cv_id, #viatico_proveedor_id').selectize();
   $('#viatico_rodado_cr_id').selectize();
   $('#viatico_moeda').selectize();
   $('#viatico_forma_pago_id').selectize();

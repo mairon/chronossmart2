@@ -1,0 +1,34 @@
+<table>
+   <thead class="report-header">
+      <tr>
+        <td colspan="10" class="title" align="center">
+          <%= current_unidade.nome_sys %> <br>
+          Control KM
+        </td>
+      </tr>
+      <tr>
+        <td colspan="10">Fecha: <%= params[:inicio] %> hasta <%= params[:final] %></td>
+      </tr>
+     
+      <tr class="td-header">
+
+        <td width="80" align="center">Cod.</td>
+        <td width="80" align="center"><%= t('DATE') %></td>
+        <td width="350">Chofer</td>
+        <td width="150">Rodado</td>
+        <td width="100" align="center">Km</td>
+        <td width="250">Obs</td>
+      </tr>
+    </thead>
+
+      <% @controle_kms.each do |controle_km| %>
+        <tr>
+          <td width="80" align="center"><%= controle_km.id.to_s.rjust(6,'0') %></td>
+          <td width="80" align="center"><%= controle_km.data.strftime("%d/%m/%y") %></td>
+          <td width="350"><%= controle_km.persona_nome %></td>
+          <td width="150"><%= controle_km.rodado_nome %></td>
+          <td width="100" align="center"><%= controle_km.km %></td>
+          <td width="250"><%= controle_km.obs %></td>
+        </tr>
+      <% end %>
+</table>

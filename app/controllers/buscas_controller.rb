@@ -1,5 +1,10 @@
 class BuscasController < ApplicationController
 
+	def busca_custo
+		last_custo = Stock.where(produto_id: params[:produto_id], status: 0 ).order(:data).last
+		return render :json => { :custo => last_custo }
+	end
+
 	def busca_viaticos
 		sql = "SELECT V.ID,
     							(lpad(cast(V.ID as varchar),6,'0') || ' - ' || cast( (V.VALOR_GS - COALESCE((SELECT SUM(CP.TOTAL_GUARANI) FROM COMPRAS CP WHERE CP.VIATICO_ID = V.ID ),0) ) as money) ) AS VALUE
@@ -25,7 +30,7 @@ class BuscasController < ApplicationController
 									(P.FABRICANTE_COD || ' ' || P.NOME) AS NOME_FABRICANTE
 
 						FROM PRODUTOS P
-						
+
 						WHERE #{cond}
 						LIMIT 15"
 		produtos = Produto.find_by_sql(sql)
@@ -70,11 +75,19 @@ class BuscasController < ApplicationController
 	def busca_tipo_contas
 		if current_unidade.conta_multi_unidades == true
 			un = ""
-		else 
+		else
 			un = "unidade_id = #{params[:unidade_id]} and "
 		end
 
 		@contas = Conta.where("#{un} tipo = #{params[:tipo]} and status = true").select('nome,id').order('nome')
+		respond_to do |format|
+			format.js
+		end
+	end
+
+	def busca_pedido_traslado
+
+		@pedido = PedidoTraslado.where("persona_id = #{params[:persona_id]}").select('cod_ext,id').order('id desc')
 		respond_to do |format|
 			format.js
 		end
@@ -181,7 +194,7 @@ class BuscasController < ApplicationController
 
 
 	def search_all_produtos
-		@produtos = Produto.select('id,nome,peso_bruto,multiplo_compra').where("status = true and nome ilike ?","%#{params[:busca]}%").limit(20)
+		@produtos = Produto.select("id,nome,peso_bruto,multiplo_compra, SIMILARITY('#{params[:busca]}', NOME)").where("status = true and NOME ILIKE ?","%#{params[:busca]}%").order('5 desc, 2').limit(20)
 		respond_to do |format|
 			format.json  { list = @produtos.map {|u| Hash[ id: u.id, label: u.nome, name: u.nome, peso_bruto: u.peso_bruto]}
 							render json: list }
@@ -298,7 +311,7 @@ class BuscasController < ApplicationController
 					WHERE P.FABRICANTE_COD = '#{prod_id}'
 					LIMIT 1"
 
-			else			
+			else
 
 				sql = "
 				SELECT P.ID AS PRODUTO_ID,
@@ -335,10 +348,10 @@ class BuscasController < ApplicationController
 
 				if params[:cod][7..11] == '00001'
 					peso = "1"
-				else	
+				else
 					peso = "#{kg}.#{grms}"
 				end
-				
+
 
 					sql = "
 					SELECT
@@ -362,7 +375,7 @@ class BuscasController < ApplicationController
 					AND TB.UNIDADE_ID = #{params[:unidade]}
 					LIMIT 1"
 
-			else			
+			else
 					if params[:tipo_busca] == 'ID'
 						filtro_prod = "P.ID = #{params[:cod]}"
 					else
@@ -393,7 +406,7 @@ class BuscasController < ApplicationController
 						AND TB.TABELA_PRECO_ID = #{params[:tabela_preco]}
 						AND P.STATUS = TRUE
 						AND TB.UNIDADE_ID = #{params[:unidade]}
-						LIMIT 1"				
+						LIMIT 1"
 			end
 
 			find_grade = ProdutosGrade.find_by_sql(sql)
@@ -459,73 +472,29 @@ class BuscasController < ApplicationController
 
 	def busca_bico
 
-			bico = Bico.find_by_id(params[:cod])
-			dp   = DepositoProduto.find_by_deposito_id(bico.deposito_id)
-			preco_personal = PersonaProduto.find_by_produto_id(dp.produto_id, conditions: ["persona_id = #{params[:persona_id]}"])
+		bico = Bico.find_by_id(params[:cod])
 
-		if preco_personal
+		sql = "SELECT P.ID AS PRODUTO_ID,
+									 P.NOME AS PRODUTO_NOME,
+									 B.DEPOSITO_ID,
+									 B.PRECO_US,
+									 B.PRECO_GS,
+									 B.PRECO_RS,
+									 B.PRECO_02_US,
+									 B.PRECO_02_GS,
+									 B.PRECO_02_RS
+						FROM BICOS B
+						INNER JOIN DEPOSITOS D
+						ON D.ID = B.DEPOSITO_ID
 
-			bico = Bico.find_by_id(params[:cod])
-			dp   = Deposito.find_by_id(bico.deposito_id, select: 'ID AS DEPOSITO_ID, SETA_PRODUTO')
-			if dp.seta_produto == 0
-				find_grade = dp
-				grade = find_grade
-			else
-				sql = "SELECT P.ID,
-											 P.NOME AS PRODUTO_NOME,
-											 DP.DEPOSITO_ID,
-											 TB.PRECO_US AS PRECO_US,
-											 TB.PRECO_GS AS PRECO_GS,
-											 TB.PRECO_RS AS PRECO_RS,
-											 CAST(0 AS DECIMAL) AS PRECO_02_US,
-											 CAST(0 AS DECIMAL) AS PRECO_02_GS,
-											 CAST(0 AS DECIMAL) AS PRECO_02_RS
-								FROM PRODUTOS P
-								INNER JOIN DEPOSITO_PRODUTOS DP
-								ON DP.PRODUTO_ID = P.ID
-								INNER JOIN BICOS B
-								ON B.DEPOSITO_ID = DP.DEPOSITO_ID
-								LEFT JOIN PERSONA_PRODUTOS TB
-								ON P.ID = TB.PRODUTO_ID
-								WHERE B.ID = #{params[:cod]}
-								AND TB.PERSONA_ID = #{params[:persona_id]}
-								"
+						LEFT JOIN PRODUTOS P
+						ON D.PRODUTO_ID = P.ID
 
-						find_grade = Produto.find_by_sql(sql)
-						grade = find_grade.first
+						WHERE B.ID = #{params[:cod]}"
+			find_grade = Produto.find_by_sql(sql)
+			grade = find_grade.first
 
-				end
-			else
-			bico = Bico.find_by_id(params[:cod])
-			dp   = Deposito.find_by_id(bico.deposito_id, select: 'ID AS DEPOSITO_ID, SETA_PRODUTO')
-			if dp.seta_produto == 0
-				find_grade = dp
-				grade = find_grade
-			else
-				sql = "SELECT P.ID,
-											 P.NOME AS PRODUTO_NOME,
-											 DP.DEPOSITO_ID,
-											 B.PRECO_US,
-											 B.PRECO_GS,
-											 B.PRECO_RS,
-											 B.PRECO_02_US,
-											 B.PRECO_02_GS,
-											 B.PRECO_02_RS
-								FROM PRODUTOS P
-								INNER JOIN DEPOSITO_PRODUTOS DP
-								ON DP.PRODUTO_ID = P.ID
-								INNER JOIN BICOS B
-								ON B.DEPOSITO_ID = DP.DEPOSITO_ID
-								WHERE B.ID = #{params[:cod]}"
-						find_grade = Produto.find_by_sql(sql)
-						grade = find_grade.first
-
-				end
-
-
-			end
-
-					return render :json => { :produto => grade }
+			return render :json => { :produto => grade }
 	end
 
 	def busca_produto_por_tabela_preco

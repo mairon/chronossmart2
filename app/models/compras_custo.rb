@@ -4,6 +4,8 @@ class ComprasCusto < ActiveRecord::Base
   belongs_to :unidade
   belongs_to :rubro
   belongs_to :rodado
+  belongs_to :ordem_carga
+  belongs_to :pedido_traslado
   belongs_to :plano_de_conta
   before_save :finds
 

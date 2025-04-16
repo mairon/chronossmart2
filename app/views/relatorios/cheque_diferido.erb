@@ -2,9 +2,17 @@
 <div class="group">
   <%= form_tag resultado_cheque_diferido_relatorios_path, :method => "get" do%>
     <table>
+
       <tr>
-        <td colspan="4"> 
+        <td colspan="2">
           <label>Periodo</label>
+          <input type="radio" id="tipodt" name="tipodt" value="0" checked /> Emisión
+          <input type="radio" id="tipodt" name="tipodt" value="1" /> Diferido
+        </td>
+      </tr>
+
+      <tr>
+        <td colspan="4">
           <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
           <div class="input-group-addon-f">
             <span class="icon-calendar"></span>
@@ -13,24 +21,22 @@
           <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
           <div class="input-group-addon-f">
           <span class="icon-calendar"></span>
-          </div>                  
+          </div>
         </td>
       </tr>
 
-      <tr>
-        <td>
-          <a href="#" data-value="0" title="Data" class="Tipodt checked" >Emisión</a>
-        </td>
-        <td align="center">
-          <a href="#" data-value="1" title="Data" class="Tipodt" >Diferido</a>
-        </td>
-        <%= hidden_field_tag :tipodt, 0 %>
-      </tr>
 
       <tr>
         <td colspan="4">
           <label><%= t('ACCOUNT') %></label>
           <%=   select("busca", "conta", Conta.all( :select => 'id,nome',:order => 'nome', :conditions => ["unidade_id = #{current_unidade.id}"]).collect {|p| [ p.nome, p.id ] }, { :prompt => 'Todos...'}, {required: true}) %>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="4">
+          <label>Cliente</label>
+          <%= text_field_tag :persona_nome, nil, class: 'panel-field' %>
+          <%= hidden_field_tag :persona_id , nil  %>
         </td>
       </tr>
 
@@ -42,42 +48,32 @@
       </tr>
 
       <tr>
-        <td>
-          <a href="#" data-value="1" title="Data" class="Emissao checked" >Cheque Recibidos</a>
+        <td colspan="2">
+          <input type="radio" id="emitidos_recebidos" name="emitidos_recebidos" value="1" checked/> Cheque Recibidos
+          <input type="radio" id="emitidos_recebidos" name="emitidos_recebidos" value="2" /> Cheques Emitidos
         </td>
-        <td align="center">
-          <a href="#" data-value="2" title="Data" class="Emissao" >Cheques Emitidos</a>
+      </tr>
+
+      <tr>
+        <td colspan="2">
+          <input type="radio" id="cheque" name="cheque" value="1" checked/> A Depositar
+          <input type="radio" id="cheque" name="cheque" value="2" /> Depositado
+          <input type="radio" id="cheque" name="cheque" value="" /> Todos
         </td>
-        <%= hidden_field_tag :emitidos_recebidos, 1 %>
       </tr>
 
       <tr>
         <td>
-          <a href="#" data-value="1" title="Status Cheque" class="ChStatus checked" >A Depositar</a>
+          <fieldset>
+            <legend><%= t('COIN') %></legend>
+            <input type="radio" id="moeda" name="moeda" value="0" <%= 'checked' if current_unidade.moeda.to_i == 0 %> /> <%= t('DOLLARS') %>
+            <input type="radio" id="moeda" name="moeda" value ="1" <%= 'checked' if current_unidade.moeda.to_i == 1 %> /> <%= t('GUARANIS') %>
+            <input type="radio" id="moeda" name="moeda" value="2" <%= 'checked' if current_unidade.moeda.to_i == 2 %> /> <%= t('REAIS') %>
+          </fieldset>
         </td>
-        <td align="center">
-          <a href="#" data-value="2" title="Status Cheque" class="ChStatus" >Depositado</a>
-        </td>
-        <td align="center">
-          <a href="#" data-value="" title="Status Cheque" class="ChStatus" >Todos</a>
-        </td>
-
-        <%= hidden_field_tag :cheque, 1 %>
       </tr>
 
-        <tr>
-          <td>
-            <a href="#" data-value="0" title="Moneda" class="Moeda us <%= 'checked' if current_unidade.moeda.to_i == 0 %>" ><%= t('DOLLARS') %></a>
-          </td>
-          <td align="center">
-            <a href="#" data-value="1" title="Moneda" class="Moeda gs <%= 'checked' if current_unidade.moeda.to_i == 1 %>" ><%= t('GUARANIS') %></a>
-          </td>
-          <td align="center">
-            <a href="#" data-value="2" title="Moneda" class="Moeda rs <%= 'checked' if current_unidade.moeda.to_i == 2 %>" ><%= t('REAIS') %></a>
-          </td>
-          <%= hidden_field_tag :moeda, current_unidade.moeda %>
-        </tr>
-        <tr>
+      <tr>
           <td colspan="4" class="footer-buttons">
             <input  id="button" class="acao btn btn-green" value="Informe"  style="cursor:pointer;" id="myModalLabel" data-toggle="modal" data-width="500" data-height="781" data-target="#myiframe" data-dismiss="modal" />
             <input  id="button" type="submit" class="btn btn-blue" value="Excel" onclick = "Tipo('1')"/>
@@ -95,70 +91,62 @@
       <div class="modal-header">
         <div class="close-button">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        </div>  
+        </div>
         <h4 class="modal-title" id="myModalLabel"><%= t('LISTING') %> de Cheques</h4>
       </div>
       <div class="modal-body" align="center">
         <div class="embed-responsive embed-responsive-16by9" style="height: 460px">
           <iframe class="embed-responsive-item" id="iframeModal" frameborder="0 " border="0"></iframe>
         </div>
-      </div>      
+      </div>
     </div>
   </div>
 </div>
 
+
+  <script>
+        $(function() {
+        $( "#persona_nome" ).autocomplete({
+            source: function( request, response ) {
+            $.ajax({
+              url: "/personas/busca",
+              dataType: "json",
+              data: {
+                tipo: 'DESCRIPCION',
+                busca: request.term
+              },
+              success: function( data ) {
+                response( data );
+              },
+            });
+          },
+          minLength: 2,
+          change: function( event, ui ) {
+            $("#persona_id").val("");
+            $('#persona_id').val(ui.item.id);
+            return false;
+          }
+        });
+        $( "#cobro_persona_nome" ).change(function(){
+          if ($( "#persona_id" ).val() == ''){
+          }
+        });
+      });
+  </script>
+
 <script>
   $('#busca_conta').selectize();
 
-
-  $(document).ready(function() {
-    $(".Tipodt").click(function() {
-      $("#tipodt").val($(this).attr('data-value'));
-      $(".Tipodt").css("border-bottom", "none");
-      $(".Tipodt").css("color", "#918f8f");
-      $(this).css("border-bottom", "2px solid #B94A48");
-      $(this).css("text-align", "center");
-      $(this).css("color", "#B94A48");
-    });
-
-    $(".Emissao").click(function() {
-      $("#emitidos_recebidos").val($(this).attr('data-value'));
-      $(".Emissao").css("border-bottom", "none");
-      $(".Emissao").css("color", "#918f8f");
-      $(this).css("border-bottom", "2px solid #B94A48");
-      $(this).css("text-align", "center");
-      $(this).css("color", "#B94A48");
-    });
-
-    $(".ChStatus").click(function() {
-      $("#cheque").val($(this).attr('data-value'));
-      $(".ChStatus").css("border-bottom", "none");
-      $(".ChStatus").css("color", "#918f8f");
-      $(this).css("border-bottom", "2px solid #B94A48");
-      $(this).css("text-align", "center");
-      $(this).css("color", "#B94A48");
-    });
-
-    $(".Moeda").click(function() {
-      $("#moeda").val($(this).attr('data-value'));
-      $(".Moeda").css("border-bottom", "none");
-      $(".Moeda").css("color", "#918f8f");
-      $(this).css("border-bottom", "2px solid #B94A48");
-      $(this).css("text-align", "center");
-      $(this).css("color", "#B94A48");
-    });
-  });
-
 ( function($) {
-  
+
 function iframeModalOpen(){
 
     $('.acao').on('click', function(e) {
       var width  = $(this).attr('data-width') || 640; // larghezza dell'iframe se non impostato usa 640
       var height = $(this).attr('data-height') || 760; // altezza dell'iframe se non impostato usa 360
-      
+
       var allowfullscreen = $(this).attr('data-video-fullscreen'); // impostiamo sul bottone l'attributo allowfullscreen se è un video per permettere di passare alla modalità tutto schermo
-      
+
       // stampiamo i nostri dati nell'iframe
       $("#myiframe iframe").attr({
         'src': '/relatorios/resultado_cheque_diferido?' + $('form').serialize(),
@@ -174,11 +162,11 @@ function iframeModalOpen(){
       $(this).find('iframe').attr("src", "");
     });
   }
-  
+
   $(document).ready(function(){
     iframeModalOpen();
   });
-  
+
   } ) ( jQuery );
 
 </script>

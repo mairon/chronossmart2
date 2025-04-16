@@ -1,0 +1,52 @@
+<div class="panel">
+  <h1 id="header">
+    Abastecidas
+  </h1>
+  
+  <div class="panel-content">
+    <%= form_tag busca_abastecidas_path, :method => "get", id: "form_v" do %>
+      <table>
+        <tr>
+          <td>De</td>
+          <td >
+            <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+            <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+            </div>
+          </td>
+          <td>hasta</td>
+          <td>
+            <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+            <div class="input-group-addon-f">
+              <span class="icon-calendar"></span>
+            </div>
+          </td>
+          <td>
+            Bico <%= select("busca", "bico", Bico.select('id,nome').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Todos' }) %>
+          </td>
+
+          <td>
+            Playero <%= select("busca", "frentista", Persona.where(tipo_frentista: 1).select('id,nome').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Todos' }) %>
+          </td>
+          <td>
+            Status<%= select_tag :status, options_for_select([["Pendientes",0],["Bajados",1],["Devolvidos",2],["Todos", '']]) %>
+          </td>
+          <td colspan="4">
+            <input type="button" class="btn btn-blue" onclick="pesquisa()" value="Buscar"/>
+            <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;") %>
+          </td>
+         </tr>
+      </table>
+    <% end %>
+  </div>
+</div>
+ <div id="pagina"></div>
+
+<script language="javascript">
+  function pesquisa(){
+    url="/abastecidas/busca?" + $('#form_v').serialize();
+    ajax(url);
+  }
+</script>
+
+<%= javascript_include_tag 'busca_ajax' %>

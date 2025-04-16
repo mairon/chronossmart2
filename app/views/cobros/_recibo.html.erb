@@ -1,0 +1,81 @@
+<div class="panel">
+  <h1 id="header">
+    Recibo de Dinero
+
+    <div class="pull-right">
+      <a href="#" data-toggle="modal" data-target="#modal-recibo" class="btn btn-green" style="height: 37px;"><i class="icon-white icon-plus-sign"></i></a>
+    </div>
+  </h1>
+
+  <div  class="panel-content">
+    
+      <table class="head_grid" style="font-size: 10px">
+        <tr>
+          <td width="80"><%= t('DOC') %></td>
+          <td width="50" align="right"><%= t('VALUE') %></td>
+        </tr>
+      </table>
+
+      <div class="rolagem" dir="div" style="height: 100px; font-size: 10px">
+        <table>
+          <% @rds.each do |cobros_nc| %>
+          <% if cobros_nc.status == 2 %>
+            <% color = 'background-color: #fa3e40; color: #fff' %>
+          <% end %>
+
+            <tr class = "<%= cycle("cor1", "cor2") %>">
+              <td  width="100"  style="<%=color%>"><%= cobros_nc.doc_01 %>.<%= cobros_nc.doc_02 %>.<%= cobros_nc.doc %></td>
+              <td  width="70"  align="right"  style="<%=color%>"><%= format_int(cobros_nc.tot_gs) %></td>
+              <% if cobros_nc.status == 1 %>
+                <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(cobros_nc, status: '2'), style: 'text-decoration: underline' %></td>          
+
+                <td>
+                  <%= link_to 'Impri.', "#",  :onclick => "FormFiscalRecibo(#{cobros_nc.id})", style: 'text-decoration: underline' %>
+                </td>
+              <% end %>
+              <td  style="<%=color %>"><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(cobros_nc, status: '0'), style: "#{color}; text-decoration: underline" %></td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+                 
+  </div>
+</div>
+
+<div class="modal fade" id="modal-recibo" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h1 id="myModalLabelf">Datos de Recibo</h1>
+      </div>
+
+      <div class="modal-body">
+
+        <% unless @rds.present? %>
+          <div class="group">
+            <%= render partial: "form_fiscals/attr_forms/cobro_update_rd" %>
+          </div>
+        <% else %>
+          <% if @rds.first.status.to_i != 1 %>
+
+          <div class="group">
+            <%= render partial: "form_fiscals/attr_forms/cobro_update_rd" %>
+          </div>
+          <% end %>
+        <% end %>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+function FormFiscalRecibo(id){
+  window.open('/form_fiscals/' + id + '/impressao_rc', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+}
+</script>

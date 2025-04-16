@@ -1,0 +1,50 @@
+<div class="panel">
+  <h1 id="header">
+    Turmas
+    <div class="pull-right">
+      <%= link_to t("NEW"), '#', class: 'button add', 'data-toggle' => "modal", 'data-target' => "#form_modal", 'data-dismiss' => "modal", 'aria-labe' => "Close" %>
+    </div>
+  </h1>
+</div>
+
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="80">Código</td>
+      <td width="350">Nome</td>
+      <td width="50">Status</td>
+    </tr>
+  </table>
+
+  <div class="rolagem" dir="div">
+    <table>
+      <% @turmas.each do |turma| %>
+        <tr class="<%= cycle("cor1", "cor2")%>">
+          <td width="80"><%= turma.id.to_s.rjust(6,'0') %></td>
+          <td width="350"><%= turma.nome %></td>
+          <td width="50"><%= turma.status %></td>
+          <td><%= link_to '', edit_turma_path(turma), class: 'icon-pencil' %></td>
+          <td><%= link_to '', turma, confirm: 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
+
+
+
+<div class="modal fade" id="form_modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 600px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('NEW') %> <span class="cota"></span></h4>
+      </div>
+      <div class="modal-body">
+        <%= render 'form' %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -10741,30 +10741,45 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
 
 }(jQuery));
 </script>
-<html>
-<body onload="window.print()" >
-  <style type="text/css">
-      body,html{
-      	margin: 0px;
-      	padding: 0px;
-      }
-			.main{
-		    display: table;
-		    margin-left: 0px;
-			}
+
+<body onload="window.print()">
+<style type="text/css">
+  table{
+    font-family: arial;
+    font-size: 09px
+  }
+
+  .ft-header{
+    text-align: center;
+  }
+  .page-break { display:block; clear:both; page-break-after:always; }
+</style>
+ 
+<% if params[:modelo] == '1' %>
+  <% @produtos.each do |p| %>
+    <table class="page-break" width="300">
+      <tr><td width="300"><b><%= current_unidade.nome_sys %></b></td></tr>
+      <tr><td align="center"><b><div id="bcTarget<%= p.id%>"></div></b></td></tr>     
+      <tr><td width="350"><b><%= p.nome.to_s[0..30] %> - Ref.<%= p.fabricante_cod.to_s %></b></td></tr>
+      <tr><td width="350"><b>G$ <%= format_int(p.preco_1_gs) %></b></td></tr>
+      <tr><td width="150"><b></b></td></tr>
+      <script>
+        $("#bcTarget<%= p.id%>").barcode("<%= p.barra %>", "code128",{barWidth:1.5, barHeight:15});
+      </script>
+    </table>
+  <% end %>
+<% else %>
+    <table class="page-break">
+      <tr><td width="300"><b><%= current_unidade.nome_sys %></b></td></tr>
+      <tr><td align="center"><b><div id="bcTarget<%= @produto.id %>"></div></b></td></tr>     
+      <tr><td width="350"><b><%= @produto.nome.to_s[0..30] %> - Ref.<%= @produto.fabricante_cod.to_s %></b></td></tr>
+      <tr><td width="350"><b>G$ <%= format_int(@preco_tb_1.preco_1_gs) %></b></td></tr>
+      <tr><td width="150"><b></b></td></tr>
+      <script>
+        $("#bcTarget<%= @produto.id%>").barcode("<%= @produto.barra %>", "code128",{barWidth:1.5, barHeight:15});
+      </script>
+    </table>
+<% end %>
 
 
-  </style>
-  <table class="main">
-  	<tr>
-  		<td align="left" width="180">
-  			<%= render "produtos/etiquetas_print" %>
-  		</td>
-  		<td align="center"width="170">
-  			<%= render "produtos/etiquetas_print1"  %>
-  		</td>
-  		<td align="center"width="150">
-  			<%= render "produtos/etiquetas_print2"  %>
-  		</td>
-  	</tr>
-  </table>
+</body>

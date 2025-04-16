@@ -16,7 +16,7 @@
   <table>
     <% @lista_cargas.each do |lista_carga| %>
       <tr class="<%= cycle("cor1", "cor2")%>">
-        <td width="80"><%= lista_carga.id.to_s.rjust(6,'0') %></td>
+        <td width="80"><%= link_to lista_carga.id.to_s.rjust(6,'0'), lista_carga_path(lista_carga.id) %></td>
         <td width="300"><%= lista_carga.rodado.placa %></td>
         <td width="50"><%= lista_carga.status %></td>
         <td width="200"><%= lista_carga.obs %></td>

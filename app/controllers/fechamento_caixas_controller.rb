@@ -316,27 +316,22 @@ ORDER BY 1;
         ORDER BY 3 DESC"
 
     @produtos_vendidos = Venda.find_by_sql(sql)
-
-
     sqlg = "SELECT
-                   F.SIGLA_PROC AS CONCEPTO,
-                   COUNT(F.ID) AS PERSONA_NOME,
-                   SUM(F.ENTRADA_GUARANI) AS ENTRADA_GUARANI,
-                   SUM(F.SAIDA_GUARANI) AS SAIDA_GUARANI,
-                   MAX(F.SIGLA_PROC) AS SIGLA_PROC,
-                   MAX(F.COD_PROC) AS COD_PROC
+                F.SIGLA_PROC,
+                F.FORMA_PAGO_ID,
+                MAX(FP.NOME) AS FORMA_PAGO_NOME,
+                COUNT(F.ID) AS COUNT_REG,
+                SUM(COALESCE(F.ENTRADA_GUARANI,0) - COALESCE(F.SAIDA_GUARANI,0)) SALDO_GS
+              FROM FINANCAS F
 
+              INNER JOIN CONTAS C
+              ON C.ID = F.CONTA_ID
 
-            FROM FINANCAS F
-            INNER JOIN CONTAS C
-            ON C.ID = F.CONTA_ID
-            WHERE COALESCE(F.SIGLA_PROC, '') <> 'FC    '
-            AND F.FORMA_PAGO_ID in (1, 13)
-            AND C.TERMINAL_ID = #{@fechamento_caixa.abertura_caixa.terminal_id}
-            AND F.DATA = '#{@fechamento_caixa.abertura_caixa.data}'
-            AND C.MOEDA = 1
-            GROUP BY 1
-            "
+              INNER JOIN FORMA_PAGOS FP
+              ON FP.ID = F.FORMA_PAGO_ID
+
+              WHERE F.FORMA_PAGO_ID IN (1, 8) AND F.CONTROLE_CAIXA = #{@fechamento_caixa.abertura_caixa_id} AND C.TERMINAL_ID =  #{@fechamento_caixa.abertura_caixa.terminal_id}  AND F.MOEDA = 1   AND F.DATA = '#{@fechamento_caixa.abertura_caixa.data}'
+              GROUP BY 1,2"
 
             @mov_efetivo_gs = Financa.find_by_sql(sqlg)
 

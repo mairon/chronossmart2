@@ -2,8 +2,10 @@
   <div class="group">
     <table class="head_grid">
       <tr>
-        <td width="250"><%= t('ACCOUNT') %></td>
+        <td width="200"><%= t('ACCOUNT') %></td>
         <td width="100" align="center"><%= t('DATE') %></td>
+        <td width="100" align="center">Cheque</td>
+        <td width="100" align="center">Diferido</td>
         <td width="450">Concepto</td>
         <td width="100" align="right"><%= t('VALUE') %></td>
 
@@ -14,8 +16,10 @@
         <% cre = 0 %>
         <% sueldo_pagos.each do |sp| %>
             <tr class = "<%= cycle("cor1", "cor2") %>">
-              <td width="250"><%= sp.conta.nome unless sp.conta_id.blank? %></td>
-              <td width="100" align="center"><%= sp.data.strftime("%d/%m/%Y") %></td>
+              <td width="200"><%= sp.conta.nome unless sp.conta_id.blank? %></td>
+              <td width="100" align="center"><%= sp.data.strftime("%d/%m/%y") %></td>
+              <td width="100" align="center"><%= sp.cheque %></td>
+              <td width="100" align="center"><%= sp.diferido.strftime("%d/%m/%y") %></td>
               <td width="450" align="left"><%= sp.obs %></td>
               <% if sp.moeda == 2 %>
                 <td width="100" align="right"><%= number_to_currency(sp.valor_rs, :format=>' %n ', :separeitor => ',')   %></td>
@@ -32,8 +36,8 @@
 
               <% end %>
                 <td><%= link_to '',  "#", class: 'icon-file', onclick: "PrintCheque(#{sp.sueldo_id}, #{sp.id})" %></td>
-                <td><%= link_to 'Editar', edit_sueldo_pago_path(sp) %></td>
-                <td><%= link_to t('DELETE'), sp, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete %></td>
+
+                <td><%= link_to '', sp, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
               </tr>
             <% end %>
         </table>

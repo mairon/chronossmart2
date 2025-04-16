@@ -1,6 +1,7 @@
 class ConsumicaoInternaProduto < ActiveRecord::Base
   belongs_to :consumicao_interna
   belongs_to :produto
+  belongs_to :deposito
 
   validates_presence_of :produto_id,:quantidade
   #validate :valid_stock
@@ -20,13 +21,13 @@ class ConsumicaoInternaProduto < ActiveRecord::Base
 
   def find_cmv
 
-    cmv = Stock.last(:conditions => ["status = 0 and deposito_id = ? and produto_id = ? AND data < ?",self.deposito_id, self.produto_id, self.data], select: 'produto_id,unitario_guarani,unitario_dolar', order: 'data,id')
+    cmv = Stock.last(:conditions => ["status = 0 and deposito_id = ? and produto_id = ? AND data < ?",self.deposito_id, self.produto_id, self.data], select: 'produto_id,promedio_guarani,promedio_dolar', order: 'data,id')
     unless cmv.nil?
-      self.unitario_dolar = cmv.unitario_dolar.to_f
-      self.total_dolar = cmv.unitario_dolar.to_f.to_f * self.quantidade.to_f
+      self.unitario_dolar = cmv.promedio_dolar.to_f
+      self.total_dolar = cmv.promedio_dolar.to_f.to_f * self.quantidade.to_f
 
-      self.total_guarani = cmv.unitario_guarani.to_f
-      self.unitario_guarani = cmv.unitario_guarani.to_f * self.quantidade.to_f
+      self.unitario_guarani = cmv.promedio_guarani.to_f
+      self.total_guarani = cmv.promedio_guarani.to_f * self.quantidade.to_f
     end
   end
 end

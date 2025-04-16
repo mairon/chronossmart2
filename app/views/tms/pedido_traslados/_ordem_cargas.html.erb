@@ -1,0 +1,266 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <h1 id="header">
+        Ordem Cargas
+        <div class="pull-right">
+          <%= link_to 'Add', '#', class: 'button add', 'data-toggle' => "modal", 'data-target' => "#form_modal", 'data-dismiss' => "modal", 'aria-labe' => "Close" %>
+        </div>
+      </h1>
+    </div>
+  </div>
+</div>
+
+<% @ordem_cargas.each do |oc| %>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel">
+        <h1 id="header">
+          #<%= oc.cod_ext %> 
+
+          <% if @pedido_traslado.tipo == 0 || @pedido_traslado.tipo == 1 %>
+            CRT <%= oc.pedido_traslado_doc.crt unless oc.pedido_traslado_doc.blank?  %> - MIC <%= oc.pedido_traslado_doc.mic unless oc.pedido_traslado_doc.blank? %>
+          <% else %>
+            CTe <%= oc.pedido_traslado_doc.cte unless oc.pedido_traslado_doc.blank? %> - Manifesto <%= oc.pedido_traslado_doc.manif unless oc.pedido_traslado_doc.blank? %>
+          <% end %>
+          
+          <div class="pull-right">
+            <%= link_to '', edit_tms_ordem_carga_path(oc), class: 'icon-pencil' %>
+            <%= link_to '', [:tms, oc], :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %>
+          </div>
+
+        </h1>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-4">
+            <label>Veiculo</label>
+            <%= oc.placa_cv %> / <%= oc.placa_cr %>
+          </div>
+
+          <div class="col-md-4">
+            <label>Motorista</label>
+            <%= oc.motorista_nome %>
+          </div>
+
+          <div class="col-md-4">
+            <label>Peso</label>
+            <%= oc.peso %>
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-md-4">
+            <label>Data</label>
+            <%= oc.data.strftime("%d/%m/%y") %>
+          </div>
+
+          <div class="col-md-4">
+            <label>Produto</label>
+            <%= oc.produto.nome %>
+          </div>
+
+          <div class="col-md-4">
+            <label>Valor Frete</label>
+            <% if oc.moeda.to_i == 0 %>
+              U$ <%= format_decimal(oc.valor_frete_us) %>
+            <% elsif oc.moeda.to_i == 1 %>
+              Gs. <%= format_int(oc.valor_frete_gs) %>
+            <% elsif oc.moeda.to_i == 2 %>
+              R$ <%= format_decimal(oc.valor_frete_rs) %>
+            <% end %>            
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-md-4">
+            <label>Km Inicial</label>
+            <%= oc.km_inicio %>
+          </div>
+
+          <div class="col-md-4">
+            <label>Km Final</label>
+            <%= oc.km_final %>
+          </div>
+
+          <div class="col-md-4">
+            <label>Status</label>
+            <% if oc.status.to_i == 0 %>
+              Em Aberto
+            <% elsif oc.status.to_i == 1 %>
+              Em Curso
+            <% elsif oc.status.to_i == 1 %>
+              Cancelado
+            <% elsif oc.status.to_i == 1 %>
+              Finzalido
+             <% end %>
+
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-md-12">
+            <label><%= t('CLASSIFICATION') %></label>
+            <%= oc.plano_de_conta_nome %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+<% end %>
+
+
+
+<div class="modal fade" id="form_modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 600px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('NEW') %> <span class="cota"></span></h4>
+      </div>
+      <div class="modal-body group">
+
+        <%= form_for [:tms, OrdemCarga.new] do |fo| %>
+          <%= fo.hidden_field :pedido_traslado_id, value:  @pedido_traslado.id %>
+          <div class="row">
+            <div class="col-md-4">
+              <label>Cod. Ext</label>
+              <%= fo.text_field :cod_ext, class: "panel-field" %>
+            </div>
+
+            <div class="col-md-4">
+              <label>Status</label>
+              <%= fo.select :status, [['Em aberto', 0], ['Em Curso', 1], ['Cancelado', 2], ['Finalizado', 3] ] %>
+            </div>
+
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <label>Data</label>
+              <%= fo.text_field :data, value: Time.now.strftime("%d/%m/%Y"), size: 10,  class: "panel-field date", required: true %>
+            </div>
+
+            <div class="col-md-4">
+              <label>Veiculo</label>
+              <% sql = "SELECT F.ID, (RC.PLACA || ' / ' || RR.PLACA) AS PLACA FROM FROTA F INNER JOIN RODADOS RC ON F.RODADO_CV_ID = RC.ID  INNER JOIN RODADOS RR ON F.RODADO_CR_ID = RR.ID " %>
+              <%= fo.collection_select :frota_id, Frotum.find_by_sql(sql), :id, :placa, { prompt: ''}, {required: true} %>        
+            </div>
+
+            <div class="col-md-4">
+              <% if @pedido_traslado.tipo == 0 || @pedido_traslado.tipo == 1 %>
+              <label>CRT/MIC</label>
+              <%= fo.collection_select :pedido_traslado_doc_id, PedidoTrasladoDoc.where(pedido_traslado_id: @pedido_traslado.id), :id, :mic, { prompt: ''}, {required: true} %>
+              <% else %>
+                <label>CTe/Maninfeto</label>
+                <%= fo.collection_select :pedido_traslado_doc_id, PedidoTrasladoDoc.where(pedido_traslado_id: @pedido_traslado.id), :id, :manif, { prompt: ''}, {required: true} %>
+              <% end %>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-9">
+              <label>Produto</label>
+              <%= fo.collection_select :produto_id, Produto.where(status: true), :id, :nome, { prompt: ''}, {required: true} %>
+            </div>
+
+            <div class="col-md-3">
+              <label>Peso</label>
+              <%= fo.text_field :peso, class: "panel-field" %>
+            </div>
+
+          </div>
+
+          <div class="row">
+            <div class="col-md-3">
+              <label><%= t('COIN') %></label>
+              <%= fo.select :moeda, [['R$', 2], ['Gs.', 1], ['U$', 0] ], :selected => @pedido_traslado.moeda.to_i %>
+            </div>
+
+            <div class="col-md-3 valores-gs">
+              <%= panel_field_gs_label 'Valor Gs.',fo,:valor_frete_gs %>
+            </div>
+
+            <div class="col-md-3 valores-us" hidden>
+              <%= panel_field_us_label 'Valor U$',fo,:valor_frete_us %>
+            </div>
+
+            <div class="col-md-3 valores-rs" hidden>
+              <%= panel_field_us_label 'Valor R$',fo,:valor_frete_rs %>
+            </div>
+            
+            <div class="col-md-3">
+              <label>Km Inicio</label>
+              <%= fo.text_field :km_inicio, class: "panel-field" %>
+            </div>
+
+            <div class="col-md-3">
+              <label>Km Final</label>
+              <%= fo.text_field :km_final, class: "panel-field" %>
+            </div>
+          </div>
+
+          <% sql = "SELECT PC.ID,
+                           (PG.DESCRICAO || ' > ' || PC.DESCRICAO) AS DESCRICAO
+                    FROM PLANO_DE_CONTAS PC
+                    LEFT JOIN PLANO_DE_CONTAS PG
+                    ON SUBSTRING(PG.CODIGO, 1, 8) = SUBSTRING(PC.CODIGO, 1, 8)
+                    WHERE LENGTH(PC.CODIGO) >=12 AND LENGTH(PG.CODIGO) =8
+                    ORDER BY 2"
+            plano = PlanoDeConta.find_by_sql(sql)
+          %>
+
+          <div class="row">
+            <div class="col-md-12">
+              <label><%= t('CLASSIFICATION') %></label>
+              <%= fo.collection_select :plano_de_conta_id, plano,:id, :descricao,{:prompt => 'Selecione'}, {required: true, class: 'selectize'} %>
+            </div>
+          </div>
+          <div class="footer-buttons">
+            <%= fo.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+          </div>    
+        <% end %>
+
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $('#ordem_carga_produto_id, #ordem_carga_frota_id').selectize();  
+
+  $(document).ready(function() {
+    if (<%= @pedido_traslado.moeda.to_i %> == '1') {
+      $(".valores-gs").show();
+      $(".valores-rs").hide();
+      $(".valores-us").hide();
+
+    } else if (<%= @pedido_traslado.moeda.to_i %> == '0') {
+      $(".valores-us").show();
+      $(".valores-rs").hide();
+      $(".valores-gs").hide();
+
+    } else if (<%= @pedido_traslado.moeda.to_i %> == '2') {
+      $(".valores-rs").show();
+      $(".valores-us").hide();
+      $(".valores-gs").hide();
+    };    
+  });
+  $("#ordem_carga_moeda").change(function() {
+      if (this.value == '1') {
+        $(".valores-gs").show();
+        $(".valores-rs").hide();
+        $(".valores-us").hide();
+
+      } else if (this.value == '0') {
+        $(".valores-us").show();
+        $(".valores-rs").hide();
+        $(".valores-gs").hide();
+
+      } else if (this.value == '2') {
+        $(".valores-rs").show();
+        $(".valores-us").hide();
+        $(".valores-gs").hide();
+      };
+  });  
+</script>

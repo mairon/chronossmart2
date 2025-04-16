@@ -1,51 +1,8 @@
-<ul class="tabs">
-    <li><a href="#tab1"> Apertura de Caja - [<%= t('EDITION') %>]</a></li>
-</ul>
-
-<div class="tab_container">
-      <div id="tab1">
-        <table>
-        	<tr>
-        		<td>
-        		<%= t('DATE') %>: <b><%= @abertura_caixa.data.strftime("%d/%m/%y") %></b>
-        		Usuario: <b><%= @abertura_caixa.usuario.usuario_nome %></b>
-        		Terminal: <b><%= @abertura_caixa.terminal.nome %></b>
-        		</td>
-
-        	</tr>
-          <tr>
-            <td width="1000">
-              <fieldset>
-							  <table class="head_grid">
-							      <tr>
-							        <td width="150"><%= t('ACCOUNT') %></td>
-							        <td width="70" align="right">Saldo</td>
-							      <tr>
-							  </table>              	
-							  <div class="rolagem_min" dir="div">
-							    <table>
-	                <% @caixas.each do |c| %>
-		                <tr class = "<%= cycle("cor1", "cor2") %>">
-		                	<td width="150"><%= c.nome %></td>
-		                	<% if c.moeda.to_i == 0 %>
-		                		<td width="70" align="right"><%= format_decimal(c.saldo_us.to_f) %></td>
-		                	<% elsif c.moeda.to_i == 1 %>
-		                		<td width="70" align="right"><%= format_int(c.saldo_gs.to_f) %></td>
-		                	<% else %>
-		                		<td width="70" align="right"><%= format_decimal(c.saldo_rs.to_f) %></td>
-		                	<% end %>
-		                </tr>
-		               <% end %>
-	                </table>
-	              </div>
-              </fieldset>
-            </td>
-          <tr>
-        </table>
-      </div>
-      <div class="buttons">
-        <%= link_to t('BACK'), edit_abertura_caixa_path(@abertura_caixa), :class => "button back" %>        
-        <%= link_to 'Finalizar', abertura_caixas_path, :class => "button next" %>        
-      </div>
-
-    </div>
+<div class="row">
+	<div class="col-md-8">
+		<%= render 'movimentos' %>
+	</div>
+	<div class="col-md-4" id="line_items">
+		<%= render 'lancamentos' %>
+	</div>
+</div>

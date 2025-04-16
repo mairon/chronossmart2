@@ -1,11 +1,13 @@
 class LogisticaController < ApplicationController
   def index
     @listas_cargas = ListaCarga.where(status: true).select('id,rodado_id,cidade_id').order('1')
+
+    render layout: 'chart'
   end
 
   def busca
     params[:unidade] = current_unidade.id
-    @presupuestos = Logistica.filtro_busca(params)
+    @vendas = Logistica.filtro_busca(params)
     render :layout => false
   end
 
@@ -51,7 +53,6 @@ class LogisticaController < ApplicationController
                   :moeda             => 1,
                   :pedido_id         => pre.id,
                   :pedido            => 1,
-                  :vendedor_id       => pre.vendedor_id,
                   :persona_id        => pre.persona_id,
                   :tipo_venda        => 1,
                   :vendedor_id       => pre.vendedor_id,

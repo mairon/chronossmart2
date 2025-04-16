@@ -56,12 +56,7 @@ before_filter :authenticate
 
     respond_to do |format|
       if @nota_creditos_detalhe.update_attributes(params[:nota_creditos_detalhe])
-        params[:data]        = @nota_creditos_detalhe.data
-        params[:deposito_id] = @nota_creditos_detalhe.deposito_id
-        params[:produto_id]  = @nota_creditos_detalhe.produto_id
-        params[:tabela] = 'NOTA_CREDITO_DTS'
-        params[:tabela_id] = @nota_creditos_detalhe.id      
-        Recalculo.gera_recalculo_entrada(params)        
+
 
         flash[:notice] = t('SUCESSFUL_EDIT_MESSAGE')
         format.html { redirect_to "/nota_creditos/#{@nota_creditos_detalhe.nota_credito_id}" }
@@ -74,13 +69,7 @@ before_filter :authenticate
   def destroy
     @nota_creditos_detalhe = NotaCreditosDetalhe.find(params[:id])
     @nota_creditos_detalhe.destroy
-    params[:data]        = @nota_creditos_detalhe.data
-    params[:deposito_id] = @nota_creditos_detalhe.deposito_id
-    params[:produto_id]  = @nota_creditos_detalhe.produto_id
-    params[:tabela] = 'NOTA_CREDITO_DTS'
-    params[:tabela_id] = @nota_creditos_detalhe.id      
-    Recalculo.gera_recalculo_entrada(params)
-
+    
 
     respond_to do |format|
         format.html { redirect_to "/nota_creditos/#{@nota_creditos_detalhe.nota_credito_id}" }

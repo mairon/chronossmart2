@@ -7,11 +7,10 @@
   has_many :compras_custos, dependent: :destroy
 
   after_create :distribui_apre_depre, :if => :usa_compra_patrimonio?
-  before_create :atribui_rubro_bens, :if => :usa_compra_patrimonio?
   #efore_update :atuliza_peso_bruto
-  before_create :atribui_custo
-  #before_save :calc_promedio_update, :gera_tabela_de_preco
-  #before_update :calc_promedio_update
+  before_create :atribui_custo, :gera_tabela_de_preco
+  before_save :calc_promedio_update, :gera_tabela_de_preco
+  before_update :calc_promedio_update
   before_save :calcs
 
   validates_presence_of :produto_id, :if => :compra_patrimonio?
@@ -31,27 +30,18 @@
     end
   end
 
-  def atribui_rubro_bens
-    if compra.classif_bens.to_i == 0
-      p   = Rodado.find_by_id(self.rodado_id,:select => 'id,placa,grupo_rubro_codigo');
-      rub = Rubro.where("codigo like '#{p.grupo_rubro_codigo}%' and descricao  like 'DEPRE%'").limit(1)
-      self.produto_nome = p.placa
-      self.rubro_id = rub.last.id
-    else
-      self.rubro_id = 242
-    end
-  end
 
   def atribui_custo
     self.custo_dolar   = self.unitario_dolar.to_f
     self.custo_guarani = self.unitario_guarani.to_f
+    self.custo_real = self.unitario_real.to_f
     self.custo_euro = self.unitario_euro.to_f
   end
 
   def distribui_apre_depre
     if self.anos.to_i > 0
         meses = self.anos.to_i * 12
-        porc  = (self.porcen.to_f / 100)
+        porc  = ( (100 - self.porcen.to_f) / 100)
 
         #rateio depreciacao dolar
         valor_rateado_us = (self.total_dolar.to_f * porc.to_f)
@@ -77,7 +67,7 @@
             ComprasDepreApre.create(
                 compra_id: self.compra_id,
                 compras_produto_id: self.id,
-                rubro_id: self.rubro_id,
+                plano_de_conta_id: compra.plano_de_conta_id,
                 moeda: self.moeda,
                 anos:  self.anos,
                 mes:   m,
@@ -92,11 +82,28 @@
                 :apre_gs => 0,
                 :apre_rs => 0
               )
+
+
+            ComprasCusto.create(  
+                    :compra_id       => self.compra_id,
+                    :compras_produto_id => self.id,
+                    :moeda           => compra.moeda,
+                    :unidade_id      => compra.unidade_id,
+                    :rodado_id      => compra.rodado_id,
+                    :centro_custo_id => compra.centro_custo_id,
+                    :plano_de_conta_id  => compra.plano_de_conta_id,
+                    :valor_us        => tot_rateio_us,
+                    :valor_gs        => tot_rateio_gs,
+                    :valor_rs        => tot_rateio_rs,
+                    :data            => compra.data.to_date.months_since(venc.to_i)
+
+                  )
+
           else
             ComprasDepreApre.create(
                 compra_id: self.compra_id,
                 compras_produto_id: self.id,
-                rubro_id: self.rubro_id,
+                plano_de_conta_id: compra.plano_de_conta_id,
                 moeda: self.moeda,
                 anos:  self.anos,
                 mes:   m,

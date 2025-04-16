@@ -25,6 +25,17 @@
 		<%= hidden_field_tag :moeda, @compra.moeda %>
 	<% end %>
 
+	    <% sql = "SELECT PC.ID,
+                     (PG.DESCRICAO || ' > ' || PC.DESCRICAO) AS DESCRICAO
+              FROM PLANO_DE_CONTAS PC
+              LEFT JOIN PLANO_DE_CONTAS PG
+              ON SUBSTRING(PG.CODIGO, 1, 8) = SUBSTRING(PC.CODIGO, 1, 8)
+              WHERE LENGTH(PC.CODIGO) >=12 AND LENGTH(PG.CODIGO) =8
+              ORDER BY 2"
+      plano = PlanoDeConta.find_by_sql(sql)
+    %>
+
+
 			<table>
 				<tr>
 					<td>
@@ -84,6 +95,21 @@
                                  { :prompt => 'Seleccione' } %>
           </td>
         </tr>
+        <% if Empresa.last.gasto_detalhado == false %>
+	        <tr>
+	        	<td>
+			        <label><%= t('CLASSIFICATION') %></label>
+			        <%= f.collection_select :plano_de_conta_id, plano,:id, :descricao,{:prompt => 'Selecione'}, {required: true} %>
+
+	        	</td>
+	        </tr>
+	        <tr>
+	        	<td>
+							<label><%= t('CENTER_OF_COSTOS') %></label>
+	      			<%= f.collection_select :centro_custo_id, CentroCusto.all( :select => 'id,nome', :order  => '1' ),:id, :nome, { :prompt => 'Selecione' }, {required: true} %>
+	        	</td>
+	        </tr>
+        <% end %>
 
 			  <tr>
           <td colspan="4">

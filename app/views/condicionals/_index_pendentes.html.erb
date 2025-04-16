@@ -1,0 +1,48 @@
+<style>
+.grid  td{
+   padding: 10px; border-bottom: 1px solid #efefef !important;cursor: pointer;
+}
+</style>
+<div class="group">
+  <h2>Pendientes</h2>
+  <table class="head_grid">
+    <tr>
+      <td width="80" align="center">Código</td>
+      <td width="40" align="center">US</td>
+      <td width="80" align="center">Fecha</td>
+      <td width="315">Clientes</td>
+      <td width="315">Vendedor</td>
+      <td width="40" align="right">Qtd</td>
+      <td width="50" align="center"></td>
+      <td width="80" align="right">Monto</td>
+      <td width="80" align="center">Status</td>
+
+    </tr>
+  </table>
+  <div class="grid" dir="div">
+    <table>
+      <% @pedentes.each do |os| %>
+        <tr class= "<%= cycle( "cor1", "cor2" )%>">
+          <td width="80"  align="center"><%= os.id.to_s.rjust(6,'0') %></td>
+          <td width="40" align="center" title="<%= os.usuario_nome %>"><%= os.usuario_created.to_s.rjust(3,'0')  %></td>
+          <td width="80"  align="center"><%= os.data.strftime("%d/%m/%y")%></td>
+          <td width="315" align="left"><%= os.persona_nome %></td>
+          <td width="315" align="left"><%= os.responsavel_nome %></td>
+          <td width="40" align="right"><%= format_int(os.qtd) %></td>
+          <% if os.moeda.to_i == 1 %>
+            <td width="50"  align="center"><span class="gs">Gs</span></td>
+            <td width="80" align="right"><%= format_int(os.tot_gs) %></td>
+          <% elsif os.moeda.to_i == 0 %>
+            <td width="50"  align="center"><span class="us">U$</span></td>
+            <td width="80" align="right"><%= format_decimal(os.tot_us) %></td>
+          <% else %>
+            <td width="50"  align="center"><span class="rs">R$</span></td>
+          <% end %>
+            <td width="80"  align="center"><%= os.status %></td>
+            <td><%= link_to '', edit_ordem_serv_path(os), class: 'icon-pencil' %></td>
+            <td><%= link_to '', os, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

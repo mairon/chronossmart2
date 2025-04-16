@@ -1,0 +1,150 @@
+<div class="row">
+	<% if params[:logistica] != 'true' %>
+	<div class="col-md-6">
+		<div class="panel">
+		<h1 id="header">Pendiente de Entrega</h1>
+		<div class="panel-content">
+		<%= form_tag "/lista_carga_produtos/add_produtos_direto", remote: true do %>
+		<%= hidden_field_tag :id, @venda.id %>
+				<table class="head_grid">
+					<tr>
+						<td width="40" align="right">Peso</td>
+						<td width="250">Producto</td>
+						<td width="40" align="right">Qtd.</td>
+						<td width="40" align="right">Stock</td>
+						<td width="40" align="right">Env.</td>
+						<td width="72" align="right">Pendente</td>
+					</tr>
+				</table>
+					<div class="rolagem" dir="div">
+					<table>
+						<% pd_saldo = 0 %>
+						<% @pedido_produtos.each do |pp| %>
+							<%= fields_for "products[]", pp do |f| %>
+							<%= f.hidden_field :produto_id, value: pp.produto_id %>
+							<%= f.hidden_field :venda_id, value: pp.venda_id %>
+							<%= f.hidden_field :vendas_produto_id, value: pp.id %>
+							<tr class="<%= cycle("cor1", "cor2")%>">
+								<td width="40" align="right"><%= pp.peso.to_f %></td>
+								<td width="250"><small>	<%= pp.produto_nome %></small></td>
+								<td width="40" align="right"><%= pp.quantidade.to_f %></td>
+								<td width="40" align="right"><%= pp.stock.to_f %></td>
+								<td width="40" align="right"><%= pp.qtd_enviado.to_f %></td>
+								<td width="72" align="right">
+									<% saldo = (pp.quantidade.to_f - pp.qtd_enviado.to_f) %>
+									<%= f.telephone_field :quantidade, value: saldo.to_i, :class => "form-control", dir: "rtl"  %>
+
+									<% pd_saldo += saldo.to_i %>
+								</td>
+							</tr>
+						<% end %>
+						<% end %>
+					</table>
+				</div>
+				<table class="head_grid">
+				  <tr>
+				    <td width="130"><%= submit_tag " Add Productos ",:disable_with => "Aguarde...", :class => "btn btn-green", id: 'click-modal' %></td>
+				    <td width="285"></td>
+				    <td width="60" align="right" style="padding-right: 10px"><%= pd_saldo %></td>
+				  </tr>
+				</table>
+		<% end %>
+		</div>
+
+	</div>
+</div>
+<% else %>
+	<div class="col-md-6" align="center">
+		<div class="panel">
+
+			<div class="panel-content">
+				<div class="row">
+				<%= form_tag "/lista_carga_produtos/add_produtos_direto", remote: true do %>
+					<%= hidden_field_tag :logistica, true %>
+					<%= hidden_field_tag :venda_id, @venda.id %>
+					<div class="col-md-4">
+						<%= select_tag 'status_entrega', options_for_select([['Pediente','0'],['Separación','1'],['En Rota','2'], ['Finalizado','3']], selected: params[:set_status]) %>
+           </div>
+           <div class="col-md-4">
+           	<%= submit_tag " Actulizar ",:disable_with => "Aguarde...", :class => "btn btn-green", id: 'click-modal' %>
+           </div>
+				<% end %>
+					<div class="col-md-4">
+
+						<% if params[:set_status] != '0' %>
+							<%= link_to 'Imprimir', "", class: 'btn btn-blue' %>
+						<% end%>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<% end %>
+
+	<div class="col-md-6">
+		<div class="panel">
+			<h1 id="header">Programado para Entrega</h1>
+			<div class="panel-content">
+      <table class="head_grid">
+        <tr>
+        	<td width="50">Fecha</td>
+        	<td width="50">Status</td>
+          <td width="450">Producto</td>
+          <td width="70" align="right">Peso</td>
+          <td width="70" align="right">Cantidad</td>
+          <% if params[:logistica] != 'false' %>
+          	<td width="55"></td>
+          <% end %>
+        </tr>
+      </table>
+
+      <div class="rolagem" dir="div" style="height: 250px" >
+        <table>
+          <% ps = 0 %>
+          <% qtd  = 0 %>
+          <% @lista_carga_produtos.each do |p| %>
+            <tr class="<%= cycle("cor1", "cor2")%>">
+            	<td width="50"><%= p.created_at.strftime("%d/%m/%y") %></td>
+            	<td width="50"><%= p.status %></td>
+              <td width="450"><%= p.produto.nome %></td>
+              <td width="70" align="right"><%= (p.produto.peso.to_f *  p.quantidade.to_f) %></td>
+              <td width="70" align="right"><%= p.quantidade.to_f %></td>
+              <% if params[:logistica] != 'false' %>
+              	<td><%= link_to '', p, :confirm => 'Estas Seguro?', :method => :delete, remote: true, class: 'icon-trash' %></td>
+              <% end %>
+              <% ps += (p.produto.peso.to_f *  p.quantidade.to_f) %>
+              <% qtd  += p.quantidade.to_f %>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+        <table>
+          <tr class="head_grid">
+            <td width="505"></td>
+            <td width="70" align="right"><b><%= ps %></b></td>
+            <td width="70" align="right"><b><%= qtd %></b></td>
+            <td width="55"></td>
+          </tr>
+        </table>
+			</div>
+		</div>
+    <div class="panel">
+    	<div class="panel-content">
+		    <%= form_tag "/lista_carga_produtos/add_produtos_direto", remote: true do %>
+		   		<div class="row">
+		   			<div class="col-md-10">
+            	<%= text_area_tag :obs_entrega %>
+		   			</div>
+		   			<div class="col-md-2">
+		   				<%= button_tag(type: "submit", class: "btn btn-blue", style:"height: 60px; widtgh: 50px") do %>
+		   					<span class="material-symbols-outlined" style="color: #fff">chat</span>
+		   				<% end %>
+		   			</div>
+		   		</div>
+		    <% end %>
+	  	</div>
+  	</div>
+
+	</div>
+</div>

@@ -1,0 +1,46 @@
+<h1 id="header">Centro de Costo - [<%= t('EDITION') %>]</h1>
+ <div class="group">
+  <style type="text/css" media="screen">
+    select{width: 100%;}
+  </style>
+
+  <%= form_for(@centro_custo) do |f| %>
+    <% if @centro_custo.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@centro_custo.errors.count, "error") %> <%= t('ERROR_ASSET_MESSAGE') %></h2>
+
+        <ul>
+        <% @centro_custo.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <table>
+     <tr>
+        <td>    
+        <label><%= t('UNIT') %></label>
+        <%= f.collection_select :unidade_id, Unidade.all( :select     => ' id,unidade_nome', :order      => '2'),:id, :unidade_nome %>
+        </td>
+     </tr>
+
+      <tr>
+        <td>
+        <label><%= t('DESCRIPTION') %></label>
+        <%= f.text_field :nome, size: 45, autofocus: true, required: true %></td>
+      </tr>
+
+
+      <tr>
+        <td>
+          <%= f.check_box :active %> <%= t('ACTIVE') %>
+        </td>
+      </tr>
+    </table>
+    <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), centro_custos_path, :class => "btn btn-back" %>
+    </div>
+
+    </div>
+<% end %>

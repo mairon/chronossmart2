@@ -11,7 +11,7 @@
       <tr>
         <td>De</td>
         <td >
-          <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+          <%= text_field_tag :inicio, Time.now.strftime("01/01/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
           <div class="input-group-addon-f">
             <span class="icon-calendar"></span>
           </div>
@@ -24,7 +24,7 @@
           </div>
         </td>
         <td>
-          <%= select_tag :tipo, options_for_select([[t('PROVIDER'),"PROVEEDOR"],['Código',"CODIGO"], [t('DOC'),"DOCUMENTO"]]) %>
+          <%= select_tag :tipo, options_for_select([[t('DOC'),"DOCUMENTO"], [t('PROVIDER'),"PROVEEDOR"],['Código',"CODIGO"]]) %>
         </td>
         <td colspan="4">
           <input id="busca" name="busca" type="search" onkeyup = "pesquisa(this.value),f(this)"onkeydown = "f(this)" size="32"/>

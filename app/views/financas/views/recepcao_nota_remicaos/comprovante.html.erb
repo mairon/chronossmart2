@@ -1,0 +1,239 @@
+<body onload="window.print()">
+
+
+   <table align="left"  valign="top">
+
+
+      <tr>
+         <td>
+            <FONT FACE="times new roman" size="4">
+               San Lorenzo S.A. Muebles y Eletrodomesticos
+            </FONT>
+         </td>
+
+         <td  align="right">
+            <FONT FACE="times new roman" size="5">
+               <%= t('VOUCHER').upcase %> DE REMICIÓN   N. <%=@recepcao_nota_remicao.id%>
+            </FONT>
+         </td>
+
+
+      </tr>
+
+
+      <tr>
+         <td colspan="2">
+            <FONT FACE="times new roman" size="3">
+               --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            </FONT>
+         </td>
+      </tr>
+
+
+
+      <tr>
+         <td>
+            <table>
+
+               <tr>
+                  <td>
+                     <FONT FACE="times new roman" size="3">
+                        Origen :
+                     </FONT>
+                  </td>
+
+                  <td align="left">
+                     <FONT FACE="times new roman" size="3">
+                        <%= @recepcao_nota_remicao.origem_unidade_nome%>
+                     </FONT>
+                  </td>
+               </tr>
+
+
+               <tr>
+                  <td>
+                     <FONT FACE="times new roman" size="3">
+                        Destino :
+                     </FONT>
+                  </td>
+
+                  <td align="left"  colspan="4">
+                     <FONT FACE="times new roman" size="3">
+                        <%= @recepcao_nota_remicao.destino_unidade_nome %>
+                     </FONT>
+                  </td>
+
+               </tr>
+            </table>
+         </td>
+
+
+      </tr>
+
+      <tr>
+         <td align="right">
+            <FONT FACE="times new roman" size="3">
+               EMISION: <%=@recepcao_nota_remicao.data.strftime("%d/%m/%Y")%> <%=Time.now.strftime("%H:%M:%S")%>
+            </FONT>
+         </td>
+      </tr>
+
+      <tr>
+         <td colspan="2">
+            <FONT FACE="times new roman" size="3">
+               --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            </FONT>
+         </td>
+      </tr>
+
+      <tr>
+         <td colspan="2" align="center">
+            <FONT FACE="times new roman" size="3">
+               ITEMS DEL <%= t('VOUCHER').upcase %>
+            </FONT>
+         </td>
+      </tr>
+
+      <tr>
+         <td colspan="4">
+            <FONT FACE="times new roman" size="3">
+               --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            </FONT>
+         </td>
+      </tr>
+
+
+      <tr height="365">
+         <td colspan="6" align="center" valign="top">
+            <FONT FACE="times new roman" size="3">
+
+               <table align="center" >
+
+                  <tr>
+                     <td width="50" align="center"><FONT FACE="times new roman" size="3">Codigo</font></td>
+                     <td width="250" align="center"><FONT FACE="times new roman" size="3">Producto</font></td>
+                     <td width="80" align="center"><FONT FACE="times new roman" size="3">Kg.</font></td>
+                     <td width="50" align="center"><FONT FACE="times new roman" size="3">Cantidad</font></td>
+                     <td width="80" align="center"><FONT FACE="times new roman" size="3">Costo Gs.</font></td>
+                     <td width="80" align="center"><FONT FACE="times new roman" size="3">Total Costo</font></td>
+                     <td width="80" align="center"><FONT FACE="times new roman" size="3">Venta Gs.</font></td>
+                     <td width="80" align="center"><FONT FACE="times new roman" size="3">Total  </font></td>
+
+                  </tr>
+                  <tr>
+                     <td colspan="7">
+                        <FONT FACE="times new roman" size="3">
+                           --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                        </FONT>
+                     </td>
+                  </tr>
+                  <% kg = 0 %>
+                  <% totcusto = 0 %>
+                  <% totvenda = 0 %>
+                  <% @nota_produtos.each do |produto| %>
+                     <%kgproduto = Produto.find_by_id(produto.produto_id)%>
+                     <tr>
+                        <td align="center"><FONT FACE="times new roman" size="3"> <%= produto.produto_cod  %> </font></td>
+                        <td align="left"><FONT FACE="times new roman" size="3"> <%= produto.produto_nome %></font> </td>
+                        <td align="center"><FONT FACE="times new roman" size="3"> <%= kgproduto.peso.to_f %></font> </td>
+                        <td align="center"><FONT FACE="times new roman" size="3"> <%= produto.quantidade %></font> </td>
+                        <td align="right"><FONT FACE="times new roman" size="3"> <%= number_to_currency( produto.custo_guarani.to_f, :format=>' %n ', :precision => 0) %> </font></td>
+                        <td align="right"><FONT FACE="times new roman" size="3"> <%= number_to_currency(custo =  produto.quantidade.to_f * produto.custo_guarani.to_f, :format=>' %n ', :precision => 0) %> </font></td>
+                        <td align="right"><FONT FACE="times new roman" size="3"> <%= number_to_currency( produto.valor_guarani.to_f, :format=>' %n ', :precision => 0) %> </font></td>
+                        <td align="right"><FONT FACE="times new roman" size="3"> <%= number_to_currency(venda =  produto.quantidade.to_f * produto.valor_guarani.to_f, :format=>' %n ', :precision => 0) %> </font></td>
+                        <% kg = kg.to_f + kgproduto.peso.to_f %>
+                        <% totcusto = totcusto.to_f +  custo.to_f%>
+                        <% totvenda = totvenda.to_f +  venda.to_f%>
+
+
+                     </tr>
+
+                  <%end%>
+               </table>
+
+            </FONT>
+         </td>
+      </tr>
+
+      <tr>
+         <td colspan="2">
+            <FONT FACE="times new roman" size="3">
+               --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            </FONT>
+         </td>
+      </tr>
+
+
+      <tr>
+         <td width="500">
+
+         </td>
+         <td  align="right" width="250">
+            <table border="1">
+               <tr>
+                  <td align="center" width="100">
+                     <FONT FACE="times new roman" size="3">
+                        <b>
+                           <%= kg.to_f %>
+                        </b>
+                     </FONT>
+                  </td>
+
+                  <td align="right" width="100">
+                     <FONT FACE="times new roman" size="3">
+                        <b>
+                           <%= @qtd %>
+                        </b>
+                     </FONT>
+                  </td>
+
+
+                  <td width="210" align="center">
+                     <FONT FACE="times new roman" size="3">
+                     </FONT>
+                  </td>
+
+                  <td align="right">
+                     <FONT FACE="times new roman" size="3">
+                        <b>
+                           <%= number_to_currency(totcusto.to_f, :format=>' %n ', :precision => 0) %>
+                        </b>
+                     </FONT>
+                  </td>
+
+                  <td width="180" align="center">
+                     <FONT FACE="times new roman" size="3">
+                     </FONT>
+                  </td>
+
+
+                  <td align="right">
+                     <FONT FACE="times new roman" size="3">
+                        <b>
+                           <%= number_to_currency( totvenda.to_f, :format=>' %n ', :precision => 0) %>
+                        </b>
+                     </FONT>
+                  </td>
+
+               </tr>
+            </table>
+         </td>
+      </tr>
+
+      <tr>
+         <td colspan="2">
+            <FONT FACE="times new roman" size="3">
+               --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            </FONT>
+         </td>
+      </tr>
+
+
+   </table>
+
+</body>
+
+
+
+
+

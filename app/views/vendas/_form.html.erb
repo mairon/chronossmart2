@@ -1,4 +1,4 @@
-<%= form_for(@venda) do |f| %>      
+<%= form_for(@venda) do |f| %>
   <% if @venda.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@venda.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
@@ -27,9 +27,20 @@
       <%= f.hidden_field :status_op, value: params[:status_op] %>
       <%= f.hidden_field :nome_ref, value: params[:nome_ref] %>
       <%= f.hidden_field :moeda, value: current_unidade.moeda %>
-      <%= f.hidden_field :persona_nome, :value => @vendas_config.persona.nome, autofocus: true %>
-      <%= f.hidden_field :persona_id, :value => @vendas_config.persona_id %>
-      <%= f.hidden_field :vendedor_id, :value => @vendas_config.vendedor_id %>
+      <% if params[:persona_id].blank? %>
+        <%= f.hidden_field :persona_nome, :value => @vendas_config.persona.nome, autofocus: true %>
+        <%= f.hidden_field :persona_id, :value => @vendas_config.persona_id %>
+      <% else %>
+        <%= f.hidden_field :persona_nome, :value => params[:persona_nome], autofocus: true %>
+        <%= f.hidden_field :persona_id, :value => params[:persona_id] %>
+      <% end %>
+
+      <% unless current_user.persona_id.blank? %>
+        <%= f.hidden_field :vendedor_id, :value => current_user.persona_id %>
+      <% else %>
+        <%= f.hidden_field :vendedor_id, :value => @vendas_config.vendedor_id %>
+      <% end %>
+
       <%= f.hidden_field :tabela_preco_id, :value => @vendas_config.persona.tabela_preco_id %>
 
     <% if params[:action] == 'new' %>

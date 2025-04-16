@@ -15,8 +15,8 @@ class Egresso < ActiveRecord::Base
     end
 
     def self.filtro_egreso(params)
-        unidade = "unidade_id = #{params[:unidade]} AND "
-        data  = "data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'" unless params[:inicio].blank?
+        unidade = "E.UNIDADE_ID = #{params[:unidade]} AND "
+        data  = "AND E.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'" unless params[:inicio].blank?
 
         if params[:tipo] == "CODIGO"
           tipo = "id"
@@ -43,7 +43,7 @@ class Egresso < ActiveRecord::Base
                 LEFT JOIN USUARIOS U
                 ON U.ID = E.USUARIO_CREATED
 
-                WHERE E.UNIDADE_ID = #{params[:unidade]} #{busca}
+                WHERE E.UNIDADE_ID = #{params[:unidade]} #{data} #{busca}
                 ORDER BY E.DATA,ID
 
 

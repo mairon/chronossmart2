@@ -1,0 +1,217 @@
+<body onload="window.print">
+<style type="text/css">
+
+	body {
+		font-family: arial;
+	}
+</style>
+<style type="text/css">
+  table {
+    border-collapse: collapse;
+    font-size: 9px
+  }
+  td{
+    padding:  5px;
+  }
+
+  .grid-prod td{
+    padding: 5px;
+  }
+  .cor2 {
+  background-color: #fff;
+}
+.cor1 {
+  background-color: #ccc;
+}
+.head{
+  font-weight: bold;
+}
+.bords{
+  border:  1px solid #000;
+  border-radius: 4px;
+}
+.page-break { display:block; clear:both; page-break-after:always; }
+</style>
+
+
+  <table width="1000">
+      <tr>
+        <td rowspan="2" width="100">
+          <div class="bords" padding="15" align="center">
+            <% if current_unidade.avatar.url.present? %>
+            <%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 125) %>
+            <% else %>
+              <h2><%= current_unidade.nome_sys %></h2>
+            <% end %>
+            <%= current_unidade.telefone %>
+          </div>
+        </td>
+        <td>
+          <div class="bords">
+            <table>
+              <tr>
+                <td style="width:450px"><%=l @condicional.data.to_date, :format => :long %>
+                </td>
+                <td align="right" style="font-size: 14px">
+                  Condicional: 
+                  <b> <%= @condicional.id.to_s.rjust(6,'0') %></b>
+                </td>                
+              </tr>
+              <tr>
+                <td colspan="2" height="100">
+                  Cliente: <b><%= @condicional.persona.nome %></b> <br>
+                  Direccíon: <b><%= @condicional.persona.direcao %></b> <br>                  
+                  <% vend = Persona.find_by_id(@condicional.vendedor_id) %>                  
+                  Tel: <b><%= @condicional.persona.telefone %></b>  <br><br><br><br>
+                  Vendedor: <b><%= vend.nome unless vend.nil? %></b>
+                  
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="bords" padding="15">
+    <table>
+    <tr>
+      <td colspan="3" align="center"><font size="3">Itens</font></td>
+    </tr>
+
+    <tr>
+       <td colspan="3">
+        <table class="head">
+          <tr>
+            <td width="150">Barra</td>
+            <td width="350" >Producto</td>
+            <td width="30" align="right">Ctd</td>
+            <td width="70" align="right">Monto</td>
+            <td></td>
+          </tr>
+        </table>
+        <table>
+            <% rt = 0 %>
+            <% vt = 0 %>
+        <% @condicional.condicional_produtos.where(status: true).each do |os| %>
+          <tr class = "<%= cycle("cor1", "cor2") %> dv<%= os.id %>">
+            <td width="150"><%= os.produto.barra %></td>
+            <td width="350"><%= os.produto.nome %></td>
+            <td width="30" align="right"><%= os.quantidade %></td>
+            <% if @condicional.moeda.to_i == 0 %>
+              <td width="70" align="right"><%= format_decimal(os.valor_us) %></td>
+              <% vt += (os.valor_us.to_f * os.quantidade.to_f) %>
+            <% elsif @condicional.moeda.to_i == 1 %>
+              <td width="70" align="right"><%= format_int(os.valor_gs) %></td>
+              <% vt += (os.valor_gs.to_f * os.quantidade.to_f) %>
+            <% elsif @condicional.moeda.to_i == 2 %>
+              <td width="70" align="right"><%= format_decimal(os.valor_rs) %></td>
+              <% vt += (os.valor_rs.to_f * os.quantidade.to_f) %>
+            <% end %>
+            
+            <td><%= link_to '', os, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+          </tr>
+          <% rt += os.quantidade.to_f %>
+        <% end %>
+        <tr>
+          <td colspan="4"></td>
+          <td align="right"><b><%= rt.to_i %></b></td>
+          <% if @condicional.moeda.to_i == 1 %>
+            <td align="right"><b><%= format_int(vt.to_i) %></td>
+          <% else %>
+            <td align="right"><b><%= format_decimal(vt.to_f) %></td>
+          <% end %>
+        </tr>
+        </table>
+       </td>
+    </tr>
+ 
+    <tr>
+     <td colspan="3" style="padding: 15px">Concepto : <%= @condicional.obs %> </td>
+    </tr>
+  </table>
+</div>
+
+<br>
+
+<div class="bords page-break">
+  <% empresa = Empresa.last(:select => "taxa_interes") %>
+  <table>
+    <tr>
+      <td width="900" colspan="4"  style="text-align: justify;padding: 15px;font-size: 9px">          
+          <br>
+        
+          El día <%=l (@condicional.data.to_date + 30), :format => :default %> PAGARÉ(MOS) a <%= current_unidade.nome_sys %> con RUC.: <%= current_unidade.ruc %> la cantidad de <%= I18n.with_locale(:es) { (vt.to_f).to_i.to_words.upcase } %>, GUARANIES **********
+          a mi (nuestra) entera satisfación. Queda expresamente convenido que la falta de pago de este pagare me(nos) constituirá en mora automáticamente, sin necesidad de interpelación judicial o extrajudicial alguna devengando durante el tiempo de la mora un interés del <%= (empresa.taxa_interes * 30).to_i %>% Asimismo, me(nos) obligamos a pagar cualquier gasto en que incurra el acreedor del presente instrumento obligacional, con relacion a este prestamo, en caso de que el mismo sea reclamado por via judicial o extrajudicial El simple vencimiento establecerá la mora, autorizando la inclusión de mi nombre Personal o razón Social que represento en la base de datos de INFORCONF, conforme a loestablecido en la jurisdicción de los tribunales de la circunscripción judicial del Alto Paraná, renunciando a cualquier otra que pudiera corresponder. Las partes constituyen domicilio especial en los lugares indicados en el presente documento.
+      </td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        Nombre: <strong><%= @condicional.persona.nome %></strong>
+        RUC/CI: <strong><%= @condicional.persona.doc_titular %></strong> <br>
+      </td>
+    </tr>
+    <tr>
+      <td width="200">
+        <br>
+        _______________________________________________
+
+      </td>
+
+      <td width="200">
+        <br>
+        _______________________________________________
+      </td>
+      <td width="200">
+        <br>
+        _______________________________________________
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Firma
+      </td>
+
+      <td>
+        Aclaración
+      </td>
+      <td>
+        Documiento
+      </td>
+    </tr>  
+
+
+    <tr>
+      <td width="200">
+        <br>
+        _______________________________________________
+
+      </td>
+
+      <td width="200">
+        <br>
+        _______________________________________________
+      </td>
+      <td width="200">
+        <br>
+        _______________________________________________
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Firma Co-deudor
+      </td>
+
+      <td>
+        Aclaración Co-deudor
+      </td>
+      <td>
+        Documiento Co-deudor
+      </td>
+    </tr>  
+
+</table>
+  </div>
+  
+  
+

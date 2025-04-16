@@ -1,26 +1,20 @@
 <table class="head_grid">
   <tr>
-    <td width="100"><%= t('COUNTRY') %></td>
-    <td width="100"><%= t('STATE') %></td>
-    <td width="100">Ciudad</td>
-    <td width="50">Nº</td>
-    <td width="150">Direción</td>
-    <td width="200">Obs</td>
+    <td width="200">Ciudad</td>
+    <td width="200">Direción</td>
+    <td width="200">Comple.</td>
   </tr>
 </table>
 
-<div class="rolagem" dir="div">
+<div class="list" dir="div">
   <table>
     <% persona_locais_entregas.each do |ple| %>
       <tr class="<%= cycle("cor1", "cor2")%>">
-        <td width="100"><%= ple.paise.nome unless ple.paise_id.blank? %></td>
-        <td width="100"><%= ple.estado.nome unless ple.estado_id.blank? %></td>
-        <td width="100"><%= ple.cidade.nome unless ple.cidade_id.blank? %></td>
-        <td width="50"><%= ple.nr %></td>
-        <td width="150"><%= ple.direcao %></td>
+        <td width="200"><%= ple.cidade.nome unless ple.cidade_id.blank? %></td>
+        <td width="200"><%= ple.direcao %></td>
         <td width="200"><%= ple.obs %></td>
-        <td><%= link_to 'Editar', edit_persona_locais_entrega_path(ple) %></td>
-        <td><%= link_to t('DELETE'), ple, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+        <td><%= link_to '', edit_persona_locais_entrega_path(ple), class: 'icon-pencil' %></td>
+        <td><%= link_to '', ple, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
       </tr>
     <% end %>
   </table>

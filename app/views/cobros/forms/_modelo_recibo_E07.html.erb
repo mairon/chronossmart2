@@ -1,0 +1,389 @@
+<body onload="window.print()"> 
+<!-- modelo 3vias oficio  -->
+<body>
+
+<% if @cobro.moeda == 0
+	 	d = "DOLAR"
+	 else
+	 	d = "GUARANIES"
+	 end
+ %>
+
+<style type="text/css">
+	table {
+		font-family:Lucida Console, Courier ;font-size:9px;
+
+	}	
+
+	.grid {
+		border-collapse: collapse;
+		
+	}
+	.header {
+		border-collapse: collapse;
+		border: 1px solid black;
+	}
+
+	#totales {
+		border-collapse: collapse;
+		border-left: 2px solid #fff;
+		border-right: 2px solid #fff;
+	}
+
+	.cond {
+		font-family:Lucida Console, Courier ;font-size:7px;
+	}
+
+	.grid tr td {
+		border-collapse: collapse;
+		border-bottom: 1px solid black;
+	}
+
+
+</style>
+<!-- PRIMEIRA VIA -->
+<% @cobro.update_attributes(op: true) %>
+
+			<table align="left"  valign="top"  border="0" style="margin-left: 10px">
+				<tr>
+					<td height="80" align="right" valign="bottom"  colspan="4" width="650">
+						<small><%= @ft.doc.to_s.rjust(5,'0') %>/<%= @cobro.id %></small></td>
+				</tr>
+				<tr>
+					<td colspan="5">
+
+					<table  border="1" style="border-collapse: collapse;">
+						<tr>
+							<td>
+
+						<table width="748">
+							<tr>
+								<td width="65" align="right">Fecha :</td>
+								<% ff = FormFiscal.where(cod_proc: @cobro.id, sigla_proc: 'CB', status: 1).last %>
+								<td width="90"><%=l ff.data.to_date.to_date unless ff.nil? %></td>
+								<td align="right">Moneda:</td>
+								<td width="70" colspan="2"><%= d %></td>
+							</tr>
+
+	
+							<tr>
+								<% per = Persona.find_by_id(@cobro.persona_id)%>
+								<td align="right">Cliente :</td>
+								<td width="350"><%= per.nome_fatura %></td>
+
+								<td align="right">RUC/CI :</td>
+								<td width="100"><%= per.ruc %></td>
+							</tr>
+
+							<tr>
+								<td align="right">Dirección :</td>
+								<td colspan="4"><%= per.direcao %></td>
+							</tr>
+						</table>
+						</td>
+        		</tr>
+					</table>
+
+					</td>
+        	</tr>
+        	<tr><td height="10"></td></tr>
+        	<tr>
+        		<td width="480" align="right">
+							<div style="font-size:16px; border:1px solid; display:table;">
+							<% if @cobro.moeda == 0 %>
+								<b>Total: U$  <%= number_to_currency( @total_us.to_f,      :format =>' %n ', :separeitor => "," )%> </b> 
+							<% else %>
+								<b>Total: G$	<%= number_to_currency(  @tot_cobro_gs.to_f - @tot_des_gs.to_f, :format =>' %n ', :precision =>0 )%> </b> 
+							<% end %>
+							</div>
+        		</td>
+        	</tr>
+
+					<tr>
+						<td valign="bottom" colspan="4" width="478">
+							En Letras
+							<% if @cobro.moeda == 0 %>							
+								<%= I18n.with_locale(:es) { @total_us.to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS' %> )
+							<% else %>
+								<%= I18n.with_locale(:es) { ( @tot_cobro_gs.to_f - @tot_des_gs.to_f ).to_i.to_words.upcase } %>
+							<% end %>
+						</td>
+					</tr>
+
+					<tr valign="top">
+						<td width="480" height="100" style="border:1px solid">
+							<% docs =  CobrosDetalhe.where("documento_numero_01 != '000' and cobro_id = ?",@cobro.id) %>
+							Pago de la factura Nº 
+							<%= CobrosDetalhe.all(:conditions => ["documento_numero_01 != '000' and cobro_id = ?",@cobro.id]).collect{|d| 
+								"#{ 'PARTE ' if d.estado.to_i == 0 }" + "#{ 'CANCELACION ' if d.estado.to_i == 1 }" + 
+								d.documento_numero_01 + '-' + d.documento_numero_02 + '-' + d.documento_numero + ' Cota: ' + d.cota.to_s + ' Monto: ' + format_int(d.cobro_guarani)   }.join(", ") %>
+							<br>
+							
+							<% cheques =  CobrosFinanca.where("cobro_id = ?",@cobro.id) %>
+							<% cheques.each do |c| %>
+							<% fp = FormaPago.find_by_id(c.forma_pago_id) %>
+
+							
+							<p>
+								Pago en: <%= fp.nome%>  Conta: <%= c.conta_nome%>
+							</p>
+								<% if c.cheque_status.to_i == 1 %>
+									<p>
+										Cheque nº <%= c.cheque %>
+										Monto:
+										<% if c.moeda.to_i == 0 %>
+											<%= format_decimal(c.valor_dolar) %>
+										<% elsif c.moeda.to_i == 1 %>
+											<%= format_int(c.valor_guarani) %>
+										<% end %>
+										Titular: <%= c.titular %>
+										Diferido: <%= c.diferido.to_date.strftime("%d/%m/%Y") %>
+										
+									</p>
+								<% end %>
+							<% end %>
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+							<br>
+							<table>
+								<tr>
+									<td>____________________________</td>
+								</tr>
+								<tr>
+									<td align="center">Firma</td>
+								</tr>
+							</table>
+							<br>
+						</td>
+					</tr>
+				</table>
+
+
+
+<!-- SEGUNDA VIA -->
+
+			<table align="left"  valign="top"  border="0" style="margin-left: 10px">
+				<tr>
+					<td height="149" align="right" valign="bottom"  colspan="4" width="650">
+						<small><%= @ft.doc.to_s.rjust(5,'0') %>/<%= @cobro.id %></small></td>
+				</tr>
+				<tr>
+					<td colspan="5">
+
+					<table  border="1" style="border-collapse: collapse;">
+						<tr>
+							<td>
+
+						<table width="748">
+							<tr>
+								<td width="65" align="right">Fecha :</td>
+								<% ff = FormFiscal.where(cod_proc: @cobro.id, sigla_proc: 'CB', status: 1).last %>
+								<td width="90"><%=l ff.data.to_date.to_date unless ff.nil? %></td>
+								<td align="right">Moneda:</td>
+								<td width="70" colspan="2"><%= d %></td>
+							</tr>
+
+	
+							<tr>
+								<% per = Persona.find_by_id(@cobro.persona_id)%>
+								<td align="right">Cliente :</td>
+								<td width="350"><%= per.nome_fatura %></td>
+
+								<td align="right">RUC/CI :</td>
+								<td width="100"><%= per.ruc %></td>
+							</tr>
+
+							<tr>
+								<td align="right">Dirección :</td>
+								<td colspan="4"><%= per.direcao %></td>
+							</tr>
+						</table>
+						</td>
+        		</tr>
+					</table>
+
+					</td>
+        	</tr>
+        	<tr><td height="10"></td></tr>
+        	<tr>
+        		<td width="480" align="right">
+							<div style="font-size:16px; border:1px solid; display:table;">
+							<% if @cobro.moeda == 0 %>
+								<b>Total: U$  <%= number_to_currency( @total_us.to_f,      :format =>' %n ', :separeitor => "," )%> </b> 
+							<% else %>
+								<b>Total: G$	<%= number_to_currency(  @tot_cobro_gs.to_f - @tot_des_gs.to_f, :format =>' %n ', :precision =>0 )%> </b> 
+							<% end %>
+							</div>
+        		</td>
+        	</tr>
+
+					<tr>
+						<td valign="bottom" colspan="4" width="478">
+							En Letras
+							<% if @cobro.moeda == 0 %>							
+								<%= I18n.with_locale(:es) { @total_us.to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS' %> )
+							<% else %>
+								<%= I18n.with_locale(:es) { ( @tot_cobro_gs.to_f - @tot_des_gs.to_f ).to_i.to_words.upcase } %>
+							<% end %>
+						</td>
+					</tr>
+
+					<tr valign="top">
+						<td width="480" height="100" style="border:1px solid">
+							<% docs =  CobrosDetalhe.where("documento_numero_01 != '000' and cobro_id = ?",@cobro.id) %>
+							Pago de la factura Nº 
+							<%= CobrosDetalhe.all(:conditions => ["documento_numero_01 != '000' and cobro_id = ?",@cobro.id]).collect{|d| 
+								"#{ 'PARTE ' if d.estado.to_i == 0 }" + "#{ 'CANCELACION ' if d.estado.to_i == 1 }" + 
+								d.documento_numero_01 + '-' + d.documento_numero_02 + '-' + d.documento_numero + ' Cota: ' + d.cota.to_s + ' Monto: ' + format_int(d.cobro_guarani)   }.join(", ") %>
+							<br>
+							<% cheques =  CobrosFinanca.where("cobro_id = ?",@cobro.id) %>
+							<% cheques.each do |c| %>
+							<% fp = FormaPago.find_by_id(c.forma_pago_id) %>
+
+							
+							<p>
+								Pago en: <%= fp.nome%>  Conta: <%= c.conta_nome%>
+							</p>
+								<% if c.cheque_status.to_i == 1 %>
+									<p>
+										Cheque nº <%= c.cheque %>
+										Monto: 
+
+										<% if c.moeda.to_i == 0 %>
+											<%= format_decimal(c.valor_dolar) %>
+										<% elsif c.moeda.to_i == 1 %>
+											<%= format_int(c.valor_guarani) %>
+										<% end %>
+										Titular: <%= c.titular %>
+										Diferido: <%= c.diferido.to_date.strftime("%d/%m/%Y") %>
+										
+									</p>
+								<% end %>
+							<% end %>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<br>
+							<br>
+							<br>
+							<br>
+						</td>
+					</tr>
+				</table>
+
+
+
+<!-- TERCEIRA VIA -->
+
+			<table align="left"  valign="top"  border="0" style="margin-left: 10px">
+				<tr>
+					<td height="150" align="right" valign="bottom"  colspan="4" width="650">
+						<small><%= @ft.doc.to_s.rjust(5,'0') %>/<%= @cobro.id %></small></td>
+				</tr>
+				<tr>
+					<td colspan="5">
+
+					<table  border="1" style="border-collapse: collapse;">
+						<tr>
+							<td>
+
+						<table width="748">
+							<tr>
+								<td width="65" align="right">Fecha :</td>
+								<% ff = FormFiscal.where(cod_proc: @cobro.id, sigla_proc: 'CB', status: 1).last %>
+								<td width="90"><%=l ff.data.to_date.to_date unless ff.nil? %></td>
+								<td align="right">Moneda:</td>
+								<td width="70" colspan="2"><%= d %></td>
+							</tr>
+
+	
+							<tr>
+								<% per = Persona.find_by_id(@cobro.persona_id)%>
+								<td align="right">Cliente :</td>
+								<td width="350"><%= per.nome_fatura %></td>
+
+								<td align="right">RUC/CI :</td>
+								<td width="100"><%= per.ruc %></td>
+							</tr>
+
+							<tr>
+								<td align="right">Dirección :</td>
+								<td colspan="4"><%= per.direcao %></td>
+							</tr>
+						</table>
+						</td>
+        		</tr>
+					</table>
+
+					</td>
+        	</tr>
+        	<tr><td height="10"></td></tr>
+        	<tr>
+        		<td width="480" align="right">
+							<div style="font-size:16px; border:1px solid; display:table;">
+							<% if @cobro.moeda == 0 %>
+								<b>Total: U$  <%= number_to_currency( @total_us.to_f,      :format =>' %n ', :separeitor => "," )%> </b> 
+							<% else %>
+								<b>Total: G$	<%= number_to_currency(  @tot_cobro_gs.to_f - @tot_des_gs.to_f, :format =>' %n ', :precision =>0 )%> </b> 
+							<% end %>
+							</div>
+        		</td>
+        	</tr>
+
+					<tr>
+						<td valign="bottom" colspan="4" width="478">
+							En Letras
+							<% if @cobro.moeda == 0 %>							
+								<%= I18n.with_locale(:es) { @total_us.to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS' %> )
+							<% else %>
+								<%= I18n.with_locale(:es) { ( @tot_cobro_gs.to_f - @tot_des_gs.to_f ).to_i.to_words.upcase } %>
+							<% end %>
+						</td>
+					</tr>
+
+					<tr valign="top">
+						<td width="480" height="100" style="border:1px solid">
+							<% docs =  CobrosDetalhe.where("documento_numero_01 != '000' and cobro_id = ?",@cobro.id) %>
+							Pago de la factura Nº 
+							<%= CobrosDetalhe.all(:conditions => ["documento_numero_01 != '000' and cobro_id = ?",@cobro.id]).collect{|d| 
+								"#{ 'PARTE ' if d.estado.to_i == 0 }" + "#{ 'CANCELACION ' if d.estado.to_i == 1 }" + 
+								d.documento_numero_01 + '-' + d.documento_numero_02 + '-' + d.documento_numero + ' Cota: ' + d.cota.to_s + ' Monto: ' + format_int(d.cobro_guarani)   }.join(", ") %>
+							<br>
+							<% cheques =  CobrosFinanca.where("cobro_id = ?",@cobro.id) %>
+							<% cheques.each do |c| %>
+							<% fp = FormaPago.find_by_id(c.forma_pago_id) %>
+
+							
+							<p>
+								Pago en: <%= fp.nome%>  Conta: <%= c.conta_nome%>
+							</p>
+								<% if c.cheque_status.to_i == 1 %>
+									<p>
+										Cheque nº <%= c.cheque %>
+										Monto: 
+
+										<% if c.moeda.to_i == 0 %>
+											<%= format_decimal(c.valor_dolar) %>
+										<% elsif c.moeda.to_i == 1 %>
+											<%= format_int(c.valor_guarani) %>
+										<% end %>
+										Titular: <%= c.titular %>
+										Diferido: <%= c.diferido.to_date.strftime("%d/%m/%Y") %>
+										
+									</p>
+								<% end %>
+							<% end %>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<br>
+							<br>
+							<br>
+							<br>
+						</td>
+					</tr>
+				</table>

@@ -1,1 +1,75 @@
-<%= render :partial => "/vendas/eps/comprovante_E05" %>
+
+<style type="text/css">
+      td{
+    font-family: Arial;
+    font-size: 12px;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-transform: uppercase;
+  }
+</style>
+
+<table>
+    <tr>
+      <td  colspan="3"><hr></td>
+    </tr>
+
+    <tr>
+      <td  colspan="3" align="center">COCINA</td>
+    </tr>
+  
+    <tr>
+        <td colspan="3"><%= Time.now.strftime("%d/%m/%y - %H:%M") %></td>
+    </tr>
+    <tr>
+        <td colspan="3"><b>Venta <%= @venda.id.to_s.rjust(6,'0')%></b></td>
+    </tr>
+    <tr>
+      <td colspan="3">Comanda: <%= @venda.cartao.nome unless @venda.cartao.nil? %></td>
+    </tr>
+    <tr>
+      <td colspan="3">Vendedor: 
+        <% unless @venda.vendedor_id.nil? %>
+        <% ps = Persona.find(@venda.vendedor_id) %>
+          <%= ps.nome %>
+        <% end %>
+      </td>
+    </tr>
+
+    <tr>
+        <td colspan="3"><%= @venda.persona_nome %></td>
+    </tr>
+    <tr>
+        <td colspan="3"><%= @venda.obs %></td>
+    </tr>
+
+    <tr>
+      <td colspan="3"><hr></td>
+    </tr>
+      <tr>
+        <td width="10"></td>
+        <td width="190"><b>Producto</b></td>
+        <td width="50" align="right"><b>CTD</b></td>
+      </tr>
+    <tr>
+      <td  colspan="3"><hr></td>
+    </tr>
+    <% indice = 1 %>
+    <% @produtos.each do |p| %>
+        <tr>
+          <td ><%= indice %></td>
+          <td width="190">
+            <%= p.produto_nome %>
+            <% p.produto_composicaos.each do |pc| %>
+              <li><%= pc.componente_nome %></li>
+            <% end %>
+            <li><%= p.obs.to_s %></li>
+          </td>
+          <td width="50" align="right"><%= p.quantidade.to_i %></td>
+        </tr>
+        <tr>
+          <td colspan="3"><hr></td>
+        </tr>        
+        <% indice += 1 %>
+    <% end %>
+</table>

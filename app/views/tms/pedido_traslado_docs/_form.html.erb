@@ -1,0 +1,44 @@
+<%= form_for(@pedido_traslado_doc) do |f| %>
+  <% if @pedido_traslado_doc.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@pedido_traslado_doc.errors.count, "error") %> prohibited this pedido_traslado_doc from being saved:</h2>
+
+      <ul>
+      <% @pedido_traslado_doc.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> pedido_traslado_docs - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">pedido_traslado_id :</td>                    
+                      <td><%= f.number_field :pedido_traslado_id %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', pedido_traslado_docs_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

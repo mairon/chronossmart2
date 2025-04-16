@@ -1,0 +1,96 @@
+<style>
+  .decr td{
+    padding: 18px;
+  }
+  div.group form{
+    padding:  0px;
+  }
+</style>
+<div class="group">
+<%= form_for(condicional_produto) do |f| %>
+  
+  <%= f.hidden_field :condicional_id %>
+  <%= f.hidden_field :produto_id, required: true %>
+  <%= f.hidden_field :quantidade, value: 1 %>
+  <%= f.hidden_field :status, value: false %>
+  <%= f.hidden_field :deposito_id, value: @condicional.deposito_id %>
+  <%= f.hidden_field :data, value: Time.now.strftime("%Y-%m-%d") %>
+
+
+    <table>
+      <tr>
+        <td>
+          <table border="1" class="decr" style="margin-top: 15px">
+            <tr>
+              <td>Referencia:</td> <td width="400"><span id="label_ref"></span></td>
+            </tr>
+            <tr>
+              <td>Descriptión:</td> <td><span id="label_nome"></span></td>
+            </tr>
+            <tr>
+              <td>Color:</td> <td><span id="label_cor"></span></td>
+            </tr>
+            <tr>
+              <td>Tamaño:</td> <td><span id="label_tamanho"></span></td>
+            </tr>
+          </table>
+        </td>
+
+        <td>
+          <table>
+            <tr>
+              <td>
+                <label>Barra</label>
+                <input type="text" id="referencia" size="25" autofocus>
+                                  <%= f.submit :value => " Grabar ", :disable_with => "Aguarde...", :class => "btn btn-green", "data-plus-as-tab" => "false" %>
+
+
+
+                <%= image_tag("load.gif",
+                                :align => "absmiddle",
+                                :border => 0,
+                                :id => "spinner",
+                                :width => 21,
+                                :height => 21,
+                                :style =>"display: none;" ) %>
+                </td>              
+            </tr>
+            <tr>
+                <%= field_gs_label 'Monto G$:',f,:valor_gs, :readonly => "readonly" %>                
+              </tr>              
+          </table>
+        </td>
+      </tr>
+    </table>
+<% end %>
+</div>
+
+<script>
+  
+$(document).ready(function() {
+      $("#referencia").change(function(){
+        var data=$('#referencia').val();
+        $.ajax({
+          type: "GET",
+           url: "/dynamic_condicional_empaque_produto?persona_id="+ <%= @condicional.persona_id %> +"&id="+ <%= @condicional.id %> +"&entrada=true&fabricante=" + escape(data) +"",
+          beforeSend: function()
+          {
+              $('#spinner').show();
+          },
+
+          success: function(response)
+          {
+            $('#spinner').hide();
+          },
+
+          errors: function(response)
+          {
+            alert('Producto no encontrado o ya registrado')
+            $('#spinner').hide();
+          }
+
+        });
+      });
+  });
+
+</script>

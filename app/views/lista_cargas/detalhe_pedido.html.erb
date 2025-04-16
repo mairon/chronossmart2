@@ -1,40 +1,37 @@
-  <ul class="tabs">
-    <li>
-      <a href="#tab1">
-        Pedido: <%= params[:pedido].to_s.rjust(6,'0') %>
-      </a>
-    </li>
-  </ul>
-  <div class="group">
-    <h2>
+<div class="panel">
+  <h1 id="header">
+    Venta: <%= params[:pedido].to_s.rjust(6,'0') %>
+  </h1>
+  <div class="panel-content">
     <table>
-      <tr>
-        <td width="110">Cliente:</td>
-        <td><%= @pedido.persona.nome %></td>
-      </tr>
-      <tr>
-        <td>Vendedor:</td>
-        <% vend = Persona.find(@pedido.vendedor_id)%>
-        <td><%= vend.nome %></td>
-      </tr>
-      <tr>
-        <td><%= t('DATE') %> Emisión:</td>
-        <td><%= @pedido.data.to_date.strftime("%d/%m/%y") %></td>
-      </tr>
-      <tr>
-        <td>Desc. Solicitada:</td>
-        <td><%= @pedido.desconto %>%</td>
-      </tr>
-      <tr>
-        <td>Obs.:</td>
-        <td><%= @pedido.obs %></td>
-      </tr>
-    </table>
-    </h2>
+          <tr>
+            <td width="110">Cliente:</td>
+            <td><%= @pedido.persona.nome %></td>
+          </tr>
+          <tr>
+            <td>Vendedor:</td>
+            <% vend = Persona.find(@pedido.vendedor_id)%>
+            <td><%= vend.nome %></td>
+          </tr>
+          <tr>
+            <td><%= t('DATE') %> Emisión:</td>
+            <td><%= @pedido.data.to_date.strftime("%d/%m/%y") %></td>
+          </tr>
+          <tr>
+            <td>Desc. Solicitada:</td>
+            <td><%= @pedido.desconto %>%</td>
+          </tr>
+          <tr>
+            <td>Obs.:</td>
+            <td><%= @pedido.obs %></td>
+          </tr>
+        </table>
   </div>
-  <div class="tab_container">
-    <div id="tab1" class="tab_content">
-      
+</div>
+
+<div class="panel">
+  <div class="panel-content">
+
       <table class="head_grid">
         <tr>
           <td width="55" align="center">Pedido</td>
@@ -51,9 +48,9 @@
           <% ps   = 0 %>
           <% qtd  = 0 %>
           <% tot  = 0 %>
-          <% @pedido.presupuesto_produtos.each do |p| %>
+          <% @pedido.vendas_produtos.each do |p| %>
             <tr class="<%= cycle("cor1", "cor2")%>">
-              <td width="55" align="center"><%= p.presupuesto_id.to_s.rjust(6,'0') %></td>
+              <td width="55" align="center"><%= p.venda_id.to_s.rjust(6,'0') %></td>
               <td width="450"><%= p.produto.nome %></td>
               <td width="70" align="right"><%= (p.produto.peso.to_f *  p.quantidade.to_f) %></td>
               <td width="70" align="right"><%= p.quantidade.to_f %></td>
@@ -66,14 +63,14 @@
           <% end %>
         </table>
       </div>
-        <table>
-          <tr class="head_grid">
+        <table  class="head_grid">
+          <tr>
             <td width="505"></td>
-            <td width="70" align="right"><b><%= ps %></b></td>
-            <td width="70" align="right"><b><%= qtd %></b></td>
+            <td width="70" align="right"><%= ps %></td>
+            <td width="70" align="right"><%= qtd %></td>
             <td width="70"></td>
-            <td width="70" align="right"><b><%= format_int(tot) %></b></td>
+            <td width="70" align="right"><%= format_int(tot) %></td>
           </tr>
         </table>
-    </div> 	
-  </div> 	
+    </div>
+  </div>

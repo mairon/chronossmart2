@@ -1,0 +1,164 @@
+  <h1 id="header">Pedido Traslados</h1>
+<div class="group">
+  <%= form_for [:tms, @pedido_traslado] do |f| %>
+    <div class="row">
+      <div class="col-md-4">
+        <label><%= t('DATE') %></label>
+        <%= f.text_field :data, value: ( Time.now.strftime("%d/%m/%Y") if params[:action] == 'new' ), size: 10,  class: "panel-field date", autofocus: true, required: true %>
+      </div>
+
+      <div class="col-md-3">
+        <label>Cod. Externo</label>
+        <%= f.text_field :cod_ext,  class: "panel-field" %>
+      </div>
+
+      <div class="col-md-3">
+        <label>Tipo</label>
+        <%= f.select :tipo, [['Importação', 0],['Exportação', 1],['Nacional', 2],['Frete Terceiro', 3]], class: 'panel-field', prompt: 'Selecione' %>
+      </div>
+
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <label>Cliente</label>
+        <%= f.text_field :persona_nome, required: true, class: 'autocomplete',  class: "panel-field" %>
+          <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
+        <%= f.hidden_field :persona_id %></td>
+
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <label>Origem</label>
+        <%= f.collection_select :origem_id, Cidade.select('id,nome').order('nome'), :id, :nome, { prompt: ''}, {required: true} %>
+      </div>
+      <div class="col-md-6">
+        <label>Destino</label>
+        <%= f.collection_select :destino_id, Cidade.select('id,nome').order('nome'), :id, :nome, { prompt: ''}, {required: true} %>
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-md-3">
+        <label><%= t('COIN') %></label>
+        <% if params[:action] == 'new' %>
+          <%= f.select :moeda, [['R$', 2], ['Gs.', 1], ['U$', 0] ], :selected => current_unidade.moeda.to_i %>
+        <% else %>
+          <%= f.select :moeda, [['R$', 2], ['Gs.', 1], ['U$', 0] ] %>
+        <% end  %>
+      </div>
+
+      <div class="col-md-3 valores-gs">
+        <%= panel_field_gs_label 'Valor Gs.',f,:valor_gs %>
+      </div>
+
+      <div class="col-md-3 valores-us" hidden>
+        <%= panel_field_us_label 'Valor U$',f,:valor_us %>
+      </div>
+
+      <div class="col-md-3 valores-rs" hidden>
+        <%= panel_field_us_label 'Valor R$',f,:valor_rs %>
+      </div>
+      <div class="col-md-3">
+        <label>Qtd Fretes</label>
+        <%= f.text_field :qtd_rodados,  class: "panel-field" %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <br>
+        <%= f.text_area :obs, class: "panel-field", placeholder: 'Obs.', rows: 3, cols: 15 %>
+      </div>
+    </div>
+
+
+    <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to 'Volver', tms_pedido_traslados_path, :class => "btn back" %>
+    </div>
+  <% end %>
+</div>
+
+
+
+<script>
+  $('#pedido_traslado_origem_id, #pedido_traslado_destino_id, #pedido_traslado_produto_id, #pedido_traslado_tipo ').selectize();
+  $(function() {
+    $( "#pedido_traslado_persona_nome" ).autocomplete({
+        source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+        $.ajax({
+          url: "/personas/busca?per=CLIENTE",
+          dataType: "json",
+
+          data: {
+            tipo: 'DESCRIPCION',
+            busca: request.term
+          },
+          beforeSend: function(){
+          $("#spinner").addClass("sppiner_show");
+          },
+
+          success: function( data ) {
+            $("#sppiner").removeClass("sppiner_show");
+            response( data );
+          },
+        });
+      },
+      minLength: 2,
+      change: function( event, ui ) {
+        $('#pedido_traslado_persona_id').val(ui.item.id);
+        return false;
+      }
+    });
+    $( "#persona_nome" ).change(function(){
+      if ($( "#pedido_traslado_persona_id" ).val() == ''){
+      }
+    });
+  });
+</script>
+
+<script>
+
+  $(document).ready(function() {
+      if (<%= @pedido_traslado.moeda.to_i %> == '1') {
+        $(".valores-gs").show();
+        $(".valores-rs").hide();
+        $(".valores-us").hide();
+
+      } else if (<%= @pedido_traslado.moeda.to_i %> == '0') {
+        $(".valores-us").show();
+        $(".valores-rs").hide();
+        $(".valores-gs").hide();
+
+      } else if (<%= @pedido_traslado.moeda.to_i %> == '2') {
+        $(".valores-rs").show();
+        $(".valores-us").hide();
+        $(".valores-gs").hide();
+      };
+  });
+</script>
+
+  <script>
+
+    $("#pedido_traslado_moeda").change(function() {
+        if (this.value == '1') {
+          $(".valores-gs").show();
+          $(".valores-rs").hide();
+          $(".valores-us").hide();
+
+        } else if (this.value == '0') {
+          $(".valores-us").show();
+          $(".valores-rs").hide();
+          $(".valores-gs").hide();
+
+        } else if (this.value == '2') {
+          $(".valores-rs").show();
+          $(".valores-us").hide();
+          $(".valores-gs").hide();
+        };
+    });
+  </script>

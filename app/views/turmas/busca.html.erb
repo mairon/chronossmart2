@@ -1,0 +1,32 @@
+<div class="group">
+  <table class="head_grid">
+    <tr>
+      <td width="80">Código</td>
+      <td width="350">Nome</td>
+      <td width="50">Status</td>
+      <td width="80" align="right">Alunos</td>
+    </tr>
+  </table>
+
+  <div class="rolagem" dir="div">
+    <table>
+      <% @turmas.each do |turma| %>
+        <tr class="<%= cycle("cor1", "cor2")%>">
+          <td width="80"><%= link_to turma.id.to_s.rjust(6,'0'), turma_path(turma.id) %></td>
+          <td width="350"><%= turma.nome %></td>
+          <td width="50" align="right">
+            <% if turma.status == true %>
+              <span class="btn-success"><%= t('ACTIVE_S') %></span>
+            <% else %>
+              <span class="btn-danger">Desactivado</span>
+            <% end %>
+          </td>
+          <td width="80" align="right"><%= turma.count_personas %></td>
+
+          <td><%= link_to '', edit_turma_path(turma), class: 'icon-pencil' %></td>
+          <td><%= link_to '', turma, confirm: 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,133 @@
+<table>
+  <tr>
+    <td width="180"><%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 60) %></td>
+    <td width="600" align="center">
+      <h1><%= current_unidade.nome_sys %> </h1>
+      <h1>Cuentas a Recibir</h1>
+    </td>
+  </tr>
+</table>
+
+<table width="800">
+	<tr>
+		<td width="40">Cliente:</td>
+		<td><%= @persona.id.to_s.rjust(6,'0')%>-<%= @persona.nome %> | CI/RUC <%= @persona.ruc %></td>
+	</tr>
+	<tr>
+		<td width="40">Telefone:</td>
+		<td><%= @persona.telefone %> <%= @persona.telefone2 %></td>
+	</tr>
+</table>
+<div class="row">
+  <div class="col-md-12">
+  	<div class="panel">
+	  	<div class="panel-body">
+	  		<p align="center">
+					<table>
+						<tr>
+							<td>
+								<div class="group">
+									<table>
+						  				<tr class="head">
+						  					<td width="80" align="center">Fecha</td>
+						  					<td width="80" align="center">Origen</td>
+						    				<td width="150">Doc.</td>
+						    				<td width="250">Vendedor</td>
+						    				<td width="80" align="right">Deuda</td>
+						    				<td width="80" align="right">Pago</td>
+						    				<td width="80" align="right">Saldo</td>
+						    				<td width="80" align="center">Venc.</td>
+						    				<td width="25" align="center">Dias</td>
+						    				<td width="80" align="right">Interes</td>
+						    				<td width="80" align="right">Saldo Corrigido</td>
+						  				</tr>
+									</table>
+
+									<% empresa = Empresa.last(:select => "taxa_interes") %>
+									<table>
+										<% tot = 0 %>
+										<% vencido = 0 %>
+										<% interes = 0 %>
+										<% saldo_interes = 0 %>
+										<% saldo_adelanto = 0 %>
+										<% @cliente.each do |c| %>
+
+					              <!-- calculo de interes -->
+					              <% if params[:interes] != 'false' %>
+						              <% dias = Date.today - c.vencimento.to_date  %>
+						              <% if dias >= 0  %>
+						                  <% interes_gs = ( ( dias.to_i * empresa.taxa_interes.to_f ) * (c.divida_guarani.to_f - c.cobro_guarani.to_f) ) / 100  %>
+						              <% else %>
+						                 <% interes_gs = 0  %>
+						              <% end %>
+					              <% else %>
+					              	<% interes_gs = 0  %>
+					              <% end %>
+
+
+												 <% if c.vencimento.to_date < Time.now.to_date %>
+				               		<% vencido += (c.divida_guarani.to_f - c.cobro_guarani.to_f) %>
+				                  <% vec = "style=\" background-color: #fa3e40; padding: 2px; color:#fff; border-radius: 4px \" " %>
+					              <% end %>
+												<tr class="<%= cycle("cor1", "cor2")%>">
+													<td width="80" align="center"><%= c.data.strftime("%d/%m/%y") %></td>
+													<td width="80" align="center"><%= c.cod_proc.to_s.rjust(6,'0') %>•<%= c.sigla_proc %></td>
+													<td width="150"><%= c.doc %></td>
+													<td width="250"><%= c.vendedor_nome %></td>
+													<td width="80" align="right"><%= format_int(c.divida_guarani) %></td>
+													<td width="80" align="right"><%= format_int(c.cobro_guarani) %></td>
+													<td width="80" align="right"><%= format_int(c.divida_guarani.to_f - c.cobro_guarani.to_f) %></td>
+													<td width="80" align="center"><span <%= raw vec %> ><%= c.vencimento.strftime("%d/%m/%y") %></span></td>
+													<td width="25" align="center"><%= (Time.now.to_date - c.vencimento.to_date).to_i  %></td>
+													<td width="80" align="right"><%= format_int(interes_gs) %></td>
+													<td width="80" align="right"><%= format_int((c.divida_guarani.to_f - c.cobro_guarani.to_f) + interes_gs.to_f) %></td>
+												</tr>
+
+												<% if c.sigla_proc == 'AD' %>
+													<% saldo_adelanto += c.divida_guarani.to_f - c.cobro_guarani.to_f %>
+												<% end %>
+
+												<% tot += (c.divida_guarani.to_f - c.cobro_guarani.to_f) %>
+												<% interes += interes_gs.to_f %>
+												<% saldo_interes += (c.divida_guarani.to_f - c.cobro_guarani.to_f) + interes_gs.to_f %>
+										<% end %>
+									</table>
+
+								<br>
+
+
+									<table class="head_grid">
+										<tr class="head">
+											<td width="150" align="right">Vencido: <font color="red"><b><%= format_int(vencido)%></b></font></td>
+											<td width="150" align="right">À Vencer: <font color="green"><b><%= format_int(tot - vencido)%></b></font></td>
+											<td width="150" align="right">Total: <font color="blue"><b><%= format_int(tot)%></b></font></td>
+											<td width="150" align="right">Interes: <font color="red"><b><%= format_int(interes)%></b></font></td>
+											<td width="150" align="right">Antecipo: <font color="blue"><b><%= format_int(saldo_adelanto)%></b></font></td>
+											<td width="200" align="right">Saldo Corrigido: <font color="red"><b><%= format_int(saldo_interes)%></b></font></td>
+										</tr>
+									</table>
+								</div>
+							</td>
+						</tr>
+					</table>
+	  		</p>
+	  	</div>
+  	</div>
+  </div>
+	</div>
+
+<style>
+	i {
+		margin-top: 2px;
+		margin-right: 5px;
+	}
+
+	.panel-tag {
+	  border-radius: 4px;
+	  color: #fff;
+	  padding: 1px 8px 1px 8px;
+	}
+</style>
+
+<%= hidden_field_tag :id, @persona.id %>
+

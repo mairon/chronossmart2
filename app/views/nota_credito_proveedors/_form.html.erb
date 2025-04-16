@@ -1,105 +1,120 @@
-<%= form_for(@nota_credito_proveedor) do |f| %>
-    <% if @nota_credito_proveedor.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@nota_credito_proveedor.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
-
-      <ul>
-        <% @nota_credito_proveedor.errors.full_messages.each do |msg| %>
-        <li>
-          <%= msg %>
-        </li>
-        <% end %>
-      </ul>
+<h1 id="header">N.C. Proveedor - [<%= t('EDITION') %>]</h1>
+<div class="panel">
+  <div class="panel-content">
+  <%= form_for(@nota_credito_proveedor) do |f| %>
+  <div class="row">
+    <div class="col-md-6">
+      <label><%= t('DATE') %></label>
+      <%= f.date_select :data %>
     </div>
-  <% end %>
-
-	<ul class="tabs">
-	  <li><a href="#tab1">N.C. Proveedor - [<%= t('EDITION') %>]</a></li>
-	</ul>
-
-  <div class="tab_container">
-    <div id="tab1" class="tab_content">
-      <table>
-        <tr>
-          <td align="right"> <%= t('DATE') %>:</td>
-          <td><%= f.date_select :data %></td>
-        </tr>
-
-        <tr>
-            <td>Cotizacion U$:</td>
-            <td>  <%= text_field :nota_credito_proveedor, :cotacao, :size     => 10,
-                                 :value    => @nota_credito_proveedor.cotacao.to_i %>
-          Cotz. Real
-          <%= text_field :nota_credito_proveedor, :cotacao_real ,
-                                        :size     => 10,
-                                        :value    => @nota_credito_proveedor.cotacao_real.to_i %>
-
-            </td>
-        	</tr>
-	        <tr>
-	          <td align="right">Proveedor:</td>
-	          <td colspan="2"><%= f.text_field :persona_nome, size: 75 %>
-	          	<%= f.hidden_field :persona_id %></td>
-	        </tr>
-					<tr>
-  					<td align="right">Numero:</td>
-            <td>
-                <%= f.text_field :documento_numero_01,:size => 3, :maxlength => 3 %>-<%= f.text_field :documento_numero_02,:size => 3, :maxlength => 3 %>-<%= f.text_field :documento_numero,   :size => 10, :maxlength => 20 %>
-            </td>
-          </tr>
-         	<tr>
-            <td></td>
-            <td>
-              <table>
-                <tr>
-                  <td width="200">
-                      <fieldset>
-                      <legend>Operación</legend>
-
-                        <%= f.radio_button :operacao, 0,  :Checked => "True" %> Devoluciones
-                        <br/>
-                        <%= f.radio_button :operacao, 1 %> Descuentos
-                      </fieldset>
-                  </td>
-
-                  <td>
-                    <fieldset>
-                    <legend><%= t('COIN') %></legend>
-
-                    <%= f.radio_button :moeda, 0,  :Checked => "True" %> Dolar
-                    <br/>
-                    <%= f.radio_button :moeda, 1 %> Guaranis
-                    <%= f.radio_button :moeda, 2 %> Reales
-                    </fieldset>
-                  </td>
-             	<td>
-	             	<fieldset>
-	              <legend>Tipo</legend>
-	              <%= f.radio_button :tipo, 0 %> Contado
-	              <br/>
-	              <%= f.radio_button :tipo, 1,  :Checked => "True" %> Credito
-	             	</fieldset>
-             	</td>
-            </tr>
-          </table>
-         </td>
-        </tr>
-        <tr>
-          <td align="right">Concepto:</td>
-          <td><%= f.text_area :concepto, :cols => 75, :rows => 5 %></td>
-        </tr>
-      </table>
-    </table>
+    <div class="col-md-3">
+      <label>Ctz. GsxU$</label>
+      <%= text_field :nota_credito_proveedor, :cotacao, size: 10, value: @nota_credito_proveedor.cotacao.to_i %>
+    </div>
+    <div class="col-md-3">
+      <label>Ctz. GsxR$</label>
+      <%= text_field :nota_credito_proveedor, :cotacao_real, size: 10, value: @nota_credito_proveedor.cotacao_real.to_i %>
+    </div>
   </div>
- <div class="buttons">
-       <%= f.submit "Seguir",:disable_with => "Aguarde..." , :class => "btn btn-default add", "data-plus-as-tab" => "false" %>
-      <%= link_to t('BACK'), nota_credito_proveedors_path,:class => 'button back' %>
+  <div class="row">
+    <div class="col-md-12">
+      <label>Proveedor</label>
+      <%= f.text_field :persona_nome, size: 75 %>
+      <%= f.hidden_field :persona_id %>
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-5">
+      <label>Doc.</label>
+      <%= f.text_field :documento_numero_01,:size => 3, :maxlength => 3 %>-<%= f.text_field :documento_numero_02,:size => 3, :maxlength => 3 %>-<%= f.text_field :documento_numero,   :size => 9, :maxlength => 20 %>
+
+    </div>
+
+    <div class="col-md-3">
+      <label><%= t('COIN') %></label>
+      <% if params[:action] == 'index'%>
+        <%= f.select :moeda, [['Gs.', 1], ['U$', 0], ['R$', 2]], selected: current_unidade.moeda %>
+      <% else %>
+        <%= f.select :moeda, [['Gs.', 1], ['U$', 0], ['R$', 2]] %>
+      <% end %>
+
+    </div>
+    <div class="col-md-3 valores-gs" hidden>
+      <%= panel_field_gs_label 'Valor Gs.',f,:total_guarani %>
+    </div>
+
+    <div class="col-md-3 valores-us" hidden>
+      <%= panel_field_us_label 'Valor U$',f,:total_dolar %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <fieldset>
+      <legend>Operación</legend>
+        <%= f.radio_button :operacao, 0,  :Checked => "True" %> Devoluciones
+        <br/>
+        <%= f.radio_button :operacao, 1 %> Descuentos
+        <%= f.radio_button :operacao, 2 %> Descuentos Por Productos
+      </fieldset>
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+        <fieldset>
+        <legend>Tipo Aplicación</legend>
+        <%= f.radio_button :tipo, 0 %> Devolción Efectivo
+        <br/>
+        <%= f.radio_button :tipo, 1,  :Checked => "True" %> Aplicación en Titulos
+        </fieldset>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <br>
+      <%= f.text_area :concepto, :cols => 75, :rows => 5, class: 'panel-field', placeholder: 'Obs.' %>
+    </div>
+  </div>
+    <div class="footer-buttons">
+      <%= f.submit "Seguir",:disable_with => "Aguarde..." , :class => "btn btn-default add", "data-plus-as-tab" => "false" %>
+      <%= link_to t('BACK'), nota_credito_proveedors_path,:class => 'btn back' %>
+    </div>
   </div>
 </div>
 
   <% end %>
 
   <script>
+
+
+
+  $("#nota_credito_proveedor_moeda").change(function() {
+      if (this.value == '1') {  
+        $(".valores-gs").show();
+        $(".valores-rs").hide();
+        $(".valores-us").hide();
+
+      } else if (this.value == '0') {
+        $(".valores-us").show();
+        $(".valores-rs").hide();
+        $(".valores-gs").hide();
+
+      } else if (this.value == '2') {
+        $(".valores-rs").show();
+        $(".valores-us").hide();
+        $(".valores-gs").hide();
+      };
+  });
+
+
+  $('#nota_credito_proveedor_moeda').trigger('change');
+
+
     //cotacao
     $(document).ready(function() {
       $.ajax({url: '/buscas/cotz_us_compra',
@@ -150,18 +165,7 @@
       });
       $( "#nota_credito_proveedor_persona_nome" ).change(function(){
       });
-    });
-    function fecha()
-    {
-      self.close();
-    }
-    //ABRI POPUP-----------------------------------------------------------------
-    document.onkeydown=function(e)
-    {
-      if(e.which == 113)
-        window.open('/personas/persona_nota_credito_proveedor', 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=10, WIDTH=1000, HEIGHT=450');
-    }
-    //FIM ABRI POPUP----------------------------------------------------------------
+    });   
 
   </script>
 </body>

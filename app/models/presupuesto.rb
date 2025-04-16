@@ -2,6 +2,7 @@ class Presupuesto < ActiveRecord::Base
   #audit(:create, :update, :destroy) { |model, user, action| "|#{model.id.to_s.rjust(8,'0')}|Hecho por #{user.usuario_nome}" }
   has_many :presupuesto_produtos, :dependent => :destroy
   has_many :presupuesto_cotas, :dependent => :destroy
+  has_one :contrato
   validates_presence_of :cotacao,:persona_id, :vendedor_id
   belongs_to :colecao
   belongs_to :persona
@@ -9,6 +10,10 @@ class Presupuesto < ActiveRecord::Base
   belongs_to :plano
   belongs_to :tabela_preco
   belongs_to :prazo
+
+  fields = CustomField.pluck(:internal_name)
+  serialize :custom_fields, JSON
+  store_accessor :custom_fields, *fields
 
   def block_data
     #VERIFICA SE SALDO E MAIOR QUE A QUANTIDADE DA VENDA
@@ -50,6 +55,7 @@ class Presupuesto < ActiveRecord::Base
                    TP.NOME AS TABELA_PRECO_NOME,
                    PL.CONDICAO,
                    P.PLANO_ID,
+                   COALESCE((SELECT C.ID FROM CONTRATOS C WHERE C.PRESUPUESTO_ID = P.ID LIMIT 1),0) CONTRATO_ID,
                    COALESCE((SELECT SUM(PP.QUANTIDADE) FROM PRESUPUESTO_PRODUTOS PP WHERE PP.PRESUPUESTO_ID = P.ID),0) QTD,
                    COALESCE((SELECT SUM(PP.TOTAL_GUARANI) FROM PRESUPUESTO_PRODUTOS PP WHERE PP.PRESUPUESTO_ID = P.ID),0) TOTAL_GS,
                    COALESCE((SELECT SUM(VP.QUANTIDADE) FROM VENDAS_PRODUTOS VP WHERE VP.PRESUPUESTO_ID = P.ID),0) FACT,
@@ -72,6 +78,6 @@ class Presupuesto < ActiveRecord::Base
                   ON P.INDICADOR_ID = I.ID
                   WHERE #{cond} #{st}
                   ORDER BY P.DATA DESC, P.ID DESC"
-    Presupuesto.find_by_sql(sql)                  
+    Presupuesto.find_by_sql(sql)
   end
 end

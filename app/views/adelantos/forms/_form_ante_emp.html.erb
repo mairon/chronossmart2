@@ -90,11 +90,9 @@
         </td>
       </tr>
 
-      <tr hidden class="valores-gs">
+     <tr hidden class="valores-gs">
         <%= field_gs_label 'Monto Gs',f,:valor_guarani,
          :onblur   => "GsToUsRs('adelanto_cotacao','adelanto_cotacao_real','adelanto_valor_guarani','adelanto_valor_dolar','adelanto_valor_real')", required: true  %>
-
-        <%= field_gs_label 'IPS Gs',f,:ips_gs %>
       </tr>
       <tr hidden class="valores-us">
          <%= field_us_label 'U$',f,:valor_dolar,
@@ -102,7 +100,7 @@
       </tr>
       <tr hidden class="valores-rs">
          <%= field_us_label 'R$',f,:valor_real,
-         :onblur   => "RsToUsGs('adelanto_cotacao','adelanto_cotacao_real','adelanto_valor_guarani','adelanto_valor_dolar','adelanto_valor_real')", required: true  %>        
+         :onblur   => "RsToUsGs('adelanto_cotacao','adelanto_cotacao_real','adelanto_valor_guarani','adelanto_valor_dolar','adelanto_valor_guarani')", required: true  %>
       </tr>
 
 

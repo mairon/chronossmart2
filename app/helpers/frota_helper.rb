@@ -1,0 +1,2 @@
+module FrotaHelper
+end

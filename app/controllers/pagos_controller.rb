@@ -153,16 +153,16 @@ class PagosController < ApplicationController
               imp_gs = 0
               rt_gs  = 0
             else
-              if d.tabela = ''
-                imp_us = ((d.divida_dolar.to_f - anterior_us.to_f) / 11)
-                rt_us  = (((d.divida_dolar.to_f - anterior_us.to_f) / 11) * 0.30)
-                imp_gs = ((d.divida_guarani.to_f - anterior_gs.to_f) / 11)
-                rt_gs  = (((d.divida_guarani.to_f - anterior_gs.to_f) / 11) * 0.30)
+              if d.tabela != 'COMPRAS_FINANCAS'
+                imp_us = 0
+                rt_us  = 0
+                imp_gs = 0
+                rt_gs  = 0
               else
-                imp_us = ((importo.imposto_05_dolar + importo.imposto_10_dolar))
-                rt_us  = ((importo.imposto_05_dolar + importo.imposto_10_dolar) * 0.30)
-                imp_gs = ((importo.imposto_05_guarani + importo.imposto_10_guarani))
-                rt_gs  = ((importo.imposto_05_guarani + importo.imposto_10_guarani) * 0.30)
+                imp_us = (((importo.gravadas_05_dolar.to_f / 21) + (importo.gravadas_10_dolar.to_f / 11) ))
+                rt_us  = (((importo.gravadas_05_dolar.to_f / 21) + (importo.gravadas_10_dolar.to_f / 11) ) * 0.70)
+                imp_gs = (((importo.gravadas_05_guarani / 21) + (importo.gravadas_10_guarani.to_f / 11)))
+                rt_gs  = (((importo.gravadas_05_guarani / 21) + (importo.gravadas_10_guarani.to_f / 11)) * 0.70)
               end
             end
             PagosDetalhe.create(  pago_id:    @pago.id,
@@ -233,7 +233,7 @@ class PagosController < ApplicationController
         end
     end
 
-    def filtro_dividas              #
+    def filtro_dividas
 
         @pago       = Pago.find(params[:id])
         @proveedor  = Proveedore.find(params[:pagos_ids])
@@ -289,24 +289,44 @@ class PagosController < ApplicationController
                             </script>"
     end
 
-    def pago_final                  #
-        @pago    = Pago.find(params[:id])
+    def pago_final
+
+      @pago    = Pago.find(params[:id])
       @cd          = PagosDetalhe.all(:conditions => ['pago_id = ?',params[:id]])
+      
       @tot_pago_us = PagosDetalhe.sum( :pago_dolar,     :conditions => ['pago_id = ?',params[:id]])
       @tot_pago_gs = PagosDetalhe.sum( :pago_guarani,   :conditions => ['pago_id = ?',params[:id]])
       @tot_pago_rs = PagosDetalhe.sum( :pago_real,      :conditions => ['pago_id = ?',params[:id]])
+      
       @tot_des_us   = PagosDetalhe.sum( :desconto_dolar,  :conditions => ['pago_id = ?',params[:id]])
       @tot_des_gs   = PagosDetalhe.sum( :desconto_guarani,:conditions => ['pago_id = ?',params[:id]])
       @tot_des_rs   = PagosDetalhe.sum( :desconto_real,   :conditions => ['pago_id = ?',params[:id]])
+      
       @tot_int_us   = PagosDetalhe.sum( :interes_dolar,   :conditions => ['pago_id = ?',params[:id]])
       @tot_int_gs   = PagosDetalhe.sum( :interes_guarani, :conditions => ['pago_id = ?',params[:id]])
       @tot_int_rs   = PagosDetalhe.sum( :interes_real, :conditions => ['pago_id = ?',params[:id]])
+      
+      if @pago.moeda.to_i == 0
+        if @tot_pago_us.to_f > (1073000 / @pago.cotacao.to_f) 
+          @tot_ret_us   = PagosDetalhe.sum( :retencao_us,   :conditions => ['pago_id = ?',params[:id]]).round(2)
+        else
+          @tot_ret_us   = 0
+        end
+      
+      elsif @pago.moeda.to_i == 1
+        if @tot_pago_gs.to_f > 1073000
+          @tot_ret_gs   = PagosDetalhe.sum( :retencao_gs,   :conditions => ['pago_id = ?',params[:id]]).round(0)
+        else
+          @tot_ret_gs   = 0
+        end  
+      end
+      
       @tot_ade_us   = PagosAdelanto.sum( :valor_us,   :conditions => ['pago_id = ?',params[:id]])
       @tot_ade_gs   = PagosAdelanto.sum( :valor_gs, :conditions => ['pago_id = ?',params[:id]])
       @tot_ade_rs   = PagosAdelanto.sum( :valor_rs, :conditions => ['pago_id = ?',params[:id]])
 
-      @fecha_result_us = ( ( @tot_pago_us.to_f + @tot_int_us.to_f ) - ( @tot_des_us.to_f + @tot_ade_us.to_f ) )
-      @fecha_result_gs = ( ( @tot_pago_gs.to_f + @tot_int_gs.to_f ) - ( @tot_des_gs.to_f + @tot_ade_gs.to_f ) )
+      @fecha_result_us = ( ( @tot_pago_us.to_f + @tot_int_us.to_f ) - ( @tot_des_us.to_f + @tot_ade_us.to_f  + @tot_ret_us.to_f) )
+      @fecha_result_gs = ( ( @tot_pago_gs.to_f + @tot_int_gs.to_f ) - ( @tot_des_gs.to_f + @tot_ade_gs.to_f  + @tot_ret_gs.to_f ) )
       @fecha_result_rs = ( ( @tot_pago_rs.to_f + @tot_int_rs.to_f ) - ( @tot_des_rs.to_f + @tot_ade_rs.to_f ) )
 
       @financ_cred_us = PagosFinanca.sum(:valor_dolar, :conditions => ["pago_id = #{@pago.id} and cred_deb = 0 "])
@@ -344,7 +364,8 @@ class PagosController < ApplicationController
     end
 
     def index
-      Pago.destroy_all("usuario_created = #{current_user.id} and op = false" )
+      #Pago.destroy_all("usuario_created = #{current_user.id} and op = false" )
+      render layout: 'chart'
     end
 
     def busca
@@ -355,7 +376,7 @@ class PagosController < ApplicationController
 
     def show                        #
         @pago       = Pago.find(params[:id])
-sql = "SELECT C.ID,
+          sql = "SELECT C.ID,
                       C.PERSONA_ID,
                       C.PERSONA_NOME,
                       C.LIQUIDACAO,
@@ -386,11 +407,10 @@ sql = "SELECT C.ID,
                       R.DESCRICAO AS RUBRO_NOME,
                       V.COTACAO AS COTACAO_VENDA,
                       V.COTACAO_RS_US AS COTZ_RS_US,
-                      (V.IMPOSTO_05_DOLAR + V.IMPOSTO_10_DOLAR) AS IMPOSTO_US,
-                      (V.IMPOSTO_05_GUARANI + V.IMPOSTO_10_GUARANI) AS IMPOSTO_GS,
-                      ((V.IMPOSTO_05_DOLAR + V.IMPOSTO_10_DOLAR)  * 0.3) AS RETENCAO_US,
-                      ((V.IMPOSTO_05_GUARANI + V.IMPOSTO_10_GUARANI) * 0.3) AS RETENCAO_GS,
-
+                    (((V.GRAVADAS_05_DOLAR / 21) + (V.GRAVADAS_10_DOLAR / 11) )) AS IMPOSTO_US,
+                    (((V.GRAVADAS_05_DOLAR / 21) + (V.GRAVADAS_10_DOLAR / 11) ) * 0.30) AS RETENCAO_US,
+                    (((V.GRAVADAS_05_GUARANI / 21) + (V.GRAVADAS_10_GUARANI / 11))) AS IMPOSTO_GS,
+                    (((V.GRAVADAS_05_GUARANI / 21) + (V.GRAVADAs_10_GUARANI / 11)) * 0.30) AS RETENCAO_GS,
                       ( SELECT SUM(AT.PAGO_DOLAR) FROM PROVEEDORES AT WHERE AT.UNIDADE_ID = #{current_unidade.id} and  AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_US,
                       ( SELECT SUM(AT.PAGO_GUARANI) FROM PROVEEDORES AT WHERE AT.UNIDADE_ID = #{current_unidade.id} and  AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_GS,
                       ( SELECT SUM(AT.PAGO_REAL) FROM PROVEEDORES AT WHERE AT.UNIDADE_ID = #{current_unidade.id} and AT.PERSONA_ID = C.PERSONA_ID AND AT.DOCUMENTO_NUMERO_01 = C.DOCUMENTO_NUMERO_01 AND AT.DOCUMENTO_NUMERO_02 = C.DOCUMENTO_NUMERO_02 AND AT.DOCUMENTO_NUMERO = C.DOCUMENTO_NUMERO AND AT.COTA = C.COTA AND AT.LIQUIDACAO = 0) AS ANTERIOR_RS
@@ -408,7 +428,7 @@ sql = "SELECT C.ID,
             ON R.ID = C.PLANO_DE_CONTA_ID
 
 
-            WHERE C.UNIDADE_ID = #{current_unidade.id} and C.PERSONA_ID = #{@pago.persona_id} AND C.LIQUIDACAO = 0 AND (C.DIVIDA_GUARANI + C.DIVIDA_DOLAR ) > 0
+            WHERE C.UNIDADE_ID = #{current_unidade.id} and C.PERSONA_ID = #{@pago.persona_id} AND C.LIQUIDACAO = 0 AND (C.DIVIDA_GUARANI + C.DIVIDA_DOLAR + C.DIVIDA_REAL ) > 0
             ORDER BY 8,12
                       "        
             @proveedor  = Proveedore.find_by_sql(sql)

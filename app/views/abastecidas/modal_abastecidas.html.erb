@@ -1,0 +1,34 @@
+<div  align="center" >
+	<table class="head_grid">
+		<tr>
+			<td width="50">Fecha/Hora</td>
+			<td width="50">Pico</td>
+			<td width="50">Playero</td>
+			<td width="70" align="right">Litros</td>
+			<td width="70" align="right">Precio</td>
+			<td width="70" align="right">Total</td>
+		</tr>
+	</table>
+	<div class="rolagem" id="div" style="height: 600px">
+		<table>
+			<% @abastecidas.each do |a| %>
+				<% if a.status.to_i == 2 %>
+					<% color = ' style= "background-color:#fa3e40; color: #fff"'.html_safe %>
+				<% end %>
+
+				<tr <%= color %> id="<%= a.id %>" class = "<%= cycle("cor1", "cor2") %>" onClick="AddVenda('<%= a.id %>','<%= a.produto_id %>','<%= a.litros.round(4) %>','<%= format_int(a.preco) %>','<%= format_int(a.preco * a.litros.round(4)) %>', '<%= a.deposito_id %>', '<%= a.bico_id %>', '<%= a.produto_nome %>',<%= params[:data] %>)"
+
+					title="<%= a.chave %> - <%= a.id %> - <%= a.data.strftime("%d/%m/%y")%> - <%= a.hora.strftime("%H:%M") %>"
+					>
+
+					<td width="50"><%= a.data.strftime("%d/%m") %> <%= a.hora.strftime("%H:%M") %></td>
+					<td width="50"><%= a.bico_nome %></td>
+					<td width="50"><%= a.frentista_nome %></td>
+					<td width="70" align="right"><%= format_peso(a.litros) %></td>
+					<td width="70" align="right"><%= format_int(a.preco) %></td>
+					<td width="70" align="right"><%= format_int(a.litros.to_f * a.preco.to_f) %></td>
+				</tr>
+			<% end %>
+		</table>
+	</div>
+</div>

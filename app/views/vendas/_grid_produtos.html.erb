@@ -1,11 +1,11 @@
 
-<% grupos = SubGrupo.order("descricao") %>
+<% grupos = SubGrupo.where("id in (11,75, 76, 77, 78,79, 80, 81)").order("descricao") %>
 <div class="gridprod">
   <div class="row">
     <div class="col-xs-12">
       <div class="text-center">
         <input type="search" id="myInput" onkeyup="myFunction()" placeholder="Buscar Grupo" title="Type in a name" class="panel-field">
-      </div>    
+      </div>
     </div>
     <div class="col-xs-12 div-top-list">
       <div id="js_image_selection" class="horizontal-scrollable-tabs">
@@ -26,9 +26,9 @@
       <div class="tab-content">
         <% grupos.each do |g| %>
           <div id="<%= g.id %>" role="tabpanel" class="tab-pane fade">
-            <% produtos = Produto.find_by_sql("SELECT P.ID AS PRODUTO_ID, P.NOME AS PRODUTO_NOME, PTP.PRECO_1_GS FROM PRODUTOS_TABELA_PRECOS PTP INNER JOIN PRODUTOS P ON P.ID = PTP.PRODUTO_ID WHERE PTP.TABELA_PRECO_ID = #{@venda.tabela_preco_id} AND P.SUB_GRUPO_ID = #{g.id} ORDER BY 2") %>
+            <% produtos = Produto.find_by_sql("SELECT P.ID AS PRODUTO_ID, P.NOME AS PRODUTO_NOME, PTP.PRECO_1_GS FROM PRODUTOS_TABELA_PRECOS PTP INNER JOIN PRODUTOS P ON P.ID = PTP.PRODUTO_ID WHERE PTP.UNIDADE_ID = #{@venda.unidade_id} and PTP.TABELA_PRECO_ID = #{@venda.tabela_preco_id} AND P.SUB_GRUPO_ID = #{g.id} ORDER BY 2") %>
               <ul class="row" >
-                <% produtos.each do |p| %>          
+                <% produtos.each do |p| %>
                 <%= fields_for "vendas_produtos[]", p do |b| %>
                   <li class="col-xs-6 col-sm-3 col-md-4" data-id="<%= p.produto_id %>"  data-preco="<%= format_int(p.preco_1_gs) %>"  data-produto-nome="<%= p.produto_nome %>">
                     <div class="thumbnail btn-grid btn-blue" align="center">
@@ -38,7 +38,7 @@
                           <span class="minus">-</span>
                           <%= text_field_tag "vendas_produtos_#{p.produto_id}_quantidade", 0 %>
                           <span class="plus">+</span>
-                        </div>                       
+                        </div>
                       </p>
                     </div>
                   </li>
@@ -60,7 +60,7 @@
     font-size: 14px;
     vertical-align: middle;
   }
-  
+
   .btn-grid {
     font-size: 16px;
     line-height: 1.42857143;
@@ -173,9 +173,9 @@ function myFunction() {
         var array = $('li[data-id]').map(function(){
           qtd = $("#vendas_produtos_"+ $(this).data('id') +"_quantidade").val()
           if ( parseInt(qtd) > 0 ) {
-            return "{produto_id: " + $(this).data('id') + ", quantidade: "+  qtd +"}";  
+            return "{produto_id: " + $(this).data('id') + ", quantidade: "+  qtd +"}";
           }
-          
+
         }).get();
 
         console.log(array);
@@ -192,9 +192,9 @@ function myFunction() {
         var array = $('li[data-id]').map(function(){
           qtd = $("#vendas_produtos_"+ $(this).data('id') +"_quantidade").val()
           if ( parseInt(qtd) > 0 ) {
-            return "{produto_id: " + $(this).data('id') + ", quantidade: "+  qtd +"}";  
+            return "{produto_id: " + $(this).data('id') + ", quantidade: "+  qtd +"}";
           }
-          
+
         }).get();
 
         console.log(array);
@@ -212,7 +212,7 @@ $('#add_grid_prodts').click(function () {
       if ( parseInt(qtd) > 0 ) {
         return {preco: $(this).data('preco'), produto_nome: $(this).data('produto-nome'), produto_id: $(this).data('id'), quantidade: parseInt(qtd) };
       }
-      
+
     }).get();
 
     console.log( array );
@@ -229,14 +229,14 @@ $('#add_grid_prodts').click(function () {
             if ( parseInt(qtd) > 0 ) {
               return $("#vendas_produtos_"+ $(this).data('id') +"_quantidade").val(0)
             }
-            
+
           }).get();
 
           console.log( array );
 
 
         }
-    });    
+    });
   });
 
 

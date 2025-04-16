@@ -6,8 +6,6 @@
   }
 </style>
 
-
-
   <h1 id="header"><%= t('SALES') %></h1>
   <div class="acessos">
 
@@ -51,10 +49,11 @@
             </td>
             <td>
               <select name="tipo" id="tipo">
-                <option>CLIENTE</option>
+                <option selected>CLIENTE</option>
+                <option>VENDEDOR</option>
                 <option>CODIGO</option>
                 <option><%= t('DOC').upcase %></option>
-                <option selected>COMANDA</option>
+                <option >COMANDA</option>
               </select>
             </td>
             <td colspan="4">
@@ -88,3 +87,29 @@
   }
 </script>
 <%= javascript_include_tag 'busca_ajax' %>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="ModalOrdemEntrega">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content" style="height: 720px; width: 950px">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h2 class="modal-title" id="myModalLabel" align="center">Ordem Entrega</h2>
+      </div>
+      <div class="modal-body-oe" style="padding: 10px">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $('#ModalOrdemEntrega').on('show.bs.modal', function (e) {
+    var loadurl = $(e.relatedTarget).data('load-url');
+    $(this).find('.modal-body-oe').load(loadurl);
+  });
+
+
+</script>

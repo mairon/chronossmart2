@@ -152,11 +152,7 @@ nombres/es personal/es o Razon social que representamos en el Registro de Moroso
 			<td>RUC/CI: <%= @venda.plano_venda.solicitude_creditos.last.garantia_01_documento %> </td>
 			<td>RUC/CI: <%= @venda.plano_venda.solicitude_creditos.last.garantia_02_documento %> </td>
 		</tr> 
-	<% @venda.vendas_produtos.each do |vp| %>
-		<tr>
-			<td colspan="2"><%= vp.produto_nome %></td>
-		</tr>
-		<% end %>		
+	
 		<tr>
 			<td height="20"></td>
 		</tr>

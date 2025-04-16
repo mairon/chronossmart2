@@ -157,7 +157,7 @@ function GsToUsRs(ct,ctrs,gs,us,rs){
 }
 
 
-function RsToUsGs(ct,ctrs,gs,us,rs){
+function RsToUsGs(ct,ctrs,rs,us,gs){
     var cambio = eval( parseFloat( document.getElementById(rs).value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById(ctrs).value.replace(/\./g, "") ) )  ;
     document.getElementById(gs).value = ( number_format( cambio,0, ',', '.') )
 
@@ -215,16 +215,5 @@ function GsToEsUs(CtEuGs,CtGsUs,Eu,Us,Gs,Rs,CtGsRs){
 
     var cambio_rs = eval( parseFloat( document.getElementById(Gs).value.replace(/\./g, "").replace(",", ".") ) / document.getElementById(CtGsRs).value.replace(/\./g, "").replace(",", ".") )  ;
     document.getElementById(Rs).value = ( number_format( cambio_rs,2, ',', '.') )
-
-}
-
-
-//real para dolar e guarani
-function RsToUsGs(CtRsUs,CtRsGs,Rs,Us,Gs){
-    var cambiors = eval( parseFloat( document.getElementById(Rs).value.replace(/\./g, "") ) / document.getElementById(CtRsUs).value.replace(/\./g, "").replace(",", ".") )  ;
-    document.getElementById(Us).value = ( number_format( cambiors,2, ',', '.') )
-
-    var cambio = eval( parseFloat( document.getElementById(Rs).value.replace(/\./g, "").replace(",", ".") ) * document.getElementById(CtRsGs).value.replace(/\./g, "").replace(",", ".") )  ;
-    document.getElementById(Gs).value = ( number_format( cambio,0, ',', '.') )
 
 }

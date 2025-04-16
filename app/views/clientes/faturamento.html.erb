@@ -3,11 +3,9 @@
   	<div class="row">
   		<div class="col-md-12">
 		    <div class="panel">
-		    	<header class="panel-heading" style="font-family: 'prox'; font-size: 18px; padding-bottom: 10px;">
+          <h1 id="header">
 		    		Factura
-		    		<div style="float: right">
-		    		</div>
-		    	</header>
+          </h1>
 
 		      <table class="head_grid">
 		        <tr>
@@ -21,6 +19,7 @@
 		      <div class="rolagem" dir="div" style="height: 180px">
 		        <table>
 		          <% @fts.each do |ft| %>
+              <%= render partial: "/form_fiscals/consulta_estado", locals: {cdc: ft.cdc} %>
 		          <% if ft.status == 2 %>
 		            <% anulada  = 'li-ft' %>
 
@@ -28,42 +27,32 @@
 
 		            <tr class = "<%= cycle("cor1", "cor2") %> <%= raw anulada %>">
 
-  		            <td  width="70">
-                    <%= link_to  "#detalhe-doc-#{ft.id}", "data-toggle" => "modal", "data-target" =>"#detalhe-doc-#{ft.id}", "data-id" => "#{ft.id}" do %>
-                      <%= ft.id %>
-                    <% end %>
+  		            <td width="70"><%= link_to ft.id, form_fiscal_path(ft.id), target: '_blank?' %></td>
+		              <td width="100"><%= ft.doc_01 %>.<%= ft.doc_02 %>.<%= ft.doc %></td>
+                  <td width="60" title="<%= ft.cdc %>"><small><%= ft.cdc.to_s[38..44] %></small></td>
+                  <td>
+                    <%= @get_resp["deList"][0]["situacion"].to_s %> -
+                    <% if @get_resp["deList"][0]["situacion"].to_s == '0' %>
+                      Generado DE
+                    <% elsif @get_resp["deList"][0]["situacion"].to_s == '1' %>
+                      Enviado en un Lote
+                    <% elsif @get_resp["deList"][0]["situacion"].to_s == '2' %>
+                      Aprobado
+                    <% elsif @get_resp["deList"][0]["situacion"].to_s == '3' %>
+                      Aprobado con observacion
+                    <% elsif @get_resp["deList"][0]["situacion"].to_s == '4' %>
+                      <span style="color: red">Rechazado</span>
+                    <% elsif @get_resp["deList"][0]["situacion"].to_s == '98' %>
+                      Inexistente
+                    <% elsif @get_resp["deList"][0]["situacion"].to_s == '99' %>
+                      Cancelado
+                    <% end %><br>
+                    <%= @get_resp["deList"][0]["respuesta_mensaje"] %>
                   </td>
-		              <td  width="100"><%= ft.doc_01 %>.<%= ft.doc_02 %>.<%= ft.doc %></td>
-                  <%
-
-                    data = {
-                        cdcList: [{
-                            cdc: "#{ft.cdc}"
-                        }]
-                    };
-
-                   url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/de/estado")
-
-                              http = Net::HTTP.new(url.host, url.port)
-                              http.use_ssl = true
-                              http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-
-                              request = Net::HTTP::Post.new(url)
-                              request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
-                              request["content-type"] = 'application/json'
-                              request.body = data.to_json
-                              response = http.request(request)
-                              puts get_resp = JSON.parse(response.body)
-
-                  %>
-
-
-                  <td  width="60" title="<%= ft.cdc %>"><small><%= ft.cdc[38..44] %></small></td>
-                  <td class="bold"><%= get_resp["deList"][0]["respuesta_mensaje"] %></td>
 		              <% if ft.status == 1 %>
                     <td><span class="btn-success">Activo</span></td>
-		                <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(ft, status: '2', modal: 'true') %></td>		                
-		                <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>                    
+		                <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(ft, status: '2', modal: 'true') %></td>
+		                <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>
                     <% if ft.tipo_emissao.to_i == 0 %>
                       <td><%= link_to 'Re-imprimir', "#",  :onclick => "MultiplaFaturaVenda(#{ft.id})" %></td>
                     <% else %>
@@ -72,12 +61,16 @@
                         <%= link_to image_tag('whats.png', height: 25), '#', onclick:"SendWhats( '#{ ft.doc_01 }-#{ ft.doc_02 }-#{ ft.doc.to_s.rjust(5,'0') }','#{ft.arquivo_pdf.to_s.gsub!(/\s+/, '')}')" %>
                       </td>
                     <% end %>
-		              <% else %>
-		                <td><span class="btn-danger">Anulado</span></td>
-		                <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>
+                  <% elsif ft.status == 2 %>
+                    <td><span class="btn-danger">Anulado</span></td>
                     <% if ft.tipo_emissao.to_i == 1 %>
                       <td><%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: ft.cdc, id: ft.id) %></td>
-                    <% end %>                    
+                    <% end %>
+		              <% elsif ft.status == 3 %>
+                    <td><span class="btn-warning">Inutilizado</span></td>
+                    <% if ft.tipo_emissao.to_i == 1 %>
+                      <td><%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: ft.cdc, id: ft.id) %></td>
+                    <% end %>
 		              <% end %>
 		            </tr>
 
@@ -91,70 +84,6 @@
                           </button>
                           <h4 class="modal-title" id="myModalLabel">Resumen Factura</h4>
                         </div>
-                        <div class="modal-body" style="padding: 5px 20px 20px 20px">
-                          <div class="group" >
-                            <div class="row">
-                              <div class="col-md-12">
-                                <label>RUC/CI</label>
-                                <%= ft.ruc %>
-                              </div>
-
-                              <div class="col-md-12">
-                                <label>Nombre</label>
-                                <%= ft.persona_nome %>
-                              </div>
-
-                              <div class="col-md-12">
-                                <label>CDC</label>
-                                <%= ft.cdc %>
-                              </div>
-                              <div class="col-md-12">
-                                <label>Nº</label>
-                                <%= get_resp["deList"][0]["numero"] %>
-                              </div>
-                              <div class="col-md-12">
-                                <label>Status</label>
-                                <% if ft.status == 1 %>
-                                  <span class="btn-success">Activo</span>
-                                <% else %>
-                                  <span class="btn-danger">Anulado</span>
-                                <% end %>
-                              </div>
-                              <div class="col-md-12">
-                                <label class="bold">Estado SET</label>
-                                <%= get_resp["deList"][0]["respuesta_codigo"] %>-<%= get_resp["deList"][0]["respuesta_mensaje"] %>
-                              </div>
-                              <div class="col-md-12">
-                                <label class="bold">Situacion SET</label>
-                                <% case get_resp["deList"][0]["situacion"].to_s %>
-                                <% when '-1' %>
-                                  -1 = Borrador
-                                <% when '0' %>
-                                  0 = Generado DE
-                                <% when '1' %>
-                                  1 = Enviado en un Lote
-                                <% when '2' %>
-                                  2 = Aprobado (Caso sea sincrono es inmediato)
-                                <% when '3' %>
-                                  3 = Aprobado con observacion
-                                <% when '4' %>
-                                  4 = Rechazado
-                                <% when '98' %>
-                                  98 = Inexistente
-                                <% when '99' %>
-                                  99 = Cancelado
-                                <% else %>
-                                  --
-                                <% end %>                                                            
-                              </div>
-
-
-
-
-
-                            </div>
-                          </div>
-                        </div>                        
                       </div>
                     </div>
                   </div>
@@ -168,7 +97,7 @@
   		<div class="col-md-12">
 				<div class="panel">
          <% unless @fts.present? %>
-            <div class="group">
+            <div class="panel-content">
               <% if @cliente.persona.cidade.api_id.blank? %>
                <div class="alert alert-danger" role="alert">
                   Atualize a Cidade do Cadastro <%= link_to 'Aqui', edit_persona_path(@cliente.persona_id), target: '_blank' %>
@@ -177,7 +106,7 @@
               <%= render partial: "form_fiscals/attr_forms/cliente_update_ft" %>
             </div>
           <% else %>
-            <div class="group">
+            <div class="panel-content">
             <% if @fts.first.status.to_i != 1 %>
               <%= render partial: "form_fiscals/attr_forms/cliente_update_ft" %>
             <% end %>
@@ -266,32 +195,3 @@
 </div>
 
 
-<script>
-
-function SendWhats(doc,base64){
-  var settings = {
-    "url": "https://<%= @device.host %>/rest/sendMessage/<%= @device.instance_key %>/mediaBase64",
-    "method": "POST",
-    "timeout": 0,
-    "headers": {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer <%= @device.token %>"
-    },
-
-      "data": JSON.stringify({
-        "messageData": {
-          "to": "595981315602@s.whatsapp.net",
-          "base64": "data:application/pdf;base64," + base64,
-          "fileName":  doc + ".pdf",
-          "type": "document",
-          "caption": "Olá, Cliente segue a Fatura "+ doc +" da Mensalidade do sistama ",
-          "mimeType": "application/pdf"
-        }
-      }),
-    };
-
-    $.ajax(settings).done(function (response) {
-      console.log(response);
-    });  
-  }
-</script>

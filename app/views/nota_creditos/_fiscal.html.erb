@@ -1,0 +1,123 @@
+        <div class="panel">
+          <h1 id="header">
+            Doc. Fiscal
+            <div class="pull-right">
+              <a href="#" data-toggle="modal" data-target="#modal-faturamento" class="btn btn-green" style="height: 37px;"><i class="icon-white icon-plus-sign"></i></a>
+            </div>
+          </h1>
+
+          <div class="panel-content">
+          <table class="head_grid">
+            <tr>
+              <td width="70" align="center">Lanz.</td>
+              <td width="100">NC</td>
+              <td width="60">CDC</td>
+              <td width="100" align="center">Estado SET</td>
+            </tr>
+          </table>
+
+          <div class="rolagem" dir="div" style="height: 180px">
+            <table>
+              <% @ncs.each do |ft| %>
+              <% if ft.status == 2 %>
+                <% anulada  = 'li-ft' %>
+              <% end %>
+
+                <tr class = "<%= cycle("cor1", "cor2") %> <%= raw anulada %>">
+
+                  <td  width="70" align="center">
+                    <%= ft.id %>
+                    <small>
+                      <%= ft.updated_at.strftime("%d/%m/%y") %>
+                      <%= ft.updated_at.strftime("%H:%M") %>
+                    </small>
+                  </td>
+                  <td  width="100"><%= ft.doc_01 %>.<%= ft.doc_02 %>.<%= ft.doc %></td>
+                  <%
+
+                    data = {
+                        cdcList: [{
+                            cdc: "#{ft.cdc}"
+                        }]
+                    };
+
+                   url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/de/estado")
+
+                              http = Net::HTTP.new(url.host, url.port)
+                              http.use_ssl = true
+                              http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+                              request = Net::HTTP::Post.new(url)
+                              request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+                              request["content-type"] = 'application/json'
+                              request.body = data.to_json
+                              response = http.request(request)
+                              puts get_resp = JSON.parse(response.body)
+
+                  %>
+
+
+                  <td  width="60" title="<%= ft.cdc %>"><small><%= ft.cdc[38..44] %></small></td>
+
+                  <% if ft.status == 1 %>
+                    <td class="bold" width="100" align="center">
+                      <%= get_resp["deList"][0]["respuesta_mensaje"] %>
+                      <span class="btn-success">Activo</span>
+                    </td>
+                    <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(ft, status: '2', modal: 'true') %></td>
+                    <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>
+                      <td><%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: ft.cdc, id: ft.id) %></td>
+                  <% else %>
+                    <td class="bold" width="100" align="center">
+                      <%= get_resp["deList"][0]["respuesta_mensaje"] %>
+                      <span class="btn-danger">Anulado</span>
+                    </td>
+                    <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>
+                    <td><%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: ft.cdc, id: ft.id) %></td>
+                  <% end %>
+                </tr>
+              <% end %>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-content">
+          <% if @nota_credito.fiscal == 0 %>
+            <% cd = CobrosDetalhe.where(venda_id: @nota_credito.documento_id).last %>
+            <% unless cd.blank? %>
+            <% ff =  FormFiscal.where(sigla_proc: 'CB', cod_proc: cd.cobro_id).last %>
+              <% unless ff.blank? %>
+                <label>CDC Factura <%= ff.doc_01 %>•<%= ff.doc_02 %>•<%= ff.doc %></label>
+                <%= ff.cdc %>
+              <% end %>
+            <% end %>
+          <% else %>
+            <% ff = FormFiscal.where(id: @nota_credito.documento_id, sigla_proc: 'VT').last %>
+            <label>CDC Factura <%= ff.doc_01 %>•<%= ff.doc_02 %>•<%= ff.doc %></label>
+            <%= ff.cdc %>
+          <% end %>
+        </div>
+      </div>
+
+  <div class="modal fade" id="modal-faturamento" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="close-button">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <h1 id="myModalLabelf">Datos de la Factura</h1>
+        </div>
+
+        <div class="modal-body">
+          <% unless @fts.present? %>
+            <div class="group">
+              <%= render partial: "form_fiscals/attr_forms/nota_cred_update_nc" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>

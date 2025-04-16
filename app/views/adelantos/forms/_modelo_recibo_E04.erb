@@ -44,7 +44,7 @@
 			<table align="left"  valign="top"  border="0" style="margin-left: 10px">
 				<tr>
 					<td height="115" align="right" valign="bottom"  colspan="4" width="478">
-						<small><%= @adelanto.documento_numero %>/<%= @adelanto.id %></small></td>
+						<small><%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc.to_s.rjust(7,'0') %>/<%= @adelanto.id %></small></td>
 				</tr>
 				<tr>
 					<td colspan="5">
@@ -57,17 +57,17 @@
 							<tr>
 								<td  width="65" align="right"><%= t('DATE') %> :</td>
 								<td width="90"><%=l @adelanto.data.to_date.to_date %></td>
-
-								<td width="70" colspan="2"><%= t('COIN') %>:<%= d %> </td>
+								<td align="right">Moneda:</td>
+								<td width="70" ><%= d %> </td>
 							</tr>
 
 	
 							<tr>
 								<td align="right">Cliente :</td>
-								<td width="478"><%= @adelanto.persona.nome %></td>
+								<td width="400"><%= @adelanto.persona.nome %></td>
 
-								<td align="right">RUC/CI :</td>
-								<td><%= @adelanto.persona.ruc %></td>
+								<td align="right" width="80">RUC/CI :</td>
+								<td width="80"><%= @adelanto.persona.ruc %></td>
 							</tr>
 
 							<tr>
@@ -97,7 +97,14 @@
 					<tr>
 						<td valign="bottom" colspan="4" width="478">
 							En Letras
-							<% if @adelanto.moeda == 0 %>							
+							<% if @adelanto.moeda == 0 %>				
+								<% real,cents=("%.2f" % @adelanto.valor_dolar.to_f).split(/\./).map{ |m| m.to_i}
+                valor_cents=Extenso.por_extenso(cents%100)
+                valor_cents+= case cents.to_i%100
+                when 0 then ""
+                when 1 then " "
+                when 2..99 then " "
+                end %>										
 								<%= I18n.with_locale(:es) { @adelanto.valor_dolar.to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS' %> )
 							<% else %>
 								<%= I18n.with_locale(:es) { ( @adelanto.valor_guarani.to_f ).to_i.to_words.upcase } %>

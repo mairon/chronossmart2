@@ -1,0 +1,47 @@
+<table class="head_grid">
+  <tr>
+  	<td width="80" align="center">Cod.</td>
+    <td width="80" align="center"><%= t('DATE') %></td>
+    <td width="250">Cliente</td>
+    <td width="150">Doc.</td>
+    <td width="40" align="center"></td>
+    <td width="80" align="right">Monto</td>
+    <td width="80" align="right">Aplicado</td>
+    <td width="80" align="right">Saldo</td>
+  </tr>
+ </table>
+ <div class="rolagem" id="div">
+    <table>
+      <% @adelantos.each do |nota| %>
+        <tr class = "<%= cycle("cor1", "cor2") %>"
+						onClick="Fecha( '<%= format_decimal(nota.cobro_real.to_f - nota.anterior_rs.to_f) %>',
+                            '<%= format_int(nota.cobro_guarani.to_f - nota.anterior_gs.to_f) %>',
+                            '<%= format_decimal(nota.cobro_dolar.to_f - nota.anterior_us.to_f) %>',
+                            '<%= nota.documento_numero_01 %>',
+                            '<%= nota.documento_numero_02 %>',
+                            '<%= nota.documento_numero %>',
+                            '<%= nota.moeda %>')">        	
+          <td width="80" align="center"> <%= nota.id.to_s.rjust(6,'0') %></td>
+          <td width="80" align="center"> <%= nota.data.strftime("%d/%m/%y") unless nota.data.blank? %></td>
+          <td width="250" align="left"> <%= nota.persona_nome %></td>
+          <td width="150" align="left"> <%= nota.documento_numero_01 %>-<%= nota.documento_numero_02 %>-<%= nota.documento_numero %></td>
+	        <% if nota.moeda == 0 %>
+	          <td width="40" align="center">U$</td>
+	          <td width="80" align="right"> <%= format_decimal(nota.cobro_dolar) %></td>
+	          <td width="80" align="right"> <%= format_decimal(nota.anterior_us) %></td>
+	          <td width="80" align="right"> <%= format_decimal(nota.cobro_dolar.to_f - nota.anterior_us.to_f) %></td>
+	        <% elsif nota.moeda == 1 %>
+	          <td width="40" align="center">G$</td>
+	          <td width="80" align="right"> <%= format_int(nota.cobro_guarani) %></td>
+	          <td width="80" align="right"> <%= format_int(nota.anterior_gs) %></td>
+	          <td width="80" align="right"> <%= format_int(nota.cobro_guarani.to_f - nota.anterior_gs.to_f) %></td>
+	        <% else %>
+	          <td width="40" align="center">R$</td>
+	          <td width="80" align="right"> <%= format_decimal(nota.cobro_real) %></td>
+	          <td width="80" align="right"> <%= format_decimal(nota.anterior_rs) %></td>
+	          <td width="80" align="right"> <%= format_decimal(nota.cobro_real.to_f - nota.anterior_rs.to_f) %></td>
+	        <% end %>          
+        </tr>
+      <% end %>
+    </table>
+ </div>  

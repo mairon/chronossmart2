@@ -1,0 +1,23 @@
+<div class="rolagem" dir="div">
+  <table>
+    <% @frota.each do |f| %>
+      <tr>
+        <td width="80"><%= f.id.to_s.rjust(6,'0') %></td>
+        <td width="150">
+          <% if f.tipo == 0 %>
+            Proprio
+          <% else %>
+            Tercerizado
+          <% end %>
+          </td>
+          <td width="250"><%= f.proprietario_nome %></td>
+          <td width="250"><%= f.motorista_nome %></td>
+          <td width="250"><%= f.rodado_cavalo %></td>
+          <td width="250"><%= f.rodado_carreta %></td>
+          <td><%= link_to '', edit_tms_frotum_path(f), class: 'icon-pencil' %></td>
+          <td><%= link_to '', [:tms, f], :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+
+      </tr>
+    <% end %>
+  </table>
+</div>

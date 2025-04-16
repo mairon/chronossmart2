@@ -1,6 +1,43 @@
 class FinancasController < ApplicationController
 
-	respond_to :html, :pdf
+	def resultado_recebimentos
+		params[:unidade] = current_unidade.id
+		@financas         = Financa.resultado_recebimentos(params)
+
+		head =
+"
+																																						             #{current_unidade.nome_sys}
+																																																							RECEBIMIENTOS
+- Fecha...: #{params[:inicio]} hasta #{params[:final]}
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+		 Cod.    Fecha   Cliente                           Forma de Pago           Moneda            U$       Gs.       R$.
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+"
+
+		respond_to do |format|
+			format.html do
+				render  :pdf                    => "relatorio_financas",
+								:layout                 => "layer_relatorios",
+								 :formats => [:html],
+								:user_style_sheet       => '/assets/relatorios.css',
+								:show_as_html           => params[:debug].present?,
+								:margin => {:top        => '1.10in',
+														:bottom     => '0.25in',
+														:left       => '0.10in',
+														:right      => '0.10in'},
+								:header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
+														:font_size  => 7,
+														:left       => head,
+														:spacing    => 25},
+								:footer => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
+														:font_size  => 7,
+														:right      => "Pagina [page] de [toPage]",
+														:left       => "MercoSys Enterprise - Fecha de la imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
+			end
+		end
+	end
 
 	def calcula_valores_fluxo_caixa
 		@receber = Cliente.where(moeda: params[:moeda]).sum('divida_guarani')
@@ -59,6 +96,26 @@ class FinancasController < ApplicationController
 			end
 		end
 	end
+
+
+	def resultado_pagamentos
+		params[:unidade] = current_unidade.id
+
+		@financas         = Financa.resultado_pagamentos(params)
+        respond_to do |format|
+		      if params[:tipo] == '1'
+
+		        format.html {
+		          render :xlsx => "resultado_pagamentos", 
+		          filename: "resultado_pagamentos-#{params[:inicio]}-#{params[:final]}"
+		        } 
+           else
+            format.html do
+              	render :layout => 'relatorio_view'
+              end
+            end
+        end
+    end
 
 	def relatorio_financas
 
@@ -267,12 +324,26 @@ Cuentas                                Anterior         Entrada        Salida   
     @financa = Financa.new(params[:financa])
     respond_to do |format|
       if @financa.save
-        flash[:notice] = t('SAVE_SUCESSFUL_MESSAGE')
-          format.html { redirect_to(painel_financas_path(persona_id: @financa.persona_id)) }
+        if @financa.tabela == 'VIATICO_DEV'
+        	format.html { redirect_to(:back) }
+      	else
+      		format.html { redirect_to(painel_financas_path(persona_id: @financa.persona_id)) }
+        end
       else
         format.html { render :action => "new" }
       end
-    end
+  	end
   end
 
+
+  def destroy
+    @financa = Financa.find(params[:id])
+    @financa.destroy
+
+    respond_to do |format|
+      if @financa.tabela == 'VIATICO_DEV'
+        format.html { redirect_to(:back) }
+      end
+    end
+  end
 end

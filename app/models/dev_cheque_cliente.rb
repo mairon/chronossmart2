@@ -5,16 +5,16 @@ class DevChequeCliente < ActiveRecord::Base
 	belongs_to :conta
   validates :cotacao, :cotacao_real, :persona_id, :conta_id, presence: true
 	validates :cotacao, :cotacao_real, numericality:  { :greater_than => 0 }
-	before_save :calc
+	before_save :finds
 
-	def calc
-		c = Conta.find_by_id(self.conta_id)
-		self.moeda = c.moeda		
 
-		m = MotivosDevCheque.find_by_id(self.motivos_dev_cheque_id)
-		self.deb_cli = m.deb_cli_prov
+	def finds
+		mdc = MotivosDevCheque.find(self.motivos_dev_cheque_id)
+		self.deb_cli = mdc.deb_cli_prov
+
+		ct = Conta.find(self.conta_id)
+		self.moeda = ct.moeda
 	end
-
 	def self.lista_cheques(persona_id,moeda, conta_id)
 		sql = "SELECT
 									F.CHEQUE,
@@ -29,7 +29,7 @@ class DevChequeCliente < ActiveRecord::Base
 									MAX(F.SIGLA_PROC) AS SIGLA_PROC,
 									MAX(F.ID) AS ID
 					FROM FINANCAS F
-  				WHERE F.STATUS = 0 AND F.CONTA_ID = #{conta_id} AND F.PERSONA_ID = #{persona_id} AND F.MOEDA = #{moeda} AND CHEQUE_STATUS <> 0
+  				WHERE F.STATUS = 0 AND F.CONTA_ID = #{conta_id} AND F.PERSONA_ID = #{persona_id} AND F.MOEDA = 1 AND CHEQUE_STATUS <> 0
   				GROUP BY 1
   				HAVING 
   					SUM(F.ENTRADA_GUARANI - f.SAIDA_GUARANI) > 0

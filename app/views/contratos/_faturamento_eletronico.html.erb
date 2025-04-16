@@ -1,0 +1,110 @@
+  <div class="panel">
+		<header class="panel-heading">
+			Factura - Terminal: <%= @contrato.terminal.nome unless @contrato.terminal.blank? %>
+			<div class="pull-right">
+				<a href="#" data-toggle="modal" data-target="#modal-faturamento" class="btn btn-green"> +</a>
+			</div>
+		</header>
+    <div class="panel-content">
+
+        <table class="head_grid">
+          <tr>
+            <td width="70" align="center">Lanz.</td>
+            <td width="60">Nº</td>
+            <td width="60">CDC</td>
+            <td width="100" align="center">Estado SET</td>
+          </tr>
+        </table>
+
+        <div class="rolagem" dir="div" style="height: 180px">
+          <table>
+            <% @fts.each do |ft| %>
+            <% if ft.status == 2 %>
+              <% anulada  = 'li-ft' %>
+            <% end %>
+
+              <tr class = "<%= cycle("cor1", "cor2") %> <%= raw anulada %>">
+
+                <td  width="70" align="center">
+                  <%= ft.id %>
+                  <small>
+                    <%= ft.updated_at.strftime("%d/%m/%y") %>
+                    <%= ft.updated_at.strftime("%H:%M") %>
+                  </small>
+                </td>
+                <td  width="100"><%= ft.doc_01 %>.<%= ft.doc_02 %>.<%= ft.doc %></td>
+                <%
+
+                  data = {
+                      cdcList: [{
+                          cdc: "#{ft.cdc}"
+                      }]
+                  };
+
+                 url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/de/estado")
+
+                            http = Net::HTTP.new(url.host, url.port)
+                            http.use_ssl = true
+                            http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+                            request = Net::HTTP::Post.new(url)
+                            request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+                            request["content-type"] = 'application/json'
+                            request.body = data.to_json
+                            response = http.request(request)
+                            puts get_resp = JSON.parse(response.body)
+
+                %>
+
+                <% if ft.status == 1 %>
+                  <td  width="60" title="<%= ft.cdc %>"><small><%= ft.cdc.to_s[38..44] %></small></td>
+                  <td class="bold" width="100" align="center">
+                    <%= get_resp["deList"][0]["respuesta_mensaje"] %>
+                    <span class="btn-success">Activo</span>
+                  </td>
+                  <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(ft, status: '2', modal: 'true') %></td>
+                  <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>
+                    <td><%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: ft.cdc, id: ft.id) %></td>
+                <% else %>
+                  <td  width="60" title="<%= ft.cdc %>"><small><%= ft.cdc.to_s[38..44] %></small></td>
+                  <td class="bold" width="100" align="center">
+                    <%= get_resp["deList"][0]["respuesta_mensaje"] %>
+                    <span class="btn-danger">Anulado</span>
+                  </td>
+                  <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>
+                  <td><%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: ft.cdc, id: ft.id) %></td>
+                <% end %>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+				  <div class="modal fade" id="modal-faturamento" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+				    <div class="modal-dialog" role="document">
+				      <div class="modal-content">
+				        <div class="modal-header">
+				          <div class="close-button">
+				            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				          </div>
+				          <h1 class="modal-title-f" id="myModalLabelf">Datos de la Factura</h1>
+				        </div>
+				        <div class="modal-body">
+									<% unless @fts.present? %>
+										<div class="group">
+									    <%= render partial: "form_fiscals/attr_forms/contrato_update_ft_eletronico" %>
+										</div>
+									<% else %>
+										<% if @fts.first.status.to_i != 1 %>
+
+										<div class="group">
+											<%= render partial: "form_fiscals/attr_forms/contrato_update_ft_eletronico" %>
+										</div>
+										<% end %>
+									<% end %>
+				        </div>
+				      </div>
+				    </div>
+				  </div>

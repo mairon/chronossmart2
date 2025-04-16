@@ -1,0 +1,39 @@
+<div class="panel">
+	<h1 id="header">
+		Extracto
+	</h1>
+
+	<div class="panel-content">
+		<table class="list">
+			<tr class="head_grid">
+				<td align="center"><%= t('DATE')%></td>
+				<td>Origen</td>
+				<td>Descrição</td>
+				<td align="right">Debito</td>
+				<td align="right">Credito</td>
+				<td align="right">Saldo</td>
+				<% @saldo = 0 %>
+			</tr>		
+			<% @extrato.each do |a| %>
+				<tr class="<%= cycle("cor1", "cor2")%>">
+					<td width="60" align="center"><%= a.data.strftime("%d/%m/%y") %></td>
+					<td width="60" align="center"><%= a.sigla_proc %><%= a.cod_proc %></td>
+					<td width="200"><%= a.descricao %></td>
+					<% if @viatico.moeda == 0 %>
+						<td width="80" align="right"><%= format_decimal(a.divida_dolar) %></td>
+						<td width="80" align="right"><%= format_decimal(a.cobro_dolar) %></td>
+						<td width="80" align="right" class="bold"><%= format_decimal( @saldo += (a.divida_dolar.to_f - a.cobro_dolar.to_f )) %></td>
+					<% elsif @viatico.moeda == 1 %>
+						<td width="80" align="right"><%= format_int(a.divida_guarani) %></td>
+						<td width="80" align="right"><%= format_int(a.cobro_guarani) %></td>
+						<td width="80" align="right" class="bold"><%= format_int( @saldo += (a.divida_guarani.to_f - a.cobro_guarani.to_f )) %></td>
+					<% else %>
+						<td width="80" align="right"><%= format_decimal(a.divida_real) %></td>
+						<td width="80" align="right"><%= format_decimal(a.cobro_real) %></td>
+						<td width="80" align="right" class="bold"><%= format_decimal( @saldo += (a.divida_real.to_f - a.cobro_real.to_f )) %></td>
+					<% end %>
+				</tr>
+			<% end %>
+		</table>
+	</div>	
+</div>

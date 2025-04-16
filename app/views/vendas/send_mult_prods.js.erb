@@ -8,6 +8,7 @@ $("#total_guarani").html("<%= number_to_currency( ( (VendasProduto.sum(:total_gu
 
 $("#total_real").html("<%= number_to_currency(VendasProduto.sum(:total_real,   :conditions => ['venda_id = ?',@venda.id]), :format=>' %n ', :precision => 2)%>");
 
+window.location.reload();
 $("#new_vendas_produto")[0].reset();
 $('.first').focus();
  $('.button').attr({

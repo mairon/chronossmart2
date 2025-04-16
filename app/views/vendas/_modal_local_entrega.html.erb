@@ -1,0 +1,90 @@
+<div class="group">
+<table class="head_grid">
+  <tr>
+    <td width="200">Ciudad</td>
+    <td width="200">Direción</td>
+    <td width="200">Comple.</td>
+  </tr>
+</table>
+
+<div class="list" dir="div">
+  <table>
+    <% @persona_locais_entregas.each do |ple| %>
+      <tr class="<%= cycle("cor1", "cor2")%>"  
+        onClick="FechaLE('<%= ple.cidade.nome unless ple.cidade_id.blank? %>',
+            '<%= ple.direcao %>',
+            '<%= ple.obs %>',
+            '<%= ple.cidade_id %>',
+        )">
+        <td width="200"><%= ple.cidade.nome unless ple.cidade_id.blank? %></td>
+        <td width="200"><%= ple.direcao %></td>
+        <td width="200"><%= ple.obs %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+
+<hr>
+
+<%= form_for(PersonaLocaisEntrega.new, remote: true) do |f| %>
+  <%= f.hidden_field :persona_id %>
+
+  <div class="row panel-modal-body">
+    <div class="col-md-12">
+      <label>Ciudad</label>
+          <%= f.collection_select :cidade_id, Cidade.find_by_sql("SELECT C.ID, (E.NOME || ' > ' ||  C.NOME || ' > ' || D.NOME) AS NOME FROM CIDADES C
+            INNER JOIN DISTRITOS D
+            ON D.ID = C.DISTRITO_ID
+
+            INNER JOIN ESTADOS E
+            ON E.ID = D.ESTADO_ID
+
+            ORDER BY 2
+            "), :id, :nome, {prompt: 'Selecione a cidade'} %>
+    </div>
+
+    <div class="col-md-12">
+      <label>Direción</label>
+      <%= f.text_field :direcao, class: "panel-field" %>
+    </div>
+    <div class="col-md-12">
+      <br>
+      <%= f.text_area :obs, :rows => 2, placeholder: 'Complemento', class: "panel-field" %>
+    </div>
+
+    <div class="footer-buttons">
+      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+    </div>
+  </div>
+
+<% end %>
+
+<script>
+  function FechaLE(cidade,direcao,obs, cidade_id){
+    document.getElementById('venda_direcao').value = cidade;
+    document.getElementById('venda_cidade_nome').value = direcao;
+    document.getElementById('venda_cidade_id').value = cidade_id;
+    document.getElementById('venda_bairro').value = obs;
+    document.getElementById('venda_entrega').value = 'true';
+    $('#le_cidade').html(cidade);
+    $('#le_direcao').html(direcao);
+    $('#le_obs').html(obs);
+    $('#form_local_entrega').submit();
+
+    $('#myModalEntrega').modal('hide');
+  }
+
+
+  $(' #persona_locais_entrega_cidade_id').selectize();
+
+
+  $('#myModalEntrega').on('shown.bs.modal', function () {
+    $("#persona_locais_entrega_persona_id").val($('#venda_persona_id').val());
+    url="/persona_locais_entregas?persona_id=" + $('#venda_persona_id').val();
+    ajax(url);
+  })
+
+</script>
+
+<%= javascript_include_tag 'busca_ajax' %>
+

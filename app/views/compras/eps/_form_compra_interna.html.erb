@@ -22,8 +22,8 @@
 			<%= f.hidden_field :documento_numero_01, value: '000' %>
 			<%= f.hidden_field :documento_numero_02, value: '000' %>
 			<%= f.hidden_field :documento_timbrado, value: '00000000' %>
-		<% else %>	
-			<%= hidden_field_tag :moeda, @compra.moeda %>		
+		<% else %>
+			<%= hidden_field_tag :moeda, @compra.moeda %>
 		<% end %>
     <% sql = "SELECT PC.ID,
                      (PG.DESCRICAO || ' > ' || PC.DESCRICAO) AS DESCRICAO
@@ -34,7 +34,7 @@
               ORDER BY 2"
       plano = PlanoDeConta.find_by_sql(sql)
     %>
-	
+
 		<table>
 			<tr>
 				<td>
@@ -81,21 +81,21 @@
         		<label><%= t('CENTER_OF_COSTOS') %></label>
         		<%= f.collection_select :centro_custo_id, CentroCusto.all( :select => 'id,nome', :order  => '1' ),:id, :nome, { :prompt => 'Selecione' } %>
 					</td>
-					
+
 					<td colspan="2">
 		        <label><%= t('CLASSIFICATION') %></label>
-		        <%= f.collection_select :plano_de_conta_id, plano,:id, :descricao,{:prompt => 'Selecione'} %>						
+		        <%= f.collection_select :plano_de_conta_id, plano,:id, :descricao,{:prompt => 'Selecione'} %>
 					</td>
-				</tr>				
+				</tr>
 				<tr>
 					<td colspan="3">
 						<label>Numero</label>
 						<% if params[:action] == 'new' %>
-							<%= f.text_field :documento_numero, size: 25, maxlength: 25, required: true, placeholder: '0000001', value: @last_doc.to_s.rjust(6, '0') %>	
+							<%= f.text_field :documento_numero, size: 25, maxlength: 25, required: true, placeholder: '0000001', value: @last_doc.to_s.rjust(6, '0') %>
 						<% else %>
-							<%= f.text_field :documento_numero, size: 25, maxlength: 25, required: true, placeholder: '0000001' %>	
+							<%= f.text_field :documento_numero, size: 25, maxlength: 25, required: true, placeholder: '0000001' %>
 						<% end %>
-						
+
 					</td>
 				</tr>
 			</table>
@@ -114,7 +114,7 @@
 				<tr>
 					<%= field_us_label 'Descuento U$',f,:desconto_dolar %>
 				</tr>
-				<tr>						
+				<tr>
 					<%= field_us_label 'Total U$',f,:total_dolar %>
 				</tr>
 			</table>
@@ -123,7 +123,7 @@
 				<tr>
 					<%= field_us_label 'Descuento R$',f,:desconto_real %>
 				</tr>
-				<tr>						
+				<tr>
 					<%= field_us_label 'Total R$',f,:total_real %>
 				</tr>
 			</table>
@@ -143,7 +143,7 @@
 
 
 <% if params[:action] == 'new' %>
-	
+
 	<script>
 	  //cotacao
 		$(document).ready(function() {
@@ -197,7 +197,7 @@
 		    $(".valores-rs").show();
 		    $(".valores-us").hide();
 		    $(".valores-gs").hide();
-	   	}			
+	   	}
 		});
 	</script>
 <% end %>
@@ -224,7 +224,7 @@
 	}
 
   //calc valores
-  $( "#compra_exentas_guarani, #compra_gravadas_05_guarani, #compra_gravadas_10_guarani" ).blur(function() {  
+  $( "#compra_exentas_guarani, #compra_gravadas_05_guarani, #compra_gravadas_10_guarani" ).blur(function() {
   	var exentas_gs = $('#compra_exentas_guarani').val();
   	var grav_05_gs = $('#compra_gravadas_05_guarani').val();
   	var grav_10_gs = $('#compra_gravadas_10_guarani').val();
@@ -232,7 +232,7 @@
   	$('#compra_total_guarani').val(number_format(tot_gs, 0, ',', '.'));
   });
 
-  $( "#compra_exentas_dolar, #compra_gravadas_05_dolar, #compra_gravadas_10_dolar" ).blur(function() {  
+  $( "#compra_exentas_dolar, #compra_gravadas_05_dolar, #compra_gravadas_10_dolar" ).blur(function() {
   	var exentas_us = $('#compra_exentas_dolar').val();
   	var grav_05_us = $('#compra_gravadas_05_dolar').val();
   	var grav_10_us = $('#compra_gravadas_10_dolar').val();
@@ -240,7 +240,7 @@
   	$('#compra_total_dolar').val(number_format(tot_us, 2, ',', '.'));
   });
 
-  $( "#compra_exentas_real, #compra_gravadas_05_real, #compra_gravadas_10_real" ).blur(function() {  
+  $( "#compra_exentas_real, #compra_gravadas_05_real, #compra_gravadas_10_real" ).blur(function() {
   	var exentas_rs = $('#compra_exentas_real').val();
   	var grav_05_rs = $('#compra_gravadas_05_real').val();
   	var grav_10_rs = $('#compra_gravadas_10_real').val();
@@ -253,7 +253,7 @@
 <script type="text/javascript">
   $('#compra_centro_custo_id').selectize();
   $('#compra_plano_de_conta_id').selectize();
-	
+
 	$(function() {
 		$( "#compra_persona_nome" ).autocomplete({
 				source: function( request, response ) {

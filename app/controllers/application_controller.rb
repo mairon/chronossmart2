@@ -5,10 +5,14 @@ class ApplicationController < ActionController::Base
   helper ApplicationHelper
   before_filter :subdomain_change_database, :set_locale
 
- 
+
   def subdomain_change_database
     if request.subdomain.present? && request.subdomain != "www"
-      ActiveRecord::Base.establish_connection(website_connection(request.subdomain))
+      if request.subdomain == 'tresfronteira'
+        ActiveRecord::Base.establish_connection('development-s1')
+      else
+        ActiveRecord::Base.establish_connection(website_connection(request.subdomain))
+      end
     end
   end
 

@@ -1,106 +1,103 @@
-<%= form_tag gerar_cotas_credito_compras_path, :method => "get" do %>
-  <%= hidden_field_tag :id, @compra.id %>
-  <input type="hidden"  name="moeda" id="moeda"  size="5" value="" />
-  <input type="hidden"  name="cota" id="cota"  size="5" value="<%= ComprasFinanca.where(compra_id: @compra.id).size.to_i + 1 %>" />
-  <input type="hidden"  name="documento_numero_01" id="documento_numero_01"  size="5" value="<%= @compra.documento_numero_01 %>" />
-  <input type="hidden"  name="documento_numero_02" id="documento_numero_02"  size="5" value="<%= @compra.documento_numero_02 %>" />
-  <input type="hidden"  name="documento_numero" id="documento_numero"  size="10" value="<%= @compra.documento_numero %>" />
-  <input type="hidden" name="venci" id="venci" size="15" value="<%= @compra.data.strftime("%d/%m/%Y")%>" />
-  <input type="hidden"  name="cotas" id="cotas"  size="10" value="1" />
-  <input type="hidden"  name="cheque_status" id="cheque_status" value="0" />
-  <input type="hidden"  name="cred_deb" id="cred_deb" value="0" />
-  <input type="hidden"  name="tipo" id="tipo" value="0" />
+  <%= form_tag gerar_cotas_credito_compras_path, :method => "get" do %>
+    <%= hidden_field_tag :id, @compra.id %>
+    <input type="hidden"  name="data" id="data" value="<%= @compra.data %>" />
+    <input type="hidden"  name="moeda" id="moeda" value="" />
+    <input type="hidden"  name="cota" id="cota" value="<%= ComprasFinanca.where(compra_id: @compra.id).size.to_i + 1 %>" />
+    <input type="hidden"  name="documento_numero_01" id="documento_numero_01" value="<%= @compra.documento_numero_01 %>" />
+    <input type="hidden"  name="documento_numero_02" id="documento_numero_02" value="<%= @compra.documento_numero_02 %>" />
+    <input type="hidden"  name="documento_numero" id="documento_numero"  size="10" value="<%= @compra.documento_numero %>" />
+    <input type="hidden" name="venci" id="venci" value="<%= @compra.data.strftime("%d/%m/%Y")%>" />
+    <input type="hidden"  name="cotas" id="cotas" value="1" />
+    <input type="hidden"  name="cheque_status" id="cheque_status" value="0" />
+    <input type="hidden"  name="cred_deb" id="cred_deb" value="0" />
+    <input type="hidden"  name="tipo" id="tipo" value="0" />
+    
+    <div class="row">
+      <div class="col-md-6">
+        <label><%= t('FORM_OF_PAYMENT') %></label>
+        <%= select("busca", "forma_pago", FormaPago.where(gasto: true).select('id,nome').order(2).collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione' },
+          {autofocus: true, required: true, class: 'selectize' } ) %>
+      </div>
 
-    <div id="tab1" class="tab_content group conta">
-      <table>
-        <tr>
-          <td>
-            <label><%= t('DATE') %></label>
-            <input type="text" name="data" id="data" size="10" onkeyup="Formatadata(this,event)", value="<%= @compra.data.strftime("%d/%m/%Y")%>" required="true" />
-          </td>
-          <td colspan="3">
-            <label><%= t('FORM_OF_PAYMENT') %></label>
-            <%= select("busca", "forma_pago", FormaPago.all(:select => ' id,nome', :conditions => ["pago = true"],
-              :order => '2').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione' },
-              {autofocus: true, required: true, onchange: "fp(this.options[this.selectedIndex].value)"})   %>             
+      <div class="col-md-6">
+        <div class="pago_ant padding-btn" hidden>
+          <a href="javascript:void(0)" class="btn btn-blue" onClick="busca_pago_antecipado()">Buscar pago antecipado</a>
+          <input type="hidden" id="fact_an" name="fact_an">
+          <input type="hidden" id="fact_an_01" name="fact_an_01">
+          <input type="hidden" id="fact_an_02" name="fact_an_02">
+          <input type="hidden" id="fact_an_cota" name="fact_an_cota">
+        </div>
 
-            <div style="display:none; float: right" class="pago_ant">
-              <a href="javascript:void(0)" class="btn btn-blue" onClick="busca_pago_antecipado()">Buscar pago antecipado</a>
-              <input hidden="" type="text" id="fact_an" name="fact_an">
-              <input hidden="" type="text" id="fact_an_01" name="fact_an_01">
-              <input hidden="" type="text" id="fact_an_02" name="fact_an_02">
-              <input hidden="" type="text" id="fact_an_cota" name="fact_an_cota">
-            </div>
+        <div class="cheque_terc padding-btn" hidden>
+          <a href="javascript:void(0)" class="btn btn-blue" onClick="busca_cheque_terceiros()">Buscar <%= t('CHECKS') %></a>
+        </div>
 
-            <div style="display:none; float: right" class="cheque_terc">
-              <a href="javascript:void(0)" class="btn btn-blue " onClick="busca_cheque_terceiros()">Buscar <%= t('CHECKS') %></a>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 0px 10px">
-            <label><%= t('ACCOUNT') %></label>
-            <% if current_unidade.conta_multi_unidades == true %>
-              <%= select("busca", "conta", Conta.all(:select => ' id,nome', :conditions => ["status = true"], :order => '2').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione' },{required: true})   %>
-            <% else %>
-              <%= select("busca", "conta", Conta.all(:select => ' id,nome', :conditions => ["status = true and unidade_id = #{current_unidade.id}"], :order => '2').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione' },{required: true})   %>
-            <% end %>            
-          </td>
-          <td>
-            <label>Valor U$</label>
-            <input  type="tel"  name="valor_us" id="valor_us"  size="15" value="<%= format_decimal(@sum_dolar) %>" class = "money_us" dir="rtl" />
-          </td>                
-          <td>
-            <label>Valor Gs</label>
-            <input  type="tel"  name="valor_gs" id="valor_gs"  size="15" value="<%= format_int(@sum_guarani) %>" class = "money_gs" dir="rtl" />
-          </td>
-          <td>
-            <label>Valor R$</label>
-            <input  type="tel"  name="valor_rs" id="valor_rs"  size="15" value="<%= format_decimal(@sum_real) %>" class = "money_us" dir="rtl" />
-          </td> 
-        </tr>
+        <div class="apl-antecipo padding-btn" hidden>
+          <a href="javascript:void(0)" class="btn btn-blue busca-viatico acao_rm">Buscar Antecipos</a>
+        </div>
 
-        <tr>  
-          <td colspan="4"> 
-            <div style="display:none" class="group cheque">
-              <table>
-                <tr>  
-                  <td>
-                    <label>Banco</label>
-                    <%= select("busca", "banco_id", Persona.all(:select => ' id, nome', :conditions => ["tipo_banco = 1"],
-                                 :order => '2').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione lo Banco' })   %>
-                  </td>
-                  <td>
-                    <label>Numero:</label> 
-                    <%= text_field_tag :cheque %>
-                  </td>
-                  <td>
-                    <label class="titulo_data_dif">Venci/Diferido:</label>
-                    <input class="titulo_data_dif" type="text" name="diferido" id="diferido" size="10" onkeyup="Formatadata(this,event)", value="<%= @compra.data.strftime("%d/%m/%Y")%>" /> 
-                  </td>
-                  <td>
-                    <label>Titular:</label>
-                    <%= text_field_tag :titular %>
-                  </td>
-                </tr>
-              </table>
-            </div> 
-          </td> 
-        </tr>
-        <tr>  
-          <td colspan="4"  style="padding: 15px 10px"> 
- 
-          </td> 
-        </tr>
-        <tr>
-          <td colspan="4">
-            <%= submit_tag t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
-          </td>
-        </tr> 
-      </table>
+      </div>
     </div>
-<% end %>
 
+    <div class="row">
+      <div class="col-md-6">
+        <label><%= t('ACCOUNT') %></label>
+        <% if current_unidade.conta_multi_unidades == true %>
+          <%= select("busca", "conta", Conta.all(:select => ' id,nome', :conditions => ["status = true"], :order => '2').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione' },{required: true, class: 'selectize'})   %>
+        <% else %>
+          <%= select("busca", "conta", Conta.all(:select => ' id,nome', :conditions => ["status = true and unidade_id = #{current_unidade.id}"], :order => '2').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione' },{required: true, class: 'selectize'})   %>
+        <% end %>       
+      </div>
+
+        <div class="col-md-3 valores-gs" hidden>
+          <label>Monto Gs.</label>
+          <input  type="tel"  name="valor_gs" id="valor_gs"  size="10" value="<%= format_int(@sum_guarani) %>" class = "money_gs" dir="rtl" />
+          <input  type="hidden"  name="total_guarani" id="total_guarani"  size="10" value="<%= format_int(@sum_guarani) %>" class = "money_gs" dir="rtl" />
+        </div>
+
+        <div class="col-md-3 valores-us" hidden>
+          <label>Monto U$</label>
+          <input  type="tel"  name="valor_us" id="valor_us"  size="10" value="<%= format_decimal(@sum_dolar) %>" class = "money_us" dir="rtl" />
+          <input  type="hidden"  name="total_dolar" id="total_dolar"  size="10" value="<%= format_decimal(@sum_dolar) %>" class = "money_us" dir="rtl" />
+        </div>
+
+        <div class="col-md-3 valores-rs" hidden>
+          <label>Monto R$</label>
+          <input  type="tel"  name="valor_rs" id="valor_rs"  size="10" value="<%= format_decimal(@sum_real) %>" class = "money_us" dir="rtl" />
+          <input  type="hidden"  name="total_real" id="total_real"  size="10" value="<%= format_decimal(@sum_real) %>" class = "money_us" dir="rtl" />
+        </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 cheque" hidden>
+        <label>Banco</label>
+        <%= select("busca", "banco_id", Persona.where("tipo_banco = 1").select('id,nome').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Selecione lo Banco' },{class: 'selectize'})   %>      
+      </div>
+      <div class="col-md-3 cheque" hidden>
+        <label>Cheque</label>
+        <%= text_field_tag :cheque, nil, class: 'panel-field' %>
+      </div>
+
+      <div class="col-md-3 cheque" hidden>
+        <label>Titular</label>
+        <%= text_field_tag :titular, nil, class: 'panel-field' %>      
+      </div>    
+    </div>
+
+    <div class="row">
+      <div class="col-md-12 cheque-diferido" hidden>
+        <label>Diferido</label>
+        <input class="titulo_data_dif" type="text" name="diferido" id="diferido" size="10" onkeyup="Formatadata(this,event)", value="<%= @compra.data.strftime("%d/%m/%Y")%>" class='panel-field' /> 
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <br>
+        <%= submit_tag t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
+      </div>
+    </div>
+  <% end %>
 
 <script type="text/javascript">
 
@@ -115,139 +112,215 @@ $("#busca_conta").change(function() {
     success: function(data){
       $('#moeda').val(data);
       d = $('#moeda').val(); 
+      if (d == '1') {  
+        $(".valores-gs").show();
+        $(".valores-rs").hide();
+        $(".valores-us").hide();
+
+      } else if (d == '0') {
+        $(".valores-us").show();
+        $(".valores-rs").hide();
+        $(".valores-gs").hide();
+
+      } else if (d == '2') {
+        $(".valores-rs").show();
+        $(".valores-us").hide();
+        $(".valores-gs").hide();
+      };
+
     }
-  });
-
-     
+  });  
 });
-  $("#cheque_status").click(function() {
-    if($('#cheque_status').is(':checked')){
-      $("#numero_cheque").css('display','block');
-    }else{
-      $("#numero_cheque").css('display','none');
-    };
-  });
 
-  function fp(v) {
-    $("#forma_pg").val(v);
+//valida saldo viatico
+$("#valor_gs").change(function() {
+  if ($("#busca_forma_pago").val() == '25') {
+    var valor_gs = parseFloat( $('#valor_gs').val().replace(/\./g, "").replace(",", ".") )
+    var saldo_gs = parseFloat( $('#total_guarani').val().replace(/\./g, "").replace(",", ".") )
+    if (valor_gs > saldo_gs) {
+      alert('Valor Major que lo Saldo de Pendiente Antecipo!')
+      $('#valor_gs').val(number_format( saldo_gs, 0, ',', '.'));
+      $('#valor_gs').focus();
+    };
+  };
+})
+
+$("#valor_us").change(function() {
+  if ($("#busca_forma_pago").val() == '25') {
+    var valor_us = parseFloat( $('#valor_us').val().replace(/\./g, "").replace(",", ".") )
+    var saldo_us = parseFloat( $('#total_dolar').val().replace(/\./g, "").replace(",", ".") )
+    if (valor_us > saldo_us) {
+      alert('Valor Major que lo Saldo de Pendiente Antecipo!')
+      $('#valor_us').val(number_format( saldo_us, 2, ',', '.'));
+      $('#valor_us').focus();
+    };
+  };
+})
+
+$("#valor_rs").change(function() {
+  if ($("#busca_forma_pago").val() == '25') {
+    var valor_rs = parseFloat( $('#valor_rs').val().replace(/\./g, "").replace(",", ".") )
+    var saldo_rs = parseFloat( $('#total_real').val().replace(/\./g, "").replace(",", ".") )
+    if (valor_rs > saldo_rs) {
+      alert('Valor Major que lo Saldo de Pendiente Antecipo!')
+      $('#valor_rs').val(number_format( saldo_rs, 2, ',', '.'));
+      $('#valor_rs').focus();
+    };
+  };
+})
+
+  $("#busca_forma_pago").change(function() {
+    v = $("#busca_forma_pago").val();
     if( v == '5'){ //CHEQUE AO DIA
-      $(".cheque").css('display','block'); 
-      $(".cheque").css('background','#bdefbd');
-      $(".conta").css('background','#bdefbd');      
-      $(".titulo_data_dif").css('display','none');
+      $(".cheque").show();  
+      $(".apl-antecipo").hide();    
+      $(".conta").css('border-left','8px solid #28a745');      
+      $(".titulo_data_dif").hide();
       $("#cheque_status").val('1');
       $("#cred_deb").val('0');
-      $(".campo_data_dif").css('display','none');
-      $(".cheque_terc").css('display','none'); 
-      $(".pago_ant").css('display','none'); 
+      $(".campo_data_dif").hide();
+      $(".cheque_terc").hide(); 
+      $(".pago_ant").hide(); 
+      $(".cheque-diferido").hide();
       $('#busca_conta').prop('disabled',false);
       $('#busca_conta').prop('required',true);
       $('#cheque').prop('required',true);
+      $('#busca_conta')[0].selectize.enable();
       
     } else if( v == '6'){ //CHEQUE DIFERIDO
-      $(".cheque").css('display','block');
-      $(".cheque").css('background','#bdefbd');
-      $(".conta").css('background','#bdefbd');            
-      $(".titulo_data_dif").css('display','block');
+      $(".cheque").show(); 
+      $(".apl-antecipo").hide();     
+      $(".conta").css('border-left','8px solid #28a745');            
+      $(".titulo_data_dif").show();
       $("#cheque_status").val('1');
-      $(".campo_data_dif").css('display','block');
+      $(".campo_data_dif").show();
+      $(".cheque-diferido").show();
       $("#cred_deb").val('0');  
-      $(".cheque_terc").css('display','none'); 
-      $(".pago_ant").css('display','none'); 
+      $(".cheque_terc").hide(); 
+      $(".pago_ant").hide(); 
       $('#busca_conta').prop('disabled',false);
       $('#busca_conta').prop('required',true);
       $('#cheque').prop('required',true);
+      $('#busca_conta')[0].selectize.enable();
 
     } else if( v == '1'){ //CONTADO
-      $(".cheque").css('display','none');
-      $(".cheque").css('background','#bdefbd');
-      $(".conta").css('background','#bdefbd');            
-      $(".titulo_data_dif").css('display','none'); 
-      $(".campo_data_dif").css('display','none');
+      $(".cheque-diferido").hide();
+      $(".cheque").hide();  
+      $(".apl-antecipo").hide();    
+      $(".conta").css('border-left','8px solid #28a745');            
+      $(".titulo_data_dif").hide(); 
+      $(".campo_data_dif").hide();
       $("#cheque_status").val('0');
       $("#cred_deb").val('0');   
-      $(".cheque_terc").css('display','none'); 
-      $(".pago_ant").css('display','none');
+      $(".cheque_terc").hide(); 
+      $(".pago_ant").hide();
       $('#busca_conta').prop('disabled',false);
       $('#busca_conta').prop('required',true);
       $('#cheque').prop('required',false);
+      $('#busca_conta')[0].selectize.enable();
 
     } else if( v == '8'){ //VUELTO EFETIVO
-      $(".cheque").css('display','none'); 
-      $(".cheque").css('background','#ff6d6d');
-      $(".conta").css('background','#ff6d6d');    
-      $(".titulo_data_dif").css('display','none');    
-      $(".campo_data_dif").css('display','none');
+      $(".cheque-diferido").hide();
+      $(".cheque").hide(); 
+      $(".apl-antecipo").hide();
+      $(".conta").css('border-left','8px solid #dc3545');
+      $(".titulo_data_dif").hide();    
+      $(".campo_data_dif").hide();
       $("#cheque_status").val('0'); 
       $("#cred_deb").val('1');
-      $(".cheque_terc").css('display','none'); 
-      $(".pago_ant").css('display','none'); 
+      $(".cheque_terc").hide(); 
+      $(".pago_ant").hide(); 
       $('#busca_conta').prop('disabled',false);
       $('#busca_conta').prop('required',true);
       $('#cheque').prop('required',false);
+      $('#busca_conta')[0].selectize.enable();
 
     } else if( v == '9'){ //VUELTO CHEQUE
-      $(".cheque").css('display','block');
-      $(".cheque").css('background','#ff6d6d');
-      $(".conta").css('background','#ff6d6d');       
-      $(".titulo_data_dif").css('display','block');    
-      $(".campo_data_dif").css('display','block');
+      $(".cheque-diferido").hide();
+      $(".cheque").show();
+      $(".apl-antecipo").hide();
+      $(".conta").css('border-left','8px solid #dc3545');       
+      $(".titulo_data_dif").show();   
+      $(".campo_data_dif").show();
       $("#cred_deb").val('1');
       $("#cheque_status").val('1'); 
-      $(".cheque_terc").css('display','none');  
-      $(".pago_ant").css('display','none');  
+      $(".cheque_terc").hide();  
+      $(".pago_ant").hide();  
       $('#busca_conta').prop('disabled',false);
       $('#busca_conta').prop('required',true);
       $('#cheque').prop('required',true);
+      $('#busca_conta')[0].selectize.enable();
 
     } else if( v == '11'){ //PAGO CHEQUE TERCEIROS
-      $(".cheque").css('display','block'); 
-      $(".titulo_data_dif").css('display','block');
-      $(".cheque_terc").css('display','block');
-      $(".campo_data_dif").css('display','block');
+      $(".cheque-diferido").hide();
+      $(".cheque").show();
+      $(".apl-antecipo").hide();
+      $(".titulo_data_dif").show();
+      $(".cheque_terc").show();
+      $(".campo_data_dif").show();
       $("#cred_deb").val('0');
       $("#cheque_status").val('1'); 
-      $(".pago_ant").css('display','none'); 
+      $(".pago_ant").hide(); 
       $('#busca_conta').prop('disabled',false);
       $('#busca_conta').prop('required',true);
       $('#cheque').prop('required',true);
+      $('#busca_conta')[0].selectize.enable();
 
     } else if( v == '12'){  //PAGO ANTECIPADO
-      $(".pago_ant").css('display','block');
-      $(".cheque").css('background','#bdefbd');
-      $(".conta").css('background','#bdefbd');  
-      $(".titulo_data_dif").css('display','none'); 
-      $(".campo_data_dif").css('display','none'); 
-      $(".cheque").css('display','none');               
-      $(".titulo_data_dif").css('display','none');
+      $(".cheque-diferido").hide();
+      $(".pago_ant").show();   
+      $(".apl-antecipo").hide();
+      $(".conta").css('border-left','8px solid #28a745');
+      $(".titulo_data_dif").hide(); 
+      $(".campo_data_dif").hide(); 
+      $(".cheque").hide();               
+      $(".titulo_data_dif").hide();
       $("#cheque_status").val('0');
       $("#cred_deb").val('0');
-      $(".campo_data_dif").css('display','none');
-      $(".cheque_terc").css('display','none'); 
+      $(".campo_data_dif").hide();
+      $(".cheque_terc").hide(); 
       $('#busca_conta').prop('required',false);
       $('#busca_conta').prop('disabled',true);
       $("#busca_conta").val('0');
       $('#cheque').prop('required',false);
+      $('#busca_conta')[0].selectize.enable();
 
+    } else if( v == '25'){  //APLICACAO VIATICO
+      $(".conta").css('border-left','8px solid #28a745');
+      $(".cheque-diferido").hide();
+      $(".apl-antecipo").show();
+      $(".pago_ant").hide(); 
+      $(".titulo_data_dif").hide(); 
+      $(".campo_data_dif").hide(); 
+      $(".cheque").hide();
+      $(".titulo_data_dif").hide();
+      $("#cheque_status").val('0');
+      $("#cred_deb").val('0');
+      $(".campo_data_dif").hide();
+      $(".cheque_terc").hide(); 
+      $('#busca_conta').hide();
+      $('#busca_conta')[0].selectize.disable();
+      $('#cheque').prop('required',false);
     }
-  }
+
+  });
 
   $('#pagos_financa_vuelto').click(function() {
     if (this.checked) {
-      $(".tipo_vuelto").css('display','block');
+      $(".tipo_vuelto").show();
     } else {
-      $(".tipo_vuelto").css('display','none');
+      $(".tipo_vuelto").hide();
     } 
   });
 
   function abre_vuelto(v) {
     $("#cheque_tipo").val(v);
     if( v == '0'){
-      $(".box_vuelto").css('display','block');
-      $(".vuelto_cheque").css('display','none');
+      $(".box_vuelto").show();
+      $(".vuelto_cheque").hide();
     }else{
-      $(".box_vuelto").css('display','block');
-      $(".vuelto_cheque").css('display','block');
+      $(".box_vuelto").show();
+      $(".vuelto_cheque").show();
       
     };
   }
@@ -266,3 +339,19 @@ $("#busca_conta").change(function() {
   }
 
 </script>
+
+  <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="modal_viatico">
+    <div class="modal-dialog" role="document" style="width: 850px;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="close-button">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <h4 class="modal-title us" id="myModalLabel" align="center">Aplicar Viaticos</h4>
+        </div>
+        <div class="modal-body" style="padding: 10px 0px 10px 0px">
+          <%= render partial: "/compras/modal_viaticos" %>
+        </div>
+      </div>
+    </div>
+  </div>

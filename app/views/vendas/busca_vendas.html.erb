@@ -30,9 +30,9 @@
         <tr class = "<%= cycle("cor1", "cor2") %>">
           <td width="60" align="center" bgcolor="<%=color%>"><%= link_to v.id.to_s.rjust(6,'0'), financas_venda_path(v) %></td>
           <td width="50" align="center" bgcolor="<%=color%>" title="<%= v.usuario_nome %>"><%= v.usuario_created %></td>
-          <td width="60" align="center" bgcolor="<%=color%>"><%= v.cartao_nome %></td>                  
+          <td width="60" align="center" bgcolor="<%=color%>"><%= v.cartao_nome %></td>
 
-          <td width="80" align="center" bgcolor="<%=color%>"><%= v.data.strftime("%d/%m/%y")%></td>                  
+          <td width="80" align="center" bgcolor="<%=color%>"><%= v.data.strftime("%d/%m/%y")%></td>
           <td width="180" align="left" bgcolor="<%=color%>"><%= v.doc %></td>
           <td width="300" align="left" bgcolor="<%=color%>"><%= truncate( v.persona_nome, :length => 35 ) %></td>
           <td width="150" align="left" bgcolor="<%=color%>"><small><%= v.obs %></small></td>
@@ -51,14 +51,13 @@
           <% elsif current_user.tipo.to_i == 1 %>
             <td  bgcolor="<%=color%>"><%= link_to '',vendas_financa_venda_path(v), class: 'icon-pencil' %></td>
           <% else %>
-            <% if v.qtd.to_f == 0.00 or v.fin.to_i <= 0 %>
               <td  bgcolor="<%=color%>"><%= link_to '',venda_path(v), class: 'icon-pencil' %></td>
-            <% else %>
-              <td colspan="2" align="center" title="Lanzamiento Bloqueado"><%= image_tag("locked-padlock.png", height: 15) %></td>
-            <% end %>
           <% end %>
           <% if params[:processo] == "venda-finalizada" %>
             <td bgcolor="<%=color%>"><%= link_to image_tag("icon-coin.png", height: 16), financas_venda_path(v) %></td>
+          <% end %>
+          <% if @venda_config.entrega == true %>
+            <td bgcolor="<%=color%>"><a href="#" class="btn" data-toggle="modal" data-load-url="<%= modal_add_ordem_entregas_path(venda_id: v.id) %>" data-target="#ModalOrdemEntrega"><span class="material-symbols-outlined">local_shipping</span></a></td>
           <% end %>
         </tr>
       <% end %>

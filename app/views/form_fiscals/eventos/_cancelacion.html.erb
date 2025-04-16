@@ -1,0 +1,102 @@
+<div class="modal fade" id="modal-cancelacion" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="width: 250px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h1 id="myModalLabelf">Datos de lo Documiento</h1>
+      </div>
+
+      <div class="modal-body group" align="center">
+
+				<%= form_tag "#", remote: true, id: "send_cancelacion" do %>
+					<%= hidden_field_tag :inu_id, form_fiscal.id %>
+					<div class="row">
+						<div class="col-md-12">
+							<label>Motivo</label>
+							<%= text_area_tag :inu_motivo, nil, required: true %>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<br>
+							<a href="javascript:void(0)" class="btn btn-danger" id="submit_cancelacion">Cancelacion</a>
+						</div>
+					</div>
+				<% end %>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="ModalStatusCanc" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="row" align="center" style="padding: 15px">
+        	<div class="col-md-12">
+	        	<h1 id="data-status">Verificando Datos</h1>
+            <div id="data-erro-status" class='alert alert-danger'  role='alert' hidden> <ul></ul></div>
+            <div id="data-success-status" class='alert alert-success'  role='alert' hidden> <ul></ul></div>
+	        	<div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+
+	  $("#submit_cancelacion").click(function() {
+	  	$('.lds-ring').show("slow");
+	  	$("#ModalStatusCanc").modal();
+	    $.ajax({
+	        type: 'POST',
+	        url:  '/form_fiscals/cancelacion',
+	        data: $('#send_cancelacion').serialize(),
+	        dataType: "JSON",
+	        success: function(data) {
+	        	if (data['fe']['success'] == false){
+	            $("#data-erro-status").show();
+	            $.each(data['fe']['errores'], function(i, error) {
+	              $("#data-erro-status").append("<p>"+ data['fe']['errores'][i].error  +"</p>")
+	            })
+	        		$('.lds-ring').hide("slow");
+	        	} else {
+	 						$("#data-success-status").show();
+	              $("#data-success-status").append("<p>"+ data['fe']['result']['ns2:rRetEnviEventoDe']['ns2:gResProcEVe']['ns2:gResProc']['ns2:dMsgRes'] +"</p>")
+	        		location.reload();
+	        	}
+
+	          console.log(data);
+	        },
+
+	        error: function (jqXHR, exception) {
+		        var msg = '';
+		        if (jqXHR.status === 0) {
+		            msg = 'Not connect.\n Verify Network.';
+		        } else if (jqXHR.status == 404) {
+		            msg = 'Requested page not found. [404]';
+		        } else if (jqXHR.status == 500) {
+		            msg = 'Internal Server Error [500].';
+		        } else if (exception === 'parsererror') {
+		            msg = 'Requested JSON parse failed. '
+
+		        } else if (exception === 'timeout') {
+		            msg = 'Time out error.';
+		        } else if (exception === 'abort') {
+		            msg = 'Ajax request aborted.';
+		        } else {
+		            msg = 'Uncaught Error.\n' + jqXHR.responseText;
+		        }
+		        $("#data-erro-status").show();
+		        $("#data-erro-status").append("<p>"+ msg +"</p>")
+		    },
+	    });
+	  });
+  </script>

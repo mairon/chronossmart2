@@ -1,0 +1,46 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel">
+      <h1 id="header">
+        <%= link_to 'Fatura', gera_receber_tms_pedido_traslados_path(id: @pedido_traslado.id), class: 'btn btn-green' %>
+        <div class="pull-right">
+        </div>
+      </h1>
+
+      <div class="panel-content">
+        <table>
+          <tr class="head_grid">
+            <td>Doc</td>
+            <td align="right">Divida</td>
+            <td align="right">Pago</td>
+            <td align="right">Saldo</td>
+          </tr>
+          <% Cliente.select("min(id) as id, max(documento_numero_01) as doc_01, max(moeda) as moeda, max(liquidacao) as liquidacao, max(documento_numero_02) as doc_02, documento_numero, sum(divida_guarani) as divida_guarani, sum(divida_dolar)  as divida_dolar, sum(divida_real) as divida_real, sum(cobro_guarani) as cobro_guarani, sum(cobro_dolar)  as cobro_dolar, sum(cobro_real) as cobro_real").where(tabela: 'PEDIDO_TRASLADOS', tabela_id: @pedido_traslado.id).group(:documento_numero).each do |c| %>
+            <tr>
+              <td width="100"><%= c.doc_01 %>•<%= c.doc_02 %>•<%= c.documento_numero %></td>
+              <% if c.moeda.to_i == 0 %>
+                <td width="70" align="right"><%= format_decimal(c.divida_dolar) %></td>
+                <td width="70" align="right"><%= format_decimal(c.cobro_dolar) %></td>
+                <td width="70" align="right"><%= format_decimal(c.divida_dolar.to_f - c.cobro_dolar.to_f) %></td>
+              <% elsif c.moeda.to_i == 1 %>
+                <td width="70" align="right"><%= format_int(c.divida_guarani) %></td>
+                <td width="70" align="right"><%= format_int(c.cobro_guarani) %></td>
+                <td width="70" align="right"><%= format_int(c.divida_guarani.to_f - c.cobro_guarani.to_f) %></td>
+              <% elsif c.moeda.to_i == 2 %>
+                <td width="70" align="right"><%= format_decimal(c.divida_real) %></td>
+                <td width="70" align="right"><%= format_decimal(c.cobro_real) %></td>
+                <td width="70" align="right"><%= format_decimal(c.divida_real.to_f - c.cobro_real.to_f) %></td>
+              <% end %>
+              <% if c.liquidacao == 0 %>
+                <td width="60"><span class=" btn-warning">Pedente</span></td>
+              <% else %>
+                <td width="60"><span class="btn-success">Pago</span></td>
+              <% end %>
+              <td><%= link_to '', cliente_path(:id => c.id, :proc => 'pedido_traslado'), :confirm => 'Estas Seguro?', :method => :delete, :class => "icon-trash" %></td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

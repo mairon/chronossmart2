@@ -1,0 +1,34 @@
+<h1 id="header">
+Picos
+<div class="pull-right">
+<%= link_to 'Nuevo', new_bico_path, :class => "button add" %>
+</div>
+</h1>
+<table class="head_grid">
+  <tr>
+    <td width="200">Pico</td>
+    <td width="100" align="right">Precio</td>
+    <td width="300">Deposito</td>
+    <td width="100">Bico Auto</td>
+    <td width="85"></td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+<table>
+<% @bicos.each do |bico| %>
+  <tr class = "<%= cycle("cor1", "cor2") %>">
+    <td width="200" align="left"><%= bico.nome %></td>
+    <td width="100" align="right"><%= format_int(bico.preco_gs) %></td>
+    <td width="300" align="left"><%= bico.deposito.nome unless bico.deposito.nil? %></td>
+    <td width="100" align="left"><%= bico.bico_auto %></td>
+    <td><%= link_to '', edit_bico_path(bico), class: 'icon-pencil' %></td>
+    <td><%= link_to '', bico, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+  </tr>
+<% end %>
+</table>
+</div>
+
+        
+   
+

@@ -62,7 +62,9 @@ $(function() {
     minLength: 2,
     select: function( event, ui ) {
       $("#transferencia_deposito_detalhe_produto_id").val("");
+
       $('#transferencia_deposito_detalhe_produto_id').val(ui.item.id);
+      $('#transferencia_deposito_detalhe_produto_nome').val(ui.item.name);
       return false;
     }
   });

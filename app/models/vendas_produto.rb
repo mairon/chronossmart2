@@ -6,6 +6,7 @@ class VendasProduto < ActiveRecord::Base
   belongs_to :deposito
   has_many :vendas_produtos_comps, :dependent => :destroy
   has_many :evento_convidados, :dependent => :destroy
+  has_many :ordem_entrega_produtos, dependent: :destroy
   has_and_belongs_to_many :produto_composicaos
   has_one :presupuesto_produto
   validates_presence_of :produto_nome, :quantidade

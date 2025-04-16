@@ -1,0 +1,54 @@
+
+<table class="head_grid">
+  <tr>
+    <td width="80">Cod</td>
+    <td width="80">Cod Ext</td>
+    <td width="80">Fecha</td>
+    <td width="100">Tipo</td>
+    <td width="250">Cliente</td>
+    <td width="150">Origem</td>
+    <td width="150">Destino</td>
+    <td width="100" align="right">Valor</td>
+    <td width="100" align="right">Ordem Cargas</td>
+
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @pedido_traslados.each do |p| %>
+      <tr>
+        <td width="80"><%= link_to p.id.to_s.rjust(6,'0'), tms_pedido_traslado_path(p)  %></td>
+        <td width="80"><%= p.cod_ext %></td>
+        <td width="80"><%= p.data.strftime("%d/%m/%y") %></td>
+        <td width="100">
+          <% if p.tipo == 0 %>
+            Importação
+          <% elsif p.tipo == 1 %>
+            Exportação
+          <% elsif p.tipo == 2 %>
+            Nacional
+          <% elsif p.tipo == 3 %>
+            Frete Terceiro
+          <% end %>          
+        </td>
+        <td width="250"><%= p.persona_nome %></td>
+        <td width="150"><%= p.origem_nome %></td>
+        <td width="150"><%= p.destino_nome %></td>
+        <td width="100" align="right">
+          <% if p.moeda.to_i == 0 %>
+            U$ <%=  format_decimal(p.valor_us) %>
+          <% elsif p.moeda.to_i == 1 %>
+            Gs. <%= format_int(p.valor_gs) %>
+          <% elsif p.moeda.to_i == 2 %>
+            R$ <%=  format_decimal(p.valor_rs) %>
+          <% end %>
+        </td>
+        <td width="150"><%= p.ctd_ordem_cargas %></td>
+          <td><%= link_to '', edit_tms_pedido_traslado_path(p), class: 'icon-pencil' %></td>
+          <td><%= link_to '', [:tms, p], :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

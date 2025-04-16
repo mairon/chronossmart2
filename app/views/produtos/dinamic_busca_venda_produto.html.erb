@@ -14,22 +14,21 @@
   <table>
     <% count = 0 %>
     <% @produtos.each do |p| %>
+
       <tr class = "<%= cycle( "cor1", "cor2" )%>"
-          onMouseOver="javascript:this.style.backgroundColor='#e6ebf2'"
-          onMouseOut="javascript:this.style.backgroundColor=''"
           onclick="Fecha( '<%= p.nome %>',
                                     '<%= p.produto_id %>',
                                     '<%= number_to_currency(p.preco_1_gs, :format=>'%n', :precision => 0)  %> ',
                                     '<%= number_to_currency(p.preco_1_us, :format=>'%n', :separator => ",")  %>',
                                     '<%= number_to_currency(p.preco_1_rs, :format=>'%n', :separator => ",")  %>' )" data-plus-as-tab="false"
           >
-
-      <td  width="20" class="<%= count %>"><input type="text" id="<%= count %>" value="<%= count %>" size="1" style="border: none; height: 3px !important"
-                onkeypress="Fecha( '<%= p.nome %>',
+      <td width="35" class="<%= count %>"><input type="text" id="<%= count %>" class="<%= count %>" value="<%= count %>" size="1" style="border: none;"
+          onkeypress="Fecha( '<%= p.nome %>',
                                     '<%= p.produto_id %>',
                                     '<%= number_to_currency(p.preco_1_gs, :format=>'%n', :precision => 0)  %>',
                                     '<%= number_to_currency(p.preco_1_us, :format=>'%n', :separator => ",")  %>',
-                                    '<%= number_to_currency(p.preco_1_rs, :format=>'%n', :separator => ",")  %>' )" data-plus-as-tab="false" ></td>
+                                    '<%= number_to_currency(p.preco_1_rs, :format=>'%n', :separator => ",")  %>' )" data-plus-as-tab="false"></td>
+
         <td width="100" class="<%= count %>"> <%= p.fabricante_cod %> </td>
         <td width="150" class="<%= count %>"> <%= p.barra %> </td>
         <td width="500" class="<%= count %>"> <%= p.produto_id.to_s.rjust(6,'0')%>-<%= p.nome %></td>

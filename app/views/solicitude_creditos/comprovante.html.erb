@@ -4,7 +4,7 @@
 	</tr>
 </table>
 
-<div style="display: block;">	
+<div style="display: block;">
 	<div style="float:left; font-size: 10px; text-align: left;">
 		<%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 60, style: 'float:left') %>
 	</div>
@@ -66,7 +66,7 @@
 
         <div class="panel">
           <h1 id="header">
-            
+
             <div class="pull-right">
             </div>
           </h1>
@@ -89,10 +89,24 @@
 	                <label>Vendedor</label><br>
 	                <%= Persona.find(@solicitude_credito.plano_venda.vendedor_id).nome %>
           			</td>
-
-
           		</tr>
 
+              <tr>
+                <td width="300">
+                  <label>Seguro</label><br>
+                <% seg = Persona.find(@solicitude_credito.plano_venda.persona_seguro_id) unless @solicitude_credito.plano_venda.persona_seguro_id.blank? %>
+                <%= seg.nome unless @solicitude_credito.plano_venda.persona_seguro_id.blank? %>
+
+                </td>
+
+                <td width="300">
+                <label>Factura</label><br>
+                  <% vd = Venda.find_by_plano_venda_id(@solicitude_credito.plano_venda_id) %>
+                  <% unless vd.blank? %>
+                    <%= vd.documento_numero_01 %>-<%= vd.documento_numero_02 %>-<%= vd.documento_numero.to_s.rjust(7,'0') %>
+                  <% end %>
+                </td>
+              </tr>
           	</table>
           </div>
         </div>
@@ -115,12 +129,12 @@
           		<tr>
           			<td width="500">
 	                <label>Nombre y Apellido</label><br>
-	                <%= @solicitude_credito.plano_venda.persona.nome %>          				
+	                <%= @solicitude_credito.plano_venda.persona.nome %>
           			</td>
           			<td>
                   <label>Nº de Cedula/RUC</label><br>
                   <%= @solicitude_credito.plano_venda.persona.ruc %>
-          				
+
           			</td>
 
           		</tr>
@@ -132,18 +146,18 @@
 
           			<td>
 	                <label>Teléfono</label><br>
-	                <%= @solicitude_credito.plano_venda.persona.telefone %>          				
+	                <%= @solicitude_credito.plano_venda.persona.telefone %>
           			</td>
-          			
+
           		</tr>
           		<tr>
           			<td colspan="4">
                   <label>Fecha Nac.</label><br>
                   <%= @solicitude_credito.plano_venda.persona.data_nascimento.strftime("%d/%m/%Y") unless @solicitude_credito.plano_venda.persona.data_nascimento.blank? %>
-          				
+
           			</td>
           		</tr>
-          	</table>          	
+          	</table>
           </div>
         </div>
       </div>
@@ -162,7 +176,7 @@
           <div class="panel-body">
           		<table>
           			<tr>
-          				<td width="300"> 
+          				<td width="300">
                     <label>Profesión</label><br>
                     <%= @solicitude_credito.plano_venda.persona.profisao %>
           				</td>
@@ -173,7 +187,7 @@
                   <td>
                     <label>Empresa</label><br>
                     <%= @solicitude_credito.plano_venda.persona.referencia1 %>
-                    
+
                   </td>
           			</tr>
           			<tr>
@@ -189,9 +203,9 @@
                   <td>
                     <label>Ingresos</label><br>
                     <%= @solicitude_credito.plano_venda.persona.salario %>
-                    
-                  </td> 
-          			</tr> 
+
+                  </td>
+          			</tr>
           		</table>
           </div>
         </div>
@@ -273,11 +287,11 @@
           		<tr>
           			<td>
 	                <label>Nombre y Apellido</label><br>
-	                <%= @solicitude_credito.garantia_01_nome %>          				
+	                <%= @solicitude_credito.garantia_01_nome %>
           			</td>
           			<td>
                 	<label>Nº de Cedula</label><br>
-                	<%= @solicitude_credito.garantia_01_documento %>          				
+                	<%= @solicitude_credito.garantia_01_documento %>
           			</td>
           		</tr>
           		<tr>
@@ -287,23 +301,23 @@
           			</td>
           			<td>
 	                <label>Cargo</label><br>
-	                <%= @solicitude_credito.garantia_01_cargo %>          				
+	                <%= @solicitude_credito.garantia_01_cargo %>
           			</td>
           		</tr>
           		<tr>
           			<td>
 	                <label>Teléfono</label><br>
-	                <%= @solicitude_credito.garantia_01_telefone %>          				
+	                <%= @solicitude_credito.garantia_01_telefone %>
           			</td>
           			<td>
 	                <label>Empresa</label><br>
-	                <%= @solicitude_credito.garantia_01_empresa %>          				
+	                <%= @solicitude_credito.garantia_01_empresa %>
           			</td>
           		</tr>
           		<tr>
           			<td>
 	                <label>Domicilio</label><br>
-	                <%= @solicitude_credito.garantia_01_domicio %>          				
+	                <%= @solicitude_credito.garantia_01_domicio %>
           			</td>
           			<td>
                 	<label>Dirección de Trabajo</label><br>
@@ -335,11 +349,11 @@
           		<tr>
           			<td>
 	                <label>Nombre y Apellido</label><br>
-	                <%= @solicitude_credito.garantia_02_nome %>          				
+	                <%= @solicitude_credito.garantia_02_nome %>
           			</td>
           			<td>
                 	<label>Nº de Cedula</label><br>
-                	<%= @solicitude_credito.garantia_02_documento %>          				
+                	<%= @solicitude_credito.garantia_02_documento %>
           			</td>
           		</tr>
           		<tr>
@@ -349,23 +363,23 @@
           			</td>
           			<td>
 	                <label>Cargo</label><br>
-	                <%= @solicitude_credito.garantia_02_cargo %>          				
+	                <%= @solicitude_credito.garantia_02_cargo %>
           			</td>
           		</tr>
           		<tr>
           			<td>
 	                <label>Teléfono</label><br>
-	                <%= @solicitude_credito.garantia_02_telefone %>          				
+	                <%= @solicitude_credito.garantia_02_telefone %>
           			</td>
           			<td>
 	                <label>Empresa</label><br>
-	                <%= @solicitude_credito.garantia_02_empresa %>          				
+	                <%= @solicitude_credito.garantia_02_empresa %>
           			</td>
           		</tr>
           		<tr>
           			<td>
 	                <label>Domicilio</label><br>
-	                <%= @solicitude_credito.garantia_02_domicio %>          				
+	                <%= @solicitude_credito.garantia_02_domicio %>
           			</td>
           			<td>
                 	<label>Dirección de Trabajo</label><br>
@@ -373,6 +387,70 @@
           			</td>
           		</tr>
           	</table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+    <% end %>
+
+    <% if @solicitude_credito.garantia_03_nome != '' %>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel">
+          <h1 id="header">
+            Garante 03
+            <div class="pull-right">
+            </div>
+          </h1>
+
+          <div class="panel-body">
+            <table>
+              <tr>
+                <td width="500"><h1 id="header">DATOS PERSONALES</h1></td>
+                <td><h1 id="header">DATOS FINANCIEROS</h1></td>
+              </tr>
+              <tr>
+                <td>
+                  <label>Nombre y Apellido</label><br>
+                  <%= @solicitude_credito.garantia_03_nome %>
+                </td>
+                <td>
+                  <label>Nº de Cedula</label><br>
+                  <%= @solicitude_credito.garantia_03_documento %>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label>Fecha Nac.</label><br>
+                  <%= @solicitude_credito.garantia_03_data_nascimento.strftime("%d/%m/%Y") unless @solicitude_credito.garantia_03_data_nascimento.blank? %>
+                </td>
+                <td>
+                  <label>Cargo</label><br>
+                  <%= @solicitude_credito.garantia_03_cargo %>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label>Teléfono</label><br>
+                  <%= @solicitude_credito.garantia_03_telefone %>
+                </td>
+                <td>
+                  <label>Empresa</label><br>
+                  <%= @solicitude_credito.garantia_03_empresa %>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label>Domicilio</label><br>
+                  <%= @solicitude_credito.garantia_03_domicio %>
+                </td>
+                <td>
+                  <label>Dirección de Trabajo</label><br>
+                  <%= @solicitude_credito.garantia_03_endereco_trabalho %>
+                </td>
+              </tr>
+            </table>
           </div>
         </div>
       </div>
@@ -394,7 +472,7 @@
           		<tr>
           			<td width="300">
 	                <label>Marca</label><br>
-	                <%= @solicitude_credito.plano_venda.produto.clase.descricao %>          				
+	                <%= @solicitude_credito.plano_venda.produto.clase.descricao %>
           			</td>
           			<td>
                   <label>Modelo</label><br>
@@ -418,7 +496,7 @@
                   <label>Chassis Nº</label>
                   <%= @solicitude_credito.plano_venda.produto.chassi %>
                 </td>
-          		</tr>          		
+          		</tr>
           	</table>
           </div>
         </div>
@@ -440,28 +518,28 @@
           	<table>
           		<tr>
           			<td width="500">
-	                <label>Marca</label><br>	
-                  <%= @solicitude_credito.usado_marca %>                
+	                <label>Marca</label><br>
+                  <%= @solicitude_credito.usado_marca %>
           			</td>
           			<td>
-	                <label>Año</label><br>	 
-                  <%= @solicitude_credito.usado_ano %>               
+	                <label>Año</label><br>
+                  <%= @solicitude_credito.usado_ano %>
           			</td>
           		</tr>
           		<tr>
           			<td>
-	                <label>Modelo</label><br>	 
-                  <%= @solicitude_credito.usado_modelo %>               
+	                <label>Modelo</label><br>
+                  <%= @solicitude_credito.usado_modelo %>
           			</td>
           			<td>
-	                <label>Color</label><br>	
-                  <%= @solicitude_credito.usado_cor %>                
+	                <label>Color</label><br>
+                  <%= @solicitude_credito.usado_cor %>
           			</td>
           		</tr>
           		<tr>
           			<td>
 	                <label>Tipo</label><br>
-                  <%= @solicitude_credito.usado_tipo %>                
+                  <%= @solicitude_credito.usado_tipo %>
           			</td>
           			<td>
 	                <label>Chapa Nº</label><br>
@@ -493,7 +571,7 @@
           </div>
         </div>
       </div>
-    </div>    
+    </div>
 
 
     <div class="row">
@@ -511,7 +589,7 @@
           			<td>
 	                <label>Monto</label><br>
 	                <%= format_decimal(@solicitude_credito.plano_venda.valor_us) %>
-          				
+
           			</td>
           		</tr>
           	</table>
@@ -531,13 +609,13 @@
                 <% if pv.valor_us.to_i > 0 %>
                   <tr class = "<%= cycle("cor1", "cor2") %>">
                     <td width="80"><%= pv.nome %></td>
-                    <td width="200"><%= pv.quantidade.to_i %>x de <%= format_decimal(pv.valor_us) %></td>                    
+                    <td width="200"><%= pv.quantidade.to_i %>x de <%= format_decimal(pv.valor_us) %></td>
                     <td width="250"><small><%= pv.obs %></small></td>
                   </tr>
                   <% end %>
                 <% end %>
                 </table>
-              </div>    
+              </div>
 
 
             </div>
@@ -545,7 +623,7 @@
         </div>
       </div>
     </div>
-      
+
     <div class="row">
       <div class="col-md-12">
         <div class="panel">
@@ -560,7 +638,7 @@
           		<tr>
 	          		<td>
 	                <label>Referencia 01</label><br>
-	                <%= @solicitude_credito.referencia_comercial_01 %>       			
+	                <%= @solicitude_credito.referencia_comercial_01 %>
 	          		</td>
           		</tr>
           		<tr>
@@ -593,14 +671,14 @@
           			</td>
                 <td>
                 <label>Contacto</label><br>
-                <%= @solicitude_credito.referencia_pessoal_contato_01 %>                  
+                <%= @solicitude_credito.referencia_pessoal_contato_01 %>
                 </td>
           		</tr>
 
           		<tr>
           			<td>
 	                <label>02 - Nombre y Apellido</label><br>
-	                <%= @solicitude_credito.referencia_pessoal_02 %>			
+	                <%= @solicitude_credito.referencia_pessoal_02 %>
           			</td>
                 <td>
                   <label>Contacto</label><br>
@@ -611,7 +689,7 @@
               <tr>
                 <td>
                   <label>03 - Nombre y Apellido</label><br>
-                  <%= @solicitude_credito.referencia_pessoal_03 %>      
+                  <%= @solicitude_credito.referencia_pessoal_03 %>
                 </td>
                 <td>
                   <label>Contacto</label><br>
@@ -622,13 +700,13 @@
               <tr>
                 <td>
                   <label>04 - Nombre y Apellido</label><br>
-                  <%= @solicitude_credito.referencia_pessoal_04 %>      
+                  <%= @solicitude_credito.referencia_pessoal_04 %>
                 </td>
                 <td>
                   <label>Contacto</label><br>
                   <%= @solicitude_credito.referencia_pessoal_contato_04 %>
                 </td>
-              </tr>              
+              </tr>
           		<tr>
           			<td>
                 	<label>Obs</label><br>
@@ -640,7 +718,7 @@
           </div>
         </div>
       </div>
-    </div>   
+    </div>
 
     <div  style="font-size: 7px; color:#fff; background-color: #C14338; padding: 10px">
 
@@ -649,8 +727,8 @@
 				mi/nosotros declarados, ya sea por procedimiento telefónico o por medio de visitas a los domicilios particulares y/o laborales proveídos, a fin de que puedan contar con los elementos de juicio y análisis necesarios para la concesión del crédito que me/nos encuentro/amos gestionando ante vuestra empresa.
 
 				Por otra parte, y en forma irrevocable, les autorizo/amos, además, en caso de un atraso superior a los 90 días en el pago del presente, crédito o cualquier otra deuda pendiente que mantenga/mos con esa empresa a que incluyan mi/nuestros nombre/es personal/es o Razón Social que
-				represento/amos, en el Registro Oficial o Privado de carácter público o privado en agencia de datos, o de cualquier base de datos o empresas divulgadora de información. Asimismo, autorizo/amos irrevocablemente a suministrar la información sobre mi/nuestra situación patrimonial, solvencia económica, el cumplimiento de mi/nuestras obligaciones comerciales a su casa matriz, empresas del grupo, subsidiarias y sucursales, y las demás entidades del sistema financiero, conforme.    	
-    </div> 
+				represento/amos, en el Registro Oficial o Privado de carácter público o privado en agencia de datos, o de cualquier base de datos o empresas divulgadora de información. Asimismo, autorizo/amos irrevocablemente a suministrar la información sobre mi/nuestra situación patrimonial, solvencia económica, el cumplimiento de mi/nuestras obligaciones comerciales a su casa matriz, empresas del grupo, subsidiarias y sucursales, y las demás entidades del sistema financiero, conforme.
+    </div>
   </div>
 
 	<table style="font-size: 13px;">
@@ -661,19 +739,19 @@
 			</td>
 			<td width="300">
 				__________________________________________ <br>
-				Firma Co-Deudor				
+				Firma Co-Deudor
 			</td>
 		</tr>
 		<tr>
 			<td width="300">
 				__________________________________________ <br>
 				Aclaración
-			</td>			
+			</td>
 
 			<td width="300">
 				__________________________________________ <br>
 				Aclaración
-			</td>	
+			</td>
 
 			<tr>
 				<td width="300">
@@ -682,12 +760,12 @@
 				</td>
 				<td width="300">
 					__________________________________________ <br>
-					Nº de Cédula		
+					Nº de Cédula
 				</td>
 			</tr>
 		</tr>
 	</table>
-	
+
 	<table style="font-size: 14px;">
 		<tr>
 			<td width="300">
@@ -696,19 +774,19 @@
 			</td>
 			<td width="300">
 				__________________________________________ <br>
-				Firma Co-Deudor				
+				Firma Co-Deudor
 			</td>
 		</tr>
 		<tr>
 			<td width="300">
 				__________________________________________ <br>
 				Aclaración
-			</td>			
+			</td>
 
 			<td width="300">
 				__________________________________________ <br>
 				Aclaración
-			</td>	
+			</td>
 
 			<tr>
 				<td width="300">
@@ -717,12 +795,12 @@
 				</td>
 				<td width="300">
 					__________________________________________ <br>
-					Nº de Cédula		
+					Nº de Cédula
 				</td>
 			</tr>
 		</tr>
 	</table>
 
-	
+
 
 

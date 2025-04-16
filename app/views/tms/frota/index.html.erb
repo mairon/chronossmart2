@@ -1,0 +1,49 @@
+<h1 id="header">
+  <%= t('fleet') %>
+  <div class="pull-right">
+    <%= link_to t("NEW"), '#', class: 'button add', 'data-toggle' => "modal", 'data-target' => "#form_modal", 'data-dismiss' => "modal", 'aria-labe' => "Close" %>
+  </div>
+</h1>
+
+<div>
+  <%= form_tag "#", :method => "get", id: "form_v" do %>
+    <table class="head_grid">   
+    <tr>
+      <td width="80"><label>Codigo</label><input class="panel-field" id="codigo" name="codigo" type="search" onkeyup = "pesquisa(this.value),f(this)"onkeydown = "f(this)"/></td>
+      <td width="150"><label>Tipo</label><%= select_tag :tipo, options_for_select([['TODOS', ''],['PROPRIO', '0'],['TERCERIZADO', '1']]) %></td>
+      <td width="250"><label><%= t("owner") %></label><input class="panel-field" id="proprietario_id" name="proprietario_id" type="search" onkeyup = "pesquisa(this.value),f(this)"onkeydown = "f(this)"/></td>
+      <td width="250"><label><%= t("driver") %></label><input class="panel-field" id="motorista_id" name="motorista_id" type="search" onkeyup = "pesquisa(this.value),f(this)"onkeydown = "f(this)"/></td>
+      <td width="250"><label><%= t("plate-horse") %></label><input class="panel-field" id="rodado_cavalo" name="rodado_cavalo" type="search" onkeyup = "pesquisa(this.value),f(this)"onkeydown = "f(this)"/></td>
+      <td width="250"><label><%= t("plate-trailer")%></label><input class="panel-field" id="rodado_carreta" name="rodado_carreta" type="search" onkeyup = "pesquisa(this.value),f(this)"onkeydown = "f(this)"/></td>
+    </tr>
+    </table>
+  <% end %>
+</div>
+
+
+ <div id="pagina"></div>
+
+<script language="javascript">
+  function pesquisa(valor){
+    url="/tms/frota/busca_frota?" + $('#form_v').serialize();
+    ajax(url);
+  }
+</script>
+
+<%= javascript_include_tag 'busca_ajax' %>
+
+<div class="modal fade" id="form_modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog " role="document" style=" width: 600px !important; ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel"><%= t('NEW') %> <span class="cota"></span></h4>
+      </div>
+      <div class="modal-body">
+        <%= render 'form' %>
+      </div>
+    </div>
+  </div>
+</div>

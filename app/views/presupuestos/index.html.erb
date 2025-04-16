@@ -2,7 +2,6 @@
 <div class="acessos">
   <%= link_to t('NEW'), new_presupuesto_path ,:class => 'button add'%>
 </div>
-
 <div class="group">
     <%= form_tag busca_presupuestos_path, :method => "get" do %>
       <table>
@@ -26,7 +25,7 @@
             <select name="status" id="status">
               <option value="0">PENDIENTE</option>
               <option value="1">EN PROCESO</option>
-              <option value="2">PARCIAL</option>              
+              <option value="2">PARCIAL</option>
               <option value="3">FINALIZADO</option>
               <option>TODOS</option>
             </select>

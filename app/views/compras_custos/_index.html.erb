@@ -3,7 +3,13 @@
   <td width="110" align="center">Compt.</td>
   <td width="150"><%= t('UNIT') %></td>
   <td width="150">Rodado</td>
+  <td width="150">CC</td>
+  <% if Empresa.last.segmento.to_i == 3 %>
+    <td width="150">Ordem Carga</td>
+    <td width="150">Pedido Traslado</td>
+  <% end %>
   <td width="150">Empleado</td>
+
   <td width="350"><%= t('CLASSIFICATION') %></td>
   <td width="100" align="right"><%= t('VALUE') %></td>
   <td width="30"></td>
@@ -18,6 +24,11 @@
         <td width="110" align="center"><%= compras_custo.data.to_date.strftime("%d/%m/%y") %></td>
         <td width="150"><%= compras_custo.unidade.unidade_nome %></td>
         <td width="150"><%= compras_custo.rodado.placa unless compras_custo.rodado.blank? %></td>
+        <td width="150"><%= compras_custo.centro_custo.nome unless compras_custo.centro_custo.blank? %></td>
+        <% if Empresa.last.segmento.to_i == 3 %>
+          <td width="150"><%= compras_custo.ordem_carga.cod_ext unless compras_custo.ordem_carga.blank? %></td>
+          <td width="150"><%= compras_custo.pedido_traslado.cod_ext unless compras_custo.pedido_traslado.blank? %></td>
+        <% end %>
         <td width="150">
           <% func = Persona.find_by_id(compras_custo.funcionario_id) %>
           <%= func.nome unless func.blank? %>

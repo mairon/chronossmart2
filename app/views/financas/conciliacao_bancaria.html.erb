@@ -1,4 +1,5 @@
 <%= form_tag resultado_conciliacao_bancaria_financas_path, :method => :get do %>
+<input name="filtro"  id="filtro"   size="10" type="hidden" value="0"/></td>
 <div class="row">
   <div class="col-md-12">
     <div class="panel">
@@ -6,66 +7,42 @@
         Conciliação Bancaria
      </header>
       <div class="panel-content">
+        <div class="row">
+          <div class="col-md-2">
+            <label>Tipo Fecha</label>
+            <%= select_tag :filtro_data, options_for_select([["Fecha Lanz","data"],["Fecha Concil.","data_conciliacao"]]) %>
+          </div>
+          <div class="col-md-4">
+            <label>Periodo</label>
+            <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+            <div class="input-group-addon-f" >
+              <span class="icon-calendar"></span>
+            </div>
+            <div class="date-separ"><%= t('TO') %></div>
+            <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+            <div class="input-group-addon-f" >
+            <span class="icon-calendar"></span>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label>Tipo</label>
+              <%= select_tag :entrada_saida, options_for_select([["Todos",""], ["Entrada","entrada"],["Salida","saida"]]) %>
+          </div>
 
-            <table>
-              <tr>
-                <td>
-                  <label>Filtro Data</label>
-                    <%= radio_button_tag :filtro_data, 'data', checked: true %> Data Lanç.
-                    <%= radio_button_tag :filtro_data, 'data_conciliacao' %> Data Conf. Cliente
-                </td>
-                <td>
-                  <label>Periodo</label>
-                  <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
-                  <div class="input-group-addon-f" >
-                    <span class="icon-calendar"></span>
-                  </div>
-                  <div class="date-separ"><%= t('TO') %></div>
-                  <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
-                  <div class="input-group-addon-f" >
-                  <span class="icon-calendar"></span>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <label style="color: #fff">.</label>
-                  <fieldset>
-                    <%= radio_button_tag :entrada_saida, 'entrada' %> Entrada
-                    <%= radio_button_tag :entrada_saida, 'saida' %> Saida
-                    <%= radio_button_tag :entrada_saida, '',  :Checked => "True" %> Todos
-                  </fieldset>
-                </td>
-
-                <input name="filtro"  id="filtro"   size="10" type="hidden" value="0"/></td>
-                <td style="padding:0px 20px;">
-                  <label style="color: #fff">.</label>
-                  <fieldset>
-                    <%= radio_button_tag :conciliacao, 'false',  :Checked => "True"%> Pendentes
-                    <%= radio_button_tag :conciliacao, 'true' %> Conciliados
-                    <%= radio_button_tag :conciliacao, '' %> Todos
-                  </fieldset>
-                </td>
-
-                <td style="padding-right:10px;">
-                  <label><%= t('ACCOUNT') %></label>
-                    <%= select("busca", "conta",
-                      Conta.all(:select => 'id,nome', conditions: 'tipo = 1', order: 'nome').collect {|p| [ p.nome, p.id ] },
-                      { :prompt => 'Todos'},{:style => "width:250px"}) %>
-                </td>
-                <td style="padding-right:10px;">
-                  <label>Cliente</label>
-                  <%= select("busca", "persona",
-                    Persona.all(:select => 'id,nome', conditions: 'tipo_cliente = 1', order: 'nome').collect {|p| [ p.nome, p.id ] },
-                    {:prompt => 'Todos'})   %>
-                </td>
-
-                <td>
-                  <label style="color: #fff">.</label>
-                  <%= submit_tag 'Filtrar', class: 'btn btn-blue' %>
-                </td>
-               </tr>
-        </table>
+          <div class="col-md-2">
+            <label>Status</label>
+              <%= select_tag :conciliacao, options_for_select([["Pendentes","false"],["Conciliados","true"],["Todos",""]]) %>
+          </div>
+          <div class="col-md-6">
+            <label><%= t('ACCOUNT') %></label>
+            <%= select("busca", "conta",
+                Conta.all(:select => 'id,nome', conditions: 'tipo = 1', order: 'nome').collect {|p| [ p.nome, p.id ] },
+                { :prompt => 'Todos'},{class: "selectize", required: true }) %>
+          </div>
+          <div class="col-md-2 padding-btn">
+            <%= submit_tag 'Filtrar', class: 'btn btn-blue' %>
+          </div>
+        </div>
       </div>
     </div>
   </div>

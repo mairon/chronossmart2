@@ -1,13 +1,43 @@
-<ul class="tabs">
-  <li><a href="#tab1">N.C. Proveedor - [Productos]</a></li>
-</ul>
-<div class="tab_container">
-  <%= render 'busca_produtos'%>
-  <%= render :partial=>"/nota_credito_proveedor_produtos/form_produto", :locals=>{:nota_credito_proveedor_produto=>NotaCreditoProveedorProduto.new(:nota_credito_proveedor_id=>@nota_credito_proveedor.id)} %> 
+<div class="panel">
+  <h1 id="header">
+    <%= form_for(@nota_credito_proveedor) do |vdc| %>
+      Selecione lo Documiento <%= vdc.collection_select :tabela_id, Compra.where("tipo_compra = 0 and persona_id = #{@nota_credito_proveedor.persona_id}").select("id, (documento_numero_01 || '.' || documento_numero_02 || '.' || documento_numero) as doc"),:id, :doc, { :prompt => 'Selecione lo documiento' }, { required: true } %>
 
-  <%= render :partial=>"/nota_credito_proveedor_produtos/index_produto", :locals=>{:nota_credito_proveedor_produtos => @nota_credito_proveedor.nota_credito_proveedor_produto} %>
-	<div class="buttons">
-	 	<%= link_to t('BACK'), edit_nota_credito_proveedor_path(@nota_credito_proveedor),:class => 'button back' %>
-	 	<%= link_to 'Seguir', "/nota_credito_proveedors/#{@nota_credito_proveedor.id}/nc_proveedor_aplic" , :class => 'button next' %>
-	</div>
+    <% end %>
+  </h1>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#nota_credito_proveedor_tabela_id').change(function() {
+        $("#edit_nota_credito_proveedor_<%= @nota_credito_proveedor.id %>").submit();
+    });
+  });
+</script>
+<% unless @nota_credito_proveedor.tabela_id.blank? %>
+  <div class="panel">
+    <div class="panel-content">
+      <%= render 'busca_produtos' %>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-content">
+      <%= render :partial=>"/nota_credito_proveedor_produtos/form_produto", :locals=>{:nota_credito_proveedor_produto=>NotaCreditoProveedorProduto.new(:nota_credito_proveedor_id=>@nota_credito_proveedor.id)} %>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-content">
+      <%= render :partial=>"/nota_credito_proveedor_produtos/index_produto", :locals=>{:nota_credito_proveedor_produtos => @nota_credito_proveedor.nota_credito_proveedor_produto} %>
+    </div>
+  </div>
+<% end %>
+
+<div class="panel">
+  <div class="panel-content">
+
+    <%= link_to t('BACK'), edit_nota_credito_proveedor_path(@nota_credito_proveedor),:class => 'button back' %>
+    <%= link_to 'Seguir', "/nota_credito_proveedors/#{@nota_credito_proveedor.id}/nc_proveedor_aplic" , :class => 'button next' %>
+  </div>
 </div>

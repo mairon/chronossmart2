@@ -1,0 +1,107 @@
+<h1 id="header">Aferición [<%= t('EDITION') %>]</h1>
+<div class="panel">
+
+  <div class="panel-content">
+  <%= form_for(@afericao) do |f| %>
+
+  <%= f.hidden_field :deposito_origem_id %>
+  <%= f.hidden_field :quantidade %>
+  <%= f.hidden_field :produto_id %>
+  <%= f.hidden_field :bico_id %>
+  <%= f.hidden_field :abastecida_id %>
+
+    <div class="row">
+      <div class="col-md-12">
+        <label>Fecha</label>
+        <%= f.date_select :data %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-2">
+        <a href="#" class="btn btn-blue" style="margin-top: 28px" data-toggle="modal" data-load-url="<%= modal_abastecidas_abastecidas_path %>" data-target="#ModalAbastecidas"><span class="material-symbols-outlined" style="color: #fff">local_gas_station</span></a>
+      </div>
+      <div class="col-md-10">
+        <label>Producto</label>
+        <%= f.text_field :produto_nome, class: 'panel-field'%>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-md-12">
+        <label>Resposavel</label>
+        <%= f.collection_select :persona_id, Persona.where('tipo_funcionario= 1' ).select('id,nome'), :id, :nome, {prompt: 'Selecione lo Resposavel'},{class: 'selectize', required: true} %>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-md-12">
+        <label>Destino Destino</label>
+        <%= f.collection_select :deposito_id, Deposito.where("unidade_id = #{current_unidade.id}").select('id,nome').order('2'), :id, :nome, {prompt: 'Selecione lo deposito'},{class: 'selectize', required: true} %>
+
+      </div>
+    </div>
+
+    <div class="footer-buttons">
+      <%= f.submit "Grabar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+      <%= link_to t('BACK'), afericaos_path, :class => "btn btn-back" %>
+    </div>
+    <% end %>
+  </div>
+  
+</div>
+
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="ModalAbastecidas">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content" style="height: 720px; width: 400px">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h2 class="modal-title" id="myModalLabel" align="center">Abastecidas </h2>
+      </div>
+      <div class="modal-body-oe" style="padding: 10px" align="center">
+        <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner-b", width: 21, height: 21, style: "display: none;") %>
+
+        <script type="text/javascript">
+          function AddVenda(id, produto_id, litros, preco, total, deposito_id, bico_id, produto_nome, data){
+              $("#afericao_abastecida_id").val(id);
+              $("#afericao_bico_id").val(bico_id);
+              $("#afericao_produto_nome").val(produto_nome);
+              $("#afericao_produto_id").val(produto_id);
+              $("#afericao_quantidade").val(number_format( litros,3, ',', '.') );
+              $("#afericao_deposito_origem_id").val(deposito_id);
+
+              $('#ModalAbastecidas').modal('hide');
+          }
+        </script>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.onkeyup = function(c) {
+    if(c.which == 187){
+      $('#spinner-b').show();
+      $("#ModalAbastecidas").modal("show");
+      $('.modal-body-oe').load('<%= modal_abastecidas_abastecidas_path %>', function(){
+        $('#spinner-b').hide("slow");
+      });
+    }
+
+  }
+
+  $('#ModalAbastecidas').on('show.bs.modal', function (e) {
+    $('#spinner-b').show();
+    var loadurl = $(e.relatedTarget).data('load-url');
+    $(this).find('.modal-body-oe').load(loadurl, function(){
+      $('#spinner-b').hide("slow");
+    });
+  });
+</script>

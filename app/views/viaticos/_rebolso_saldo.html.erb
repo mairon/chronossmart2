@@ -1,0 +1,100 @@
+<div class="panel">
+	<h1 id="header">
+		Devolução Saldo
+
+    <div class="pull-right">
+      <a href="#" data-toggle="modal" data-target="#modal-faturamento" class="btn btn-green" style="height: 37px;"><i class="icon-white icon-plus-sign"></i></a>    
+    </div>
+	</h1>
+
+	<div class="panel-content">
+		
+		<table class="list">
+			<% Financa.where(tabela: 'VIATICO_DEV', tabela_id: @viatico.id).each do |f| %>
+			<tr class="<%= cycle("cor1", "cor2")%>">
+				<td width="50" align="center"><%= f.data.strftime("%d/%m/%y")%></td>
+				<td width="100"><%= f.conta.nome %></td>
+				<td width="100"><%= f.concepto %></td>
+				<% if f.moeda.to_i == 0 %>
+					<td width="70" align="right"><%= format_decimal(f.entrada_dolar) %></td>
+				<% elsif f.moeda.to_i == 1 %>
+					<td width="70" align="right"><%=  format_int(f.entrada_guarani) %></td>
+				<% elsif f.moeda.to_i == 2 %>
+					<td width="70" align="right"><%=  format_decimal(f.entrada_real) %></td>
+				<% end %>
+				<td><%= link_to '', f, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+			</tr>
+			<% end %>
+		</table>
+		
+	</div>
+
+</div>
+  <div class="modal fade" id="modal-faturamento" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="close-button">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <h1>Devolução Saldo</h1>
+        </div>
+
+        <div class="modal-body">
+        	<div class="group">
+					<%= form_for(Financa.new) do |f| %>
+						<%= f.hidden_field :cod_proc, value: @viatico.id %>
+						<%= f.hidden_field :sigla_proc, value: 'VTD' %>
+						<%= f.hidden_field :persona_id, value: @viatico.persona_id %>
+						<%= f.hidden_field :forma_pago_id, value: 1 %>
+						<%= f.hidden_field :moeda, value: @viatico.moeda %>
+						<%= f.hidden_field :tabela_id, value: @viatico.id %>
+						<%= f.hidden_field :tabela, value: 'VIATICO_DEV' %>
+						<%= f.hidden_field :documento_numero_01, value: 'V00' %>
+						<%= f.hidden_field :documento_numero_02, value: '000' %>
+						<%= f.hidden_field :documento_numero, value: @viatico.id %>
+
+						<div class="row">
+							<div class="col-md-12">
+								<%= f.date_select :data %>
+							</div>
+						</div>
+						<div class="row">
+				      <div class="col-md-12">
+				        <label><%= t('ACCOUNT') %></label>
+				        <%= f.collection_select :conta_id, Conta.all(:select => ' id,nome', :conditions => ["moeda = #{@viatico.moeda} and unidade_id = #{current_unidade.id}"], :order => '2'),:id, :nome,{:prompt => 'Selecione'}, {required: true, class: 'conta_id selectize'} %>
+				      </div>
+				    </div>
+				    <div class="row">
+							<% if @viatico.moeda == 1 %>
+					      <div class="col-md-12 valores-gs">
+					        <%= panel_field_gs_label 'Valor Gs.',f,:entrada_guarani, value: format_int(@saldo.to_f) %>
+					      </div>
+				      <% elsif @viatico.moeda == 0 %>
+
+					      <div class="col-md-12 valores-us">
+					        <%= panel_field_us_label 'Valor U$',f,:entrada_dolar, value: format_decimal(@saldo.to_f) %>
+					      </div>
+				      <% elsif @viatico.moeda == 2 %>
+					      <div class="col-md-12 valores-rs">
+					        <%= panel_field_us_label 'Valor R$',f,:entrada_real, value: format_decimal(@saldo.to_f) %>
+					      </div>
+				      <% end %>
+						</div>
+
+				    <div class="row">
+				      <div class="col-md-12">
+				      	<br>
+				        <%= f.text_area :concepto, class: "panel-field", placeholder: 'Obs.', rows: '3', value: 'DEV. VIATICO' %>
+				      </div>
+				    </div>
+
+				    <div class="footer-buttons">
+				      <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
+				    </div>
+					<% end %>
+					</div>  
+				</div>
+      </div>
+    </div>
+  </div>

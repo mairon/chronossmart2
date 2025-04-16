@@ -1,15 +1,14 @@
 class ListaCargasController < ApplicationController
 
   def detalhe_pedido
-    @pedido = Presupuesto.find(params[:pedido])
+    @pedido = Venda.find(params[:pedido])
     render layout: 'consulta'
   end
 
-
   def produtos_adicionados
     @lista_carga = ListaCarga.find(params[:id])
-    @pedido = Presupuesto.find(params[:pedido])
-    @lista_carga_produtos = ListaCargaProduto.where(lista_carga_id: @lista_carga.id, presupuesto_id: params[:pedido])
+    @pedido = Venda.find(params[:pedido])
+    @lista_carga_produtos = ListaCargaProduto.where(lista_carga_id: @lista_carga.id, venda_id: params[:pedido])
     render layout: 'consulta'
   end
 
@@ -23,8 +22,8 @@ class ListaCargasController < ApplicationController
 
   def separacao
     @lista_carga = ListaCarga.find(params[:id])
-    @pedido = Presupuesto.find(params[:pedido])
-    @lista_carga_produtos = ListaCargaProduto.where(lista_carga_id: @lista_carga.id, presupuesto_id: params[:pedido])
+    @pedido = Venda.find(params[:pedido])
+    @lista_carga_produtos = ListaCargaProduto.where(lista_carga_id: @lista_carga.id, venda_id: params[:pedido])
     render layout: false
   end
 
@@ -48,13 +47,11 @@ class ListaCargasController < ApplicationController
     @lista_carga = ListaCarga.find(params[:id])
     @lista_carga_adds = ListaCarga.lista_carga_add(params)
     params[:unidade_id] = current_unidade.id
-    @pedido = Presupuesto.find(params[:presupuesto_id]) if params[:presupuesto_id].present?
+    @pedido = Venda.find(params[:presupuesto_id]) if params[:presupuesto_id].present?
     @pedidos_pendentes = ListaCarga.pedido_pendentes(params)
     @pedido_produtos = ListaCarga.pedido_produtos(params) if params[:presupuesto_id].present?
 
-    respond_to do |format|
-      format.html # show.html.erb
-    end
+    render layout: 'chart'
   end
 
   # GET /lista_cargas/new

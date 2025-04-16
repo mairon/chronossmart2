@@ -1,0 +1,42 @@
+<table>
+	<% tot_gs = 0 %>
+	<% tot_us = 0 %>
+	<% @consumicao_interna.each do |ci| %>
+		<tr class= "<%= cycle( "cor1", "cor2" )%>">
+			<td><%= ci.id.to_s.rjust(6,'0') %></td>
+			<td><%= ci.data.strftime("%d/%m/%y") %></td>
+			<td><%= ci.motivo_nome %></td>
+			<td><%= ci.centro_custo_nome %></td>
+			<td><%= ci.rodado_nome %></td>
+			<td><%= ci.produto_nome %></td>
+			<td><%= ci.quantidade %></td>
+
+			<% if ci.moeda == 1 %>
+				<td>Gs.</td>
+				<% if params[:tipo] == '1' %>
+					<td width="70" align="right"><%= ci.unitario_guarani %></td>
+					<td width="70" align="right"><%= ci.total_guarani %></td>
+				<% else %>
+					<td width="70" align="right"><%= format_int(ci.unitario_guarani) %></td>
+					<td width="70" align="right"><%= format_int(ci.total_guarani) %></td>
+				<% end %>
+				<% tot_gs += ci.total_guarani.to_f %>
+				
+
+			<% else %>
+				<td>U$</td>
+				<% if params[:tipo] == '1' %>
+					<td width="70" align="right"><%= ci.unitario_dolar %></td>
+					<td width="70" align="right"><%= ci.total_dolar %></td>
+				<% else %>	
+					<td width="70" align="right"><%= format_decimal(ci.unitario_dolar) %></td>
+					<td width="70" align="right"><%= format_decimal(ci.total_dolar) %></td>
+				<% end %>
+				<% tot_us += ci.total_dolar.to_f %>
+			<% end %>
+		</tr>
+	<% end %>
+	<tr>
+		<td></td>
+	</tr>
+</table>

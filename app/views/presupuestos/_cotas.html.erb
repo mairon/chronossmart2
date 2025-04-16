@@ -1,37 +1,42 @@
 <%= form_tag gera_cotas_presupuestos_path, :method => "get" do %>
 <%= hidden_field_tag :presupuesto_id, @presupuesto.id %>
 <div class="row">
-	<div class="col-md-2">
-		<label>1º Venc.</label>
-		<%= text_field_tag :vencimento, @presupuesto.data.strftime("%d/%m/%Y"), class: 'panel-field' %>
-	</div>
-
 	<div class="col-md-2" style="padding-top: 20px">
 		<label></label>
-		<%= submit_tag 'Grabas', class: 'btn btn-green' %>
+		<% if @presupuesto.contrato.blank? %>
+			<%= submit_tag 'Generar Cuotas', class: 'btn btn-green' %>
+		<% end %>
 	</div>
 
 </div>
 
 <% end %>
 <table class="list">
-	<tr class="head">
+	<tr class="head_grid">
 		<td width="80">Cuotas</td>
+		<td width="300">Producto</td>
 		<td width="80" align="right">Monto</td>
 		<td width="100" align="center">Venc.</td>
 	</tr>
 	<% tot = 0 %>
-	<% @presupuesto.presupuesto_cotas.select("presupuesto_cotas.cuotas, min(presupuesto_cotas.vencimento) as vencimento, sum(presupuesto_cotas.valor_gs) as valor_gs").group(:cuotas).order("presupuesto_cotas.cuotas").each do |pc| %>
+	<% @presupuesto.presupuesto_cotas.order("vencimento").each do |pc| %>
 		<tr class = "<%= cycle("cor1", "cor2") %>">
 		<td><%= pc.cuotas %></td>
+		<td width="300"><%= format_int(pc.produto.nome) %></td>
 		<td align="right"><%= format_int(pc.valor_gs) %></td>
 		<td align="center"><%= pc.vencimento.strftime("%d/%m/%Y") %></td>
+		<% if @presupuesto.contrato.blank? %>
+			<% if @presupuesto.status.to_i == 0 %>
+				<td><%= link_to '', edit_presupuesto_cota_path(pc), class: 'icon-pencil' %></td>
+			<% end %>
+		<% end %>
+
 		</tr>
 		<% tot += pc.valor_gs.to_f %>
 	<% end %>
-	<tr>
-		<td></td>
-		<td><%= format_int(tot) %></td>
+	<tr class="head_grid">
+		<td colspan="2"></td>
+		<td align="right"><%= format_int(tot) %></td>
 	</tr>
 </table>
 

@@ -1,75 +1,108 @@
-<%= form_for(nota_creditos_detalhe) do |f| %>
-   <%= f.hidden_field :nota_credito_id  %>
-   <%= f.hidden_field :produto_id  %>
-   <%= f.hidden_field :venda_id  %>
-   <%= f.hidden_field :documento_numero_01  %>
-   <%= f.hidden_field :documento_numero_02  %>
-   <%= f.hidden_field :documento_numero  %>
-   <%= f.hidden_field :documento_id, :value => @nota_credito.documento_id  %>
-   <%= f.hidden_field :documento_nome, :value => @nota_credito.documento_nome  %>
-   <%= f.hidden_field :deposito_id  %>
-   <%= f.hidden_field :deposito_nome  %>
-   <%= f.hidden_field :codigo%>
-   <%= f.hidden_field :fabricante_cod%>
-   <%= f.hidden_field :data, :value => @nota_credito.data%>
-   <%= f.hidden_field :clase_produto, :value => @nota_credito.clase_produto%>
-   <%= f.hidden_field :cotacao, :value => @nota_credito.cotacao%>
-   <%= f.hidden_field :persona_id, :value => @nota_credito.persona_id%>
-   <%= f.hidden_field :persona_nome, :value => @nota_credito.persona_nome%>
-   <%= f.hidden_field :tipo, :value => @nota_credito.tipo%>
-   <%= f.hidden_field :moeda, :value => @nota_credito.moeda %>
-<div class="group">
-   <table>
-      <tr>
-        <td align="right">Producto:</td>
-        <td colspan="5">
-          <%= f.text_field :produto_nome, size: 60, :readonly => "readonly" %>
-        </td>
-        <td>Cantidad:</td>
-        <td><%= f.text_field :quantidade, size: 5 %></td>
-          <%= f.hidden_field :taxa %>
-      </tr>
-      <% if @nota_credito.moeda == 0 %>
-          <tr>
-             <%= field_us 'Unit U$:',f,:unitario_dolar,:onblur => "NotaCreditoUnitGs(),NotaCreditoUnitUs()" %>
+<div class="panel">
+  <div class="panel-content">
 
-             <%= f.hidden_field :unitario_guarani  %>
+    <%= form_for(nota_creditos_detalhe) do |f| %>
+       <%= f.hidden_field :nota_credito_id  %>
+       <%= f.hidden_field :produto_id  %>
+       <%= f.hidden_field :venda_id  %>
+       <%= f.hidden_field :documento_numero_01  %>
+       <%= f.hidden_field :documento_numero_02  %>
+       <%= f.hidden_field :documento_numero  %>
+       <%= f.hidden_field :documento_id, :value => @nota_credito.documento_id  %>
+       <%= f.hidden_field :documento_nome, :value => @nota_credito.documento_nome  %>
+       <%= f.hidden_field :codigo%>
+       <%= f.hidden_field :deposito_nome %>
+       <%= f.hidden_field :fabricante_cod%>
+       <%= f.hidden_field :data, :value => @nota_credito.data%>
+       <%= f.hidden_field :clase_produto, :value => @nota_credito.clase_produto%>
+       <%= f.hidden_field :cotacao, :value => @nota_credito.cotacao%>
+       <%= f.hidden_field :persona_id, :value => @nota_credito.persona_id%>
+       <%= f.hidden_field :persona_nome, :value => @nota_credito.persona_nome%>
+       <%= f.hidden_field :tipo, :value => @nota_credito.tipo%>
+       <%= f.hidden_field :moeda, :value => @nota_credito.moeda %>
+        <div class="row">
+          <div class="col-md-2">
+            <label>Deposito</label>
+            <%= f.collection_select :deposito_id, Deposito.where(unidade_id: current_unidade.id).select("id,nome"),:id, :nome, {}, {class: 'selectize'} %></td>
+          </div>
 
-             <%= field_us 'Total U$:',f,:total_dolar %>
-             <td>
-               <%= f.submit t('SAVE'),:class => 'button' %>
-          </td>
-             <%= f.hidden_field :total_guarani  %>
-             <%= f.hidden_field :iva_dolar %>
-             <%= f.hidden_field :iva_guarani  %>
-          </tr>
-      <% else %>
-          <tr>
-             <td>Unit Gs.:</td>
+          <div class="col-md-4">
+            <label>Producto</label>
+            <%= f.text_field :produto_nome, class: 'panel-field' %>
+          </div>
+          <div class="col-md-1">
+            <label>Ctd</label>
+            <%= f.text_field :quantidade, class: 'panel-field' %>
+            <%= f.hidden_field :taxa %>
+          </div>
+          <% if @nota_credito.moeda == 0 %>
 
-             <%= field_gs 'Unit Gs.:',f,:unitario_guarani,:onblur => "NotaCreditoUnitGs(),NotaCreditoTotalUs()" %>
+            <div class="col-md-2">
+              <%= panel_field_us_label 'Unit U$:',f,:unitario_dolar,:onblur => "NotaCreditoUnitGs(),NotaCreditoUnitUs()" %>
+            </div>
 
-             <%= f.hidden_field :unitario_dolar %>
+            <div class="col-md-2">
+              <%= panel_field_us_label 'Total U$:',f,:total_dolar %>
+            </div>
+              <%= f.hidden_field :unitario_guarani  %>
+              <%= f.hidden_field :total_guarani  %>
+              <%= f.hidden_field :iva_dolar %>
+              <%= f.hidden_field :iva_guarani  %>
 
-             <%= field_gs 'Total Gs.:',f,:total_guarani,:onblur => "NotaCreditoUnitGs(),NotaCreditoTotalDolar(),NotaCreditoTotalGs()" %>
-
-             <td>
-             <%= f.submit t('SAVE'),:class => 'button' %>
-             </td>
-
-             <%= f.hidden_field :total_dolar  %>
-             <%= f.hidden_field :iva_guarani  %>
-             <%= f.hidden_field :iva_dolar %>
-
-          </tr>
-      <% end %>
-   </table>
-<% end %>
+          <% else %>
+            <div class="col-md-2">
+              <%= panel_field_gs_label 'Unit Gs.:',f,:unitario_guarani,:onblur => "NotaCreditoUnitGs(),NotaCreditoTotalUs()" %>
+            </div>
+            <div class="col-md-2">
+              <%= panel_field_gs_label 'Total Gs.:',f,:total_guarani,:onblur => "NotaCreditoUnitGs(),NotaCreditoTotalDolar(),NotaCreditoTotalGs()" %>
+            </div>
+            <%= f.hidden_field :unitario_dolar %>
+            <%= f.hidden_field :total_dolar  %>
+            <%= f.hidden_field :iva_guarani  %>
+            <%= f.hidden_field :iva_dolar %>
+          <% end %>
+          <div class="col-md-1 padding-btn">
+            <%= f.submit t('SAVE'),:class => 'btn btn-green' %>
+          </div>
+        </div>
+    <% end %>
   </div>
+</div>
 
 
 <script>
-  
+
+$(function() {
+  $( "#nota_creditos_detalhe_produto_nome" ).autocomplete({
+      source: function( request, response ) {
+      $.ajax({
+        url: "/buscas/search_all_produtos",
+        dataType: "json",
+        data: {
+          tipo: 'DESCRIPCION',
+          busca: request.term
+        },
+        beforeSend: function(){
+          $("#spinner").show("fast");
+        },
+
+        success: function( data ) {
+          response( data );
+          $('#spinner').hide("slow");
+
+        },
+      });
+    },
+    minLength: 2,
+    select: function( event, ui ) {
+      $("#nota_creditos_detalhe_produto_id").val("");
+      $('#nota_creditos_detalhe_produto_id').val(ui.item.id);
+      $('#multiplo').val(number_format(ui.item.multiplo_compra, 0, ',', '.'));
+      return false;
+    }
+  });
+  });
+
 function NotaCreditoUnitUs(){
 
     var total = eval( parseFloat( document.getElementById('nota_creditos_detalhe_unitario_dolar').value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById('nota_creditos_detalhe_quantidade').value.replace(/\./g, "").replace(",", ".") ) )  ;

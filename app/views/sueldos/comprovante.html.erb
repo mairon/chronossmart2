@@ -25,13 +25,16 @@ tr.cor1 {
     <tr>
       <td >
         <b class="header">
-          <%= $empresa_nome %>
+          <%= current_unidade.nome_sys %>
         </b>
      </td>
 
       <td align="right" >
         <b class="header">
-          Hoja de Pago N.:<%=@sueldo.id.to_s.rjust(6,'0')%>
+          <% sp = SueldoPago.where(sueldo_id: @sueldo.id).last %>
+          <% unless sp.blank? %>
+            RECIBO DE DINERO <%= sp.documento_numero_01 %>-<%= sp.documento_numero_01 %>-<%= sp.documento_numero.to_s.rjust(8, '0') %>
+          <% end %>
         </b>
      </td>
     </tr>
@@ -39,7 +42,9 @@ tr.cor1 {
     <tr>
       <td align="left" colspan="2">
         <table>
-
+          <tr>
+            <td colspan="2"><b>Hoja de Pago N.:<%=@sueldo.id.to_s.rjust(6,'0')%></b></td>
+          </tr>
         <tr>
           <td align="right">
             Periodo :

@@ -54,7 +54,7 @@
                   <tr>
                     <td colspan="4">
                     <label>Tutor</label>
-                    <%= text_field_tag :persona_nome, "#{@contrato.persona.nome unless @contrato.persona_id.nil?}", size: '100%', required: true, class: 'autocomplete', autofocus: true, placeholder: 'Digite o nome do Tutor', value: params[:persona_nome] %>
+                    <%= text_field_tag :persona_nome, size: '100%', required: true, class: 'autocomplete', autofocus: true, placeholder: 'Digite o nome do Tutor', value: params[:persona_nome] %>
                       <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
                     <%= f.hidden_field :persona_id, value: params[:persona_id] %></td>
                   </tr>

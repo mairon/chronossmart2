@@ -1,0 +1,232 @@
+<%= form_for(condicional_produto) do |f| %>
+  <% if condicional_produto.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(condicional_produto.errors.count, "error") %> prohibited this condicional_produto from being saved:</h2>
+
+      <ul>
+      <% condicional_produto.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<%= f.hidden_field :condicional_id %>
+  <div class="group">
+    <%= f.hidden_field :fabricante_cod %>
+    <%= f.hidden_field :clase_id %>
+    <%= f.hidden_field :grupo_id %>
+    <%= f.hidden_field :sub_grupo_id %>
+    <%= f.hidden_field :cor_id %>
+    <%= f.hidden_field :tamanho_id %>
+    <%= f.hidden_field :colecao_id %>
+    <%= f.hidden_field :produtos_grade_id %>
+    <%= f.hidden_field :produto_id %>
+    <%= f.hidden_field :data,          :value => @condicional.data %>
+    <%= hidden_field_tag :cotacao, @condicional.cotacao.to_i %>
+    <%= f.hidden_field :moeda,         :value => @condicional.moeda %>
+    <%= f.hidden_field :persona_id,    :value => @condicional.persona_id %>
+
+    <%= hidden_field_tag :unidade, @condicional.unidade_id %>
+    <%= hidden_field_tag :tabela_preco, @condicional.tabela_preco %>
+
+    <input type="hidden" id="moeda" name="moeda" value="<%= @condicional.moeda %>" />
+      <table>
+
+        <td align="right" width="70">Producto :</td>
+          <td colspan="6">
+
+              <% last_tipo_busca = CondicionalProduto.last(:conditions => ["condicional_id = #{@condicional.id}"]) %>
+              <% if last_tipo_busca != nil %>
+                <% if last_tipo_busca.tipo_busca.to_i == 0 %>
+                  <%= f.select :tipo_busca, ([["Ref.", 0],["Barra", 1]]), {} %>
+                <% else %>
+                  <%= f.select(:tipo_busca, options_for_select([['Ref.', 0], ['Barra', 1]], 1), {}) %>
+                <% end %>
+              <% else %>
+                <%= f.select :tipo_busca, ([["Ref.", 0],["Barra", 1]]), {} %>
+              <% end %>
+
+            <%= text_field :cod, :busca,
+                       :size        => 30,
+                       :placeholder => 'Ref. / Cod. Barra', autofocus: true %>
+
+            <%= f.text_field :produto_nome,
+                             :size      => 60,
+                             :readonly => "readonly",
+                             :placeholder => 'Nome' %>
+
+            <%= f.text_field :cor_nome,
+                             :size      => 20,
+                             :readonly => "readonly",
+                             :placeholder => 'Color' %>
+
+            <%= f.text_field :tamanho_nome,
+                             :size      => 5,
+                             :readonly => "readonly",
+                             :placeholder => 'Tamanho' %>
+
+            <%= f.text_field :saldo,
+                             :size      => 5,
+                             :readonly => "readonly",
+                             :placeholder => 'stock',
+                             :placeholder => 'Tamanho' %>
+
+
+
+          </td>
+        </tr>
+
+        <tr>
+          <td align="right">Cantidad :</td>
+          <% if @condicional.moeda == 0  %>
+              <td><%= f.text_field :quantidade,:value => 1, :size => 9, :onblur => "CalcQtdDescimal('condicional_produto_unitario_us','condicional_produto_quantidade','condicional_produto_total_us')"  %></td>
+               <%= field_us 'Unit. U$ :',f, :unitario_us%>
+               <%= field_us 'Total U$ :',f,:total_us %>
+          <% elsif @condicional.moeda == 1 %>
+              <td><%= f.text_field :quantidade,:value => 1, :size => 9, :onblur => "CalcQtd('condicional_produto_unitario_gs','condicional_produto_quantidade','condicional_produto_total_gs')"  %></td>
+               <%= field_gs 'Unit. Gs :',f, :unitario_gs %>
+               <%= field_gs 'Total Gs :',f,:total_gs %>
+          <% end %>
+        </tr>
+
+        <tr>
+          <td align="right">Deposito:</td>
+          <td colspan="4"><%= f.collection_select :deposito_id, Deposito.all(:select => 'id,nome',
+                                                                 :conditions => ["unidade_id = #{@condicional.unidade_id}"],
+                                                                 :order => '2'),:id,
+                                                                 :nome %></td>
+          <td>
+            <%= f.submit "Grabar",:disable_with => "Aguarde...", :class => "button", :id => 'button_s'   %>
+          </td>
+        </tr>
+      </table>
+
+   </div>
+   </body>
+
+<% end %>
+
+
+</div>
+<script type="text/javascript">
+  $("#cod_busca").blur(function(){
+      if ($("#cod_busca").val() != ''){
+      if ($("#condicional_produto_tipo_busca").val() == '0'){
+          var cliente  = document.getElementById('tabela_preco').value
+          var deposito = document.getElementById('condicional_produto_deposito_id').value
+          var unidade  = document.getElementById('unidade').value
+          var dt       = document.getElementById('condicional_produto_data').value
+
+          window.open('/produtos/busca_condicional_produto?busca='+$("#cod_busca").val()+'&moeda='+$("#moeda").val()+'&cliente='+cliente+'&deposito_id='+deposito+'&unidade='+unidade+'&data='+dt+'', 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=50, WIDTH=2500, HEIGHT=400');
+      }else{
+
+
+        $.ajax({url: "/buscas/busca_venda_produto",
+                type: 'GET',
+                beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+                data: 'cod=' + escape($('#cod_busca').val()) +
+                  "&unidade=" + $("#unidade").val() +
+                  "&data=" + $("#condicional_produto_data").val() +
+                  "&deposito=" + $("#condicional_produto_deposito_id").val() +
+                  "&cliente=" + $("#tabela_preco").val(),
+                success: function(grade){
+                $('#condicional_produto_produto_nome').val(grade["produto"].nome);
+                $('#condicional_produto_produto_id').val(grade["produto"].produto_id);
+                $('#condicional_produto_clase_id').val(grade["produto"].clase_id);
+                $('#condicional_produto_grupo_id').val(grade["produto"].grupo_id);
+                $('#condicional_produto_cor_id').val(grade["produto"].cor_id);
+                $('#condicional_produto_tamanho_id').val(grade["produto"].tamanho_id);
+                $('#condicional_produto_cor_nome').val(grade["produto"].cor_nome);
+                $('#condicional_produto_tamanho_nome').val(grade["produto"].tamanho_nome);
+                $('#condicional_produto_colecao_id').val(grade["produto"].colecao_id);
+                $('#condicional_produto_produtos_grade_id').val(grade["produto"].produtos_grade_id);
+                $('#condicional_produto_fabricante_cod').val(grade["produto"].fabricante_cod);
+                $('#condicional_produto_saldo').val(number_format( grade["produto"].stock, 3, ',', '.'));
+          //tabela de preco 01
+          if ($('#tabela_preco').val() == '1'){
+            if ($('#condicional_produto_moeda').val() == '0'){
+              $('#condicional_produto_unitario_us').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
+              $('#condicional_produto_total_us').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
+            }if ($('#condicional_produto_moeda').val() == '1'){
+              $('#condicional_produto_unitario_gs').val(number_format( grade["produto"].preco_1_gs, 0, ',', '.'));
+              $('#condicional_produto_total_gs').val(number_format( grade["produto"].preco_1_gs, 0, ',', '.'));
+            }if ($('#condicional_produto_moeda').val() == '2'){
+              $('#condicional_produto_unitario_rs').val(number_format( grade["produto"].preco_1_rs, 2, ',', '.'));
+              $('#condicional_produto_total_rs').val(number_format( grade["produto"].preco_1_rs, 2, ',', '.'));
+            }
+          }
+          //tabela de preco 02
+          if ($('#tabela_preco').val() == '2'){
+            if ($('#condicional_produto_moeda').val() == '0'){
+              $('#condicional_produto_unitario_us').val(number_format( grade["produto"].preco_2_us, 2, ',', '.'));
+              $('#condicional_produto_total_us').val(number_format( grade["produto"].preco_2_us, 2, ',', '.'));
+            }if ($('#condicional_produto_moeda').val() == '1'){
+              $('#condicional_produto_unitario_gs').val(number_format( grade["produto"].preco_2_gs, 0, ',', '.'));
+              $('#condicional_produto_total_gs').val(number_format( grade["produto"].preco_2_gs, 0, ',', '.'));
+            }if ($('#condicional_produto_moeda').val() == '2'){
+              $('#condicional_produto_unitario_rs').val(number_format( grade["produto"].preco_2_rs, 2, ',', '.'));
+              $('#condicional_produto_total_rs').val(number_format( grade["produto"].preco_2_rs, 2, ',', '.'));
+            }
+          }
+
+          //tabela de preco 03
+          if ($('#tabela_preco').val() == '3'){
+            if ($('#condicional_produto_moeda').val() == '0'){
+              $('#condicional_produto_unitario_us').val(number_format( grade["produto"].preco_3_us, 2, ',', '.'));
+              $('#condicional_produto_total_us').val(number_format( grade["produto"].preco_3_us, 2, ',', '.'));
+            }if ($('#condicional_produto_moeda').val() == '1'){
+              $('#condicional_produto_unitario_gs').val(number_format( grade["produto"].preco_3_gs, 0, ',', '.'));
+              $('#condicional_produto_total_gs').val(number_format( grade["produto"].preco_3_gs, 0, ',', '.'));
+            }if ($('#condicional_produto_moeda').val() == '2'){
+              $('#condicional_produto_unitario_rs').val(number_format( grade["produto"].preco_3_rs, 2, ',', '.'));
+              $('#condicional_produto_total_rs').val(number_format( grade["produto"].preco_3_rs, 2, ',', '.'));
+            }
+          }
+          //tabela de preco 04
+          if ($('#tabela_preco').val() == '4'){
+            if ($('#condicional_produto_moeda').val() == '0'){
+              $('#condicional_produto_unitario_us').val(number_format( grade["produto"].preco_4_us, 2, ',', '.'));
+              $('#condicional_produto_total_us').val(number_format( grade["produto"].preco_4_us, 2, ',', '.'));
+            }if ($('#condicional_produto_moeda').val() == '1'){
+              $('#condicional_produto_unitario_gs').val(number_format( grade["produto"].preco_4_gs, 0, ',', '.'));
+              $('#condicional_produto_total_gs').val(number_format( grade["produto"].preco_4_gs, 0, ',', '.'));
+            }if ($('#condicional_produto_moeda').val() == '2'){
+              $('#condicional_produto_unitario_rs').val(number_format( grade["produto"].preco_4_rs, 2, ',', '.'));
+              $('#condicional_produto_total_rs').val(number_format( grade["produto"].preco_4_rs, 2, ',', '.'));
+            }
+          }
+          $('#condicional_produto_preco_dolar').val(number_format( grade["produto"].preco_venda_dolar,2, ',', '.'));
+          $('#condicional_produto_preco_guarani').val(number_format( grade["produto"].preco_venda_guarani,0, ',', '.'));
+          $('#button_s').focus();
+        }})
+      };
+    };
+    });
+  
+
+    function CalcQtdDescimal(unit,qtd,tot){
+        var total = eval( parseFloat( document.getElementById(unit).value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById(qtd).value.replace(/\./g, "").replace(",", ".") ) )  ;
+        document.getElementById(tot).value = ( number_format(total,2, ',', '.') );
+    }
+
+    function CalcQtd(unit,qtd,tot){
+        var total = eval( parseFloat( document.getElementById(unit).value.replace(/\./g, "").replace(",", ".") ) * parseFloat( document.getElementById(qtd).value.replace(/\./g, "").replace(",", ".") ) )  ;
+        document.getElementById(tot).value = ( number_format(total,0, ',', '.') );
+    }
+
+</script>
+
+<script>
+
+$(document).ready(function(){
+   if ($.browser.mozilla) {
+        $("input").keypress(checkForEnter);
+        $("input:checkbox").keydown(checkForEnter);
+    } else {
+        $("input").keydown(checkForEnter);
+        $("input:checkbox").keydown(checkForEnter);
+        $("select").keydown(checkForEnter);
+    }
+});
+</script>

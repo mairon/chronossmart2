@@ -10,9 +10,9 @@ class Stock < ActiveRecord::Base
                  S.PRODUTO_ID,
                  S.SAIDA,
                  P.NOME AS PRODUTO_NOME,
-                 PS.NOME AS PERSONA_NOME,                 
+                 PS.NOME AS PERSONA_NOME,
                  (SELECT PTB.PRECO_1_GS FROM PRODUTOS_TABELA_PRECOS PTB WHERE PTB.PRODUTO_ID = S.PRODUTO_ID AND PTB.TABELA_PRECO_ID = PS.TABELA_PRECO_ID LIMIT 1) AS PRECO_PERSONA
-                     
+
                 FROM STOCKS S
 
                 LEFT JOIN PRODUTOS P
@@ -20,8 +20,8 @@ class Stock < ActiveRecord::Base
 
                 LEFT JOIN PERSONAS PS
                 ON PS.ID = S.PERSONA_ID
-                  
-                WHERE S.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' AND TABELA = 'CHECK_POINTS' #{deposito} #{produto} #{persona}
+
+                WHERE P.status = TRUE AND S.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' AND TABELA = 'CHECK_POINTS' #{deposito} #{produto} #{persona}
                 "
       Stock.find_by_sql(sql)
   end
@@ -33,9 +33,9 @@ class Stock < ActiveRecord::Base
     produto  = " AND S.PRODUTO_ID = #{params[:produto_id]}"  unless params[:produto_id].blank?
     persona  = " AND S.PERSONA_ID = #{params[:persona_id]}"  unless params[:persona_id].blank?
 
-    sql = "SELECT P.NOME AS PRODUTO_NOME, 
+    sql = "SELECT P.NOME AS PRODUTO_NOME,
                   SUM(S.SAIDA) AS TOT
-                     
+
                 FROM STOCKS S
 
                 LEFT JOIN PRODUTOS P
@@ -43,7 +43,7 @@ class Stock < ActiveRecord::Base
 
                 LEFT JOIN PERSONAS PS
                 ON PS.ID = S.PERSONA_ID
-                  
+
                 WHERE S.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' AND TABELA = 'CHECK_POINTS' #{deposito} #{produto} #{persona}
                 GROUP BY 1
                 "
@@ -56,10 +56,10 @@ class Stock < ActiveRecord::Base
     produto  = " AND S.PRODUTO_ID = #{params[:produto_id]}"  unless params[:produto_id].blank?
     persona  = " AND S.PERSONA_ID = #{params[:persona_id]}"  unless params[:persona_id].blank?
 
-    sql = "SELECT P.NOME AS PRODUTO_NOME, 
+    sql = "SELECT P.NOME AS PRODUTO_NOME,
                   (SELECT PTB.PRECO_1_GS FROM PRODUTOS_TABELA_PRECOS PTB WHERE PTB.PRODUTO_ID = S.PRODUTO_ID AND PTB.TABELA_PRECO_ID = PS.TABELA_PRECO_ID LIMIT 1) AS PRECO_PERSONA,
                   SUM(S.SAIDA) AS TOT
-                     
+
                 FROM STOCKS S
 
                 LEFT JOIN PRODUTOS P
@@ -67,7 +67,7 @@ class Stock < ActiveRecord::Base
 
                 LEFT JOIN PERSONAS PS
                 ON PS.ID = S.PERSONA_ID
-                  
+
                 WHERE S.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' AND TABELA = 'CHECK_POINTS' #{deposito} #{produto} #{persona}
                 GROUP BY 1,2
                 "
@@ -593,7 +593,7 @@ class Stock < ActiveRecord::Base
         end
         sql = "SELECT S.PRODUTO_ID,
 											S.DEPOSITO_ID,
-											MAX(P.NOME) AS PRODUTO_NOME,                      
+											MAX(P.NOME) AS PRODUTO_NOME,
 											MAX(C.DESCRICAO) AS CLASE_NOME,
 											MAX(G.DESCRICAO) AS GRUPO_NOME,
 											MAX(SG.DESCRICAO) AS SUBGRUPO_NOME,
@@ -601,8 +601,8 @@ class Stock < ActiveRecord::Base
                       MAX(P.FABRICANTE_COD) AS FABRICANTE_COD,
                       (SELECT PTB.PRECO_1_US FROM  PRODUTOS_TABELA_PRECOS PTB WHERE PTB.PRODUTO_ID = S.PRODUTO_ID LIMIT 1) AS PRECO_VENDA_US,
                       (SELECT PTB.PRECO_1_GS FROM  PRODUTOS_TABELA_PRECOS PTB WHERE PTB.PRODUTO_ID = S.PRODUTO_ID LIMIT 1) AS PRECO_VENDA_GS,
-											(SELECT SS.UNITARIO_GUARANI FROM STOCKS SS WHERE SS.STATUS = 0 AND SS.PRODUTO_ID = S.PRODUTO_ID  ORDER BY SS.DATA DESC, SS.TABELA_ID DESC  LIMIT 1) CUSTO_MEDIO_GS,
-											(SELECT SS.UNITARIO_DOLAR FROM STOCKS SS WHERE SS.STATUS = 0 AND SS.PRODUTO_ID = S.PRODUTO_ID  ORDER BY SS.DATA DESC, SS.TABELA_ID DESC  LIMIT 1) CUSTO_MEDIO_US,
+											(SELECT SS.PROMEDIO_GUARANI FROM STOCKS SS WHERE SS.STATUS = 0 AND SS.PRODUTO_ID = S.PRODUTO_ID  ORDER BY SS.DATA DESC, SS.TABELA_ID DESC  LIMIT 1) CUSTO_MEDIO_GS,
+											(SELECT SS.PROMEDIO_DOLAR FROM STOCKS SS WHERE SS.STATUS = 0 AND SS.PRODUTO_ID = S.PRODUTO_ID  ORDER BY SS.DATA DESC, SS.TABELA_ID DESC  LIMIT 1) CUSTO_MEDIO_US,
 											SUM(S.ENTRADA - S.SAIDA) STOCK
 											FROM STOCKS S
 											INNER JOIN PRODUTOS P
@@ -663,9 +663,10 @@ class Stock < ActiveRecord::Base
         persona       = "AND V.PERSONA_ID = #{params[:persona_id]}" unless params[:persona_id].blank?
         clase       = "AND P.CLASE_ID = (#{params[:busca]["clase"]})" unless params[:busca]["clase"].blank?
         #PRODUTO
-        produto = "AND P.id = #{params[:produto_id]}" unless params[:produto_id].blank?
-        terminal      = "AND V.TERMINAL_ID = #{params[:busca]['terminal']}" unless params[:busca]['terminal'].blank?
-        colecao = "AND P.COLECAO_ID = #{params[:busca]["colecao"]}" unless params[:busca]["colecao"].blank?
+        produto  = "AND P.id = #{params[:produto_id]}" unless params[:produto_id].blank?
+        terminal = "AND V.TERMINAL_ID = #{params[:busca]['terminal']}" unless params[:busca]['terminal'].blank?
+        colecao  = "AND P.COLECAO_ID = #{params[:busca]["colecao"]}" unless params[:busca]["colecao"].blank?
+        grupo    = "AND P.grupo_id = #{params[:busca]["grupo"]}" unless params[:busca]["grupo"].blank?
 
 
 
@@ -673,11 +674,12 @@ class Stock < ActiveRecord::Base
                      P.ID AS PRODUTO_ID,
                      V.PERSONA_ID,
                      MAX(P.NOME) AS PRODUTO_NOME,
+                     MAX(G.DESCRICAO) AS GRUPO_NOME,
+                     MAX(SG.DESCRICAO) AS SUB_GRUPO_NOME,
                      MAX(P.FABRICANTE_COD) AS REFERENCIA,
-                     MAX(CL.DESCRICAO) AS MARCA_NOME,
                      MAX(V.PERSONA_NOME) AS PERSONA_NOME,
                      SUM(VP.QUANTIDADE) AS QUANTIDADE,
-                     MAX((SELECT SS.UNITARIO_GUARANI FROM STOCKS SS WHERE SS.DATA <= VP.DATA AND SS.STATUS = 0 AND SS.DEPOSITO_ID = VP.DEPOSITO_ID AND SS.PRODUTO_ID = VP.PRODUTO_ID ORDER BY SS.DATA DESC, SS.TABELA_ID DESC LIMIT 1)) CUSTO_MEDIO_GS,
+                     MAX((SELECT SS.PROMEDIO_GUARANI FROM STOCKS SS WHERE SS.DATA <= VP.DATA AND SS.STATUS = 0 AND SS.DEPOSITO_ID = VP.DEPOSITO_ID AND SS.PRODUTO_ID = VP.PRODUTO_ID ORDER BY SS.DATA DESC, SS.TABELA_ID DESC LIMIT 1)) CUSTO_MEDIO_GS,
                      SUM( (VP.TOTAL_GUARANI - COALESCE(VP.DESCONTO_GUARANI,0))) / SUM(VP.QUANTIDADE) AS UNITARIO_GUARANI,
                      SUM(VP.TOTAL_GUARANI - COALESCE(VP.DESCONTO_GUARANI,0)) AS TOTAL_GUARANI
 
@@ -689,14 +691,16 @@ class Stock < ActiveRecord::Base
                      INNER JOIN PRODUTOS P
                      ON P.ID = VP.PRODUTO_ID
 
-                     INNER JOIN CLASES CL
-                     ON CL.ID = P.CLASE_ID
+                     LEFT JOIN GRUPOS G
+                     ON P.GRUPO_ID = G.ID
 
+                     LEFT JOIN SUB_GRUPOS SG
+                     ON P.SUB_GRUPO_ID = SG.ID
 
                      WHERE V.UNIDADE_ID = #{params[:unidade]}
-                     AND (SELECT COUNT(VF) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID ) > 0
+                     AND exists (SELECT 1 FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID )
                      AND V.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
-                     #{vend} #{cc} #{produto} #{terminal} #{persona} #{clase} #{colecao}
+                     #{vend} #{cc} #{produto} #{terminal} #{persona} #{clase} #{colecao} #{grupo}
                      GROUP BY 1,2
 
                 UNION ALL
@@ -705,11 +709,12 @@ class Stock < ActiveRecord::Base
                      P.ID AS PRODUTO_ID,
                      V.PERSONA_ID,
                      MAX(P.NOME) AS PRODUTO_NOME,
+                     MAX(G.DESCRICAO) AS GRUPO_NOME,
+                     MAX(SG.DESCRICAO) AS SUB_GRUPO_NOME,
                      MAX(P.FABRICANTE_COD) AS REFERENCIA,
-                     MAX(CL.DESCRICAO) AS MARCA_NOME,
                      MAX(V.PERSONA_NOME) AS PERSONA_NOME,
                      SUM(VP.QUANTIDADE) * -1 AS QUANTIDADE,
-                     (SUM((SELECT SS.UNITARIO_GUARANI FROM STOCKS SS WHERE SS.STATUS = 0 AND SS.DEPOSITO_ID =  VP.DEPOSITO_ID AND SS.PRODUTO_ID = VP.PRODUTO_ID ORDER BY SS.DATA DESC, SS.TABELA_ID DESC LIMIT 1)) / SUM(VP.QUANTIDADE)) * -1 CUSTO_MEDIO_GS,
+                     (SUM((SELECT SS.PROMEDIO_GUARANI FROM STOCKS SS WHERE SS.STATUS = 0 AND SS.DEPOSITO_ID =  VP.DEPOSITO_ID AND SS.PRODUTO_ID = VP.PRODUTO_ID ORDER BY SS.DATA DESC, SS.TABELA_ID DESC LIMIT 1)) / SUM(VP.QUANTIDADE)) * -1 CUSTO_MEDIO_GS,
                      (SUM(VP.TOTAL_GUARANI) / SUM(VP.QUANTIDADE)) * -1 AS UNITARIO_GUARANI,
                      SUM(VP.TOTAL_GUARANI) * -1 AS TOTAL_GUARANI
 
@@ -718,13 +723,14 @@ class Stock < ActiveRecord::Base
                      ON V.ID = VP.NOTA_CREDITO_ID
                      INNER JOIN PRODUTOS P
                      ON P.ID = VP.PRODUTO_ID
+                     LEFT JOIN GRUPOS G
+                     ON P.GRUPO_ID = G.ID
 
-                     LEFT JOIN CLASES CL
-                     ON CL.ID = P.CLASE_ID
+                     LEFT JOIN SUB_GRUPOS SG
+                     ON P.SUB_GRUPO_ID = SG.ID
 
-
-                     WHERE V.OPERACAO = 0 AND V.UNIDADE_ID = #{params[:unidade]} AND V.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
-                     #{vend} #{cc} #{produto} #{persona} #{clase} #{colecao}
+                     WHERE V.UNIDADE_ID = #{params[:unidade]} AND V.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
+                     #{vend} #{cc} #{produto} #{persona} #{clase} #{colecao} #{grupo}
                      GROUP BY 1,2
 
 
@@ -734,8 +740,9 @@ class Stock < ActiveRecord::Base
                      P.ID AS PRODUTO_ID,
                      V.PERSONA_ID,
                      MAX(P.NOME) AS PRODUTO_NOME,
+                     MAX(G.DESCRICAO) AS GRUPO_NOME,
+                     MAX(SG.DESCRICAO) AS SUB_GRUPO_NOME,
                      MAX(P.FABRICANTE_COD) AS REFERENCIA,
-                     MAX(CL.DESCRICAO) AS MARCA_NOME,
                      MAX(V.PERSONA_NOME) AS PERSONA_NOME,
                      SUM(VP.QUANTIDADE) AS QUANTIDADE,
                      SUM((SELECT sum(PC.QUANTIDADE * ((SELECT (SS.UNITARIO_GUARANI / PV.PESO) FROM STOCKS SS WHERE SS.STATUS = 0 AND SS.ENTRADA > 0 AND SS.PRODUTO_ID = PC.COMPONENTE_ID AND SS.DATA <= VP.DATA ORDER BY SS.DATA DESC, SS.TABELA_ID DESC  LIMIT 1) ) )
@@ -749,15 +756,19 @@ class Stock < ActiveRecord::Base
                      FROM VENDAS_PRODUTOS VP
                      INNER JOIN VENDAS V
                      ON V.ID = VP.VENDA_ID
+
                      INNER JOIN PRODUTOS P
                      ON P.ID = VP.PRODUTO_ID
-                     LEFT JOIN CLASES CL
-                     ON CL.ID = P.CLASE_ID
+                     LEFT JOIN GRUPOS G
+                     ON P.GRUPO_ID = G.ID
+
+                     LEFT JOIN SUB_GRUPOS SG
+                     ON P.SUB_GRUPO_ID = SG.ID
 
                      WHERE  P.TIPO_PRODUTO = 2 AND  V.UNIDADE_ID = #{params[:unidade]}
-                     AND (SELECT COUNT(VF) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID ) > 0
+                     AND exists (SELECT 1 FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID )
                      AND V.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
-                     #{vend} #{cc} #{produto} #{terminal} #{persona} #{clase} #{colecao}
+                     #{vend} #{cc} #{produto} #{terminal} #{persona} #{clase} #{colecao} #{grupo}
                      GROUP BY 1,2
                      ORDER BY 9 DESC
         "

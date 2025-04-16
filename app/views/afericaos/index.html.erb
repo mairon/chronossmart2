@@ -1,0 +1,36 @@
+<h1 id="header">Aferición</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_afericao_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+    <td width="50" align="center">Cod.</td>
+    <td width="50" align="center">Fecha</td>
+    <td width="50" align="center">Control</td>
+    <td width="300">Resposable</td>
+    <td width="50">Bico</td>
+    <td width="250">Origen</td>
+    <td width="250">Destino</td>
+    <td width="70" align="right">Cantidad</td>
+  </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @afericaos.each do |a| %>
+      <tr class= "<%= cycle( "cor1", "cor2" )%>">
+    <td width="50" align="center"><%= a.id.to_s.rjust(6,'0') %></td>
+    <td width="50" align="center"><%= a.data.strftime("%d/%m/%y") %></td>
+    <td width="50" align="center"><%= a.abastecida_id.to_s.rjust(6,'0') %></td>
+    <td width="300"><%= a.resposavel_nome %></td>
+    <td width="50"><%= a.bico_nome %></td>
+    <td width="250"><%= a.deposito_origem_nome %></td>
+    <td width="250"><%= a.deposito_destino_nome %></td>
+    <td width="70" align="right"><%= a.quantidade %></td>
+        <td><%= link_to 'Borrar', a, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

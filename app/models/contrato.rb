@@ -2,26 +2,19 @@ class Contrato < ActiveRecord::Base
 	belongs_to :persona
   belongs_to :centro_custo
   belongs_to :apartamento
+  belongs_to :pedido_traslado
+  belongs_to :terminal
 	has_many :contrato_servicos, dependent: :destroy, order: 'id'
   has_many :contrato_custos, dependent: :destroy, order: 'id'
   accepts_nested_attributes_for :contrato_servicos, :reject_if => lambda { |a| a[:produto_id].blank? }, :allow_destroy => true
 	after_create :gerador_cotas
 	before_destroy :destroy_cli
-  before_update :update_cli
 
   validates_presence_of :persona_id
 
 	def destroy_cli
 		Cliente.destroy_all("tabela = 'CONTRATOS' and tabela_id = #{self.id}")
 	end
-
-  def update_cli
-    cli = Cliente.where("tabela = 'CONTRATOS' and tabela_id = #{self.id}")
-    cli.each do |p|
-      p.update_attributes(descricao: self.obs, centro_custo_id: self.centro_custo_id)
-    end
-  end
-
 
 	def gerador_cotas
 

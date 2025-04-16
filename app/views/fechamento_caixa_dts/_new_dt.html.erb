@@ -11,28 +11,35 @@
     </div>
   <% end %>
   <%= f.hidden_field :fechamento_caixa_id %>
+  <%= f.hidden_field :abertura_caixa_id %>
   <%= f.hidden_field :forma_pago_id, value: 17 %>
+  <%= f.hidden_field :usuario_created, value: current_user.id %>
 
   <div class="row">
     <div class="col-md-6">
       <label>Cuenta <%= t('SOURCE_S') %></label>
-      <%= f.collection_select :conta_origem_id, Conta.all(:select => 'id,nome',:order => '1,2',:conditions => ["unidade_id = #{current_unidade.id} and terminal_id = #{ @fechamento_caixa.abertura_caixa.terminal_id} and forma_pago_id = 1"]),:id,:nome,{:prompt => 'selecione la Cuenta'},{required: true} %>
-      
+      <%= f.collection_select :conta_origem_id, Conta.all(:select => 'id,nome',:order => '1,2',:conditions => ["unidade_id = #{current_unidade.id} and terminal_id = #{ @abertura_caixa.terminal_id}"]),:id,:nome,{:prompt => 'selecione la Cuenta'},{required: true, class: 'selectize'} %>
     </div>
+
     <div class="col-md-6">
         <label>Cuenta Destino</label>
-        <%= f.collection_select :conta_destino_id, Conta.all(:select => 'id,nome',:order => '1,2',:conditions => ["unidade_id = #{current_unidade.id} and tesouraria = true "]),:id,:nome,{:prompt => 'selecione la Cuenta'},{required: true} %>
-      
+        <%= f.collection_select :conta_destino_id, Conta.all(:select => 'id,nome',:order => '1,2',:conditions => ["unidade_id = #{current_unidade.id} and tesouraria = true"]),:id,:nome,{:prompt => 'selecione la Cuenta'},{required: true, class: 'selectize'} %>
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <br>
+      <%= f.text_area :obs, class: 'panel-field', placeholder: 'Concepto', rows: 3, required: true %>
     </div>
   </div>
   <div class="row">
     <div class="col-md-6">
-      <%= field_us_label 'Valor',f,:valor %>      
+      <%= field_us_label 'Valor',f,:valor %>
     </div>
 
-    <div class="col-md-6">
-      <label>.</label>
+    <div class="col-md-6 padding-btn">
       <%= f.submit :value => t('SAVE'), :class => "button add", :disable_with => "Aguarde..." %>
     </div>
-  </div>              
+  </div>
 <% end %>

@@ -1,0 +1,33 @@
+<div class="panel">
+	<h1 id="header">Cheques Diferidos</h1>
+	<div class="panel-content">
+		<table class="head_grid">
+				<tr>
+					<td width="60" align="center">Fecha</td>
+					<td width="60" align="center">Diferido</td>
+					<td width="200">Cuenta</td>
+					<td width="100">Cheque</td>
+					<td width="220">Titular</td>
+					<td width="80" align="right">Monto</td>
+				</tr>
+		</table>
+		<div class="rolagem" id="div" style="height: 150px">
+			<table>
+				<% tot = 0 %>
+				<% Financa.where(persona_id: @persona.id, cheque_status: 1 ).each do |c| %>
+				<tr class="<%= cycle("cor1", "cor2")%>">
+					<td width="60" align="center"><%= c.data.strftime("%d/%m/%y") %></td>
+					<td width="60" align="center"><%= c.diferido.strftime("%d/%m/%y") %></td>
+					<td width="200"><small><%= c.conta.nome %></small></td>
+					<td width="100"><%= c.cheque %></td>
+					<td width="220"><small><%= c.titular %></small></td>
+					<td width="80" align="right"><%= format_int(c.entrada_guarani) %></td>
+					<% tot += c.entrada_guarani %>
+				</tr>
+				<% end %>
+			</table>
+		</div>
+		<p class="bold" align="right"><%= format_int(tot)%></p>
+	</div>
+
+</div>

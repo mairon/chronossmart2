@@ -18,6 +18,9 @@
           </h1>
 
           <div class="panel-body">
+
+
+
             <div class="row">
               <div class="col-md-4">
                 <label>Plan de Venta</label>
@@ -34,6 +37,23 @@
                 <%= Persona.find(@solicitude_credito.plano_venda.vendedor_id).nome %>
               </div>
             </div>
+
+            <div class="row">
+              <div class="col-md-4">
+                <label>Seguro</label>
+                <% seg = Persona.find(@solicitude_credito.plano_venda.persona_seguro_id) unless @solicitude_credito.plano_venda.persona_seguro_id.blank? %>
+                <%= seg.nome unless @solicitude_credito.plano_venda.persona_seguro_id.blank? %>
+              </div>
+
+              <div class="col-md-4">
+                <label>Factura</label>
+                  <% vd = Venda.find_by_plano_venda_id(@solicitude_credito.plano_venda_id) %>
+                  <% unless vd.blank? %>
+                    <%= vd.documento_numero_01 %>-<%= vd.documento_numero_02 %>-<%= vd.documento_numero.to_s.rjust(7,'0') %>
+                  <% end %>                
+              </div>
+            </div>  
+
           </div>
         </div>
       </div>

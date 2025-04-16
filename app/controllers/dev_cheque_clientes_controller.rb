@@ -37,10 +37,8 @@ class DevChequeClientesController < ApplicationController
     @dev_cheque_cliente = DevChequeCliente.find(params[:id])
     @lista_cheque = DevChequeCliente.lista_cheques(@dev_cheque_cliente.persona_id,@dev_cheque_cliente.moeda,@dev_cheque_cliente.conta_id)
     @dev_dts = DevChequeClienteDt.where("dev_cheque_cliente_id = ?",@dev_cheque_cliente.id)
-    respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @dev_cheque_cliente }
-    end
+    
+    render layout: 'chart'
   end
 
   def comprovante

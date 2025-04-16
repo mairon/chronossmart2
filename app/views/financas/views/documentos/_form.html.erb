@@ -1,0 +1,50 @@
+<%= form_for(@documento) do |f| %>
+
+  <% if @documento.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@documento.errors.count, "error") %> <%=  t('ERROR_ASSET_MESSAGE') %></h2>
+      <ul>
+        <% @documento.errors.full_messages.each do |msg| %>
+        <li>
+          <%= msg %>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+<ul class="tabs">
+      <li><a href="#tab1">Documento [<%= t('EDITION') %>]</a></li>
+</ul>
+<div class="tab_container">
+  <div id="tab1" class="tab_content">
+    <table>
+      <tr>
+        <td align="right">Descripción:</td>
+        <td><%= f.text_field :nome, size: 50, autofocus: true, required: true %></td>
+
+        <td align="right">Sigla :</td>
+        <td><%= f.text_field :sigla, :size => 5  %></td>
+
+        <td align="right">Fiscal </td>
+        <td><%= f.check_box :fiscal %></td>
+
+        <td align="right">Compra </td>
+        <td><%= f.check_box :compra %></td>
+
+        <td align="right">Gasto</td>
+        <td> <%= f.check_box :gastos %></td>
+
+        <td align="right">Empleado</td>
+        <td> <%= f.check_box :folha %></td>
+
+      </tr>
+    </table>
+  </div>
+  <div class="buttons">
+    <%= f.submit t('SAVE'), :class => "button add", :disable_with => "Aguarde...", "data-plus-as-tab" => "false"   %>
+    <%= link_to 'Voltar', documentos_path, :class => "button back" %>
+  </div>
+</div>
+<% end %>
+
+

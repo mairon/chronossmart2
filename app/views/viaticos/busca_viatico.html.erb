@@ -1,12 +1,15 @@
 <div class="group">
   <table class="head_grid">
     <tr>
-      <td width="80" align="center"><%= t('CODE') %></td>
-      <td width="80" align="center"><%= t('DATE') %></td>
-      <td width="250">Nombre</td>
-      <td width="250">Concepto</td>
+      <td width="60" align="center"><%= t('CODE') %></td>
+      <td width="80" align="center"><%= t('DATE') %></td>      
+      <td width="220">Favorecido</td>
+      <td width="200">Forma Pg.</td>
+      <td width="250">Obs</td>
       <td width="35"></td>
-      <td width="70" align="right">Monto</td>
+      <td width="70" align="right">Valor</td>
+      <td width="70" align="right">Aplic</td>
+      <td width="70" align="right">Saldo</td>
     </tr>
   </table>
   <div class="rolagem" dir="div">
@@ -18,26 +21,31 @@
       <% @viaticos.each do |c| %>
 
       <tr class = "<%= cycle("cor1", "cor2") %>">
-        <td width="80" align="center"> <%= c.id.to_s.rjust(6,'0') %></td>
+        <td width="60" align="center"> <%= link_to c.id.to_s.rjust(6,'0'), viatico_path(c.id) %></td>
         <td width="80" align="center"> <%= c.data.strftime("%d/%m/%y")%></td>
-        <td width="250" align="left"  > <%= truncate( c.persona_nome, :legth => 90) %></td>
-        <td width="250" align="left"  > <%= truncate( c.obs, :legth => 90) %></td>
+        <td width="220" align="left"> <%= truncate( c.persona_nome, :legth => 90) %></td>
+        <td width="200" align="left"> <%= truncate( c.forma_pago_nome, :legth => 90) %></td>
+        <td width="250" align="left"> <%= truncate( c.obs, :legth => 90) %></td>
         <% if c.moeda == 0 %>
           <td width="20" align="center">U$</td>
           <td width="70" align="right"> <%= format_decimal(c.valor_us) %></td>
+          <td width="70" align="right"> <%= format_decimal(c.aplicado_us) %></td>
+          <td width="70" align="right"> <%= format_decimal(c.valor_us.to_f - c.aplicado_us.to_f) %></td>
         <% elsif c.moeda == 1 %>
           <td width="20" align="center">G$</td>
           <td width="70" align="right" > <%= format_int(c.valor_gs) %></td>
+          <td width="70" align="right" > <%= format_int(c.aplicado_gs) %></td>
+          <td width="70" align="right"> <%= format_int(c.valor_gs.to_f - c.aplicado_gs.to_f) %></td>
         <% else %>
           <td width="20" align="center">R$</td>
-          <td width="70" align="right" > <%= format_decimal( c.valor_rs) %></td>
+          <td width="70" align="right"> <%= format_decimal(c.valor_rs) %></td>
+          <td width="70" align="right"> <%= format_decimal(c.aplicado_rs) %></td>
+          <td width="70" align="right"> <%= format_decimal(c.valor_rs.to_f - c.aplicado_rs.to_f) %></td>
         <% end %>
         <td><%= link_to '', edit_viatico_path(c), class: 'icon-pencil' %></td>        
         <td width="30">
           <%= link_to '', c, :confirm => 'Estas Seguro?', :method => :delete , class: 'icon-trash' %>
         </td>       
-      
-        <td title="Visualizar"><a target="_blank" href="/viaticos/<%= c.id %>/comprovante" class='icon-fullscreen'></a></td>
       </tr>
       <% end %>
     </table>

@@ -94,6 +94,7 @@
         url:  '/form_fiscals/cliente_update_ft?' + $('form').serialize(),
         dataType: "JSON",
         success: function(data) {
+        	<% if current_unidade.environment_production_fiscal == true %>
         	if (data['fe']['success'] == false){
             $("#data-erro-status").show();
             $.each(data['fe']['errores'], function(i, error) {
@@ -105,9 +106,11 @@
             $.each(data['fe']["result"]['deList'], function(i, cdc) {
               $("#data-success-status").append("<p>"+ data['fe']["result"]["deList"][i].cdc  +"</p>")
             })
-
         		location.reload();
         	}
+					<% else %>
+							location.reload();
+        	 <% end %>
 
           console.log(data);
         }

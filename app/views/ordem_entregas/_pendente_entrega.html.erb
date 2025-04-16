@@ -1,0 +1,88 @@
+<div>
+<%= form_tag "/ordem_entregas/add_produtos", remote: true do %>
+	<%= hidden_field_tag :venda_id, @venda.id %>
+	<table class="head_grid">
+		<tr>
+			<td width="40" align="right">Peso</td>
+			<td width="222">Producto</td>
+			<td width="60" align="right">Qtd.</td>
+			<td width="60" align="right">Stock</td>
+			<td width="60" align="right">Env.</td>
+			<td width="65" align="right">Pendente</td>
+		</tr>
+	</table>
+		<div class="rolagem" dir="div" style="height: 460px;">
+		<table>
+			<% pd_saldo = 0 %>
+			<% @pendente_entrega.each do |pp| %>
+				<%= fields_for "products[]", pp do |f| %>
+				<%= f.hidden_field :produto_id, value: pp.produto_id %>
+				<%= f.hidden_field :vendas_produto_id, value: pp.id %>
+				<%= f.hidden_field :ordem_entrega_id, value: @ordem_entrega.id %>
+				<tr class="<%= cycle("cor1", "cor2")%>">
+					<td width="40" align="right"><%= pp.peso.to_f %></td>
+					<td width="222"><small>	<%= pp.produto_nome %></small></td>
+					<td width="60" align="right"><%= format_peso(pp.quantidade.to_f) %></td>
+					<td width="60" align="right"><%= format_peso(pp.stock.to_f) %></td>
+					<td width="60" align="right"><%= format_peso(pp.qtd_enviado.to_f) %></td>
+					<td width="65" align="right">
+						<% saldo = (pp.quantidade.to_f - pp.qtd_enviado.to_f) %>
+						<%= hidden_field_tag :saldo, format_peso(saldo), id: "saldo_#{pp.id}" %>
+						<%= f.telephone_field :quantidade, value: format_peso(saldo.to_f), dir: "rtl", style: 'font-size: 12px; width: 100%; padding: 2px', onchange: "valid_qtd( '#{format_peso(saldo)}', this.value, '#{pp.id}' )" %>
+
+						<% pd_saldo += saldo.to_f %>
+					</td>
+					<td><span class="material-symbols-outlined" id="add-<%= pp.id %>" onclick="AddOrdemEntrega($('#products_<%= pp.id %>_quantidade').val(), $('#products_<%= pp.id %>_produto_id').val(), $('#products_<%= pp.id %>_vendas_produto_id').val(), <%= pp.id %>)">add_circle</span></td>
+				</tr>
+			<% end %>
+			<% end %>
+		</table>
+	</div>
+	<table class="head_grid">
+	  <tr>
+	    <td width="140"><%= submit_tag " Add Productos", :class => "btn btn-green", id: 'click-modal' %></td>
+	    <td width="305"></td>
+	    <td width="60" align="right" style="padding-right: 10px"><%= format_peso(pd_saldo) %></td>
+	  </tr>
+	</table>
+<% end %>
+</div>
+
+
+<script>
+	function valid_qtd(saldo, qtd, id){
+
+		saldo_s = parseFloat(String( saldo).replace(/\./g, "").replace(",", ".") );
+		qtd_s   = parseFloat( String(qtd).replace(/\./g, "").replace(",", ".") );
+
+		if (qtd_s > saldo_s) {
+			alert('Cantidad Mayor que lo Saldo a Enviar')
+			$("#products_"+id+"_quantidade").val(saldo_s)
+		}
+	}
+</script>
+
+
+<script type="text/javascript">
+
+
+	$('#click-modal').click(function(){
+    $('#click-modal').css({'display':'none'});
+	})
+
+  function AddOrdemEntrega(qtd, produto_id, vendas_produto_id, id){
+  	$("#add-" + id).css({'display':'none'});
+    $.ajax({
+        type: "POST",
+        url: '/ordem_entrega_produtos',
+        dataType: 'script',
+        data : {"ordem_entrega_produto": {
+        	"ordem_entrega_id"     : <%= @ordem_entrega.id %>,
+          "produto_id"   : produto_id,
+          "vendas_produto_id"   : vendas_produto_id,
+          "quantidade" :  qtd
+        	}
+        }
+    })
+  }
+</script>

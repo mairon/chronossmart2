@@ -1,5 +1,5 @@
 <div class="panel">
-  <div  class="panel-body">
+  <div  class="panel-content">
     <% if @cobro.moeda.to_i == 0 %>  
       <table>
         <tr>
@@ -68,70 +68,5 @@
           </tr>
         </table>
       <% end %>
-    </div>
-  </div>
-  <div class="panel">
-    <div  class="panel-body">
-        <legend>Factura</legend>
-        <table class="head_grid">
-          <tr>
-            <td width="100"><%= t('DOC') %></td>
-            <td width="70" align="right"><%= t('VALUE') %></td>
-          </tr>
-        </table>
-
-        <div class="rolagem" dir="div" style="height: 100px">
-          <table>
-            <% @fts.each do |cobros_nc| %>
-            <% if cobros_nc.status == 2 %>
-              <% color = '#fa3e40' %>
-            <% end %>
-
-              <tr class = "<%= cycle("cor1", "cor2") %>">
-                <td  width="100"  bgcolor="<%=color%>"><%= cobros_nc.doc_01 %>.<%= cobros_nc.doc_02 %>.<%= cobros_nc.doc %></td>
-                <td  width="70"  align="right"  bgcolor="<%=color%>"><%= format_int(cobros_nc.tot_gs) %></td>
-                <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(cobros_nc) %></td>
-                <td><%= link_to 'Impri.', "#",  :onclick => "ComprovanteFC(#{cobros_nc.id})" %></td>
-              </tr>
-            <% end %>
-          </table>
-        </div>
-        <%= render partial: "form_fiscals/attr_forms/cobro_update_fc" %>           
-    </div>
-  </div>
-
-  <div class="panel">
-    <div  class="panel-body">
-        <legend>Recibo de Dinero</legend>
-        <table class="head_grid" style="font-size: 10px">
-          <tr>
-            <td width="80"><%= t('DOC') %></td>
-            <td width="50" align="right"><%= t('VALUE') %></td>
-          </tr>
-        </table>
-
-        <div class="rolagem" dir="div" style="height: 100px; font-size: 10px">
-          <table>
-            <% @rds.each do |cobros_nc| %>
-            <% if cobros_nc.status == 2 %>
-              <% color = 'background-color: #fa3e40; color: #fff' %>
-            <% end %>
-
-              <tr class = "<%= cycle("cor1", "cor2") %>">
-                <td  width="100"  style="<%=color%>"><%= cobros_nc.doc_01 %>.<%= cobros_nc.doc_02 %>.<%= cobros_nc.doc %></td>
-                <td  width="70"  align="right"  style="<%=color%>"><%= format_int(cobros_nc.tot_gs) %></td>
-                <% if cobros_nc.status == 1 %>
-                  <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(cobros_nc, status: '2'), style: 'text-decoration: underline' %></td>          
-
-                  <td>
-                    <%= link_to 'Impri.', "#",  :onclick => "ComprovanteRecibo()", style: 'text-decoration: underline' %>
-                  </td>
-                <% end %>
-                <td  style="<%=color %>"><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(cobros_nc, status: '0'), style: "#{color}; text-decoration: underline" %></td>
-              </tr>
-            <% end %>
-          </table>
-        </div>
-        <%= render partial: "form_fiscals/attr_forms/cobro_update_rd" %>           
     </div>
   </div>

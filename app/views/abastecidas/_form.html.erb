@@ -1,0 +1,56 @@
+<%= form_for(@abastecida) do |f| %>
+	<% if @abastecida.errors.any? %>
+		<div id="error_explanation">
+			<h2><%= pluralize(@abastecida.errors.count, "error") %> prohibited this abastecida from being saved:</h2>
+
+			<ul>
+				<% @abastecida.errors.full_messages.each do |msg| %>
+					<li><%= msg %></li>
+				<% end %>
+			</ul>
+		</div>
+	<% end %>
+
+	<ul class="tabs">
+		<li><a href="#tab1"> Abastecidas - [Edicion]</a></li>
+	</ul>
+
+	<div class="tab_container">
+		<div id="tab1" class="tab_content">
+			<fieldset>
+				<table>
+					<tr>
+						<td align="right">Chave:</td>
+						<% if params[:pendente] == "true" %>
+								 <td><%= f.text_field :chave, disabled: true %></td>
+						<% else %>
+								<td><%= f.text_field :chave %></td>
+						<% end %>
+
+						<td align="right">Fecha:</td>
+						<% if params[:pendente] == "true" %>
+						<td><%= f.date_select :data, disabled: true %></td>
+						<% else %>
+						<td><%= f.date_select :data %></td>
+						<% end %>
+					</tr>
+					<tr>
+						<td align="right">Litros:</td>
+						<td><%= f.text_field :litros %></td>
+					</tr>
+					<tr>
+						<td align="right">Status</td>
+						<td><%= f.text_field :status %></td>
+					</tr>
+
+				</table>
+			</fieldset>
+		</div>
+
+		<div class="buttons">
+			<%= f.submit :value => " Grabar ", :class => "button add" %>
+			<%= link_to 'Volver', abastecidas_path, :class => "button back" %>
+		</div>
+
+	</div>
+<% end %>

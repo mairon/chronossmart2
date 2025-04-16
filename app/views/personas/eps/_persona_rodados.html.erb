@@ -1,16 +1,11 @@
 <div class="panel">
-  <div class="panel-body">
-    <div class="row">
-      <div class="col-md-10">
-        <h3>Equipos</h3>
-      </div>
-      <div class="col-md-2">
-        <a class="modalButton-frma panel-icon-right" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-equipos">
-          <%= image_tag("icon-edit.png", width: '13') %>
-        </a>
-      </div>
+  <h1 id="header">
+    Equipos
+    <div class="pull-right">
+      <a class="btn" data-toggle="modal" data-width="500" data-height="781" data-target="#modal-equipos"><i class=" icon-plus-sign"></i></a>
     </div>
-
+  </h1>
+  <div class="panel-body">
     <div class="row">
       <div class="col-md-12">
 
@@ -23,7 +18,7 @@
           </tr>
         </table>
 
-        <div class="rolagem" dir="div" style="height: 200px;">
+        <div class="list" dir="div">
           <table>
             <% @persona.persona_rodados.each do |persona_rodado| %>
               <tr class="<%= cycle("cor1", "cor2")%>">

@@ -1,18 +1,19 @@
-   <table class="head_grid">
+   <table class="head_grid" style="font-size: 10px;">
       <tr>
         <td width="150">Ref.</td>
         <td width="120" >Grupo</td>
         <td width="250" >Producto</td>
         <td width="40" align="right">Ctd</td>
         <td width="70" align="right">Unid.</td>
-        <td width="90" align="right">Total</td>
+        <td width="70" align="right">Total</td>
         <td width="70" align="right">Desc.</td>
         <td width="70" align="right">Monto c/ Desc.</td>
         <td width="70" align="right">Cuotas</td>
         <td width="70" align="right">Valor Cuotas</td>
+        <td width="70" align="center">1º Venc.</td>
       </tr>
    </table>
-   <div class="rolagem" dir="div">
+   <div class="rolagem" dir="div"  style="font-size: 10px;">
       <table>
          <% indice     = 1 %>
          <% qtd        = 0 %>
@@ -56,7 +57,7 @@
                   <% if pp.cuotas.to_i > 0 %>
                     <%= format_int( (pp.total_guarani.to_f - (pp.total_guarani.to_f * (pp.desconto.to_f / 100))) / pp.cuotas.to_i ) %>
                   <% end %>
-                </td>                
+                </td>
                  <% tot_gs += pp.total_guarani.to_f %>
                  <% tot_cus_gs += (pp.promedio_guarani.to_f * pp.quantidade) %>
                <% else %>
@@ -64,6 +65,7 @@
                  <td width="70" align="right"><%= format_decimal( pp.total_real ) %></td>
                   <% tot_rs += pp.total_real %>
                <% end %>
+               <td width="70" align="center"><%= pp.vencimento.strftime("%d/%m/%y") %></td>
                <td><%= link_to '', edit_presupuesto_presupuesto_produto_path(presupuesto,pp), class: 'icon-pencil' %></td>
                <td><%= link_to '', [presupuesto,pp], :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>
 

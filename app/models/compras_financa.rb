@@ -1,15 +1,43 @@
 class ComprasFinanca < ActiveRecord::Base
-    belongs_to :compra
-    belongs_to :conta
-    belongs_to :persona
-    belongs_to :forma_pago
-    validates_presence_of :valor_dolar, :valor_guarani
-    #validates_uniqueness_of :documento_numero  , :scope=>[:persona_id, :documento_numero_01, :documento_numero_02, :persona_id, :cota], :message => " ja cadastrado."
-    after_save :liquida_prov_gasto
-    after_destroy :liquida_prov_gasto
+  belongs_to :compra
+  belongs_to :conta
+  belongs_to :persona
+  belongs_to :forma_pago
+  validates_presence_of :valor_dolar, :valor_guarani
+  #validates_uniqueness_of :documento_numero  , :scope=>[:persona_id, :documento_numero_01, :documento_numero_02, :persona_id, :cota], :message => " ja cadastrado."
+  after_save :liquida_prov_gasto, :finds
+  after_destroy :liquida_prov_gasto
 
-    before_save :finds
-    def finds        #
+  after_create :trigger_viatico_cliente
+  after_destroy :trigger_viatico_cliente_destroy
+
+  def trigger_viatico_cliente
+
+      extrato = Cliente.where(persona_id: compra.funcionario_id, documento_numero_01: 'V00', documento_numero: self.fact_an )
+      if self.moeda == 0
+         if extrato.sum('divida_dolar - cobro_dolar') == 0 
+            extrato.update_all(liquidacao: 1)
+         end
+
+      elsif self.moeda == 1
+         if extrato.sum('divida_guarani - cobro_guarani').to_f == 0 
+            extrato.update_all(liquidacao: 1)
+         end
+
+      elsif self.moeda == 2
+         if extrato.sum('divida_real - cobro_real').to_f == 0 
+            extrato.update_all(liquidacao: 1)
+         end
+      end
+  end
+
+  def trigger_viatico_cliente_destroy
+    extrato = Cliente.where(persona_id: self.persona_id, documento_numero_01: 'V00', documento_numero: self.documento_numero )
+    extrato.update_all(liquidacao: 0)
+  end    
+
+
+    def finds
         if compra.moeda == 0
           self.valor_guarani = self.valor_dolar.to_f * compra.cotacao.to_f
           self.valor_real = self.valor_dolar.to_f / compra.cotacao_rs_us.to_f
@@ -26,15 +54,8 @@ class ComprasFinanca < ActiveRecord::Base
           self.valor_dolar = self.valor_euro.to_f * compra.cotacao_eu_us.to_f
         end
 
-        documento          = Documento.find_by_id(self.documento_id);
-        self.documento_nome = documento.nome.to_s unless self.documento_id.blank?
-
         conta          = Conta.find_by_id(self.conta_id);
         self.conta_nome = conta.nome.to_s  unless self.conta_id.blank?;
-
-        persona          = Persona.find_by_id(self.persona_id);
-        self.persona_nome = persona.nome.to_s  unless self.persona_id.blank?;
-        self.persona_ruc  = persona.ruc.to_s  unless self.persona_id.blank?;
 
         if compra.tipo_compra == 1
             if compra.descricao == ''

@@ -1,0 +1,93 @@
+  <div class="panel">
+    <div class="panel-content">
+      <h1>Factura  <a href="#" data-toggle="modal" data-target="#modal-faturamento" class="btn btn-green" style="padding: 5px 10px; float: right; "> +</a></h1>
+
+					<table class="head_grid">
+					  <tr>
+					    <td width="100">Lanz.</td>
+					    <td width="100">Factura</td>
+					  </tr>
+					</table>
+
+					<div class="rolagem" dir="div" style="height: 80px">
+					  <table>  
+					    <% @fts.each do |ft| %>
+					    <% if ft.status == 2 %>
+					      <% color = '#fa3e40' %>
+					    <% end %>
+
+					      <tr class = "<%= cycle("cor1", "cor2") %>">
+					      <td  width="100"  bgcolor="<%=color%>"><%= ft.id %></td>
+					        <td  width="100"  bgcolor="<%=color%>"><%= ft.doc_01 %>.<%= ft.doc_02 %>.<%= ft.doc %></td>
+					        <% if ft.status == 1 %>
+					          <td>
+					          	<% if current_user.tipo.to_i == 0 %>
+					          		<%= link_to 'Anular', form_anula_nc_form_fiscal_path(ft, status: '2') %>
+					          	<% end %>
+					        	</td>
+					          <td>
+				          		<%= link_to 'Re-imprimir', "#",  :onclick => "MultiplaFaturaVenda(#{ft.id})" %>					          	
+					          </td>
+					        <% end %>
+					        <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0') %></td>
+					      </tr>
+					    <% end %>
+					  </table>
+					</div>
+				  <div class="modal fade" id="modal-faturamento" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+				    <div class="modal-dialog" role="document">
+				      <div class="modal-content">
+				        <div class="modal-header">
+				          <div class="close-button">
+				            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				          </div>
+				          <h1 class="modal-title-f" id="myModalLabelf">Datos de la Factura</h1>
+				        </div>
+				        <div class="modal-body">
+
+
+									<% unless @fts.present? %>
+										<%= render partial: "form_fiscals/attr_forms/contrato_update_ft" %>
+									<% else %>
+										<% if @fts.first.status.to_i != 1 %>
+											<%= render partial: "form_fiscals/attr_forms/contrato_update_ft" %>
+										<% end %>
+
+										<!-- controle de impressao !-->
+										<% if @fts.first.status.to_i == 1 and @fts.first.impressao.to_i == 0 and @fts.first.autorizacao == true %>
+											<script type="text/javascript">
+												function MultiplaFaturaVenda(){
+													window.open('/form_fiscals/' + <%= @fts.first.id %> +'/impressao_ft', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+
+												    $.ajax({
+												    		type: "POST",
+												        url: '/form_fiscals/'+ <%= @fts.first.id %> +'/update_impressao',
+												        data: 'id=' + <%= @fts.first.id %>,
+												        dataType: 'script'
+												    })
+
+												}
+												window.onload = MultiplaFaturaVenda;
+											</script>
+										<% else %>
+											<script type="text/javascript">
+												function MultiplaFaturaVenda(id){
+													window.open('/form_fiscals/' + id +'/impressao_ft', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
+												    $.ajax({
+												    		type: "POST",
+												        url: '/form_fiscals/'+ id +'/update_impressao',
+												        data: 'id=' + id,
+												        dataType: 'script'
+												    })
+												}
+											</script>
+										<% end %>
+									<% end %>
+
+
+				        </div>
+				      </div>
+				    </div>
+				  </div>
+					</div>
+</div>

@@ -1,5 +1,82 @@
 class Relatorios < ActiveRecord::Base
 
+	def self.consumicao_interna(params)
+		rod = "AND CI.RODADO_ID = #{params[:busca]["rodado"]}" unless params[:busca]["rodado"].blank?
+		per = "AND CI.PERSONA_ID = #{params[:busca]["persona"]}" unless params[:busca]["persona"].blank?
+		mot = "AND CI.MOTIVO_ID = #{params[:busca]["motivo"]}" unless params[:busca]["motivo"].blank?
+		cc = "AND CI.CENTRO_CUSTO_ID = #{params[:busca]["cc"]}" unless params[:busca]["cc"].blank?
+
+		if params[:lancamento].to_s != "1"
+			if params[:moeda] == "0"
+				moeda = "AND CI.MOEDA = 0"
+			elsif params[:moeda] == "1"
+				moeda = "AND CI.MOEDA = 1"
+			else
+				moeda = "AND CI.MOEDA = 2"
+			end
+		end
+
+ 					sql = "SELECT CI.ID,
+ 									CI.DATA,
+                  M.NOME AS MOTIVO_NOME,
+                  CC.NOME AS CENTRO_CUSTO_NOME,
+                  R.PLACA AS RODADO_NOME,
+                  P.NOME AS PRODUTO_NOME,
+                  CIP.QUANTIDADE,
+                  CIP.UNITARIO_GUARANI,
+                  CIP.TOTAL_GUARANI,
+                  CIP.UNITARIO_DOLAR,
+                  CIP.TOTAL_DOLAR,
+                  CI.MOEDA
+              FROM CONSUMICAO_INTERNA_PRODUTOS CIP
+
+              INNER JOIN CONSUMICAO_INTERNAS CI
+              ON CI.ID = CIP.CONSUMICAO_INTERNA_ID
+
+              LEFT JOIN MOTIVOS M
+              ON M.ID = CI.MOTIVO_ID
+
+              LEFT JOIN CENTRO_CUSTOS CC
+              ON CC.ID = CI.CENTRO_CUSTO_ID
+
+              LEFT JOIN RODADOS R
+              ON R.ID = CI.RODADO_ID
+
+              LEFT JOIN PRODUTOS P
+              ON P.ID = CIP.PRODUTO_ID
+              WHERE CI.UNIDADE_ID = #{params[:unidade]} and CI.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}'
+              #{rod} #{per} #{mot} #{cc} #{moeda}
+              ORDER BY 2,1
+              "
+      ConsumicaoInterna.find_by_sql(sql)
+	end
+
+	def self.controle_km(params)
+
+		rod = "AND CK.RODADO_ID = #{params[:busca]["rodado"]}" unless params[:busca]["rodado"].blank?
+		per = "AND CK.PERSONA_ID = #{params[:busca]["persona"]}" unless params[:busca]["persona"].blank?
+
+		    sql = "SELECT CK.ID,
+                  CK.DATA,
+                  R.PLACA AS RODADO_NOME,
+                  P.NOME AS PERSONA_NOME,
+                  CK.OBS,
+                  CK.KM
+            FROM CONTROLE_KMS CK
+
+            LEFT JOIN PERSONAS P
+            ON P.ID = CK.PERSONA_ID
+
+            LEFT JOIN RODADOS R
+            ON R.ID = CK.RODADO_ID
+
+            WHERE CK.UNIDADE_ID = #{params[:unidade]} and CK.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}' #{rod} #{per}
+            ORDER BY CK.DATA, CK.ID"
+
+		ControleKm.find_by_sql(sql)
+
+	end
+
 def self.detalhe_sueldo(params)
   per  = "AND SS.PERSONA_ID = #{params[:busca]["empregado"]}" unless params[:busca]["empregado"].blank?
   if params[:tipo_detalhe]  == 'SUELDO Y COMISION'
@@ -639,7 +716,7 @@ def self.resultado_control_obra(params)
 												WHERE V.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
 												#{unidade} #{sub_grupo} #{grupo} #{persona} #{produto} #{moeda}
 						ORDER BY 4
-						"						
+						"
 
 		end
 		VendasProduto.find_by_sql(sql)
@@ -826,7 +903,7 @@ def self.resultado_control_obra(params)
     if params[:emitidos_recebidos].to_s == '1'
       em_r = "AND F.CHEQUE_STATUS BETWEEN 1 AND 2"
     else
-      em_r = "AND F.CHEQUE_STATUS = 0 AND F.CHEQUE <> '' AND F.ESTADO = 0 AND (F.SAIDA_DOLAR + F.SAIDA_GUARANI + F.SAIDA_REAL) > 0"
+      em_r = "AND TABELA IN ('COMPRAS_FINANCAS', 'PAGOS', 'ADELANTOS', 'EGRESSOS', 'SUELDO_PAGOS') AND  F.CHEQUE <> '' AND (F.SAIDA_DOLAR + F.SAIDA_GUARANI + F.SAIDA_REAL) > 0"
     end
 
     sql = "SELECT F.TABELA,
@@ -850,7 +927,7 @@ def self.resultado_control_obra(params)
             FROM FINANCAS F
             INNER JOIN CONTAS C
             ON C.ID = F.CONTA_ID
-            WHERE F.ESTADO = 0 AND C.UNIDADE_ID = #{params[:unidade]} AND F.CHEQUE_STATUS IS NOT NULL #{em_r} #{moeda} #{data} #{diferido} #{cheque} #{numero} #{conta} #{cliente} ORDER BY F.DATA,F.CHEQUE, F.ID, F.SAIDA_GUARANI
+            WHERE C.UNIDADE_ID = #{params[:unidade]} AND F.CHEQUE_STATUS IS NOT NULL #{em_r} #{moeda} #{data} #{diferido} #{cheque} #{numero} #{conta} #{cliente} ORDER BY F.DIFERIDO,F.CHEQUE, F.ID, F.SAIDA_GUARANI
 "
 
     Financa.find_by_sql( sql )
@@ -860,12 +937,12 @@ def self.resultado_control_obra(params)
 	def self.gastos(params)
 
 		#filtros
-		rodado        = "AND C.RODADO_ID = '#{params[:busca]["rodado"]}'" unless params[:busca]["rodado"].blank?
-		centro_custo  = "AND C.CENTRO_CUSTO_ID = '#{params[:busca]["centro_custo"]}'" unless params[:busca]["centro_custo"].blank?
+		rodado        = "AND CC.RODADO_ID = '#{params[:busca]["rodado"]}'" unless params[:busca]["rodado"].blank?
+		centro_custo  = "AND CC.CENTRO_CUSTO_ID = '#{params[:busca]["centro_custo"]}'" unless params[:busca]["centro_custo"].blank?
 		persona       = "AND C.PERSONA_ID = #{params[:busca]["prov"]}" unless params[:busca]["prov"].blank?
 		forma_pago    = "AND C.FORMA_PAGO_ID = #{params[:busca]["forma_pago"]}" unless params[:busca]["persona"].blank?
 		safra         = "AND C.SAFRA_ID = #{params[:busca]["safra"]}" unless params[:busca]["safra"].blank?
-		plano_contas  = "AND C.PLANO_DE_CONTA_ID = #{params[:busca]["plano_de_conta"]}" unless params[:busca]["plano_de_conta"].blank?
+		plano_contas  = "AND CC.PLANO_DE_CONTA_ID = #{params[:busca]["plano_de_conta"]}" unless params[:busca]["plano_de_conta"].blank?
 
 		fiscal    = "AND C.FISCAL = #{params[:tipo_fiscal]}" if params[:tipo_fiscal] != '2'
 		tipo_doc  = "AND C.TIPO = #{params[:tipo_doc]}" if params[:tipo_doc] != '2'
@@ -897,7 +974,7 @@ def self.resultado_control_obra(params)
 								    S.NOME AS SAFRA,
 								    PC.DESCRICAO AS PLANO_DE_CONTA_NOME,
 								    C.DESCRICAO
-							FROM COMPRAS C 
+							FROM COMPRAS C
 							INNER JOIN PERSONAS P
 							ON P.ID = C.PERSONA_ID
 
@@ -971,8 +1048,8 @@ def self.resultado_control_obra(params)
 							 			SUM(C.TOTAL_DOLAR) AS TOTAL_DOLAR,
 							 			SUM(C.TOTAL_GUARANI) AS TOTAL_GUARANI,
 							 			SUM(C.TOTAL_REAL) AS TOTAL_REAL
-										
-										FROM COMPRAS C 
+
+										FROM COMPRAS C
 										INNER JOIN PERSONAS P
 										ON P.ID = C.PERSONA_ID
 
@@ -996,10 +1073,10 @@ def self.resultado_control_obra(params)
 										AND C.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
 										AND C.UNIDADE_ID = #{params[:unidade]} #{rodado} #{centro_custo} #{persona} #{forma_pago} #{safra} #{moeda} #{plano_contas}  #{fiscal} #{tipo_doc}
 										GROUP BY 1
-										"			
+										"
 		end
 
-		Compra.find_by_sql(sql)		
+		Compra.find_by_sql(sql)
 
 	end
 
@@ -1083,6 +1160,7 @@ def self.resultado_control_obra(params)
 											 S.NOME AS SETOR_NOME,
 											 (SELECT SUM(VP.QUANTIDADE) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID ) AS QTD,
 											 (SELECT SUM(VP.TOTAL_DOLAR) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID ) AS TOTAL_DOLAR,
+											 (SELECT SUM(VP.TOTAL_REAL) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID ) AS TOTAL_REAL,
 											 (SELECT SUM(VP.TOTAL_GUARANI) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID ) AS TOTAL_GUARANI
 
 								FROM
@@ -1104,6 +1182,34 @@ def self.resultado_control_obra(params)
 
 								WHERE (SELECT COUNT(VF) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID ) > 0 AND V.UNIDADE_ID = #{params[:unidade]} AND V.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{n_faturado} #{regiao} #{find_pedido} #{find_condic} #{moeda} #{persona} #{doc_tipo} #{vendedor} #{indicador} #{setor} #{setor}
 								ORDER BY 3,2, 10"
+
+		elsif params["detalhe"] == '7' #Vendedor/Agrupado Cliente
+					sql ="SELECT
+											 V.VENDEDOR_ID,
+											 V.PERSONA_ID,
+											 MAX(P.NOME) AS VENDEDOR_NOME,
+											 MAX(C.NOME) AS PERSONA_NOME,
+											 SUM(VP.QUANTIDADE) AS QTD,
+											 SUM(V.DESCONTO_GS) AS DESCONTO_GS,
+											 SUM(VP.TOTAL_DOLAR) AS TOTAL_DOLAR,
+											 SUM(VP.TOTAL_GUARANI) AS TOTAL_GUARANI
+
+								FROM VENDAS_PRODUTOS VP
+								INNER JOIN VENDAS V
+								ON V.ID = VP.VENDA_ID
+
+								LEFT JOIN PERSONAS C
+								ON V.PERSONA_ID = C.ID
+
+								LEFT JOIN SETORS S
+								ON V.SETOR_ID = S.ID
+
+								LEFT JOIN PERSONAS P
+								ON V.VENDEDOR_ID = P.ID
+
+								WHERE (SELECT COUNT(VF) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID ) > 0 AND V.UNIDADE_ID = #{params[:unidade]} AND V.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{n_faturado} #{regiao} #{find_pedido} #{find_condic} #{moeda} #{persona} #{doc_tipo} #{vendedor} #{indicador} #{setor} #{setor}
+								GROUP BY 1, 2
+								ORDER BY 3,4"
 
 		elsif params["detalhe"] == '6' #Vendedor/produtos
 					sql ="SELECT V.ID,
@@ -1160,7 +1266,7 @@ def self.resultado_control_obra(params)
 														   MAX(P.ESCOLARIDADE) AS ESCOLARIDADE,
 														   MAX((SELECT COUNT(C.ID) FROM EVENTO_CONVIDADOS C WHERE C.PERSONA_ID = EC.PERSONA_ID )),
 														   MAX((SELECT COUNT(C.ID) FROM EVENTO_CONVIDADOS C WHERE C.PERSONA_ID = EC.PERSONA_ID AND C.PRESENTE = TRUE))
-														   
+
 													FROM EVENTO_CONVIDADOS EC
 													INNER JOIN PERSONAS P
 													ON P.ID = EC.PERSONA_ID
@@ -1170,7 +1276,7 @@ def self.resultado_control_obra(params)
 
 													INNER JOIN PRODUTOS PD
 													ON PD.ID = VP.PRODUTO_ID
-													WHERE 
+													WHERE
 													GROUP BY 1,2"
 
 			elsif  params["detalhe"] == '5' #Resumen por Vendedor
@@ -1222,7 +1328,7 @@ def self.resultado_control_obra(params)
 			else
 				if params[:devolvidos] == '1'
 					dev = "AND VP.QUANTIDADE < 0 "
-					
+
 				end
 					sql ="SELECT V.ID,
 											 V.DATA,
@@ -1235,7 +1341,8 @@ def self.resultado_control_obra(params)
 											 S.NOME AS SETOR_NOME,
 											 (SELECT SUM(VP.QUANTIDADE) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID #{dev} ) AS QTD,
 											 (SELECT SUM(VP.TOTAL_DOLAR) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID  #{dev}) AS TOTAL_DOLAR,
-											 (SELECT SUM(VP.TOTAL_GUARANI) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID #{dev} ) AS TOTAL_GUARANI
+											 (SELECT SUM(VP.TOTAL_GUARANI) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID #{dev} ) AS TOTAL_GUARANI,
+											 (SELECT SUM(VP.TOTAL_REAL) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID #{dev} ) AS TOTAL_REAL
 								FROM
 								VENDAS V
 								LEFT JOIN PERSONAS P
@@ -1305,7 +1412,7 @@ def self.resultado_control_obra(params)
 					Cobro.find_by_sql(sql)
 
 		elsif params[:detalhe].to_s == '3' #RENDICION
-        
+
 				if params[:lancamento].to_s != "1"
 						if params[:moeda] == "0"
 							moeda = "AND C.moeda = 0"
@@ -1612,7 +1719,7 @@ def self.resultado_control_obra(params)
 					FROM
 						PERSONAS P
 					WHERE
-					  P.TIPO_FUNCIONARIO = 1 
+					  P.TIPO_FUNCIONARIO = 1
 					  AND ((SELECT COUNT(S.ID) FROM SUELDOS_DETALHES S WHERE PERSONA_ID = P.ID #{dias} AND date_part('month', DATA) = '#{params[:mes]}' AND date_part('year', DATA) = '#{params[:ano]}')  ) > 0
 	          #{empregado} #{unidade} #{chofer}
 
@@ -1718,7 +1825,7 @@ def self.resultado_control_obra(params)
 
 								WHERE P.MOEDA = #{params[:moeda]} AND P.TABELA = 'ADELANTO_COTAS' AND P.UNIDADE_ID = #{params[:unidade]} AND
 									P.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
-									#{tp_ad} #{persona_p} #{liq} #{tipo_adelanto}
+									#{persona_p} #{liq} #{tipo_adelanto}
 								ORDER BY 1,7,8,3
 							"
 

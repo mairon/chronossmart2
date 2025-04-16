@@ -1,13 +1,33 @@
-<style>
-  td{
-    font-size: 9px;
-  }
-</style>
-<div class="group">
-  <table>
+<%
+
+format_xls 'table' do
+  workbook use_autowidth: true
+  format 'thead tr td', b: true # bold
+end
+
+
+%>
+  <table class="my-table">
+    <% if params[:tipo] == '1' %>
+    <thead>
+      <tr>
+        <td>Cod</td>
+        <td>Fecha</td>
+        <td>Compt.</td>
+        <td>Persona</td>
+        <td>Rodado</td>
+        <td>Empleado</td>
+        <td>Centro de Costo</td>
+        <td>Grupo de Costo</td>
+        <td>Clasificacion</td>
+        <td>Valor</td>
+      </tr>
+    </thead>
+    <% end %>
     <% tot = 0 %>
+    <tbody>
     <% @gastos.each do |gt| %>
-    	<tr class="<%= cycle("cor1", "cor2")%>">
+    	<tr>
     		<td width="30" align="center"><%= gt.compra_id.to_s.rjust(4,'0')%></td>
     		<td width="40" align="center"><%= gt.data.to_date.strftime("%d/%m/%y") unless gt.data.blank?  %></td>
     		<td width="35" align="center"><%= gt.competencia.to_date.strftime("%m/%y") unless gt.competencia.blank? %></td>
@@ -17,19 +37,21 @@
         <td width="150"><%= truncate(gt.centro_custo_nome, length: 25) %></td>
     		<td width="200"><%= truncate(gt.grupo_rubro, length: 25) %></td>
     		<td width="300"><%= truncate(gt.rubro_nome, length: 50) %></td>
-    		<% if params[:moeda] == '0' %>
-    			<td width="60" align="right"><%= format_decimal(gt.valor_us) %></td>
-            <% tot += gt.valor_us.to_f %>
-    		<% elsif params[:moeda] == '1' %>
-    			<td width="60" align="right"><%= format_int(gt.valor_gs) %></td>
-            <% tot += gt.valor_gs.to_f %>
-    		<% else %>
-    			<td width="60" align="right"><%= format_decimal(gt.valor_rs) %></td>
-            <% tot += gt.valor_rs.to_f %>
-    		<% end %>        
+
+          <% if params[:moeda] == '0' %>
+              <td width="60" align="right"><%= format_decimal(gt.valor_us) %></td>
+              <% tot += gt.valor_us.to_f %>
+          <% elsif params[:moeda] == '1' %>
+              <td width="60" align="right"><%= format_int(gt.valor_gs) %> </td>
+              <% tot += gt.valor_gs.to_f %>
+          <% else %>
+            <td width="60" align="right"><%= format_decimal(gt.valor_rs) %></td>
+              <% tot += gt.valor_rs.to_f %>
+          <% end %>
     	</tr>
     <% end %>
-    
+    </tbody>
+    <tfoot>
     <tr class="head">
       <td colspan="9"></td>
       <% if params[:moeda] == '1' %>
@@ -38,6 +60,5 @@
         <td width="40" align="right"><%= format_decimal(tot) %></td>
       <% end %>
     </tr>
-  </tr>
+    </tfoot>
  </table>
-</div>

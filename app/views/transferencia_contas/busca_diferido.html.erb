@@ -50,7 +50,7 @@
                      <% tot += diferido.entrada_guarani.to_f %>
                   <% end %>
 
-                  <td width="10" align="center"><%= check_box_tag "diferido_ids[]", diferido.id, false, { :class => 'm', onclick: "soma(this)" }  %> <%= hidden_field_tag "id", params[:id] %></td>
+                  <td width="10" align="center"><%= check_box_tag "diferido_ids[]", diferido.cheque, false, { :class => 'm', onclick: "soma(this)" }  %> <%= hidden_field_tag "id", params[:id] %></td>
                   <input type="hidden" name="valor_<%= diferido.id %>" id="valor_<%= diferido.id %>" value="<%= format_int(diferido.entrada_guarani) %>" />
                </tr>
             <% end %>

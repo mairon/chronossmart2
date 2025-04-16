@@ -1,0 +1,45 @@
+<div class="panel">
+  <div class="panel-content">
+    <table class="head_grid">
+      <tr>
+        <td width="80">Códgo</td>
+        <td width="80" align="center">Fecha</td>
+        <td width="80" align="center">Hora</td>
+        <td width="80" align="center">Status</td>
+        <td width="250">Frentista</td>
+        <td width="50">Bico</td>
+        <td width="70" align="right">Litros</td>
+        <td width="70" align="right">Precio</td>
+        <td width="70" align="right">Total</td>
+      </tr>
+    </table>
+    <div class="rolagem" dir="div">
+      <table>
+        <% @abastecidas.each do |abastecida| %>
+          <tr class="<%= cycle("cor1", "cor2")%>">
+            <td width="80" ><%= abastecida.id.to_s.rjust(6,'0') %></td>
+            <td width="80" align="center"><%= abastecida.data.strftime("%d/%m/%y") %></td>
+            <td width="80" align="center"><%= abastecida.hora.strftime("%H:%M") %></td>
+            <td width="80" align="center">
+              <% if abastecida.status == 0 %>
+                <span class='btn-success'>Pendiente</span>
+              <% elsif abastecida.status == 1 %>
+                <span class='btn-warning'>Bajado</span>
+              <% elsif abastecida.status == 2 %>
+                <span class='btn-danger'>Devolvido</span>
+              <% end %>
+            </td>
+            <td width="250"><%= abastecida.frentista_nome %> <small>(<%= abastecida.chave %>)</small></td>
+            <td width="50"><%= abastecida.bico_nome %></td>
+            <td width="70" align="right"><%= format_peso(abastecida.litros) %></td>
+            <td width="70" align="right"><%= format_int(abastecida.preco) %></td>
+            <td width="70" align="right"><%= format_int((abastecida.preco.to_f) * abastecida.litros.to_f) %></td>
+            <% if current_user.tipo == 0 %>
+            <td><%= link_to '', edit_abastecida_path(abastecida), class: 'icon-pencil' %></td>
+            <% end %>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  </div>
+</div>

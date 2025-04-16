@@ -1,13 +1,23 @@
 <div class="row">
   <div class="col-md-12">
     <div class="panel">
+        <div class="panel-content">
+          <%= @nota_credito.persona_id %>
         <%= form_for(@nota_credito) do |vdc| %>
-        Selecione lo Documiento <%= vdc.collection_select :documento_id, 
-                    FormFiscal.where("persona_id = #{@nota_credito.persona_id}").select("id, (doc_01 || '.' || doc_02 || '.' || doc) as doc"),:id, :doc, { :prompt => 'Selecione lo documiento' }, { required: true } %>
+          <% if @nota_credito.fiscal.to_i == 1 %>
+            Selecione lo Documiento <%= vdc.collection_select :documento_id,
+                      FormFiscal.where("persona_id = #{@nota_credito.persona_id}").select("id,cod_proc, (doc_01 || '.' || doc_02 || '.' || doc) as doc"),:id, :doc, { :prompt => 'Selecione lo documiento' }, { required: true } %>
+          <% else %>
+            Selecione lo Documiento <%= vdc.collection_select :documento_id,
+                        Venda.where("documento_numero_01 = '000' and persona_id = #{@nota_credito.persona_id}").select("id, (documento_numero_01 || '.' || documento_numero_02 || '.' || documento_numero) as doc"),:id, :doc, { :prompt => 'Selecione lo documiento' }, { required: true } %>
+
+          <% end %>
         <% end %>
+      </div>
     </div>
   </div>
 </div>
+
 <script type="text/javascript">
   $(document).ready(function() {
     $('#nota_credito_documento_id').change(function() {
@@ -22,10 +32,11 @@
     <% ff = FormFiscal.where(id: @nota_credito.documento_id).last %>
     <% cl = Cliente.where(id: ff.cod_proc).last %>
     <% cs = ContratoServico.where(contrato_id: cl.cod_proc) %>
-    
+
     <div class="row">
       <div class="col-md-12">
         <div class="panel">
+          <div class="panel-content">
           <header>CDC: <%= ff.cdc %></header>
            <table class="head_grid">
               <tr>
@@ -54,7 +65,7 @@
               <% end %>
             </table>
           </div>
-          
+        </div>
         </div>
       </div>
     </div>
@@ -63,37 +74,41 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel">
-          <%= render :partial=>"produtos" %>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-12">
-        <div class="panel">
-          <%= render :partial=>"new_detalhe", :locals=>{:nota_creditos_detalhe=>NotaCreditosDetalhe.new(:nota_credito_id=>@nota_credito.id)} %>
-        </div>
-      </div>
-    </div>
-
-
-    <div class="row">
-      <div class="col-md-12">
-        <div class="panel">
-          <%= render :partial=>"index_detalhe", :locals=>{:nota_creditos_detalhes=> @nota_credito.nota_creditos_detalhes} %>
+          <div class="panel-content">
+            <%= render :partial=>"produtos" %>
+          </div>
         </div>
       </div>
     </div>
   <% end %>
 <% end %>
 
+    <div class="row">
+      <div class="col-md-12">
+        <%= render :partial=>"new_detalhe", :locals=>{:nota_creditos_detalhe=>NotaCreditosDetalhe.new(:nota_credito_id=>@nota_credito.id)} %>
+      </div>
+    </div>
 
-<div class="buttons">
-  <a href="/nota_creditos/<%= @nota_credito.id.to_i%>/edit" class="btn back"><%= t('BACK') %></a>
-  <% if @nota_credito.tipo == 0 %>
-    <a href="/nota_creditos" class="btn">Finalizar</a>
-    <a href="javascript:void(0)" class="btn print" onClick="Comprovante()"><%= t('VOUCHER') %></a>  
-  <% else %>
-  <a href="/nota_creditos/<%= @nota_credito.id.to_i%>/documentos" class="btn next">Seguir</a>
-  <% end %>
-</div>
+
+    <div class="row">
+      <div class="col-md-12">
+          <%= render :partial=>"index_detalhe", :locals=>{:nota_creditos_detalhes=> @nota_credito.nota_creditos_detalhes} %>
+        </div>
+      </div>
+    </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="footer-buttons">
+        <a href="/nota_creditos/<%= @nota_credito.id.to_i%>/edit" class="btn btn-blue"><%= t('BACK') %></a>
+        <% if @nota_credito.tipo == 0 %>
+          <a href="/nota_creditos" class="btn">Finalizar</a>
+          <a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"><%= t('VOUCHER') %></a>
+        <% else %>
+        <a href="/nota_creditos/<%= @nota_credito.id.to_i%>/documentos" class="btn btn-blue">Seguir</a>
+        <% end %>
+    </div>
+    </div>
+  </div>
+
+
+

@@ -1,0 +1,60 @@
+<style>
+  .grid-footer td{
+    padding: 5px;
+    color: #000;
+    font-weight: bold;
+  }
+</style>
+
+<h1 class="us">Productos Retirados</h1>
+  <table class="head_grid">
+    <tr>
+      <td width="150">Referencia</td>
+      <td width="550" >Producto</td>
+      <td width="30" align="right">Ctd</td>
+      <td width="70" align="right">Monto</td>
+      <td></td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div" style="height: 200px;">
+     <table>
+        <% rt = 0 %>
+        <% vt = 0 %>
+
+        <% @condicional.condicional_produtos.includes(:produto).where(status: true).order("id desc").each do |os| %>
+        
+          <% prod_rep = CondicionalProduto.joins(:condicional).where("condicionals.persona_id = ? and condicional_produtos.produto_id = ? and condicionals.id != ?", @condicional.persona_id, os.produto_id, @condicional.id).sum(:quantidade) %>
+          <% if prod_rep.to_i > 0 %>
+            <% color = '#ffcccd' %>
+          <% end %>
+
+          <tr class = "<%= cycle("cor1", "cor2") %>">
+            <td bgcolor="<%=color%>" width="150"><%= os.produto.fabricante_cod unless os.produto.nil? %></td>
+            <td bgcolor="<%=color%>" width="550"><%= os.produto_id.to_s.rjust(6,'0') %>-<%= os.produto.nome unless os.produto.nil? %></td>
+            
+            <td bgcolor="<%=color%>" width="30" align="right"><%= os.quantidade %></td>
+            <% if @condicional.moeda.to_i == 0 %>
+              <td bgcolor="<%=color%>" width="70" align="right"><%= format_decimal(os.valor_us) %></td>
+              <% vt += (os.valor_us.to_f * os.quantidade.to_f) %>
+            <% elsif @condicional.moeda.to_i == 1 %>
+              <td bgcolor="<%=color%>" width="70" align="right"><%= format_int(os.valor_gs) %></td>
+              <% vt += (os.valor_gs.to_f * os.quantidade.to_f) %>
+            <% elsif @condicional.moeda.to_i == 2 %>
+              <td bgcolor="<%=color%>" width="70" align="right"><%= format_decimal(os.valor_rs) %></td>
+              <% vt += (os.valor_rs.to_f * os.quantidade.to_f) %>
+            <% end %>
+            <% if @condicional.status == 0 %>
+              <td bgcolor="<%=color%>"><%= link_to '', os, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+            <% end %>
+          </tr>
+          <% rt += os.quantidade.to_f %>
+        <% end %>
+     </table>
+  </div>
+  <table>
+    <tr class="head_grid">
+      <td width="700"></td>
+      <td width="30" align="right"><%= rt.to_i %></td>
+      <td width="70" align="right"><%= format_int(vt) %></td>
+    </tr>
+  </table>

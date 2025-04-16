@@ -1,0 +1,125 @@
+<body onload="window.print()">
+
+
+  <table align="left"  valign="top">
+
+
+    <tr>
+      <td>
+          <FONT FACE="times new roman" size="4">
+             San Lorenzo S.A. Muebles y Eletrodomesticos
+            </FONT>
+        </td>
+    </tr>
+
+    <tr>
+      <td colspan="2">
+        <FONT FACE="times new roman" size="3">
+          --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        </FONT>
+      </td>
+    </tr>
+
+
+
+       <td align="right">
+          <FONT FACE="times new roman" size="3">
+            EMISION: <%=@recepcao_nota_remicao.data.strftime("%d/%m/%Y")%> <%=Time.now.strftime("%H:%M:%S")%>
+          </FONT>
+       </td>
+    </tr>
+
+    <tr>
+      <td colspan="2">
+        <FONT FACE="times new roman" size="3">
+          --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        </FONT>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="2" align="center">
+        <FONT FACE="times new roman" size="3">
+          ITEMS 
+        </FONT>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="2">
+        <FONT FACE="times new roman" size="3">
+          --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        </FONT>
+      </td>
+    </tr>
+
+
+    <tr height="365">
+      <td colspan="2" align="center" valign="top">
+        <FONT FACE="times new roman" size="3">
+
+          <table align="center" >
+
+      <tr>
+        <td width="50" align="center"><FONT FACE="times new roman" size="3">Codigo</font></td>
+        <td width="400" align="center"><FONT FACE="times new roman" size="3">Producto</font></td>
+        <td width="50" align="center"><FONT FACE="times new roman" size="3">Cantidad</font></td>
+        <td width="150" align="center"><FONT FACE="times new roman" size="3">Obs.</font></td>
+      </tr>
+      <tr>
+        <td colspan="5">
+          <FONT FACE="times new roman" size="3">
+          --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+          </FONT>
+        </td>
+      </tr>
+      <% @nota_produtos.each do |produto| %>
+        <tr>
+          <td align="center"><FONT FACE="times new roman" size="3"> <%= produto.produto_cod %> </font></td>
+          <td align="left"><FONT FACE="times new roman" size="3"> <%= produto.produto_nome %></font> </td>
+          <td align="center"><FONT FACE="times new roman" size="3"> <%= produto.quantidade %></font> </td>
+        </tr>
+
+      <%end%>
+    </table>
+
+        </FONT>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="2">
+        <FONT FACE="times new roman" size="3">
+          --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        </FONT>
+      </td>
+    </tr>
+
+
+    <tr>
+      <td colspan="2" align="right">
+        <FONT FACE="times new roman" size="3">
+          <b>
+            Total =>  <%= number_to_currency(@qtd, :format=>' %n ', :precision => 0) %>
+          </b>
+        </FONT>
+      </td>
+    </tr>
+
+    <tr>
+      <td colspan="2">
+        <FONT FACE="times new roman" size="3">
+          --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        </FONT>
+      </td>
+    </tr>
+
+
+  </table>
+
+</body>
+
+
+
+
+

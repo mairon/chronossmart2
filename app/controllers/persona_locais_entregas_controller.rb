@@ -2,12 +2,10 @@ class PersonaLocaisEntregasController < ApplicationController
   # GET /persona_locais_entregas
   # GET /persona_locais_entregas.json
   def index
-    @persona_locais_entregas = PersonaLocaisEntrega.all
+    @persona_locais_entregas = PersonaLocaisEntrega.where(persona_id: params[:persona_id])
 
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @persona_locais_entregas }
-    end
+
+    render layout: false
   end
 
   # GET /persona_locais_entregas/1
@@ -44,7 +42,8 @@ class PersonaLocaisEntregasController < ApplicationController
 
     respond_to do |format|
       if @persona_locais_entrega.save
-        format.html { redirect_to "/personas/#{@persona_locais_entrega.persona_id}/local_entregas"}
+        format.html { redirect_to "/personas/#{@persona_locais_entrega.persona_id}"}
+        format.js {render text: "$('.modal-body-oe').load('#{modal_add_ordem_entregas_path(venda_id: params[:venda_id]) }');"}
       else
         format.html { render action: "new" }
       end
@@ -58,7 +57,7 @@ class PersonaLocaisEntregasController < ApplicationController
 
     respond_to do |format|
       if @persona_locais_entrega.update_attributes(params[:persona_locais_entrega])
-        format.html { redirect_to "/personas/#{@persona_locais_entrega.persona_id}/local_entregas"}
+        format.html { redirect_to "/personas/#{@persona_locais_entrega.persona_id}"}
       else
         format.html { render action: "edit" }
       end
@@ -72,7 +71,7 @@ class PersonaLocaisEntregasController < ApplicationController
     @persona_locais_entrega.destroy
 
     respond_to do |format|
-      format.html { redirect_to "/personas/#{@persona_locais_entrega.persona_id}/local_entregas"}
+      format.html { redirect_to "/personas/#{@persona_locais_entrega.persona_id}"}
     end
   end
 end

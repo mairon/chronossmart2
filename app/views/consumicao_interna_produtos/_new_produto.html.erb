@@ -17,6 +17,7 @@
 	 <%= f.hidden_field :cotacao,:value =>   @consumicao_interna.cotacao.to_i %>
 	 <%= f.hidden_field :moeda,:value => @consumicao_interna.moeda  %>
 	 <%= f.hidden_field :data,:value => @consumicao_interna.data  %>
+   <%= f.hidden_field :abastecida_id %>
 
 	<div class="group">
 		<table>
@@ -25,6 +26,14 @@
 				<td >
 					<%= f.collection_select :deposito_id, Deposito.all(:select => 'id,nome',:conditions => ["unidade_id = #{@consumicao_interna.unidade_id}"], :order => '2'),:id, :nome %>
 				</td>
+
+        <% if Empresa.last.segmento.to_i == 4 %>
+          <td>
+            <a href="#" class="btn btn-blue" data-toggle="modal" data-load-url="<%= modal_abastecidas_abastecidas_path(consumicao_interna_id: @consumicao_interna.id) %>" data-target="#ModalAbastecidas"><span class="material-symbols-outlined" style="color: #fff">local_gas_station</span></a>
+          </td>
+        <% end %>
+
+
         <td align="right">Producto:</td>
         <td>
           <%= f.text_field :produto_nome, size: 56, autofocus: true %>
@@ -82,6 +91,7 @@ $(function() {
     select: function( event, ui ) {
       $("#consumicao_interna_produto_produto_id").val("");
       $('#consumicao_interna_produto_produto_id').val(ui.item.id);
+      $('#consumicao_interna_produto_produto_nome').val(ui.item.name);
       var deposito = $('#consumicao_interna_produto_deposito_id').val()
 
       $.ajax({url: "/buscas/busca_conferencia_produto",
@@ -111,3 +121,54 @@ $(function() {
 
 </script>
 
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="ModalAbastecidas">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content" style="height: 720px; width: 400px">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h2 class="modal-title" id="myModalLabel" align="center">Abastecidas </h2>
+      </div>
+      <div class="modal-body-oe" style="padding: 10px" align="center">
+        <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner-b", width: 21, height: 21, style: "display: none;") %>
+
+        <script type="text/javascript">
+          function AddVenda(id, produto_id, litros, preco, total, deposito_id, bico_id, produto_nome, data){
+              $("#consumicao_interna_produto_abastecida_id").val(id);
+              $("#consumicao_interna_produto_produto_nome").val(produto_nome);
+              $("#consumicao_interna_produto_produto_id").val(produto_id);
+              $("#consumicao_interna_produto_quantidade").val(number_format( litros,3, ',', '.') );
+              $("#consumicao_interna_produto_deposito_id").val(deposito_id);
+
+              $('#ModalAbastecidas').modal('hide');
+          }
+        </script>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.onkeyup = function(c) {
+    if(c.which == 187){
+      $('#spinner-b').show();
+      $("#ModalAbastecidas").modal("show");
+      $('.modal-body-oe').load('<%= modal_abastecidas_abastecidas_path(consumicao_interna: @consumicao_interna.id) %>', function(){
+        $('#spinner-b').hide("slow");
+      });
+    }
+
+  }
+
+  $('#ModalAbastecidas').on('show.bs.modal', function (e) {
+    $('#spinner-b').show();
+    var loadurl = $(e.relatedTarget).data('load-url');
+    $(this).find('.modal-body-oe').load(loadurl, function(){
+      $('#spinner-b').hide("slow");
+    });
+  });
+</script>

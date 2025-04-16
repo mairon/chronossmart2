@@ -1,0 +1,29 @@
+<% dividas_gs = Cliente.where(persona_id: @persona.id, liquidacao: 0 ).sum("divida_guarani - cobro_guarani") %>
+<% cheques_gs = Financa.where(persona_id: @persona.id, cheque_status: 1 ).sum("entrada_guarani") %>
+<% limit_credito_disponivel = (((@persona.limite_credito.to_f - (dividas_gs.to_f + cheques_gs.to_f)) / @persona.limite_credito.to_f) * 100) %>
+
+<% limit_credito_disponivel_dividas = (((@persona.limite_credito.to_f - (dividas_gs.to_f)) / @persona.limite_credito.to_f) * 100) %>
+<% limit_credito_utilizado_dividas = (100 - ((@persona.limite_credito.to_f - (dividas_gs.to_f)) / @persona.limite_credito.to_f) * 100) %>
+
+<% limit_credito_disponivel_cheques = (((@persona.limite_credito.to_f - (cheques_gs.to_f)) / @persona.limite_credito.to_f) * 100) %>
+<% limit_credito_utilizado_cheques = (100 - ((@persona.limite_credito.to_f - (cheques_gs.to_f)) / @persona.limite_credito.to_f) * 100) %>
+
+<div class="panel">
+	<div class="panel-content">
+		<h3 align="center" class="bold">Limite Disponible</h3>
+		<h1 align="center" class="bold">Gs. <%= format_int( @persona.limite_credito.to_f - (dividas_gs.to_f + cheques_gs.to_f)) %> <br> <small><%= format_decimal(limit_credito_disponivel ) %>%</small></h1>
+		<div class="pull-left"><small>Gs.0</small></div>
+		<div class="pull-right"><small>Gs.<%= format_int(@persona.limite_credito) %></small></div>
+		<br>
+		<div class="progress">
+  		<div class="progress-bar" role="progressbar" style="width: <%= limit_credito_utilizado_dividas.round(2)%>% " aria-valuenow="<%= limit_credito_utilizado_dividas.round(2)%>" aria-valuemin="0" aria-valuemax="100"></div>
+		    <div class="progress-bar" role="progressbar" style="width:  <%= limit_credito_utilizado_cheques.round(2)%>%; background-color: #000" aria-valuenow=" <%= limit_credito_utilizado_cheques.round(2)%>" aria-valuemin="0" aria-valuemax="100"></div>
+		</div>
+		<label>Utilizado <small>(<%= format_decimal(limit_credito_utilizado_dividas) %>%)</small></label>
+		<div style="background-color: #1060ff; padding: 5px; border-radius: 5px; width: 15px; display: inline-block;"></div>  Gs.<%= format_int(dividas_gs) %>
+
+		<label>Cheques Diferidos <small>(<%= format_decimal(limit_credito_utilizado_cheques) %>%)</small></label>
+		<div style="background-color: #000; padding: 5px; border-radius: 5px; width: 15px; display: inline-block;"></div>  Gs.<%= format_int(cheques_gs) %>
+
+	</div>
+</div>

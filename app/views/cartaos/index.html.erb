@@ -8,6 +8,7 @@
     <td width="200">Mesas/Trajetas</td>
     <td width="50">Status</td>
     <td width="200">Barra</td>
+    <td width="100">Ultima Venta</td>
   </tr>
 </table>
 
@@ -17,7 +18,8 @@
       <tr class = "<%= cycle("cor1", "cor2") %>">
         <td width="200"><%= cartao.nome %></td>
         <td width="50"><%= cartao.status %></td>
-        <td width="200"><%= cartao.barra %></td>
+        <td width="100"><%= cartao.barra %></td>
+        <td><%= cartao.venda_id %></td>
         <td><%= link_to 'Editar', edit_cartao_path(cartao) %></td>
         <td><%= link_to 'Borrar', cartao, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
       </tr>

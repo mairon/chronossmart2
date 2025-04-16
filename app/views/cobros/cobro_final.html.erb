@@ -1,57 +1,65 @@
 
   <div class="row">
     <div class="col-md-8">
-      <div class="panel">
-        <div  class="panel-body">
-          <h1 id="header">
-            <%= t('DATE') %> <%= @cobro.data.strftime("%d/%m/%Y") %> |
-            <%= @cobro.persona_nome %>
-            | Cotz. U$:
-            <%= format_int( @cobro.cotacao ) %> 
-            R$.: <%= format_int( @cobro.cotacao_real ) %>
-            R$xU$: <%= format_decimal( @cobro.cotacao_rs_us ) %>
-          </h1>
 
-          <%= render :partial=>"index_financa", :locals=>{:cobros_financas => @cobro.cobros_financas} %>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel">
+            <h1 id="header">
+              <%= t('DATE') %> <%= @cobro.data.strftime("%d/%m/%Y") %> |
+              <%= @cobro.persona_nome %>
+              | Cotz. U$:
+              <%= format_int( @cobro.cotacao ) %>
+              R$.: <%= format_int( @cobro.cotacao_real ) %>
+              R$xU$: <%= format_decimal( @cobro.cotacao_rs_us ) %>
+            </h1>
+            <div  class="panel-content">
+              <%= render :partial=>"index_financa", :locals=>{:cobros_financas => @cobro.cobros_financas} %>
+            </div>
+          </div>
+        </div>
 
-          <% if @cobro.moeda.to_i == 0 %>
+        <div class="col-md-12">
+          <div class="panel">
+            <div  class="panel-content conta">
+              <% if @cobro.moeda.to_i == 0 %>
 
-            <% if (@fecha_result_us.to_f.round(2) != (@financ_cred_us.to_f - @financ_deb_us.to_f).to_f.round(2)) %>
-              <%= render :partial=>"new_financa_E03", :locals=>{:cobros_financa=>CobrosFinanca.new(:cobro_id=>@cobro.id)} %>
-            <% elsif (@fecha_result_us.to_f.round(2) == (@financ_cred_us.to_f - @financ_deb_us.to_f).to_f.round(2)) %>
-              <div class="alert alert-success" align="center" style="margin: 10px">
-                <font color="green"><h1> <b><%= t('OPERATION_CONCLUDED') %></b></h1></font>
-              </div>
-            <% end %>
+                <% if (@fecha_result_us.to_f.round(2) != (@financ_cred_us.to_f - @financ_deb_us.to_f).to_f.round(2)) %>
+                  <%= render :partial=>"new_financa_E03", :locals=>{:cobros_financa=>CobrosFinanca.new(:cobro_id=>@cobro.id)} %>
+                <% elsif (@fecha_result_us.to_f.round(2) == (@financ_cred_us.to_f - @financ_deb_us.to_f).to_f.round(2)) %>
+                  <div class="alert alert-success" align="center" style="margin: 10px">
+                    <font color="green"><h1> <b><%= t('OPERATION_CONCLUDED') %></b></h1></font>
+                  </div>
+                <% end %>
 
-          <% elsif @cobro.moeda.to_i == 1 %>
+              <% elsif @cobro.moeda.to_i == 1 %>
 
-            <% if (@fecha_result_gs.to_f.round(2) != (@financ_cred_gs.to_f - @financ_deb_gs.to_f).to_f.round(2))  %>
-              <%= render :partial=>"new_financa_E03", :locals=>{:cobros_financa=>CobrosFinanca.new(:cobro_id=>@cobro.id)} %>
-            <% elsif (@fecha_result_gs.to_f.round(2) == (@financ_cred_gs.to_f - @financ_deb_gs.to_f).round(2)) %>
-              <div class="alert alert-success" align="center" style="margin: 10px">
-                <font color="green"><h1> <b><%= t('OPERATION_CONCLUDED') %></b></h1></font>
-              </div>
-            <% end %>
+                <% if (@fecha_result_gs.to_f.round(0) != (@financ_cred_gs.to_f - @financ_deb_gs.to_f).to_f.round(0))  %>
+                  <%= render :partial=>"new_financa_E03", :locals=>{:cobros_financa=>CobrosFinanca.new(:cobro_id=>@cobro.id)} %>
+                <% elsif (@fecha_result_gs.to_f.round(0) == (@financ_cred_gs.to_f - @financ_deb_gs.to_f).round(0)) %>
+                  <div class="alert alert-success" align="center" style="margin: 10px">
+                    <font color="green"><h1> <b><%= t('OPERATION_CONCLUDED') %></b></h1></font>
+                  </div>
+                <% end %>
 
-          <% elsif @cobro.moeda.to_i == 2 %>
+              <% elsif @cobro.moeda.to_i == 2 %>
 
-            <% if (@fecha_result_rs.to_f.round(2) != (@financ_cred_rs.to_f - @financ_deb_rs.to_f).to_f.round(2)) %>
-              <%= render :partial=>"new_financa_E03", :locals=>{:cobros_financa=>CobrosFinanca.new(:cobro_id=>@cobro.id)} %>
-            <% elsif (@fecha_result_rs.to_f.round(2) == (@financ_cred_rs.to_f - @financ_deb_rs.to_f).to_f.round(2)) %>
-              <div class="alert alert-success" align="center" style="margin: 10px">
-                <font color="green"><h1> <b><%= t('OPERATION_CONCLUDED') %></b></h1></font>
-              </div>
-            <% end %>
-          <% end %>
+                <% if (@fecha_result_rs.to_f.round(2) != (@financ_cred_rs.to_f - @financ_deb_rs.to_f).to_f.round(2)) %>
+                  <%= render :partial=>"new_financa_E03", :locals=>{:cobros_financa=>CobrosFinanca.new(:cobro_id=>@cobro.id)} %>
+                <% elsif (@fecha_result_rs.to_f.round(2) == (@financ_cred_rs.to_f - @financ_deb_rs.to_f).to_f.round(2)) %>
+                  <div class="alert alert-success" align="center" style="margin: 10px">
+                    <font color="green"><h1> <b><%= t('OPERATION_CONCLUDED') %></b></h1></font>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
 
-
-          <div class="footer-buttons">             
+          <div class="footer-buttons">
             <% if @cobro.moeda == 0 %>
               <input type="hidden" id="sum" value="<%= format_decimal( @fecha_result_us.to_f ) %>">
               <input type="hidden" id="tot" value="<%= format_decimal( (@financ_cred_us.to_f - @financ_deb_us.to_f) ) %>">
               <% if @fecha_result_us.to_f.round(2) != (@financ_cred_us.to_f - @financ_deb_us.to_f).round(2) %>
-                <h1 style="color:red; float:left; font-size:32px" ><%= t('PENDING') %></h1>
               <% else %>
                 <a href="#" class="btn btn-green delete" onclick="ValidCompra()" >Finalizar</a>
               <% end %>
@@ -60,7 +68,6 @@
               <input type="hidden" id="sum" value="<%= format_int( @fecha_result_gs.to_f ) %>">
               <input type="hidden" id="tot" value="<%= format_int((@financ_cred_gs.to_f - @financ_deb_gs.to_f) ) %>">
               <% if @fecha_result_gs.to_f.round(2) != (@financ_cred_gs.to_f - @financ_deb_gs.to_f).round(2) %>
-                <h1 style="color:red; float:left; font-size:32px" ><%= t('PENDING') %></h1>
               <% else %>
                 <a href="#" class="btn btn-green" onclick="ValidCompra()" >Finalizar</a>
               <% end %>
@@ -69,25 +76,31 @@
               <input type="hidden" id="tot" value="<%= format_decimal( (@financ_cred_rs.to_f - @financ_deb_rs.to_f) ) %>">
 
               <% if @fecha_result_rs.to_f.round(2) != (@financ_cred_rs.to_f - @financ_deb_rs.to_f).round(2) %>
-                <h1 style="color:red; float:left; font-size:32px" ><%= t('PENDING') %></h1>
               <% else %>
                 <a href="#" class="btn btn-green" onclick="ValidCompra()" >Finalizar</a>
               <% end %>
             <% end %>
 
-            <a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"><%= image_tag('printer.png') %> Comprovante</a>
-            
+            <a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"><%= image_tag('printer.png') %> Comprobante</a>
+
             <%= hidden_field_tag :id, @cobro.id %>
-            <a href="/cobros/<%=params[:id]%>" class="btn btn-back" ><%= t('BACK') %></a> 
-          </div>          
+            <a href="/cobros/<%=params[:id]%>" class="btn btn-blue" ><%= t('BACK') %></a>
+          </div>
         </div>
       </div>
-
-
-
     </div>
+
     <div class="col-md-4">
       <%= render "somatorio_financeira" %>
+
+      <% if current_unidade.environment_production_fiscal == true %>
+        <%= render 'faturamento_eletronico' %>
+      <% else %>
+        <%= render 'faturamento_impresso' %>
+      <% end %>
+
+      <%= render "recibo" %>
+      <%= render "nota_credito" %>
     </div>
   </div>
 
@@ -103,7 +116,7 @@
   }
   function Comprovante(){
     window.open('/cobros/'+document.getElementById('id').value+'/comprovante', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
-  }  
+  }
 
   function ValidCompra(){
   if (parseFloat(document.getElementById('sum').value) !=  parseFloat(document.getElementById('tot').value)){

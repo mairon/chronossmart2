@@ -193,4 +193,8 @@ module ApplicationHelper
     number_to_currency( valor, format: '%n', precision: 0 )
   end
 
+
+   def custom_field_input(form, custom_field)
+        form.text_field custom_field.internal_name, id: custom_field.internal_name
+    end
 end

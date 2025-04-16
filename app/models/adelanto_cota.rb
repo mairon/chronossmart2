@@ -1,5 +1,5 @@
 class AdelantoCota < ActiveRecord::Base
-  audit(:create, :update, :destroy) { |model, user, action| "|#{model.adelanto_id.to_s.rjust(8,'0')}| Hecho por #{user.usuario_nome}" }
+  #audit(:create, :update, :destroy) { |model, user, action| "|#{model.adelanto_id.to_s.rjust(8,'0')}| Hecho por #{user.usuario_nome}" }
 	belongs_to :adelanto
 	#validate :valid_cotas, :on => :update
 

@@ -19,11 +19,15 @@ class Ingresso < ActiveRecord::Base
 
     def self.filtro_ingreso(params)
         unidade = "unidade_id = #{params[:unidade]} AND "
-        data  = "data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'" unless params[:inicio].blank?
+        data  = "AND data BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'" unless params[:inicio].blank?
 
         if params[:tipo] == "CODIGO"
           tipo = "id"
           busca = "AND E.ID = #{params[:busca]}" unless params[:busca].blank?
+        elsif params[:tipo] == "CHEQUE"
+          tipo = "cheque"
+          busca = "AND E.CHEQUE = '#{params[:busca]}'" unless params[:busca].blank?
+
         else
           tipo = "conta_nome"
           busca = "AND C.NOME ILIKE '%#{params[:busca]}%' " unless params[:busca].blank?
@@ -47,7 +51,7 @@ class Ingresso < ActiveRecord::Base
                 LEFT JOIN USUARIOS U
                 ON U.ID = E.USUARIO_CREATED
 
-                WHERE E.UNIDADE_ID = #{params[:unidade]} #{busca}
+                WHERE E.UNIDADE_ID = #{params[:unidade]} #{busca} #{data}
                 ORDER BY E.DATA DESC,ID DESC
 
 

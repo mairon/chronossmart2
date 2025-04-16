@@ -45,9 +45,9 @@
              </td>
                <td width="50" align="left"><%= cl.id %></td>
                <td width="50" align="left"><%= cl.data_nascimento.strftime("%d/%m") %></td>
-               <td width="480" align="left"><%= link_to "#{cl.persona.nome} - #{cl.nome}", persona_path(cl.persona_id)%></td>
+               <td width="480" align="left"><%= link_to "#{cl.persona.nome unless cl.persona.nil?} - #{cl.nome}", persona_path(cl.persona_id)%></td>
                <td width="150">
-                 <i class="fa fa-whatsapp"></i> <a href=" http://api.whatsapp.com/send?1=pt_BR&phone=<%= cl.persona.telefone.to_s.gsub(' ', '').gsub('+', '') %>" target="_blank"><%= cl.persona.telefone %></a>
+                 <i class="fa fa-whatsapp"></i> <a href=" http://api.whatsapp.com/send?1=pt_BR&phone=<%= cl.persona.telefone.to_s.gsub(' ', '').gsub('+', '') unless cl.persona.nil? %>" target="_blank"><%= cl.persona.telefone unless cl.persona.nil? %></a>
                </td>
             </tr>
             <% total += 1 %>

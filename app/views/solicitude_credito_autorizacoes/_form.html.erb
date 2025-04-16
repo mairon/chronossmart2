@@ -24,26 +24,26 @@
 
                 <table>
                   <tr>
-                                      
-                      <td align="right">solicitude_credio_id :</td>                    
+
+                      <td align="right">solicitude_credio_id :</td>
                       <td><%= f.number_field :solicitude_credio_id %></td>
-                                      
-                      <td align="right">status :</td>                    
+
+                      <td align="right">status :</td>
                       <td><%= f.number_field :status %></td>
-                                      
-                      <td align="right">obs :</td>                    
+
+                      <td align="right">obs :</td>
                       <td><%= f.text_area :obs %></td>
-                                      </tr>                 
+                                      </tr>
                 </table>
               </fieldset>
             </td>
           </tr>
         </table>
       </div>
-      
+
       <div class="buttons">
         <%= f.submit :value => " Grabar ", :class => "button" %>
-        <%= link_to 'Volver', solicitude_credito_autorizacoes_path, :class => "button back" %>        
+        <%= link_to 'Volver', solicitude_credito_autorizacoes_path, :class => "button back" %>
       </div>
 
     </div>

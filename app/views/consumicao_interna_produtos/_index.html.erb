@@ -2,6 +2,7 @@
 	 <table class="head_grid">
 		<tr>
 			 <td width="50" align="center">#</td>
+			 <td align="center" width="150">Deposito</td>
 			 <td align="center" width="100">Referencia</td>
 			 <td width="370">Producto</td>
 			 <td width="70" align="right">Cantidad</td>
@@ -19,9 +20,10 @@
 			 <% consumicao_interna_produtos.each do |cip| %>
 				<tr class = "<%= cycle("cor1", "cor2") %>">
 					<td width="50" align="center"><%= indice %></td>
+					<td width="150" align="center"><%= cip.deposito.nome %></td>
 					<td width="100" align="center"><%= cip.produto.fabricante_cod %></td>
 					<td width="370"><%= cip.produto_id.to_s.rjust(6,'0')%>-<%= cip.produto.nome %></td>
-					<td width="70" align="right"><%= format_int(cip.quantidade) %></td>
+					<td width="70" align="right"><%= format_peso(cip.quantidade) %></td>
 					<% if @consumicao_interna.moeda.to_i == 0 %>
 						<td width="70" align="right"><%= format_decimal(cip.unitario_dolar) %></td>
 						<td width="70" align="right"><%= format_decimal(cip.total_dolar) %></td>

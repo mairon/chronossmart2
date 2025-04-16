@@ -62,7 +62,7 @@
 
 		<div class="col-md-6">
 			<label>Nº Factura</label>
-			<%= select("busca", "doc", FormFiscal.all(:select => 'id,doc,doc_01,doc_02',:conditions => ["tipo_doc = 1 and status = 0  and terminal_id = #{@venda.terminal_id} and unidade_id = #{@venda.unidade_id}"],limit: 40,:order => 'CAST(doc as integer)').collect {|p| [ p.doc_01 << '.' << p.doc_02 << '.' << p.doc, p.id ] },:class => "panel-field") %>
+			<%= select("busca", "doc", FormFiscal.all(:select => 'id,doc,doc_01,doc_02',:conditions => ["tipo_doc = 1 and status = 0  and terminal_id = #{@venda.terminal_id} and unidade_id = #{@venda.unidade_id}"],limit: 100,:order => 'CAST(doc as integer)').collect {|p| [ p.doc_01 << '.' << p.doc_02 << '.' << p.doc, p.id ] },:class => "panel-field") %>
 		</div>
 		<div class="col-md-12">
 			<br>

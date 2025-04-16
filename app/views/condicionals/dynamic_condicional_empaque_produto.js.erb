@@ -1,0 +1,52 @@
+	<% if @list_grade.present? %>
+		<% if @list_grade.last.cd == 'SAIDA' %>
+
+				<% if @list_grade.last.saldo_stock.to_i >= 0 %>
+					$('#label_ref').append('<%= @list_grade.last.fabricante_cod %>');
+					$('#label_nome').append('<%= @list_grade.last.produto_nome %>');
+					$('#label_cor').append('<%= @list_grade.last.cor %>');
+					$('#label_tamanho').append('<%= @list_grade.last.tamanho %>');
+					$('#label_conf').empty();
+
+
+					$('#condicional_produto_produto_id').attr("value", <%= @list_grade.last.produto_id %>);
+					
+					<% if @list_grade.last.preco_desc_gs.to_f > 0 %>
+						$('#condicional_produto_valor_gs').attr("value",number_format(  parseFloat(<%= @list_grade.last.preco_desc_gs.to_f %>),0, ',', '.'));
+						$('#condicional_produto_promo_id').attr("value", <%= @list_grade.last.promo_id %>);
+						$('#label_promo').append('Desconto: <%= @list_grade.last.percen_desc.to_i %>%');
+					<% else %>
+						$('#condicional_produto_valor_gs').attr("value",number_format(  parseFloat(<%= @list_grade.last.preco_gs.to_i %>),0, ',', '.'));
+					<% end %>
+				<% else %>
+					alert('Producto Sin Stock!');
+					$("#new_condicional_produto")[0].reset();
+					$("#referencia").focus()
+				<% end %>
+		<% end %>
+
+	<% else %>
+		alert('Producto no encontrado o ya registrado')
+		$("#new_condicional_produto")[0].reset();
+		$("#referencia").focus()
+	<% end %>
+
+
+<% if @list_grade.present? %>  
+	<% if @list_grade.last.cd == 'ENTRADA' %>
+		$('#label_ref').append('<%= @list_grade.last.fabricante_cod %>');
+		$('#label_nome').append('<%= @list_grade.last.produto_nome %>');
+		$('#label_cor').append('<%= @list_grade.last.cor %>');
+		$('#label_tamanho').append('<%= @list_grade.last.tamanho %>');
+		$('#label_conf').empty();
+
+
+		$('#condicional_produto_produto_id').attr("value", <%= @list_grade.last.produto_id %>);
+		$('#condicional_produto_valor_gs').attr("value",number_format(  parseFloat(<%= @list_grade.last.preco_gs.to_i %>),0, ',', '.'));
+
+	<% end %>
+<% else %>
+	alert('Producto no encontrado o ya registrado')
+	$("#new_condicional_produto")[0].reset();
+	$("#referencia").focus()
+<% end %>

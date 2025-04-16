@@ -21,7 +21,7 @@
         <label><%= t('DATE') %></label>
         <%= f.date_select :data %>
       </td>
-            
+
       <td>
         <fieldset>
           <legend><%= t('COIN') %></legend>
@@ -32,14 +32,14 @@
           <% elsif current_unidade.moeda.to_i == 1 %>
             <%= f.radio_button :moeda, 1,  :Checked => "True" %> Guaranies
             <%= f.radio_button :moeda, 0 %> Dolar
-            <%= f.radio_button :moeda, 2 %> Real            
+            <%= f.radio_button :moeda, 2 %> Real
           <% elsif current_unidade.moeda.to_i == 2 %>
             <%= f.radio_button :moeda, 1 %> Guaranies
             <%= f.radio_button :moeda, 0 %> Dolar
             <%= f.radio_button :moeda, 2,  :Checked => "True" %> Real
           <% end %>
         </fieldset>
-      </td>    
+      </td>
     </tr>
     <tr>
       <td colspan="4">
@@ -58,14 +58,14 @@
       </td>
     </tr>
 
-    <tr>      
+    <tr>
       <td colspan="4">
         <label>Deposito</label>
         <%= f.collection_select :deposito_id, Deposito.all(:select => 'id,nome', :conditions => "unidade_id = #{current_unidade.id}",:order => '2'),:id,:nome, { :prompt => 'Selecione lo Deposito' } %>
       </td>
     </tr>
 
-    <tr>      
+    <tr>
       <td colspan="4">
         <label>Concepto</label>
         <%= f.text_area :obs, rows: 5, cols: '100%', placeholder: 'Concepto' %></td>
@@ -76,7 +76,7 @@
     <%= link_to t('BACK'), conferencias_path, :class => "btn btn-back" %>
   </div>
   <% end %>
-</div>  
+</div>
 
 <script>
   $('#conferencia_deposito_id').selectize();

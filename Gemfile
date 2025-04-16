@@ -10,7 +10,7 @@ gem "simple_calendar"
 gem 'unicorn'
 gem 'erubis', '~> 2.7'
 gem 'liquid'
-gem 'RedCloth'
+#gem 'RedCloth'
 gem "paperclip"
 gem 'aws-sdk', '1.67.0'
 
@@ -23,6 +23,8 @@ gem 'aws-sigv4', '1.2.4'
 gem 'aws-sdk-s3', "1.100.0"
 gem 'racc', '1.4.14'
 gem 'fcmpush'
+#gem 'railroady', '1.4.0'
+gem 'ar-octopus'
 
 gem "will_paginate", '~> 3.0.7'
 gem 'wicked_pdf', '1.1.0'

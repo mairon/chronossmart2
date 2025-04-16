@@ -80,6 +80,7 @@
           <td>
             <% if @compra.classif_bens.to_i == 0 %>
               <%= f.hidden_field :pedido_compra_produto_id, :value => 0 %>
+              <%= f.hidden_field :apre_depre, :value => 0 %>
             <% else %>
               <fieldset>
                 <legend>Tipo</legend>

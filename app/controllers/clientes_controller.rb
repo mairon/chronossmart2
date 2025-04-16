@@ -70,7 +70,6 @@ class ClientesController < ApplicationController
     @cliente = Cliente.find(params[:id])
     @contra_servis = ContratoServico.where(contrato_id: @cliente.cod_proc).order(:id)
     @fts = FormFiscal.where("sigla_proc = 'CL' AND cod_proc = #{params[:id]} AND STATUS != 0").select("id, arquivo_pdf,ruc, persona_nome,tipo_emissao,impressao, cod_proc, tot_gs, doc_01, doc_02, doc, status, cdc").order('id desc ')
-    @device = Device.last
     render layout: 'chart'
   end
 
@@ -516,7 +515,7 @@ end
   end
 
   def index_inicio
-    @clientes = Cliente.find(:all, :conditions => ["tabela = 'SALDO'"], :order => 'id desc')
+    @clientes = Cliente.find(:all, :conditions => ["tabela IN ('SALDO','IMPORT')"], :order => 'persona_nome, cota, id')
 
     respond_to do |format|
       format.html # index.html.erb
@@ -592,6 +591,8 @@ end
           format.html { redirect_to(contrato_path(@cliente.cod_proc)) }
       elsif params[:proc] == 'menu'
         format.html { redirect_to('/fluxo_caixa/movimentos') }
+      elsif params[:proc] == 'pedido_traslado'
+        redirect_to(:back)
       else
         format.html { redirect_to('/clientes/index_inicio') }
       end

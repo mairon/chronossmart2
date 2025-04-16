@@ -1,0 +1,39 @@
+<h1 id="header">fatura_import_produtos</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_fatura_import_produto_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Fatura import</t>
+            <td>Dcodint</t>
+            <td>Ddesproser</t>
+            <td>Ddesunimed</t>
+            <td>Dcantproser</t>
+            <td>Dpuniproser</t>
+            <td>Ddescitem</t>
+            <td>Dtotopeitem</t>
+            <td>Produto</t>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @fatura_import_produtos.each do |fatura_import_produto| %>
+      <tr>
+                  <td><%= fatura_import_produto.fatura_import_id %></td>
+                  <td><%= fatura_import_produto.dcodint %></td>
+                  <td><%= fatura_import_produto.ddesproser %></td>
+                  <td><%= fatura_import_produto.ddesunimed %></td>
+                  <td><%= fatura_import_produto.dcantproser %></td>
+                  <td><%= fatura_import_produto.dpuniproser %></td>
+                  <td><%= fatura_import_produto.ddescitem %></td>
+                  <td><%= fatura_import_produto.dtotopeitem %></td>
+                  <td><%= fatura_import_produto.produto_id %></td>
+                <td><%= link_to 'Editar', edit_fatura_import_produto_path(fatura_import_produto) %></td>
+        <td><%= link_to 'Borrar', fatura_import_produto, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

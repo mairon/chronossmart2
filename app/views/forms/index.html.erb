@@ -1,1 +1,15 @@
-<%= link_to 'novo', :action => "new" %>
+<div class="panel">
+	<h1 id="header">
+		Formularios Impressos
+		<div class="pull-right"><%= link_to t('NEW'), new_cobro_path, :class => "button add" %>    </div>
+	</h1>
+	<div class="panel-body">
+    <table>
+      <% @forms.each do |f| %>
+      	<td width="80"  align="center"><%= f.id.to_s.rjust(6,'0') %></td>
+      	<td><%= link_to '', edit_form_path(f), class: 'icon-pencil' %></td>
+      <% end %>
+    </table>
+
+	</div>
+</div>

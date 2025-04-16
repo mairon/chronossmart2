@@ -31,9 +31,9 @@
             <td class="<%= count %>" width="100"> <%= p.fabricante_cod %> </td>
             <td class="<%= count %>" width="460"> <a href="#" onclick="OpenDt(<%= p.produto_id %>)"><%= p.produto_id.to_s.rjust(6,'0') %>-<%= p.nome %></a></td>
             <% if p.stock.to_i <= 0 %>
-               <td class="<%= count %>" width="40"  align="right"><font color="red"> <%= format( "%.0f",p.stock.to_f ) %></font> </td>
+               <td class="<%= count %>" width="40"  align="right"><font color="red"> <%= format( "%.3f",p.stock.to_f ) %></font> </td>
             <%else%>
-               <td class="<%= count %>" width="40"  align="right"><font color="green"> <%= format( "%.0f",p.stock.to_f ) %></font> </td>
+               <td class="<%= count %>" width="40"  align="right"><font color="green"> <%= format( "%.3f",p.stock.to_f ) %></font> </td>
             <%end%>
             <% if current_unidade.moeda == 0 %>
               <td class="<%= count %>" width="70" align="right"><%= format_decimal( p.tabela_1_us.to_f ) %></td>

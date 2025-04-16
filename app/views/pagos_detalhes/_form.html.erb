@@ -56,6 +56,10 @@
                              :size     => 15 ,
                              :readonly => "readonly"%></td>
                              <%= f.hidden_field :saldo_guarani %>
+        <td>Retención:</td>
+        <td><%= f.text_field :retencao_us,
+                             :size     => 15 %></td>
+
 
       </tr>
 
@@ -78,6 +82,7 @@
                              :size     => 15 ,
                              :readonly => "readonly"%></td>
                              <%= f.hidden_field :saldo_guarani %>
+         <%= field_us 'Retención U$',f,:retencao_us %>
 
       </tr>
 
@@ -102,6 +107,8 @@
                              :size     => 15,
                              :readonly => "readonly" %></td>
                              <%= f.hidden_field :saldo_dolar %>
+
+        <%= field_gs 'Retención Gs. :',f,:retencao_gs %>
       </tr>
   <% end %>
 

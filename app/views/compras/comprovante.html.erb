@@ -4,13 +4,13 @@
          <td>
             <table>
                <tr>
-                  <td width="400">
+                  <td width="650">
                     <h3>
-                      <%= session[:empresa_nome] %>
+                      <%= current_unidade.nome_sys %>
                     </h3>
                   </td>
 
-                  <td align="right" width="400">
+                  <td align="right" width="800">
                      <b>
                         <% if @compra.tipo_compra == 1 %>
                            <h3><%= t('VOUCHER').upcase %> DE GASTO   N. <%= @compra.id.to_s.rjust(6,'0') %></h3>
@@ -232,33 +232,47 @@
          <table border='1'>
             <tr class="head">
             <td width="50"><%= t('SHARE') %></td>
-            <td width="150"><%= t('DOC') %></td>
-            <td width="100" align="right"><%= t('VALUE') %></td>
-            <td width="100" align="center"> Vencimiento</td>
+            <td width="300"><%= t('DOC') %></td>
+            <td width="150" align="right"><%= t('VALUE') %></td>
+            <td width="150" align="center"> Vencimiento</td>
 
 
             </tr>
             <% @condicoes.each do |c| %>
             <tr class="<%= cycle("cor1", "cor2") %>" >
                <td width="50"><%= c.cota %></td>
-               <td width="150"><%= c.documento_numero_01 %>-<%= c.documento_numero_02 %>-<%= c.documento_numero %></td>
+               <td width="300"><%= c.documento_numero_01 %>-<%= c.documento_numero_02 %>-<%= c.documento_numero %></td>
                <% if @compra.moeda == 0 %>
-                  <td width="100" align="right">   <%= h number_to_currency(c.valor_dolar)  %></td>
+                  <td width="150" align="right">   <%= format_decimal(c.valor_dolar)  %></td>
                <% elsif @compra.moeda == 1 %>
-                  <td width="100" align="right">   <%= h number_to_currency(c.valor_guarani)  %></td>
+                  <td width="150" align="right">   <%= format_int(c.valor_guarani)  %></td>
                <% else %>
-                  <td width="100" align="right">   <%= h number_to_currency(c.valor_real)  %></td>
+                  <td width="150" align="right">   <%= format_decimal(c.valor_real)  %></td>
                <% end %>
-               <td width="100" align="center">  <%= h c.vencimento.strftime("%d/%m/%Y") %></td>
+               <td width="150" align="center">  <%= h c.vencimento.strftime("%d/%m/%Y") %></td>
             </tr>
             <% end %>
          </table>
       </td>
    </tr>
+   <tr>
+      <td>
+         <br>
+         <br>
+         <br>
+
+         <br>
+         <br>
+         <br>
+         <p>______________________________</p>
+         <p>Firma</p>
+         <p><%= Persona.find(@compra.funcionario_id).nome unless @compra.funcionario_id.blank? %></p>
+      </td>
+   </tr>
 </table>
+
+
 </body>
-
-
 
 
 
@@ -266,4 +280,7 @@
    table {
       border-collapse: collapse;
    }
+
+   td {font-size: 28px; padding: 5px}
 </style>
+

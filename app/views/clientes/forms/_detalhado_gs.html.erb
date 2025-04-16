@@ -106,9 +106,9 @@
     <tr class = "<%= cycle( "cor1", "cor2" )%>">
   <% end %>
       <td width="50" align="center">  <%=h c.data.strftime("%d/%m/%y")%> </td>
-      <td width="50" align="left">    <%=h c.cod_proc %></td>
+      <td width="50" align="left">    <%=h c.sigla_proc %>•<%=h c.cod_proc %></td>
       <% if  c.venda_id != nil %>
-        <% id_vendas += [c.venda_id] %>  
+        <% id_vendas += [c.venda_id] %>
       <% end %>
       <td width="180" align="left">   <%=h truncate( c.vendedor_nome) %><%= c.descricao %> </td>
       <td width="80"> <%=h c.documento_numero_01%>-<%=h c.documento_numero_02%>-<%=h c.documento_numero%> </td>

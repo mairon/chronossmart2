@@ -1,0 +1,189 @@
+<style type="text/css">
+	table {border-collapse: collapse;}
+	.page-break { display:block; clear:both; page-break-after:always;  }
+
+</style>
+
+<table>
+	<tr>
+		<td>
+		<div class="border">
+			<table height="70">
+				<tr>
+					<td align="center">
+						<% if current_unidade.id == 1 %>
+							<%= wicked_pdf_image_tag('logo_luxus.jpg', :width => 200, :height => 100) %>
+						<% else %>
+						<%= wicked_pdf_image_tag('logo-realce.png', :width => 200, :height => 100) %>
+						<% end %>
+					</td>
+				</tr>
+			</table>
+		</div>
+		</td>
+
+		<td>
+		<div class="border" border='1'>
+
+			<table height="100">
+				<tr>
+					<td align="right"></td>
+					<td width="490" colspan="5"><%=l @condicional.data.to_date, :format => :long %></td>
+				</tr>
+				<tr>
+					<td>Cond Nº: </td>
+					<td> <%= @condicional.id.to_s.rjust(6,"0") %> </td>
+					<td align="right">Pazo de Condicional: </td>
+					<td> <%= @condicional.prazo.strftime("%d/%m/%Y") %> </td>
+					</tr>
+
+
+				<tr>
+					<td >Señor(a) : </td>
+					<td> <%= @condicional.persona_nome %> </td>
+				</tr>
+
+				<tr>
+					<td >Moneda : </td>
+					<td>
+					<% if @condicional.moeda.to_i == 0 %>
+						Dolares
+					<% elsif @condicional.moeda.to_i == 1 %>
+						Guaranies
+					<% else %>
+						Reais
+					<% end %>
+					</td>
+				</tr>
+			</table>
+		</div>
+		</td>
+	</tr>
+</table>
+
+</div>
+<p align="center">
+	Itens
+</p>
+
+<div class="border">
+	<table>
+		<tr>
+			<td width="100" align="center" style="border-bottom: 1px solid black;">Ref.</td>
+			<td width="300" align="center" style="border-bottom: 1px solid black;">Producto</td>
+			<td width="50" align="left" style="border-bottom: 1px solid black;">Tamaño</td>
+			<td width="200" align="left" style="border-bottom: 1px solid black;">Color</td>
+			<td width="70" align="right" style="border-bottom: 1px solid black;">Cantidad</td>
+			<td width="70" align="right" style="border-bottom: 1px solid black;">Unitario</td>
+			<td width="70" align="right" style="border-bottom: 1px solid black;">Total</td>
+		</tr>
+	</table>
+
+	<table>
+		<% indice = 1 %>
+		<% qtd       = 0 %>
+		<% t_us  = 0 %>
+		<% t_gs  = 0 %>
+		<% t_rs  = 0 %>
+		<% @produtos.each do |pp| %>
+		<tr class = "<%= cycle("cor1", "cor2") %>">
+			<td width="100" align="center"><%= pp.fabricante_cod %></td>
+			<td width="300" align="left"><%= pp.produto_nome%></td>
+      <td width="50" align="left"><%= pp.tamanho_nome %></td>
+      <td width="200" align="left">
+      	<%= pp.cor_nome %>
+      </td>
+			<td width="70" align="right"><%= pp.quantidade%></td>
+			<% if @condicional.moeda.to_i == 0 %>
+  			  <td width="70" align="right"><%= number_to_currency( pp.unitario_us, :format =>' %n ', :separator => ",") %></td>
+	  		  <td width="70" align="right"><%= number_to_currency( pp.total_us, :format =>' %n ', :separator => ",") %></td>
+	  		<% elsif @condicional.moeda.to_i == 1 %>
+  			  <td width="70" align="right"><%= number_to_currency( pp.unitario_gs, :format =>' %n ', :precision => 0) %></td>
+	  		  <td width="70" align="right"><%= number_to_currency( pp.total_gs, :format =>' %n ', :precision => 0) %></td>
+				<% else %>
+  			  <td width="70" align="right"><%= number_to_currency( pp.unitario_rs, :format =>' %n ', :separator => ",") %></td>
+	  		  <td width="70" align="right"><%= number_to_currency( pp.total_rs, :format =>' %n ', :separator => ",") %></td>
+	  		<% end %>
+		</tr>
+		<% indice += 1 %>
+		<% qtd  += pp.quantidade.to_f %>
+		<% t_us  += pp.total_us.to_f %>
+		<% t_gs  += pp.total_gs.to_f %>
+		<% t_rs  += 0 %>
+		<% end %>
+
+		<tr>
+			<td colspan="8"  align="center" style="border-top: 1px solid black;"></td>
+		</tr>
+		<tr>
+			<td colspan="4"></td>
+			<td align="right"><%= qtd %></td>
+  	  <% if @condicional.moeda.to_i == 0 %>
+				<td colspan="2"  align="right">Suma Total : <%= number_to_currency( t_us, :format =>' %n ', :separator => "," )%> </td>
+		  <% elsif @condicional.moeda.to_i == 1 %>
+				<td colspan="2"  align="right">Suma Total : <%= number_to_currency( t_gs, :format =>' %n ', :precision => 0 )%> </td>
+		  <% else %>
+				<td colspan="2"  align="right">Suma Total : <%= number_to_currency( t_rs, :format =>' %n ', :separator => "," )%> </td>
+		  <% end %>
+		</tr>
+	</table>
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<div class="border" >
+	<table>
+		<tr>
+			<td colspan="4"  align="justify">
+
+					El Día		<%=l @condicional.data.to_date, :format => :long %>		pagaré(mos) a <% unid = Unidade.find_by_id(@condicional.unidade_id) %> <%= unid.nome_sys %>---------------
+				la cantidad de
+				<% if @condicional.moeda == 0 %>
+										<% real,cents=("%.2f" % t_us.to_f).split(/\./).map{ |m| m.to_i}
+									      valor_cents=Extenso.por_extenso(cents%100)
+									      valor_cents+= case cents.to_i%100
+									      when 0 then ""
+									      when 1 then " "
+									      when 2..99 then " "
+									      end %>
+										<%= I18n.with_locale(:es) { (t_us.to_f).to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s + '/100 DOLARES AMERICANOS' %>
+									<% else %>
+										<%= I18n.with_locale(:es) { (t_gs.to_f).to_i.to_words.upcase }%>
+									<% end %>
+
+				.----, o a su órden
+				Por igual valor recibido en __________________ a mi(nuestra) entera satisfación. Queda expresamente convenido que la falta de pago de este pagare me(nos) constituirá en mora automáticamente, sin necesidad de interpelación judicial o extrajudicial alguna, devengando durante el tiempo de la mora un interes del ......% o un interes moratorio del .....% y una comision del .....% por el simple retardo sin que esto implique prorroga del plazo de la obligación. Asimismo, me(nos) obligamos a pagar cualquier gasto en que incurra el acreedor con relación a éste préstamo, en caso de que el mismo sea reclamado por via judicial o extrajudicial. El simple vencimiento establecerá la mora, autorizando a la consulta como la inclusión a la base de datos de INFORCONF, conforme a lo establecido en la Ley 1682, como tambien para que se pueda proveer la información a terceros. A los efectos Legales y Procesales nos sometemos a la jurisdicción de los tribunales de la República del Paraguay y renunciando a cualquier otra que pudiera corresponder. Las partes se constituyen domicilio especial en los lugares indicados en el presente documento.
+			</td>
+		</tr>
+		<tr>
+			<td>Nombre: <%= @condicional.persona.nome %></td>
+		</tr>
+		<tr>
+			<td>Domicilio: <%= @condicional.persona.direcao %> </td>
+		</tr>
+		<tr>
+			<td>Cédula de Identidad: <%= @condicional.persona.ruc %> </td>
+		</tr>
+		<tr>
+			<td height="60"></td>
+		</tr>
+		<tr>
+			<td align="center">___________________________________</td>
+			<td>___________________________________</td>
+			<td>___________________________________</td>
+		</tr>
+		<tr>
+			<td align="center">Firma</td>
+			<td align="center">Aclaración</td>
+			<td align="center" >Documento</td>
+		</tr>
+
+	</table>
+	</div>
+
+

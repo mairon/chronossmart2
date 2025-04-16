@@ -123,27 +123,28 @@ class Sueldo < ActiveRecord::Base
                                :debito_rs        =>  0)
         #ips
         if self.tipo_liquidacao.to_i != 2
-
-          SueldosDetalhe.create( :sueldo_id        => self.id.to_i,
-                                 :data             => self.data_inicio,
-                                 :vencimento       => self.data_inicio,
-                                 :dias             => self.dias,
-                                 :tipo             => "IPS",
-                                 :documento_numero_01 =>'000',
-                                 :documento_numero_02 =>'000',
-                                 :documento_numero    =>'700' + self.id.to_s,
-                                 :cota             => 0,
-                                 :estado           => 1,
-                                 :moeda            => self.moeda,
-                                 :descricao        => "IPS REFERENTE AL MES DE "+"#{self.data_inicio}".to_date.strftime("%m/%Y"),
-                                 :persona_id       => self.persona_id,
-                                 :persona_nome     => self.persona_nome,
-                                 :credito_us       =>  0,
-                                 :credito_gs       =>  0,
-                                 :credito_rs       =>  0,
-                                 :debito_us        =>  0,
-                                 :debito_gs        =>  calc_ip.to_f,
-                                 :debito_rs        =>  0)
+          if self.persona.ips.to_f > 0
+            SueldosDetalhe.create( :sueldo_id        => self.id.to_i,
+                                   :data             => self.data_inicio,
+                                   :vencimento       => self.data_inicio,
+                                   :dias             => self.dias,
+                                   :tipo             => "IPS",
+                                   :documento_numero_01 =>'000',
+                                   :documento_numero_02 =>'000',
+                                   :documento_numero    =>'700' + self.id.to_s,
+                                   :cota             => 0,
+                                   :estado           => 1,
+                                   :moeda            => self.moeda,
+                                   :descricao        => "IPS REFERENTE AL MES DE "+"#{self.data_inicio}".to_date.strftime("%m/%Y"),
+                                   :persona_id       => self.persona_id,
+                                   :persona_nome     => self.persona_nome,
+                                   :credito_us       =>  0,
+                                   :credito_gs       =>  0,
+                                   :credito_rs       =>  0,
+                                   :debito_us        =>  0,
+                                   :debito_gs        =>  calc_ip.to_f,
+                                   :debito_rs        =>  0)
+          end
         end
 
       else
