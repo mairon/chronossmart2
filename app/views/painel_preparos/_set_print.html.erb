@@ -1,7 +1,5 @@
 <script type="text/javascript" src="/qz-v2/js/qz-tray.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/11.1.0/jsrsasign-all-min.js"></script>
-<script type="text/javascript" src="/qz-v2/assets/signing/sign-message.js"></script>
 <!-- Required scripts -->
 <script type="text/javascript" src="/qz-v2/js/sample/promise-polyfill-8.1.3.min.js"></script>
 <script type="text/javascript" src="/qz-v2/js/sample/whatwg-fetch-3.0.0.min.js"></script>
@@ -9,13 +7,14 @@
 <script type="text/javascript" src="/qz-v2/js/sample/array-from-pollyfill.js"></script>
 
 <script>
+  qz.websocket.connect();
+
   qz.security.setCertificatePromise(function(resolve, reject) {
      fetch("../qz-v2/assets/signing/digital-certificate.txt", {cache: 'no-store', headers: {'Content-Type': 'text/plain'}})
         .then(function(data) { data.ok ? resolve(data.text()) : reject(data.text()); });
   });
 
 
-  qz.websocket.connect();
     /// Connection ///
     function launchQZ() {
         if (!qz.websocket.isActive()) {

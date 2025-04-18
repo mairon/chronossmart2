@@ -24,6 +24,12 @@
 
 
 <script language="javascript">
+
+	document.onkeydown=function(e){
+		if(e.which == 118)
+			window.open('/personas/persona_dividas', 'Pagina', ' SCROLLBARS=YES, TOP=10, LEFT=10, WIDTH=1000, HEIGHT=450');
+	};
+
 	function SeguirCobros(){
 		var tipo = document.getElementById('tipo').value
 		var per  = document.getElementById('per').value
