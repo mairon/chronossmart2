@@ -12,7 +12,6 @@ RUN date
 
 
 WORKDIR /chronos-smart2
-ADD vendor/gems/auditor-master ./vendor/gems/auditor-master
 COPY Gemfile /chronos-smart2/Gemfile
 COPY Gemfile.lock /chronos-smart2/Gemfile.lock
 RUN bundle install

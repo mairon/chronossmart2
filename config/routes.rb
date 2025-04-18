@@ -1524,7 +1524,10 @@ resources :analizes_financas
 			get 'print_funcionario'
 			get 'historico_vendas'
 			get 'busca_historico_vendas'
+<<<<<<< HEAD
 			get 'visao_geral_cliente_print'
+=======
+>>>>>>> origin/feature/add-whatsapp-service
 		end
 	end
 	resources :produtos do
@@ -2333,4 +2336,7 @@ end
 resources :rubros
 resources :plano_de_contas
 
+  get '/whatsapp/status' => 'whatsapps#status'
+  get '/whatsapp/qrcode' => 'whatsapps#create_qrcode'
+  get '/whatsapp/logout' => 'whatsapps#logout'
 end

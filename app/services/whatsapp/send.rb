@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 # class responsible for sending messages
+<<<<<<< HEAD
 class Whatsapp
+=======
+module Whatsapp
+>>>>>>> origin/feature/add-whatsapp-service
   class Send
     attr_reader :telephone, :filepath, :title
 

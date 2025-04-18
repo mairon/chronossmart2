@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 # class responsible for check if a telephone uses Whatsapp
+<<<<<<< HEAD
 class Whatsapp
+=======
+module Whatsapp
+>>>>>>> origin/feature/add-whatsapp-service
   class Check
     attr_reader :instance, :telephone
 

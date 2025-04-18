@@ -1,16 +1,25 @@
 # frozen_string_literal: true
 
 # class responsible for manage Whatsapp connection
+<<<<<<< HEAD
 class Whatsapp
   class Connection
     attr_reader :instance, :telephone, :token
 
     def initialize(token:, instance:, telephone:)
+=======
+module Whatsapp
+  class Connection
+    attr_reader :instance, :telephone, :token
+
+    def initialize(token:, instance:, telephone: '')
+>>>>>>> origin/feature/add-whatsapp-service
       @instance = instance
       @telephone = telephone
       @token = token
     end
 
+<<<<<<< HEAD
     def connect?
       response = RestClient.get(connection_url, headers)
 
@@ -37,6 +46,34 @@ class Whatsapp
       Rails.logger.error("Message: #{error.message} - Backtrace: #{error.backtrace}")
 
       false
+=======
+    def connect
+      response = RestClient.get(connection_url, headers)
+
+      result = JSON.parse(response.body)
+
+      raise StandardError if result['error']
+
+      { code: result['pairingCode'] }
+    rescue StandardError, RestClient::Forbidden, RestClient::Unauthorized => error
+      Rails.logger.error("Message: #{error.message} - Backtrace: #{error.backtrace}")
+
+      { code: '' }
+    end
+
+    def disconnect
+      response = RestClient.delete(disconnection_url, headers)
+
+      result = JSON.parse(response.body)
+
+      raise StandardError if result['error']
+
+      { error: false, message: result['message'] }
+    rescue StandardError, RestClient::Forbidden, RestClient::Unauthorized => error
+      Rails.logger.error("Message: #{error.message} - Backtrace: #{error.backtrace}")
+
+      { error: true, message: 'Error logging out instance' }
+>>>>>>> origin/feature/add-whatsapp-service
     end
 
     private
