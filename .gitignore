@@ -1,6 +1,7 @@
 *.rbc
 capybara-*.html
 .rspec
+.pg_data/
 /log
 /app-bc
 /tmp
@@ -19,6 +20,8 @@ config/initializers/secret_token.rb
 # Only include if you have production secrets in this file, which is no longer a Rails default
 /config/*.yml
 
+*.yml
+
 # dotenv
 # TODO Comment out this rule if environment variables can be committed
 .env
@@ -28,6 +31,10 @@ config/initializers/secret_token.rb
 /vendor
 /test
 
+
+rubocop_report.html
+gems_outdated.html
+report.html
 
 # these should all be checked in to normalize the environment:
 # Gemfile.lock, .ruby-version, .ruby-gemset

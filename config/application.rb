@@ -31,7 +31,7 @@ module Zetta
 
 	# The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
 	config.i18n.load_path += Dir[Rails.root.join('config', 'locales', '*.{rb,yml}').to_s]
-	
+
 	# Configure the default encoding used in templates for Ruby 1.9.
 	config.encoding = "utf-8"
 
@@ -63,6 +63,11 @@ module Zetta
 	config.generators do |g|
 		g.stylesheets false
 	end
+
+  config.eager_load_paths += %W[
+    #{config.root}/app/services
+  ]
+
   end
 end
 require 'csv'
