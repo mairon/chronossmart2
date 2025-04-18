@@ -1,50 +1,4 @@
 <div class="panel">
-	<div class="panel-content">
-		<% if @form_fiscal.tipo_emissao == 1 %>
-			<%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: @form_fiscal.cdc, id: @form_fiscal.id), class: 'btn btn-blue' %>
-			<% if @get_resp["deList"][0]["situacion"].to_s == '4' %>
-				<%= link_to  "Inutilizacion", "#", "data-toggle" => "modal", "data-target" =>"#modal-inutilizacion", class: 'btn btn-warning' %>
-				<%= render "form_fiscals/eventos/inutilizacion" %>
-			<% end %>
-
-			<% else %>
-        <%= link_to 'Imprimir', "#",  :onclick => "MultiplaFaturaVenda(#{@form_fiscal.id})", class: 'button' %>
-        <%= link_to 'Finalizar', form_fiscals_path, class: 'button' %>
-
-
-		    <% if @form_fiscal.status.to_i == 1 and  @form_fiscal.impressao.to_i == 0 %>
-		    <script type="text/javascript">
-		      function MultiplaFaturaVenda(){
-		        window.open('/form_fiscals/' + <%= @form_fiscal.id %> +'/impressao_ft', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
-
-		          $.ajax({
-		              type: "POST",
-		              url: '/form_fiscals/'+ <%= @form_fiscal.id %> +'/update_impressao',
-		              data: 'id=' + <%= @form_fiscal.id %>,
-		              dataType: 'script'
-		          })
-
-		      }
-		      window.onload = MultiplaFaturaVenda;
-		    </script>
-		  <% else %>
-		    <script type="text/javascript">
-		      function MultiplaFaturaVenda(id){
-		        window.open('/form_fiscals/' + id +'/impressao_ft', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
-		          $.ajax({
-		              type: "POST",
-		              url: '/form_fiscals/'+ id +'/update_impressao',
-		              data: 'id=' + id,
-		              dataType: 'script'
-		          })
-		      }
-		    </script>
-		  <% end %>
-
-		<% end %>
-	</div>
-</div>
-<div class="panel">
 	<h1 id="header">Dados Fiscales</h1>
 	<div class="panel-body">
   		<table class="list">
@@ -152,32 +106,3 @@
   		</table>
 	</div>
 </div>
-
-<% if @form_fiscal.status.to_i == 1 and  @form_fiscal.impressao.to_i == 0 %>
-  <script type="text/javascript">
-    function MultiplaFaturaVenda(){
-      window.open('/form_fiscals/' + <%= @form_fiscal.id %> +'/impressao_ft', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
-
-        $.ajax({
-            type: "POST",
-            url: '/form_fiscals/'+ <%= @form_fiscal.id %> +'/update_impressao',
-            data: 'id=' + <%= @form_fiscal.id %>,
-            dataType: 'script'
-        })
-
-    }
-    window.onload = MultiplaFaturaVenda;
-  </script>
-<% else %>
-  <script type="text/javascript">
-    function MultiplaFaturaVenda(id){
-      window.open('/form_fiscals/' + id +'/impressao_ft', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
-        $.ajax({
-            type: "POST",
-            url: '/form_fiscals/'+ id +'/update_impressao',
-            data: 'id=' + id,
-            dataType: 'script'
-        })
-    }
-  </script>
-<% end %>
