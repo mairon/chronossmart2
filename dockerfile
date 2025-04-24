@@ -10,9 +10,10 @@ ENV TZ="America/Asuncion"
 RUN date
 
 
-WORKDIR /chronos-smart2
-COPY Gemfile /chronos-smart2/Gemfile
-COPY Gemfile.lock /chronos-smart2/Gemfile.lock
+WORKDIR /smart
+COPY vendor/gems/auditor-master /smart/vendor/gems/auditor-master
+COPY Gemfile /smart/Gemfile
+COPY Gemfile.lock /smart/Gemfile.lock
 RUN bundle install
 
 # Add a script to be executed every time the container starts.

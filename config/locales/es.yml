@@ -1,4 +1,13 @@
 es:
+  devices:
+    show:
+      device_name: 'Device - %{name}'
+      status: 'Status'
+      connected: 'Conectado'
+      disconnected: 'Desconectado'
+      exit_lnk: 'Salir'
+      disconnect_btn: 'Desconectar'
+      generate_qr_code_btn: ' Gera QR'
   will_paginate:
     previous_label: "&#8592; Volver"
     next_label: "Seguir &#8594;"
