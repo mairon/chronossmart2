@@ -3,11 +3,12 @@
 # class responsible for check Whatsapp status
 module Whatsapp
   class Status
-    attr_reader :token, :instance
+    attr_reader :host, :instance, :token
 
-    def initialize(token:, instance:)
-      @token = token
+    def initialize(host:, instance:, token:)
+      @host = host
       @instance = instance
+      @token = token
     end
 
     def connected?
@@ -29,7 +30,7 @@ module Whatsapp
     end
 
     def url
-      "https://#{ENV['WHATSAPP_API_HOST']}/rest/instance/#{instance}"
+      "https://#{host}/rest/instance/#{instance}"
     end
   end
 end

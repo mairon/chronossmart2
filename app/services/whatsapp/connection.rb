@@ -3,26 +3,12 @@
 # class responsible for manage Whatsapp connection
 module Whatsapp
   class Connection
-    attr_reader :instance, :telephone, :token
+    attr_reader :host, :instance, :token
 
-    def initialize(token:, instance:, telephone: '')
+    def initialize(host:, instance:, token:)
+      @host = host
       @instance = instance
-      @telephone = telephone
       @token = token
-    end
-
-    def connect
-      response = RestClient.get(connection_url, headers)
-
-      result = JSON.parse(response.body)
-
-      raise StandardError if result['error']
-
-      { code: result['pairingCode'] }
-    rescue StandardError, RestClient::Forbidden, RestClient::Unauthorized => error
-      Rails.logger.error("Message: #{error.message} - Backtrace: #{error.backtrace}")
-
-      { code: '' }
     end
 
     def disconnect
@@ -46,11 +32,7 @@ module Whatsapp
     end
 
     def disconnection_url
-      "https://#{ENV['WHATSAPP_API_HOST']}/rest/instance/#{instance}/logout"
-    end
-
-    def connection_url
-      "https://#{ENV['WHATSAPP_API_HOST']}/rest/instance/pairingCode/#{instance}?phoneNumber=#{telephone}"
+      "https://#{host}/rest/instance/#{instance}/logout"
     end
   end
 end

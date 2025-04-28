@@ -3,7 +3,9 @@
 # class responsible for the whatsapps controller
 class WhatsappsController < ApplicationController
   def create_qrcode
-    result = Whatsapp::Qrcode.new(token: params['token'], instance: params['instance']).create
+    result = Whatsapp::Qrcode
+      .new(host: params['host'], instance: params['instance'], token: params['token'])
+      .create
 
     render json: result, status: :ok
   rescue StandardError => error
@@ -25,7 +27,9 @@ class WhatsappsController < ApplicationController
   end
 
   def logout
-    result = Whatsapp::Connection.new(token: params['token'], instance: params['instance']).disconnect
+    result = Whatsapp::Connection
+      .new(host: params['host'], instance: params['instance'], token: params['token'])
+      .disconnect
 
     render json: result, status: :ok
   rescue StandardError => error

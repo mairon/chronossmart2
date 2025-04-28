@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe Whatsapp::Qrcode do
   describe '#create' do
     it 'creates QR Code when to a Whatsapp instance when pass valid params' do
+      host = 'example.com'
       qr_code = 'data:image/png;base64,iVBORw0KG='
       token = 'any token'
       instance = 'any instance'
@@ -12,7 +13,7 @@ RSpec.describe Whatsapp::Qrcode do
       allow(response).to receive(:body) { { 'error' => false, 'qrcode' => qr_code }.to_json }
       allow(RestClient).to receive(:get) { response }
 
-      result = described_class.new(token: token, instance: instance).create
+      result = described_class.new(host: host, instance: instance, token: token).create
 
       expected_result = { qrcode: qr_code }
 
@@ -20,6 +21,7 @@ RSpec.describe Whatsapp::Qrcode do
     end
 
     it 'no validates when QR Code haven\'t format in Base64' do
+      host = 'example.com'
       qr_code = 'data:image/png;base32,iVBORw0KG='
       token = 'any token'
       instance = 'any instance'
@@ -29,7 +31,7 @@ RSpec.describe Whatsapp::Qrcode do
       allow(response).to receive(:body) { { 'error' => false, 'qrcode' => qr_code }.to_json }
       allow(RestClient).to receive(:get) { response }
 
-      result = described_class.new(token: token, instance: instance).create
+      result = described_class.new(host: host, instance: instance, token: token).create
 
       expected_result = { error: 'Error to create QRCode' }
 
@@ -37,6 +39,7 @@ RSpec.describe Whatsapp::Qrcode do
     end
 
     it 'no creates QR code when occurs generic errors' do
+      host = 'example.com'
       token = 'any token'
       instance = 'any instance'
 
@@ -44,7 +47,7 @@ RSpec.describe Whatsapp::Qrcode do
 
       allow(RestClient).to receive(:get) { raise StandardError }
 
-      result = described_class.new(token: token, instance: instance).create
+      result = described_class.new(host: host, instance: instance, token: token).create
 
       expected_result = { error: 'Error to create QRCode' }
 
@@ -52,6 +55,7 @@ RSpec.describe Whatsapp::Qrcode do
     end
 
     it 'no creates QR code when isn\'t phroibited' do
+      host = 'example.com'
       token = 'any token'
       instance = 'any instance'
 
@@ -59,7 +63,7 @@ RSpec.describe Whatsapp::Qrcode do
 
       allow(RestClient).to receive(:get) { raise RestClient::Forbidden }
 
-      result = described_class.new(token: token, instance: instance).create
+      result = described_class.new(host: host, instance: instance, token: token).create
 
       expected_result = { error: 'Error to create QRCode' }
 
@@ -67,6 +71,7 @@ RSpec.describe Whatsapp::Qrcode do
     end
 
     it 'no creates QR code when isn\'t authorized' do
+      host = 'example.com'
       token = 'any token'
       instance = 'any instance'
 
@@ -74,7 +79,7 @@ RSpec.describe Whatsapp::Qrcode do
 
       allow(RestClient).to receive(:get) { raise RestClient::Unauthorized }
 
-      result = described_class.new(token: token, instance: instance).create
+      result = described_class.new(host: host, instance: instance, token: token).create
 
       expected_result = { error: 'Error to create QRCode' }
 

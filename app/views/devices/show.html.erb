@@ -5,7 +5,7 @@
     <%= t('.status') %>
     <br>
     <br>
-    <% if connected_whatsapp?(token: @device.token, instance: @device.instance_key) %>
+    <% if connected_whatsapp?(host: @device.host, instance: @device.instance_key, token: @device.token) %>
       <span class="btn-success"><%= t('.connected') %></span>
     <% else %>
       <span class="btn-danger"><%= t('.disconnected') %></span>
@@ -13,7 +13,7 @@
   </h2>
 
   <p>
-    <% if connected_whatsapp?(token: @device.token, instance: @device.instance_key) %>
+    <% if connected_whatsapp?(host: @device.host, instance: @device.instance_key, token: @device.token) %>
       <a href="#" id="whatsappLogoutBtn" class="btn btn-danger">
         <%= t('.disconnect_btn') %>
       </a>
@@ -24,7 +24,7 @@
       </a>
     <% end %>
   </p>
-  <% if connected_whatsapp?(token: @device.token, instance: @device.instance_key) %>
+  <% if connected_whatsapp?(host: @device.host, instance: @device.instance_key, token: @device.token) %>
     <br>
     <p><%= link_to t('.exit_lnk'), devices_url %></p>
     </br>
@@ -32,7 +32,7 @@
     <p><img id="qrCodeImg"></img></p>
   <% end %>
 </div>
-<% if connected_whatsapp?(token: @device.token, instance: @device.instance_key) %>
+<% if connected_whatsapp?(host: @device.host, instance: @device.instance_key, token: @device.token) %>
   <div class="panel">
     <h1 id="header"><%= t('.send_test') %></h1>
     <div class="panel-content">
@@ -60,7 +60,7 @@
     $.ajax({
       url: '/whatsapp/qrcode',
       type: 'GET',
-      data: { token: "<%= @device.token %>", instance: "<%= @device.instance_key %>" },
+      data: { host: "<%= @device.host %>", instance: "<%= @device.instance_key %>", token: "<%= @device.token %>"},
       success: function(data) {
         $('#qrCodeImg').attr('src', data.qrcode);
       }
@@ -71,7 +71,7 @@
     $.ajax({
       url: '/whatsapp/logout',
       type: 'GET',
-      data: { token: "<%= @device.token %>", instance: "<%= @device.instance_key %>" },
+      data: { host: "<%= @device.host %>", instance: "<%= @device.instance_key %>", token: "<%= @device.token %>" },
       success: function(data) {
         if(data.error == false) {
           location.reload();
