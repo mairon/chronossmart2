@@ -20,7 +20,7 @@ RSpec.describe Whatsapp::Message do
 
         result = described_class.new(params: params).send
 
-        expected_result = { message: success_message }
+        expected_result = { message: success_message, success: true }
 
         expect(result).to eq(expected_result)
       end
@@ -40,7 +40,7 @@ RSpec.describe Whatsapp::Message do
 
         result = described_class.new(params: params).send
 
-        expected_result = { message: error_message }
+        expected_result = { message: error_message, success: false }
 
         expect(result).to eq(expected_result)
       end
@@ -67,7 +67,7 @@ RSpec.describe Whatsapp::Message do
 
         result = described_class.new(params: params).send
 
-        expected_result = { message: error_message }
+        expected_result = { message: error_message, success: false }
 
         expect(result).to eq(expected_result)
       end

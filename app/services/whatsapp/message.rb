@@ -18,11 +18,11 @@ module Whatsapp
 
       result = JSON.parse(response.body)
 
-      { message: result['message'] }
+      { message: result['message'], success: true }
     rescue StandardError, RestClient::Unauthorized => error
       Rails.logger.error("#Message: #{error.message} - Backtrace: #{error.backtrace}")
 
-      { message: "Error to send message to #{recipient}" }
+      { message: "Error to send message to #{recipient}", success: false }
     end
 
     def message
