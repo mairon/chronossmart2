@@ -1,13 +1,17 @@
 es:
   devices:
     show:
-      device_name: 'Device - %{name}'
+      device_name: 'WhatsApp - %{name}'
       status: 'Status'
       connected: 'Conectado'
       disconnected: 'Desconectado'
       exit_lnk: 'Salir'
       disconnect_btn: 'Desconectar'
-      generate_qr_code_btn: ' Gera QR'
+      generate_qr_code_btn: ' Crear QR'
+      send_test: 'Prueba de envío'
+      whatsapp_number: 'Número de WhatsApp (Debe contener el código del país)'
+      message: 'Mensaje'
+      send_test_btn: 'Enviar prueba'
   will_paginate:
     previous_label: "&#8592; Volver"
     next_label: "Seguir &#8594;"

@@ -5,7 +5,7 @@
     <%= t('.status') %>
     <br>
     <br>
-    <% if connected_whatsapp?(token: @device.token, instance: @device_instance_key) %>
+    <% if connected_whatsapp?(token: @device.token, instance: @device.instance_key) %>
       <span class="btn-success"><%= t('.connected') %></span>
     <% else %>
       <span class="btn-danger"><%= t('.disconnected') %></span>
@@ -13,37 +13,47 @@
   </h2>
 
   <p>
-  <a href="#" id="createQrcodeBtn" class="btn btn-green">
-    <i class="icon-white icon-qrcode"></i>
-    <%= t('.generate_qr_code_btn') %>
-  </a>
-  <% if connected_whatsapp?(token: @device.token, instance: @device_instance_key) %>
-    <a href="#" id="whatsappLogoutBtn" class="btn btn-danger" style="display: none;">
-      <%= t('.disconnect_btn') %>
-    </a>
-  <% end %>
+    <% if connected_whatsapp?(token: @device.token, instance: @device.instance_key) %>
+      <a href="#" id="whatsappLogoutBtn" class="btn btn-danger">
+        <%= t('.disconnect_btn') %>
+      </a>
+    <% else %>
+      <a href="#" id="createQrcodeBtn" class="btn btn-green">
+        <i class="icon-white icon-qrcode"></i>
+        <%= t('.generate_qr_code_btn') %>
+      </a>
+    <% end %>
   </p>
-  <p><img id="qrCodeImg"></img></p>
-  <p><%= link_to t('.exit_lnk'), devices_url %></p>
+  <% if connected_whatsapp?(token: @device.token, instance: @device.instance_key) %>
+    <br>
+    <p><%= link_to t('.exit_lnk'), devices_url %></p>
+    </br>
+  <% else %>
+    <p><img id="qrCodeImg"></img></p>
+  <% end %>
 </div>
-
-<div class="panel">
-  <h1 id="header">Teste de Envio</h1>
-  <div class="panel-content">
-    <form action="#">
-      <div class="row">
-        <div class="col-md-12">
-          <label for="">N• Whats</label>
-          <%= text_field_tag :numero, nil, class: 'panel-field' %>
+<% if connected_whatsapp?(token: @device.token, instance: @device.instance_key) %>
+  <div class="panel">
+    <h1 id="header"><%= t('.send_test') %></h1>
+    <div class="panel-content">
+      <%= render 'partials/messages' %>
+      <%= form_tag '/whatsapp/send_message' do |form| %>
+        <div class="row">
+          <div class="col-md-12">
+            <label for=""><%= t('.whatsapp_number') %></label>
+            <%= text_field_tag :recipient, nil, class: 'panel-field', required: true %>
+          </div>
+          <div class="col-md-12">
+            <label for=""><%= t('.message') %></label>
+            <%= text_area_tag :text, nil, class: 'panel-field', required: true %>
+          </div>
+          <%= hidden_field_tag :device_id, @device.id %>
+          <div class="col-md-12"><%= submit_tag t('.send_test_btn'), class: 'btn btn-green' %></div>
         </div>
-        <div class="col-md-12">
-          <label for="">Mensagem</label>
-          <%= text_area_tag :obs, nil, class: 'panel-field' %>
-        </div>
-        <div class="col-md-12"><%= submit_tag 'Enviar teste', class: 'btn btn-green' %></div>
-      </div>
-    </form>
+      <% end %>
+    </div>
   </div>
+<% end %>
 
 <script>
   $('#createQrcodeBtn').click(function() {
