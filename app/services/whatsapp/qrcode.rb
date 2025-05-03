@@ -5,9 +5,10 @@ module Whatsapp
   class Qrcode
     NotAcceptable = Class.new(StandardError)
 
-    attr_reader :instance, :token
+    attr_reader :host, :instance, :token
 
-    def initialize(token:, instance:)
+    def initialize(host:, instance:, token:)
+      @host = host
       @instance = instance
       @token = token
     end
@@ -37,7 +38,7 @@ module Whatsapp
     end
 
     def url
-      "https://#{ENV['WHATSAPP_API_HOST']}/rest/instance/qrcode_base64/#{instance}"
+      "https://#{host}/rest/instance/qrcode_base64/#{instance}"
     end
   end
 end

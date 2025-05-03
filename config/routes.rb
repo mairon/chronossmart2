@@ -2334,7 +2334,8 @@ end
 resources :rubros
 resources :plano_de_contas
 
-  get '/whatsapp/status' => 'whatsapps#status'
-  get '/whatsapp/qrcode' => 'whatsapps#create_qrcode'
-  get '/whatsapp/logout' => 'whatsapps#logout'
+  get '/whatsapp/status'        => 'whatsapps#status'
+  get '/whatsapp/qrcode'        => 'whatsapps#create_qrcode'
+  get '/whatsapp/logout'        => 'whatsapps#logout'
+  post '/whatsapp/send_message' => 'whatsapps#send_message'
 end

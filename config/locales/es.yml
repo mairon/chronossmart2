@@ -1,4 +1,17 @@
 es:
+  devices:
+    show:
+      device_name: 'WhatsApp - %{name}'
+      status: 'Status'
+      connected: 'Conectado'
+      disconnected: 'Desconectado'
+      exit_lnk: 'Salir'
+      disconnect_btn: 'Desconectar'
+      generate_qr_code_btn: ' Crear QR'
+      send_test: 'Prueba de envío'
+      whatsapp_number: 'Número de WhatsApp (Debe contener el código del país)'
+      message: 'Mensaje'
+      send_test_btn: 'Enviar prueba'
   will_paginate:
     previous_label: "&#8592; Volver"
     next_label: "Seguir &#8594;"
@@ -102,9 +115,14 @@ es:
       month: Mes
       second: Segundos
       year: Año
+  successes:
+    messages:
+      test_sent_successfully: '¡Prueba enviada exitosamente!'
   errors:
     format: ! '%{attribute} %{message}'
     messages:
+      device_not_found: '¡Dispositivo no encontrado!'
+      message_send_failed: '¡Error al enviar el mensaje!'
       accepted: debe ser aceptado
       blank: no puede estar en blanco
       confirmation: no coincide con la confirmación
