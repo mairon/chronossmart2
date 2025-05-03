@@ -1,0 +1,21 @@
+<div class="panel">
+  <h1 id="header">
+    Turmas
+  </h1>
+  <div class="panel-content">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="list" dir="div">
+          <table>
+            <% @turmas.each do |tp| %>
+              <tr class="<%= cycle("cor1", "cor2")%>">
+                <td width="100"><%= tp.turma_id %></td>
+                <td width="300"><%= tp.turma.nome %></td>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

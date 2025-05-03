@@ -160,6 +160,14 @@
 
 			  </div>
 			</div>
+			<% @turmas = TurmaPersona.where(persona_id: @persona.id) %>
+			<% unless @turmas.blank? %>
+				<div class="row">
+				  <div class="col-md-12">
+				  	<%= render "/personas/eps/turmas" %>
+				  </div>
+				</div>
+			<% end %>
 
 			<div class="row">
 			  <div class="col-md-12">
