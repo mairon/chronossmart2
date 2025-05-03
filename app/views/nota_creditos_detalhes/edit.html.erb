@@ -1,7 +1,6 @@
 <h1 align="right" id="header">.</h1>
 Nota de Credito Producto - Edicion
-<% form_for(@nota_creditos_detalhe) do |f| %>
-  <%= f.error_messages %>
+<%= form_for(@nota_creditos_detalhe) do |f| %>
    <%= f.hidden_field :nota_credito_id  %>
    <%= f.hidden_field :produto_id  %>
    <%= f.hidden_field :documento_nome  %>

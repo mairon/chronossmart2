@@ -1,4 +1,5 @@
-<div class="group">
+<div class="panel">
+  <div class="panel-content">
   <table class="head_grid">
     <tr>
       <td width="50" align="center"><%= t('CODE') %></td>
@@ -21,7 +22,7 @@
         <% color = '' %>
       <% end %>
         <tr class = "<%= cycle("cor1", "cor2")%>">
-          <td width="50" align="center" bgcolor="<%= color%>"><%= tc.id.to_s.rjust(6,'0') %></td>
+          <td width="50" align="center" bgcolor="<%= color%>"><%= link_to tc.id.to_s.rjust(6,'0'), transferencia_conta_path(tc.id) %></td>
           <td width="70" align="center" bgcolor="<%= color%>"><%= tc.data.strftime("%d/%m/%y") %></td>
           <td width="150" bgcolor="<%= color%>">
             <% if tc.deposito == 0 %>
@@ -44,7 +45,9 @@
       <% end %>
     </table>
   </div>
-</div>
-<div class="head_grid">
-  <%= will_paginate @transferencia_contas %>
+
+    <div class="head_grid">
+      <%= will_paginate @transferencia_contas %>
+    </div>
+  </div>
 </div>

@@ -2,18 +2,18 @@
     <div class="col-md-8">
       <div class="panel">
         <h1 id="header">
-					Cuotas - 
+					Cuotas -
 					<% if @adelanto.tipo_adelanto.to_i == 0 %>
 					  Prestamo de Proveedor
-					<% elsif @adelanto.tipo_adelanto.to_i == 1 %>  
+					<% elsif @adelanto.tipo_adelanto.to_i == 1 %>
 					  Antecipo de Cliente
-					<% elsif @adelanto.tipo_adelanto.to_i == 2 %>  
+					<% elsif @adelanto.tipo_adelanto.to_i == 2 %>
 					  Antecipo a Empleado
-					<% elsif @adelanto.tipo_adelanto.to_i == 3 %>  
+					<% elsif @adelanto.tipo_adelanto.to_i == 3 %>
 					  Prestamo a Cliente
-					<% elsif @adelanto.tipo_adelanto.to_i == 4 %>  
+					<% elsif @adelanto.tipo_adelanto.to_i == 4 %>
 					  Antecipo Proveedor
-					<% end %>						 
+					<% end %>
 				</h1>
       	<div class="panel-body"">
 					<b> <%= @adelanto.persona_nome %></b> -
@@ -74,17 +74,20 @@
 			    		<% if (@adelanto.valor_guarani.to_f - @adelanto.adelanto_cotas.sum(:valor_gs)) == 0  %>
 								<%= link_to 'Finalizar', adelantos_path(tipo_adelanto: @adelanto.tipo_adelanto) , :class => "btn btn-green" %>
 								<a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"><%= image_tag('printer.png') %> <%= t('VOUCHER') %></a>
-								
+								<%= link_to  "#", class: 'btn btn-blue', onclick: "PrintCheque(#{@adelanto.id})"  do %>
+									<span class="material-symbols-outlined" style="color: #fff;float: left;margin-right: 5px">checkbook</span> Cheque
+								<% end %>
+
 			    		<% end %>
 
 			    	<% elsif @adelanto.moeda == 2 %>
 			    		<% if (@adelanto.valor_real.to_f - @adelanto.adelanto_cotas.sum(:valor_rs)) == 0  %>
 								<%= link_to 'Finalizar', adelantos_path(tipo_adelanto: @adelanto.tipo_adelanto) , :class => "btn btn-green" %>
 								<a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"><%= image_tag('printer.png') %> <%= t('VOUCHER') %></a>
-								
+
 			    		<% end %>
 
-			    	<% end %>          
+			    	<% end %>
 						<%= hidden_field_tag :id, @adelanto.id %>
 					</div>
 				</div>
@@ -92,7 +95,7 @@
 		</div>
 
 		<div class="col-md-4">
-			
+
 			  <div class="panel">
 			    <div  class="panel-body">
 			    	<% if @adelanto.tipo_adelanto.to_i == 1 %>
@@ -115,7 +118,7 @@
 			                <td  width="100"  style="<%=color%>"><%= cobros_nc.doc_01 %>.<%= cobros_nc.doc_02 %>.<%= cobros_nc.doc %></td>
 			                <td  width="70"  align="right"  style="<%=color%>"><%= format_int(cobros_nc.tot_gs) %></td>
 			                <% if cobros_nc.status == 1 %>
-			                  <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(cobros_nc, status: '2'), style: 'text-decoration: underline' %></td>          
+			                  <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(cobros_nc, status: '2'), style: 'text-decoration: underline' %></td>
 			                  <td><%= link_to 'Impri.', "#",  :onclick => "ComprovanteRecibo(#{cobros_nc.id})", style: 'text-decoration: underline' %></td>
 			                <% end %>
 			                <td  style="<%=color %>"><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(cobros_nc, status: '0'), style: "#{color}; text-decoration: underline" %></td>
@@ -129,7 +132,7 @@
 			        <% end %>
 			    </div>
 			  </div>
-		  
+
 
 
 
@@ -145,3 +148,11 @@
 		window.open('/adelantos/' + document.getElementById('id').value+'/comprovante', 'Pagina', ' SCROLLBARS=YES, TOP=250, LEFT=500, WIDTH=600, HEIGHT=400');
 	}
 </script>
+
+<script>
+   function PrintCheque(id, pf){
+    window.open('/adelantos/'+ id + '/print_cheque', 'Pagina', ' SCROLLBARS=YES, TOP=50, LEFT=200, WIDTH=900, HEIGHT=300');
+  }
+
+</script>
+

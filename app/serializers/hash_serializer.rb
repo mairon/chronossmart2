@@ -1,5 +1,4 @@
 class HashSerializer
-  
   def self.dump(hash)
     hash.to_json
   end

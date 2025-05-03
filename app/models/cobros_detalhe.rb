@@ -6,47 +6,47 @@ class CobrosDetalhe < ActiveRecord::Base
     before_save :calcs
     def calcs
         if cobro.moeda == 0
-            if self.cobro_dolar.to_f == self.saldo_dolar.to_f
-              self.estado = 1
-            else
-              self.estado = 0
-            end
-           self.cobro_guarani     = self.cobro_dolar.to_f * cobro.cotacao.to_i
-           self.desconto_guarani = self.desconto_dolar.to_f * cobro.cotacao.to_i
-           self.interes_guarani  = self.interes_dolar.to_f * cobro.cotacao.to_i
+          if self.cobro_dolar.to_f == self.saldo_dolar.to_f
+            self.estado = 1
+          else
+            self.estado = 0
+          end
+          self.cobro_guarani     = self.cobro_dolar.to_f * cobro.cotacao.to_i
+          self.desconto_guarani = self.desconto_dolar.to_f * cobro.cotacao.to_i
+          self.interes_guarani  = self.interes_dolar.to_f * cobro.cotacao.to_i
           self.saldo_perc = ((self.cobro_dolar.to_f / self.valor_dolar.to_f) * 100).round(4)
+
         elsif cobro.moeda == 1
+          if self.cobro_guarani.to_f == self.saldo_guarani.to_f
+            self.estado = 1
+          else
+            self.estado = 0
+          end
 
-            if self.cobro_guarani.to_f == self.saldo_guarani.to_f
-              self.estado = 1
-            else
-              self.estado = 0
-            end
+          self.cobro_dolar = self.cobro_guarani.to_f / cobro.cotacao.to_i
+          self.desconto_dolar = self.desconto_guarani.to_f / cobro.cotacao.to_i
+          self.interes_dolar  = self.interes_guarani.to_f / cobro.cotacao.to_i
 
-            self.cobro_dolar = self.cobro_guarani.to_f / cobro.cotacao.to_i
-            self.desconto_dolar = self.desconto_guarani.to_f / cobro.cotacao.to_i
-            self.interes_dolar  = self.interes_guarani.to_f / cobro.cotacao.to_i
-
-            if self.cobro_guarani.to_f < 0
-              self.saldo_perc = (( (self.cobro_guarani.to_f * -1 ) / (self.anterior_guarani.to_f * -1 ) * -1 ) * 100).round(4)
-            else
-              self.saldo_perc = ((self.cobro_guarani.to_f / self.valor_guarani.to_f) * 100).round(4)
-            end
+          if self.cobro_guarani.to_f < 0
+            self.saldo_perc = (((self.cobro_guarani.to_f * -1) / (self.anterior_guarani.to_f)) * 100).round(4)
+          else
+            self.saldo_perc = ((self.cobro_guarani.to_f / self.valor_guarani.to_f) * 100).round(4)
+          end
 
         else
-            if self.cobro_real.to_f == self.saldo_real.to_f
-              self.estado = 1
-            else
-              self.estado = 0
-            end
+          if self.cobro_real.to_f == self.saldo_real.to_f
+            self.estado = 1
+          else
+            self.estado = 0
+          end
 
-           self.cobro_guarani     = self.cobro_real.to_f * cobro.cotacao_real.to_i
-           self.desconto_guarani = self.desconto_real.to_f * cobro.cotacao_real.to_i
-           self.interes_guarani  = self.interes_real.to_f * cobro.cotacao_real.to_i
+          self.cobro_guarani    = self.cobro_real.to_f * cobro.cotacao_real.to_i
+          self.desconto_guarani = self.desconto_real.to_f * cobro.cotacao_real.to_i
+          self.interes_guarani  = self.interes_real.to_f * cobro.cotacao_real.to_i
 
-           self.cobro_dolar       = self.cobro_guarani.to_f / cobro.cotacao.to_i
-           self.desconto_dolar   = self.desconto_guarani.to_f / cobro.cotacao.to_i
-           self.interes_dolar    = self.interes_guarani.to_f / cobro.cotacao.to_i
+          self.cobro_dolar      = self.cobro_guarani.to_f / cobro.cotacao.to_i
+          self.desconto_dolar   = self.desconto_guarani.to_f / cobro.cotacao.to_i
+          self.interes_dolar    = self.interes_guarani.to_f / cobro.cotacao.to_i
         end
     end
 end

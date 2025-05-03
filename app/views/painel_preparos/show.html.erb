@@ -1,11 +1,5 @@
 <%= render "set_print" %>
-<script>
-  //setInterval(function() {
-    var data = ['imprimiu'];   // Raw commands (ZPL provided)
-    var config = qz.configs.create("PDFwriter");               // Exact printer name from OS
-    qz.print(config, data).then(function() {});
-  //}, 10000); //10 seconds
-</script>
+
 <div class="row">
   <div class="col-md-12">
     <div class="panel">
@@ -40,16 +34,13 @@
       </div>
         <script language="javascript">
           $(document).ready(function() {
-            url="/painel_preparos/preparo_pendentes?painel_preparo_id=<%= @painel_preparo.id %>";
-            ajax(url);
+            $("#pagina").load("/painel_preparos/preparo_pendentes?painel_preparo_id=<%= @painel_preparo.id %>");
           });
 
           setInterval(function() {
-            url="/painel_preparos/preparo_pendentes?painel_preparo_id=<%= @painel_preparo.id %>";
-            ajax(url);
+            $("#pagina").load("/painel_preparos/preparo_pendentes?painel_preparo_id=<%= @painel_preparo.id %>");
           }, 10000); //10 seconds
         </script>
-        <%= javascript_include_tag 'busca_ajax' %>
       <div class="connectedSortable" id="sortable1" data-box-id="1">
         <div id="pagina"></div>
       </div>

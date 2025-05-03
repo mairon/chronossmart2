@@ -11,13 +11,14 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20250305022645) do
+ActiveRecord::Schema.define(:version => 20250330202227) do
 
   create_table "abastecidas", :force => true do |t|
     t.string   "chave",      :limit => 20
     t.date     "data"
     t.time     "hora"
     t.integer  "bomba"
+    t.integer  "bico"
     t.decimal  "litros",                   :precision => 15, :scale => 3, :default => 0.0
     t.decimal  "preco",                    :precision => 15, :scale => 3, :default => 0.0
     t.decimal  "valor",                    :precision => 15, :scale => 3, :default => 0.0
@@ -25,8 +26,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "status"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "api_id"
-    t.string   "bico",       :limit => 10
   end
 
   create_table "abertura_caixas", :force => true do |t|
@@ -136,26 +135,18 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "terminal_id"
     t.decimal  "ips_gs",                             :precision => 15, :scale => 2, :default => 0.0
     t.integer  "centro_custo_id"
-    t.integer  "rodado_cv_id"
-    t.integer  "rodado_cr_id"
-    t.integer  "plano_de_conta_id"
   end
 
   create_table "afericaos", :force => true do |t|
     t.integer  "unidade_id"
     t.integer  "deposito_id"
     t.integer  "persona_id"
-    t.decimal  "quantidade",                        :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "quantidade",     :precision => 15, :scale => 2, :default => 0.0
     t.integer  "bico_id"
-    t.decimal  "custo_medio_gs",                    :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "custo_medio_gs", :precision => 15, :scale => 2, :default => 0.0
     t.date     "data"
-    t.datetime "created_at",                                                                        :null => false
-    t.datetime "updated_at",                                                                        :null => false
-    t.string   "produto_nome",       :limit => 150
-    t.integer  "produto_id"
-    t.decimal  "promedio_guarani",                  :precision => 15, :scale => 2, :default => 0.0
-    t.integer  "deposito_origem_id"
-    t.integer  "abastecida_id"
+    t.datetime "created_at",                                                     :null => false
+    t.datetime "updated_at",                                                     :null => false
   end
 
   create_table "ajuste_preco_detalhes", :force => true do |t|
@@ -225,6 +216,7 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "created_at",                                  :null => false
     t.integer  "unidade_id"
     t.string   "cod_processo",    :limit => 8
+    t.integer  "vendedor_id"
   end
 
   add_index "audits", ["auditable_id", "auditable_type", "version"], :name => "auditable_index"
@@ -242,8 +234,8 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.string   "nome",        :limit => 25
     t.decimal  "vazao"
     t.string   "codigo_tec",  :limit => 15
-    t.datetime "created_at",                                                                 :null => false
-    t.datetime "updated_at",                                                                 :null => false
+    t.datetime "created_at",                                                                :null => false
+    t.datetime "updated_at",                                                                :null => false
     t.integer  "unidade_id"
     t.integer  "deposito_id"
     t.decimal  "preco_us",                  :precision => 15, :scale => 2, :default => 0.0
@@ -255,7 +247,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "ordem",                                                    :default => 0
     t.integer  "bico_auto"
     t.integer  "bomba_auto"
-    t.boolean  "status",                                                   :default => true
   end
 
   create_table "block_financeiros", :force => true do |t|
@@ -367,6 +358,7 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "updated_at",                              :null => false
     t.integer  "status_op",                :default => 0
     t.integer  "venda_id"
+    t.integer  "unidade_id"
   end
 
   create_table "centro_custos", :force => true do |t|
@@ -384,7 +376,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "updated_at",              :null => false
     t.string   "sigla",      :limit => 6
     t.integer  "persona_id"
-    t.integer  "unidade_id"
   end
 
   create_table "check_points", :force => true do |t|
@@ -395,10 +386,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "updated_at"
     t.datetime "datetime"
     t.datetime "tempo_trabalhado"
-    t.integer  "persona_id"
-    t.datetime "checkpoint"
-    t.boolean  "import",           :default => false
-    t.integer  "produto_id"
   end
 
   create_table "cheque_diferidos", :force => true do |t|
@@ -567,7 +554,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.decimal  "saldo_rs",                           :precision => 15, :scale => 2
     t.boolean  "finan",                                                             :default => false
     t.string   "titulo",              :limit => 50
-    t.decimal  "taxa",                               :precision => 15, :scale => 2
   end
 
   add_index "clientes", ["data", "persona_id", "unidade_id", "liquidacao"], :name => "find_cliente"
@@ -730,7 +716,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.decimal  "dif_cambio_rs",                      :precision => 15, :scale => 2, :default => 0.0
     t.integer  "tot_cotas"
     t.integer  "centro_custo_id"
-    t.decimal  "saldo_perc",                         :precision => 15, :scale => 2
   end
 
   create_table "cobros_financas", :force => true do |t|
@@ -792,7 +777,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "cred_deb",             :limit => 2
     t.integer  "cartao_bandeira_id"
     t.integer  "nr_comprovante"
-    t.integer  "aplic_liquidacao",                                                   :default => 0
   end
 
   create_table "comissaos", :force => true do |t|
@@ -1000,12 +984,7 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.boolean  "repasse",                                                                :default => false
     t.date     "vencimento"
     t.integer  "producao_id"
-    t.integer  "safra_id"
-    t.integer  "controle_caixa"
-    t.integer  "viatico_id"
     t.decimal  "frete_real",                              :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "seguro_real",                             :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "despacho_real",                           :precision => 15, :scale => 2, :default => 0.0
   end
 
   add_index "compras", ["data", "tipo_compra"], :name => "compras_data_tipo_compra_idx"
@@ -1027,10 +1006,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "compras_financa_id"
     t.integer  "unidade_id"
     t.integer  "plano_de_conta_id"
-    t.integer  "rodado_id"
-    t.integer  "funcionario_id"
-    t.integer  "ordem_carga_id"
-    t.integer  "pedido_traslado_id"
   end
 
   create_table "compras_depre_apres", :force => true do |t|
@@ -1052,7 +1027,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.decimal  "valor_mensal_us",    :precision => 15, :scale => 2, :default => 0.0
     t.decimal  "valor_mensal_gs",    :precision => 15, :scale => 2, :default => 0.0
     t.decimal  "valor_mensal_rs",    :precision => 15, :scale => 2, :default => 0.0
-    t.integer  "plano_de_conta_id"
   end
 
   create_table "compras_documentos", :force => true do |t|
@@ -1175,8 +1149,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "cred_deb",                                                          :default => 0
     t.integer  "fact_an_cota",                                                      :default => 0
     t.decimal  "valor_euro",                         :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "total_real",                         :precision => 15, :scale => 2, :default => 0.0
-    t.integer  "viatico_liquidacao",                                                :default => 0
   end
 
   create_table "compras_gastos", :force => true do |t|
@@ -1334,7 +1306,7 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.string   "barra",                     :limit => 150
     t.integer  "apre_depre"
     t.integer  "anos"
-    t.decimal  "porcen",                                   :precision => 15, :scale => 3, :default => 0.0
+    t.decimal  "porcen",                                   :precision => 15, :scale => 2, :default => 0.0
     t.integer  "rodado_id"
     t.decimal  "valor_real_ben_us",                        :precision => 15, :scale => 2, :default => 0.0
     t.decimal  "valor_real_ben_gs",                        :precision => 15, :scale => 2, :default => 0.0
@@ -1354,7 +1326,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.decimal  "outros_euro",                              :precision => 15, :scale => 2, :default => 0.0
     t.decimal  "despacho_euro",                            :precision => 15, :scale => 2, :default => 0.0
     t.decimal  "outros_real",                              :precision => 15, :scale => 2, :default => 0.0
-    t.integer  "viatico_liquidacao",                                                      :default => 0
   end
 
   add_index "compras_produtos", ["compra_id", "pedido_compra_id", "pedido_compra_produto_id", "quantidade"], :name => "busca_compra_produtos"
@@ -1500,27 +1471,22 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "moeda"
     t.integer  "persona_id"
     t.integer  "tipo_busca",        :limit => 2,                                :default => 0
-    t.decimal  "valor_gs",                       :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "valor_us",                       :precision => 15, :scale => 2, :default => 0.0
-    t.boolean  "status",                                                        :default => true
   end
 
   create_table "condicionals", :force => true do |t|
     t.integer  "persona_id"
     t.date     "data"
-    t.decimal  "cotacao",                        :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "cotacao",                     :precision => 15, :scale => 2, :default => 0.0
     t.date     "prazo"
     t.text     "obs"
     t.integer  "moeda"
     t.integer  "vendedor_id"
     t.integer  "unidade_id"
-    t.datetime "created_at",                                                                     :null => false
-    t.datetime "updated_at",                                                                     :null => false
+    t.datetime "created_at",                                                                  :null => false
+    t.datetime "updated_at",                                                                  :null => false
     t.integer  "tabela_preco"
-    t.string   "persona_nome",    :limit => 150
-    t.integer  "status",          :limit => 2,                                  :default => 0
-    t.integer  "usuario_created"
-    t.integer  "deposito_id"
+    t.string   "persona_nome", :limit => 150
+    t.integer  "status",       :limit => 2,                                  :default => 0
   end
 
   create_table "conferencia_produtos", :force => true do |t|
@@ -1546,13 +1512,12 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "sub_grupo_id"
     t.text     "obs"
     t.string   "ubicacao",     :limit => 100
-    t.datetime "created_at",                                 :null => false
-    t.datetime "updated_at",                                 :null => false
+    t.datetime "created_at",                  :null => false
+    t.datetime "updated_at",                  :null => false
     t.integer  "deposito_id"
     t.integer  "grupo_id"
     t.integer  "clase_id"
     t.integer  "moeda"
-    t.integer  "tipo",                        :default => 0
   end
 
   create_table "config_contabils", :force => true do |t|
@@ -1638,6 +1603,7 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "updated_at"
     t.string   "descricao",  :limit => nil
     t.string   "modelo",     :limit => nil
+    t.integer  "unidade_id"
   end
 
   create_table "consumicao_interna_produtos", :force => true do |t|
@@ -1650,7 +1616,7 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.string   "produto_nome",          :limit => 200
     t.integer  "deposito_id"
     t.string   "deposito_nome",         :limit => 200
-    t.decimal  "quantidade",                           :precision => 15, :scale => 3, :default => 0.0
+    t.decimal  "quantidade",                           :precision => 15, :scale => 2, :default => 0.0
     t.decimal  "unitario_dolar",                       :precision => 15, :scale => 2, :default => 0.0
     t.decimal  "unitario_guarani",                     :precision => 15, :scale => 2, :default => 0.0
     t.decimal  "total_dolar",                          :precision => 15, :scale => 2, :default => 0.0
@@ -1674,7 +1640,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "tipo_busca",            :limit => 2
     t.string   "fabricante_cod",        :limit => 150
     t.decimal  "saldo",                                :precision => 15, :scale => 2
-    t.integer  "abastecida_id"
   end
 
   create_table "consumicao_internas", :force => true do |t|
@@ -1701,25 +1666,11 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "unidade_id"
     t.integer  "persona_id"
     t.integer  "tipo_economico"
-    t.string   "persona_nome",    :limit => 150
-    t.integer  "motivo_id"
-    t.integer  "centro_custo_id"
-    t.integer  "rodado_id"
-    t.integer  "terminal_id"
   end
 
   create_table "conta", :force => true do |t|
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
-  end
-
-  create_table "conta_cheques", :force => true do |t|
-    t.integer  "conta_id"
-    t.integer  "numero"
-    t.text     "obs"
-    t.integer  "status",     :default => 0
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
   end
 
   create_table "contas", :force => true do |t|
@@ -1745,13 +1696,13 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "terminal_id"
     t.integer  "ordem",                            :default => 0
     t.boolean  "tesouraria",                       :default => false
+    t.boolean  "status"
     t.integer  "centro_custo_id"
     t.boolean  "modal"
     t.integer  "persona_id"
     t.boolean  "consolidado",                      :default => false
     t.boolean  "consolidado_modal",                :default => false
     t.integer  "forma_pago_id"
-    t.boolean  "status",                           :default => true
   end
 
   create_table "contas_forma_pagos", :force => true do |t|
@@ -1818,7 +1769,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "created_at",                                                  :null => false
     t.datetime "updated_at",                                                  :null => false
     t.text     "obs"
-    t.integer  "persona_id"
   end
 
   add_index "contrato_servicos", ["contrato_id"], :name => "index_contrato_servicos_on_contrato_id"
@@ -1857,10 +1807,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "terminal_id"
     t.string   "periodicidade",           :limit => 30
     t.integer  "apartamento_id"
-    t.integer  "plano_id"
-    t.integer  "tabela_preco_id"
-    t.integer  "presupuesto_id"
-    t.integer  "pedido_traslado_id"
   end
 
   add_index "contratos", ["persona_id"], :name => "index_contratos_on_persona_id"
@@ -1876,8 +1822,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.date     "data"
     t.datetime "created_at",               :null => false
     t.datetime "updated_at",               :null => false
-    t.integer  "persona_id"
-    t.text     "obs"
   end
 
   create_table "controle_visita", :force => true do |t|
@@ -1906,6 +1850,18 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "updated_at",                                  :null => false
   end
 
+  create_table "custom_fields", :force => true do |t|
+    t.string   "label"
+    t.string   "internal_name", :limit => 80
+    t.string   "tabela",        :limit => 50
+    t.string   "field_type",    :limit => 2,  :default => "0", :null => false
+    t.text     "description"
+    t.datetime "created_at",                                   :null => false
+    t.datetime "updated_at",                                   :null => false
+  end
+
+  add_index "custom_fields", ["internal_name"], :name => "index_custom_fields_on_internal_name", :unique => true
+
   create_table "deposito_produtos", :force => true do |t|
     t.integer  "produto_id"
     t.datetime "created_at",  :null => false
@@ -1928,7 +1884,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "seta_produto"
     t.decimal  "capacidade",                     :precision => 15, :scale => 2, :default => 0.0
     t.decimal  "minimo",                         :precision => 15, :scale => 2, :default => 0.0
-    t.integer  "produto_id"
   end
 
   create_table "dev_cheque_cliente_dts", :force => true do |t|
@@ -1941,13 +1896,12 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.string   "banco",                 :limit => 50
     t.datetime "created_at",                                                                          :null => false
     t.datetime "updated_at",                                                                          :null => false
-    t.date     "data"
   end
 
   create_table "dev_cheque_clientes", :force => true do |t|
     t.date     "data"
-    t.decimal  "cotacao",               :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "cotacao_real",          :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "cotacao",         :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "cotacao_real",    :precision => 15, :scale => 2, :default => 0.0
     t.integer  "moeda"
     t.integer  "persona_id"
     t.text     "obs"
@@ -1955,11 +1909,8 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "usuario_created"
     t.integer  "usuario_updated"
     t.integer  "conta_id"
-    t.datetime "created_at",                                                            :null => false
-    t.datetime "updated_at",                                                            :null => false
-    t.integer  "motivos_dev_cheque_id"
-    t.integer  "vuelto_conta_id"
-    t.boolean  "deb_cli"
+    t.datetime "created_at",                                                      :null => false
+    t.datetime "updated_at",                                                      :null => false
   end
 
   create_table "dev_cheque_prov_dts", :force => true do |t|
@@ -1970,17 +1921,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
   create_table "dev_cheque_provs", :force => true do |t|
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
-  end
-
-  create_table "devices", :force => true do |t|
-    t.string   "nome",         :limit => 50
-    t.string   "host",         :limit => 50
-    t.string   "instance_key", :limit => 50
-    t.string   "token",        :limit => 50
-    t.string   "id_control",   :limit => 50
-    t.string   "webhook",      :limit => 100
-    t.datetime "created_at",                  :null => false
-    t.datetime "updated_at",                  :null => false
   end
 
   create_table "diario_debes", :force => true do |t|
@@ -2091,6 +2031,8 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "created_at",      :null => false
     t.datetime "updated_at",      :null => false
     t.integer  "estado_id"
+    t.integer  "api_id"
+    t.text     "cidades_json"
   end
 
   create_table "documentos", :force => true do |t|
@@ -2107,7 +2049,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "gasto",                          :default => 0
     t.integer  "gastos",                         :default => 0
     t.boolean  "folha",                          :default => false
-    t.integer  "processo",                       :default => 0
   end
 
   create_table "egressos", :force => true do |t|
@@ -2227,10 +2168,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.boolean  "modulo_tintometrico"
     t.decimal  "base_calc_retencao_gs",                  :precision => 15, :scale => 2, :default => 0.0
     t.integer  "segmento",                                                              :default => 0
-    t.integer  "segmentos",                                                             :default => 0
-    t.string   "locale",                  :limit => 10
-    t.boolean  "mobile_integration",                                                    :default => false
-    t.boolean  "gasto_detalhado",                                                       :default => false
   end
 
   create_table "entrada_curvas", :force => true do |t|
@@ -2323,15 +2260,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "api_id"
   end
 
-  create_table "etapas", :force => true do |t|
-    t.integer  "pipeline_id"
-    t.integer  "ordem"
-    t.date     "max_data"
-    t.datetime "created_at",                 :null => false
-    t.datetime "updated_at",                 :null => false
-    t.string   "nome",        :limit => 100
-  end
-
   create_table "etiquetas", :force => true do |t|
     t.string   "especie",     :limit => 30
     t.string   "variedade",   :limit => 30
@@ -2346,62 +2274,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.string   "ing_respons", :limit => 40
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "evento_convidados", :force => true do |t|
-    t.integer  "evento_id"
-    t.string   "nome",              :limit => 100
-    t.string   "doc",               :limit => 50
-    t.boolean  "confirmado",                       :default => false
-    t.boolean  "presente",                         :default => false
-    t.date     "confirmado_data"
-    t.datetime "created_at",                                          :null => false
-    t.datetime "updated_at",                                          :null => false
-    t.string   "telefone",          :limit => 20
-    t.text     "comple"
-    t.integer  "venda_id"
-    t.integer  "produto_id"
-    t.integer  "vendas_produto_id"
-    t.integer  "persona_id"
-  end
-
-  create_table "fatura_import_produtos", :id => false, :force => true do |t|
-    t.integer  "id",                                                                              :null => false
-    t.integer  "fatura_import_id"
-    t.string   "dcodint",          :limit => 50
-    t.string   "ddesproser",       :limit => 150
-    t.string   "ddesunimed",       :limit => 10
-    t.decimal  "dcantproser",                     :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "dpuniproser",                     :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "ddescitem",                       :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "dtotopeitem",                     :precision => 15, :scale => 2, :default => 0.0
-    t.integer  "produto_id"
-    t.datetime "created_at",                                                                      :null => false
-    t.datetime "updated_at",                                                                      :null => false
-    t.string   "tamanho",          :limit => 20
-  end
-
-  create_table "fatura_imports", :id => false, :force => true do |t|
-    t.integer  "id",                                                                         :null => false
-    t.text     "data_xml"
-    t.integer  "dnumtim"
-    t.string   "dest",        :limit => 10
-    t.string   "dpunexp",     :limit => 10
-    t.string   "dnumdoc",     :limit => 10
-    t.date     "dfeemide"
-    t.string   "cmoneope",    :limit => 5
-    t.string   "drucem",      :limit => 10
-    t.string   "ddvemi",      :limit => 4
-    t.string   "dnomemi",     :limit => 150
-    t.integer  "icondope"
-    t.string   "ddcondope",   :limit => 50
-    t.string   "dplazocre",   :limit => 50
-    t.decimal  "dtotgralope",                :precision => 15, :scale => 2, :default => 0.0
-    t.integer  "persona_id"
-    t.integer  "colecao_id"
-    t.datetime "created_at",                                                                 :null => false
-    t.datetime "updated_at",                                                                 :null => false
-    t.integer  "clase_id"
   end
 
   create_table "faturas", :force => true do |t|
@@ -2469,9 +2341,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "cred_deb",            :limit => 2,                                :default => 0
     t.integer  "conta_origem_id"
     t.integer  "conta_destino_id"
-    t.integer  "abertura_caixa_id"
-    t.text     "obs"
-    t.integer  "usuario_created"
   end
 
   add_index "fechamento_caixa_dts", ["fechamento_caixa_id"], :name => "index_fecha_cai_dts"
@@ -2589,7 +2458,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.decimal  "entrada_peso",                       :precision => 15, :scale => 2
     t.string   "titulo",              :limit => 50
     t.integer  "plano_de_conta_id"
-    t.integer  "centro_custo_id"
   end
 
   add_index "financas", ["data", "conta_id", "moeda"], :name => "find_financas"
@@ -2597,52 +2465,51 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
   create_table "form_fiscals", :force => true do |t|
     t.date     "data"
     t.date     "vencimento"
-    t.string   "doc_01",        :limit => 5
-    t.string   "doc_02",        :limit => 5
-    t.string   "doc",           :limit => 15
-    t.string   "timbrado",      :limit => 20
+    t.string   "doc_01",       :limit => 5
+    t.string   "doc_02",       :limit => 5
+    t.string   "doc",          :limit => 15
+    t.string   "timbrado",     :limit => 20
     t.integer  "status"
     t.integer  "tipo"
     t.integer  "tipo_doc"
-    t.string   "ruc",           :limit => 20
-    t.string   "persona_nome",  :limit => 150
+    t.string   "ruc",          :limit => 20
+    t.string   "persona_nome", :limit => 150
     t.integer  "persona_id"
     t.integer  "cod_proc"
-    t.string   "sigla_proc",    :limit => 10
+    t.string   "sigla_proc",   :limit => 10
     t.integer  "moeda"
     t.integer  "cotas"
     t.integer  "dv"
     t.integer  "tipo_op"
-    t.decimal  "gv_10_gs",                     :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "gv_05_gs",                     :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "ip_10_gs",                     :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "ip_05_gs",                     :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "ex_gs",                        :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "tot_gs",                       :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "gv_10_us",                     :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "gv_05_us",                     :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "ip_10_us",                     :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "ip_05_us",                     :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "ex_us",                        :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "tot_us",                       :precision => 15, :scale => 2, :default => 0.0
-    t.datetime "created_at",                                                                     :null => false
-    t.datetime "updated_at",                                                                     :null => false
+    t.decimal  "gv_10_gs",                    :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "gv_05_gs",                    :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "ip_10_gs",                    :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "ip_05_gs",                    :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "ex_gs",                       :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "tot_gs",                      :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "gv_10_us",                    :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "gv_05_us",                    :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "ip_10_us",                    :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "ip_05_us",                    :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "ex_us",                       :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "tot_us",                      :precision => 15, :scale => 2, :default => 0.0
+    t.datetime "created_at",                                                                    :null => false
+    t.datetime "updated_at",                                                                    :null => false
     t.integer  "cota"
     t.integer  "terminal_id"
     t.integer  "unidade_id"
-    t.integer  "impressao",                                                   :default => 0
-    t.decimal  "qtd",                          :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "unit_gs",                      :precision => 15, :scale => 2, :default => 0.0
+    t.integer  "impressao",                                                  :default => 0
+    t.decimal  "qtd",                         :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "unit_gs",                     :precision => 15, :scale => 2, :default => 0.0
     t.integer  "produto_id"
-    t.boolean  "autorizacao",                                                 :default => false
-    t.string   "cdc",           :limit => 80
-    t.integer  "tipo_emissao",                                                :default => 0
+    t.boolean  "autorizacao",                                                :default => true
+    t.string   "cdc",          :limit => 80
+    t.integer  "tipo_emissao",                                               :default => 0
     t.text     "arquivo_pdf"
-    t.decimal  "unit_us",                      :precision => 15, :scale => 2, :default => 0.0
-    t.string   "situacion",     :limit => 50
-    t.string   "estado_set",    :limit => 50
+    t.decimal  "unit_us",                     :precision => 15, :scale => 2, :default => 0.0
     t.text     "motivo"
-    t.string   "autorizacao_n", :limit => 30
+    t.string   "serie",        :limit => 4
+    t.boolean  "consumicao",                                                 :default => false
   end
 
   create_table "forma_pagos", :force => true do |t|
@@ -2688,17 +2555,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.text     "vendas_comprovante"
     t.text     "sql_comissao"
     t.text     "vendas_fatura"
-    t.string   "form_cobro_fatura",       :limit => 100
-  end
-
-  create_table "frota", :force => true do |t|
-    t.integer  "tipo"
-    t.integer  "rodado_cv_id"
-    t.integer  "rodado_cr_id"
-    t.integer  "motorista_id"
-    t.integer  "proprietario_id"
-    t.datetime "created_at",      :null => false
-    t.datetime "updated_at",      :null => false
   end
 
   create_table "grupo_comissaos", :force => true do |t|
@@ -2846,16 +2702,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.string   "rodado_nome"
   end
 
-  create_table "lista_carga_produtos", :force => true do |t|
-    t.integer  "lista_carga_id"
-    t.decimal  "quantidade",        :precision => 15, :scale => 3, :default => 0.0
-    t.integer  "vendas_produto_id"
-    t.integer  "venda_id"
-    t.integer  "produto_id"
-    t.datetime "created_at",                                                        :null => false
-    t.datetime "updated_at",                                                        :null => false
-  end
-
   create_table "lista_cargas", :force => true do |t|
     t.integer  "rodado_id"
     t.integer  "cidade_id"
@@ -2863,9 +2709,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.boolean  "status"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
-    t.date     "data"
-    t.integer  "km_inicio"
-    t.integer  "km_final"
   end
 
   create_table "localidades", :force => true do |t|
@@ -3058,14 +2901,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "updated_at",     :null => false
   end
 
-  create_table "modelo_contratos", :force => true do |t|
-    t.string   "nome",       :limit => 100
-    t.text     "modelo"
-    t.string   "processo",   :limit => 100
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
-  end
-
   create_table "moedas", :force => true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -3095,7 +2930,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "score",                           :default => 0
     t.boolean  "add_sueldo",                      :default => false
     t.integer  "avaliacao_ref_id"
-    t.integer  "processo"
   end
 
   create_table "motivos_dev_cheques", :force => true do |t|
@@ -3143,46 +2977,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "usuario_updated"
     t.integer  "unidade_created"
     t.integer  "unidade_updated"
-  end
-
-  create_table "negocio_historicos", :force => true do |t|
-    t.integer  "negocio_id"
-    t.integer  "etapa_id"
-    t.integer  "tarefa_id"
-    t.string   "tipo_tarefa_id"
-    t.string   "titulo",         :limit => 100
-    t.string   "origem",         :limit => 50
-    t.text     "detalhe"
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
-    t.integer  "usuario_id"
-    t.integer  "nota_id"
-  end
-
-  create_table "negocio_produtos", :force => true do |t|
-    t.integer  "negocio_id"
-    t.integer  "produto_id"
-    t.integer  "moeda"
-    t.decimal  "quantidade", :precision => 15, :scale => 3, :default => 0.0
-    t.decimal  "unit_us",    :precision => 15, :scale => 3, :default => 0.0
-    t.decimal  "unit_gs",    :precision => 15, :scale => 3, :default => 0.0
-    t.decimal  "tot_gs",     :precision => 15, :scale => 3, :default => 0.0
-    t.decimal  "tot_us",     :precision => 15, :scale => 3, :default => 0.0
-    t.datetime "created_at",                                                 :null => false
-    t.datetime "updated_at",                                                 :null => false
-  end
-
-  create_table "negocios", :force => true do |t|
-    t.string   "titulo"
-    t.integer  "persona_id"
-    t.integer  "etapa_id"
-    t.integer  "moeda"
-    t.integer  "vendedor_id"
-    t.date     "expect_fechamento"
-    t.integer  "status"
-    t.datetime "created_at",        :null => false
-    t.datetime "updated_at",        :null => false
-    t.integer  "usuario_id"
   end
 
   create_table "noft_apps", :force => true do |t|
@@ -3259,10 +3053,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.decimal  "unitario_real",                            :precision => 15, :scale => 2, :default => 0.0
     t.decimal  "total_real",                               :precision => 15, :scale => 2, :default => 0.0
     t.string   "fabricante_cod",            :limit => 100
-    t.decimal  "custo_gs",                                 :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "custo_us",                                 :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "desconto_gs",                              :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "desconto_us",                              :precision => 15, :scale => 2, :default => 0.0
   end
 
   create_table "nota_credito_proveedors", :force => true do |t|
@@ -3301,8 +3091,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "updated_at"
     t.decimal  "cotacao_real",                       :precision => 15, :scale => 2, :default => 0.0
     t.integer  "unidade_id"
-    t.integer  "tabela_id"
-    t.string   "tabela",              :limit => 80
   end
 
   create_table "nota_creditos", :force => true do |t|
@@ -3362,9 +3150,9 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.string   "servico_nome",        :limit => 120
     t.integer  "unidade_id"
     t.integer  "contrato_id"
+    t.integer  "motivo"
     t.integer  "origem_proc",                                                       :default => 0
     t.integer  "fiscal",                                                            :default => 0
-    t.integer  "motivo"
   end
 
   create_table "nota_creditos_detalhes", :force => true do |t|
@@ -3462,8 +3250,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.decimal  "custo_contabil_guarani",                :precision => 15, :scale => 2
     t.string   "persona_nome",           :limit => 200
     t.integer  "persona_id"
-    t.decimal  "bruto",                                 :precision => 15, :scale => 3
-    t.decimal  "tara",                                  :precision => 15, :scale => 3
   end
 
   create_table "nota_remicaos", :force => true do |t|
@@ -3500,78 +3286,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "unidade_created"
     t.integer  "unidade_updated"
     t.integer  "estado"
-    t.string   "persona_nome",         :limit => 150
-    t.integer  "persona_id"
-    t.integer  "rodado_cv_id"
-    t.integer  "rodado_cr_id"
-    t.string   "kms",                  :limit => 30
-    t.text     "obs"
-    t.integer  "safra_id"
-    t.integer  "cultivo_id"
-    t.decimal  "valor_guarani",                       :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "valor_dolar",                         :precision => 15, :scale => 2, :default => 0.0
-  end
-
-  create_table "notas", :force => true do |t|
-    t.text     "descricao"
-    t.integer  "usuario_id"
-    t.integer  "negocio_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-    t.integer  "tarefa_id"
-  end
-
-  create_table "ordem_cargas", :force => true do |t|
-    t.integer  "pedido_traslado_id"
-    t.date     "data"
-    t.integer  "frota_id"
-    t.integer  "rodado_cv_id"
-    t.integer  "rodado_cr_id"
-    t.integer  "motorista_id"
-    t.integer  "proprietario_id"
-    t.integer  "origem_id"
-    t.integer  "destino_id"
-    t.integer  "pedido_traslado_doc_id"
-    t.integer  "km_inicio"
-    t.integer  "km_final"
-    t.decimal  "valor_frete_gs",         :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "valor_frete_us",         :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "valor_frete_rs",         :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "peso",                   :precision => 15, :scale => 2, :default => 0.0
-    t.integer  "produto_id"
-    t.integer  "status",                                                :default => 0
-    t.datetime "created_at",                                                             :null => false
-    t.datetime "updated_at",                                                             :null => false
-    t.integer  "cod_ext"
-    t.integer  "moeda"
-    t.integer  "plano_de_conta_id"
-  end
-
-  create_table "ordem_entrega_produtos", :force => true do |t|
-    t.integer  "ordem_entrega_id"
-    t.integer  "produto_id"
-    t.integer  "vendas_produto_id"
-    t.decimal  "quantidade",        :precision => 15, :scale => 3, :default => 0.0
-    t.datetime "created_at",                                                        :null => false
-    t.datetime "updated_at",                                                        :null => false
-  end
-
-  create_table "ordem_entregas", :force => true do |t|
-    t.integer  "venda_id"
-    t.integer  "persona_id"
-    t.integer  "vendedor_id"
-    t.integer  "cidade_id"
-    t.string   "direcao"
-    t.text     "complemento"
-    t.text     "obs"
-    t.integer  "local_retirada"
-    t.integer  "status",                    :default => 0
-    t.date     "data"
-    t.datetime "created_at",                                   :null => false
-    t.datetime "updated_at",                                   :null => false
-    t.integer  "persona_locais_entrega_id"
-    t.boolean  "print_comprovante",         :default => false
-    t.integer  "rodado_id"
   end
 
   create_table "ordem_producaos", :force => true do |t|
@@ -3602,7 +3316,7 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "ordem_serv_id"
     t.integer  "deposito_id"
     t.integer  "produto_id"
-    t.decimal  "quantidade",    :precision => 15, :scale => 3, :default => 0.0
+    t.integer  "quantidade"
     t.datetime "created_at",                                                     :null => false
     t.datetime "updated_at",                                                     :null => false
     t.date     "data"
@@ -3825,7 +3539,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "tot_cotas"
     t.integer  "rubro_id"
     t.integer  "centro_custo_id"
-    t.integer  "plano_de_conta_id"
   end
 
   create_table "pagos_financas", :force => true do |t|
@@ -3861,8 +3574,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "forma_pago_id"
     t.integer  "cred_deb",            :limit => 2
     t.string   "titular",             :limit => 200
-    t.integer  "centro_custo_id"
-    t.integer  "plano_de_conta_id"
   end
 
   create_table "painel_cliente_logs", :force => true do |t|
@@ -3871,6 +3582,15 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.string   "senha"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+  end
+
+  create_table "painel_preparos", :force => true do |t|
+    t.string   "nome"
+    t.text     "grupo_ids"
+    t.integer  "unidade_id"
+    t.datetime "created_at",               :null => false
+    t.datetime "updated_at",               :null => false
+    t.string   "set_print",  :limit => 50
   end
 
   create_table "paises", :force => true do |t|
@@ -3992,36 +3712,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "presupuesto_id"
     t.datetime "created_at",       :null => false
     t.datetime "updated_at",       :null => false
-  end
-
-  create_table "pedido_traslado_docs", :force => true do |t|
-    t.integer  "pedido_traslado_id"
-    t.string   "crt",                :limit => 80
-    t.string   "cte",                :limit => 80
-    t.string   "mic",                :limit => 80
-    t.string   "manif",              :limit => 80
-    t.datetime "created_at",                       :null => false
-    t.datetime "updated_at",                       :null => false
-  end
-
-  create_table "pedido_traslados", :force => true do |t|
-    t.integer  "unidade_id"
-    t.integer  "cod_ext"
-    t.integer  "origem_id"
-    t.integer  "destino_id"
-    t.date     "data"
-    t.integer  "moeda"
-    t.decimal  "valor_us",                    :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "valor_gs",                    :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "valor_rs",                    :precision => 15, :scale => 2, :default => 0.0
-    t.integer  "produto_id"
-    t.integer  "persona_id"
-    t.integer  "qtd_rodados"
-    t.text     "obs"
-    t.datetime "created_at",                                                                  :null => false
-    t.datetime "updated_at",                                                                  :null => false
-    t.integer  "tipo"
-    t.string   "persona_nome", :limit => 200
   end
 
   create_table "pedidosovis", :id => false, :force => true do |t|
@@ -4164,7 +3854,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "created_at",                     :null => false
     t.datetime "updated_at",                     :null => false
     t.integer  "cargo_id"
-    t.string   "profissao",       :limit => 100
   end
 
   create_table "persona_docs", :force => true do |t|
@@ -4181,7 +3870,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.text     "obs"
     t.boolean  "status",                                 :default => true
     t.boolean  "sem_venc",                               :default => false
-    t.integer  "plano_venda_id"
   end
 
   create_table "persona_escalas", :force => true do |t|
@@ -4372,6 +4060,7 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "tipo_ap_especial",                                                     :default => 0
     t.decimal  "desc_especial",                         :precision => 15, :scale => 2, :default => 0.0
     t.integer  "tipo_banco",                                                           :default => 0
+    t.integer  "retencao",               :limit => 2
     t.string   "senha",                  :limit => 50
     t.string   "nome_fatura",            :limit => 200
     t.integer  "unidade_id"
@@ -4436,15 +4125,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.boolean  "consolidado_modal",                                                    :default => false
     t.text     "obs"
     t.string   "color_tag",              :limit => 30
-    t.string   "facial_id",              :limit => 50
-    t.integer  "tipo_aluno",                                                           :default => 0
-    t.integer  "turma_id"
-    t.string   "coordenadas",            :limit => 150
-    t.integer  "centro_custo_id"
-    t.string   "doc_titular",            :limit => 50
-    t.boolean  "retencao",                                                             :default => true
-    t.string   "constancia_numero",      :limit => 50
-    t.string   "constancia_control",     :limit => 50
   end
 
   add_index "personas", ["id", "nome", "nome_fatura"], :name => "busca_persona"
@@ -4482,21 +4162,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "updated_at"
   end
 
-  create_table "pipeline_usuarios", :force => true do |t|
-    t.integer  "pipeline_id"
-    t.integer  "usuario_id"
-    t.integer  "permissao",   :default => 2
-    t.datetime "created_at",                 :null => false
-    t.datetime "updated_at",                 :null => false
-  end
-
-  create_table "pipelines", :force => true do |t|
-    t.string   "nome",       :limit => 150
-    t.boolean  "status"
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
-  end
-
   create_table "plano_de_contas", :force => true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -4519,38 +4184,10 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "updated_at",                                                 :null => false
   end
 
-  create_table "plano_venda_conds", :force => true do |t|
-    t.integer  "plano_venda_id"
-    t.string   "nome",           :limit => 150
-    t.decimal  "quantidade",                    :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "valor_gs",                      :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "valor_us",                      :precision => 15, :scale => 2, :default => 0.0
-    t.text     "obs"
-    t.datetime "created_at",                                                                    :null => false
-    t.datetime "updated_at",                                                                    :null => false
-  end
-
-  create_table "plano_vendas", :force => true do |t|
-    t.date     "data"
-    t.integer  "persona_id"
-    t.integer  "vendedor_id"
-    t.integer  "produto_id"
-    t.text     "obs"
-    t.integer  "status",                                                              :default => 0
-    t.datetime "created_at",                                                                           :null => false
-    t.datetime "updated_at",                                                                           :null => false
-    t.string   "persona_nome",          :limit => 150
-    t.integer  "moeda"
-    t.integer  "tabela_preco_id"
-    t.decimal  "valor_us",                             :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "valor_gs",                             :precision => 15, :scale => 2, :default => 0.0
-    t.integer  "persona_escrivania_id"
-    t.integer  "persona_seguro_id"
-    t.decimal  "valor_gs_escritura",                   :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "valor_gs_seguro",                      :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "valor_us_escritura",                   :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "valor_us_seguro",                      :precision => 15, :scale => 2, :default => 0.0
-    t.integer  "tot_cotas"
+  create_table "plano_vendas", :id => false, :force => true do |t|
+    t.integer "id",         :null => false
+    t.integer "status"
+    t.integer "persona_id"
   end
 
   create_table "planos", :force => true do |t|
@@ -4589,110 +4226,54 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "unidade_updated"
     t.integer  "presupuesto_id"
     t.integer  "produto_id"
-    t.string   "produto_nome",            :limit => 200
-    t.decimal  "unitario_dolar",                         :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "unitario_guarani",                       :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "total_dolar",                            :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "total_guarani",                          :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "iva_dolar",                              :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "iva_guarani",                            :precision => 15, :scale => 2, :default => 0.0
-    t.string   "fabricante_cod",          :limit => 100
-    t.decimal  "cotacao",                                :precision => 15, :scale => 2, :default => 0.0
+    t.string   "produto_nome",      :limit => 200
+    t.decimal  "unitario_dolar",                   :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "unitario_guarani",                 :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "total_dolar",                      :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "total_guarani",                    :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "iva_dolar",                        :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "iva_guarani",                      :precision => 15, :scale => 2, :default => 0.0
+    t.string   "fabricante_cod",    :limit => 100
+    t.decimal  "cotacao",                          :precision => 15, :scale => 2, :default => 0.0
     t.date     "data"
-    t.decimal  "quantidade",                             :precision => 15, :scale => 3, :default => 0.0
-    t.decimal  "saldo",                                  :precision => 15, :scale => 3, :default => 0.0
-    t.decimal  "taxa",                                   :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "quantidade",                       :precision => 15, :scale => 3, :default => 0.0
+    t.decimal  "saldo",                            :precision => 15, :scale => 3, :default => 0.0
+    t.decimal  "taxa",                             :precision => 15, :scale => 2, :default => 0.0
     t.integer  "tipo"
     t.integer  "clase_id"
     t.integer  "grupo_id"
-    t.string   "barra",                   :limit => 100
+    t.string   "barra",             :limit => 100
     t.integer  "moeda"
     t.integer  "persona_id"
-    t.string   "persona_nome",            :limit => 200
-    t.string   "deposito_nome",           :limit => 150
+    t.string   "persona_nome",      :limit => 200
+    t.string   "deposito_nome",     :limit => 150
     t.integer  "deposito_id"
-    t.decimal  "desconto",                               :precision => 15, :scale => 2
-    t.decimal  "total_desconto",                         :precision => 15, :scale => 2
+    t.decimal  "desconto",                         :precision => 15, :scale => 2
+    t.decimal  "total_desconto",                   :precision => 15, :scale => 2
     t.integer  "produto_cod"
     t.decimal  "interes"
     t.integer  "sub_grupo_id"
     t.integer  "tipo_venda"
     t.integer  "clase_produto"
-    t.decimal  "unitario_real",                          :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "total_real",                             :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "unitario_real",                    :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "total_real",                       :precision => 15, :scale => 2, :default => 0.0
     t.integer  "cor_id"
-    t.string   "cor_nome",                :limit => 100
+    t.string   "cor_nome",          :limit => 100
     t.integer  "tamanho_id"
-    t.string   "tamanho_nome",            :limit => 100
+    t.string   "tamanho_nome",      :limit => 100
     t.integer  "colecao_id"
     t.integer  "produtos_grade_id"
-    t.decimal  "desconto_real",                          :precision => 15, :scale => 2
+    t.decimal  "desconto_real",                    :precision => 15, :scale => 2
     t.integer  "tabela_preco_id"
-    t.decimal  "promedio_guarani",                       :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "promedio_dolar",                         :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "promedio_guarani",                 :precision => 15, :scale => 2, :default => 0.0
+    t.decimal  "promedio_dolar",                   :precision => 15, :scale => 2, :default => 0.0
     t.integer  "status"
-    t.string   "persona_dependente_nome", :limit => 100
-    t.integer  "cuotas",                                                                :default => 1
-    t.integer  "centro_custo_id"
-    t.date     "vencimento"
   end
 
   add_index "presupuesto_produtos", ["presupuesto_id", "quantidade"], :name => "busca_presupuesto"
 
-  create_table "presupuestos", :force => true do |t|
-    t.integer "tipo"
-    t.date    "data"
-    t.decimal "cotacao",                            :precision => 15, :scale => 2, :default => 0.0
-    t.integer "moeda"
-    t.string  "ruc",                 :limit => 50
-    t.string  "persona_nome",        :limit => 200
-    t.string  "telefone",            :limit => 50
-    t.integer "persona_id"
-    t.integer "usuario_created"
-    t.integer "usuario_updated"
-    t.string  "direcao",             :limit => 150
-    t.string  "bairro",              :limit => 150
-    t.integer "cidade_id"
-    t.string  "cidade_nome",         :limit => 150
-    t.string  "documento_numero",    :limit => 50
-    t.string  "documento_numero_01", :limit => 50
-    t.string  "documento_numero_02", :limit => 50
-    t.integer "documento_id"
-    t.integer "fatura"
-    t.string  "documento_nome",      :limit => 150
-    t.integer "conta_id"
-    t.string  "conta_nome",          :limit => 50
-    t.decimal "limite_credito",                     :precision => 15, :scale => 2, :default => 0.0
-    t.string  "classificacao",       :limit => 50
-    t.integer "vendedor_id"
-    t.string  "vendedor_nome",       :limit => 50
-    t.integer "tipo_maiorista"
-    t.integer "persona_cod"
-    t.string  "pedido_numero",       :limit => 50
-    t.decimal "saldo_disponivel",                   :precision => 15, :scale => 2, :default => 0.0
-    t.integer "tipo_venda"
-    t.integer "clase_produto"
-    t.date    "prazo_entrega"
-    t.integer "status"
-    t.decimal "cotacao_real",                       :precision => 15, :scale => 2, :default => 0.0
-    t.integer "venda_id"
-    t.string  "forma_pago"
-    t.string  "obs"
-    t.string  "entrega"
-    t.integer "plano_id"
-    t.integer "tabela_preco"
-    t.integer "colecao_id"
-    t.integer "unidade_id"
-    t.integer "sub_grupo_id"
-    t.integer "cod_imp"
-    t.integer "indicador_id"
-    t.integer "prazo_id"
-    t.integer "tabela_preco_id"
-    t.integer "origem",                                                            :default => 0
-    t.decimal "desconto",                           :precision => 15, :scale => 2, :default => 0.0
-    t.integer "persona_rodado_id"
-    t.integer "qtd_dependentes",                                                   :default => 1
-  end
+# Could not dump table "presupuestos" because of following StandardError
+#   Unknown type 'jsonb' for column 'custom_fields'
 
   create_table "producao_produtos", :force => true do |t|
     t.integer  "producao_id"
@@ -4774,8 +4355,7 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "updated_at"
   end
 
-  create_table "produto_composicaos_vendas_produtos", :id => false, :force => true do |t|
-    t.integer  "id",                    :null => false
+  create_table "produto_composicaos_vendas_produtos", :force => true do |t|
     t.integer  "produto_composicao_id"
     t.integer  "vendas_produto_id"
     t.datetime "created_at"
@@ -4811,7 +4391,7 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.string   "nome",                      :limit => 200
     t.string   "embalagem",                 :limit => 30
     t.string   "referencia",                :limit => 20
-    t.string   "barra",                     :limit => 20
+    t.string   "barra",                     :limit => 40
     t.string   "fabricante_cod",            :limit => 30
     t.integer  "fabricante_id"
     t.decimal  "taxa",                                     :precision => 15, :scale => 2, :default => 0.0
@@ -4905,16 +4485,11 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.boolean  "balanca",                                                                 :default => false
     t.boolean  "preparacao",                                                              :default => false
     t.boolean  "altera_preco_venda",                                                      :default => false
+    t.string   "set_print",                 :limit => 30
+    t.string   "cor",                       :limit => 40
+    t.string   "chassi",                    :limit => 40
+    t.string   "ano",                       :limit => 40
     t.integer  "tickets",                                                                 :default => 0
-    t.boolean  "set_print",                                                               :default => false
-    t.string   "cor",                       :limit => 50
-    t.string   "ano",                       :limit => 10
-    t.string   "chassi",                    :limit => 100
-    t.decimal  "unid_rateio",                              :precision => 15, :scale => 3
-    t.string   "placa",                     :limit => 50
-    t.string   "ex",                        :limit => 50
-    t.string   "numero_motor",              :limit => 50
-    t.string   "doc",                       :limit => 20
   end
 
   add_index "produtos", ["nome", "fabricante_cod"], :name => "produto_busca"
@@ -5402,22 +4977,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "rubro_grupo_id"
     t.string   "grupo_rubro_codigo", :limit => 20
     t.string   "controle",           :limit => 50
-    t.integer  "tipo"
-  end
-
-  create_table "romaneio_produtos", :force => true do |t|
-    t.integer  "romaneio_id"
-    t.integer  "produto_id"
-    t.integer  "produto_nome"
-    t.decimal  "quantidade",    :precision => 15, :scale => 3, :default => 0.0
-    t.decimal  "unit_dolar",    :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "total_dolar",   :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "bruto",         :precision => 15, :scale => 3, :default => 0.0
-    t.decimal  "tara",          :precision => 15, :scale => 3, :default => 0.0
-    t.datetime "created_at",                                                    :null => false
-    t.datetime "updated_at",                                                    :null => false
-    t.decimal  "unit_guarani",  :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "total_guarani", :precision => 15, :scale => 2, :default => 0.0
   end
 
   create_table "romaneios", :force => true do |t|
@@ -5436,13 +4995,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.string   "depositante_nome",  :limit => 100
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "nota_remicao_id"
-    t.integer  "persona_id"
-    t.string   "persona_nome",      :limit => 150
-    t.string   "documento_numero",  :limit => 20
-    t.text     "obs"
-    t.integer  "cultivo_id"
-    t.integer  "contrato_id"
   end
 
   create_table "rota", :force => true do |t|
@@ -5631,6 +5183,7 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
   end
 
   add_index "stocks", ["data", "produtos_grade_id", "deposito_id", "id"], :name => "stocks_busca"
+  add_index "stocks", ["deposito_id", "produto_id", "data"], :name => "busca_stocks"
 
   create_table "sub_grupo_precos", :force => true do |t|
     t.integer  "sub_grupo_id"
@@ -5790,10 +5343,9 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.string   "nome",         :limit => 100
     t.text     "obs"
     t.boolean  "status"
-    t.datetime "created_at",                                     :null => false
-    t.datetime "updated_at",                                     :null => false
+    t.datetime "created_at",                                 :null => false
+    t.datetime "updated_at",                                 :null => false
     t.integer  "tipo_usuario",                :default => 2
-    t.boolean  "presupuesto",                 :default => false
   end
 
   create_table "taggings", :force => true do |t|
@@ -5823,21 +5375,18 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "updated_at"
     t.datetime "dia_inicio"
     t.datetime "dia_final"
-    t.string   "status",         :limit => 50,  :default => "pendente"
+    t.string   "status",       :limit => 50,  :default => "pendente"
     t.datetime "quando"
     t.integer  "persona_id"
     t.integer  "vendedor_id"
-    t.string   "persona_nome",   :limit => 150
-    t.string   "data_inicio",    :limit => 30
-    t.string   "data_final",     :limit => 30
-    t.integer  "tipo_tarefa_id"
-    t.string   "origem"
-    t.integer  "negocio_id"
+    t.string   "persona_nome", :limit => 150
+    t.string   "data_inicio",  :limit => 30
+    t.string   "data_final",   :limit => 30
   end
 
   add_index "tarefas", ["data_inicio"], :name => "index_data_inicio"
   add_index "tarefas", ["persona_id"], :name => "index_persona_id"
-  add_index "tarefas", ["vendedor_id"], :name => "index_vendedor_id"
+  add_index "tarefas", ["persona_nome"], :name => "index_persona_nome"
 
   create_table "terminal_contas", :force => true do |t|
     t.integer  "terminal_id"
@@ -5870,44 +5419,12 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "updated_at", :null => false
   end
 
-  create_table "tipo_tarefas", :force => true do |t|
-    t.string   "nome",       :limit => 100
-    t.text     "icon"
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
-  end
-
   create_table "tipos", :force => true do |t|
     t.string   "nome"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
     t.string   "sigla"
     t.integer  "amostra_inicio"
-  end
-
-  create_table "transacoes", :force => true do |t|
-    t.date     "data"
-    t.integer  "operacao"
-    t.integer  "produto_id"
-    t.decimal  "quantidade",                      :precision => 15, :scale => 3, :default => 0.0
-    t.decimal  "unitario",                        :precision => 15, :scale => 3, :default => 0.0
-    t.integer  "deposito_id"
-    t.decimal  "total",                           :precision => 15, :scale => 3, :default => 0.0
-    t.integer  "forma_pago_id"
-    t.integer  "moeda"
-    t.integer  "conta_id"
-    t.integer  "persona_id"
-    t.string   "persona_nome",     :limit => 150
-    t.text     "obs"
-    t.datetime "created_at",                                                                      :null => false
-    t.datetime "updated_at",                                                                      :null => false
-    t.decimal  "taxa",                            :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "credito_usdt",                    :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "debito_usdt",                     :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "credito_rs",                      :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "debito_rs",                       :precision => 15, :scale => 2, :default => 0.0
-    t.integer  "unidade_id"
-    t.string   "documento_numero", :limit => 50
   end
 
   create_table "transf_cartao_dts", :force => true do |t|
@@ -6085,30 +5602,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
 
   add_index "trocas", ["persona_id"], :name => "index_trocas_on_persona_id"
 
-  create_table "turma_personas", :force => true do |t|
-    t.integer  "persona_id"
-    t.boolean  "status",     :default => true
-    t.integer  "turma_id"
-    t.datetime "created_at",                   :null => false
-    t.datetime "updated_at",                   :null => false
-  end
-
-  create_table "turma_responsavels", :force => true do |t|
-    t.integer  "persona_id"
-    t.integer  "turma_id"
-    t.decimal  "comissao",   :precision => 15, :scale => 3, :default => 0.0
-    t.datetime "created_at",                                                 :null => false
-    t.datetime "updated_at",                                                 :null => false
-  end
-
-  create_table "turmas", :force => true do |t|
-    t.string   "nome",       :limit => 150
-    t.boolean  "status",                    :default => true
-    t.datetime "created_at",                                  :null => false
-    t.datetime "updated_at",                                  :null => false
-    t.integer  "unidade_id"
-  end
-
   create_table "turno_horarios", :force => true do |t|
     t.integer  "turno_id"
     t.string   "dia_semana"
@@ -6173,7 +5666,7 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.string   "ruc",                           :limit => 20
     t.string   "telefone",                      :limit => 30
     t.string   "numero",                        :limit => 15
-    t.string   "email",                         :limit => 25
+    t.string   "email",                         :limit => 50
     t.string   "avatar_file_name"
     t.string   "avatar_content_type"
     t.integer  "avatar_file_size"
@@ -6184,7 +5677,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.string   "nome_api_fiscal",               :limit => 50
     t.boolean  "environment_production_fiscal",                :default => false
     t.boolean  "retencao",                                     :default => false
-    t.boolean  "conta_multi_unidades",                         :default => false
   end
 
   add_index "unidades", ["id"], :name => "busca_unidade"
@@ -6248,6 +5740,7 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.string   "locale",                              :default => "es"
     t.text     "menu_code"
     t.string   "senha_autoriza_venda", :limit => 20
+    t.boolean  "status",                              :default => true
     t.integer  "centro_custo_id"
   end
 
@@ -6265,35 +5758,9 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.datetime "updated_at",                                                           :null => false
   end
 
-  create_table "venda_compras", :force => true do |t|
-    t.integer  "venda_id"
-    t.integer  "compra_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
-
-  create_table "venda_devolucaos", :force => true do |t|
-    t.integer  "venda_id"
-    t.integer  "produto_id"
-    t.integer  "vendas_produto_id"
-    t.decimal  "quantidade",        :precision => 15, :scale => 3, :default => 0.0
-    t.integer  "moeda"
-    t.date     "data"
-    t.decimal  "unit_gs",           :precision => 15, :scale => 3, :default => 0.0
-    t.decimal  "tot_gs",            :precision => 15, :scale => 3, :default => 0.0
-    t.decimal  "unit_us",           :precision => 15, :scale => 3, :default => 0.0
-    t.decimal  "tot_us",            :precision => 15, :scale => 3, :default => 0.0
-    t.decimal  "unit_rs",           :precision => 15, :scale => 3, :default => 0.0
-    t.decimal  "tot_rs",            :precision => 15, :scale => 3, :default => 0.0
-    t.datetime "created_at",                                                        :null => false
-    t.datetime "updated_at",                                                        :null => false
-  end
-
-  create_table "venda_romaneios", :force => true do |t|
-    t.integer  "venda_id"
-    t.integer  "romaneio_id"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+  create_table "venda_romaneios", :id => false, :force => true do |t|
+    t.integer "id",       :null => false
+    t.integer "venda_id"
   end
 
   create_table "vendas", :force => true do |t|
@@ -6376,16 +5843,14 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.integer  "status_op",                                                         :default => 0
     t.decimal  "desconto_rs",                        :precision => 15, :scale => 2, :default => 0.0
     t.integer  "setor_id"
-    t.string   "cartao_nome",         :limit => 50
+    t.integer  "conta_id"
+    t.string   "cartao_nome",         :limit => 10
     t.integer  "centro_custo_id"
     t.integer  "plano_venda_id"
-    t.text     "dados_contrato"
-    t.integer  "ordem_carga_id"
     t.decimal  "desconto_porcen",                    :precision => 15, :scale => 2, :default => 0.0
-    t.integer  "plano_id"
-    t.integer  "turma_id"
   end
 
+  add_index "vendas", ["cartao_id"], :name => "index_cartao"
   add_index "vendas", ["data"], :name => "busca_data"
 
   create_table "vendas_analizes", :force => true do |t|
@@ -6423,9 +5888,8 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
   create_table "vendas_cond_liqs", :force => true do |t|
     t.integer  "venda_id"
     t.integer  "cond_liq_id"
-    t.datetime "created_at",     :null => false
-    t.datetime "updated_at",     :null => false
-    t.integer  "condicional_id"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
   end
 
   create_table "vendas_configs", :force => true do |t|
@@ -6462,18 +5926,18 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.boolean  "autoriza_gerente",                                                    :default => false
     t.boolean  "altera_vendedor_obrig",                                               :default => false
     t.text     "focus_first"
-    t.boolean  "busca_barra",                                                         :default => true
-    t.integer  "unit_us_decimal",                                                     :default => 2
-    t.boolean  "romaneio",                                                            :default => false
-    t.boolean  "vincula_gasto",                                                       :default => false
     t.boolean  "multi_moeda",                                                         :default => false
+    t.boolean  "busca_barra",                                                         :default => true
+    t.boolean  "romaneio",                                                            :default => false
+    t.decimal  "unit_us_decimal",                      :precision => 15, :scale => 2, :default => 0.0
+    t.boolean  "vincula_gasto",                                                       :default => false
     t.boolean  "condicional",                                                         :default => false
-    t.boolean  "plano",                                                               :default => false
+    t.boolean  "cartao",                                                              :default => true
+    t.boolean  "setor",                                                               :default => true
     t.boolean  "centro_custo",                                                        :default => false
-    t.boolean  "setor",                                                               :default => false
-    t.boolean  "cartao",                                                              :default => false
-    t.boolean  "pedido",                                                              :default => false
     t.boolean  "turma",                                                               :default => false
+    t.boolean  "plano",                                                               :default => false
+    t.boolean  "pedido",                                                              :default => false
   end
 
   create_table "vendas_entrada_produtos", :force => true do |t|
@@ -6707,8 +6171,10 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.string   "fact_ad"
     t.string   "fact_ad_01"
     t.string   "fact_ad_02"
-    t.integer  "tot_cotas",                                                           :default => 1
+    t.integer  "tot_cotas"
   end
+
+  add_index "vendas_financas", ["venda_id"], :name => "vendas_financa_venda_id"
 
   create_table "vendas_ordem_servs", :force => true do |t|
     t.integer  "venda_id"
@@ -6782,15 +6248,15 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.boolean  "print",                                                                :default => false
     t.decimal  "perc_comissao",                         :precision => 15, :scale => 2, :default => 0.0
     t.decimal  "desconto_guarani",                      :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "cashback_gs",                           :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "cashback_us",                           :precision => 15, :scale => 2, :default => 0.0
     t.integer  "promo_id"
+    t.decimal  "cashback_gs",                           :precision => 15, :scale => 2
     t.boolean  "op",                                                                   :default => false
+    t.integer  "status_preparo",                                                       :default => 0
     t.integer  "tabela_preco_id"
   end
 
   add_index "vendas_produtos", ["produto_id"], :name => "venda_produto_produto_id"
-  add_index "vendas_produtos", ["venda_id"], :name => "venda_produto_venda_id"
+  add_index "vendas_produtos", ["venda_id"], :name => "vendas_produto_venda_id"
 
   create_table "vendas_produtos_comps", :force => true do |t|
     t.integer  "venda_id"
@@ -6806,31 +6272,6 @@ ActiveRecord::Schema.define(:version => 20250305022645) do
     t.string   "produto_nome",      :limit => 200
     t.decimal  "densidade",                        :precision => 15, :scale => 4, :default => 0.0
     t.integer  "produto_id"
-  end
-
-  create_table "viaticos", :force => true do |t|
-    t.date     "data"
-    t.integer  "persona_id"
-    t.string   "persona_nome",    :limit => 150
-    t.decimal  "valor_gs",                       :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "valor_rs",                       :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "valor_us",                       :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "cotacao",                        :precision => 15, :scale => 2, :default => 0.0
-    t.decimal  "cotacao_real",                   :precision => 15, :scale => 2, :default => 0.0
-    t.text     "obs"
-    t.integer  "forma_pago_id"
-    t.string   "cheque",          :limit => 50
-    t.date     "diferido"
-    t.integer  "rodado_cv_id"
-    t.integer  "rodado_cr_id"
-    t.integer  "conta_id"
-    t.integer  "usuario_created"
-    t.integer  "usuario_updated"
-    t.integer  "moeda"
-    t.datetime "created_at",                                                                     :null => false
-    t.datetime "updated_at",                                                                     :null => false
-    t.integer  "unidade_id"
-    t.integer  "proveedor_id"
   end
 
   create_table "warning_", :id => false, :force => true do |t|

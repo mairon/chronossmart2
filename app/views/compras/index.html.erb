@@ -53,3 +53,12 @@
   }
 </script>
 <%= javascript_include_tag 'busca_ajax' %>
+
+
+
+
+
+<% Compra.where("sueldo_pago_id is not null").each do |c| %>
+  <%= c.id %>
+
+<% end %>

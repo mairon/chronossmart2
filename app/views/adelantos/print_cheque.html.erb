@@ -1,7 +1,5 @@
 <script type="text/javascript" src="/qz-v2/js/qz-tray.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/11.1.0/jsrsasign-all-min.js"></script>
-<script type="text/javascript" src="/qz-v2/assets/signing/sign-message.js"></script>
 <!-- Required scripts -->
 <script type="text/javascript" src="/qz-v2/js/sample/promise-polyfill-8.1.3.min.js"></script>
 <script type="text/javascript" src="/qz-v2/js/sample/whatwg-fetch-3.0.0.min.js"></script>
@@ -9,13 +7,14 @@
 <script type="text/javascript" src="/qz-v2/js/sample/array-from-pollyfill.js"></script>
 
 <script>
+  qz.websocket.connect();
+
   qz.security.setCertificatePromise(function(resolve, reject) {
-     fetch("../qz-v2/assets/signing/digital-certificate.txt", {cache: 'no-store', headers: {'Content-Type': 'text/plain'}})
+     fetch("/qz/assets/signing/digital-certificate.txt", {cache: 'no-store', headers: {'Content-Type': 'text/plain'}})
         .then(function(data) { data.ok ? resolve(data.text()) : reject(data.text()); });
   });
 
 
-  qz.websocket.connect();
     /// Connection ///
     function launchQZ() {
         if (!qz.websocket.isActive()) {
@@ -106,43 +105,44 @@
     }
 
 </script>
+<% set_prints = ConfigPrinter.where(processo: 'COMPROVANTE_VENDA').last %>
 <script>
   function QzComprovante(){
+    qz.printers.find("<%= set_prints.printer %>").then((found) => {
+      var config = qz.configs.create(found);
+      var printData = [
+        '\x1B' + '\x69' + '\x61' + '\x00' + '\x1B' + '\x40',
+        '\x1B' + '\x4D', // normal text
 
-        var config = qz.configs.create("TICKET");               // Exact printer name from OS
-var data = [
-   '\x1B' + '\x40',          // init
-   '\x1B' + '\x61' + '\x31', // center align
-   '\x1B' + '\x21' + '\x30', // em mode on
-   'Control #0001' + '\x0A',     // text and line break
-   '<%= Time.now.strftime("%H:%M") %>' + '\x0A',     // text and line break
-   'Tarjeta: 00001' + '\x0A',     // text and line break
-   '\x1B' + '\x21' + '\x0A' + '\x1B' + '\x45' + '\x0A', // em mode off
-   '\x0A',                   // line break
-   '\x0A',                   // line break
-   '\x0A',                   // line break
-   '\x1B' + '\x21' + '\x20', // em mode on
-   '\x1B' + '\x61' + '\x30', // left align
-   'Resposable: Joao' + '\x0A',     // text and line break
-   '\x0A',                   // line break
-   '\x0A',                   // line breakk
-   '------------------------' + '\x0A',
-   '1x EMPANADA' + '\x0A',
-   '------------------------' + '\x0A',
-   '2x COSTLILLA' + '\x0A',
-   '------------------------' + '\x0A',
-   '\x0A',                   // line break
-   '\x0A',                   // line break
-   '\x0A',
-   '\x0A' + '\x0A' + '\x0A' + '\x0A' + '\x0A' + '\x0A' + '\x0A',
-   '\x1D' + '\x56'  + '\x00' // full cut (new syntax)
-   ];
+        '\x1B' + '\x61' + '\x30' , // left align
 
-        qz.print(config, data).then(function() {
-           alert("Sent data to printer");
-        });
+        '\x0A' ,
 
+        //Valor Cheque TOTAL
+        '<%= ''.to_s.ljust(75, ' ') %>' + '=' + '<%= format_int(@adelanto.valor_guarani.to_f).to_s%>' + '=' +'\x0A' +'\x0A',
+
+        //Datas de emitido e diferido
+           '<%= ''.to_s.ljust(56, ' ') %>' + '<%= @adelanto.data.strftime("%d") %>' + '<%= ''.to_s.ljust(3, ' ') %>' + '<%= @adelanto.data.strftime("%m") %>' + '<%= ''.to_s.ljust(5, ' ') %>' + '<%= @adelanto.data.strftime("%y") %>' + '<%= ''.to_s.ljust(9, ' ') %>' + '<%= @adelanto.diferido.strftime("%d") %>' + '<%= ''.to_s.ljust(3, ' ') %>' + '<%= @adelanto.diferido.strftime("%m") %>' + '<%= ''.to_s.ljust(6, ' ') %>' + '<%= @adelanto.diferido.strftime("%y") %>' +'\x0A'+'\x0A' ,
+
+        //Nominal
+           '<%= ''.to_s.ljust(32, ' ') %>' + '<%= @adelanto.persona_nome %>' +'\x0A'+'\x0A',
+
+       //Valor em letras
+          '<%= ''.to_s.ljust(32, ' ') %>' +  '<%= I18n.with_locale(:es) { @adelanto.valor_guarani.to_i.to_words.upcase }[0..61].ljust(61,' *') %>'  + '\x0A',
+          '<%= ''.to_s.ljust(18, ' ') %>' +  '<%= I18n.with_locale(:es) { @adelanto.valor_guarani.to_i.to_words.upcase }[62..90] %>' + '<%= ''.to_s.ljust(10, ' *') %>'+ '\x0A',
+
+
+
+        '\x0C'
+
+        ];
+      return qz.print(config, printData);
+    }).catch((e) => {
+      alert(e);
+    })
   };
 </script>
 
-<a href="#" onclick="QzComprovante()">Print</a>
+
+<a href="javascript:void(0)" class="btn btn-blue" onClick="QzComprovante()"><%= image_tag('printer.png') %> Imprimir Matricial</a>
+Favorecido: <%= @adelanto.persona_nome %>

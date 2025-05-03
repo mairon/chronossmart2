@@ -1,34 +1,12 @@
-<style type="text/css">
-  .rolagem td, .head_grid td{
-    cursor:pointer;
-    color: #000 !important;
-    font-size: 14px;
-  }
-</style>
-
-  <h1 id="header"><%= t('SALES') %></h1>
-  <div class="acessos">
-
-    <% if VendasConfig.last.pdv_popup == true %>
-      <a href="#" onclick="openPopup()" class="button add">Nuevo</a>
-      <script>
-      function openPopup()//w  w  w.  j  a  v a  2s .com
-      {
-         var popup = window.open("/vendas/new?tipo_venda=0", "popup", "fullscreen");
-        if (popup.outerWidth < screen.availWidth || popup.outerHeight < screen.availHeight)
-        {
-           popup.moveTo(0,0);
-           popup.resizeTo(screen.availWidth, screen.availHeight);
-        }
-      }
-
-      </script>
-    <% else %>
+<div class="panel">
+  <h1 id="header">
+    <%= t('SALES') %>
+    <div class="pull-right">
       <a href="/vendas/new?tipo_venda=0" class="button add">Nuevo</a>
-    <% end %>
-
-  </div>
-  <div class="group">
+      <a href="#" class="btn" data-toggle="modal" data-load-url="<%= modal_consulta_ordem_entregas_path %>" data-target="#ModalOrdemEntregaBusca"><span class="material-symbols-outlined">local_shipping</span></a>
+    </div>
+  </h1>
+  <div class="panel-content">
     <form>
       <input type="hidden" id="processo" name="processo" value="<%= params[:processo] %>" size="5">
         <table>
@@ -73,13 +51,11 @@
             </td>
           </tr>
         </table>
-        <% abertura = AberturaCaixa.last(:conditions => ["status = true and usuario_id = #{current_user.id} and unidade_id = #{current_unidade.id}"]) %>
-        <input type="hidden" id="caixa" value="<%= abertura.id unless abertura.nil? %>">
-
       </form>
    	</div>
+  </div>
 
-   	<div id="pagina"></div>
+ 	<div id="pagina"></div>
 <script language="javascript">
   function pesquisa(valor){
     url="/vendas/busca_vendas?" + $('form').serialize();
@@ -91,7 +67,7 @@
 
 <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="ModalOrdemEntrega">
   <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content" style="height: 720px; width: 950px">
+    <div class="modal-content" style="height: 720px; width: 1300px">
       <div class="modal-header">
         <div class="close-button">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -110,6 +86,34 @@
     var loadurl = $(e.relatedTarget).data('load-url');
     $(this).find('.modal-body-oe').load(loadurl);
   });
+</script>
 
 
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="ModalOrdemEntregaBusca">
+  <div class="modal-dialog modal-lg" role="document"  style="height: 720px; width: 1200px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h2 class="modal-title" id="myModalLabel" align="center">Consulta Ordem Entrega</h2>
+      </div>
+      <div class="modal-body-oe-busca" style="padding: 10px">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $('#ModalOrdemEntregaBusca').on('show.bs.modal', function (e) {
+    var loadurl = $(e.relatedTarget).data('load-url');
+    $(this).find('.modal-body-oe-busca').load(loadurl);
+  });
+
+  $('#ModalOrdemEntregaBusca').on('hidden.bs.modal', function () {
+    $('.modal-body-oe-busca').empty();
+  })
 </script>

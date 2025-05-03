@@ -5,7 +5,7 @@ $(document).ready(function() {
                 $.ajax({
                         url: '/whatsapp/qrcode',
                         type: 'GET',
-                        data: { token: 'M6alkCCgKyF', instance: 'megastart-M6alkCCgKyF' },
+                        data: { token: 'MFaXZtaB3E9', instance: 'megastart-MFaXZtaB3E9' },
                         success: function(data) {
                                 $('#qrCodeImg').attr('src', data.qrcode);
                         }
@@ -16,7 +16,7 @@ $(document).ready(function() {
                 $.ajax({
                         url: '/whatsapp/logout',
                         type: 'GET',
-                        data: { token: 'M6alkCCgKyF', instance: 'megastart-M6alkCCgKyF' },
+                        data: { token: 'MFaXZtaB3E9', instance: 'megastart-MFaXZtaB3E9' },
                         success: function(data) {
                                 if(data.error == false) {
                                         location.reload();
@@ -32,7 +32,7 @@ function initializers() {
         $.ajax({
                 url: '/whatsapp/status',
                 type: 'GET',
-                data: { token: 'M6alkCCgKyF', instance: 'megastart-M6alkCCgKyF' },
+                data: { token: 'MFaXZtaB3E9', instance: 'megastart-MFaXZtaB3E9' },
                 success: function(data) {
                         if(data.message == 'connected') {
                                 $('#whatsappStatus').text('Conectado');

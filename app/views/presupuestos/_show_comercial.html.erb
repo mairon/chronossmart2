@@ -4,7 +4,7 @@
     <div class="pull-right">
       <%= link_to t('BACK'), edit_presupuesto_path(@presupuesto),:class =>'btn btn-default' %>
       <%= link_to 'Generar (PDF)', print_presupuesto_presupuesto_path(@presupuesto, tipo: '0'),:class =>'btn btn-blue  btn-print' %>
-      <%= link_to '(PDF) - INTERNO', print_presupuesto_presupuesto_path(@presupuesto, tipo: '1'),:class =>'btn btn-blue btn-print' %>
+      <%= link_to '(PDF) - INTERNO', print_presupuesto_presupuesto_path(@presupuesto, tipo: '1', grupos: params[:grupos]),:class =>'btn btn-blue btn-print' %>
       <% if @venda_config.modelo_cp.to_i == 1 %>
         <a href="javascript:void(0)" class="btn btn-blue" onClick="QzComprovante()"><%= image_tag('printer.png') %> Matricial</a>
       <% end %>
@@ -54,8 +54,21 @@
     });
   });
 </script>
-
-
+<% unless params[:grupos].blank? %>
+  <div class="panel">
+    <div class="panel-content">
+      <% gp = Grupo.where("id in (#{params[:grupos].map  { |t| t }.join(', ')})") %>
+      <% gp.each do |a| %>
+        <span class="btn btn-primary"><%= a.descricao %></span>
+      <% end %>
+      <div class="pull-right">
+        <%= link_to presupuesto_path(@presupuesto.id) do %>
+          <span class="material-symbols-outlined">filter_alt_off</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
 <div class="panel">
   <div class="panel-content">
   <%= render :partial=>"presupuesto_produtos/index_comercial", :locals=>{:presupuesto => @presupuesto,:presupuesto_produtos => @presupuesto.presupuesto_produtos} %>

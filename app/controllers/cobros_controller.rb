@@ -486,6 +486,7 @@ class CobrosController < ApplicationController
                       C.DOCUMENTO_NUMERO_01 || '-' || C.documento_numero_02 || '-' || C.DOCUMENTO_NUMERO as doc,
                       C.COTA,
                       MIN(C.ID) AS ID,
+                      MIN(C.VENCIMENTO) AS VENCIMENTO,
                       MIN(C.DOCUMENTO_NUMERO_01) AS DOCUMENTO_NUMERO_01,
                       MIN(C.DOCUMENTO_NUMERO_02) AS DOCUMENTO_NUMERO_02,
                       MIN(C.DOCUMENTO_NUMERO) AS DOCUMENTO_NUMERO,
@@ -508,7 +509,6 @@ class CobrosController < ApplicationController
                       MIN(C.CENTRO_CUSTO_ID) AS CENTRO_CUSTO_ID,
                       MIN(V.COTACAO) AS COTACAO_VENDA,
                       ARRAY(SELECT (VP.PRODUTO_NOME) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = MIN(C.VENDA_ID) ) AS array_venda_produtos,
-                      MIN(C.VENCIMENTO) AS VENCIMENTO,
                       SUM(COALESCE(C.DIVIDA_DOLAR,0)) AS DIVIDA_DOLAR,
                       SUM(COALESCE(C.DIVIDA_GUARANI,0)) AS DIVIDA_GUARANI,
                       SUM(COALESCE(C.DIVIDA_REAL,0)) AS DIVIDA_REAL,
@@ -536,7 +536,7 @@ class CobrosController < ApplicationController
             WHERE C.UNIDADE_ID = #{current_unidade.id} AND C.PERSONA_ID = #{@cobro.persona_id} AND C.LIQUIDACAO = 0
 
             GROUP BY 1,2,3
-            ORDER BY 10,2,3,12"
+            ORDER BY 5,2,3"
 
         sql2 = "SELECT C.ID,
                       C.PERSONA_ID,

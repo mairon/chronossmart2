@@ -42,11 +42,11 @@
     </div>
     <div class="col-md-6">
       <% if @ordem_serv.moeda.to_i == 0 %>
-        <%= field_us_label 'Monto U$ :',f,:valor_us, required: true %>
+        <%= field_us_label 'Monto U$ :',f,:valor_us, required: true, class: 'new-valor_us' %>
       <% elsif @ordem_serv.moeda.to_i == 1 %>
-        <%= field_gs_label 'Monto G$ :',f,:valor_gs, required: true %>
+        <%= field_gs_label 'Monto G$ :',f,:valor_gs, required: true, class: 'new-valor_gs' %>
       <% elsif @ordem_serv.moeda.to_i == 2 %>
-        <%= field_us_label 'Monto R$ :',f,:valor_rs, required: true %>
+        <%= field_us_label 'Monto R$ :',f,:valor_rs, required: true, class: 'new-valor_rs' %>
       <% end %>
     </div>    
   </div>
@@ -90,11 +90,11 @@ $("#cod_busca").change(function(){
         success: function(grade){
         //tabela de preco
         if (<%= @ordem_serv.moeda %> == '0'){
-          $('#ordem_serv_prod_valor_us').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
+          $('.new-valor_us').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
         }if (<%= @ordem_serv.moeda %> == '1'){
-          $('#ordem_serv_prod_valor_gs').val(number_format( grade["produto"].preco_1_gs, 0, ',', '.'));
+          $('.new-valor_gs').val(number_format( grade["produto"].preco_1_gs, 0, ',', '.'));
         }if (<%= @ordem_serv.moeda %> == '2'){
-          $('#ordem_serv_prod_valor_rs').val(number_format( grade["produto"].preco_1_rs, 2, ',', '.'));
+          $('.new-valor_rs').val(number_format( grade["produto"].preco_1_rs, 2, ',', '.'));
         }
       }
     });

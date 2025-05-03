@@ -81,14 +81,6 @@
               <%= f.collection_select :vend_responsavel_id, Persona.where(tipo_cliente: 1, tipo_aluno: 0).select('id,nome'),:id,:nome,{:prompt => 'Selecione '} %>
 
             </div>
-
-            <% turma = Turma.where(unidade_id: current_unidade.id).order(:id) %>
-            <% unless turma.blank? %>
-              <div class="col-md-6">
-                <label>Turma</label>
-                <%= f.collection_select :turma_id, turma,:id, :nome, { :prompt => 'Selecione' }%>
-              </div>
-            <% end %>
           </div>
           <div class="row">
             <div class="col-md-6">

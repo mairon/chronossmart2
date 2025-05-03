@@ -1,12 +1,11 @@
-
 class TransferenciaContasController < ApplicationController
     before_filter :authenticate
 
     def busca_diferido
       @transferencia_conta = TransferenciaConta.find(params[:id])
-      periodo = "DIFERIDO BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' 
+      periodo = "DIFERIDO BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
               AND " unless params[:final].blank?
-      sql = "SELECT 
+      sql = "SELECT
                    CHEQUE,
                    MAX(COD_PROC) AS COD_PROC,
                    MAX(SIGLA_PROC) AS SIGLA_PROC,
@@ -33,7 +32,7 @@ class TransferenciaContasController < ApplicationController
     def resultado_busca_diferido   #
         @transferencia_conta = TransferenciaConta.find(params[:id])
 
-      sql = "SELECT 
+      sql = "SELECT
                    CHEQUE,
                    MAX(COD_PROC) AS COD_PROC,
                    MAX(SIGLA_PROC) AS SIGLA_PROC,
@@ -51,7 +50,7 @@ class TransferenciaContasController < ApplicationController
                    SUM(ENTRADA_REAL) AS ENTRADA_REAL,
                    MAX(ID) AS ID
             FROM FINANCAS
-            WHERE CHEQUE IN (?) AND CHEQUE_STATUS IN (1,3) and CONTA_ID = #{@transferencia_conta.ingreso_id} 
+            WHERE CHEQUE IN (?) AND CHEQUE_STATUS IN (1,3) and CONTA_ID = #{@transferencia_conta.ingreso_id}
             GROUP BY 1
             ORDER BY 5,4"
 
@@ -83,8 +82,8 @@ class TransferenciaContasController < ApplicationController
                   :concepto                => @transferencia_conta.concepto,
                   :cheque_status           => 1,
                   :entrada_dolar           => 0,
-                  :entrada_guarani         => 0,  
-                  :entrada_real            => 0,  
+                  :entrada_guarani         => 0,
+                  :entrada_real            => 0,
                   :saida_dolar             => df.entrada_guarani / @transferencia_conta.cotacao.to_f ,
                   :saida_guarani           => df.entrada_guarani.to_f,
                   :saida_real              => df.entrada_guarani.to_f / @transferencia_conta.cotacao_real.to_f ,
@@ -306,10 +305,10 @@ class TransferenciaContasController < ApplicationController
                 :tabela                  => 'CHEQUES DIFERIDOS' )
             end
         end
-       end 
-        
+       end
+
         redirect_to(@transferencia_conta)
-        
+
     end
 
     def get_moeda                  #
@@ -327,11 +326,9 @@ class TransferenciaContasController < ApplicationController
     end
 
 
-    def index                      #
+    def index
 
-        respond_to do |format|
-            format.html # index.html.erb
-        end
+      render layout: 'chart'
     end
 
     def busca
@@ -342,35 +339,32 @@ class TransferenciaContasController < ApplicationController
         end
     end
 
-    def show                       #
-        @transferencia_conta = TransferenciaConta.find(params[:id])
+    def show
+      @transferencia_conta = TransferenciaConta.find(params[:id])
 
-        @diferido            = TransferenciaContasDetalhe.all(:conditions => ["transferencia_conta_id = ?",@transferencia_conta.id])
-
-        respond_to do |format|
-            format.html # show.html.erb
-        end
+      @diferido = TransferenciaContasDetalhe.all(:conditions => ["transferencia_conta_id = ?",@transferencia_conta.id])
+      render layout: 'chart'
     end
 
     def comprovante                       #
         @transferencia_conta = TransferenciaConta.find(params[:id])
-         
+
         @diferido            = TransferenciaContasDetalhe.all(:conditions => ["transferencia_conta_id = ?",@transferencia_conta.id])
-        
+
         render :layout => false
     end
 
     def viatico                       #
         @transferencia_conta = TransferenciaConta.find(params[:id])
-         
+
         @diferido            = TransferenciaContasDetalhe.all(:conditions => ["transferencia_conta_id = ?",@transferencia_conta.id])
-        
+
         render :layout => false
     end
 
 
     def new                        #
-        @transferencia_conta = TransferenciaConta.new        
+        @transferencia_conta = TransferenciaConta.new
         respond_to do |format|
             format.html # new.html.erb
             format.xml  { render :xml => @transferencia_conta }
@@ -413,7 +407,7 @@ class TransferenciaContasController < ApplicationController
     end
 
     def destroy                    #
-    
+
     @transferencia_conta = TransferenciaConta.find(params[:id])
 
 

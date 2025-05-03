@@ -1,12 +1,34 @@
-<div class="group" align="center">
-  <h1 id="header">Device <%= "Token: M6alkCCgKyF - Instance: megastart-M6alkCCgKyF" %></h1>
-  <br>
-  <h2 align="center">Status: <span id="whatsappStatus"></span></h2>
+<div class="panel">
+  <div class="panel-content">
+    <h1 id="header">Device <%= "Token: M6alkCCgKyF - Instance: megastart-M6alkCCgKyF" %></h1>
+    <br>
+    <h2 align="center">Status: <span id="whatsappStatus"></span></h2>
 
-  <p>
-    <a href="#" id="createQrcodeBtn" class="btn btn-green"><i class="icon-white icon-qrcode"></i> Gera QR</a>
-    <a href="#" id="whatsappLogoutBtn" class="btn btn-danger" style="display: none;">Desconectar</a>
-  </p>
-  <p><img id="qrCodeImg"></img></p>
-  <p><%= link_to 'Salir', devices_url %></p>
+    <p>
+      <a href="#" id="createQrcodeBtn" class="btn btn-green"><i class="icon-white icon-qrcode"></i> Gera QR</a>
+      <a href="#" id="whatsappLogoutBtn" class="btn btn-danger" style="display: none;">Desconectar</a>
+    </p>
+    <p><img id="qrCodeImg"></img></p>
+    <p><%= link_to 'Salir', devices_url %></p>
+
+  </div>
+</div>
+
+<div class="panel">
+  <h1 id="header">Teste de Envio</h1>
+  <div class="panel-content">
+    <form action="#">
+      <div class="row">
+        <div class="col-md-12">
+          <label for="">N• Whats</label>
+          <%= text_field_tag :numero, nil, class: 'panel-field' %>
+        </div>
+        <div class="col-md-12">
+          <label for="">Mensagem</label>
+          <%= text_area_tag :obs, nil, class: 'panel-field' %>
+        </div>
+        <div class="col-md-12"><%= submit_tag 'Enviar teste', class: 'btn btn-green' %></div>
+      </div>
+    </form>
+  </div>
 </div>

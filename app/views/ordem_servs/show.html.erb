@@ -24,31 +24,16 @@
 </div>
 
 <div class="row">
-  <div class="col-md-4">
-    <div class="panel">
-      <div class="panel-content">
-        <%= render 'retirados' %>
-      </div>
-    </div>
+  <div class="col-md-7">
+    <%= render 'retirados' %>
+
+    <%= render 'devolvidos' %>
   </div>
 
-  <div class="col-md-4">
-    <div class="panel">
-      <div class="panel-content">
-        <%= render 'devolvidos' %>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-4">
-    <div class="panel">
-      <div class="panel-content">
-        <%= render 'saldo' %>
-      </div>
-    </div>
+  <div class="col-md-5">
+    <%= render 'saldo' %>
   </div>
 </div>
-
 
 <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="myModal">
   <div class="modal-dialog" role="document">
@@ -73,7 +58,22 @@
       $('#ordem_serv_prod_produto_id').focus();
     })
   });
+
+
+
+$(document).keydown(function(c) {
+  if(c.which == 187){
+    $('#myModal').modal('show');
+    $('#myModal').on('shown.bs.modal', function () {
+      $('#ordem_serv_prod_produto_id').focus();
+    })
+
+    }
+});
+
 </script>
+
+
 
 
 

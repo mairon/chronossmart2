@@ -1,4 +1,4 @@
-<h1 style="font-size: 22px;" class="bold"><b>Venta <%= @venda.id.to_s.rjust(6,'0')%></b></h1>
+<h1 style="font-size: 22px;" class="bold"><b>Venta <%= @venda.id.to_s.rjust(6,'0')%> | <%= @venda.controle_caixa %></b></h1>
 <div class="row">
   <div class="col-md-6">
   	<div class="panel">
@@ -53,7 +53,6 @@
       	<%= render 'list_produtos' %>
       </div>
     </div>
-
   </div>
 </div>
 

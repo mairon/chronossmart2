@@ -49,7 +49,7 @@
         <%= render 'forma_pago' %>
         <!--! Verifica se já tem algum movimento e não deixa mais faturar -->
 
-        <% @mov_cl =  Cliente.where(persona_id: @venda.persona_id, documento_numero: @venda.documento_numero.to_s).sum("cobro_guarani + cobro_dolar") %>
+        <% @mov_cl =  Cliente.where(tipo: '1', persona_id: @venda.persona_id, documento_numero: @venda.documento_numero.to_s).sum("cobro_guarani + cobro_dolar") %>
         <% if @mov_cl.to_f == 0 %>
           <div class="partial-fatuamento" hidden>
             <% if current_unidade.environment_production_fiscal == true %>

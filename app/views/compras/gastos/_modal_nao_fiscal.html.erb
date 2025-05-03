@@ -46,6 +46,16 @@
           <%= f.collection_select :centro_custo_id, CentroCusto.all( :select => 'id,nome', :order  => '1' ),:id, :nome, { :prompt => 'Selecione' }, {required: true} %>
         </div>
       </div>
+    <% else %>
+    <div class="row">
+      <div class="col-md-12">
+        <fieldset>
+          <legend>Tipo</legend>
+          <%= f.radio_button :tipo, 0, Checked: "True" %> Contado
+          <%= f.radio_button :tipo, 1 %> Credito
+        </fieldset>
+      </div>
+    </div>
     <% end %>
 
       <div class="row">

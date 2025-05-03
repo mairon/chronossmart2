@@ -279,6 +279,7 @@ class Cliente < ActiveRecord::Base
         classif   = "AND P.CLASSIFICACAO = '#{params[:busca]["classif"]}' " unless params[:busca]["classif"].blank?
         andelanto = "AND COALESCE(C.DOCUMENTO_ID,0)  <> 9 " if params[:filtra_adelanto].to_s != "1"
         vend      = "AND P.vend_responsavel_id = #{params[:busca]["vendedor"]} " unless params[:busca]["vendedor"].blank?
+        turma     = "AND V.TURMA_ID = #{params[:busca]["turma"]} " unless params[:busca]["turma"].blank?
 
         tutor      = "AND P.vend_responsavel_id = #{params[:busca]["tutor"]} " unless params[:busca]["tutor"].blank?
         setor     = "AND P.SETOR_ID = #{params[:busca]["setor"]} " unless params[:busca]["setor"].blank?
@@ -322,11 +323,11 @@ class Cliente < ActiveRecord::Base
 
         if params[:tipo_data].to_s == 'emicao'
             #FITRO POR DATA FATURACAO
-            cond = "#{unidade} C.data  BETWEEN  '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'  #{liq_open} #{liq_close} #{liq_all} #{moeda} #{vend} #{cliente_status} #{clase_produto} #{filtro_saldo_periodo} #{setor} #{regiao} #{doc} #{direcao} #{classif} #{cc} #{find_valor} #{tipo_persona} #{consumo} #{tutor}"
+            cond = "#{unidade} C.data  BETWEEN  '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'  #{liq_open} #{liq_close} #{liq_all} #{moeda} #{vend} #{cliente_status} #{clase_produto} #{filtro_saldo_periodo} #{setor} #{regiao} #{doc} #{direcao} #{classif} #{cc} #{find_valor} #{tipo_persona} #{consumo} #{tutor} #{turma}"
             orden = '4,19,13,14,1'
         else
             #FITRO POR DATA FATURACAO VENCIMENTO
-            cond = "#{unidade}C.vencimento  BETWEEN  '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{liq_open} #{liq_close} #{liq_all} #{moeda} #{vend} #{cliente_status} #{clase_produto} #{filtro_saldo_periodo} #{setor} #{regiao} #{doc} #{direcao} #{classif} #{cc} #{find_valor} #{tipo_persona} #{consumo} #{tutor}"
+            cond = "#{unidade}C.vencimento  BETWEEN  '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{liq_open} #{liq_close} #{liq_all} #{moeda} #{vend} #{cliente_status} #{clase_produto} #{filtro_saldo_periodo} #{setor} #{regiao} #{doc} #{direcao} #{classif} #{cc} #{find_valor} #{tipo_persona} #{consumo} #{tutor} #{turma}"
             orden = '4,19,13,14,1'
         end
 
@@ -599,6 +600,7 @@ class Cliente < ActiveRecord::Base
         consumo  = "AND C.TABELA = 'CHECK_POINTS' "                     if params[:solo_consumo] == "1"
         setor     = "AND P.SETOR_ID = #{params[:busca]["setor"]} " unless params[:busca]["setor"].blank?
         tutor     = "AND P.vend_responsavel_id = #{params[:busca]["tutor"]} " unless params[:busca]["tutor"].blank?
+        turma     = "AND V.TURMA_ID = #{params[:busca]["turma"]} " unless params[:busca]["turma"].blank?
         liq_open  = "AND C.liquidacao = 0  #{vend}"                     if params[:filtro] == "0"  and params[:saldo_periodo] != '1'
         liq_close = "AND C.liquidacao = 1  #{vend}"                     if params[:filtro] == "1"
         liq_all   = " #{vend}"                                        if params[:filtro] == "2"
@@ -636,11 +638,11 @@ class Cliente < ActiveRecord::Base
 
         if params[:tipo_data].to_s == 'emicao'
             #FITRO POR DATA FATURACAO
-            cond = " AND #{unidade} C.data  BETWEEN  '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'  #{liq_open} #{liq_close} #{liq_all} #{moeda} #{vend} #{cliente_status} #{clase_produto} #{filtro_saldo_periodo} #{setor} #{regiao} #{doc} #{direcao} #{classif} #{cc} #{cota} #{find_valor} #{consumo} #{tutor}" 
+            cond = " AND #{unidade} C.data  BETWEEN  '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'  #{liq_open} #{liq_close} #{liq_all} #{moeda} #{vend} #{cliente_status} #{clase_produto} #{filtro_saldo_periodo} #{setor} #{regiao} #{doc} #{direcao} #{classif} #{cc} #{cota} #{find_valor} #{consumo} #{tutor} #{turma}" 
             orden = '32,2,13,14,1'
         else
             #FITRO POR DATA FATURACAO VENCIMENTO
-            cond = "AND #{unidade} C.vencimento  BETWEEN  '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{liq_open} #{liq_close} #{liq_all} #{moeda} #{vend} #{cliente_status} #{clase_produto} #{filtro_saldo_periodo} #{setor} #{regiao} #{doc} #{direcao} #{classif} #{cc} #{cota} #{find_valor} #{consumo} #{tutor}"
+            cond = "AND #{unidade} C.vencimento  BETWEEN  '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{liq_open} #{liq_close} #{liq_all} #{moeda} #{vend} #{cliente_status} #{clase_produto} #{filtro_saldo_periodo} #{setor} #{regiao} #{doc} #{direcao} #{classif} #{cc} #{cota} #{find_valor} #{consumo} #{tutor} #{turma}"
             orden = '32,19,13,14,1'
         end
 

@@ -64,5 +64,7 @@ Zetta::Application.configure do
       endpoint: "https://sfo3.digitaloceanspaces.com",
     }
   }
-
+  ENV['WHATSAPP_API_HOST'] = "apistart03.megaapi.com.br"
+  ENV['WHATSAPP_API_TOKEN'] = "MFaXZtaB3E9"
+  
 end

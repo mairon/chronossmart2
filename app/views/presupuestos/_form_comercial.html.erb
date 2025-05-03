@@ -37,8 +37,15 @@
 					<label><%= t('DATE') %> Entrega</label>
 					<%= f.date_select :prazo_entrega %>
 				</td>
-
 			</tr>
+
+			<tr>
+				<td>
+					<label><%= t('DATE') %> Retirada</label>
+					<%= f.date_select :data_retirada %>
+				</td>
+			</tr>
+
 			<tr>
 				<td colspan="4">
 				 <fieldset>
@@ -87,6 +94,13 @@
 			</tr>
 
 			<tr>
+				<td colspan="4">
+					<label>Forma Pago</label>
+					<%= f.text_area :forma_pago, rows: 3, cols: 55 %>
+				</td>
+			</tr>
+
+			<tr>
 				<td>
     <% CustomField.where(tabela: 'PRESUPUESTOS').each do |field| %>
       <%= f.label field.internal_name %>
@@ -120,9 +134,15 @@
 			},
 			minLength: 2,
 			change: function( event, ui ) {
-				$("#presupuesto_persona_id").val("");
-				$('#presupuesto_persona_id').val(ui.item.id);
-				return false;
+	      if (ui.item === null) {
+	        $(this).val('');
+	        $("#venda_persona_id").val("");
+	        alert('seleccione de el nombre de la lista')
+	      } else{
+					$("#presupuesto_persona_id").val("");
+					$('#presupuesto_persona_id').val(ui.item.id);
+					return false;
+				}
 			}
 		});
 	});
@@ -156,3 +176,4 @@ $(document).ready(function() {
 });
 </script>
 <% end %>
+

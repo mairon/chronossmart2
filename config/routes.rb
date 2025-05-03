@@ -2037,6 +2037,7 @@ resources :pagares_detalhe
 		member do
 			get 'comprovante'
 			get 'recibo'
+			get 'print_cheque'
 			get 'liquidacao'
 		end
 	end

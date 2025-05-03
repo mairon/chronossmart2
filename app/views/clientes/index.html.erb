@@ -55,6 +55,16 @@ WHERE P.UNIDADE_ID = #{current_unidade.id} AND P.vend_responsavel_id IS NOT NULL
       </div>
     <% end %>
 
+    <% tm = Turma.all( :select => 'id', :order  => '1' ) %>
+    <% unless tm.blank? %>
+      <div class="row">
+        <div class="col-md-12">
+          <label>Turmas</label>
+            <%= select("busca", "turma", Turma.all(:select => 'id,nome',:order => 'nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...'}) %>
+        </div>
+      </div>
+    <% end %>
+
     <div class="row">
       <div class="col-md-6">
         <label>Vendedor</label>
@@ -210,10 +220,7 @@ WHERE P.UNIDADE_ID = #{current_unidade.id} AND P.vend_responsavel_id IS NOT NULL
     document.getElementById('tipo').value = d
   }
 
-  $('#busca_vendedor, #busca_direcao, #busca_classif, #busca_cc, #busca_tutor').selectize();
-  $('').selectize();
-  $('').selectize();
-  $('').selectize();
+  $('#busca_vendedor, #busca_direcao, #busca_classif, #busca_cc, #busca_tutor, #busca_turma').selectize();
 
 </script>
 
