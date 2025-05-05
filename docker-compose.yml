@@ -9,7 +9,3 @@ services:
       - .:/chronos-smart2
     ports:
       - "4000:4000"
-    develop:
-      watch:
-        - action: rebuild
-          path: .
