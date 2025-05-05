@@ -17,10 +17,10 @@
         <td width="50" align="center"><%= t('QUOTA') %></td>
         <td width="80" align="center">Venc.</td>
         <td width="40" align="center">Dias</td>
-        <td width="70" align="right"><%= t('INTEREST') %></td>
-        <td width="70" align="right"><%= t('VALUE') %></td>
-        <td width="70" align="right">Anterior</td>
-        <td width="70" align="right">Saldo</td>
+        <td width="80" align="right"><%= t('INTEREST') %></td>
+        <td width="80" align="right"><%= t('VALUE') %></td>
+        <td width="80" align="right">Anterior</td>
+        <td width="80" align="right">Saldo</td>
 
       </tr>
     </table>
@@ -44,7 +44,7 @@
 
               <!-- calculo de interes -->
               <%  dias = Date.today - c.vencimento.to_date if c.liquidacao == 0  %>
-              <%  if dias >= 0  %>
+              <%  if dias >= 0 and saldo_dolar.to_f > 0  %>
                   <%  interes_us = ( ( dias.to_i * empresa.taxa_interes.to_f ) * saldo_dolar.to_f) / 100 %>
               <% else %>
                  <%  interes_us = 0  %>
@@ -85,7 +85,7 @@
 
               <!-- calculo de interes -->
               <%  dias = Date.today - c.vencimento.to_date if c.liquidacao == 0  %>
-              <%  if dias >= 0  %>
+              <%  if dias >= 0 and saldo_guarani.to_f > 0 %>
                   <%  interes_gs = ( ( dias.to_i * empresa.taxa_interes.to_f ) * saldo_guarani.to_f) / 100  %>
               <% else %>
                  <%  interes_gs = 0  %>
@@ -201,28 +201,28 @@
 
             <% if @cobro.moeda.to_i == 0 %>
               <input type="hidden" name="valor_<%= c.id %>" id="valor_<%= c.id %>" value="<%= format_decimal(saldo_dolar) %>" />
-              <td class="acao" width="70" align="right"><%= number_to_currency(interes_us, :format=>' %n ', :separeitor => ',')%></td>
-              <td class="acao" width="70" align="right"><%= number_to_currency(c.divida_dolar, :format=>' %n ', :separeitor => ',')%></td>
-              <td class="acao" width="70" align="right"><%= number_to_currency(c.anterior_us, :format=>' %n ', :separeitor => ',' )%></td>
-              <td class="acao" width="70" align="right"><%= number_to_currency(saldo_dolar_original, :format=>' %n ', :separeitor => ',' )%></td>
-              <td class="acao" width="70" align="right"><%= number_to_currency(saldo_dolar.to_f, :format=>' %n ', :separeitor => ',' )%></td>
+              <td class="acao" width="80" align="right"><%= number_to_currency(interes_us, :format=>' %n ', :separeitor => ',')%></td>
+              <td class="acao" width="80" align="right"><%= number_to_currency(c.divida_dolar, :format=>' %n ', :separeitor => ',')%></td>
+              <td class="acao" width="80" align="right"><%= number_to_currency(c.anterior_us, :format=>' %n ', :separeitor => ',' )%></td>
+              <td class="acao" width="80" align="right"><%= number_to_currency(saldo_dolar_original, :format=>' %n ', :separeitor => ',' )%></td>
+              <td class="acao" width="80" align="right"><%= number_to_currency(saldo_dolar.to_f, :format=>' %n ', :separeitor => ',' )%></td>
               <td class="acao" width="50" align="right"><%= number_to_currency((saldo_dolar.to_f) - saldo_dolar_original.to_f, :format=>' %n ', :separeitor => ',' )%></td>
             <% elsif @cobro.moeda.to_i == 1 %>
               <input type="hidden" name="valor_<%= c.id %>" id="valor_<%= c.id %>" value="<%= format_int(saldo_guarani) %>" />
-              <td class="acao" width="70" align="right"><%= number_to_currency(interes_gs, :format=>' %n ', :precision => 0 )%></td>
-              <td class="acao" width="70" align="right"><%= number_to_currency(c.divida_guarani, :format=>' %n ', :precision => 0 )%></td>
-              <td class="acao" width="70" align="right"><%= number_to_currency(c.anterior_gs, :format=>' %n ', :precision => 0 )%></td>
-              <td class="acao" width="70" align="right"><%= number_to_currency(interes_gs.to_f + saldo_guarani.to_f, :format=>' %n ', :precision => 0 )%></td>
+              <td class="acao" width="80" align="right"><%= number_to_currency(interes_gs, :format=>' %n ', :precision => 0 )%></td>
+              <td class="acao" width="80" align="right"><%= number_to_currency(c.divida_guarani, :format=>' %n ', :precision => 0 )%></td>
+              <td class="acao" width="80" align="right"><%= number_to_currency(c.anterior_gs, :format=>' %n ', :precision => 0 )%></td>
+              <td class="acao" width="80" align="right"><%= number_to_currency(interes_gs.to_f + saldo_guarani.to_f, :format=>' %n ', :precision => 0 )%></td>
               <% tot_interes_gs   += interes_gs.to_f %>
               <% tot_divida_gs    += saldo_guarani_original.to_f %>
               <% tot_corrigida_gs += ( saldo_guarani.to_f + interes_gs.to_f ) %>
 
             <% elsif @cobro.moeda.to_i == 2 %>
               <input type="hidden" name="valor_<%= c.id %>" id="valor_<%= c.id %>" value="<%= format_decimal(saldo_real) %>" />
-              <td class="acao" width="70" align="right"><%= number_to_currency(interes_rs, :format=>' %n ', :separeitor => ',')%></td>
-              <td class="acao" width="70" align="right"><%= number_to_currency(c.divida_real, :format=>' %n ', :separeitor => ',')%></td>
-              <td class="acao" width="70" align="right"><%= number_to_currency(c.anterior_rs, :format=>' %n ', :separeitor => ',' )%></td>
-              <td class="acao" width="70" align="right"><%= number_to_currency(saldo_real.to_f, :format=>' %n ', :separeitor => ',' )%></td>
+              <td class="acao" width="80" align="right"><%= number_to_currency(interes_rs, :format=>' %n ', :separeitor => ',')%></td>
+              <td class="acao" width="80" align="right"><%= number_to_currency(c.divida_real, :format=>' %n ', :separeitor => ',')%></td>
+              <td class="acao" width="80" align="right"><%= number_to_currency(c.anterior_rs, :format=>' %n ', :separeitor => ',' )%></td>
+              <td class="acao" width="80" align="right"><%= number_to_currency(saldo_real.to_f, :format=>' %n ', :separeitor => ',' )%></td>
 
             <% end %>
 
@@ -232,12 +232,12 @@
     </div>
     <table>
       <tr class="head_grid">
-        <td width="795">Suma <input type="text" name="valor" id="valor" value="0" size="11" style="border: none; font-size: 12px; padding:0px"></td>
+        <td width="786">Suma <input type="text" name="valor" id="valor" value="0" size="11" style="border: none; font-size: 12px; padding:0px"></td>
         <% if @cobro.moeda == 1 %>
-          <td width="70" align="right"><%= format_int(tot_interes_gs.to_f) %></td>
-          <td width="70" align="right"></td>
-          <td width="70" align="right"></td>
-          <td width="70"><%= format_int(tot_divida_gs.to_f) %></td>
+          <td width="80" align="right"><%= format_int(tot_interes_gs.to_f) %></td>
+          <td width="80" align="right"></td>
+          <td width="80" align="right"></td>
+          <td width="80"><%= format_int(tot_divida_gs.to_f) %></td>
         <% else %>
         <% end %>
       </tr>

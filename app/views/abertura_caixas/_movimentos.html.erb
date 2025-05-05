@@ -17,7 +17,9 @@
 			<% end %>
 
 		</div>
+
 	</h1>
+	
 	<div class="panel-content">
 		<% if @abertura_caixa.status == true %>
 			<h2 align="center"><span class="btn btn-success">Abierto</span></h2>
@@ -25,6 +27,18 @@
 			<h2 align="center"><span class="btn btn-danger">Cerrado</span></h2>
 		<% end %>
 		<!-- Saldos Anterior Efetivos !-->
+		<table  class="border">
+			<tr>
+      	<td width="266"><b class="bold">Usuario</b></td>
+      	<td width="266"><b class="bold">Turno</b></td>
+      	<td width="266"><b class="bold">Terminal</b></td>
+			</tr>
+			<tr>
+      	<td width="266"><b class="bold"><%= @abertura_caixa.usuario.usuario_nome %></b></td>
+      	<td width="266"><b class="bold"><%= @abertura_caixa.turno.nome %></b></td>
+      	<td width="266"><b class="bold"><%= @abertura_caixa.terminal.nome %></b></td>
+			</tr>
+		</table>
 
 		<% sql_saldo_anterior_gs = "SELECT
 		  SUM(COALESCE(F.ENTRADA_GUARANI,0) - COALESCE(F.SAIDA_GUARANI,0)) AS ANTERIOR_GS FROM FINANCAS F

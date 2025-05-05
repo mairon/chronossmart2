@@ -30,8 +30,11 @@ class PresupuestosController < ApplicationController
   def print_presupuesto
       @presupuesto = Presupuesto.find(params[:id])
 
-      @presupuesto_produto = PresupuestoProduto.all(:conditions => ['presupuesto_id = ?',params[:id]], :order => 'fabricante_cod,cor_id,tamanho_id')
-
+    unless params[:grupos].blank?
+      @presupuesto_produtos = PresupuestoProduto.joins(:produto).where("produtos.grupo_id in (#{params[:grupos].map  { |t| t }.join(', ')}) and presupuesto_produtos.presupuesto_id = #{@presupuesto.id}").order("produtos.grupo_id,presupuesto_produtos.id")      
+    else
+      @presupuesto_produtos = PresupuestoProduto.joins(:produto).where("presupuesto_produtos.presupuesto_id = #{@presupuesto.id}").order("produtos.grupo_id,presupuesto_produtos.id")
+    end
 
     respond_to do |format|
           format.html do
@@ -130,10 +133,18 @@ class PresupuestosController < ApplicationController
   def show
     @venda_config = VendasConfig.where(unidade_id: current_unidade.id).last
     @presupuesto = Presupuesto.find(params[:id])
+    unless params[:grupos].blank?
+      @presupuesto_produtos = PresupuestoProduto.joins(:produto).where("produtos.grupo_id in (#{params[:grupos].map  { |t| t }.join(', ')}) and presupuesto_produtos.presupuesto_id = #{@presupuesto.id}").order("produtos.grupo_id,presupuesto_produtos.id")      
+    else
+      @presupuesto_produtos = PresupuestoProduto.joins(:produto).where("presupuesto_produtos.presupuesto_id = #{@presupuesto.id}").order("produtos.grupo_id,presupuesto_produtos.id")
+    end
     render layout: 'chart'
   end
 
   def new
+      fields = CustomField.pluck(:internal_name)
+      store_accessor :custom_fields, [ fields ]
+
       @presupuesto = Presupuesto.new
 
       respond_to do |format|

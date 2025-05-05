@@ -806,7 +806,7 @@
   end
 
   def index
-
+    render layout: 'chart'
   end
 
   def busca_vendas

@@ -7,7 +7,6 @@
 	*= require dropdown
 	*= require multi-select
   *= require selectize.bootstrap3
-  *= require step-progress.min
   *= require datepicker
   *= require bootstrap-nav-tab-scrollable
   *= require colorpicker

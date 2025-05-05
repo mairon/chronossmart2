@@ -54,7 +54,7 @@ lista_cobros = CobrosDetalhe.find_by_sql(sql)
 
 
 	<tr class = "<%= cycle( "cor1", "cor2" )%>">
-		<td width="60" align="cented"><%= lc.cobro_id.to_s.rjust(6,'0') %></td>
+		<td width="60" align="cented">CB<%= lc.cobro_id.to_s.rjust(6,'0') %>  VT<%= lc.venda_id.to_s.rjust(6,'0') %></td>
 		<td width="250"><%= responsavel_nome %></td>
 		<td width="250"><%= lc.persona_nome %></td>
 		<td width="60" align="cented"><%= lc.data.strftime("%d/%m/%y") %></td>

@@ -2,6 +2,11 @@ class AdelantosController < ApplicationController
 
   before_filter :authenticate
 
+  def print_cheque
+    @adelanto    = Adelanto.find(params[:id])
+    render layout: false
+  end
+
   def liquidacao
     @adelanto    = Adelanto.find(params[:id])
 

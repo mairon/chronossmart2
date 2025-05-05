@@ -13,6 +13,9 @@
   <% end %>
   <%= f.hidden_field :ordem_serv_id %>
   <%= f.hidden_field :status, value: false %>
+  <%= f.hidden_field :valor_gs %>
+  <%= f.hidden_field :valor_rs %>
+  <%= f.hidden_field :valor_us %>
   <div class="row">
     <div class="col-md-12">
       <label><%= t('DATE') %></label>
@@ -28,7 +31,7 @@
   <div class="row">
     <div class="col-md-12">
       <label>Producto</label>
-      <%= f.collection_select :produto_id, Produto.all( :select => ' id,nome', :order  => '2' ), :id, :nome,{prompt: 'Selecione lo producto'}, {required: true, readonly: true} %>
+      <%= f.collection_select :produto_id, Produto.all( :select => ' id,nome', :order  => '2' ), :id, :nome,{ prompt: 'Selecione lo producto'}, {required: true, readonly: true, class: 'panel-field'} %>
       
     </div>
   </div>

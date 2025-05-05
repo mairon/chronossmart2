@@ -1,49 +1,67 @@
-<h1 class="gs">Productos Devolvidos</h1>
-<table class="head_grid">
-  <tr>
-    <td width="200">Producto</td>
-    <td width="30" align="right">Ctd</td>
-    <td width="60" align="right">Monto</td>
-    <td></td>
-  </tr>
-</table>
-<div class="rolagem" dir="div" style="height: 250px;">
-   <table>
-      <% rt = 0 %>
-      <% vt = 0 %>
-      <% @ordem_serv.ordem_serv_prods.where(status: false).each do |os| %>
-        <tr class = "<%= cycle("cor1", "cor2") %> dv<%= os.id %>">
-          <td width="230">
-            <small><%= os.data.strftime("%d/%m/%y") %></small><br>
-            <small> <%= os.produto.nome %></small>
-          </td>
-          <td width="30" align="right"><%= format_peso(os.quantidade) %></td>
-          <% if @ordem_serv.moeda.to_i == 0 %>
-            <td width="60" align="right"><%= format_decimal(os.valor_us) %></td>
-            <% vt += (os.valor_us.to_f * os.quantidade.to_f) %>
-          <% elsif @ordem_serv.moeda.to_i == 1 %>
-            <td width="60" align="right"><%= format_int(os.valor_gs) %></td>
-            <% vt += (os.valor_gs.to_f * os.quantidade.to_f) %>
-          <% elsif @ordem_serv.moeda.to_i == 2 %>
-            <td width="60" align="right"><%= format_decimal(os.valor_rs) %></td>
-            <% vt += (os.valor_rs.to_f * os.quantidade.to_f) %>
-          <% end %>
-          <td><%= link_to '', os, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
-        </tr>
-        <% rt += os.quantidade.to_f %>
-      <% end %>
-   </table>
+<div class="panel">
+
+  <h1 id="header" class="gs">
+    Productos Devolvidos
+  </h1>
+
+  <div class="panel-content">
+
+  <table class="head_grid">
+    <tr>
+      <td align="center" width="60">Fecha</td>
+      <td width="280">Producto</td>
+      <td width="60" align="right">Ctd</td>
+      <td width="40" align="center">UM</td>
+      <td width="75" align="right">Unit</td>
+      <td width="75" align="right">Tot</td>
+      <td></td>
+    </tr>
+  </table>
+  <div class="rolagem" dir="div" style="height: 250px;">
+     <table>
+        <% rt = 0 %>
+        <% vt = 0 %>
+        <% @ordem_serv.ordem_serv_prods.includes(:produto).where(status: false).each do |os| %>
+          <tr class = "<%= cycle("cor1", "cor2") %> dv<%= os.id %>">
+            <td align="center" width="60"><%= os.data.strftime("%d/%m/%y") %></td>
+            <td width="280">
+              <small> <%= os.produto.nome %></small>
+            </td>
+            <td width="60" align="right"><%= format_peso(os.quantidade) %></td>
+            <td width="40" align="right"><%= os.produto.unidade_medida.sigla unless os.produto.unidade_medida.blank? %></td>
+            <% if @ordem_serv.moeda.to_i == 0 %>
+              <td width="75" align="right"><%= format_decimal(os.valor_us) %></td>
+              <td width="75" align="right"><%= format_decimal(os.valor_us * os.quantidade.to_f) %></td>
+              <% vt += (os.valor_us.to_f * os.quantidade.to_f) %>
+            <% elsif @ordem_serv.moeda.to_i == 1 %>
+              <td width="75" align="right"><%= format_int(os.valor_gs) %></td>
+              <td width="75" align="right"><%= format_int(os.valor_gs * os.quantidade.to_f) %></td>
+              <% vt += (os.valor_gs.to_f * os.quantidade.to_f) %>
+            <% elsif @ordem_serv.moeda.to_i == 2 %>
+              <td width="75" align="right"><%= format_decimal(os.valor_rs) %></td>
+              <td width="75" align="right"><%= format_decimal(os.valor_rs * os.quantidade.to_f) %></td>
+              <% vt += (os.valor_rs.to_f * os.quantidade.to_f) %>
+            <% end %>
+            <td><%= link_to '', os, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
+          </tr>
+          <% rt += os.quantidade.to_f %>
+        <% end %>
+     </table>
+  </div>
+  <table>
+    <tr class="head_grid">
+      <td width="330"></td>
+      <td width="60" align="right"><%= rt %></td>
+      <td width="40" align="center"></td>
+      <td width="75" align="right"></td>
+      <td width="75" align="right">
+        <% if @ordem_serv.moeda.to_i == 1 %>
+          <%= format_int(vt.to_i) %>
+        <% else %>
+          <%= format_decimal(vt.to_f) %>
+        <% end %>
+      </td>
+    </tr>
+  </table>
 </div>
-<div class="row">
-  <div class="col-md-6">
-  </div>
-  <div class="col-md-6" align="right">
-    <b style="padding-right: 68px"><%= format_peso(rt) %></b>
-    <% if @ordem_serv.moeda.to_i == 1 %>
-      <b style="padding-right: 38px"><%= format_int(vt.to_i) %></b>
-    <% else %>
-      <b style="padding-right: 38px"><%= format_decimal(vt.to_f) %></b>
-    <% end %>
-    
-  </div>
 </div>

@@ -2,11 +2,9 @@ source 'http://rubygems.org'
 
 gem 'googlecharts'
 
-gem 'dotenv-rails'
-
 gem 'rails', '3.2.22.5'
 gem 'pg', '~> 0.18'
-gem 'auditor'
+gem 'auditor', :path => './vendor/gems/auditor-master'
 gem "simple_calendar"
 #gem 'thin'
 gem 'unicorn'
@@ -56,22 +54,10 @@ gem 'bigdecimal', '1.3.5'
 #gem 'aws-sdk-s3'
 #gem 'activerecord-oracle_enhanced-adapter', '~> 1.4.0'
 #gem 'ruby-oci8', '2.2.9'
-
-gem 'test-unit', '~> 3.0'
-
-gem 'rest-client'
-gem 'rubocop', require: false
-gem "rubycritic", require: false
-gem 'simplecov', require: false, group: :test
-
 group :development do
 	gem "rails3-generators"
 	#gem "debugger"
 	#gem 'brakeman', :require => false
-
-
-  gem 'bundler-audit'
-  gem 'brakeman', require: false
 end
 # Gems used only for assets and not required
 # in production environments by default.
@@ -85,9 +71,4 @@ group :assets do
 	gem 'jquery-rails'
 	gem 'jquery-ui-rails'
 	gem 'jquery-ui-themes'
-end
-
-group :development, :test do
-  gem 'pry-rails'
-  gem 'rspec-rails', '~> 3.9.1'
 end

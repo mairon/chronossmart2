@@ -1,21 +1,13 @@
 # frozen_string_literal: true
 
 # class responsible for check Whatsapp status
-<<<<<<< HEAD
-class Whatsapp
-  class Status
-    attr_reader :instance
-
-    def initialize(instance:)
-=======
 module Whatsapp
   class Status
-    attr_reader :token, :instance
+    attr_reader :host, :instance, :token
 
-    def initialize(token:, instance:)
-      @token = token
->>>>>>> origin/feature/add-whatsapp-service
+
       @instance = instance
+      @token = token
     end
 
     def connected?
@@ -51,7 +43,7 @@ module Whatsapp
     end
 
     def url
-      "https://#{ENV['WHATSAPP_API_HOST']}/rest/instance/#{instance}"
+      "https://#{host}/rest/instance/#{instance}"
     end
   end
 end

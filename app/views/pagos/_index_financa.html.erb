@@ -10,9 +10,9 @@
   </table>
   <div class="rolagem" dir="div" style="height: 100px">
     <table>
-    <% tot = 0 %>      
+    <% tot = 0 %>
     <% pagos_financas.each do |cf| %>
-      <tr class = "<%= cycle( "cor1", "cor2" )%>">        
+      <tr class = "<%= cycle( "cor1", "cor2" )%>">
          <td width="200" align="left"><%= cf.forma_pago.nome %></td>
          <td width="215" align="left"><%= cf.conta_nome %></td>
          <td width="100" align="center"><%= cf.cheque %></td>
@@ -27,7 +27,7 @@
                <% color = '#56b349' %>
                <% tot += cf.valor_dolar.to_f %>
             <% end %>
-            <td width="80" align="right" ><b style="color: <%= color %>"><%= format_decimal( cf.valor_dolar ) %></b></td>            
+            <td width="80" align="right" ><b style="color: <%= color %>"><%= format_decimal( cf.valor_dolar ) %></b></td>
 
           <% elsif @pago.moeda == 1 %>
             <% if cf.cred_deb.to_i == 1 %>
@@ -40,7 +40,7 @@
                <% tot += cf.valor_guarani.to_f %>
             <% end %>
             <td width="80" align="right"><b style="color: <%= color %>"><%= format_int( cf.valor_guarani ) %></b></td>
-            
+
           <% else %>
             <% if cf.cred_deb.to_i == 1 %>
                <% sinal = "-" %>
@@ -53,7 +53,7 @@
             <% end %>
 
             <td width="80" align="right" style="color: <%= color %>"><b><%= format_decimal( cf.valor_real ) %></b></td>
-          <% end %>        
+          <% end %>
           <td align="center" ><b style="color: <%= color %>"><%= sinal %></b></td>
           <td><%= link_to '',  "#", class: 'icon-file', onclick: "PrintCheque(#{@pago.id}, #{cf.id})" %></td>
           <td><%= link_to '',  edit_pagos_financa_path(cf), class: 'icon-pencil' %></td>
@@ -79,5 +79,5 @@
    function PrintCheque(id, pf){
     window.open('/pagos/'+ id + '/print_cheque/?pf=' + pf, 'Pagina', ' SCROLLBARS=YES, TOP=50, LEFT=200, WIDTH=900, HEIGHT=300');
   }
- 
+
 </script>

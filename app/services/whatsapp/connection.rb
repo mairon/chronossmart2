@@ -1,64 +1,13 @@
 # frozen_string_literal: true
 
 # class responsible for manage Whatsapp connection
-<<<<<<< HEAD
-class Whatsapp
-  class Connection
-    attr_reader :instance, :telephone, :token
-
-    def initialize(token:, instance:, telephone:)
-=======
 module Whatsapp
   class Connection
-    attr_reader :instance, :telephone, :token
 
-    def initialize(token:, instance:, telephone: '')
->>>>>>> origin/feature/add-whatsapp-service
+    def initialize(host:, instance:, token:)
+      @host = host
       @instance = instance
-      @telephone = telephone
       @token = token
-    end
-
-<<<<<<< HEAD
-    def connect?
-      response = RestClient.get(connection_url, headers)
-
-      binding.pry
-
-      raise StandardError unless response.code == 200
-
-      result = JSON.parse(response.body)
-    rescue StandardError, RestClient::Forbidden, RestClient::Unauthorized => error
-      Rails.logger.error("Message: #{error.message} - Backtrace: #{error.backtrace}")
-
-      binding.pry
-
-      false
-    end
-
-    def disconnect?
-      response = RestClient.delete(disconnection_url, headers)
-
-      raise StandardError unless response.code == 200
-
-      result = JSON.parse(response.body)
-    rescue StandardError, RestClient::Forbidden, RestClient::Unauthorized => error
-      Rails.logger.error("Message: #{error.message} - Backtrace: #{error.backtrace}")
-
-      false
-=======
-    def connect
-      response = RestClient.get(connection_url, headers)
-
-      result = JSON.parse(response.body)
-
-      raise StandardError if result['error']
-
-      { code: result['pairingCode'] }
-    rescue StandardError, RestClient::Forbidden, RestClient::Unauthorized => error
-      Rails.logger.error("Message: #{error.message} - Backtrace: #{error.backtrace}")
-
-      { code: '' }
     end
 
     def disconnect
@@ -73,7 +22,6 @@ module Whatsapp
       Rails.logger.error("Message: #{error.message} - Backtrace: #{error.backtrace}")
 
       { error: true, message: 'Error logging out instance' }
->>>>>>> origin/feature/add-whatsapp-service
     end
 
     private
@@ -83,11 +31,7 @@ module Whatsapp
     end
 
     def disconnection_url
-      "https://#{ENV['WHATSAPP_API_HOST']}/rest/instance/#{instance}/logout"
-    end
-
-    def connection_url
-      "https://#{ENV['WHATSAPP_API_HOST']}/rest/instance/pairingCode/#{instance}?phoneNumber=#{telephone}"
+      "https://#{host}/rest/instance/#{instance}/logout"
     end
   end
 end

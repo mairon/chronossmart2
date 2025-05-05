@@ -1,6 +1,6 @@
 class Presupuesto < ActiveRecord::Base
   #audit(:create, :update, :destroy) { |model, user, action| "|#{model.id.to_s.rjust(8,'0')}|Hecho por #{user.usuario_nome}" }
-  has_many :presupuesto_produtos, :dependent => :destroy
+  has_many :presupuesto_produtos, order: 'grupo_id, id', :dependent => :destroy
   has_many :presupuesto_cotas, :dependent => :destroy
   has_one :contrato
   validates_presence_of :cotacao,:persona_id, :vendedor_id
@@ -11,10 +11,12 @@ class Presupuesto < ActiveRecord::Base
   belongs_to :tabela_preco
   belongs_to :prazo
 
+  #after_save :gera_tarefa
   fields = CustomField.pluck(:internal_name)
   serialize :custom_fields, JSON
-  store_accessor :custom_fields, *fields
+  store_accessor :custom_fields, [ fields ]
 
+  puts "================ #{fields}"
   def block_data
     #VERIFICA SE SALDO E MAIOR QUE A QUANTIDADE DA VENDA
     if ( self.data.to_date == self.prazo_entrega.to_date  )

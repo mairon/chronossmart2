@@ -4,7 +4,7 @@
     <div class="pull-right">
       <%= link_to 'Salir', ordem_entregas_url, class: 'btn btn-blue' %>
       <% if @ordem_entrega.print_comprovante == true %>
-        <a href="javascript:void(0)" disabled="disabled" class="btn btn-blue" onClick="QzComprovante()" id="btn-print"><%= image_tag('printer.png') %> Matricial</a>
+        <a href="javascript:void(0)" disabled="disabled" class="btn btn-blue" id="btn-print"><%= image_tag('printer.png') %> Matricial</a>
       <% else %>
         <a href="javascript:void(0)" class="btn btn-blue" onClick="QzComprovante()" id="btn-print"><%= image_tag('printer.png') %> Matricial</a>
       <% end %>

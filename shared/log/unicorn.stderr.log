@@ -82,3 +82,47 @@ Errno::EOPNOTSUPP: Operation not supported - connect(2) for /chronos-smart2/shar
   /usr/local/bundle/gems/unicorn-6.1.0/bin/unicorn:128:in `<top (required)>'
   /usr/local/bundle/bin/unicorn:23:in `load'
   /usr/local/bundle/bin/unicorn:23:in `<top (required)>'
+I, [2025-04-28T19:54:34.142619 #9]  INFO -- : Refreshing Gem list
+The PGconn, PGresult, and PGError constants are deprecated, and will be
+removed as of version 1.0.
+
+You should use PG::Connection, PG::Result, and PG::Error instead, respectively.
+
+Called from /usr/local/bundle/gems/activesupport-3.2.22.5/lib/active_support/dependencies.rb:236:in `load_dependency'
+/chronos-smart2/app/controllers/api/v1/postback_controller.rb:6: warning: key :status is duplicated and overwritten on line 6
+I, [2025-04-28T19:56:31.706283 #9]  INFO -- : listening on addr=0.0.0.0:4000 fd=17
+F, [2025-04-28T19:56:31.707113 #9] FATAL -- : error adding listener addr=/chronos-smart2/shared/sockets/unicorn.sock
+Errno::EOPNOTSUPP: Operation not supported - connect(2) for /chronos-smart2/shared/sockets/unicorn.sock
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `initialize'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `new'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `bind_listen'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:242:in `listen'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `block in bind_new_listeners!'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `each'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `bind_new_listeners!'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:141:in `start'
+  /usr/local/bundle/gems/unicorn-6.1.0/bin/unicorn:128:in `<top (required)>'
+  /usr/local/bundle/bin/unicorn:23:in `load'
+  /usr/local/bundle/bin/unicorn:23:in `<top (required)>'
+I, [2025-04-28T19:57:15.974869 #9]  INFO -- : Refreshing Gem list
+The PGconn, PGresult, and PGError constants are deprecated, and will be
+removed as of version 1.0.
+
+You should use PG::Connection, PG::Result, and PG::Error instead, respectively.
+
+Called from /usr/local/bundle/gems/activesupport-3.2.22.5/lib/active_support/dependencies.rb:236:in `load_dependency'
+/chronos-smart2/app/controllers/api/v1/postback_controller.rb:6: warning: key :status is duplicated and overwritten on line 6
+I, [2025-04-28T19:59:10.114689 #9]  INFO -- : listening on addr=0.0.0.0:4000 fd=17
+F, [2025-04-28T19:59:10.115506 #9] FATAL -- : error adding listener addr=/chronos-smart2/shared/sockets/unicorn.sock
+Errno::EOPNOTSUPP: Operation not supported - connect(2) for /chronos-smart2/shared/sockets/unicorn.sock
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `initialize'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `new'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/socket_helper.rb:138:in `bind_listen'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:242:in `listen'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `block in bind_new_listeners!'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `each'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:877:in `bind_new_listeners!'
+  /usr/local/bundle/gems/unicorn-6.1.0/lib/unicorn/http_server.rb:141:in `start'
+  /usr/local/bundle/gems/unicorn-6.1.0/bin/unicorn:128:in `<top (required)>'
+  /usr/local/bundle/bin/unicorn:23:in `load'
+  /usr/local/bundle/bin/unicorn:23:in `<top (required)>'

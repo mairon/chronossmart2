@@ -1,89 +1,109 @@
-<h1 id="header">Transferencia Cuentas - [<%= t('EDITION') %>]</h1>
- <div class="group">
+<div class="panel">
+  <h1 id="header">
+    Transferencia Cuentas - #<%= @transferencia_conta.id.to_s.rjust(6,'0') %> - <%= @transferencia_conta.numero %>
+    <div class="pull-right">
+        <%= link_to t('BACK'), edit_transferencia_conta_path(@transferencia_conta),  :class => 'btn btn-back' %>
+        <a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"><%= image_tag('printer.png') %> <%= t('VOUCHER') %></a>
+        <%= link_to 'Finalizar', transferencia_contas_path, :class => 'btn btn-green' %>
 
-<div class="group">
-   <table  class="head_grid">
-      <tr>
-         <td width="50"></td>
-         <td width="80" align="center">Emitido</td>
-         <td width="80" align="center">Diferido</td>
-         <td width="80" align="center">Compensado</td>
-         <td width="80" align="center"><%= t('CHECKS') %></td>
-         <td width="250" >Origem</td>
-         <td width="250">Destino</td>
-         <td width="100" align="right"><%= t('VALUE') %></td>
-      </tr>
-   </table>
-   <div class="rolagem" id="div" style="height: 200px">
-      <table>
-          <% tot = 0 %>
-         <% @diferido.each do |df| %>
-            <tr class = "<%= cycle("cor1", "cor2")%>">
-               <td width="50" align="center"><%= df.id %></td>
-               <td width="80" align="center"><%= df.original.strftime("%d/%m/%Y") %></td>
-               <td width="80" align="center"><%= df.diferido.strftime("%d/%m/%Y") %></td>
-               <td width="80" align="center"><%= df.data.strftime("%d/%m/%Y") %></td>
-               <td width="80" align="center"><%= df.cheque %></td>
-               <td width="250" align="left"><%= df.conta_origem_nome %></td>
-               <td width="250" align="left"><%= df.conta_destino_nome %></td>
-               <% if @transferencia_conta.destino_moeda == 0 %>
-                <td width="100" align="right"><%= number_to_currency( df.saida_dolar,       :format =>' %n ', :separator => "," ) %></td>
-                <% tot += df.saida_dolar %>
+    </div>
+  </h1>
+  <div class="panel-content">
+    <div class="row">
+      <div class="col-md-4">
+        <label>Cuenta Origen</label>
+        <%= Conta.find(@transferencia_conta.ingreso_id).nome %>
+      </div>
+      <div class="col-md-4">
+        <label>Cuenta Destino</label>
+        <%= Conta.find(@transferencia_conta.destino_id).nome %>
+      </div>
+      <div class="col-md-4">
+        <label>Tipo</label>
+        <% if @transferencia_conta.deposito == 0 %>
+          TRANF. CONTAS
+        <% elsif @transferencia_conta.deposito == 1 %>
+          DEPOSITO
+        <% elsif @transferencia_conta.deposito == 2 %>
+          TRANF CHEQ./EFETIVO
+        <% end %>
+      </div>
 
-               <% elsif @transferencia_conta.destino_moeda == 1 %>
-                <td width="100" align="right"><%= number_to_currency( df.saida_guarani,       :format =>' %n ', :precision => 0 ) %></td>
-                <% tot += df.saida_guarani %>
-
-               <% else %>
-                <td width="100" align="right"><%= number_to_currency( df.saida_real,       :format =>' %n ', :separator => "," ) %></td>
-                <% tot += df.saida_real %>
-               <% end %>
-                  <td><%= link_to '', edit_transferencia_contas_detalhe_path(df), class: 'icon-pencil' %></td>
-                  <td><%= link_to '', df, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>
-            </tr>
-         <% end %>
-      </table>
-   </div>
-   <table  class="head_grid">
-      <tr>
-         <td width="50"></td>
-         <td width="80" align="center"></td>
-         <td width="80" align="center"></td>
-         <td width="80" align="center"></td>
-         <td width="80" align="center"></td>
-         <td width="250" ></td>
-         <td width="250"></td>
-         <% if @transferencia_conta.destino_moeda == 1 %>
-          <td width="100" align="right"><b><%= number_to_currency( tot, :format =>' %n ', :precision => 0 )%></b></td>
-         <% else %>
-          <td width="100" align="right"><b><%= number_to_currency( tot, :format =>' %n ', :separator => "," )%></b></td>
-         <% end %>
-      </tr>
-   </table>
-
+    </div>
+  </div>
 </div>
 
-<table class="head_grid">
-  <tr>
-      <td align="right"><%= t('DATE') %> Diferido :</td>
-        <td>
-          <input type="text" name="inicio" id="inicio"  size="10"  onkeyup="Formatadata(this,event)" />
-          Hasta
-          <input type="text" name="final"  id="final"   size="10" onkeyup="Formatadata(this,event)"/>
-        </td>
-        <td><a href="javascript:void(0)" onClick="Diferido()" class="btn btn-blue">Buscar Cheques</a></td>
-  </tr>
-</table>
+<div class="panel">
+  <div class="panel-content">
+    <table  class="head_grid">
+      <tr>
+        <td width="50">Código</td>
+        <td width="80" align="center">Emitido</td>
+        <td width="80" align="center">Diferido</td>
+        <td width="80" align="center">Compensado</td>
+        <td width="80" align="center"><%= t('CHECKS') %></td>
+        <td width="250" >Origem</td>
+        <td width="250">Destino</td>
+        <td width="100" align="right"><%= t('VALUE') %></td>
+      </tr>
+     </table>
+     <div class="rolagem" id="div" style="height: 200px">
+        <table>
+            <% tot = 0 %>
+           <% @diferido.each do |df| %>
+              <tr class = "<%= cycle("cor1", "cor2")%>">
+                 <td width="50" align="center"><%= df.id %></td>
+                 <td width="80" align="center"><%= df.original.strftime("%d/%m/%Y") %></td>
+                 <td width="80" align="center"><%= df.diferido.strftime("%d/%m/%Y") %></td>
+                 <td width="80" align="center"><%= df.data.strftime("%d/%m/%Y") %></td>
+                 <td width="80" align="center"><%= df.cheque %></td>
+                 <td width="250" align="left"><%= df.conta_origem_nome %></td>
+                 <td width="250" align="left"><%= df.conta_destino_nome %></td>
+                 <% if @transferencia_conta.destino_moeda == 0 %>
+                  <td width="100" align="right"><%= format_decimal( df.saida_dolar ) %></td>
+                  <% tot += df.saida_dolar %>
 
-  <form>
-    <div class="footer-buttons">
-      <%= link_to t('BACK'), edit_transferencia_conta_path(@transferencia_conta),  :class => 'btn btn-back' %> 
-      <a href="javascript:void(0)" class="btn btn-blue" onClick="Comprovante()"><%= image_tag('printer.png') %> <%= t('VOUCHER') %></a>
+                 <% elsif @transferencia_conta.destino_moeda == 1 %>
+                  <td width="100" align="right"><%= format_int( df.saida_guarani ) %></td>
+                  <% tot += df.saida_guarani %>
 
-      <%= link_to 'Finalizar', transferencia_contas_path, :class => 'btn btn-green' %>
-    </div>
-  </form>
+                 <% else %>
+                  <td width="100" align="right"><%= format_decimal( df.saida_real ) %></td>
+                  <% tot += df.saida_real %>
+                 <% end %>
+                    <td><%= link_to '', edit_transferencia_contas_detalhe_path(df), class: 'icon-pencil' %></td>
+                    <td><%= link_to '', df, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>
+              </tr>
+           <% end %>
+        </table>
+     </div>
+     <table  class="head_grid">
+        <tr>
+           <td width="50"></td>
+           <td width="80" align="center"></td>
+           <td width="80" align="center"></td>
+           <td width="80" align="center"></td>
+           <td width="80" align="center"></td>
+           <td width="250" ></td>
+           <td width="250"></td>
+           <% if @transferencia_conta.destino_moeda == 1 %>
+            <td width="100" align="right"><%= format_int( tot )%></td>
+           <% else %>
+            <td width="100" align="right"><%= format_decimal( tot ) %></td>
+           <% end %>
+        </tr>
+     </table>
+  </div>
+</div>
+<div class="panel">
+  <div class="panel-content">
+    <label>Buscar Cheques</label>
+    <input type="text" name="inicio" id="inicio"  size="10"  onkeyup="Formatadata(this,event)" />
+    Hasta
+    <input type="text" name="final"  id="final"   size="10" onkeyup="Formatadata(this,event)"/>
+    <a href="javascript:void(0)" onClick="Diferido()" class="btn btn-blue">Buscar Cheques</a>
 
+  </div>
 </div>
 <%= hidden_field_tag :id, @transferencia_conta.id %>
 <%= hidden_field_tag :conta, @transferencia_conta.ingreso_id %>

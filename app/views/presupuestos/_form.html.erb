@@ -32,19 +32,28 @@
 					<%= text_field :presupuesto,:cotacao_real, size: 10, value: @presupuesto.cotacao_real.to_i %>
 				</td>
 			</tr>
+
 			<tr>
 				<td>
 					<label><%= t('DATE') %> Entrega</label>
 					<%= f.date_select :prazo_entrega %>
 				</td>
-
 			</tr>
+
+			<tr>
+				<td>
+					<label><%= t('DATE') %> Retirada</label>
+					<%= f.date_select :data_retirada %>
+				</td>
+			</tr>
+
+
 			<tr>
 				<td colspan="4">
 				 <fieldset>
 						<legend><%= t('COIN') %></legend>
 						<%= f.radio_button :moeda, 0 %> U$
-						<%= f.radio_button :moeda, 1, :Checked => "True"  %> Gs
+						<%= f.radio_button :moeda, 1, :Checked => "True" %> Gs
 						<%= f.radio_button :moeda, 2 %> R$
 				 </fieldset>
 				</td>
@@ -88,6 +97,12 @@
 				</td>
 			</tr>
 
+			<tr>
+				<td colspan="4">
+					<label>Forma Pago</label>
+					<%= f.text_area :forma_pagos, rows: 3, cols: 55 %>
+				</td>
+			</tr>
 		 </table>
     <div class="footer-buttons">
       <%= f.submit "Seguir", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
@@ -114,10 +129,16 @@
 			},
 			minLength: 2,
 			change: function( event, ui ) {
-				$("#presupuesto_persona_id").val("");
-				$('#presupuesto_persona_id').val(ui.item.id);
-				return false;
-			}
+	      if (ui.item === null) {
+	        $(this).val('');
+	        $("#venda_persona_id").val("");
+	        alert('seleccione de el nombre de la lista')
+	      } else{
+					$("#presupuesto_persona_id").val("");
+					$('#presupuesto_persona_id').val(ui.item.id);
+					return false;
+				};
+		};
 		});
 	});
 

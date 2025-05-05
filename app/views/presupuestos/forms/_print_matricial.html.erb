@@ -46,6 +46,12 @@
 <div class="border1">
   <table>
     <tr>
+      <td>
+        <label>Fecha</label><br>
+        <%= @presupuesto.data.strftime("%d/%m/%Y")%>
+      </td>
+    </tr>
+    <tr>
       <td width="600" colspan="3">
         <label>Cliente</label><br>
         <%= @presupuesto.persona.nome %>
@@ -90,14 +96,17 @@
     <td align="center" width="100">Img</td>
     <td width="400">Producto/Servicios</td>
     <td align="right" width="50">Cantidad</td>
-    <td align="right" width="70">Unit.</td>
-    <td align="right" width="70">Tot.</td>
+    <td align="right" width="50">Multiplo</td>
+    <% if params[:tipo] != '1' %>
+      <td align="right" width="70">Unit.</td>
+      <td align="right" width="70">Tot.</td>
+    <% end %>
   </tr>
       <% qtd    = 0 %>
       <% tot    = 0 %>
       <% indice = 1 %>
       <% quebra     = '' %>
-      <% PresupuestoProduto.joins(:produto).where("presupuesto_produtos.presupuesto_id = #{@presupuesto.id}").order("produtos.grupo_id").each do |pc|%>
+      <% @presupuesto_produtos.each do |pc|%>
            <% if quebra != pc.produto.grupo.descricao %>
             <% if quebra != "" %>
               <tr>
@@ -118,14 +127,17 @@
         <td width="100" align="center"><%= wicked_pdf_image_tag(pc.produto.produto_imagens.last.foto.url, :height => 60) unless pc.produto.produto_imagens.blank? %></td>
         <td align="left" width="400"><%= pc.produto_id.to_s.rjust(6,'0') %>-<%= pc.produto.nome %></td>
         <td align="right" width="50"><%= format_peso(pc.quantidade) %></td>
-        <% if @presupuesto.moeda.to_i == 0 %>
-          <td align="right" width="70"><%= format_decimal(pc.unitario_dolar) %></td>
-          <td align="right" width="70"><%= format_decimal(pc.total_dolar) %></td>
-          <% tot    += pc.total_dolar %>
-        <% else %>
-          <td align="right" width="70"><%= format_int(pc.unitario_guarani) %></td>
-          <td align="right" width="70"><%= format_int(pc.total_guarani) %></td>
-          <% tot    += pc.total_guarani %>
+        <td align="right" width="50"><%= format_peso(pc.multiplo_qtd) %></td>
+        <% if params[:tipo] != '1' %>
+          <% if @presupuesto.moeda.to_i == 0 %>
+            <td align="right" width="70"><%= format_decimal(pc.unitario_dolar) %></td>
+            <td align="right" width="70"><%= format_decimal(pc.total_dolar) %></td>
+            <% tot    += pc.total_dolar %>
+          <% else %>
+            <td align="right" width="70"><%= format_int(pc.unitario_guarani) %></td>
+            <td align="right" width="70"><%= format_int(pc.total_guarani) %></td>
+            <% tot    += pc.total_guarani %>
+          <% end %>
         <% end %>
       </tr>
       <% qtd    += pc.quantidade %>
@@ -135,10 +147,12 @@
       <td colspan="5" align="right">Total</td>
       <td align="right"> <%= format_peso(qtd.to_f) %></td>
       <td></td>
-      <% if @presupuesto.moeda.to_i == 0 %>
-        <td align="right" width="70"><%= format_decimal(tot) %></td>
-      <% else %>
-        <td align="right" width="70"><%= format_int(tot) %></td>
+      <% if params[:tipo] != '1' %>
+        <% if @presupuesto.moeda.to_i == 0 %>
+          <td align="right" width="70"><%= format_decimal(tot) %></td>
+        <% else %>
+          <td align="right" width="70"><%= format_int(tot) %></td>
+        <% end %>
       <% end %>
 
      </tr>

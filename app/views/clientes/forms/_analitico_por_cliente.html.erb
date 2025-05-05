@@ -112,9 +112,9 @@
         <td width="50"><%= c.documento_numero %></td>
         <td width="40"  align="center"><%= c.cota %>/<%= c.tot_cotas %></td>
         <% if params[:moeda] == '0' %>
-          <td width="70" align="right"><%= format_decimal(c.divida_dolar.to_f) %></td>
-          <td width="70" align="right"><%= format_decimal(c.anterior_us.to_f) %></td>
-          <td width="70" align="right"><%= format_decimal(saldo_dolar.to_f) %></td>
+          <td width="70" align="right"><%= format_decimal(c.divida_dolar.to_f) %> </td>
+          <td width="70" align="right"><%= format_decimal(c.anterior_us.to_f) %> </td>
+          <td width="70" align="right"><%= format_decimal(saldo_dolar.to_f) %> </td>
           <% sub_div    += c.divida_dolar.to_f %>
           <% sub_pg     += c.anterior_us.to_f %>
           <% sub_saldo  += saldo_dolar.to_f %>
@@ -124,9 +124,9 @@
           <% saldo  += saldo_dolar.to_f %>
 
         <% elsif params[:moeda] == '1' %>
-          <td width="70" align="right"><%= format_int(c.divida_guarani.to_f) %></td>
-          <td width="70" align="right"><%= format_int(c.anterior_gs.to_f) %></td>
-          <td width="70" align="right"><%= format_int(saldo_guarani.to_f) %></td>
+          <td width="70" align="right"><%= format_int(c.divida_guarani.to_f) %> </td>
+          <td width="70" align="right"><%= format_int(c.anterior_gs.to_f) %> </td>
+          <td width="70" align="right"><%= format_int(saldo_guarani.to_f) %> </td>
           <% sub_div    += c.divida_guarani.to_f %>
           <% sub_pg     += c.anterior_gs.to_f %>
           <% sub_saldo  += saldo_guarani.to_f %>
@@ -136,9 +136,9 @@
           <% saldo  += saldo_guarani.to_f %>
 
         <% else %>
-          <td width="70" align="right"><%= format_decimal(c.divida_real.to_f) %></td>
-          <td width="70" align="right"><%= format_decimal(c.anterior_rs.to_f) %></td>
-          <td width="70" align="right"><%= format_decimal(saldo_real.to_f) %></td>
+          <td width="70" align="right"><%= format_decimal(c.divida_real.to_f) %> </td>
+          <td width="70" align="right"><%= format_decimal(c.anterior_rs.to_f) %> </td>
+          <td width="70" align="right"><%= format_decimal(saldo_real.to_f) %> </td>
           <% sub_div    += c.divida_real.to_f %>
           <% sub_pg     += c.anterior_rs.to_f %>
           <% sub_saldo  += saldo_real.to_f %>
@@ -153,31 +153,31 @@
   <% if params[:moeda] == '1' %>
     <tr class="head">
       <td colspan="7"></td>
-      <td width="70" align="right"><%= format_int(sub_div.to_f) %></td>
-      <td width="70" align="right"><%= format_int(sub_pg.to_f) %></td>
-      <td width="70" align="right"><%= format_int(sub_saldo.to_f) %></td>
+      <td width="70" align="right"><%= format_int(sub_div.to_f) %> </td>
+      <td width="70" align="right"><%= format_int(sub_pg.to_f) %> </td>
+      <td width="70" align="right"><%= format_int(sub_saldo.to_f) %> </td>
     </tr>
 
     <tr class="head">
       <td colspan="7"></td>
-      <td width="70" align="right"><%= format_int(div.to_f) %></td>
-      <td width="70" align="right"><%= format_int(pg.to_f) %></td>
-      <td width="70" align="right"><%= format_int(saldo.to_f) %></td>
+      <td width="70" align="right"><%= format_int(div.to_f) %> </td>
+      <td width="70" align="right"><%= format_int(pg.to_f) %> </td>
+      <td width="70" align="right"><%= format_int(saldo.to_f) %> </td>
     </tr>
   <% else %>
 
     <tr class="head">
       <td colspan="7"></td>
-      <td width="70" align="right"><%= format_decimal(sub_div.to_f) %></td>
-      <td width="70" align="right"><%= format_decimal(sub_pg.to_f) %></td>
-      <td width="70" align="right"><%= format_decimal(sub_saldo.to_f) %></td>
+      <td width="70" align="right"><%= format_decimal(sub_div.to_f) %> </td>
+      <td width="70" align="right"><%= format_decimal(sub_pg.to_f) %> </td>
+      <td width="70" align="right"><%= format_decimal(sub_saldo.to_f) %> </td>
     </tr>
 
     <tr class="head">
       <td colspan="7"></td>
-      <td width="70" align="right"><%= format_decimal(div.to_f) %></td>
-      <td width="70" align="right"><%= format_decimal(pg.to_f) %></td>
-      <td width="70" align="right"><%= format_decimal(saldo.to_f) %></td>
+      <td width="70" align="right"><%= format_decimal(div.to_f) %> </td>
+      <td width="70" align="right"><%= format_decimal(pg.to_f) %> </td>
+      <td width="70" align="right"><%= format_decimal(saldo.to_f) %> </td>
     </tr>
 
   <% end %>

@@ -66,6 +66,7 @@ module Zetta
 
   config.eager_load_paths += %W[
     #{config.root}/app/services
+    #{config.root}/app/exceptions
   ]
 
   end
