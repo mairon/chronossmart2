@@ -2,7 +2,7 @@
   <% quebra     = "" %>
   <% quebra2    = "" %>
   <% tutor      = "" %>
-  
+
   <% tutor_div   = 0 %>
   <% tutor_pg    = 0 %>
   <% tutor_saldo = 0 %>
@@ -76,25 +76,25 @@
           <% if quebra2 != "" %>
                <tr>
                   <td colspan="7"><b>Total Aluno <%= quebra2 %></b></td>
-                  <td width="70" align="right"><%= format_int(aluno_div.to_f) %></td>
-                  <td width="70" align="right"><%= format_int(aluno_pg.to_f) %></td>
-                  <td width="70" align="right"><%= format_int(aluno_saldo.to_f) %></td>
+                  <td width="70" align="right"><%= format_int(aluno_div.to_f) %> </td>
+                  <td width="70" align="right"><%= format_int(aluno_pg.to_f) %> </td>
+                  <td width="70" align="right"><%= format_int(aluno_saldo.to_f) %> </td>
                </tr>
 
                <tr>
                   <td></td>
-               </tr>     
+               </tr>
             <% aluno_div   = 0 %>
             <% aluno_pg    = 0 %>
             <% aluno_saldo = 0 %>
           <% end %>
 
-          <% if quebra != "" %>             
+          <% if quebra != "" %>
            <tr>
               <td colspan="7"><b>Total <%= quebra %> </b></td>
-              <td width="70" align="right"><%= format_int(tutor_div.to_f) %></td>
-              <td width="70" align="right"><%= format_int(tutor_pg.to_f) %></td>
-              <td width="70" align="right"><%= format_int(tutor_saldo.to_f) %></td>
+              <td width="70" align="right"><%= format_int(tutor_div.to_f) %> </td>
+              <td width="70" align="right"><%= format_int(tutor_pg.to_f) %> </td>
+              <td width="70" align="right"><%= format_int(tutor_saldo.to_f) %> </td>
 
             </tr>
             <tr>
@@ -119,9 +119,9 @@
           <% if quebra2 != "" and tutor_saldo.to_i != 0  %>
             <tr>
               <td colspan="7"><b>Total Aluno <%= quebra2 %></b></td>
-              <td width="70" align="right"><%= format_int(aluno_div.to_f) %></td>
-              <td width="70" align="right"><%= format_int(aluno_pg.to_f) %></td>
-              <td width="70" align="right"><%= format_int(aluno_saldo.to_f) %></td>
+              <td width="70" align="right"><%= format_int(aluno_div.to_f) %> </td>
+              <td width="70" align="right"><%= format_int(aluno_pg.to_f) %> </td>
+              <td width="70" align="right"><%= format_int(aluno_saldo.to_f) %> </td>
             </tr>
 
             <tr>
@@ -171,14 +171,14 @@
         <td width="50"><%= c.documento_numero %></td>
         <td width="40"  align="center"><%= c.cota %>/<%= c.tot_cotas %></td>
         <% if params[:moeda] == '0' %>
-          <td width="70" align="right"><%= format_decimal(c.divida_dolar.to_f) %></td>
-          <td width="70" align="right"><%= format_decimal(c.anterior_us.to_f) %></td>
-          <td width="70" align="right"><%= format_decimal(saldo_dolar.to_f) %></td>
+          <td width="70" align="right"><%= format_decimal(c.divida_dolar.to_f) %> </td>
+          <td width="70" align="right"><%= format_decimal(c.anterior_us.to_f) %> </td>
+          <td width="70" align="right"><%= format_decimal(saldo_dolar.to_f) %> </td>
 
         <% elsif params[:moeda] == '1' %>
-          <td width="70" align="right"><%= format_int(c.divida_guarani.to_f) %></td>
-          <td width="70" align="right"><%= format_int(c.anterior_gs.to_f) %></td>
-          <td width="70" align="right"><%= format_int(saldo_guarani.to_f) %></td>
+          <td width="70" align="right"><%= format_int(c.divida_guarani.to_f) %> </td>
+          <td width="70" align="right"><%= format_int(c.anterior_gs.to_f) %> </td>
+          <td width="70" align="right"><%= format_int(saldo_guarani.to_f) %> </td>
 
           <% tutor_div   += c.divida_guarani.to_f %>
           <% tutor_pg    += c.anterior_gs.to_f %>
@@ -193,9 +193,9 @@
           <% geral_saldo += saldo_guarani.to_f %>
 
         <% else %>
-          <td width="70" align="right"><%= format_decimal(c.divida_real.to_f) %></td>
-          <td width="70" align="right"><%= format_decimal(c.anterior_rs.to_f) %></td>
-          <td width="70" align="right"><%= format_decimal(saldo_real.to_f) %></td>
+          <td width="70" align="right"><%= format_decimal(c.divida_real.to_f) %> </td>
+          <td width="70" align="right"><%= format_decimal(c.anterior_rs.to_f) %> </td>
+          <td width="70" align="right"><%= format_decimal(saldo_real.to_f) %> </td>
 
         <% end %>
       </tr>
@@ -203,25 +203,25 @@
   <% if params[:moeda] == '1' %>
     <tr class="head">
       <td colspan="7"><b>Total Aluno <%= quebra2 %></b></td>
-      <td width="70" align="right"><%= format_int(aluno_div.to_f) %></td>
-      <td width="70" align="right"><%= format_int(aluno_pg.to_f) %></td>
-      <td width="70" align="right"><%= format_int(aluno_saldo.to_f) %></td>
+      <td width="70" align="right"><%= format_int(aluno_div.to_f) %> </td>
+      <td width="70" align="right"><%= format_int(aluno_pg.to_f) %> </td>
+      <td width="70" align="right"><%= format_int(aluno_saldo.to_f) %> </td>
     </tr>
 
     <tr class="head">
-      
+
       <td colspan="7"><b>Total <%= quebra %> </b></td>
-      <td width="70" align="right"><%= format_int(tutor_div.to_f) %></td>
-      <td width="70" align="right"><%= format_int(tutor_pg.to_f) %></td>
-      <td width="70" align="right"><%= format_int(tutor_saldo.to_f) %></td>
+      <td width="70" align="right"><%= format_int(tutor_div.to_f) %> </td>
+      <td width="70" align="right"><%= format_int(tutor_pg.to_f) %> </td>
+      <td width="70" align="right"><%= format_int(tutor_saldo.to_f) %> </td>
     </tr>
 
     <tr class="head">
-      
+
       <td colspan="7"><b>Total General </b></td>
-      <td width="70" align="right"><%= format_int(geral_div.to_f) %></td>
-      <td width="70" align="right"><%= format_int(geral_pg.to_f) %></td>
-      <td width="70" align="right"><%= format_int(geral_saldo.to_f) %></td>
+      <td width="70" align="right"><%= format_int(geral_div.to_f) %> </td>
+      <td width="70" align="right"><%= format_int(geral_pg.to_f) %> </td>
+      <td width="70" align="right"><%= format_int(geral_saldo.to_f) %> </td>
     </tr>
 
   <% else %>

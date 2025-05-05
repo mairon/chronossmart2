@@ -312,7 +312,13 @@ class ClientesController < ApplicationController
       @clientes = Cliente.relatorio_contas_receber(params)
       @saldo_anterior = Cliente.relatorio_contas_receber_saldo_anterior(params)
     end
-    render :layout => 'relatorio_view'
+
+    if params[:tipo] == '1'
+      render :xlsx => "relatorio_contas_receber",
+      filename: "Receber-#{params[:inicio]}-#{params[:final]}"
+    else
+      render :layout => 'relatorio_view'
+    end
   end
 
   def resultado_extracto_funcionario
@@ -482,9 +488,8 @@ end
     if params[:tipo] == '1'
       format.html {
         xls = render_to_string :action => "relatorio_contas_receber", :layout => false
-        kit = PDFKit.new(xls,
-                         :encoding => 'UTF-8')
-        send_data(xls,:filename => "relatorio_contas_receber.xls")
+        kit = PDFKit.new(xls, :encoding => 'UTF-8')
+        send_data(xls,:filename => "Receber-#{params[:inicio]}-#{params[:final]}.xls")
       }
     else
         format.html do

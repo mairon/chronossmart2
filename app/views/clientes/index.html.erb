@@ -1,5 +1,6 @@
+<div class="panel">
 <h1 id="header"><%= t('LISTING') %> de <%= t('ACCOUNT') %>s a <%= t('RECEIVE') %></h1>
-  <div class="group">
+  <div class="panel-content">
     <%= form_tag relatorio_contas_receber_clientes_path, :method => "get" do %>
     <div class="row">
       <div class="col-md-3">
@@ -168,13 +169,14 @@ WHERE P.UNIDADE_ID = #{current_unidade.id} AND P.vend_responsavel_id IS NOT NULL
     <div class="row">
       <div class="col-md-12">
         <br>
-        <input type="submit" class="btn btn-green" value="Informe"  style="cursor:pointer;" id="acao" data-toggle="modal" data-width="500" data-height="781" data-dismiss="modal" />
-        <a href="#" class="xls btn btn-blue">Excel</a>
+        <input type="submit" class="btn btn-green" value="Informe" id="acao" data-toggle="modal" data-width="500" data-height="781" data-dismiss="modal" onclick="Tipo(0)" />
+        <input id="button" type="submit" class="btn btn-blue" value="Excel" onclick="Tipo(1)"/>
         <input type="hidden" name="tipo" id="tipo" size="5" value="0"/>
 
       </div>
     </div>
    </div>
+ </div>
 
   <script>
         $(function() {
@@ -209,13 +211,6 @@ WHERE P.UNIDADE_ID = #{current_unidade.id} AND P.vend_responsavel_id IS NOT NULL
 
 
 <script>
-
-
-  $('.xls').click(function() {
-    window.location.href = '/clientes/relatorio_contas_receber.xls?' + $('form').serialize();
-  });
-
-
   function Tipo(d){
     document.getElementById('tipo').value = d
   }
