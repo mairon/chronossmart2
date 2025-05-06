@@ -5,7 +5,6 @@ module Whatsapp
   class Status
     attr_reader :host, :instance, :token
 
-
       @instance = instance
       @token = token
     end

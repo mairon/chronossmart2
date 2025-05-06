@@ -21,6 +21,7 @@ RSpec.describe Whatsapp::Status do
     end
 
     it 'returns \'false\' when instance isn\'t connected' do
+      host = 'example.com'
       token = '123abc'
       instance = 'megastart-123abc'
       body = "{\"error\":false,\"message\":\"Instance status fetched\",\"instance\":{\"key\":\"#{instance}\",\"status\":\"disconnected\",\"user\":{\"id\":\"595986287555:57@s.whatsapp.net\",\"lid\":\"100764227739678:57@lid\",\"name\":\"Mairon Brasil\"}}}"
