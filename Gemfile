@@ -11,6 +11,7 @@ gem 'erubis', '~> 2.7'
 gem 'liquid'
 gem "paperclip"
 gem 'aws-sdk', '1.65.0'
+gem 'rest-client'
 
 gem 'aws-eventstream', '1.1.1'
 gem 'aws-partitions', '1.493.0'
@@ -61,6 +62,11 @@ group :development do
 end
 # Gems used only for assets and not required
 # in production environments by default.
+group :development, :test do
+  gem 'pry-rails'
+  #gem 'rspec-rails', '~> 3.9.1'
+end
+
 group :assets do
   #gem 'sass-rails'
   #gem "compass"

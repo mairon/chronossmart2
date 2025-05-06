@@ -3,6 +3,7 @@
 # class responsible for manage Whatsapp connection
 module Whatsapp
   class Connection
+    attr_reader :host, :instance, :token
 
     def initialize(host:, instance:, token:)
       @host = host

@@ -5,6 +5,8 @@ module Whatsapp
   class Status
     attr_reader :host, :instance, :token
 
+    def initialize(host:, instance:, token:)
+      @host = host
       @instance = instance
       @token = token
     end
@@ -12,15 +14,6 @@ module Whatsapp
     def connected?
       response = RestClient.get(url, headers)
 
-<<<<<<< HEAD
-      raise StandardError unless response.code == 200
-
-      result = JSON.parse(response.body)
-
-      result['instance']['status'] == 'connected'
-    rescue StandardError, RestClient::Unauthorized
-      false
-=======
       result = JSON.parse(response.body)
 
       { message: result['instance']['status'] }
@@ -28,17 +21,12 @@ module Whatsapp
       Rails.logger.error("#Message: #{error.message} - Backtrace: #{error.backtrace}")
 
       { message:  'Error to check status' }
->>>>>>> origin/feature/add-whatsapp-service
     end
 
     private
 
     def headers
-<<<<<<< HEAD
-      { "Authorization": "Bearer #{ENV['WHATSAPP_API_TOKEN']}", "Content-Type": "application/json" }
-=======
       { "Authorization": "Bearer #{token}", "Content-Type": "application/json" }
->>>>>>> origin/feature/add-whatsapp-service
     end
 
     def url
