@@ -205,7 +205,7 @@ def self.resultado_contratos(params)
 					ON CC.ID = C.CENTRO_CUSTO_ID
 
 
-					WHERE C.ID > 0 #{data} #{persona} #{vendedor} #{doc} #{tipo_contrato} #{cc} #{valor} #{cota} #{pl}
+					WHERE C.ID > 0 AND C.MOEDA = #{params[:moeda]} #{data} #{persona} #{vendedor} #{doc} #{tipo_contrato} #{cc} #{valor} #{cota} #{pl}
 					ORDER BY C.DATA"
 				elsif params[:detalhe] == '1'
 					sql = "SELECT  C.ID,
@@ -241,7 +241,7 @@ def self.resultado_contratos(params)
 
 										LEFT JOIN PERSONAS VD
 										ON VD.ID = C.VENDEDOR_ID
-										WHERE C.ID > 0 #{data} #{persona} #{vendedor} #{doc} #{tipo_contrato} #{cc} #{produto} #{pl}
+										WHERE C.ID > 0 AND C.MOEDA = #{params[:moeda]} #{data} #{persona} #{vendedor} #{doc} #{tipo_contrato} #{cc} #{produto} #{pl}
 										ORDER BY C.DATA
 										"
 				end
@@ -943,6 +943,7 @@ def self.resultado_control_obra(params)
 		forma_pago    = "AND C.FORMA_PAGO_ID = #{params[:busca]["forma_pago"]}" unless params[:busca]["persona"].blank?
 		safra         = "AND C.SAFRA_ID = #{params[:busca]["safra"]}" unless params[:busca]["safra"].blank?
 		plano_contas  = "AND CC.PLANO_DE_CONTA_ID = #{params[:busca]["plano_de_conta"]}" unless params[:busca]["plano_de_conta"].blank?
+		referencia    = "AND C.OB_REF ILIKE  '%#{params[:referencia]}%'" unless params[:referencia].blank?
 
 		fiscal    = "AND C.FISCAL = #{params[:tipo_fiscal]}" if params[:tipo_fiscal] != '2'
 		tipo_doc  = "AND C.TIPO = #{params[:tipo_doc]}" if params[:tipo_doc] != '2'
@@ -973,7 +974,10 @@ def self.resultado_control_obra(params)
 								    FP.NOME AS FORMA_PAGO_NOME,
 								    S.NOME AS SAFRA,
 								    PC.DESCRICAO AS PLANO_DE_CONTA_NOME,
-								    C.DESCRICAO
+								    C.DESCRICAO,
+								    C.OB_REF,
+								    ARRAY(SELECT CC.NOME FROM COMPRAS_CUSTOS CP INNER JOIN CENTRO_CUSTOS CC ON CC.ID = CP.CENTRO_CUSTO_ID WHERE CP.COMPRA_ID = C.ID) AS array_centro_custos,
+								    ARRAY(SELECT CC.DESCRICAO FROM COMPRAS_CUSTOS CP INNER JOIN PLANO_DE_CONTAS CC ON CC.ID = CP.PLANO_DE_CONTA_ID WHERE CP.COMPRA_ID = C.ID) AS array_plano_contas
 							FROM COMPRAS C
 							INNER JOIN PERSONAS P
 							ON P.ID = C.PERSONA_ID
@@ -996,7 +1000,7 @@ def self.resultado_control_obra(params)
 
 							WHERE C.TIPO_COMPRA = 1 AND C.TABELA IS NULL
 							AND C.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
-							AND C.UNIDADE_ID = #{params[:unidade]} #{rodado} #{centro_custo} #{persona} #{forma_pago} #{safra} #{moeda} #{plano_contas} #{fiscal} #{tipo_doc}
+							AND C.UNIDADE_ID = #{params[:unidade]} #{rodado} #{centro_custo} #{persona} #{forma_pago} #{safra} #{moeda} #{plano_contas} #{fiscal} #{tipo_doc} #{referencia}
 							"
 
 		elsif params[:tp].to_s == "1" #analitico de custo
@@ -1019,7 +1023,8 @@ def self.resultado_control_obra(params)
 										C.DESCRICAO AS COMPRA_DESCRICAO,
 										R.PLACA AS RODADO_NOME,
 										P.NOME AS FUNCIONARIO_NOME,
-										CEC.NOME AS CENTRO_CUSTO_NOME
+										CEC.NOME AS CENTRO_CUSTO_NOME,
+										C.OB_REF
 						FROM COMPRAS_CUSTOS CC
 
 						INNER JOIN COMPRAS C
@@ -1038,7 +1043,7 @@ def self.resultado_control_obra(params)
 						ON P.ID = CC.FUNCIONARIO_ID
 
 						WHERE #{f_data} BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
-						#{rodado} #{centro_custo} #{persona} #{forma_pago} #{safra} #{moeda} #{plano_contas} #{fiscal} #{tipo_doc}
+						#{rodado} #{centro_custo} #{persona} #{forma_pago} #{safra} #{moeda} #{plano_contas} #{fiscal} #{tipo_doc} #{referencia}
 						ORDER BY C.DATA, C.ID
 						"
 			ComprasCusto.find_by_sql(sql)
@@ -1071,7 +1076,7 @@ def self.resultado_control_obra(params)
 
 										WHERE C.TIPO_COMPRA = 1  AND C.TABELA IS NULL
 										AND C.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
-										AND C.UNIDADE_ID = #{params[:unidade]} #{rodado} #{centro_custo} #{persona} #{forma_pago} #{safra} #{moeda} #{plano_contas}  #{fiscal} #{tipo_doc}
+										AND C.UNIDADE_ID = #{params[:unidade]} #{rodado} #{centro_custo} #{persona} #{forma_pago} #{safra} #{moeda} #{plano_contas}  #{fiscal} #{tipo_doc} #{referencia}
 										GROUP BY 1
 										"
 		end
@@ -1093,6 +1098,7 @@ def self.resultado_control_obra(params)
 		sub_grupo     = " AND C.SUB_GRUPO_ID    = #{params[:busca]["sub_grupo"]}"    unless params[:busca]["sub_grupo"].blank?
 		unidade       = "C.UNIDADE_ID = #{params[:unidade]} AND "
 		proveedor     = "AND C.persona_id = '#{params[:busca]["proveedor"]}'" unless params[:busca]["proveedor"].blank?
+		centro_custo  = "AND C.centro_custo_id = '#{params[:busca]["centro_custo"]}'" unless params[:busca]["centro_custo"].blank?
 		clase_produto = "AND C.clase_produto = '#{params[:busca]["clase_produto"]}'" unless params[:busca]["clase_produto"].blank?
 		tipo_compra   = "AND C.tipo_compra = '#{params[:tipo_compra]}'" unless params[:tipo_compra] == '4'
 		doc_tipo      = "AND C.TIPO = #{params[:status]}" unless  params[:status].blank?
@@ -1111,14 +1117,19 @@ def self.resultado_control_obra(params)
 								 C.AJUSTE_US,
 								 C.AJUSTE_GS,
 								 C.AJUSTE_RS,
+								 CC.NOME AS CENTRO_CUSTO_NOME,
 								 (SELECT SUM(CP.QUANTIDADE) FROM COMPRAS_PRODUTOS CP WHERE CP.COMPRA_ID = C.ID) AS QTD,
 								 C.DOCUMENTO_NUMERO_01 || '-'|| C.DOCUMENTO_NUMERO_02||'-'|| C.DOCUMENTO_NUMERO AS DOC,
 								 SG.DESCRICAO AS MARCA
 					FROM COMPRAS C
 					LEFT JOIN SUB_GRUPOS SG
 					ON SG.ID = C.SUB_GRUPO_ID
+
+					LEFT JOIN CENTRO_CUSTOS CC 
+					ON CC.ID = C.CENTRO_CUSTO_ID
+
 					WHERE #{unidade} C.TIPO_COMPRA != 1
-					AND C.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{moeda} #{proveedor}  #{clase_produto} #{tipo_compra} #{doc_tipo} #{sub_grupo}
+					AND C.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{moeda} #{proveedor}  #{clase_produto} #{tipo_compra} #{doc_tipo} #{sub_grupo} #{centro_custo}
 					ORDER BY 2,1"
 	Compra.find_by_sql(sql)
 	end

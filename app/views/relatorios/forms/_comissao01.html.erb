@@ -1,221 +1,233 @@
-<!-- MODELO LISTADO DE COMICAO UNIJET!-->
-<table border="0">
-	<% tot = 0%>
-	<% @empl.each do |ep| %>
-	   <!-- ELTON -->
-	   <% if ep.id == 647 %>
-	   
-	      <% vend  = Venda.sum(:total_dolar,:conditions =>["clase_produto = 0 AND DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}'"])%>
-	      <% devl  = NotaCreditosDetalhe.sum(:total_dolar,:conditions =>["clase_produto = 0 AND DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}'"])%>
-	      <% adela = Adelanto.sum( :valor_dolar,:conditions => ["DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}' AND clase_produto = 0 AND vendedor_id = 647"])%>
+<!-- MODELO LISTADO DE MENEGAZ!-->
+<% vendedor = "AND V.VENDEDOR_ID = #{params[:busca]["vendedor"]}" unless params[:busca]["vendedor"].blank? %>
+<% produto = "AND P.GRUPO_ID = #{params[:busca]["grupo"]}" unless params[:busca]["grupo"].blank? %>
+<% sql = "SELECT CD.COBRO_ID,
+			CD.DOCUMENTO_NUMERO,
+			CD.VENDA_ID,
+      CD.DATA,
+      V.VENDEDOR_ID,
+      PV.NOME AS VENDEDOR_NOME,
+      V.PERSONA_NOME,
+      VP.PRODUTO_ID,
+	   	VP.PRODUTO_NOME,
+	   	VP.QUANTIDADE,
+	   	VP.UNITARIO_GUARANI,
+	   	VP.TOTAL_GUARANI,
+	   	CD.SALDO_PERC,
+	   	(SELECT SS.PROMEDIO_GUARANI FROM STOCKS SS WHERE SS.DATA <= VP.DATA AND SS.STATUS = 0 AND SS.DEPOSITO_ID = VP.DEPOSITO_ID AND SS.PRODUTO_ID = VP.PRODUTO_ID ORDER BY SS.DATA DESC, SS.TABELA_ID DESC LIMIT 1) AS CUSTO_MEDIO_GS
+FROM VENDAS_PRODUTOS VP
 
-	      <% cobro = 0 %>
-	      
-          <% if vend.to_f + cobro.to_f > 0 %>
-	         <tr class="head">
-		        <td width="40" align="center"><%= ep.id %></td>
-		        <td width="550"  colspan="3" align="left"><%= ep.nome %></td>
-		        <td width="70" align="right"><%= number_to_currency( vend.to_f,  :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( cobro.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( devl.to_f,  :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( adela.to_f,  :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( ep.comissao.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( com = ( ( adela.to_f + vend.to_f + cobro.to_f ) * ep.comissao.to_f ) / 100, :format=>' %n ', :separeitor => ',') %></td>
-	         </tr>
-	         
-	         <% if params[:status] == "1"%>	   
-                <% det_vend  = Venda.all('id,data,persona_nome,total_dolar',:conditions =>["clase_produto = 0 AND DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}'"])%>
+INNER JOIN COBROS_DETALHES CD
+ON CD.VENDA_ID = VP.VENDA_ID
 
-                <% det_vend.each do |dv|%>
-	               <tr>
-	               	  <td></td>
-		              <td width="40"  align="center"><%= dv.id %></td>
-		              <td width="70" align="left"><%= dv.data.strftime("%d/%m/%Y") %></td>
-		              <td width="250" align="left"><%= dv.persona_nome %></td>
-		              <td width="70" align="right"><%= number_to_currency( dv.total_dolar.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right"><%= number_to_currency( ep.comissao.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		              <td width="70" align="right"><%= number_to_currency( ( dv.total_dolar.to_f * ep.comissao.to_f ) / 100, :format=>' %n ', :separeitor => ',') %></td>
-	               </tr>	
-	            <% end %>
-	            
-             <tr height="20"><td></td></tr>
-	         <% end %>
+INNER JOIN VENDAS V
+ON V.ID = VP.VENDA_ID
 
-	      <% end %>
+INNER JOIN PERSONAS PV
+ON PV.ID = V.VENDEDOR_ID
 
-	   <!-- SANDRO -->
-	   <% elsif ep.id == 2659 %>
-	   
-	      <% vend  = Venda.sum(:total_dolar,:conditions =>["clase_produto = 0 AND DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}'"])%>
-	      <% devl  = NotaCreditosDetalhe.sum(:total_dolar,:conditions =>["clase_produto = 0 AND DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}'"])%>
-	      <% adela = Adelanto.sum( :valor_dolar,:conditions => ["DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}' AND clase_produto = 0 AND vendedor_id = 2659"])%>
-
-	      <% cobro = 0 %>
-	      
-          <% if vend.to_f + cobro.to_f > 0 %>
-	         <tr class="head">
-		        <td width="40" align="center"><%= ep.id %></td>
-		        <td width="550"  colspan="3" align="left"><%= ep.nome %></td>
-		        <td width="70" align="right"><%= number_to_currency( vend.to_f,  :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( cobro.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( devl.to_f,  :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( adela.to_f,  :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( ep.comissao.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( com = ( ( adela.to_f + vend.to_f + cobro.to_f ) * ep.comissao.to_f ) / 100, :format=>' %n ', :separeitor => ',') %></td>
-	         </tr>
-	         
-	         <% if params[:status] == "1"%>	   
-                <% det_vend  = Venda.all('id,data,persona_nome,total_dolar',:conditions =>["clase_produto = 0 AND DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}'"])%>
-
-                <% det_vend.each do |dv|%>
-	               <tr>
-	               	  <td></td>
-		              <td width="40"  align="center"><%= dv.id %></td>
-		              <td width="70" align="left"><%= dv.data.strftime("%d/%m/%Y") %></td>
-		              <td width="250" align="left"><%= dv.persona_nome %></td>
-		              <td width="70" align="right"><%= number_to_currency( dv.total_dolar.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right"><%= number_to_currency( ep.comissao.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		              <td width="70" align="right"><%= number_to_currency( ( dv.total_dolar.to_f * ep.comissao.to_f ) / 100, :format=>' %n ', :separeitor => ',') %></td>
-	               </tr>	
-	            <% end %>
-	            
-             <tr height="20"><td></td></tr>
-	         <% end %>
-
-	      <% end %>
+INNER JOIN PRODUTOS P
+ON P.ID = VP.PRODUTO_ID
 
 
-	   <!-- HUGO -->
-	   <% elsif ep.id == 1852 %>
-	
-	      <% vend  = Venda.sum(:total_dolar,:conditions =>["clase_produto = 0  AND vendedor_id = 1852 AND DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}'"])%>
-	      <% devl  = NotaCreditosDetalhe.sum(:total_dolar,:conditions =>["clase_produto = 0  AND vendedor_id = 1852 AND DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}'"])%>
-	      <% adela  = Adelanto.sum( :valor_dolar,:conditions => ["DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}' AND clase_produto = 0 AND vendedor_id = 1852"])%>
-	      <% cobro = 0 %>
-	   
-          <% if vend.to_f + cobro.to_f > 0 %>
-	         <tr class="head">
-		        <td width="40" align="center"><%= ep.id %></td>
-		        <td width="550" colspan="3" align="left"><%= ep.nome %></td>
-		        <td width="70" align="right"><%= number_to_currency( vend.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( cobro.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( devl.to_f,  :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( adela.to_f,  :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( ep.comissao.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( com = ( ( adela.to_f + vend.to_f + cobro.to_f ) * ep.comissao.to_f ) / 100, :format=>' %n ', :separeitor => ',') %></td>
-	         </tr>
-
-	         <% if params[:status] == "1"%>
-	   
-                <% det_vend  = Venda.all(:conditions => 'id,data,persona_nome,total_dolar',:conditions =>["clase_produto = 0 AND DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}'"])%>
-                <% det_vend.each do |dv|%>
-        	       <tr>
-	               	  <td></td>
-		              <td width="40"  align="center"><%= dv.id %></td>
-		              <td width="70" align="left"><%= dv.data.strftime("%d/%m/%Y") %></td>
-		              <td width="250" align="left"><%= dv.persona_nome %></td>
-		              <td width="70" align="right"><%= number_to_currency( dv.total_dolar.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right"><%= number_to_currency( ep.comissao.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		              <td width="70" align="right"><%= number_to_currency( ( dv.total_dolar.to_f * ep.comissao.to_f ) / 100, :format=>' %n ', :separeitor => ',') %></td>		              
-	               </tr>	
-	            <% end %>
-	            
-             <tr height="20"><td></td></tr>
-	         <% end %>
-
-          <% end %>
-
-	   <!-- MAQUINAS -->
-	   <% else %>
-	
-	      <% vend   = Venda.sum(:total_dolar,:conditions =>["clase_produto = 1  AND tipo = 0 AND vendedor_id = ? AND DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}'",ep.id])%>
-	      <% cobro  = Cobro.sum( :valor_dolar,:conditions => ["DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}' AND clase_produto = 1 AND vendedor_id = ?",ep.id])%>
-	      <% devl   = NotaCreditosDetalhe.sum(:total_dolar,:conditions =>["clase_produto = 1  AND tipo = 0 AND vendedor_id = ? AND DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}'",ep.id])%>
-	      <% adela  = Adelanto.sum( :valor_dolar,:conditions => ["DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}' AND clase_produto = 1 AND vendedor_id = ?",ep.id])%>
-	      	      	   
-	      <% if vend.to_f + cobro.to_f > 0 %>
-	         <tr class="head">
-		        <td width="40" align="center"><%= ep.id %></td>
-		        <td width="550" colspan="3" align="left"><%= ep.nome %></td>
-		        <td width="70" align="right"><%= number_to_currency( vend.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( cobro.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( adela.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( devl.to_f,  :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( ep.comissao.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		        <td width="70" align="right"><%= number_to_currency( com = ( ( adela.to_f + vend.to_f + cobro.to_f ) * ep.comissao.to_f ) / 100, :format=>' %n ', :separeitor => ',') %></td>
-	         </tr>
-		
-	         <% if params[:status] == "1"%>
-	   
-                <% det_vend  = Venda.all(:conditions => 'id,data,persona_nome,total_dolar',:conditions =>["clase_produto = 1  AND tipo = 0 AND vendedor_id = ? AND DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}'",ep.id])%>
-                <% det_vend.each do |dv|%>
-	               <tr>
-	               	  <td></td>
-		              <td width="40"  align="center"><%= dv.id %></td>
-		              <td width="70" align="left"><%= dv.data.strftime("%d/%m/%Y") %></td>
-		              <td width="350" align="left"><%= dv.persona_nome %></td>
-		              <td width="70" align="right"><%= number_to_currency( dv.total_dolar.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right"><%= number_to_currency( ep.comissao.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		              <td width="70" align="right"><%= number_to_currency( ( dv.total_dolar.to_f * ep.comissao.to_f ) / 100, :format=>' %n ', :separeitor => ',') %></td>		              		              
-	               </tr>	
-	            <% end %>
-
-	            <% det_cobro  = Cobro.all( :select => 'id,data,persona_nome,valor_dolar',:conditions => ["DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}' AND clase_produto = 1 AND vendedor_id = ?",ep.id])%>
-                <% det_cobro.each do |dc|%>
-	               <tr>
-	               	  <td></td>
-		              <td width="40"  align="center"><%= dc.id %></td>
-		              <td width="70"  align="left"><%= dc.data.strftime("%d/%m/%Y") %></td>
-		              <td width="250" align="left"><%= dc.persona_nome %></td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right"><%= number_to_currency( dc.valor_dolar.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right"><%= number_to_currency( ep.comissao.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		              <td width="70" align="right"><%= number_to_currency( ( dc.valor_dolar.to_f * ep.comissao.to_f ) / 100, :format=>' %n ', :separeitor => ',') %></td>		              		              
-	               </tr>	
-	            <% end %>
-
-	            <% det_adela  = Adelanto.all( :select => 'id,data,persona_nome,valor_dolar',:conditions => ["DATA BETWEEN '#{params[:inicio]}' AND '#{params[:final]}' AND clase_produto = 1 AND vendedor_id = ?",ep.id])%>
-                <% det_adela.each do |da|%>
-	               <tr>
-	               	  <td></td>
-		              <td width="40"  align="center"><%= da.id %></td>
-		              <td width="70"  align="left"><%= da.data.strftime("%d/%m/%Y") %></td>
-		              <td width="250" align="left"><%= da.persona_nome %></td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right"><%= number_to_currency( da.valor_dolar.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		              <td width="70" align="right">0</td>
-		              <td width="70" align="right"><%= number_to_currency( ep.comissao.to_f, :format=>' %n ', :separeitor => ',') %></td>
-		              <td width="70" align="right"><%= number_to_currency( ( da.valor_dolar.to_f * ep.comissao.to_f ) / 100, :format=>' %n ', :separeitor => ',') %></td>		              		              
-	               </tr>	
-	            <% end %>
+WHERE CD.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}' #{vendedor} #{produto}
 
 
-             <tr height="20"><td></td></tr>
-	         <% end %>
-	     
-	      <% end %>
-		
-	   <% end %>
-	   
-	   <% tot += com.to_f%>	   
-	<% end %>
-    <tr class="head" height="20">
-    	<td colspan="9"></td>
-	   <td width="70" align="right"><%= number_to_currency( tot.to_f , :format=>' %n ', :separeitor => ',') %></td>		              		              
+UNION ALL
+
+
+SELECT CD.VENDA_ID AS COBRO_ID,
+			CD.DOCUMENTO_NUMERO,
+			CD.VENDA_ID,
+      CD.DATA,
+      V.VENDEDOR_ID,
+      PV.NOME AS VENDEDOR_NOME,
+      V.PERSONA_NOME,
+      VP.PRODUTO_ID,
+	   	VP.PRODUTO_NOME,
+	   	VP.QUANTIDADE,
+	   	VP.UNITARIO_GUARANI,
+	   	VP.TOTAL_GUARANI,
+	   	100 AS SALDO_PERC,
+	   	(SELECT SS.PROMEDIO_GUARANI FROM STOCKS SS WHERE SS.DATA <= VP.DATA AND SS.STATUS = 0 AND SS.DEPOSITO_ID = VP.DEPOSITO_ID AND SS.PRODUTO_ID = VP.PRODUTO_ID ORDER BY SS.DATA DESC, SS.TABELA_ID DESC LIMIT 1) AS CUSTO_MEDIO_GS
+FROM VENDAS_PRODUTOS VP
+
+INNER JOIN VENDAS_FINANCAS CD
+ON CD.VENDA_ID = VP.VENDA_ID
+
+INNER JOIN VENDAS V
+ON V.ID = VP.VENDA_ID
+
+INNER JOIN PERSONAS PV
+ON PV.ID = V.VENDEDOR_ID
+
+INNER JOIN PRODUTOS P
+ON P.ID = VP.PRODUTO_ID
+
+
+WHERE CD.FORMA_PAGO_ID NOT IN(2,8,9,10) AND CD.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}' #{vendedor} #{produto}
+
+UNION ALL
+
+SELECT CD.COBRO_ID,
+			CD.DOCUMENTO_NUMERO,
+			CD.VENDA_ID,
+      CD.DATA,
+      V.VENDEDOR_ID,
+      PV.NOME AS VENDEDOR_NOME,
+      V.PERSONA_NOME,
+      VP.PRODUTO_ID,
+	   	VP.PRODUTO_NOME,
+	   	VP.QUANTIDADE * -1,
+	   	VP.UNITARIO_GUARANI * -1,
+	   	VP.TOTAL_GUARANI * -1,
+	   	CD.SALDO_PERC,
+	   	(SELECT SS.PROMEDIO_GUARANI FROM STOCKS SS WHERE SS.DATA <= VP.DATA AND SS.STATUS = 0 AND SS.DEPOSITO_ID = VP.DEPOSITO_ID AND SS.PRODUTO_ID = VP.PRODUTO_ID ORDER BY SS.DATA DESC, SS.TABELA_ID DESC LIMIT 1) * -1 AS CUSTO_MEDIO_GS
+FROM NOTA_CREDITOS_DETALHES VP
+
+INNER JOIN COBROS_DETALHES CD
+ON CD.VENDA_ID = VP.VENDA_ID
+
+INNER JOIN VENDAS V
+ON V.ID = VP.VENDA_ID
+
+INNER JOIN PERSONAS PV
+ON PV.ID = V.VENDEDOR_ID
+
+INNER JOIN PRODUTOS P
+ON P.ID = VP.PRODUTO_ID
+
+
+WHERE CD.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}'  #{vendedor} #{produto}
+ORDER BY 6, 4"
+
+lista_cobros = CobrosDetalhe.find_by_sql(sql)
+%>
+
+
+<table>
+
+	<thead class="report-header">
+  <tr>
+    <td colspan="11" class="title" align="center">
+      <%= current_unidade.nome_sys %> <br>
+      LISTADO COMISIÓN
+    </td>
+  </tr>
+  <tr>
+    <td colspan="11">Fecha: <%= params[:inicio] %> hasta <%= params[:final] %></td>
+  </tr>
+
+  <tr class="td-header">
+
+    <td width="50">Cobro</td>
+    <td width="50">Fecha</td>
+    <td width="200">Cliente</td>
+    <td width="250">Cobro</td>
+    <td align="right" width="60">Ctd</td>
+    <td align="right" width="70">Unit</td>
+    <td align="right" width="70">Tot</td>
+    <td align="right" width="60">% Cobrado</td>
+    <td align="right" width="70">CMV</td>
+    <td align="right" width="70">Margen</td>
+    <td align="right" width="70">% Renta.</td>
+  </tr>
+</thead>
+
+	<% quebra = "" %>
+	<% sub_tot = 0 %>
+	<% sub_cmv = 0 %>
+	<% sub_qtd = 0 %>
+	<% sub_tot_c = 0 %>
+
+	<% tot   = 0 %>
+	<% cmv   = 0 %>
+	<% qtd   = 0 %>
+	<% tot_c = 0 %>
+
+<% lista_cobros.each do |lc| %>
+
+  <% if quebra !=  lc.vendedor_nome %>
+    <% if quebra != "" %>
+		  <tr class="head">
+		    <td colspan="4">Sub Total</td>
+		    <td align="right"><%= format_int(sub_qtd) %></td>
+		    <td></td>
+		    <td align="right"><%= format_int(sub_tot) %></td>
+		    <td></td>
+		    <td align="right"><%= format_int(sub_cmv) %></td>
+		    <td align="right"><%= format_int(sub_tot_c) %></td>
+		    <td align="right"><%= format_decimal( (sub_tot_c.to_f * 100) / sub_cmv.to_f) %>%</td>
+		  </tr>
+
+		  <tr class="head td-header">
+		  	<td colspan="10" align="right">Comissión <%= quebra %> 25gs/L</td>
+		  	<td align="right"><%= format_decimal( (sub_tot_c.to_f * 100) / sub_cmv.to_f) %></td>
+		  </tr>
+      <% sub_qtd   = 0 %>
+      <% sub_tot   = 0 %>
+      <% sub_tot_c = 0 %>
+      <% sub_cmv = 0 %>
+
+    <% end %>
+    <tr>
+      <td class="head" colspan="10"><%= quebra = lc.vendedor_nome %>
     </tr>
+  <% end %>
+
+	<tr class = "<%= cycle( "cor1", "cor2" )%>">
+		<td width="50" align="cented"><%= lc.cobro_id.to_s.rjust(6,'0') %></td>
+		<td width="50" align="cented"><%= lc.data.strftime("%d/%m/%y") %></td>
+		<td width="200"><small><%= lc.persona_nome %></small></td>
+		<td width="250"><small><%= lc.produto_nome %></small></td>
+		<td width="60" align="right"><%= format_decimal(lc.quantidade) %></td>
+		<td width="70" align="right"><%= format_int(lc.unitario_guarani) %></td>
+		<td width="70" align="right"><%= format_int(lc.total_guarani) %></td>
+		<td width="60" align="right"><%= format_decimal(lc.saldo_perc) %>%</td>
+		<td width="70" align="right"><%= format_int(lc.quantidade.to_f * lc.custo_medio_gs.to_f ) %></td>
+		<td width="70" align="right"><%= format_int(marg_gs = ((lc.total_guarani.to_f - (lc.quantidade.to_f * lc.custo_medio_gs.to_f) ) * (lc.saldo_perc.to_f / 100) )  )  %></td>
+		<td width="70" align="right"><%= format_decimal( (marg_gs * 100) / (lc.quantidade.to_f * lc.custo_medio_gs.to_f)  )  %>%</td>
+
+		<% sub_tot   += (lc.total_guarani.to_f) %>
+		<% sub_qtd   += lc.quantidade.to_f %>
+		<% sub_tot_c += marg_gs.to_f %>
+		<% sub_cmv   += (lc.quantidade.to_f * lc.custo_medio_gs.to_f) %>
+
+		<% tot   += (lc.total_guarani.to_f) %>
+		<% qtd   += lc.quantidade.to_f %>
+		<% tot_c += marg_gs.to_f %>
+		<% cmv   += (lc.quantidade.to_f * lc.custo_medio_gs.to_f) %>
+
+	</tr>
+<% end %>
+  <tr class="head">
+    <td colspan="4">Sub Total</td>
+    <td align="right"><%= format_int(sub_qtd) %></td>
+    <td></td>
+    <td align="right"><%= format_int(sub_tot) %></td>
+    <td></td>
+    <td align="right"><%= format_int(sub_cmv) %></td>
+    <td align="right"><%= format_int(sub_tot_c) %></td>
+    <td align="right"><%= format_decimal( (sub_tot_c.to_f * 100) / sub_cmv.to_f) %>%</td>
+  </tr>
+
+  <tr class="head td-header">
+  	<td colspan="10" align="right">Comissión <%= quebra %> 25gs/L</td>
+  	<td align="right">
+  		<%= format_int(sub_qtd.to_f * (25)) %>
+
+  	</td>
+  </tr>
+
+  <tr class="head">
+    <td colspan="4">Total</td>
+    <td align="right"><%= format_int(qtd) %></td>
+    <td></td>
+    <td align="right"><%= format_int(tot) %></td>
+    <td></td>
+    <td align="right"><%= format_int(cmv) %></td>
+    <td align="right"><%= format_int(tot_c) %></td>
+    <td align="right"><%= format_decimal( (tot_c.to_f * 100) / cmv.to_f) %>%</td>
+  </tr>
 </table>
+

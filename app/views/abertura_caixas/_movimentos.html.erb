@@ -176,7 +176,7 @@
 		                        INNER JOIN FORMA_PAGOS FP
 		                        ON FP.ID = F.FORMA_PAGO_ID
 
-		                        WHERE C.TERMINAL_ID = 1  AND F.MOEDA = 1 AND F.CONTROLE_CAIXA = #{@abertura_caixa.id}
+		                        WHERE F.MOEDA = 1 AND F.CONTROLE_CAIXA = #{@abertura_caixa.id}
 		                        GROUP BY 1,2"
 		operacoes_gs = Financa.find_by_sql(sql_operacoes_gs)
 		                      %>
@@ -220,7 +220,7 @@
 		                        INNER JOIN FORMA_PAGOS FP
 		                        ON FP.ID = F.FORMA_PAGO_ID
 
-		                        WHERE C.TERMINAL_ID = 1  AND F.MOEDA = 0 AND F.CONTROLE_CAIXA = #{@abertura_caixa.id}
+		                        WHERE F.MOEDA = 0 AND F.CONTROLE_CAIXA = #{@abertura_caixa.id}
 		                        GROUP BY 1,2"
 		operacoes_us = Financa.find_by_sql(sql_operacoes_us)
 		                      %>
@@ -264,7 +264,7 @@
 		                        INNER JOIN FORMA_PAGOS FP
 		                        ON FP.ID = F.FORMA_PAGO_ID
 
-		                        WHERE C.TERMINAL_ID = 1  AND F.MOEDA = 2 AND F.CONTROLE_CAIXA = #{@abertura_caixa.id}
+		                        WHERE F.MOEDA = 2 AND F.CONTROLE_CAIXA = #{@abertura_caixa.id}
 		                        GROUP BY 1,2"
 		operacoes_rs = Financa.find_by_sql(sql_operacoes_rs)
 		                      %>

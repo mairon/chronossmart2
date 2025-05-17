@@ -1,0 +1,118 @@
+<div class="panel">
+  <h1 id="header">
+    Presupuesto #<%= @presupuesto.id.to_s.rjust(6,'0') %>
+    <div class="pull-right">
+      <%= link_to t('BACK'), edit_presupuesto_path(@presupuesto),:class =>'btn btn-default' %>
+      <%= link_to 'Generar (PDF)', print_presupuesto_presupuesto_path(@presupuesto, tipo: '0'),:class =>'btn btn-blue  btn-print' %>
+      <%= link_to '(PDF) - INTERNO', print_presupuesto_presupuesto_path(@presupuesto, tipo: '1', grupos: params[:grupos]),:class =>'btn btn-blue btn-print' %>
+      <% if @venda_config.modelo_cp.to_i == 1 %>
+        <a href="javascript:void(0)" class="btn btn-blue" onClick="QzComprovante()"><%= image_tag('printer.png') %> Matricial</a>
+      <% end %>
+      <%= link_to 'Finalizar', presupuestos_path,:class =>'btn' %>
+
+    </div>
+  </h1>
+  <div class="panel-content">
+    <div class="row">
+      <div class="col-md-3">
+      <%= form_for(@presupuesto) do |f| %>
+        <label>Status</label>
+        <%= f.select :status, [['Pendiente', 0],['Aprovado', 1],['Entrege Parcial', 2], ['Finalizado', 3]] %>
+      <% end %>
+      </div>
+      <div class="col-md-3">
+        <label>Cliente</label>
+        <br>
+        <%= @presupuesto.persona_nome %>
+      </div>
+      <div class="col-md-3">
+        <label>Condición de Pago</label>
+        <br>
+        <%= @presupuesto.plano.condicao unless @presupuesto.plano_id.blank? %>
+      </div>
+      <div class="col-md-3">
+        <label>Tabla de Precio</label>
+        <br>
+        <%= @presupuesto.tabela_preco.nome unless @presupuesto.tabela_preco_id.blank? %>
+      </div>
+    </div>
+    <div class="row">
+      <% CustomField.where(tabela: 'PRESUPUESTOS').each.each do |field| %>
+        <div class="col-md-3">
+          <label><%= field.label %></label>
+          <%= @presupuesto.custom_fields[field.internal_name] %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#presupuesto_status').change(function() {
+        $("#edit_presupuesto_<%= @presupuesto.id %>").submit();
+    });
+  });
+</script>
+<% unless params[:grupos].blank? %>
+  <div class="panel">
+    <div class="panel-content">
+      <% gp = Grupo.where("id in (#{params[:grupos].map  { |t| t }.join(', ')})") %>
+      <% gp.each do |a| %>
+        <span class="btn btn-primary"><%= a.descricao %></span>
+      <% end %>
+      <div class="pull-right">
+        <%= link_to presupuesto_path(@presupuesto.id) do %>
+          <span class="material-symbols-outlined">filter_alt_off</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
+<div class="panel">
+  <div class="panel-content">
+  <%= render :partial=>"presupuesto_produtos/index_alquiler", :locals=>{:presupuesto => @presupuesto,:presupuesto_produtos => @presupuesto.presupuesto_produtos} %>
+  </div>
+</div>
+<div class="panel">
+  <div class="panel-content">
+  <%= render :partial=>"presupuesto_produtos/new_produto_alquiler" , :locals=>{:presupuesto => @presupuesto, :presupuesto_produto => PresupuestoProduto.new} %>
+  </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="ModalF2">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h4 class="modal-title" id="myModalLabel" align="center">Buscar Producto</h4>
+      </div>
+      <div class="modal-body" style="padding: 10px 5px 25px 5px">
+        <%= render '/produtos/busca_presupuesto_produto' %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+
+
+  document.onkeydown=function(e){
+    if(e.which == 113){ //F2
+      $('#ModalF2').modal('show');
+      $('#ModalF2').on('shown.bs.modal', function () {
+          $('#busca_f2').focus();
+      })
+    };
+  }
+
+</script>
+
+
+<% if @venda_config.modelo_cp.to_i == 1 %>
+  <%= render 'set_print' %>
+<% end %>

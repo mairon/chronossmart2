@@ -130,9 +130,10 @@
     <div class="row">
       <div class="col-md-12">
         <br>
-        <input type="submit" class="btn btn-green" value="Informe"  style="cursor:pointer;" id="acao" data-toggle="modal" data-width="500" data-height="781" data-dismiss="modal" />
-        <a href="#" class="xls btn btn-blue">Excel</a>
+        <input type="submit" class="btn btn-green" value="Informe" id="acao" data-toggle="modal" data-width="500" data-height="781" data-dismiss="modal" onclick="Tipo(0)" />
+        <input id="button" type="submit" class="btn btn-blue" value="Excel" onclick="Tipo(1)"/>
         <input type="hidden" name="tipo" id="tipo" size="5" value="0"/>
+
         
       </div>
     </div>
@@ -141,10 +142,6 @@
 
 
 <script>
-
-  $('.xls').click(function() {
-    window.location.href = '/relatorios/resultado_contratos.xls?' + $('form').serialize();
-  });
 
   $('#busca_vendedor').selectize();
   $('#busca_direcao').selectize();

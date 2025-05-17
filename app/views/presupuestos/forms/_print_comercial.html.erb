@@ -2,8 +2,10 @@
   <tr>
     <td width="600"><%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 60) %></td>
     <td width="600" align="center">
-      <h1><%= current_unidade.razao_social %> </h1>
+      <h1><%= current_unidade.nome_sys %> </h1>
       <h1>Presupuesto Nº <%= @presupuesto.id.to_s.rjust(6,'0')%></h1>
+      <h3>Razao Social: <%= current_unidade.razao_social %></h3>
+      <h3>RUC: <%= current_unidade.ruc %></h3>
     </td>
   </tr>
 </table>
@@ -12,7 +14,7 @@
 <style>
   .border1{
     border: 2px solid #000;
-    border-radius: 4px;   
+    border-radius: 4px;
   }
 
   .border1 table{
@@ -79,24 +81,22 @@
         <b><%= @presupuesto.entrega %></b>
       </td>
 
-    </tr>    
+    </tr>
   </table>
 </div>
 
 <br>
 <h2 align="center">Itens</h2>
 <div class="border1" style="min-height:600px;">
-  
-  
-<table class="grid"> 
+
+
+<table class="grid">
   <tr style="font-weight: bold;background-color: #999;">
     <td align="center" width="20">#</td>
     <td align="center" width="80">Referencia</td>
-    <td align="center" width="20">UM</td>
-    <td align="center" width="100">Img</td>
     <td width="400">Producto/Servicios</td>
     <td align="right" width="50">Cantidad</td>
-    <td align="right" width="50">Multiplo</td>
+    <td align="center" width="20">UM</td>
     <% if params[:tipo] != '1' %>
       <td align="right" width="70">Unit.</td>
       <td align="right" width="70">Tot.</td>
@@ -107,27 +107,12 @@
       <% indice = 1 %>
       <% quebra     = '' %>
       <% @presupuesto_produtos.each do |pc|%>
-           <% if quebra != pc.produto.grupo.descricao %>
-            <% if quebra != "" %>
-              <tr>
-                <td></td>
-              </tr>
-            <% end %>
-            <tr>
-              <td colspan="4" style="background: #b0b0b0;"></td>
-              <td class="head" colspan="4" style="background: #b0b0b0;"><%= quebra = pc.produto.grupo.descricao %></td>
-            </tr>
-
-           <% end %>
-
       <tr class="<%= cycle("cor1", "cor2")%>">
         <td align="center" width="20"><%= indice %></td>
         <td align="center" width="80"><%= pc.produto.fabricante_cod %></td>
-        <td align="center" width="80"><%= pc.produto.unidade_medida.sigla unless pc.produto.unidade_medida.blank? %></td>
-        <td width="100" align="center"><%= wicked_pdf_image_tag(pc.produto.produto_imagens.last.foto.url, :height => 60) unless pc.produto.produto_imagens.blank? %></td>
         <td align="left" width="400"><%= pc.produto_id.to_s.rjust(6,'0') %>-<%= pc.produto.nome %></td>
         <td align="right" width="50"><%= format_peso(pc.quantidade) %></td>
-        <td align="right" width="50"><%= format_peso(pc.multiplo_qtd) %></td>
+        <td align="center" width="80"><%= pc.produto.unidade_medida.sigla unless pc.produto.unidade_medida.blank? %></td>
         <% if params[:tipo] != '1' %>
           <% if @presupuesto.moeda.to_i == 0 %>
             <td align="right" width="70"><%= format_decimal(pc.unitario_dolar) %></td>
@@ -144,8 +129,9 @@
       <% indice += 1 %>
      <% end %>
      <tr class="head">
-      <td colspan="5" align="right">Total</td>
+      <td colspan="3" align="right">Total</td>
       <td align="right"> <%= format_peso(qtd.to_f) %></td>
+      <td></td>
       <td></td>
       <% if params[:tipo] != '1' %>
         <% if @presupuesto.moeda.to_i == 0 %>
@@ -169,7 +155,7 @@
         <%= @presupuesto.obs %>
       </td>
     </tr>
-    
+
   </table>
 </div>
 
@@ -181,13 +167,13 @@
     <tr>
       <td width="300" align="center">
         __________________________________________ <br>
-        Firma 
+        Firma
       </td>
       <td width="300"></td>
 
       <td width="300" align="center">
-        
-      </td>     
+
+      </td>
     </tr>
   </table>
 

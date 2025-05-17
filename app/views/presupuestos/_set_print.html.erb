@@ -132,14 +132,13 @@
         '<%= ''.to_s.ljust(95, '-') %>' + '\x0A', // linha
 
         // Cabeçario
-        '<%= 'Seq'.to_s.ljust(6, ' ') %>',
-        '<%= 'Codigo'.to_s.ljust(10, ' ') %>',
-        '<%= 'Catd'.to_s.ljust(10, ' ') %>',
-        '<%= 'UM'.to_s.ljust(5, ' ') %>',
-        '<%= 'Descripcion'.to_s.ljust(35, ' ') %>',
-        '<%= 'Cod Fabr.'.to_s.ljust(10, ' ') %>',
-        '<%= 'Unit.'.to_s.rjust(8, ' ') %>',
-        '<%= 'Total'.to_s.rjust(8, ' ') %>',
+        '<%= 'Seq'.to_s.ljust(4, ' ') %>',
+        '<%= 'Codigo'.to_s.ljust(7, ' ') %>',
+        '<%= 'Ctd'.to_s.ljust(12, ' ') %>',
+        '<%= 'UM'.to_s.ljust(4, ' ') %>',
+        '<%= 'Descripcion'.to_s.ljust(45, ' ') %>',
+        '<%= 'Unit.'.to_s.rjust(12, ' ') %>',
+        '<%= 'Total'.to_s.rjust(12, ' ') %>',
 
         '\x0A',
 
@@ -149,14 +148,13 @@
         '<% seq = 1 %>',
         '<% @presupuesto.presupuesto_produtos.each do |vp| %>',
 
-          '<%= "#{seq}".to_s.ljust(6, ' ') %>',
-          '<%= "#{vp.id}".to_s.ljust(10, ' ') %>',
-          '<%= "#{vp.quantidade.to_f}".to_s.ljust(10, ' ') %>',
-          '<%= "#{vp.produto.unidade_medida.sigla unless vp.produto.unidade_medida.blank? }".to_s.ljust(5, ' ') %>',
-          '<%= "#{vp.produto_nome}".to_s.ljust(35, ' ') %>',
-          '<%= "#{vp.produto.fabricante_cod}".to_s.ljust(10, ' ') %>',
-          '<%= "#{format_int(vp.unitario_guarani)}".to_s.rjust(8, ' ') %>',
-          '<%= "#{format_int(vp.total_guarani)}".to_s.rjust(8, ' ') %>',
+          '<%= "#{seq}".to_s.ljust(4, ' ') %>',
+          '<%= "#{vp.id}".to_s.ljust(7, ' ') %>',
+          '<%= "#{vp.quantidade.to_f}".to_s.ljust(12, ' ') %>',
+          '<%= "#{vp.produto.unidade_medida.sigla unless vp.produto.unidade_medida.blank? }".to_s.ljust(4, ' ') %>',
+          '<%= "#{vp.produto_nome[0..45]}".to_s.ljust(45, ' ') %>',
+          '<%= "#{format_int(vp.unitario_guarani)}".to_s.rjust(12, ' ') %>',
+          '<%= "#{format_int(vp.total_guarani)}".to_s.rjust(12, ' ') %>',
           '<% seq += 1 %>',
           '\x0A',
         '<% end %>',

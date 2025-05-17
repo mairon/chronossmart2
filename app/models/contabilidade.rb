@@ -18,8 +18,8 @@ class Contabilidade < ActiveRecord::Base
     filtro = " #{unid} C.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' AND CP.FISCAL = 1"
 
     filtro_nc = " #{doc} NC.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' AND (NC.TOTAL_GUARANI + NC.TOTAL_DOLAR) > 0"
- 
-    sql = "SELECT 
+
+    sql = "SELECT
                   C.ID,
                   C.COMPRA_ID,
                   C.DATA,
@@ -45,44 +45,44 @@ class Contabilidade < ActiveRecord::Base
                   C.GRAVADAS_10_GUARANI AS GV_10_G,
                   C.GRAVADAS_10_DOLAR AS GV_10_D,
                   C.IMPOSTO_10_GUARANI AS IP_10_G,
-                  C.IMPOSTO_10_DOLAR AS IP_10_D,       
+                  C.IMPOSTO_10_DOLAR AS IP_10_D,
                   C.TOTAL_GUARANI AS TOT_G,
                   C.TOTAL_DOLAR AS TOT_D,
                   (SELECT COUNT(CF.ID) FROM COMPRAS_FINANCAS CF WHERE CF.COMPRA_ID = C.COMPRA_ID) AS COTAS
-           FROM   
-                  COMPRAS_DOCUMENTOS C 
-           LEFT JOIN 
+           FROM
+                  COMPRAS_DOCUMENTOS C
+           LEFT JOIN
                   MOEDAS M
            ON     C.DATA = M.DATA
-           LEFT JOIN 
+           LEFT JOIN
                   COMPRAS CP
            ON     C.COMPRA_ID = CP.ID
 
-           RIGHT JOIN 
+           RIGHT JOIN
                   PERSONAS P
            ON     P.ID = CP.PERSONA_ID
 
            WHERE  #{filtro}
 
            UNION ALL
-           
+
            SELECT
                  NC.ID,
-                 CAST(0 AS INTEGER),                 
+                 CAST(0 AS INTEGER),
                  NC.DATA,
-                 M.COTACAO_OFICIAL_VENDA AS COT_VD,                 
-                 NC.TIPO,   
-                 CAST('' AS VARCHAR) AS TIMBRADO,    
+                 M.COTACAO_OFICIAL_VENDA AS COT_VD,
+                 NC.TIPO,
+                 CAST('' AS VARCHAR) AS TIMBRADO,
                  CAST('---' AS VARCHAR) AS RN,
-                 CAST(4 AS INTEGER),                                                                              
+                 CAST(4 AS INTEGER),
                  NC.DOCUMENTO_NUMERO_01 AS DN_01,
                  NC.DOCUMENTO_NUMERO_02 AS DN_02,
                  NC.DOCUMENTO_NUMERO AS DN,
-                 NC.MOEDA,                 
+                 NC.MOEDA,
                  NC.DOCUMENTO_ID,
                  NC.PERSONA_NOME,
                  NC.PERSONA_ID,
-                 NC.RUC AS PERSONA_RUC,     
+                 NC.RUC AS PERSONA_RUC,
                  NC.EXENTA_GUARANI AS EXG,
                  NC.EXENTA_DOLAR AS EXD,
                  NC.GRAVADA_05_GUARANI AS GV_05_G,
@@ -91,17 +91,17 @@ class Contabilidade < ActiveRecord::Base
                  NC.IMPOSTO_05_DOLAR AS IP_05_D,
                  NC.GRAVADA_10_GUARANI AS GV_10_G,
                  NC.GRAVADA_10_DOLAR AS  GV_10_D,
-                 NC.IMPOSTO_10_GUARANI AS IP_10_G, 
+                 NC.IMPOSTO_10_GUARANI AS IP_10_G,
                  NC.IMPOSTO_10_DOLAR AS IP_10_D,
-                 NC.TOTAL_GUARANI AS TOT_G, 
+                 NC.TOTAL_GUARANI AS TOT_G,
                  NC.TOTAL_DOLAR AS TOT_D,
                  CAST(0 AS INTEGER) AS COTAS
-           FROM 
+           FROM
                  NOTA_CREDITOS NC
-           LEFT JOIN 
+           LEFT JOIN
                   MOEDAS M
            ON    NC.DATA = M.DATA
-                       
+
            WHERE #{filtro_nc}
 
            ORDER BY 3,1 "
@@ -115,8 +115,8 @@ class Contabilidade < ActiveRecord::Base
     unidade = "AND VFAT.UNIDADE_ID= #{params[:busca]["unidade"]}"
 
 
-    sql = "SELECT 
-                  CAST(0 AS integer) AS def,
+    sql = "SELECT
+                  'VT' AS ORIGEM,
                   V.id,
                   CAST(0 AS integer) AS tabela_id,
                   VFAT.DOC_01 AS documento_numero_01,
@@ -129,7 +129,7 @@ class Contabilidade < ActiveRecord::Base
                   VFAT.MOTIVO,
                   VFAT.TIPO_EMISSAO,
                   VFAT.SERIE,
-                  CAST(0 AS integer) AS STATUS,
+                  VFAT.STATUS,
                   V.moeda,
                   VFAT.data,
                   VFAT.RUC AS ruc,
@@ -149,15 +149,57 @@ class Contabilidade < ActiveRecord::Base
                   ((SELECT SUM(VP.TOTAL_DOLAR) FROM VENDAS_PRODUTOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.VENDA_ID = V.ID AND P.TAXA = 10 ) / 11)  + (COALESCE((SELECT SUM(VP.TOTAL_GUARANI - (VP.TOTAL_DOLAR * 0.7843137)) FROM VENDAS_PRODUTOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.VENDA_ID = V.ID AND P.TAXA = 80 ),0) / 11) AS imposto_10_dolar,
                   (SELECT COUNT(VF.ID) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID AND VF.COTA <> 0) AS COTAS
          FROM FORM_FISCALS VFAT
-         LEFT JOIN VENDAS V 
+         LEFT JOIN VENDAS V
          ON V.ID = VFAT.COD_PROC
-         WHERE  VFAT.STATUS = 1 AND #{filtro_v}
+         WHERE  VFAT.STATUS <> 0 AND #{filtro_v}
          AND  VFAT.TIPO_DOC  = 1 AND VFAT.SIGLA_PROC = 'VT'
 
          UNION ALL
 
-          SELECT 
-                  CAST(0 AS integer) AS def,
+          SELECT
+                  'VT' AS ORIGEM,
+                  V.id,
+                  CAST(0 AS integer) AS tabela_id,
+                  VFAT.DOC_01 AS documento_numero_01,
+                  VFAT.DOC_02 AS documento_numero_02,
+                  VFAT.DOC AS documento_numero,
+                  VFAT.TIMBRADO AS TIMBRADO,
+                  VFAT.TIPO,
+                  VFAT.CDC,
+                  VFAT.VENCIMENTO,
+                  VFAT.MOTIVO,
+                  VFAT.TIPO_EMISSAO,
+                  VFAT.SERIE,
+                  VFAT.STATUS,
+                  V.moeda,
+                  VFAT.data,
+                  VFAT.RUC AS ruc,
+                  V.persona_id,
+                  VFAT.PERSONA_NOME AS persona_nome,
+                  (SELECT SUM(VP.TOTAL_GS) FROM CONTRATO_SERVICOS VP WHERE VP.CONTRATO_ID = V.ID) AS TOTAL_GS,
+                  COALESCE((SELECT SUM((VP.QUANTIDADE * VP.UNITARIO_GS)) FROM CONTRATO_SERVICOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.CONTRATO_ID = V.ID AND P.TAXA = 0 ),0) + COALESCE((SELECT SUM(VP.TOTAL_GS * 0.7843137) FROM CONTRATO_SERVICOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.CONTRATO_ID = V.ID AND P.TAXA = 80 ),0) AS EXENTAS_GUARANI,
+                  (SELECT SUM(VP.TOTAL_GS) FROM CONTRATO_SERVICOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.CONTRATO_ID = V.ID AND P.TAXA = 5 ) AS gravadas_05_guarani,
+                  ((SELECT SUM(VP.TOTAL_GS) FROM CONTRATO_SERVICOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.CONTRATO_ID = V.ID AND P.TAXA = 5 ) / 21 ) AS imposto_05_guarani,
+                  COALESCE((SELECT SUM(VP.TOTAL_GS) FROM CONTRATO_SERVICOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.CONTRATO_ID = V.ID AND P.TAXA = 10 ),0) + COALESCE((SELECT SUM(VP.TOTAL_GS - (VP.TOTAL_GS * 0.7843137)) FROM CONTRATO_SERVICOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.CONTRATO_ID = V.ID AND P.TAXA = 80 ),0) AS gravadas_10_guarani,
+                  ((SELECT SUM(VP.TOTAL_GS) FROM CONTRATO_SERVICOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.CONTRATO_ID = V.ID AND P.TAXA = 10 ) / 11)  + (COALESCE((SELECT SUM(VP.TOTAL_GS - (VP.TOTAL_GS * 0.7843137)) FROM CONTRATO_SERVICOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.CONTRATO_ID = V.ID AND P.TAXA = 80 ),0) / 11) AS imposto_10_guarani,
+                  0 as total_DOLAR,
+                  COALESCE((SELECT SUM(VP.TOTAL_US) FROM CONTRATO_SERVICOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.CONTRATO_ID = V.ID AND P.TAXA = 0 ),0) + COALESCE((SELECT SUM(VP.TOTAL_US * 0.7843137) FROM CONTRATO_SERVICOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.CONTRATO_ID = V.ID AND P.TAXA = 80 ),0) AS EXENTAS_dolar,
+                  (SELECT SUM(VP.TOTAL_US) FROM CONTRATO_SERVICOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.CONTRATO_ID = V.ID AND P.TAXA = 5 ) AS gravadas_05_dolar,
+                  ((SELECT SUM(VP.TOTAL_US) FROM CONTRATO_SERVICOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.CONTRATO_ID = V.ID AND P.TAXA = 5 ) / 21 ) AS imposto_05_dolar,
+                  COALESCE((SELECT SUM(VP.TOTAL_US) FROM CONTRATO_SERVICOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.CONTRATO_ID = V.ID AND P.TAXA = 10 ),0) + COALESCE((SELECT SUM(VP.TOTAL_US - (VP.TOTAL_US * 0.7843137)) FROM CONTRATO_SERVICOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.CONTRATO_ID = V.ID AND P.TAXA = 80 ),0) AS gravadas_10_dolar,
+                  ((SELECT SUM(VP.TOTAL_US) FROM CONTRATO_SERVICOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.CONTRATO_ID = V.ID AND P.TAXA = 10 ) / 11)  + (COALESCE((SELECT SUM(VP.TOTAL_GS - (VP.TOTAL_US * 0.7843137)) FROM CONTRATO_SERVICOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.CONTRATO_ID = V.ID AND P.TAXA = 80 ),0) / 11) AS imposto_10_dolar,
+                  (SELECT COUNT(VF.ID) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID AND VF.COTA <> 0) AS COTAS
+         FROM FORM_FISCALS VFAT
+         LEFT JOIN CONTRATOS V
+         ON V.ID = VFAT.COD_PROC
+         WHERE  VFAT.STATUS <> 0 AND #{filtro_v}
+         AND  VFAT.TIPO_DOC  = 1 AND VFAT.SIGLA_PROC = 'CT'
+
+
+         UNION ALL
+
+          SELECT
+                  'CT' AS ORIGEM,
                   V.id,
                   CAST(0 AS integer) AS tabela_id,
                   VFAT.DOC_01 AS documento_numero_01,
@@ -167,10 +209,10 @@ class Contabilidade < ActiveRecord::Base
                   VFAT.tipo,
                   VFAT.CDC,
                   VFAT.VENCIMENTO,
-                  VFAT.MOTIVO,  
-                  VFAT.TIPO_EMISSAO,                
+                  VFAT.MOTIVO,
+                  VFAT.TIPO_EMISSAO,
                   VFAT.SERIE,
-                  CAST(0 AS integer) AS STATUS,
+                  VFAT.STATUS,
                   V.moeda,
                   VFAT.data,
                   VFAT.RUC AS ruc,
@@ -191,20 +233,19 @@ class Contabilidade < ActiveRecord::Base
                   0 AS COTAS
          FROM FORM_FISCALS VFAT
 
-         LEFT JOIN CLIENTES C 
+         LEFT JOIN CLIENTES C
          ON C.ID = VFAT.COD_PROC AND C.SIGLA_PROC = 'CT'
 
-         LEFT JOIN CONTRATOS V 
+         LEFT JOIN CONTRATOS V
          ON V.ID = C.COD_PROC
 
-         WHERE  VFAT.STATUS = 1 AND #{filtro_v} AND V.MOEDA = 0
+         WHERE  VFAT.STATUS <> 0 AND #{filtro_v} AND V.MOEDA = 0
          AND  VFAT.TIPO_DOC  = 1 AND VFAT.SIGLA_PROC = 'CL'
 
          UNION ALL
 
-
-        SELECT 
-                  CAST(0 AS integer) AS def,
+        SELECT
+                  'CB' AS ORIGEM,
                   VFAT.id,
                   CAST(0 AS integer) AS tabela_id,
                   VFAT.DOC_01 AS documento_numero_01,
@@ -214,21 +255,21 @@ class Contabilidade < ActiveRecord::Base
                   VFAT.tipo,
                   VFAT.CDC,
                   VFAT.VENCIMENTO,
-                  VFAT.MOTIVO,                    
-                  VFAT.TIPO_EMISSAO,                
+                  VFAT.MOTIVO,
+                  VFAT.TIPO_EMISSAO,
                   VFAT.SERIE,
-                  CAST(0 AS integer) AS STATUS,
+                  VFAT.STATUS,
                   VFAT.moeda,
                   VFAT.data,
                   VFAT.RUC AS ruc,
                   VFAT.persona_id,
                   VFAT.PERSONA_NOME AS persona_nome,
                   VFAT.TOT_GS AS TOTAL_GUARANI,
-                  CAST(0 AS numeric(15,2)) AS EXENTAS_GUARANI,
-                  CAST(0 AS numeric(15,2)) AS gravadas_05_guarani,
-                  CAST(0 AS numeric(15,2)) AS imposto_05_guarani,
-                  VFAT.TOT_GS AS gravadas_10_guarani,
-                  (VFAT.TOT_GS / 11) AS imposto_10_guarani,
+                  VFAT.ex_gs  AS EXENTAS_GUARANI,
+                  VFAT.gv_05_gs AS gravadas_05_guarani,
+                  VFAT.ip_05_gs AS imposto_05_guarani,
+                  (VFAT.gv_10_gs + VFAT.ip_10_gs) AS gravadas_10_guarani,
+                  VFAT.ip_10_gs AS imposto_10_guarani,
                   VFAT.TOT_US AS TOTAL_DOLAR,
                   CAST(0 AS numeric(15,2)) AS exentas_dolar,
                   CAST(0 AS numeric(15,2)) AS gravadas_05_dolar,
@@ -238,16 +279,16 @@ class Contabilidade < ActiveRecord::Base
                   1 AS COTAS
          FROM FORM_FISCALS VFAT
          INNER JOIN COBROS C
-         ON C.ID = VFAT.COD_PROC 
-         WHERE  VFAT.STATUS = 1 AND #{filtro_v}
+         ON C.ID = VFAT.COD_PROC
+         WHERE  VFAT.STATUS <> 0 AND #{filtro_v}
 
          AND  VFAT.TIPO_DOC  = 1 AND VFAT.SIGLA_PROC = 'CB'
 
          UNION ALL
 
 
-        SELECT 
-                  CAST(0 AS integer) AS def,
+        SELECT
+                  'VTI' AS ORIGEM,
                   VFAT.id,
                   CAST(0 AS integer) AS tabela_id,
                   VFAT.DOC_01 AS documento_numero_01,
@@ -257,10 +298,10 @@ class Contabilidade < ActiveRecord::Base
                   VFAT.tipo,
                   VFAT.CDC,
                   VFAT.VENCIMENTO,
-                  VFAT.MOTIVO,    
+                  VFAT.MOTIVO,
                   VFAT.TIPO_EMISSAO,
                   VFAT.SERIE,
-                  CAST(0 AS integer) AS STATUS,
+                  VFAT.STATUS,
                   VFAT.moeda,
                   VFAT.data,
                   VFAT.RUC AS ruc,
@@ -280,10 +321,10 @@ class Contabilidade < ActiveRecord::Base
                   VFAT.TOT_US AS imposto_10_dolar,
                   1 AS COTAS
          FROM FORM_FISCALS VFAT
-         WHERE  VFAT.STATUS = 1 AND #{filtro_v}
+         WHERE  VFAT.STATUS <> 0 AND #{filtro_v}
          AND  VFAT.TIPO_DOC  = 1 AND VFAT.SIGLA_PROC = 'VTI'
          ORDER BY 11,6"
-                  
+
     Fatura.find_by_sql(sql)
   end
 
@@ -390,7 +431,7 @@ class Contabilidade < ActiveRecord::Base
   end
 
   def self.livro_mayor(params)
-        
+
         if params[:lancamento].to_s != "1"
          if params[:moeda] == "0"
             moeda = "AND D.MOEDA = 0"
@@ -467,7 +508,7 @@ class Contabilidade < ActiveRecord::Base
     dd_prod  = " AND dd.produto_id  = #{params[:busca]["produto"]}"  unless params[:busca]["produto"].blank?
     dd_clase = " AND dd.clase_id  = #{params[:busca]["clase"]}"  unless params[:busca]["clase"].blank?
     dd_grupo = " AND dd.grupo_id  = #{params[:busca]["grupo"]}"  unless params[:busca]["grupo"].blank?
-    
+
     dh_prod  = " AND dh.produto_id  = #{params[:busca]["produto"]}"  unless params[:busca]["produto"].blank?
     dh_clase = " AND dh.clase_id  = #{params[:busca]["clase"]}"  unless params[:busca]["clase"].blank?
     dh_grupo = " AND dh.grupo_id  = #{params[:busca]["grupo"]}"  unless params[:busca]["grupo"].blank?
@@ -566,8 +607,8 @@ class Contabilidade < ActiveRecord::Base
     filtro_mq_usado = "date_part('month', C.DATA_EMICAO) = '#{params[:mes]}'  AND  date_part('year', C.DATA_EMICAO) = '#{params[:ano]}' AND C.DOCUMENTO_ID > 1 AND C.DOCUMENTO_ID < 4 OR date_part('month', C.DATA) = '#{params[:mes]}'  AND  date_part('year', C.DATA) = '#{params[:ano]}' AND C.DOCUMENTO_ID = 11"
 
     filtro_nc = "date_part('month', NC.DATA) = '#{params[:mes]}'  AND  date_part('year', NC.DATA) = '#{params[:ano]}'"
- 
-    sql = "SELECT 
+
+    sql = "SELECT
                   C.ID,
                   C.COMPRA_ID,
                   C.RUBRO_ID,
@@ -594,21 +635,21 @@ class Contabilidade < ActiveRecord::Base
                   C.GRAVADAS_10_GUARANI AS GV_10_G,
                   C.GRAVADAS_10_DOLAR AS GV_10_D,
                   C.IMPOSTO_10_GUARANI AS IP_10_G,
-                  C.IMPOSTO_10_DOLAR AS IP_10_D,       
+                  C.IMPOSTO_10_DOLAR AS IP_10_D,
                   C.TOTAL_GUARANI AS TOT_G,
                   C.TOTAL_DOLAR AS TOT_D
-           FROM   
-                  COMPRAS_DOCUMENTOS C 
-           INNER JOIN 
+           FROM
+                  COMPRAS_DOCUMENTOS C
+           INNER JOIN
                   MOEDAS M
            ON     C.DATA = M.DATA
-           LEFT JOIN 
+           LEFT JOIN
                   COMPRAS CP
            ON     C.COMPRA_ID = CP.ID
 
            WHERE  #{filtro}
 
-           UNION ALL 
+           UNION ALL
 
            SELECT C.ID,
                   CAST(0 AS INTEGER),
@@ -636,37 +677,37 @@ class Contabilidade < ActiveRecord::Base
                   C.GRAVADAS_10_GUARANI AS GV_10_G,
                   C.GRAVADAS_10_DOLAR AS GV_10_D,
                   C.IMPOSTO_10_GUARANI AS IP_10_G,
-                  C.IMPOSTO_10_DOLAR AS IP_10_D,       
+                  C.IMPOSTO_10_DOLAR AS IP_10_D,
                   C.TOTAL_GUARANI AS TOT_G,
                   C.TOTAL_DOLAR AS TOT_D
-           FROM   
-                  VENDAS_ENTRADA_PRODUTOS C 
-           LEFT JOIN 
+           FROM
+                  VENDAS_ENTRADA_PRODUTOS C
+           LEFT JOIN
                   MOEDAS M
            ON     C.DATA_EMICAO = M.DATA
            WHERE  #{filtro_mq_usado}
 
 
            UNION ALL
-           
+
            SELECT
                  NC.ID,
-                 CAST(0 AS INTEGER),  
-                 CAST(0 AS INTEGER),   
-                 CAST('COMPRAS' AS VARCHAR),                             
+                 CAST(0 AS INTEGER),
+                 CAST(0 AS INTEGER),
+                 CAST('COMPRAS' AS VARCHAR),
                  NC.DATA,
-                 M.COTACAO_OFICIAL_VENDA AS COT_VD,                 
-                 NC.TIPO,   
-                 CAST('--' AS VARCHAR),    
+                 M.COTACAO_OFICIAL_VENDA AS COT_VD,
+                 NC.TIPO,
+                 CAST('--' AS VARCHAR),
                  CAST('---' AS VARCHAR) AS RN,
-                 CAST(4 AS INTEGER),                                                                              
+                 CAST(4 AS INTEGER),
                  NC.DOCUMENTO_NUMERO_01 AS DN_01,
                  NC.DOCUMENTO_NUMERO_02 AS DN_02,
                  NC.DOCUMENTO_NUMERO AS DN,
-                 NC.MOEDA,                 
+                 NC.MOEDA,
                  NC.DOCUMENTO_ID,
                  NC.PERSONA_NOME,
-                 CAST('--' AS VARCHAR),     
+                 CAST('--' AS VARCHAR),
                  ( SELECT SUM(TOTAL_GUARANI) FROM NOTA_CREDITOS_DETALHES WHERE TAXA = 0 AND NOTA_CREDITO_ID = NC.ID) AS EXG,
                  ( SELECT SUM(TOTAL_DOLAR) FROM NOTA_CREDITOS_DETALHES WHERE TAXA = 0 AND NOTA_CREDITO_ID = NC.ID) AS EXD,
                  ( SELECT SUM(TOTAL_GUARANI) FROM NOTA_CREDITOS_DETALHES WHERE TAXA = 5 AND NOTA_CREDITO_ID = NC.ID) AS GV_05_G,
@@ -675,28 +716,28 @@ class Contabilidade < ActiveRecord::Base
                  ( SELECT SUM(TOTAL_DOLAR / 11) FROM NOTA_CREDITOS_DETALHES WHERE TAXA = 5 AND NOTA_CREDITO_ID = NC.ID) AS IP_05_D,
                  ( SELECT SUM(TOTAL_GUARANI) FROM NOTA_CREDITOS_DETALHES WHERE TAXA = 10 AND NOTA_CREDITO_ID = NC.ID) AS GV_10_G,
                  ( SELECT SUM(TOTAL_DOLAR) FROM NOTA_CREDITOS_DETALHES WHERE TAXA = 10 AND NOTA_CREDITO_ID = NC.ID) AS  GV_10_D,
-                 ( SELECT SUM(TOTAL_GUARANI  / 11 ) FROM NOTA_CREDITOS_DETALHES WHERE TAXA = 10 AND NOTA_CREDITO_ID = NC.ID) AS IP_10_G, 
+                 ( SELECT SUM(TOTAL_GUARANI  / 11 ) FROM NOTA_CREDITOS_DETALHES WHERE TAXA = 10 AND NOTA_CREDITO_ID = NC.ID) AS IP_10_G,
                  ( SELECT SUM(TOTAL_DOLAR / 11 ) FROM NOTA_CREDITOS_DETALHES WHERE TAXA = 10 AND NOTA_CREDITO_ID = NC.ID) AS IP_10_D,
-                 ( SELECT SUM(TOTAL_GUARANI ) FROM NOTA_CREDITOS_DETALHES WHERE TAXA = 10 AND NOTA_CREDITO_ID = NC.ID) AS TOT_G, 
+                 ( SELECT SUM(TOTAL_GUARANI ) FROM NOTA_CREDITOS_DETALHES WHERE TAXA = 10 AND NOTA_CREDITO_ID = NC.ID) AS TOT_G,
                  ( SELECT SUM(TOTAL_DOLAR ) FROM NOTA_CREDITOS_DETALHES WHERE TAXA = 10 AND NOTA_CREDITO_ID = NC.ID) AS TOT_D
-           FROM 
+           FROM
                  NOTA_CREDITOS NC
-           LEFT JOIN 
+           LEFT JOIN
                   MOEDAS M
            ON    NC.DATA = M.DATA
-                       
+
            WHERE #{filtro_nc}
 
            ORDER BY 3,1 "
 
-     ComprasDocumento.find_by_sql(sql)  
+     ComprasDocumento.find_by_sql(sql)
   end
-  
+
   def self.resumo_vendas(params)                     #
 
     filtro = "DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}}' AND '#{params[:final].split("/").reverse.join("-")}}'"
 
-   sql = "SELECT 
+   sql = "SELECT
                   CAST(0 AS integer) AS def,
                   id,
                   tabela_id,
@@ -723,12 +764,12 @@ class Contabilidade < ActiveRecord::Base
                   gravadas_10_dolar,
                   imposto_10_dolar
          FROM FATURAS
-         WHERE  #{filtro}  
-                         
+         WHERE  #{filtro}
+
          UNION ALL
-         
+
          SELECT
-               CAST(1 AS integer) AS def,         
+               CAST(1 AS integer) AS def,
                id,
                CAST(0 AS integer) AS tabela_id,
                documento_numero_01,
@@ -753,7 +794,7 @@ class Contabilidade < ActiveRecord::Base
                CAST(0 AS INTEGER) As imposto_05_dolar,
                TOTAL_DOLAR AS gravadas_10_dolar,
                CAST(0 AS INTEGER) AS imposto_10_dolar
-         FROM NOTA_CREDITO_PROVEEDORS         
+         FROM NOTA_CREDITO_PROVEEDORS
          WHERE  #{filtro}
          ORDER BY 10,6"
 
@@ -816,7 +857,7 @@ class Contabilidade < ActiveRecord::Base
 
     #compras
     filtro = "  DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'"
-    
+
     compras_mercadoria = Compra.where(filtro << ' and tipo_compra = 0 ')
     compras_mercadoria.each do |c|
       diario =  Diario.create(
@@ -870,7 +911,7 @@ class Contabilidade < ActiveRecord::Base
     filtro = "  DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'"
     #lancamento contabil pagos
     pagos = Pago.all( :conditions =>  filtro + 'AND ADELANTO <> 1' )
-  
+
     pagos.each do |p|
 
       pagos_fin = PagosFinanca.last(:conditions => ["pago_id = ?", p.id])
@@ -938,7 +979,7 @@ class Contabilidade < ActiveRecord::Base
                               :valor_guarani    => pd.pago_guarani )
 
         end
-    end 
+    end
 
   end
 end

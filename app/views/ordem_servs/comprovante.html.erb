@@ -29,7 +29,7 @@
 </style>
 
 
-<table border="1" width="800">
+<table border="1">
     <tr>
      <td rowspan="2">
       <% if current_unidade.avatar.url.present?  %>
@@ -58,7 +58,6 @@
         Plataforma: <b><%= @ordem_serv.plataforma %></b> <br>
         Cabezal Electronico: <b><%= @ordem_serv.cabeca %></b> <br>
         Celda de Carga: <b><%= @ordem_serv.celda %></b> <br>
-        Obs.: <%= @ordem_serv.obs %><br>
       </td>
     </tr>
 
@@ -70,44 +69,70 @@
        <td colspan="3">
         <table class="head">
           <tr>
-            <td width="580">Producto</td>
+            <td width="580">Producto/Servicios</td>
             <td width="70" align="right">Ctd</td>
-            <% if params[:interno] == 'interno' %>
-              <td width="70" align="right">Monto</td>
+            <% if params[:formato] == 'interno' %>
+              <td width="80" align="right">Venta Unit.</td>
+              <td width="80" align="right">Venta Total</td>
+              <td width="80" align="right">Costo Unit.</td>
+              <td width="80" align="right">Costo Total</td>
+              <td width="80" align="right">Dif.</td>
             <% end %>
           </tr>
         </table>
         <table>
             <% rt = 0 %>
             <% vt = 0 %>
-            <% @ordem_serv.ordem_serv_prods.where(status: true).each do |os| %>
+            <% ct = 0 %>
+            <% @ordem_serv.ordem_serv_prods.includes(:produto).where(status: true).each do |os| %>
               <tr class = "<%= cycle("cor1", "cor2") %>" >
                 <td width="580">
-                  <%= os.produto.nome %>
+                  <%= os.produto.barra %> - <%= os.produto.nome %>
                 </td>
 
                   <td width="70" align="right"><%= os.quantidade %></td>
-                  <% if params[:interno] == 'interno' %>
-                  <% if @ordem_serv.moeda.to_i == 0 %>
-                    <td width="70" align="right"><%= format_decimal(os.valor_us) %></td>
-                    <% vt += (os.valor_us.to_f * os.quantidade.to_f) %>
-                  <% elsif @ordem_serv.moeda.to_i == 1 %>
-                    <td width="70" align="right"><%= format_int(os.valor_gs) %></td>
-                    <% vt += (os.valor_gs.to_f * os.quantidade.to_f) %>
-                  <% elsif @ordem_serv.moeda.to_i == 2 %>
-                    <td width="70" align="right"><%= format_decimal(os.valor_rs) %></td>
-                    <% vt += (os.valor_rs.to_f * os.quantidade.to_f) %>
+                  <% if params[:formato] == 'interno' %>
+                    <% if @ordem_serv.moeda.to_i == 0 %>
+                      <td width="80" align="right"><%= format_decimal(os.valor_us) %></td>
+                      <% vt += (os.valor_us.to_f * os.quantidade.to_f) %>
+
+                    <% elsif @ordem_serv.moeda.to_i == 1 %>
+
+                      <td width="80" align="right"><%= format_int(os.valor_gs) %></td>
+                      <td width="80" align="right"><%= format_int(os.quantidade.to_f * os.valor_gs.to_f) %></td>
+                      <% st = Stock.where("status = 0 and deposito_id = ? and produto_id = ? AND data <= ?",os.deposito_id,os.produto_id, os.data).last %>
+                      <td width="80" align="right">
+                        <% unless st.blank? %>
+                          <%= format_int(st.unitario_guarani) %>
+                        <% end %>
+                        </td>
+                        <td width="80" align="right">
+                          <% unless st.blank? %>
+                            <%= format_int(os.quantidade.to_f * st.unitario_guarani.to_f ) %>
+                            <% ct += (os.quantidade.to_f * st.unitario_guarani.to_f) %>
+                          <% end %>
+                        </td>
+                      <td width="80" align="right"><%= format_int( (os.quantidade.to_f * os.valor_gs.to_f) - (os.quantidade.to_f * st.unitario_guarani.to_f) ) unless st.blank?  %></td>
+
+                      <% vt += (os.valor_gs.to_f * os.quantidade.to_f) %>
+                    <% elsif @ordem_serv.moeda.to_i == 2 %>
+                      <td width="80" align="right"><%= format_decimal(os.valor_rs) %></td>
+                      <% vt += (os.valor_rs.to_f * os.quantidade.to_f) %>
+                    <% end %>
                   <% end %>
                 </tr>
-              <% end %>
               <% rt += os.quantidade.to_f %>
             <% end %>
-            <% if params[:interno] == 'interno' %>
+            <% if params[:formato] == 'interno' %>
               <tr>
-                <td></td>
-                <td align="right"><b>Total => <%= rt.to_i %></b></td>
+                <td>Total => </td>
+                <td align="right"><b><%= rt.to_i %></b></td>
                 <% if @ordem_serv.moeda.to_i == 1 %>
+                  <td></td>
                   <td align="right"><b><%= format_int(vt.to_i) %></td>
+                  <td></td>
+                  <td align="right"><b><%= format_int(ct.to_i) %></td>
+                    <td align="right"><b><%= format_int(vt.to_i - ct.to_i) %></td>
                 <% else %>
                   <td align="right"><b><%= format_decimal(vt.to_f) %></td>
                 <% end %>
@@ -118,7 +143,7 @@
     </tr>
 
     <tr>
-     <td colspan="3" style="padding: 15px">Concepto : <%= @ordem_serv.obs %> </td>
+     <td colspan="3" style="padding: 15px">Concepto : <%=raw @ordem_serv.obs.to_s.gsub(/\n/, '<br/>') %></td>
     </tr>
 
     <tr>

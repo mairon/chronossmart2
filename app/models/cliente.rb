@@ -639,11 +639,11 @@ class Cliente < ActiveRecord::Base
         if params[:tipo_data].to_s == 'emicao'
             #FITRO POR DATA FATURACAO
             cond = " AND #{unidade} C.data  BETWEEN  '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'  #{liq_open} #{liq_close} #{liq_all} #{moeda} #{vend} #{cliente_status} #{clase_produto} #{filtro_saldo_periodo} #{setor} #{regiao} #{doc} #{direcao} #{classif} #{cc} #{cota} #{find_valor} #{consumo} #{tutor} #{turma}" 
-            orden = '32,2,13,14,1'
+            orden = '3,11,1'
         else
             #FITRO POR DATA FATURACAO VENCIMENTO
             cond = "AND #{unidade} C.vencimento  BETWEEN  '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{liq_open} #{liq_close} #{liq_all} #{moeda} #{vend} #{cliente_status} #{clase_produto} #{filtro_saldo_periodo} #{setor} #{regiao} #{doc} #{direcao} #{classif} #{cc} #{cota} #{find_valor} #{consumo} #{tutor} #{turma}"
-            orden = '32,19,13,14,1'
+            orden = '3,12,13,1'
         end
 
 

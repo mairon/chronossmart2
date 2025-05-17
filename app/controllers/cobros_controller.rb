@@ -392,6 +392,7 @@ class CobrosController < ApplicationController
     #METHOD BASE------------------------------------------------------------------
 
     def index
+      render layout: 'chart'
       #Cobro.destroy_all("usuario_created = #{current_user.id} and op = false" )
     end
 

@@ -5,7 +5,7 @@ class Abastecida < ActiveRecord::Base
    	tables = postgres.exec('SELECT ID, valor, chave, litros, preco, bico, data,hora FROM ABASTECIDAS WHERE STATUS = 0 ORDER BY ID')
 
    	tables.each do |t|
-   		Abastecida.create(
+   		ab = Abastecida.create(
    			api_id: t['id'],
    			chave: t['chave'],
    			litros: t['litros'].to_f,
@@ -16,7 +16,7 @@ class Abastecida < ActiveRecord::Base
    			hora: (Time.parse(t['hora']) - 3.hours),
    			status: 0
    		)
-   		postgres.exec("UPDATE ABASTECIDAS SET STATUS = 1 WHERE ID = #{t['id']}")
+   		postgres.exec("UPDATE ABASTECIDAS SET STATUS = 1 WHERE ID = #{ab.api_id}")
    	end
 
   end

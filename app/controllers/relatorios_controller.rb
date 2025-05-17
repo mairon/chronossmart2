@@ -94,7 +94,7 @@ class RelatoriosController < ApplicationController
 
     if params[:tipo_listado] == '1'
       unid = "AND P.UNIDADE_ID = #{params[:busca]["unidade"]}" unless params[:busca]["unidade"].blank?
-      per  = "AND CP.USUARIO_ID = #{params[:busca]["empregado"]}" unless params[:busca]["empregado"].blank?
+      per  = "AND CP.PERSONA_ID = #{params[:busca]["empregado"]}" unless params[:busca]["empregado"].blank?
       sql = "
 
       SELECT DISTINCT CP.CREATED_AT AS DATETIME,
@@ -107,7 +107,7 @@ class RelatoriosController < ApplicationController
       INNER JOIN PERSONAS P
       ON P.ID = CP.PERSONA_ID
 
-      WHERE CP.CREATED_AT::date BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
+      WHERE P.TIPO_FUNCIONARIO = 1 AND CP.CHECK_POINT_TYPE <> 'REGISTROCONSUMO' AND CP.CREATED_AT::date BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
       #{unid} #{per}
       ORDER BY 5,1,2
 
@@ -329,6 +329,16 @@ end
 
 	def resultado_contratos
 		@contratos = Relatorios.resultado_contratos(params)
+
+
+    if params[:moeda] == "0"
+      moeda = "SOLO REGISTROS U$"
+    elsif params[:moeda] == "1"
+      moeda = "SOLO REGISTROS G$"
+    else
+      moeda = "SOLO REGISTROS R$"
+    end
+
 		unless params[:busca]["centro_custo"].blank?
 			cc_desc = CentroCusto.find_by_id(params[:busca]["centro_custo"])
 			cc_desc_title =  '- ' << cc_desc.nome
@@ -345,6 +355,7 @@ end
 
 #{t('DATE')}..: #{params[:inicio]}  #{t('TO')} #{params[:final]}
 CC....: #{cc_desc_title}
+MONEDA: #{moeda}
 ------------------------------------------------------------------------------------------------------------------------------------------
  Cod   Doc      Status   #{t('DATE')}   Final  CC                     Cliente               Tipo     Venc. Comp Obs                        Valor
 ------------------------------------------------------------------------------------------------------------------------------------------
@@ -357,6 +368,7 @@ CC....: #{cc_desc_title}
 
 #{t('DATE')}..: #{params[:inicio]}  #{t('TO')} #{params[:final]}
 CC....: #{cc_desc_title}
+MONEDA: #{moeda}
 ------------------------------------------------------------------------------------------------------------------------------------------
  Cod   Doc      Status  #{t('DATE')}    Final   CC                 Cliente             Tipo    Prod/Serv.                 Qtd.    Unit.    Total
 ------------------------------------------------------------------------------------------------------------------------------------------
@@ -364,25 +376,28 @@ CC....: #{cc_desc_title}
 
 			end
 
-	respond_to do |format|
-
-				format.html do
-					render  :pdf                    => "resultado_contratos",
-									:layout                 => "layer_relatorios",
-									:margin => {:top        => '1.20in',
-															:bottom     => '0.25in',
-															:left       => '0.10in',
-															:right      => '0.10in'},
-									:header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
-															:font_size  => 7,
-															:left       => head,
-															:spacing    => 21},
-									:footer => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
-															:font_size  => 7,
-															:right      => "Pagina [page] de [toPage]",
-															:left       => "Chronos Smart #{t('DATE')} impr.: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
-				end
-				format.xls
+    if params[:tipo] == '1'
+      render :xlsx => "resultado_contratos",
+      filename: "Contrato-#{params[:inicio]}-#{params[:final]}"
+    else
+    respond_to do |format|
+        format.html do
+          render  :pdf                    => "resultado_contratos",
+                  :layout                 => "layer_relatorios",
+                  :margin => {:top        => '1.20in',
+                              :bottom     => '0.25in',
+                              :left       => '0.10in',
+                              :right      => '0.10in'},
+                  :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
+                              :font_size  => 7,
+                              :left       => head,
+                              :spacing    => 21},
+                  :footer => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
+                              :font_size  => 7,
+                              :right      => "Pagina [page] de [toPage]",
+                              :left       => "Chronos Smart #{t('DATE')} impr.: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
+        end
+      end
 		end
 	end
 
@@ -1808,35 +1823,12 @@ Cod.          Descripcion                                                       
 		params[:unidade] = current_unidade.id
 		@compras = Relatorios.compras(params)
 
-		respond_to do |format|
-		  if params[:tipo] == '1'
-		    format.html {
-		      xls = render_to_string :action => "resultado_compras", :layout => false
-		      kit = PDFKit.new(xls,
-		                       :encoding => 'UTF-8')
-		      send_data(xls,:filename => "resultado_compras.xls")
-		    }
-		  else
-				format.html do
-					render  :pdf                    => "resultado_#{t('DATE')}mento_caixa",
-								:layout                 => "layer_relatorios",
-								:margin => {:top        => '1.20in',
-														:bottom     => '0.25in',
-														:left       => '0.10in',
-														:right      => '0.10in'},
-								:header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
-														:font_size  => 7,
-														:html => { :template => 'relatorios/headers/compras.html',
-														:layout     => "layer_relatorios" },
-														:spacing    => 0},
-
-								:footer => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
-														:font_size  => 7,
-														:right      => "Pagina [page] de [toPage]",
-														:left       => "Chronos Smart #{t('DATE')} impr.: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
-			end
-		end
-	end
+    if params[:tipo] == '1'
+      render :xlsx => "resultado_compras",
+      filename: "Compras-#{params[:inicio]}-#{params[:final]}"
+    else
+      render :layout => 'relatorio_view'
+    end
 	end
 
 
@@ -1994,11 +1986,11 @@ head =
 			params[:unidade] = current_unidade.id
 			if params[:lancamento].to_s != "1"
 				if params[:moeda] == "0"
-					moeda = "SOMENTE REGISTROS U$"
+					moeda = "SOLO REGISTROS U$"
 				elsif params[:moeda] == "1"
-					moeda = "SOMENTE REGISTROS G$"
+					moeda = "SOLO REGISTROS G$"
 				else
-					moeda = "SOMENTE REGISTROS R$"
+					moeda = "SOLO REGISTROS R$"
 				end
 			else
 				if params[:moeda] == "0"

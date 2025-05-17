@@ -4,13 +4,14 @@
   format_xls 'table.my-table' do
     workbook use_autowidth: true
     format '.header', b: true # bold
-  end        
+  end
 
 %>
-  <table class="my-table">   
+  <table class="my-table">
     <tr class="header">
       <td>FECHA </td>
-      <td>TIPO_DOCUMENTO</td>
+      <td>ORIGEN </td>
+      <td>TIPO_DOC</td>
       <td>FACTURA</td>
       <td>SERIE</td>
       <td>CDC</td>
@@ -34,17 +35,17 @@
       <td>MOTIVO</td>
     </tr>
 
-  
+      <% tot = 0 %>
       <% @venda.each do |venda| %>
-          
-        <tr>
+        <tr class = "<%= cycle("cor1", "cor2") %>">
           <td><%= venda.data.to_date.strftime("%d/%m/%Y") %></td>
+          <td><%= venda.origem %>-<%= venda.id %></td>
           <% if venda.tipo_emissao.to_i == 0 %>
             <td>IMPRESO</td>
           <% elsif venda.tipo_emissao.to_i == 1 %>
             <td>ELECTRONICO</td>
           <% end %>
-          <td ><%= venda.documento_numero_01 %>-<%= venda.documento_numero_02 %>-<%= venda.documento_numero %> </td>
+          <td width="250"><%= venda.documento_numero_01 %>-<%= venda.documento_numero_02 %>-<%= venda.documento_numero.to_s.rjust(7,'0') %> </td>
           <td ><%= venda.serie %></td>
           <td class="cdc">"<%= venda.cdc.to_s %>"</td>
           <td ><%= venda.timbrado %></td>
@@ -59,13 +60,14 @@
 
           <% if venda.moeda.to_i == 1 %>
             <td align="right"><%= format_int( venda.gravadas_10_guarani.to_f - ( venda.gravadas_10_guarani.to_f / 11 )).to_s.gsub('.', '') %></td>
-            <td align="right"><%= format_int( (venda.gravadas_05_guarani.to_f - venda.imposto_05_guarani.to_f)).to_s.gsub('.', '') %></td>              
+            <td align="right"><%= format_int( (venda.gravadas_05_guarani.to_f - venda.imposto_05_guarani.to_f)).to_s.gsub('.', '') %></td>
             <td align="right"><%= format_int( venda.exentas_guarani.to_f).to_s.gsub('.', '') %></td>
             <td align="right"><%= format_int( venda.total_guarani).to_s.gsub('.', '') %></td>
             <td>GS</td>
+            <% tot += venda.total_guarani.to_f %>
           <% else %>
             <td align="right"><%= format_decimal( venda.gravadas_10_dolar.to_f - ( venda.gravadas_10_dolar.to_f / 11 )).to_s.gsub('.', '').gsub(',', '.') %></td>
-            <td align="right"><%= format_decimal( (venda.gravadas_05_dolar.to_f - venda.imposto_05_dolar.to_f)).to_s.gsub('.', '').gsub(',', '.') %></td>              
+            <td align="right"><%= format_decimal( (venda.gravadas_05_dolar.to_f - venda.imposto_05_dolar.to_f)).to_s.gsub('.', '').gsub(',', '.') %></td>
             <td align="right"><%= format_decimal( venda.exentas_dolar.to_f).to_s.gsub('.', '').gsub(',', '.') %></td>
             <td align="right"><%= format_decimal( venda.total_dolar).to_s.gsub('.', '').gsub(',', '.') %></td>
             <td>US</td>
@@ -80,11 +82,19 @@
           <td></td>
           <td></td>
           <td></td>
-          <% if venda.status == 1 %>
+          <% if venda.status.to_i == 1 %>
             <td>ACTIVO</td>
-          <% elsif venda.status == 2 %>
+          <% elsif venda.status.to_i == 2 %>
             <td>CANCELADO</td>
+          <% elsif venda.status.to_i == 3 %>
+            <td>INUTILIZADO</td>
+
           <% end %>
           <td><%= venda.motivo %></td>
+        </tr>
       <% end %>
+      <tr>
+        <td colspan="14"></td>
+        <td><%= format_int(tot) %></td>
+      </tr>
     </table>

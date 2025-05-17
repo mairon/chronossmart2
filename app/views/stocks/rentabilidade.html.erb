@@ -1,3 +1,4 @@
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <h1 id="header">Rentabilidad</h1>
   <div class="group">
     <h2>
@@ -222,6 +223,7 @@ $("#produto_id").change(function(){
         </div>
       </div>
       <div class="modal-footer">
+        <button id="sheetjsexport"><b>Export as XLSX</b></button>
         <button type="button" class="btn btn-primary" id="print-nav">Imprimir</button>
       </div>
     </div>
@@ -231,6 +233,14 @@ $("#produto_id").change(function(){
 <script>
   $('#print-nav').on('click', function () {
     document.getElementById('iframeModal').contentWindow.print();
+  });
+
+  document.getElementById("sheetjsexport").addEventListener('click', function() {
+    /* Create worksheet from HTML DOM TABLE */
+    var wb = XLSX.utils.table_to_book(document.getElementById("iframeModal").contentWindow.document.getElementById('TableToExport'), {raw: true, header:['C']});
+
+    /* Export to file (start a download) */
+    XLSX.writeFile(wb, "SheetJSTable.csv");
   });
 </script>
 

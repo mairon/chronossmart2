@@ -35,7 +35,10 @@
         <% end %>
         <td width="50" align="center" bgcolor="<%= color%>"> <%= c.data.strftime("%d/%m/%y")%></td>
         <td width="250" align="left"   bgcolor="<%= color%>"> <%= truncate( c.persona_nome, :legth => 90) %></td>
-        <td width="150" align="left"   bgcolor="<%= color%>"><%= c.documento_numero_01 %>-<%= c.documento_numero_02 %>-<%= c.documento_numero %></td>
+        <td width="150" align="left"   bgcolor="<%= color%>">
+          <%= c.documento_numero_01 %>-<%= c.documento_numero_02 %>-<%= c.documento_numero %>
+          <%= c.ob_ref %>
+        </td>
         <% if c.tipo.to_i == 0 %>
           <td width="40" align="left"   bgcolor="<%= color%>">CO</td>
         <% else %>

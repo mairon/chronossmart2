@@ -10,7 +10,7 @@
   table {
     border-spacing: 0;
     border-collapse: collapse;
-  }        
+  }
 </style>
 <table>
   <tr>
@@ -93,7 +93,7 @@
                   <% if pp.cuotas.to_i > 0 %>
                     <%= format_int( (pp.total_guarani.to_f - (pp.total_guarani.to_f * (pp.desconto.to_f / 100))) / pp.cuotas.to_i   ) %>
                   <% end %>
-                </td>                
+                </td>
                  <% tot_gs += pp.total_guarani.to_f - (pp.total_guarani.to_f * (pp.desconto.to_f / 100)) %>
                  <% tot_cus_gs += (pp.promedio_guarani.to_f * pp.quantidade) %>
                <% else %>
@@ -134,7 +134,7 @@
                               INNER JOIN PRODUTOS P
                               ON P.ID = PP.PRODUTO_ID
                               WHERE PP.PRESUPUESTO_ID = #{@presupuesto.id}
-                              GROUP BY 1" 
+                              GROUP BY 1"
 
                               resumen = PresupuestoProduto.find_by_sql(sql_resumo)
             %>
@@ -142,7 +142,7 @@
             <table>
                 <tr>
                   <td class="head" colspan="2" style="background: #fa4736; color: #fff">Resumen</td>
-                </tr>  
+                </tr>
                 <tr>
                   <td class="head">Description</td>
                   <td class="head" align="right">Monto</td>
@@ -152,7 +152,7 @@
                   <tr class = "<%= cycle("cor1", "cor2") %> list">
                     <td width="150"><%= r.produto_nome %></td>
                     <td width="70" align="right"><%= format_int(r.total) %></td>
-                  </tr>      
+                  </tr>
                   <% tot_resumen += r.total.to_f %>
                 <% end %>
                 <tr  class="head">
@@ -160,14 +160,14 @@
                   <td width="70" align="right"><%= format_int(tot_resumen) %></td>
                 </tr>
             </table>
-            !--> 
-            
+            !-->
+
           </td>
           <td valign="top">
               <table>
                 <tr>
                   <td class="head" colspan="4" style="background: #fa4736; color: #fff">Plan de Pago</td>
-                </tr>  
+                </tr>
                 <tr>
                   <td class="head">Cuotas</td>
                   <td class="head" width="150">Producto</td>
@@ -193,7 +193,7 @@
             </table>
           </td>
 
-                 
+
         </tr>
       </table>
 

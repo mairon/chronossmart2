@@ -97,7 +97,7 @@
           <% if @nota_credito.origem_proc.to_i == 0 %>
             <% ff = FormFiscal.where(id: @nota_credito.documento_id, sigla_proc: 'VT').last %>
           <% else %>
-            <% ff = FormFiscal.where(id: @nota_credito.documento_id, sigla_proc: 'CL').last %>
+            <% ff = FormFiscal.where("id = #{@nota_credito.documento_id} and sigla_proc in ('CL', 'CT' )").last %>
           <% end %>
             <label>CDC Factura <%= ff.doc_01 %>•<%= ff.doc_02 %>•<%= ff.doc %></label>
             <%= ff.cdc %>

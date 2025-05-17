@@ -2285,6 +2285,28 @@ class FormFiscalsController < ApplicationController
 
           contrato_servicos.each do |cs|
 
+          iva_tipo = 1
+          iva_base = 100
+
+          if cs.produto.taxa.to_i == 0
+            iva_tipo = 3
+            iva_base = 0
+            iva = 0
+          elsif cs.produto.taxa.to_i == 5
+            iva_tipo = 1
+            iva_base = 100
+            iva = 5
+          elsif cs.produto.taxa.to_i == 10
+            iva_tipo = 1
+            iva_base = 100
+            iva = 10
+          elsif cs.produto.taxa.to_i == 70
+            iva_tipo = 4
+            iva_base = 30
+            iva = 10
+          end
+
+
             if params[:moeda].to_i == 1
               precioUnitario = cs.unitario_gs.to_i
             else
@@ -2296,9 +2318,9 @@ class FormFiscalsController < ApplicationController
               unidadMedida: 77,
               cantidad: cs.quantidade,
               precioUnitario: precioUnitario,
-              ivaTipo: 1,
-              ivaBase: 100,
-              iva: cs.produto.taxa.to_i}]
+              ivaTipo: iva_tipo,
+              ivaBase: iva_base,
+              iva: iva}]
           end
 
       end

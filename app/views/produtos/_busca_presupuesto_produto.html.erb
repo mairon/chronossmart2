@@ -35,10 +35,11 @@
       }else{
         $('#presupuesto_produto_unitario_real').val(preco_rs);
       }
-      $("#presupuesto_produto_quantidade").focus()
 
-      $("#vendas_produto_quantidade").focus()
       $('#ModalF2').modal('hide');
+
+      $("#presupuesto_produto_quantidade").focus().select()
+
     }
 </script>
 
@@ -49,7 +50,7 @@
       if (count_caract > 2) {
         //FUNÇÃO QUE MONTA A URL E CHAMA A FUNÇÃO AJAX
 
-        urlf2="/produtos/dinamic_busca_presupuesto_produto?deposito_id=1&tabela_preco_id="+ <%= @presupuesto.tabela_preco_id %> +"&data=<%= @presupuesto.data %>&unidade=<%= @presupuesto.unidade_id %>&moeda=<%= @presupuesto.moeda %>&busca="+$("#busca_f2").val();
+        urlf2="/produtos/dinamic_busca_presupuesto_produto?deposito_id=1&tabela_preco_id="+ $("#busca_tabela_preco_id").val() +"&data=<%= @presupuesto.data %>&unidade=<%= @presupuesto.unidade_id %>&moeda=<%= @presupuesto.moeda %>&busca="+$("#busca_f2").val();
         ajaxf2(urlf2);
       }
 

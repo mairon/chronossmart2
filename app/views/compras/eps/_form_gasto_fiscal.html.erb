@@ -97,10 +97,8 @@
 
 
          	<td colspan="2">
-         		<label>Viatico</label>
-         		<%= f.collection_select :viatico_id,
-                       Viatico.where(persona_id: @compra.funcionario_id).select("id, (lpad(cast(ID as varchar),6,'0')) AS LABEL ").order('id'),:id, :label,
-                       { :prompt => 'Seleccione lo Viatico' } %>
+	          <label>Ref.</label>
+	          <%= f.text_field :ob_ref, class: 'panel-field' %>
           </td>
 
         </tr>
