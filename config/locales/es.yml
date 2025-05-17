@@ -225,3 +225,8 @@ es:
   plate-horse: 'Chapa Cavalito'
   plate-trailer: 'Chapa Carreta'
   fleet: 'Flota'
+  l_date: 'Fecha'
+  to: 'Hasta'
+  code: 'Código'
+  account: 'Conta'
+  value: 'Valor'

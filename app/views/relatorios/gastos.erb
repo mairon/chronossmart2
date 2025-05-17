@@ -19,8 +19,8 @@
         <label>Fecha</label>
         <fieldset>
           <%= radio_button_tag :data_f, 0,  :Checked => "True"%> Documiento
-          <%= radio_button_tag :data_f, 1 %> Competencia 
-        </fieldset>        
+          <%= radio_button_tag :data_f, 1 %> Competencia
+        </fieldset>
       </div>
 
       <div class="col-md-7">
@@ -34,15 +34,20 @@
         <div class="input-group-addon-f">
         <span class="icon-calendar"></span>
         </div>
-      </td>        
+      </td>
       </div>
     </div>
-
+    <div class="row">
+      <div class="col-md-3">
+        <label>Ref</label>
+        <%= text_field_tag :referencia,'', class: 'panel-field' %>
+      </div>
+    </div>
     <div class="row">
       <div class="col-md-12">
         <label><%= t('PROVIDER') %></label>
          <%=   select("busca", "prov", Persona.all(:select => 'id,nome',:conditions => ['tipo_fornecedor = 1'],:order => 'nome').collect {|p| [ p.nome, p.id ] }, { :prompt => 'Todos...' })   %>
-        
+
       </div>
     </div>
 
@@ -97,7 +102,7 @@
 
     <div class="row">
       <div class="col-md-12">
-        <%= check_box_tag :lancamento,'1', checked: 'true' %> <%= t('ALL_RELEASES') %>        
+        <%= check_box_tag :lancamento,'1', checked: 'true' %> <%= t('ALL_RELEASES') %>
       </div>
     </div>
 

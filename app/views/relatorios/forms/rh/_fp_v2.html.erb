@@ -40,7 +40,8 @@
     <td class="header" align="right"> Movimiento</td>
   </tr>
   <% uni = "AND unidade_id = #{params[:busca]["unidade"]}" unless params[:busca]["unidade"].blank? %>
-  <% Persona.where("estado = 0 and tipo_funcionario = 1 #{uni}").order('unidade_id,nome').each do |sd| %>
+  <% per = "AND ID = #{params[:busca]["empregado"]}" unless params[:busca]["empregado"].blank? %>
+  <% Persona.where("estado = 0 and tipo_funcionario = 1 #{uni} #{per}").order('unidade_id,nome').each do |sd| %>
 
     <tr class = "<%= cycle( "cor1", "cor2" )%>">
       <td width="120"><%= sd.unidade.unidade_nome %></td>

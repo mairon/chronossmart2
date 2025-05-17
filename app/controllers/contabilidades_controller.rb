@@ -15,27 +15,27 @@ class ContabilidadesController < ApplicationController
         }
       else
       format.html do
-        render  :pdf                    => "resultado_livro_compra",                
+        render  :pdf                    => "resultado_livro_compra",
                 :layout                 => "layer_relatorios",
                 :orientation                    => 'Landscape',
                 :margin => {:top        => '0.25in',
                             :bottom     => '0.25in',
                             :left       => '0.10in',
-                            :right      => '0.10in'},        
+                            :right      => '0.10in'},
                 :footer => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
                             :font_size  => 7,
                             :right      => "Pagina [page] de [toPage]",
                             :left       => "Chronos Software - #{t('DATE')} de la imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
       end
       end
-    end    
+    end
     end
 
     def resultado_livro_venda
       @venda = Contabilidade.livro_venda(params)
       respond_to do |format|
       if params[:tipo] == '1'
-        format.html{ render xlsx: :resultado_livro_venda, filename: "Livro-Venta.xlsx" }       
+        format.html{ render xlsx: :resultado_livro_venda, filename: "Livro-Venta.xlsx" }
       else
 
       format.html do
@@ -45,7 +45,7 @@ class ContabilidadesController < ApplicationController
                 :margin => {:top        => '0.40in',
                             :bottom     => '0.25in',
                             :left       => '0.10in',
-                            :right      => '0.10in'},        
+                            :right      => '0.10in'},
                 :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
                             :font_size  => 7,
                             :spacing    => 25},
@@ -73,7 +73,7 @@ class ContabilidadesController < ApplicationController
 
 
 -----------------------------------------------------------------------------------------------------------------------------------------
-  #{t('DATE')}    Lanz.  Diario          Doc.         Cuenta   Concepto                                                    Debe           Haber        
+  #{t('DATE')}    Lanz.  Diario          Doc.         Cuenta   Concepto                                                    Debe           Haber
 -----------------------------------------------------------------------------------------------------------------------------------------
         "
 
@@ -82,12 +82,12 @@ class ContabilidadesController < ApplicationController
 
     respond_to do |format|
       format.html do
-        render  :pdf                    => "resultado_livro_diario",                
+        render  :pdf                    => "resultado_livro_diario",
                 :layout                 => "layer_relatorios",
                 :margin => {:top        => '1.20in',
                             :bottom     => '0.25in',
                             :left       => '0.10in',
-                            :right      => '0.10in'},        
+                            :right      => '0.10in'},
                 :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
                             :font_size  => 7,
                             :left       => head,
@@ -125,12 +125,12 @@ Moneda.........: #{moeda}
 
     respond_to do |format|
       format.html do
-        render  :pdf                    => "resultado_livro_mayor",                
+        render  :pdf                    => "resultado_livro_mayor",
                 :layout                 => "layer_relatorios",
                 :margin => {:top        => '1.20in',
                             :bottom     => '0.25in',
                             :left       => '0.10in',
-                            :right      => '0.10in'},        
+                            :right      => '0.10in'},
                 :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
                             :font_size  => 7,
                             :left       => head,
@@ -162,12 +162,12 @@ Cod.       #{t('DATE')}                   Proceso               N. Proceso      
 
     respond_to do |format|
       format.html do
-        render  :pdf                    => "resultado_livro_mayor_produtos",                
+        render  :pdf                    => "resultado_livro_mayor_produtos",
                 :layout                 => "layer_relatorios",
                 :margin => {:top        => '1.20in',
                             :bottom     => '0.25in',
                             :left       => '0.10in',
-                            :right      => '0.10in'},        
+                            :right      => '0.10in'},
                 :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
                             :font_size  => 7,
                             :left       => head,
@@ -213,7 +213,7 @@ Descripcion                                                                Anter
                 :margin => {:top        => '1.20in',
                             :bottom     => '0.25in',
                             :left       => '0.10in',
-                            :right      => '0.10in'},        
+                            :right      => '0.10in'},
                 :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
                             :font_size  => 7,
                             :left       => head,
@@ -240,12 +240,12 @@ Descripcion                                                                Anter
 
     respond_to do |format|
       format.html do
-        render  :pdf                    => "resultado_balance_general",                
+        render  :pdf                    => "resultado_balance_general",
                 :layout                 => "layer_relatorios",
                 :margin => {:top        => '1.20in',
                             :bottom     => '0.25in',
                             :left       => '0.10in',
-                            :right      => '0.10in'},        
+                            :right      => '0.10in'},
                 :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
                             :font_size  => 7,
                             :left       => head,
@@ -260,8 +260,8 @@ Descripcion                                                                Anter
 
 
     def resultado_resumo_compra                  #
-    
-        @compra =   Contabilidade.resumo_compra(params)    
+
+        @compra =   Contabilidade.resumo_compra(params)
         head =
         "                                                                                            #{$empresa_nome}
                                                                                     Resumen de Compra
@@ -275,12 +275,12 @@ Descripcion                                                                Anter
 
     respond_to do |format|
       format.html do
-        render  :pdf                    => "resultado_resumo_compra",                
+        render  :pdf                    => "resultado_resumo_compra",
                 :layout                 => "layer_relatorios",
                 :margin => {:top        => '1.20in',
                             :bottom     => '0.25in',
                             :left       => '0.10in',
-                            :right      => '0.10in'},        
+                            :right      => '0.10in'},
                 :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
                             :font_size  => 7,
                             :left       => head,
@@ -295,8 +295,8 @@ Descripcion                                                                Anter
 
 
     def resultado_resumo_vendas                  #
-    
-        @venda =   Contabilidade.resumo_vendas(params)    
+
+        @venda =   Contabilidade.resumo_vendas(params)
         head =
         "                                                        #{$empresa_nome}
                                                          Resumen de Vendas
@@ -310,12 +310,12 @@ Descripcion                           Exentas           Grav. 05        Impost. 
 
         respond_to do |format|
       format.html do
-        render  :pdf                    => "resultado_resumo_vendas",                
+        render  :pdf                    => "resultado_resumo_vendas",
                 :layout                 => "layer_relatorios",
                 :margin => {:top        => '1.20in',
                             :bottom     => '0.25in',
                             :left       => '0.10in',
-                            :right      => '0.10in'},        
+                            :right      => '0.10in'},
                 :header => {:font_name  => 'Lucida Console, Courier, Monotype, bold',
                             :font_size  => 7,
                             :left       => head,

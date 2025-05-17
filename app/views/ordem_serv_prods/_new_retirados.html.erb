@@ -32,7 +32,7 @@
   <div class="row">
     <div class="col-md-12">
       <label>Producto</label>
-      <%= f.collection_select :produto_id, Produto.all( :select => "id, (id || ' - ' || nome) as nome", :order  => '2' ), :id, :nome,{prompt: 'Selecione lo producto'}, {required: true, class: 'ret_produto_id panel-field'} %>
+      <%= f.collection_select :produto_id, Produto.all( :select => "id, (barra || ' - ' || nome) as nome", :order  => '2' ), :id, :nome,{prompt: 'Selecione lo producto'}, {required: true, class: 'ret_produto_id panel-field'} %>
     </div>
   </div>
   <div class="row">
@@ -48,11 +48,11 @@
       <% elsif @ordem_serv.moeda.to_i == 2 %>
         <%= field_us_label 'Monto R$ :',f,:valor_rs, required: true, class: 'new-valor_rs' %>
       <% end %>
-    </div>    
+    </div>
   </div>
   <div class="row">
     <div class="col-md-12">
-      <br>      
+      <br>
       <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
     </div>
   </div>
@@ -69,7 +69,7 @@ $("#cod_busca").change(function(){
       beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
       data: 'tipo_busca=BARRA&cod=' + $('#cod_busca').val(),
       success: function(grade){
-      //tabela de preco
+        alert(grade)
      $(".ret_produto_id").val(grade);
     }
   });

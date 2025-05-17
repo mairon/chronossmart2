@@ -1,5 +1,7 @@
 <% if Empresa.last.segmento.to_i == 1 %>
   <%= render 'show_educacao' %>
+<% elsif Empresa.last.segmento.to_i == 5 %>
+  <%= render 'show_alquiler' %>
 <% else %>
   <%= render 'show_comercial' %>
 <% end %>

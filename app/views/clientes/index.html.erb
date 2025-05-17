@@ -118,13 +118,21 @@ WHERE P.UNIDADE_ID = #{current_unidade.id} AND P.vend_responsavel_id IS NOT NULL
     </div>
 
     <div class="row">
-      <div class="col-md-12">
+      <div class="col-md-6">
         <fieldset>
           <legend>Tipo Persona</legend>
           <input type="radio" id="tipo_persona" name="tipo_persona" value="0" checked/> Cliente
           <input type="radio" id="tipo_persona" name="tipo_persona" value="1"/> Empleado
           <input type="radio" id="tipo_persona" name="tipo_persona" value="2"/> Alunos
           <input type="radio" id="tipo_persona" name="tipo_persona" value=""/> Todos
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset>
+        <legend>Interes</legend>
+          <input type="radio" id="int" name="int" value="1" checked/>Sin Interes
+          <input type="radio" id="int" name="int" value="0"/>Saldo Corrigido(con int.)
+          <input type="radio" id="int" name="int" value="2"/>Todos
         </fieldset>
       </div>
     </div>

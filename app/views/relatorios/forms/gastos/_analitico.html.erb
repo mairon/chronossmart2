@@ -11,7 +11,7 @@
         <td>Rodado</td>
         <td align="right">Valor</td>
       </tr>
-    <% end %>      
+    <% end %>
       <% totgt = 0 %>
       <% totlitros = 0 %>
 
@@ -19,21 +19,29 @@
          <tr class = "<%= cycle("cor1", "cor2") %>">
             <td width="50" align="center">   <%= gt.id.to_s.rjust(8,'0') %></td>
             <td width="50" align="center">   <%= gt.data.strftime("%d/%m/%y") %></td>
-            <td width="120"><%= gt.doc %></td>
-            <td width="150" align="left"><small><%= gt.centro_custo_nome %></small></td>
+            <td width="120">
+              <%= gt.doc %>
+              <%= gt.ob_ref %>
+            </td>
+            <td width="150" align="left">
+              <small><%=raw gt.array_centro_custos.to_s.gsub('"', '').gsub('{', '').gsub('}', '') %></small>
+            </td>
             <td width="150" align="left"><small><%= truncate(gt.persona_nome, length: 25) %></small></td>
-            <td width="300" align="left"><small><%= truncate(gt.plano_de_conta_nome, length: 50) %></small></td>
+            <td width="300" align="left">
+              <small><%=raw gt.array_plano_contas.to_s.gsub('"', '').gsub('{', '').gsub('}', '') %></small><br>
+              <small><%=raw gt.descricao %></small>
+            </td>
             <td width="50" align="center"><%= gt.rodado_nome %></td>
-            <% if params[:moeda] == '0' %>            
+            <% if params[:moeda] == '0' %>
                <td width="70" align="right"><%= format_decimal( gt.total_dolar ) %> </td>
                <% totgt +=  gt.total_dolar %>
             <% elsif params[:moeda] == '1' %>
                <td width="70" align="right"><%= format_int( gt.total_guarani ) %> </td>
                <% totgt += gt.total_guarani %>
-            <% else %>   
+            <% else %>
                <td width="70" align="right"><%= format_decimal( gt.total_real ) %> </td>
-               <% totgt +=  gt.total_real %>            
-            <% end %> 
+               <% totgt +=  gt.total_real %>
+            <% end %>
          </tr>
       <% end %>
       <tr class="head" height="30">

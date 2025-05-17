@@ -142,6 +142,9 @@
     elsif params[:tipo] == "DOCUMENTO"
       tipo = "G.DOCUMENTO_NUMERO"
       cond =  "#{unidade} AND #{tipo} LIKE '%#{params[:busca]}%'" unless params[:busca].blank?
+    elsif params[:tipo] == "REFERENCIA"
+      tipo = "G.OB_REF"
+      cond =  "#{unidade} AND #{tipo} LIKE '%#{params[:busca]}%'" unless params[:busca].blank?
     end
 
     sql = "SELECT G.ID,
@@ -194,6 +197,9 @@
       elsif params[:tipo] == "DOCUMENTO"
         tipo = "G.DOCUMENTO_NUMERO"
         cond =  " AND #{tipo} LIKE '%#{params[:busca]}%'" unless params[:busca].blank?
+      elsif params[:tipo] == "REFERENCIA"
+      tipo = "AND G.OB_REF"
+      cond =  "#{tipo} LIKE '%#{params[:busca]}%'" unless params[:busca].blank?
       else
         tipo = "G.PERSONA_NOME"
         cond =  "AND #{tipo} ILIKE '%#{params[:busca]}%'"
@@ -217,6 +223,7 @@
                   G.TOTAL_GUARANI,
                   G.TOTAL_DOLAR,
                   G.TOTAL_REAL,
+                  G.OB_REF,
                   PC.DESCRICAO AS PLANO_DE_CONTA_NOME,
                   (SELECT COUNT(ID) FROM COMPRAS_FINANCAS CF WHERE CF.COMPRA_ID = G.ID) AS FINANCEIRO
             FROM COMPRAS G

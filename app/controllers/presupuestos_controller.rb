@@ -143,7 +143,7 @@ class PresupuestosController < ApplicationController
 
   def new
       fields = CustomField.pluck(:internal_name)
-      store_accessor :custom_fields, [ fields ]
+      #store_accessor :custom_fields, [ fields ]
 
       @presupuesto = Presupuesto.new
 

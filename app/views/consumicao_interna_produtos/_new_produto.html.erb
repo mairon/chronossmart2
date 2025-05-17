@@ -36,6 +36,9 @@
 
         <td align="right">Producto:</td>
         <td>
+          <%= text_field :cod, :busca,
+              :size        => 20, :placeholder => 'Ref. / Cod. Barra', :autofocus   => true %>
+
           <%= f.text_field :produto_nome, size: 56, autofocus: true %>
           <%= f.hidden_field :produto_id %>
         </td>
@@ -46,6 +49,7 @@
 					<%= f.text_field :quantidade, size: 8, value: 1 %>
           <%= f.submit t('SAVE'), :class => 'button add', :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %>
 				</td>
+        <td>Stock: <span id="sum_stock"></span></td>
 			</tr>
 		</table>
 	</div>
@@ -53,23 +57,28 @@
 
 <script type="text/javascript">
 
-  $("#busca_prod_cod").change(function(){
-
-      $.ajax({url: "/buscas/busca_compra_produto",
+$("#cod_busca").change(function(){
+  $.ajax({url: "/buscas/busca_produto",
           type: 'GET',
           beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
-          data: "cod=" + escape($("#busca_prod_cod").val()),
+          data: {
+            "cod": this.value,
+            "tipo_cod": 'BARRA',
+            "data": '<%= @consumicao_interna.data %>',
+            "deposito_id": $("#consumicao_interna_produto_deposito_id").val(),
+          },
           error: function(XMLHttpRequest, textStatus, errorThrown) {
                   alert('Producto no Encontrado');
-                  $('#busca_prod_cod').focus();
-                  $('#busca_prod_cod').val('');
+                  $('#cod_busca').focus();
+                  $('#cod_busca').val('');
               },
           success: function(grade){
             $('#consumicao_interna_produto_produto_nome').val(grade["produto"].nome);
             $('#consumicao_interna_produto_produto_id').val(grade["produto"].produto_id);
+            $('#sum_stock').text(grade["sum_stock"]);
         }
       });
-  });
+});
 
 
 $(function() {

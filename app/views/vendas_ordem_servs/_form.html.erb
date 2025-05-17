@@ -6,7 +6,8 @@
         <div class="col-md-10" >
           <label>Nº OS</label>
           <%= f.hidden_field :venda_id %>
-          <%= f.collection_select :ordem_serv_id, OrdemServ.where(status: 'PENDIENTE', persona_id: @venda.persona_id).select('id,rt'), :id, :rt, { prompt: 'Selecione a OS' }, {required: true} %>
+          <%= f.collection_select :ordem_serv_id, OrdemServ.where(status: 'PENDIENTE', persona_id: @venda.persona_id).select("id,
+           ( CAST(ID AS VARCHAR) || '-' || RT) AS rt"), :id, :rt, { prompt: 'Selecione a OS' }, {required: true} %>
         </div>
         <div class="col-md-2" style="margin-top: 27px">
 

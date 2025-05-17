@@ -23,6 +23,7 @@
           <td width="80"  align="center"><%= os.id.to_s.rjust(6,'0') %></td>
           <td width="100"  align="center"><%= os.rt.to_s.rjust(4,'0') %></td>
           <td width="40" align="center" title="<%= os.usuario_nome %>"><%= os.usuario_created.to_s.rjust(3,'0')  %></td>
+
           <td width="80"  align="center"><%= os.data.strftime("%d/%m/%y")%></td>
           <td width="80" align="center">
             <% if os.garantia == true %>
@@ -31,7 +32,10 @@
               <b>NO</b>
             <% end %>
           </td>
-          <td width="315" align="left"><%= os.persona_nome %></td>
+          <td width="315" align="left">
+            <%= os.persona_nome %>
+            <p><%= os.modelo %></p>
+            </td>
           <td width="115" align="left"><%= os.responsavel_nome[0..12] %></td>
           <td width="60" align="right"><%= format_int(os.qtd) %></td>
           <% if os.moeda.to_i == 1 %>

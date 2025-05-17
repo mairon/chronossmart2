@@ -24,42 +24,42 @@
 
                 <table>
                   <tr>
-                                      
-                      <td align="right">Usuario :</td>                    
+
+                      <td align="right">Usuario :</td>
                       <td>
                         <%= f.collection_select :usuario_id, Usuario.all(:select => 'id,usuario_nome',:order => '2'),:id,:usuario_nome,{}  %>
                       </td>
-                                      
-                      <td align="right">Menu :</td>                    
+
+                      <td align="right">Menu :</td>
                       <td>
                         <%= f.collection_select :menu_id, Menu.all(:select => 'id,nome',:order => '1 desc'),:id,:nome,{} %>
 
                       </td>
-                      <td align="right">m :</td>                    
+                      <td align="right">m :</td>
                       <td><%= f.check_box :m %></td>
-                                      
-                      <td align="right">c :</td>                    
+
+                      <td align="right">c :</td>
                       <td><%= f.check_box :c %></td>
-                                      
-                      <td align="right">r :</td>                    
+
+                      <td align="right">r :</td>
                       <td><%= f.check_box :r %></td>
-                                      
-                      <td align="right">u :</td>                    
+
+                      <td align="right">u :</td>
                       <td><%= f.check_box :u %></td>
-                                      
-                      <td align="right">d :</td>                    
+
+                      <td align="right">d :</td>
                       <td><%= f.check_box :d %></td>
-                                      </tr>                 
+                                      </tr>
                 </table>
               </fieldset>
             </td>
           </tr>
         </table>
       </div>
-      
+
       <div class="buttons">
         <%= f.submit :value => t('SAVE'), :class => "button" %>
-        <%= link_to t('BACK'), usuario_perfils_path, :class => "button back" %>        
+        <%= link_to t('BACK'), usuario_perfils_path, :class => "button back" %>
       </div>
 
     </div>

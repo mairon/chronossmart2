@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user
   helper_method :current_unidade
+  helper_method :permission_action_user
   helper ApplicationHelper
   before_filter :subdomain_change_database, :set_locale
 
@@ -36,6 +37,10 @@ class ApplicationController < ActionController::Base
   def current_unidade
     @current_unidade ||= Unidade.find(session[:unidade])
     Auditor::Unidade.current_unidade = @current_unidade
+  end
+
+  def permission_action_user
+    UsuarioPerfil.joins(:menu).where(menus: {url: request.fullpath}, usuario_perfils: {usuario_id: current_user.id} ).last
   end
 
   def authenticate

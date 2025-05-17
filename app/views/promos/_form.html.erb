@@ -12,7 +12,7 @@
 <div class="group">
 
 <%= form_for(@promo) do |f| %>
-  <% if params[:action] %>
+  <% if params[:action] == 'new' %>
     <%= f.hidden_field :tipo, value: params[:tipo] %>  
   <% end %>
   

@@ -507,7 +507,7 @@ end
                   :footer => {:font_name  => 'arial, 900',
                               :font_size  => 7,
                               :right      => "Pagina [page] de [toPage]",
-                              :left       => "Chronos Smart - De de la imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
+                              :left       => "Chronos Smart - imprecion: #{Time.now.strftime("%d/%m/%Y")} Hora: #{Time.now.strftime("%H:%M:%S")} - Usuario: #{current_user.usuario_nome}"}
         end
       end
     end

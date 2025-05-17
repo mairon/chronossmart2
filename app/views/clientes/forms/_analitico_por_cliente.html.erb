@@ -11,7 +11,7 @@
 
    <thead class="report-header">
       <tr>
-        <td colspan="10" class="title" align="center">
+        <td colspan="13" class="title" align="center">
           <%= current_unidade.nome_sys %> <br>
           Extracto Cliente
         </td>
@@ -59,9 +59,17 @@
         <td width="70" align="right">Divida</td>
         <td width="70" align="right">Cobrado</td>
         <td width="70" align="right">Saldo</td>
+        <td width="25" align="center">Dias</td>
+        <td width="70" align="right">Interes</td>
+        <td width="70" align="right">Saldo Corrigido</td>
+
 
       </tr>
     </thead>
+    <% vencido = 0 %>
+    <% interes = 0 %>
+    <% saldo_interes = 0 %>
+    <% tot_dias_atraso = 0 %>
 
     <% @clientes.each do |c| %>
      <% if quebra != c.persona_nome %>
@@ -104,6 +112,25 @@
 
       <tr class = "<%= cycle( "cor1", "cor2" ) %>" >
 
+        <!-- calculo de interes -->
+        <% if params[:int] == '0' %>
+          <% dias = Date.today - c.vencimento.to_date  %>
+          <% if dias >= 0  %>
+              <% interes_gs = ( ( dias.to_i * Empresa.last.taxa_interes.to_f ) * (c.divida_guarani.to_f - c.cobro_guarani.to_f) ) / 100  %>
+          <% else %>
+             <% interes_gs = 0  %>
+          <% end %>
+        <% else %>
+          <% interes_gs = 0  %>
+        <% end %>
+
+
+
+           <% if c.vencimento.to_date < Time.now.to_date %>
+            <% vencido += (c.divida_guarani.to_f - c.cobro_guarani.to_f) %>
+            <% vec = "style=\" background-color: #fa3e40; padding: 2px; color:#fff; border-radius: 4px \" " %>
+          <% end %>
+
         <td width="50"  align="center"><%= c.data.strftime("%d/%m/%y")%></td>
         <td width="50"  align="center"><%= c.vencimento.strftime("%d/%m/%y")%></td>
         <td width="50"  align="center"><%= c.pg_data.to_date.strftime("%d/%m/%y") unless c.pg_data.nil? %></td>
@@ -127,6 +154,11 @@
           <td width="70" align="right"><%= format_int(c.divida_guarani.to_f) %> </td>
           <td width="70" align="right"><%= format_int(c.anterior_gs.to_f) %> </td>
           <td width="70" align="right"><%= format_int(saldo_guarani.to_f) %> </td>
+          <td width="25" align="center"><%= (Time.now.to_date - c.vencimento.to_date).to_i  %></td>
+          <td width="70" align="right"><%= format_int(interes_gs) %></td>
+          <td width="70" align="right"><%= format_int((c.divida_guarani.to_f - c.cobro_guarani.to_f) + interes_gs.to_f) %></td>
+          <% tot_dias_atraso += (Time.now.to_date - c.vencimento.to_date).to_i %>
+
           <% sub_div    += c.divida_guarani.to_f %>
           <% sub_pg     += c.anterior_gs.to_f %>
           <% sub_saldo  += saldo_guarani.to_f %>
@@ -134,6 +166,9 @@
           <% div    += c.divida_guarani.to_f %>
           <% pg     += c.anterior_gs.to_f %>
           <% saldo  += saldo_guarani.to_f %>
+
+          <% interes += interes_gs.to_f %>
+          <% saldo_interes += (c.divida_guarani.to_f - c.cobro_guarani.to_f) + interes_gs.to_f %>
 
         <% else %>
           <td width="70" align="right"><%= format_decimal(c.divida_real.to_f) %> </td>
@@ -163,6 +198,10 @@
       <td width="70" align="right"><%= format_int(div.to_f) %> </td>
       <td width="70" align="right"><%= format_int(pg.to_f) %> </td>
       <td width="70" align="right"><%= format_int(saldo.to_f) %> </td>
+      <td width="25" align="right"><%= tot_dias_atraso %></td>
+      <td width="70" align="right"><%= format_decimal(interes.to_f) %> </td>
+      <td width="70" align="right"><%= format_decimal(saldo_interes.to_f) %> </td>
+
     </tr>
   <% else %>
 

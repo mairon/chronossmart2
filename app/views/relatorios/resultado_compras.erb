@@ -1,5 +1,30 @@
-<div class="group">
-   <table>
+<table>
+  <thead class="report-header">
+  <tr>
+    <td colspan="10" class="title" align="center">
+      <%= current_unidade.nome_sys %> <br>
+      LISTADO COMPRAS
+    </td>
+  </tr>
+  <tr>
+    <td colspan="10">Fecha: <%= params[:inicio] %> hasta <%= params[:final] %></td>
+  </tr>
+
+  <tr class="td-header">
+
+    <td align="center" width="50">Cod.</td>
+    <td width="60" align="center">Fecha</td>
+    <td width="80">Tipo Compra</td>
+    <td width="80">Tipo</td>
+    <td width="150">CC</td>
+    <td width="250">Cliente</td>
+    <td width="100">Doc.</td>
+    <td align="right" width="60">Qtd</td>
+    <td align="right" width="70">Total</td>
+  </tr>
+</thead>
+
+
       <% tot_gs  = 0 %>
       <% tot_us  = 0 %>
       <% tot_rs  = 0 %>
@@ -24,8 +49,8 @@
 
          <tr class = "<%= cycle("cor1", "cor2") %>">
           <td width="50"  align="center"> <%=  cp.id.to_s.rjust(6,'0') %></td>
-            <td width="50"  align="center"> <%=  cp.data.strftime("%d/%m/%y") %></td>
-            <td width="50" align="left">
+            <td width="60"  align="center"> <%=  cp.data.strftime("%d/%m/%y") %></td>
+            <td width="80" align="left">
               <% if cp.tipo_compra == 0 %>
                 CM
                 <% elsif cp.tipo_compra == 2 %>
@@ -34,7 +59,7 @@
                 CB
               <% end %>
             </td>
-            <td width="50" align="left">
+            <td width="80" align="left">
               <% if cp.tipo.to_i == 0 %>
                 CT
                 <% contado_tot_us  += cp.total_dolar %>
@@ -47,16 +72,18 @@
                 <% credito_tot_rs  += cp.total_real %>
               <% end %>
             </td>
-            <td width="275" align="left"> <%= truncate(cp.persona_nome, :length => 30) %></td>
+            <td width="150"><%=  cp.centro_custo_nome %></td>
+            <td width="250" align="left"> <%= truncate(cp.persona_nome, :length => 30) %></td>
             <td width="100"><%=  cp.doc %></td>
-            <td width="60" align="right"><b><%= format_int(cp.qtd.to_i) %></b></td>
+
+            <td width="60" align="right"><b><%= format_peso(cp.qtd.to_f) %></b></td>
             <% qtd += cp.qtd.to_i %>
             <% if params["moeda"].to_s  == '0' %>
-               <td width="70" align="right">    <%=  format_decimal( cp.total_dolar) %></td>
+               <td width="80" align="right">    <%=  format_decimal( cp.total_dolar) %></td>
             <% elsif params["moeda"].to_s  == '1' %>
-               <td width="70" align="right">    <%=  format_int( cp.total_guarani ) %></td>
+               <td width="80" align="right">    <%=  format_int( cp.total_guarani ) %></td>
             <% else %>
-               <td width="70" align="right">    <%=  format_decimal( cp.total_real ) %></td>
+               <td width="80" align="right">    <%=  format_decimal( cp.total_real ) %></td>
             <% end %>
             <td></td>
           </tr>
@@ -95,7 +122,7 @@
                     <td width="454">
                       <%= truncate(p.produto_nome, :length => 55) %>
                       <% dt_prod = truncate(p.produto_nome, :length => 55) %>
-                        Precio =>                       
+                        Precio =>
                         <% if params["moeda"].to_s  == '0' %>
                           <%= format_decimal( p.unitario_dolar ) %>
                         <% elsif params["moeda"].to_s  == '1' %>
@@ -135,8 +162,8 @@
 
       <!--TOTAL!-->
       <tr class="head" height="30"  align="right">
-         <td colspan="6">Total del Documentos ==> </td>
-         <td align="right"> <%= format_int(qtd.to_i) %> </td>
+         <td colspan="7">Total del Documentos ==> </td>
+         <td align="right"> <%= format_peso(qtd.to_f) %> </td>
          <% if params["moeda"].to_s  == '0' %>
             <td align="right">    <%=  number_to_currency( tot_us, :format =>' %n ', :separeitor => ',' ) %> </td>
          <% elsif params["moeda"].to_s  == '1' %>
@@ -151,8 +178,8 @@
         </tr>
 
         <tr class="head" height="30">
-           <td colspan="6" align="right">Total del iten Selecionado: <%= dt_prod %> ==> </td>
-           <td align="right"> <%= format_int(qtd_dt.to_i) %> </td>
+           <td colspan="7" align="right">Total del iten Selecionado: <%= dt_prod %> ==> </td>
+           <td align="right"> <%= format_peso(qtd_dt.to_f) %> </td>
            <% if params["moeda"].to_s  == '0' %>
               <td align="right">    <%=  number_to_currency( tot_dt_us, :format =>' %n ', :separeitor => ',' ) %> </td>
            <% elsif params["moeda"].to_s  == '1' %>
@@ -163,4 +190,3 @@
         </tr>
       <% end %>
    </table>
-</div>

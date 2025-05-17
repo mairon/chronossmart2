@@ -21,9 +21,16 @@
       <label><%= t('UNIT') %></label>
       <%= f.text_field :unidade_nome, class: 'panel-field' ,autofocus: true, required: true %>
     </div>
+  </div>
+  <div class="row">
+    <div class="col-md-8">
+      <label>Razao Social</label>
+      <%= f.text_field :razao_social, class: 'panel-field' %>
+    </div>
+
     <div class="col-md-4">
       <label>CI/RUC</label>
-      <%= f.text_field :ruc, class: 'panel-field' %>      
+      <%= f.text_field :ruc, class: 'panel-field' %>
     </div>
   </div>
 
@@ -83,8 +90,8 @@
       <br>
       <%= f.check_box :retencao %> Retención <br>
       <%= f.check_box :conta_multi_unidades %> Contas Multi Unidades
-      
-    </div>  
+
+    </div>
   </div>
   <div class="row">
     <div class="col-md-12">
@@ -92,11 +99,15 @@
       <%= f.collection_select :unidade_tabela_preco_id, Unidade.all( :select => ' id, unidade_nome', :order  => '2' ), :id, :unidade_nome,{:prompt => 'Selecione la unidade'} %>
     </div>
   </div>
-  
+
   <div class="row">
     <div class="col-md-6">
       <label>Token API</label>
       <%= f.text_field :token_api, class: 'panel-field' %>
+    </div>
+    <div class="col-md-6">
+      <label>Tenit</label>
+      <%= f.text_field :nome_api_fiscal, class: 'panel-field' %>
     </div>
   </div>
   <div class="footer-buttons">

@@ -1,9 +1,11 @@
+<%= form_tag "/presupuestos/#{@presupuesto.id}", :method => "get" do %>
    <table class="head_grid">
       <tr>
         <td width="100">Ref.</td>
         <td width="180">Grupo</td>
         <td width="450" >Producto</td>
         <td width="70" align="right">Ctd</td>
+        <td width="70" align="right">Multiplo</td>
         <td width="80" align="right">Unid.</td>
         <td width="80" align="right">Total</td>
       </tr>
@@ -18,11 +20,27 @@
          <% tot_rs     = 0 %>
          <% quebra       = "" %>
          <% @presupuesto_produtos.each do |pp| %>
+            <% if quebra != pp.produto.grupo.descricao %>
+              <% if quebra != "" %>
+
+            <% end %>
+
+              <tr>
+                <td colspan="10" class="head_grid">
+                  <%= check_box_tag "grupos[]", pp.produto.grupo_id, false, { :class => 'm', onclick: "soma(this)" } %> <%= quebra = pp.produto.grupo.descricao %>
+                </td>
+              </tr>
+            <% end %>
+
             <tr class = "<%= cycle("cor1", "cor2") %>">
               <td width="100">  <%= pp.produto.fabricante_cod %></td>
               <td width="180"><%= pp.produto.grupo_id %>-<%= pp.produto.grupo.descricao %></td>
-              <td width="450" align="left"><%= pp.produto_id %>-<%= pp.produto_nome %></td>
+              <td width="450" align="left">
+                <%= pp.produto_nome %>
+                <%=raw pp.obs.to_s.gsub(/\n/, '<br/>') %>
+              </td>
               <td width="70"  align="right"><b><%= format_peso(pp.quantidade) %></b></td>
+              <td width="70"  align="right"><b><%= format_peso(pp.multiplo_qtd) %></b></td>
                <% if @presupuesto.moeda == 0 %>
                  <td width="80" align="right"><%= format_decimal( pp.unitario_dolar ) %></td>
                  <td width="80" align="right"><%= format_decimal( pp.total_dolar ) %></td>
@@ -48,6 +66,7 @@
     <table class="head_grid">
       <tr>
         <td width="740">
+          <%= submit_tag "Agrupar", class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false" %>
         </td>
         <td width="40" align="right"><%= format_peso(qtd) %></td>
         <td width="80" align="right">Total:</td>
@@ -62,3 +81,4 @@
         </td>
       </tr>
     </table>
+<% end %>

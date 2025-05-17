@@ -121,8 +121,59 @@
     </tr>
 
     <tr>
-     <td colspan="3" style="padding: 15px">Concepto : <%= @venda.obs %> </td>
+     <td colspan="3" style="padding: 15px">Concepto : <%=raw @venda.obs %> </td>
     </tr>
+
+
+    <tr>
+     <td colspan="3" style="padding: 15px">
+
+        <table class="head_grid">
+           <tr>
+              <td width="50" align="center">Cota</td>
+              <td width="200">Forma de Pago</td>
+              <td width="10" align="center"></td>
+              <td width="70" align="right">Valor</td>
+              <td width="70" align="center">Venci.</td>
+           </tr>
+        </table>
+
+        <table>
+          <% @venda.vendas_financas.each do |vendas_financa| %>
+          <tr class= "<%= cycle( "cor1", "cor2" )%>">
+                 <td width="50" align="center"><%= vendas_financa.cota %>/<%= vendas_financa.tot_cotas %></td>
+                 <td width="200">
+                      <%= vendas_financa.forma_pago.nome %> <%= vendas_financa.cheque %>
+                      <p><small><%= "(#{vendas_financa.fact_ad_01}-#{vendas_financa.fact_ad_02}-#{vendas_financa.fact_ad})" unless vendas_financa.fact_ad_01.blank? %></small></p>
+                  </td>
+                 <% if vendas_financa.moeda.to_i == 0 %>
+                    <td width="10" align="center">U$</td>
+                    <td width="70" align="right"><%= format_decimal(vendas_financa.valor_dolar.to_f) %></td>
+                 <% elsif vendas_financa.moeda.to_i == 1 %>
+                    <td width="15" align="center">Gs</td>
+                    <td width="70" align="right"><%= format_int(vendas_financa.valor_guarani.to_f) %></td>
+                 <% elsif vendas_financa.moeda.to_i == 2 %>
+                    <td width="15" align="center">R$</td>
+                    <td width="70" align="right"><%= format_decimal(vendas_financa.valor_real.to_f) %></td>
+                 <% elsif vendas_financa.moeda.to_i == 3 %>
+                    <td width="15" align="center">P$</td>
+                    <td width="70" align="right"><%= format_decimal(vendas_financa.valor_peso.to_f) %></td>
+                 <% end %>
+
+                  <td width="70" align="center">
+                    <% if vendas_financa.forma_pago_id.to_i == 2 %>
+                      <%= vendas_financa.vencimento.strftime("%d/%m/%y") %>
+                    <% else %>
+                      <%= vendas_financa.diferido.strftime("%d/%m/%y") %>
+                    <% end %>
+                  </td>
+              </tr>
+           <% end %>
+
+        </table>
+     </td>
+    </tr>
+
 
 </table>
 

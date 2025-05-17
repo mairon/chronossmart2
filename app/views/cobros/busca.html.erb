@@ -1,14 +1,13 @@
 <div class="group">
   <table class="head_grid">
     <tr>
-      <td width="80" align="center"><%= t('CODE') %></td>
-      <td width="40" align="center">US</td>
-      <td width="70" align="center"><%= t('DATE') %></td>
+      <td width="60" align="center"><%= t("code") %></td>
+      <td width="70" align="center"><%= t("l_date") %></td>
       <td width="315">Clientes</td>
       <td width="250">Obs</td>
-      <td width="150"><%= t('ACCOUNT') %></td>
+      <td width="150"><%= t("account") %></td>
       <td width="50" align="center"></td>
-      <td width="70" align="right"><%= t('VALUE') %></td>
+      <td width="70" align="right"><%= t("value") %></td>
 
     </tr>
   </table>
@@ -16,8 +15,7 @@
     <table>
       <% @cobros.each do |cobro| %>
         <tr class= "<%= cycle( "cor1", "cor2" )%>">
-          <td width="80"  align="center"><%= cobro.id.to_s.rjust(6,'0') %></td>
-          <td width="40" align="center" title="<%= cobro.usuario_nome %>"><%= cobro.usuario_created.to_s.rjust(3,'0')  %></td>
+          <td width="60" align="center" title="Criado por: <%= cobro.usuario_nome %>"><%= link_to cobro.id.to_s.rjust(6,'0'), cobro_path(cobro) %></td>
           <td width="70"  align="center"><%= cobro.data.strftime("%d/%m/%y")%></td>
           <td width="315" align="left"><%= cobro.persona_nome %></td>
           <td width="250" align="left"><small><%= cobro.descricao %></small></td>
@@ -37,9 +35,8 @@
             <td colspan="2" align="center" title="Lanzamiento Bloqueado"><%= image_tag("locked-padlock.png", height: 16) %></td>
             <td><%= link_to '', comprovante_cobro_path(cobro),  class: 'icon-fullscreen' %></td>
           <% else %>
-            <td><%= link_to '', edit_cobro_path(cobro), class: 'icon-pencil' %></td>
-            <td><%= link_to '', cobro, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' %></td>
-            <td><%= link_to '', comprovante_cobro_path(cobro), target: "_blank",  class: 'icon-fullscreen' %></td>
+            <td><%= link_to '', edit_cobro_path(cobro), class: 'icon-pencil' if params[:permission_user_update] == 'true' %></td>
+            <td><%= link_to '', cobro, :confirm => 'Estas Seguro?', :method => :delete, class: 'icon-trash' if params[:permission_user_delete] == 'true' %></td>
           <% end %>
         </tr>
       <% end %>
@@ -51,7 +48,3 @@
   </div>
 
 </div>
-
-
-
-

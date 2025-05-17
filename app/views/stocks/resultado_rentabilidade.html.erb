@@ -2,7 +2,7 @@
 <% cmv = 0 %>
 <% fat = 0 %>
 <% dif = 0 %>
-<table>
+<table id="TableToExport">
 	<thead class="report-header">
   <tr>
     <td colspan="10" class="title" align="center">
@@ -16,7 +16,7 @@
  
   <tr class="td-header">
 
-    <td align="center" width="50">Cod.</td>
+    <td data-s="bold" align="center" width="50">Cod.</td>
     <td width="100">Grupo</td>
     <td width="100">SubGrupo</td>
     <td width="250">Producto</td>
@@ -43,26 +43,26 @@
 			<td bgcolor="<%=color%>" width="100"><%= truncate(v.sub_grupo_nome) %></td>
 			<td bgcolor="<%=color%>" width="250"><%= truncate(v.produto_nome) %></td>
 			<td bgcolor="<%=color%>" width="250"><%= truncate(v.persona_nome) %></td>
-			<td bgcolor="<%=color%>" align="right" width="40"><%= format_peso(v.quantidade.to_f) %> </td>
+			<td bgcolor="<%=color%>" align="right" width="40"><%= format_peso(v.quantidade.to_f) %></td>
 			<% qtd += v.quantidade.to_f %>
 			<% if params[:moeda]== '1' %>
-				<td bgcolor="<%=color%>" align="right" width="70"><%= format_int(v.custo_medio_gs.to_f) %> </td>
-				<td bgcolor="<%=color%>" align="right" width="70"><%= format_int(v.custo_medio_gs.to_f * v.quantidade.to_f) %> </td>
+				<td bgcolor="<%=color%>" align="right" width="70"><%= format_int(v.custo_medio_gs.to_f) %></td>
+				<td bgcolor="<%=color%>" align="right" width="70"><%= format_int(v.custo_medio_gs.to_f * v.quantidade.to_f) %></td>
 				<td bgcolor="<%=color%>" align="right" width="70"><%= format_int(v.unitario_guarani.to_f) %> </td>
 				<td bgcolor="<%=color%>" align="right" width="70"><%= format_int(v.total_guarani) %> </td>
-				<td bgcolor="<%=color%>" align="right" width="70"><%= format_int( (v.total_guarani.to_f - (v.custo_medio_gs.to_f * v.quantidade.to_f) ) ) %> </td>
-				<td bgcolor="<%=color%>" align="right" width="40"><%= format_int( ((v.total_guarani.to_f - (v.custo_medio_gs.to_f * v.quantidade.to_f) ) / (v.custo_medio_gs.to_f * v.quantidade.to_f)) * 100  ) %>% </td>
+				<td bgcolor="<%=color%>" align="right" width="70"><%= format_int( (v.total_guarani.to_f - (v.custo_medio_gs.to_f * v.quantidade.to_f) ) ) %></td>
+				<td bgcolor="<%=color%>" align="right" width="40"><%= format_int( ((v.total_guarani.to_f - (v.custo_medio_gs.to_f * v.quantidade.to_f) ) / (v.custo_medio_gs.to_f * v.quantidade.to_f)) * 100  ) %>%</td>
 
 					<% cmv += (v.custo_medio_gs.to_f * v.quantidade.to_f) %>
 					<% fat += v.total_guarani.to_f %>
 					<% dif += (v.total_guarani.to_f - (v.custo_medio_gs.to_f * v.quantidade.to_f) ) %>
 			<% else %>
-				<td bgcolor="<%=color%>" align="right" width="70"><%= format_decimal(v.custo_medio_us.to_f) %> </td>
-				<td bgcolor="<%=color%>" align="right" width="70"><%= format_decimal(v.custo_medio_us.to_f * v.quantidade.to_f) %> </td>
-				<td bgcolor="<%=color%>" align="right" width="70"><%= format_decimal(v.unitario_dolar.to_f) %> </td>
-				<td bgcolor="<%=color%>" align="right" width="70"><%= format_decimal(v.total_dolar) %> </td>
-				<td bgcolor="<%=color%>" align="right" width="70"><%= format_decimal( (v.total_dolar.to_f - (v.custo_medio_us.to_f * v.quantidade.to_f) ) ) %> </td>
-				<td bgcolor="<%=color%>" align="right" width="40"><%= format_decimal( ((v.total_dolar.to_f - (v.custo_medio_us.to_f * v.quantidade.to_f) ) / (v.custo_medio_gs.to_f * v.quantidade.to_f)) * 100  ) %>% </td>
+				<td bgcolor="<%=color%>" align="right" width="70"><%= format_decimal(v.custo_medio_us.to_f) %></td>
+				<td bgcolor="<%=color%>" align="right" width="70"><%= format_decimal(v.custo_medio_us.to_f * v.quantidade.to_f) %></td>
+				<td bgcolor="<%=color%>" align="right" width="70"><%= format_decimal(v.unitario_dolar.to_f) %></td>
+				<td bgcolor="<%=color%>" align="right" width="70"><%= format_decimal(v.total_dolar) %></td>
+				<td bgcolor="<%=color%>" align="right" width="70"><%= format_decimal( (v.total_dolar.to_f - (v.custo_medio_us.to_f * v.quantidade.to_f) ) ) %></td>
+				<td bgcolor="<%=color%>" align="right" width="40"><%= format_decimal( ((v.total_dolar.to_f - (v.custo_medio_us.to_f * v.quantidade.to_f) ) / (v.custo_medio_gs.to_f * v.quantidade.to_f)) * 100  ) %>%</td>
 
 					<% cmv += (v.custo_medio_us.to_f * v.quantidade.to_f) %>
 					<% fat += v.total_dolar.to_f %>

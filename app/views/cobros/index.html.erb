@@ -1,30 +1,29 @@
-<h1 id="header">
-  <%= t('CHARGE') %>s
-  <div class="pull-right">
-      <%= link_to t('NEW'), new_cobro_path, :class => "button add" %>
-  </div>
-</h1>
-<div class="group">
+<div class="panel">
+  <h1 id="header">
+    Cobros
+    <div class="pull-right">
+        <%= link_to t('new'), new_cobro_path, :class => "button add" %>
+    </div>
+  </h1>
+  <div class="panel-content">
     <%= form_tag busca_cobros_path, :method => "get" do %>
       <table>
         <tr>
-          <!--FILTRO_DATA!-->
-          <td align="right"><%= t('DATE') %>:</td>
+
+          <td align="right">De:</td>
           <td colspan="2">
             <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
             <div class="input-group-addon-f">
               <span class="icon-calendar"></span>
             </div>
-          <td style="padding-left: 10px"><%= t('TO') %>:</td>
+          <td style="padding-left: 10px"><%= t("to") %></td>
           <td>
             <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
             <div class="input-group-addon-f">
               <span class="icon-calendar"></span>
             </div>
           </td>
-          <td>
-            <%= select_tag :tipo, options_for_select([["Cliente","CLIENTE"],['Código',"CODIGO"]]) %>
-          </td>
+
           <td colspan="4">
             <input id="busca" name="busca" type="text" onkeyup = "pesquisa(this.value)" size="25"/>
             <input type="button" class="btn btn-default" onclick="pesquisa(document.getElementById('busca').value)" value="Buscar"/>
@@ -32,14 +31,14 @@
           </td>
          </tr>
       </table>
-    <input type="hidden" id="seta" value="0"/>
     <% end %>
-    <div id="pagina">
-    </div>
+  </div>
 </div>
+<div id="pagina"></div>
+
 <script language="javascript">
   function pesquisa(valor){
-    url="/cobros/busca?" + $('form').serialize();
+    url="/cobros/busca?permission_user_update=<%= permission_action_user.u %>&permission_user_delete=<%= permission_action_user.d %>&" + $('form').serialize();
     ajax(url);
   }
 </script>

@@ -120,12 +120,19 @@
           </td>
         </tr>
 			  <tr>
-         	<td colspan="4">
-         		<label><%= t('EMPLOYEE') %></label>
+         	<td colspan="2">
+         		<label>Empleado</label>
          		<%= f.collection_select :funcionario_id,
                        Persona.where(tipo_funcionario: 1).select('id,nome').order('nome'),:id, :nome,
-                       { :prompt => 'Seleccione' } %>
+                       { :prompt => 'Seleccione lo empleado' } %>
           </td>
+
+
+         	<td colspan="2">
+	          <label>Ref.</label>
+	          <%= f.text_field :ob_ref, class: 'panel-field' %>
+          </td>
+
         </tr>
 				<tr>
 					<td>

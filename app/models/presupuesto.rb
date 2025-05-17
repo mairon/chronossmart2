@@ -12,11 +12,11 @@ class Presupuesto < ActiveRecord::Base
   belongs_to :prazo
 
   #after_save :gera_tarefa
-  fields = CustomField.pluck(:internal_name)
-  serialize :custom_fields, JSON
-  store_accessor :custom_fields, [ fields ]
+  #fields = CustomField.pluck(:internal_name)
+  #serialize :custom_fields, JSON
+  #store_accessor :custom_fields, [ fields ]
 
-  puts "================ #{fields}"
+  #puts "================ #{fields}"
   def block_data
     #VERIFICA SE SALDO E MAIOR QUE A QUANTIDADE DA VENDA
     if ( self.data.to_date == self.prazo_entrega.to_date  )
