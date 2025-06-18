@@ -20,7 +20,7 @@
   <div class="rolagem" dir="div">
     <table>
       <% @contas.each do |conta| %>
-        
+
         <tr class = "<%= cycle("cor1", "cor2") %>">
           <td width="110" align="center"><%= conta.id.to_s.rjust(6,'0') %></td>
           <td width="50">
@@ -31,7 +31,7 @@
              Banco
             <% end %>
             </b>
-          </td>          
+          </td>
           <td width="250"><%= conta.unidade.unidade_nome %></td>
           <td width="300"><%= conta.nome %></td>
           <td width="150"><%= conta.numero %></td>
@@ -39,7 +39,7 @@
             <small>
               <%= raw conta.forma_pagos.map { |t| "<span class='badge badge-primary'> #{t.nome} </span>" }.join(', ') unless conta.forma_pagos.nil? %>
             </small>
-          </td>          
+          </td>
           <td width="150"><%= conta.terminal.nome unless conta.terminal.nil? %></td>
 
           <td width="80"align="center">
@@ -54,8 +54,8 @@
           <% if conta.tipo == 1 %>
             <td><%= link_to '', conta_path(conta), class: "icon-list" %></td>
           <% end %>
-          
-          <td>            
+
+          <td>
             <%= link_to '', conta, :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: "icon-trash" %>
           </td>
         </tr>
@@ -63,70 +63,3 @@
     </table>
   </div>
 </div>
-
-
-
-
-<%= Digest::MD5.hexdigest("B$kh$OeX,L$1GM)TlB2)xis81W8q$e$82f$EY2fJ47149230000.00PYG") %>
-<br>
-cod <%= cod_proc = rand(988297) %>
-<%
-data = {
-    public_key: "uxUa0nhrVVJJmHGr76qeEuS94Jqkb2UO",
-    operation: {
-        token: "#{Digest::MD5.hexdigest("B$kh$OeX,L$1GM)TlB2)xis81W8q$e$82f$EY2fJ#{cod_proc}30000.00PYG")}",
-        shop_process_id: cod_proc,
-        amount: "30000.00",
-        currency: "PYG",
-        additional_data: "",
-        description: "Produto teste",
-        return_url: "https://crescer.chronos.com.py:4000/api/v1/postback?#{cod_proc}",
-        cancel_url: "https://crescer.chronos.com.py:4000/api/v1/postback?#{cod_proc}"
-    },
-    test_client: true
-}
-
-
-                url = URI("https://vpos.infonet.com.py:8888/vpos/api/0.3/single_buy")
-
-                http = Net::HTTP.new(url.host, url.port)
-                http.use_ssl = true
-                http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-
-                request = Net::HTTP::Post.new(url)
-                request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
-                request["content-type"] = 'application/json'
-                # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
-                puts data.to_json
-                request.body = data.to_json
-                puts '----------------------------------------------------------------------'
-                response = http.request(request)
-                puts get_resp = JSON.parse(response.body)
-
-
-%>
-<html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>iFrame</title>
-<script src="https://vpos.infonet.com.py:8888/checkout/javascript/dist/bancard-checkout-4.0.0.js"></script>
-</head>
-<script type="application/javascript"> styles = {
-"form-background-color": "#001b60",
-"button-background-color": "#4faed1",
-"button-text-color": "#fcfcfc",
-"button-border-color": "#dddddd",
-"input-background-color": "#fcfcfc",
-"input-text-color": "#111111",
-"input-placeholder-color": "#111111"
-};
-window. onload = function () {
-  Bancard.Checkout.createForm ('iframe-container', '<%= get_resp["process_id"] %>', styles);
-};
-</script>
-<div id="iframe-container"></div>
-
-<%= get_resp["process_id"] %>
-<%= get_resp %>
-</html>
