@@ -24,7 +24,7 @@
 		      <div class="rolagem" dir="div" style="height: 180px">
 		        <table>
 		          <% @fts.each do |ft| %>
-              <%= render partial: "/form_fiscals/consulta_estado", locals: {cdc: ft.cdc} %>
+              <%= render partial: "/form_fiscals/consulta_estado", locals: {cdc: ft.cdc, terminal: ft.terminal} %>
 		          <% if ft.status == 2 %>
 		            <% anulada  = 'li-ft' %>
 		          <% end %>

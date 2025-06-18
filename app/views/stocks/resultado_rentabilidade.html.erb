@@ -38,7 +38,7 @@
 			<% else %>
 				<% color = '' %>
 			<% end %>
-			<td bgcolor="<%=color%>" align="center" width="50"><%= v.produto_id.to_s.rjust(6,'0') %></td>
+			<td bgcolor="<%=color%>" align="center" width="50"><%= v.cod_proc.to_s.rjust(6,'0') %></td>
 			<td bgcolor="<%=color%>" width="100"><%= truncate(v.grupo_nome) %></td>
 			<td bgcolor="<%=color%>" width="100"><%= truncate(v.sub_grupo_nome) %></td>
 			<td bgcolor="<%=color%>" width="250"><%= truncate(v.produto_nome) %></td>

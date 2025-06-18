@@ -194,9 +194,9 @@ class BuscasController < ApplicationController
 
 
 	def search_all_produtos
-		@produtos = Produto.select("id,nome,peso_bruto,multiplo_compra, SIMILARITY('#{params[:busca]}', NOME)").where("status = true and NOME ILIKE ?","%#{params[:busca]}%").order('5 desc, 2').limit(20)
+		@produtos = Produto.select("id,nome,peso_bruto,fabricante_cod,multiplo_compra, SIMILARITY('#{params[:busca]}', NOME)").where("status = true and NOME ILIKE ?","%#{params[:busca]}%").order('5 desc, 2').limit(20)
 		respond_to do |format|
-			format.json  { list = @produtos.map {|u| Hash[ id: u.id, label: u.nome, name: u.nome, peso_bruto: u.peso_bruto]}
+			format.json  { list = @produtos.map {|u| Hash[ id: u.id, label: "#{u.fabricante_cod} #{u.nome}", name: u.nome, peso_bruto: u.peso_bruto]}
 							render json: list }
 
 		end
@@ -218,8 +218,8 @@ class BuscasController < ApplicationController
 	end
 
 	def get_produto
-		prod =  Produto.find_by_barra( params[:cod], :select => 'id')
-		return render :text => prod.id.to_i
+		prod =  Produto.find_by_barra( params[:cod], :select => 'id,nome')
+		return render :json => { :prod => prod}
 	end
 
 	def get_clase
@@ -425,7 +425,7 @@ class BuscasController < ApplicationController
 		 sql = " SELECT P.ID AS PRODUTO_ID,
 					P.NOME AS PRODUTO_NOME,
 					COALESCE((SELECT SUM(COALESCE(S.ENTRADA,0) - COALESCE(S.SAIDA,0)) FROM STOCKS S WHERE S.PRODUTO_ID = P.ID AND S.DATA <= '#{params[:dt].split("/").reverse.join("-")}' AND S.DEPOSITO_ID = #{params[:deposito_id]}),0) AS SALDO_ATUAL,
-					COALESCE((SELECT S.UNITARIO_GUARANI FROM STOCKS S WHERE S.PRODUTO_ID = P.ID AND S.DATA <= '#{params[:dt].split("/").reverse.join("-")}' AND S.DEPOSITO_ID = #{params[:deposito_id]} ORDER BY ID DESC LIMIT 1),0) AS CUSTO_PRODUTO_GUARANI
+					COALESCE((SELECT S.UNITARIO_GUARANI FROM STOCKS S WHERE S.STATUS = 0 AND S.PRODUTO_ID = P.ID AND S.DATA <= '#{params[:dt].split("/").reverse.join("-")}' AND S.DEPOSITO_ID = #{params[:deposito_id]} ORDER BY ID DESC LIMIT 1),0) AS CUSTO_PRODUTO_GUARANI
 				FROM PRODUTOS P
 				WHERE #{prod}
 				ORDER BY 2"

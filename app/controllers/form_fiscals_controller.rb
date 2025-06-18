@@ -1,5 +1,371 @@
 class FormFiscalsController < ApplicationController
 
+  def nc_cancelacion
+    #nc
+    lanz_ft = FormFiscal.find_by_id(params[:nc_id])
+
+    #nc
+    lanz_nc = FormFiscal.find_by_id(params[:busca]['doc_nc'])
+
+    url = URI("https://api.facturasend.com.py/#{lanz_ft.terminal.nome_api_fiscal}/de/xml/#{lanz_ft.cdc}")
+
+
+
+
+    http = Net::HTTP.new(url.host, url.port)
+
+    request = Net::HTTP::Get.new(url)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+    request["authorization"] = "Bearer api_key_#{lanz_ft.terminal.token_api}"
+    request["content-type"] = 'application/json'
+    response = http.request(request)
+
+    xml_ft = Nokogiri::XML(response.body)
+
+      list_prods = []
+      xml_ft.css('gCamItem').each do |node|
+        children = node.children
+
+        list_prods  += [{codigo: children.css('dCodInt').inner_text,
+            descripcion: children.css('dDesProSer').inner_text,
+            unidadMedida: children.css('cUniMed').inner_text,
+            cantidad: children.css('dCantProSer').inner_text,
+            descuento: children.css('dDescGloItem').inner_text,
+            precioUnitario: children.css('dPUniProSer').inner_text,
+            ivaTipo: children.css('gCamIVA').css('iAfecIVA').inner_text,
+            ivaBase: children.css('gCamIVA').css('dPropIVA').inner_text,
+            iva: children.css('gCamIVA').css('dTasaIVA').inner_text}]
+
+      end
+
+      #condição
+      if xml_ft.css('gDtipDE').css('gCamCond').css('iCondOpe').inner_text.to_i == 1
+        cd_detalhe =  {tipo: 1, entregas: [{
+            tipo: 1,
+            monto: xml_ft.css('gDtipDE').css('gCamCond').css('dMonTiPag').inner_text,
+            moneda: xml_ft.css('gDtipDE').css('gCamCond').css('cMoneTiPag').inner_text,
+            monedaDescripcion: xml_ft.css('gDtipDE').css('gCamCond').css('dDMoneTiPag').inner_text,
+            cambio: "null"
+        }]}
+
+      elsif xml_ft.css('gDtipDE').css('gCamCond').css('iCondOpe').inner_text.to_i == 2
+        cd_detalhe = { tipo: 2, credito: {
+          tipo: 1,
+          plazo: "30 días",
+          cuotas: 1,
+          infoCuotas: [{
+              moneda: "PYG",
+              monto: xml_ft.css('gDtipDE').css('gCamCond').css('dMonTiPag').inner_text
+          }]
+      }}
+      end
+
+
+        cliente = {
+                      contribuyente: true,
+                      ruc: "#{xml_ft.css('gDatGralOpe').css('gDatRec').css('dRucRec').inner_text}-#{xml_ft.css('gDatGralOpe').css('gDatRec').css('dDVRec').inner_text}",
+                      codigo: xml_ft.css('gDatGralOpe').css('gDatRec').css('dCodCliente').inner_text,
+                      razonSocial: xml_ft.css('gDatGralOpe').css('gDatRec').css('dNomRec').inner_text,
+                      nombreFantasia: xml_ft.css('gDatGralOpe').css('gDatRec').css('dNomFanRec').inner_text,
+                      tipoOperacion: 1,
+                      direccion: xml_ft.css('gDatGralOpe').css('gDatRec').css('dDirRec').inner_text,
+                      pais: 'PRY',
+                      paisDescripcion: 'Paraguay',
+                      numeroCasa: "0",
+                      departamento: xml_ft.css('gDatGralOpe').css('gDatRec').css('cDepRec').inner_text,
+                      distrito: xml_ft.css('gDatGralOpe').css('gDatRec').css('cDisRec').inner_text,
+                      ciudad: xml_ft.css('gDatGralOpe').css('gDatRec').css('cCiuRec').inner_text,
+                      tipoContribuyente: 2
+                  }
+
+      md = 'PYG'
+      condicionTipoCambio = "null"
+      monto = params[:tot_gs].to_i
+      monedaDescripcion = 'Guarani'
+      motivo_nc = 1
+
+      data = {ch:  [{
+                  tipoDocumento: 5,
+                  establecimiento: lanz_nc.doc_01,
+                  serie: lanz_nc.serie,
+                  punto: lanz_nc.doc_02,
+                  numero: lanz_nc.doc,
+                  fecha: "#{Time.now.strftime("%Y-%m-%d")}T#{Time.now.strftime('%H:%M:%S')}",
+                  tipoEmision: 1,
+                  tipoTransaccion: 2,
+                  tipoImpuesto: 1,
+                  moneda: md,
+                  condicionTipoCambio: condicionTipoCambio,
+                  cambio: 'null',
+                  cliente: cliente,
+                  usuario: {
+                      documentoTipo: 1,
+                      documentoNumero: '7723670',
+                      nombre: 'Mairon Daniel Centurion Brasil',
+                      cargo: 'Vendedor'
+                  },
+                  notaCreditoDebito: {
+                      motivo: motivo_nc
+                  },
+                  items: list_prods,
+                  documentoAsociado: { formato: 1,
+                    cdc: lanz_ft.cdc
+                  }
+
+              }]}
+
+
+            url = URI("https://api.facturasend.com.py/#{lanz_ft.terminal.nome_api_fiscal}/lote/create")
+
+            http = Net::HTTP.new(url.host, url.port)
+            http.use_ssl = true
+            http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+            request = Net::HTTP::Post.new(url)
+            request["authorization"] = "Bearer api_key_#{lanz_ft.terminal.token_api}"
+            request["content-type"] = 'application/json'
+            # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
+            puts data[:ch].to_json
+            request.body = data[:ch].to_json
+            puts '----------------------------------------------------------------------'
+            response = http.request(request)
+            puts get_resp = JSON.parse(response.body)
+
+
+        if get_resp['success'] == true
+
+            lanz_nc.update_attributes(cod_proc: lanz_ft.id,
+                         sigla_proc: 'FF',
+                         data: Time.now.strftime("%Y-%m-%d"),
+                         status: 1,
+                         tipo: 1,
+                         ruc: "#{xml_ft.css('gDatGralOpe').css('gDatRec').css('dRucRec').inner_text}-#{xml_ft.css('gDatGralOpe').css('gDatRec').css('dDVRec').inner_text}",
+                         persona_nome: xml_ft.css('gDatGralOpe').css('gDatRec').css('dNomRec').inner_text,
+                         persona_id: xml_ft.css('gDatGralOpe').css('gDatRec').css('dCodCliente').inner_text,
+                         cota: 1,
+                         tipo_op: 9,
+                         moeda: 1,
+                         cdc: get_resp["result"]["deList"].last["cdc"],
+                         tot_gs: xml_ft.css('gDtipDE').css('gCamCond').css('dMonTiPag').inner_text )
+          end
+
+    return render :json => { :fe => get_resp }
+
+  end
+
+  def nota_remicao_update
+    lanz = FormFiscal.find_by_id(params[:busca]['doc'])
+
+
+    if lanz.tipo_emissao.to_i == 1
+
+      pers = Persona.find_by_id(params[:persona_id])
+      ctz = Moeda.last
+
+      nr = NotaRemicao.find_by_id(params[:cod_proc])
+      rod = Rodado.find_by_id(nr.rodado_cv_id)
+      ff = FormFiscal.where(id: nr.form_fiscal_id).last
+      chofer = Persona.find(nr.chofer_id)
+      origem = Cidade.find(current_unidade.cidade_id)
+      puts "cidades #{current_unidade.cidade_id}"
+      puts "departamento #{origem.distrito.estado.api_id}"
+      puts "distrito #{origem.distrito.api_id}"
+      puts "ciudad #{origem.api_id}"
+      if nr.motivo.to_i == 7
+        vendas_produtos = TransferenciaDepositoDetalhe.where(transferencia_deposito_id: nr.transferencia_deposito_id)
+      else
+        cl = Venda.find(ff.cod_proc)
+        vendas_produtos = VendasProduto.select('produto_id,quantidade,total_guarani,total_dolar,unitario_guarani, unitario_dolar').where(venda_id: cl.id)
+      end
+
+        list_prods = []
+        tot_prod = 0
+        vendas_produtos.each do |cs|
+          cmv = Stock.select('unitario_dolar,unitario_guarani').where(" unitario_guarani <> 0 and entrada > 0 and produto_id = #{cs.produto_id} and data <= '#{nr.data}' ").order('data desc, tabela_id desc').limit('1').last
+
+          if nr.motivo.to_i == 7
+            precioUnitario = cmv.unitario_guarani.to_i
+          else
+            precioUnitario = cs.unitario_guarani.to_i
+          end
+          list_prods  += [{codigo: cs.produto_id.to_s.rjust(6,'0'),
+            descripcion: cs.produto.nome,
+            unidadMedida: 77,
+            cantidad: cs.quantidade,
+            precioUnitario: precioUnitario,
+            ivaTipo: 1,
+            ivaBase: 100,
+            iva: cs.produto.taxa.to_i}]
+
+            tot_prod += ( precioUnitario * cs.quantidade.to_f)
+        end
+
+        md = 'PYG'
+        condicionTipoCambio = "null"
+        cambio = "null"
+        monto = tot_prod.to_i
+        monedaDescripcion = 'Guarani'
+
+      #tipo cliente
+      if params[:ruc].to_s.count('-').to_i == 0
+        cliente = {
+                      contribuyente: false,
+                      codigo: params[:persona_id].to_s.rjust(6,'0'),
+                      razonSocial: params[:persona_nome],
+                      nombreFantasia: pers.nome,
+                      tipoOperacion: 2,
+                      direccion: pers.direcao,
+                      pais: 'PRY',
+                      paisDescripcion: 'Paraguay',
+                      numeroCasa: "0",
+                      departamento: pers.cidade.distrito.estado.api_id,
+                      distrito: pers.cidade.distrito.api_id,
+                      ciudad: pers.cidade.api_id,
+                      documentoTipo: 1,
+                      telefono: pers.telefone,
+                      documentoNumero: params[:ruc],
+                      email: pers.email
+                  }
+      else
+        cliente = {
+                      contribuyente: true,
+                      ruc: params[:ruc],
+                      codigo: params[:persona_id].to_s.rjust(6,'0'),
+                      razonSocial: params[:persona_nome],
+                      nombreFantasia: pers.nome,
+                      tipoOperacion: 1,
+                      direccion: pers.direcao,
+                      pais: 'PRY',
+                      paisDescripcion: 'Paraguay',
+                      numeroCasa: "0",
+                      departamento: pers.cidade.distrito.estado.api_id,
+                      distrito: pers.cidade.distrito.api_id,
+                      ciudad: pers.cidade.api_id,
+                      tipoContribuyente: 1,
+                      telefono: pers.telefone,
+                      email: pers.email
+                  }
+      end
+
+
+      data = {ch:  [{
+                  tipoDocumento: 7,
+                  establecimiento: 1,
+                  serie: lanz.serie,
+                  punto: lanz.doc_02,
+                  numero: lanz.doc,
+                  fecha: "#{params[:data].to_date.strftime("%Y-%m-%d")}T#{Time.now.strftime('%H:%M:%S')}",
+                  tipoEmision: 1,
+                  tipoTransaccion: 2,
+                  tipoImpuesto: 1,
+                  moneda: md,
+                  condicionTipoCambio: condicionTipoCambio,
+                  cambio: cambio,
+                  cliente: cliente,
+                  observacion: nr.obs,
+                  usuario: {
+                      documentoTipo: 1,
+                      documentoNumero: '7723670',
+                      nombre: 'Mairon Daniel Centurion Brasil',
+                      cargo: 'Vendedor'
+                  },
+                  remision: {
+                      motivo: nr.motivo,
+                      tipoResponsable: 1,
+                      kms: nr.kms,
+                      fechaFactura: params[:data]
+                  },
+                  items: list_prods,
+                  transporte: {
+                    tipo: 1,
+                    modalidad: 1,
+                    tipoResponsable: 1,
+                    inicioEstimadoTranslado: "#{params[:data].to_date.strftime("%Y-%m-%d")}",
+                    finEstimadoTranslado: "#{params[:data].to_date.strftime("%Y-%m-%d")}",
+
+                    salida: {
+                      direccion: current_unidade.direcao,
+                      numeroCasa: '0',
+                      departamento: current_unidade.cidade.distrito.estado.api_id,
+                      distrito: current_unidade.cidade.distrito.api_id,
+                      ciudad: current_unidade.cidade.api_id,
+                    },
+                    entrega: {
+                      direccion: nr.direcao,
+                      numeroCasa: '0',
+                      departamento: nr.cidade.distrito.estado.api_id,
+                      distrito: nr.cidade.distrito.api_id,
+                      ciudad: nr.cidade.api_id,
+                    },
+                    vehiculo: {
+                      tipo: 'Camion',
+                      marca: rod.marcao,
+                      documentoTipo: 2,
+                      numeroMatricula: rod.placa,
+                    },
+                    transportista: {
+                      contribuyente: true,
+                      nombre: current_unidade.razao_social,
+                      ruc: current_unidade.ruc,
+                      direccion: current_unidade.direcao,
+                        chofer:{
+                        documentoNumero: chofer.ruc.to_s.gsub('.', ''),
+                        nombre: chofer.nome,
+                        direccion: current_unidade.direcao,
+                      }
+                    }
+                  }
+              }]}
+
+          url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/lote/create")
+
+          http = Net::HTTP.new(url.host, url.port)
+          http.use_ssl = true
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+          request = Net::HTTP::Post.new(url)
+          request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
+          request["content-type"] = 'application/json'
+          # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
+          puts data[:ch].to_json
+          request.body = data[:ch].to_json
+          puts '----------------------------------------------------------------------'
+          response = http.request(request)
+          puts get_resp = JSON.parse(response.body)
+
+          puts '-----------------======-----------------------------------------------------'
+          puts get_resp['success']
+
+          if get_resp['success'] == true
+            lanz.update_attributes(cod_proc: params[:cod_proc],
+                                     sigla_proc: params[:sigla_proc],
+                                     data: params[:data],
+                                     status: params[:status],
+                                     tipo: params[:tipo],
+                                     ruc: params[:ruc],
+                                     persona_nome: params[:persona_nome],
+                                     persona_id: params[:persona_id],
+                                     cota: params[:cota],
+                                     tipo_op: params[:tipo_op],
+                                     moeda: params[:moeda],
+                                     cdc: get_resp["result"]["deList"].last["cdc"],
+                                     tot_gs: params[:tot_gs] )
+
+                        nt_remicao = NotaRemicao.find_by_id(params[:cod_proc])
+                        #atulizar numero do documento
+                        nt_remicao.update_attributes(documento_numero: lanz.doc,
+                                                documento_numero_01: lanz.doc_01,
+                                                documento_numero_02: lanz.doc_02)
+
+          end
+
+          return render :json => { :fe => get_resp }
+      end
+    end
+
+
   def reenviar
     @form_fiscal = FormFiscal.find(params[:id])
     @venda = Venda.find(@form_fiscal.cod_proc)
@@ -14,14 +380,14 @@ class FormFiscalsController < ApplicationController
         motivo: params[:inu_motivo]
       }
 
-        url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/evento/cancelacion")
+        url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/evento/cancelacion")
 
         http = Net::HTTP.new(url.host, url.port)
         http.use_ssl = true
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
         request = Net::HTTP::Post.new(url)
-        request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+        request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
         request["content-type"] = 'application/json'
         # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
         puts data.to_json
@@ -53,14 +419,14 @@ class FormFiscalsController < ApplicationController
         motivo: params[:inu_motivo]
       }
 
-        url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/evento/inutilizacion")
+        url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/evento/inutilizacion")
 
         http = Net::HTTP.new(url.host, url.port)
         http.use_ssl = true
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
         request = Net::HTTP::Post.new(url)
-        request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+        request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
         request["content-type"] = 'application/json'
         # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
         puts data.to_json
@@ -240,14 +606,14 @@ class FormFiscalsController < ApplicationController
               }]}
 
 
-          url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/lote/create")
+          url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/lote/create")
 
           http = Net::HTTP.new(url.host, url.port)
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
           request = Net::HTTP::Post.new(url)
-          request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+          request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
           request["content-type"] = 'application/json'
           # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
           puts data[:ch].to_json
@@ -328,21 +694,21 @@ class FormFiscalsController < ApplicationController
 
 
   def gera_pdf_cdc
-
+      lanz = FormFiscal.find_by_id(params[:id])
       data = { cdcList: [
           {
           cdc: params[:cdc]
             }
           ]}
 
-          url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/de/pdf")
+          url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/de/pdf")
 
           http = Net::HTTP.new(url.host, url.port)
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
           request = Net::HTTP::Post.new(url)
-          request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+          request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
           request["content-type"] = 'application/json'
           # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
           puts data.to_json
@@ -362,82 +728,195 @@ class FormFiscalsController < ApplicationController
 
 
   def transmite_de
-          data =  [{
-            tipoDocumento: 5,
-            establecimiento: 1,
-            punto: "001",
-            numero: 1,
-            descripcion: "monto equivocado",
-            observacion: "monto equivocado",
-            tipoContribuyente: 1,
-            fecha: "2023-02-27T23:00:00",
-            tipoEmision: 1,
-            tipoTransaccion: 2,
-            tipoImpuesto: 1,
-            moneda: "USD",
-            condicionTipoCambio: 1,
-            cambio: 7340,
-            cliente: {
-                contribuyente: true,
-                ruc: "80058558-5",
-                codigo: "000031",
-                razonSocial: "DIST. 3 FRONTERAS S.A",
-                nombreFantasia: "DIST. 3 FRONTERAS S.A",
-                tipoOperacion: 1,
-                direccion: "",
-                numeroCasa: "",
-                departamento: 11,
-                distrito: 209,
-                ciudad: 3556,
-                pais: "PRY",
-                tipoContribuyente: 1,
-                documentoTipo: 1,
-                email: ""
-            },
-            usuario: {
-                documentoTipo: 1,
-                documentoNumero: "7723670",
-                nombre: "Mairon",
-                cargo: "Vendedor"
-            },
-            notaCreditoDebito: {
-                motivo: 1
-            },
-            items: [{
-                codigo: "000020",
-                descripcion: "INSTALACION DE ANTIVIRUS",
-                cantidad: 20,
-                precioUnitario: 480.00,
-                pais: "PRY",
-                ivaTipo: 1,
-                ivaBase: 100,
-                iva: 10
-            }],
-            documentoAsociado: {
-                formato: 1,
-                cdc: "01077236700001001000010222023012314489387157"
-            }
-        }]
-          url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/lote/create")
+
+      lanz = FormFiscal.find_by_id(params[:id])
+      pers = Persona.find_by_id(lanz.persona_id)
+      ctz = Moeda.last
+      if lanz.moeda.to_i == 1
+        md = 'PYG'
+        condicionTipoCambio = "null"
+        cambio = "null"
+        monto = lanz.tot_gs.to_i
+        monedaDescripcion = 'Guarani'
+        desconto_global = 0
+      else
+        md = 'USD'
+        condicionTipoCambio = 1
+        cambio = ctz.cotacao.to_i
+        monto = lanz.tot_us.to_f
+        monedaDescripcion = 'Dolar'
+        desconto_global = 0
+      end
+
+        list_prods = []
+
+          iva_tipo = 1
+          iva_base = 100
+
+          if lanz.produto.taxa.to_i == 0
+            iva_tipo = 3
+            iva_base = 0
+            iva = 0
+          elsif lanz.produto.taxa.to_i == 5
+            iva_tipo = 1
+            iva_base = 100
+            iva = 5
+          elsif lanz.produto.taxa.to_i == 10
+            iva_tipo = 1
+            iva_base = 100
+            iva = 10
+          elsif lanz.produto.taxa.to_i == 70
+            iva_tipo = 4
+            iva_base = 30
+            iva = 10
+          end
+
+          if lanz.produto.embalagem == 'LT'
+            unidade_medido = 89
+          else
+            unidade_medido = 77
+          end
+
+
+          if lanz.moeda.to_i == 1
+            precioUnitario = lanz.unit_gs.to_i
+          else
+            precioUnitario = lanz.unit_us.to_f
+          end
+
+
+          list_prods  += [{codigo: lanz.produto_id.to_s.rjust(6,'0'),
+            descripcion: lanz.produto.nome,
+            unidadMedida: lanz.produto.unidade_medida_id,
+            cantidad: lanz.qtd.to_f,
+            precioUnitario: precioUnitario,
+            ivaTipo: iva_tipo,
+            ivaBase: iva_base,
+            iva: iva}]
+
+
+      #condição
+      if lanz.tipo.to_i == 0
+        cd_detalhe =  {tipo: 1, entregas: [{
+            tipo: 1,
+            monto: monto,
+            moneda: md,
+            monedaDescripcion: monedaDescripcion,
+            cambio: cambio
+        }]}
+
+      elsif lanz.tipo.to_i == 1
+
+        praz = '30 Dias'
+
+        cd_detalhe = { tipo: 2, credito: {
+          tipo: 1,
+          plazo: praz,
+          cuotas: 1,
+          infoCuotas: [{
+              moneda: "PYG",
+              monto: monto,
+              vencimiento: (lanz.data.to_date + 30)
+          }]
+      }}
+      end
+
+
+      #tipo cliente
+      if lanz.ruc.to_s.gsub('.', '').count('-').to_i == 0
+        cliente = {
+                      contribuyente: false,
+                      codigo: lanz.persona_id.to_s.rjust(6,'0'),
+                      razonSocial: lanz.persona_nome,
+                      nombreFantasia: lanz.persona_nome,
+                      tipoOperacion: 2,
+                      direccion: pers.direcao,
+                      pais: 'PRY',
+                      paisDescripcion: 'Paraguay',
+                      numeroCasa: "0",
+                      departamento: pers.cidade.distrito.estado.api_id,
+                      distrito: pers.cidade.distrito.api_id,
+                      ciudad: pers.cidade.api_id,
+                      documentoTipo: 1,
+                      documentoNumero: lanz.ruc,
+                      email: pers.email
+                  }
+      else
+        cliente = {
+                      contribuyente: true,
+                      ruc: lanz.ruc,
+                      codigo: lanz.persona_id.to_s.rjust(6,'0'),
+                      razonSocial: lanz.persona_nome,
+                      nombreFantasia: lanz.persona_nome,
+                      tipoOperacion: 1,
+                      direccion: pers.direcao,
+                      pais: 'PRY',
+                      paisDescripcion: 'Paraguay',
+                      numeroCasa: "0",
+                      departamento: pers.cidade.distrito.estado.api_id,
+                      distrito: pers.cidade.distrito.api_id,
+                      ciudad: pers.cidade.api_id,
+                      tipoContribuyente: 2,
+                      email: pers.email
+                  }
+      end
+
+
+      data = {ch:  [{
+                  tipoDocumento: 1,
+                  establecimiento: lanz.doc_01,
+                  serie: lanz.serie,
+                  punto: lanz.doc_02.to_s.gsub(' ', ''),
+                  numero: lanz.doc,
+                  fecha: "#{lanz.data.to_date.strftime("%Y-%m-%d")}T#{Time.now.strftime('%H:%M:%S')}",
+                  tipoEmision: 1,
+                  tipoImpuesto: 1,
+                  moneda: md,
+                  condicionTipoCambio: condicionTipoCambio,
+                  descuentoGlobal: desconto_global,
+                  cambio: cambio,
+                  cliente: cliente,
+                  observacion: "Chronos Software",
+                  usuario: {
+                      documentoTipo: 1,
+                      documentoNumero: '157264',
+                      nombre: 'Marcos Jara',
+                      cargo: 'Vendedor'
+                  },
+                  factura: {
+                      presencia: 1
+                  },
+                  condicion: cd_detalhe,
+                  items: list_prods
+              }]}
+
+
+          url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/lote/create")
 
           http = Net::HTTP.new(url.host, url.port)
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
           request = Net::HTTP::Post.new(url)
-          request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+          request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
           request["content-type"] = 'application/json'
           # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
-          puts data.to_json
-          request.body = data.to_json
+          puts data[:ch].to_json
+          request.body = data[:ch].to_json
           puts '----------------------------------------------------------------------'
           response = http.request(request)
           puts get_resp = JSON.parse(response.body)
 
+          puts '-----------------======-----------------------------------------------------'
+          puts get_resp['success']
 
-          respond_to do |format|
-            format.html { redirect_to form_fiscals_path}
+          if get_resp['success'] == true
+
+            lanz.update_attributes(cdc: get_resp["result"]["deList"].last["cdc"] )
+
           end
+
+          redirect_to form_fiscal_path(lanz.id)
   end
 
   def fact_indep_update_ft
@@ -505,8 +984,8 @@ class FormFiscalsController < ApplicationController
       @financ_deb_gs = CobrosFinanca.sum(:valor_guarani, :conditions => ["cobro_id = #{@cobro.id} and cred_deb = 1 "])
       @financ_deb_rs = CobrosFinanca.sum(:valor_real, :conditions => ["cobro_id = #{@cobro.id} and cred_deb = 1 "])
 
-      @saldo_fina_us = ( ( @fecha_result_us.to_f + @financ_deb_us.to_f ) - @financ_cred_us )
-      @saldo_fina_gs = ( ( @fecha_result_gs.to_f + @financ_deb_gs.to_f ) - @financ_cred_gs )
+      @saldo_fina_us = ( ( @fecha_result_us.to_f + @financ_deb_us.to_f ) - @financ_cred_us.to_f )
+      @saldo_fina_gs = ( ( @fecha_result_gs.to_f + @financ_deb_gs.to_f ) - @financ_cred_gs.to_f )
       @saldo_fina_rs = ( ( @fecha_result_rs.to_f + @financ_deb_rs.to_f ) - @financ_cred_rs )
 
 
@@ -642,14 +1121,14 @@ class FormFiscalsController < ApplicationController
         motivo: params[:motivo]
       }
 
-        url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/evento/cancelacion")
+        url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/evento/cancelacion")
 
         http = Net::HTTP.new(url.host, url.port)
         http.use_ssl = true
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
         request = Net::HTTP::Post.new(url)
-        request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+        request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
         request["content-type"] = 'application/json'
         # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
         puts data.to_json
@@ -671,14 +1150,14 @@ class FormFiscalsController < ApplicationController
                 motivo: params[:motivo]
               }
 
-                url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/evento/cancelacion")
+                url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/evento/cancelacion")
 
                 http = Net::HTTP.new(url.host, url.port)
                 http.use_ssl = true
                 http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
                 request = Net::HTTP::Post.new(url)
-                request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+                request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
                 request["content-type"] = 'application/json'
                 # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
                 puts data.to_json
@@ -697,14 +1176,14 @@ class FormFiscalsController < ApplicationController
                 motivo: params[:motivo]
               }
 
-                url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/evento/cancelacion")
+                url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/evento/cancelacion")
 
                 http = Net::HTTP.new(url.host, url.port)
                 http.use_ssl = true
                 http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
                 request = Net::HTTP::Post.new(url)
-                request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+                request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
                 request["content-type"] = 'application/json'
                 # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
                 puts data.to_json
@@ -723,14 +1202,14 @@ class FormFiscalsController < ApplicationController
                 motivo: params[:motivo]
               }
 
-                url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/evento/cancelacion")
+                url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/evento/cancelacion")
 
                 http = Net::HTTP.new(url.host, url.port)
                 http.use_ssl = true
                 http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
                 request = Net::HTTP::Post.new(url)
-                request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+                request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
                 request["content-type"] = 'application/json'
                 # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
                 puts data.to_json
@@ -776,14 +1255,14 @@ class FormFiscalsController < ApplicationController
             motivo: params[:motivo]
           }
 
-            url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/evento/cancelacion")
+            url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/evento/cancelacion")
 
             http = Net::HTTP.new(url.host, url.port)
             http.use_ssl = true
             http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
             request = Net::HTTP::Post.new(url)
-            request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+            request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
             request["content-type"] = 'application/json'
             # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
             puts data.to_json
@@ -1046,14 +1525,14 @@ class FormFiscalsController < ApplicationController
               }]}
 
 
-          url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/lote/create")
+          url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/lote/create")
 
           http = Net::HTTP.new(url.host, url.port)
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
           request = Net::HTTP::Post.new(url)
-          request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+          request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
           request["content-type"] = 'application/json'
           # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
           puts data[:ch].to_json
@@ -1295,14 +1774,14 @@ class FormFiscalsController < ApplicationController
               }]}
 
 
-          url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/lote/create")
+          url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/lote/create")
 
           http = Net::HTTP.new(url.host, url.port)
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
           request = Net::HTTP::Post.new(url)
-          request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+          request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
           request["content-type"] = 'application/json'
           # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
           puts data[:ch].to_json
@@ -1512,14 +1991,14 @@ class FormFiscalsController < ApplicationController
               }]}
 
 
-          url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/lote/create")
+          url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/lote/create")
 
           http = Net::HTTP.new(url.host, url.port)
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
           request = Net::HTTP::Post.new(url)
-          request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+          request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
           request["content-type"] = 'application/json'
           # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
           puts data[:ch].to_json
@@ -1730,14 +2209,14 @@ class FormFiscalsController < ApplicationController
               }]}
 
 
-            url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/lote/create")
+            url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/lote/create")
 
             http = Net::HTTP.new(url.host, url.port)
             http.use_ssl = true
             http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
             request = Net::HTTP::Post.new(url)
-            request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+            request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
             request["content-type"] = 'application/json'
             # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
             puts data[:ch].to_json
@@ -1863,7 +2342,7 @@ class FormFiscalsController < ApplicationController
                  MAX(VVP.TAXA) AS TAXA
                  FROM COBROS_DETALHES VP
                  INNER JOIN CLIENTES VVP
-                 ON VVP.PERSONA_ID = VP.PERSONA_ID and VVP.divida_guarani > 0 and VVP.documento_numero = VP.documento_numero and VVP.cota = VP.cota AND VP.VENDA_ID IS NULL
+                 ON VVP.PERSONA_ID = VP.PERSONA_ID and VVP.divida_guarani > 0 and VVP.documento_numero = VP.documento_numero and VVP.cota = VP.cota AND VP.VENDA_ID IS NULL AND VVP.TABELA IN ('CHECK_POINTS', 'CONTRATOS')
 
                  WHERE VP.COBRO_ID = #{venda.id} AND VP.VENDA_ID IS NULL
                  GROUP BY 1,2"
@@ -1988,7 +2467,7 @@ class FormFiscalsController < ApplicationController
           cambio = "null"
           monto = tot_monto_gs.to_i
           monedaDescripcion = 'Guarani'
-          desconto_global =  0
+          desconto_global = CobrosDetalhe.sum( :desconto_guarani, :conditions => ['cobro_id = ?',params[:cod_proc]]).to_i
         else
           md = 'USD'
           condicionTipoCambio = 1
@@ -2000,13 +2479,27 @@ class FormFiscalsController < ApplicationController
 
 
       #condição
-      cd_detalhe =  {tipo: 1, entregas: [{
+      if params[:tipo].to_i == 0
+        cd_detalhe =  {tipo: 1, entregas: [{
+            tipo: 1,
+            monto: monto,
+            moneda: md,
+            monedaDescripcion: monedaDescripcion,
+            cambio: cambio
+        }]}
+
+      elsif params[:tipo].to_i == 1
+        cd_detalhe = { tipo: 2, credito: {
           tipo: 1,
-          monto: monto,
-          moneda: md,
-          monedaDescripcion: monedaDescripcion,
-          cambio: cambio
-      }]}
+          plazo: "30 días",
+          cuotas: 1,
+          infoCuotas: [{
+              moneda: "PYG",
+              monto: monto,
+              vencimiento: params[:data].to_date + 30
+          }]
+      }}
+      end
 
       #tipo cliente
       if params[:ruc].to_s.gsub('.', '').count('-').to_i == 0
@@ -2077,14 +2570,14 @@ class FormFiscalsController < ApplicationController
               }]}
 
 
-          url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/lote/create")
+          url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/lote/create")
 
           http = Net::HTTP.new(url.host, url.port)
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
           request = Net::HTTP::Post.new(url)
-          request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+          request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
           request["content-type"] = 'application/json'
           # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
           puts data[:ch].to_json
@@ -2263,9 +2756,12 @@ class FormFiscalsController < ApplicationController
 
       else  #contrato
         ff = FormFiscal.where(id: nc.documento_id).last
-        cl = Cliente.where(id: ff.cod_proc).last
-
-        contrato_servicos = ContratoServico.select('produto_id,quantidade,total_gs,total_us,unitario_gs, unitario_us,obs').where(contrato_id: cl.cod_proc)
+        if ff.sigla_proc == 'CL'
+          cliente = Cliente.find(ff.cod_proc)
+          contrato_servicos = ContratoServico.select('produto_id,quantidade,total_gs,total_us,unitario_gs, unitario_us,obs').where(contrato_id: cliente.cod_proc)
+        else
+            contrato_servicos = ContratoServico.select('produto_id,quantidade,total_gs,total_us,unitario_gs, unitario_us,obs').where(contrato_id: ff.cod_proc)
+        end
 
         if params[:moeda].to_i == 1
           md = 'PYG'
@@ -2420,14 +2916,14 @@ class FormFiscalsController < ApplicationController
               }]}
 
 
-          url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/lote/create")
+          url = URI("https://api.facturasend.com.py/#{lanz.terminal.nome_api_fiscal}/lote/create")
 
           http = Net::HTTP.new(url.host, url.port)
           http.use_ssl = true
           http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
           request = Net::HTTP::Post.new(url)
-          request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+          request["authorization"] = "Bearer api_key_#{lanz.terminal.token_api}"
           request["content-type"] = 'application/json'
           # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
           puts data[:ch].to_json

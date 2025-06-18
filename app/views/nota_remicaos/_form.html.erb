@@ -9,15 +9,19 @@
             </div>
           </h1>
 
-          <div class="panel-body">
+          <div class="panel-content">
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-3">
                 <label><%= t('DATE') %></label>
                 <%= f.text_field :data, value: Time.now.strftime("%d/%m/%Y"),  class: "panel-field date", autofocus: true, required: true %>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <label>Doc.</label>
-                <%= f.text_field :documento_numero_01, size: 3 %>-<%= f.text_field :documento_numero_02, size: 3 %>-<%= f.text_field :documento_numero, size: 10 %>
+                <%= f.text_field :documento_numero_01, size: 3 %>-<%= f.text_field :documento_numero_02,  size: 3 %>-<%= f.text_field :documento_numero, size: 10 %>
+              </div>
+              <div class="col-md-3">
+                <label>Terminal</label>
+                <%= f.collection_select :terminal_id, Terminal.where(unidade_id: current_unidade.id).order("2"),:id,:nome, {prompt: 'Terminal'} %>
               </div>
             </div>
             <div class="row">
@@ -75,7 +79,7 @@
             </div>
           </h1>
 
-          <div class="panel-body">
+          <div class="panel-content">
             <div class="row">
 
               <div class="col-md-6">
@@ -114,7 +118,7 @@
             </div>
           </h1>
 
-          <div class="panel-body">
+          <div class="panel-content">
             <div class="row">
               <div class="col-md-12">
               <label><%= t('CITY') %></label>

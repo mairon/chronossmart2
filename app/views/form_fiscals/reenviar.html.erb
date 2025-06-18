@@ -2,7 +2,7 @@
 <h2>
 	Re-Enviar DE: <%= @form_fiscal.cdc %> |
 
-	<%= render partial: "/form_fiscals/consulta_estado", locals: {cdc: @form_fiscal.cdc} %>
+	<%= render partial: "/form_fiscals/consulta_estado", locals: {cdc: @form_fiscal.cdc, terminal: @form_fiscal.terminal } %>
 	Estado SET: <%= @get_resp["deList"][0]["situacion"] %> - <%= @get_resp["deList"][0]["respuesta_mensaje"] %>
 	</h2>
 <%= form_tag "/form_fiscals/venda_update_ft", remote: true do %>

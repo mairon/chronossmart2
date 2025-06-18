@@ -1,8 +1,7 @@
    <table class="head_grid">
       <tr>
         <td width="100">Ref.</td>
-        <td width="180">Grupo</td>
-        <td width="450" >Producto</td>
+        <td width="550" >Producto</td>
         <td width="70" align="right">Ctd</td>
         <td width="80" align="right">Unid.</td>
         <td width="80" align="right">Total</td>
@@ -17,11 +16,10 @@
          <% tot_cus_gs = 0 %>
          <% tot_rs     = 0 %>
          <% quebra       = "" %>
-         <% @presupuesto_produtos.each do |pp| %>
+         <% @presupuesto_produtos.order('id').each do |pp| %>
             <tr class = "<%= cycle("cor1", "cor2") %>">
               <td width="100">  <%= pp.produto.fabricante_cod %></td>
-              <td width="180"><%= pp.produto.grupo_id %>-<%= pp.produto.grupo.descricao %></td>
-              <td width="450" align="left"><%= pp.produto_id %>-<%= pp.produto_nome %></td>
+              <td width="550" align="left"><%= pp.produto_id %>-<%= pp.produto_nome %></td>
               <td width="70"  align="right"><b><%= format_peso(pp.quantidade) %></b></td>
                <% if @presupuesto.moeda == 0 %>
                  <td width="80" align="right"><%= format_decimal( pp.unitario_dolar ) %></td>
@@ -47,7 +45,7 @@
     </div>
     <table class="head_grid">
       <tr>
-        <td width="740">
+        <td width="665">
         </td>
         <td width="40" align="right"><%= format_peso(qtd) %></td>
         <td width="80" align="right">Total:</td>

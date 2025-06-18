@@ -1,6 +1,7 @@
 <table class="head_grid">
 	 <tr>
 		<td width="30" >DP</td>
+		<td width="100" >Fabricate Cod</td>
 		<td width="260" >Producto</td>
 		<td width="100" align="right">Cant.</td>
 		<td width="65" align="right">%</td>
@@ -101,7 +102,8 @@
 
 			  <tr class = "<%= cycle("cor1", "cor2") %>">
 					<td width="30" align="left" title="<%= cp.deposito_nome %>"><%= cp.deposito_id %></td>
-					<td width="260" align="left"><small><%= cp.produto_nome %></small></td>
+					<td width="100" align="left"><small><%= cp.fabricante_cod %></small></td>
+					<td width="260" align="left"><small><%= cp.id %>•<%= cp.produto_nome %></small></td>
 					<td width="100"  align="right"><b><%= format_peso(cp.quantidade.to_f) %></b></td>
 					<td width="65"  align="right"><b><%= format_peso(cp.porcen) %></b></td>
 					<% if @compra.moeda == 0 %>

@@ -1,5 +1,5 @@
 
-<% grupos = SubGrupo.where("id in (11,75, 76, 77, 78,79, 80, 81)").order("descricao") %>
+<% grupos = SubGrupo.where("id in (11,75,76,77,78,79,80,81)").order("descricao") %>
 <div class="gridprod">
   <div class="row">
     <div class="col-xs-12">
@@ -26,7 +26,7 @@
       <div class="tab-content">
         <% grupos.each do |g| %>
           <div id="<%= g.id %>" role="tabpanel" class="tab-pane fade">
-            <% produtos = Produto.find_by_sql("SELECT P.ID AS PRODUTO_ID, P.NOME AS PRODUTO_NOME, PTP.PRECO_1_GS FROM PRODUTOS_TABELA_PRECOS PTP INNER JOIN PRODUTOS P ON P.ID = PTP.PRODUTO_ID WHERE PTP.UNIDADE_ID = #{@venda.unidade_id} and PTP.TABELA_PRECO_ID = #{@venda.tabela_preco_id} AND P.SUB_GRUPO_ID = #{g.id} ORDER BY 2") %>
+            <% produtos = Produto.find_by_sql("SELECT P.ID AS PRODUTO_ID, P.NOME AS PRODUTO_NOME, PTP.PRECO_1_GS FROM PRODUTOS_TABELA_PRECOS PTP INNER JOIN PRODUTOS P ON P.ID = PTP.PRODUTO_ID WHERE P.PREPARACAO = TRUE AND PTP.UNIDADE_ID = #{@venda.unidade_id} and PTP.TABELA_PRECO_ID = #{@venda.tabela_preco_id} AND P.SUB_GRUPO_ID = #{g.id} ORDER BY 2") %>
               <ul class="row" >
                 <% produtos.each do |p| %>
                 <%= fields_for "vendas_produtos[]", p do |b| %>

@@ -30,18 +30,26 @@
             <%= f.text_field :produto_nome, size: 70 %>
           </td>
         </tr>
-        <tr>          
+        <tr>
           <td>
             <label>Cuotas</label>
             <%= f.text_field :cuotas, size: 15 %>
           </td>
         </tr>
-        <tr>          
+        <tr>
           <td colspan="2">
             <label>Vencimiento</label>
             <%= f.date_select :vencimento, size: 15 %>
           </td>
         </tr>
+
+        <tr>
+          <td colspan="2">
+            <label>Descuento</label>
+            <%= f.text_field :desconto, size: 15 %>
+          </td>
+        </tr>
+
         <tr>
           <% if @presupuesto.moeda == 0  %>
             <td>
@@ -56,9 +64,9 @@
               <td>
               <label>Cantidad</label>
               <%= f.text_field :quantidade, :size => 9, :value => 1, :onblur => "CalcQtd('presupuesto_produto_unitario_guarani','presupuesto_produto_quantidade','presupuesto_produto_total_guarani')" %>
-                
+
               </td>
-               <%= field_gs_label 'Unit. Gs',f, :unitario_guarani, :readonly => 
+               <%= field_gs_label 'Unit. Gs',f, :unitario_guarani, :readonly =>
 true, :onblur => "CalcQtd('presupuesto_produto_unitario_guarani','presupuesto_produto_quantidade','presupuesto_produto_total_guarani')" %>
                <%= field_gs_label 'Total Gs',f,:total_guarani, :readonly => true %>
 
@@ -67,9 +75,9 @@ true, :onblur => "CalcQtd('presupuesto_produto_unitario_guarani','presupuesto_pr
               <label>Cantidad</label>
               <%= f.text_field :quantidade, :size => 9, :value => 1, :onblur => "CalcQtdDescimal('presupuesto_produto_unitario_real','presupuesto_produto_quantidade','presupuesto_produto_total_real')" %></td>
 
-            <%= field_us_label 'Unit. R$ :', f, :unitario_real, :readonly => 
+            <%= field_us_label 'Unit. R$ :', f, :unitario_real, :readonly =>
 true, :onblur => "CalcQtdDescimal('presupuesto_produto_unitario_real','presupuesto_produto_quantidade','presupuesto_produto_total_real')" %>
-            <%= field_us_label 'Total R$ :', f, :total_real, :readonly => 
+            <%= field_us_label 'Total R$ :', f, :total_real, :readonly =>
 true %>
           <% end %>
           <td style="padding-top: 21px">
@@ -160,5 +168,5 @@ true %>
         }
       });
       };
-    });  
+    });
 </script>

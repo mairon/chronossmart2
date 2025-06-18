@@ -48,7 +48,9 @@
          <% tot_us     = 0 %>
          <% tot_gs     = 0 %>
          <% tot_cus_gs = 0 %>
+         <% tot_cus_rs = 0 %>
          <% tot_rs     = 0 %>
+         <% tot_desc_rs = 0 %>
          <% quebra     = '' %>
          <% @presupuesto.presupuesto_produtos.order("persona_id, id").each do |pp| %>
            <% if quebra != pp.persona.nome %>
@@ -96,18 +98,41 @@
                 </td>
                  <% tot_gs += pp.total_guarani.to_f - (pp.total_guarani.to_f * (pp.desconto.to_f / 100)) %>
                  <% tot_cus_gs += (pp.promedio_guarani.to_f * pp.quantidade) %>
-               <% else %>
-                 <td width="70" align="right"><%= format_decimal( pp.unitario_real ) %></td>
-                 <td width="70" align="right"><%= format_decimal( pp.total_real ) %></td>
-                  <% tot_rs += pp.total_real %>
-               <% end %>
-
+               <% elsif @presupuesto.moeda == 2 %>
+                 <td width="70" align="right"><%= format_decimal( pp.unitario_real) %></td>
+                 <td width="70" align="right"><%= format_decimal( pp.total_real) %></td>
+                 <td width="70" align="right">
+                  <% if pp.desconto.to_i > 0 %>
+                    -<%= pp.desconto.to_i %>%
+                  <% end %>
+                </td>
+                 <td width="70" align="right">
+                  <% if pp.desconto.to_i > 0 %>
+                    <%= format_decimal( (pp.total_real.to_f - (pp.total_real.to_f * (pp.desconto.to_f / 100)))  ) %>
+                    <% tot_desc_rs += (pp.total_real.to_f - (pp.total_real.to_f * (pp.desconto.to_f / 100))) %>
+                    <% else %>
+                      <% tot_desc_rs += (pp.total_real.to_f - (pp.total_real.to_f * (pp.desconto.to_f / 100))) %>
+                  <% end %>
+                </td>
+                 <td width="70" align="right">
+                  <% if pp.cuotas.to_i > 0 %>
+                    <%= pp.cuotas.to_i %>
+                  <% end %>
+                </td>
+                 <td width="70" align="right">
+                  <% if pp.cuotas.to_i > 0 %>
+                    <%= format_decimal( (pp.total_real.to_f - (pp.total_real.to_f * (pp.desconto.to_f / 100))) / pp.cuotas.to_i ) %>
+                  <% end %>
+                </td>
+                 <% tot_rs += pp.total_real.to_f %>
+                 <% tot_cus_rs += (pp.unitario_real.to_f * pp.quantidade.to_f) %>
+                <% end %>
                <% qtd += pp.quantidade.to_f %>
             </tr>
             <% indice += 1 %>
          <% end %>
       </table>
-
+      <% if @presupuesto.moeda == 1 %>
       <table>
         <tr>
           <td class="head">TOTALES CURSOS: <%= format_int(@presupuesto.presupuesto_produtos.where(tipo: 1).sum("total_guarani - (total_guarani * (desconto / 100))") ) %></td>
@@ -122,6 +147,22 @@
           <td class="head">TOTALES GENERAL: <%= format_int(tot_gs) %></td>
         </tr>
       </table>
+      <% elsif @presupuesto.moeda == 2 %>
+        <table>
+          <tr>
+            <td class="head">TOTALES CURSOS: <%= format_decimal(@presupuesto.presupuesto_produtos.where(tipo: 1).sum("total_real - (total_real * (desconto / 100))") ) %></td>
+          </tr>
+
+          <tr>
+            <td class="head">TOTALES Productos: <%= format_decimal( tot_rs.to_f - (@presupuesto.presupuesto_produtos.where(tipo: 1).sum("total_real - (total_real * (desconto / 100))")).to_f ) %></td>
+          </tr>
+
+
+          <tr>
+            <td class="head">TOTALES GENERAL: <%= format_decimal(tot_rs) %></td>
+          </tr>
+        </table>
+      <% end %>
 
       <table>
         <tr>

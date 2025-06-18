@@ -102,7 +102,7 @@ class ComprasController < ApplicationController
             LEFT JOIN CENTRO_CUSTOS CC
             ON C.CENTRO_CUSTO_ID = CC.ID
 
-            WHERE C.UNIDADE_ID = #{current_unidade.id} AND C.PERSONA_ID = #{params[:persona_id]} AND C.LIQUIDACAO = 0 AND (C.DIVIDA_GUARANI + C.DIVIDA_DOLAR + C.DIVIDA_REAL ) > 0
+            WHERE C.UNIDADE_ID = #{current_unidade.id} AND C.PERSONA_ID = #{params[:persona_id]} AND C.SIGLA_PROC = 'VT' AND C.LIQUIDACAO = 0 AND (C.DIVIDA_GUARANI + C.DIVIDA_DOLAR + C.DIVIDA_REAL ) > 0
             ORDER BY 12,16
                       "
 
@@ -568,6 +568,7 @@ class ComprasController < ApplicationController
 										C.OUTROS_REAL,
 										C.PROMEDIO_GUARANI,
 										C.PROMEDIO_DOLAR,
+										P.FABRICANTE_COD,
 										(SELECT P.PRECO_1_GS FROM PRODUTOS_TABELA_PRECOS P WHERE P.PRODUTO_ID = C.PRODUTO_ID AND  P.UNIDADE_ID = #{current_unidade.id} ORDER BY P.ID LIMIT 1) AS PRECO_VENDA_GS,
 										(SELECT P.PRECO_1_US FROM PRODUTOS_TABELA_PRECOS P WHERE P.PRODUTO_ID = C.PRODUTO_ID AND  P.UNIDADE_ID = #{current_unidade.id} ORDER BY P.ID LIMIT 1) AS PRECO_VENDA_US,
 										(SELECT P.PRECO_1_RS FROM PRODUTOS_TABELA_PRECOS P WHERE P.PRODUTO_ID = C.PRODUTO_ID AND  P.UNIDADE_ID = #{current_unidade.id} ORDER BY P.ID LIMIT 1) AS PRECO_VENDA_RS

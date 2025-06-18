@@ -10,7 +10,7 @@
      '\x1B' + '\x61' + '\x31', // center align
      '\x1B' + '\x21' + '\x30', // em mode on
      'Control #<%= n.id %>' + '\x0A',     // text and line break
-     '<%= Time.now.strftime("%H:%M") %>' + '\x0A',     // text and line break
+     '<%= Time.now.strftime("%d/%m/%Y - %H:%M") %>' + '\x0A',     // text and line break
      'Tarjeta: <%= n.cartao_nome %>' + '\x0A',     // text and line break
      '\x1B' + '\x21' + '\x0A' + '\x1B' + '\x45' + '\x0A', // em mode off
      '\x0A',                   // line break
@@ -18,16 +18,16 @@
      '\x0A',                   // line break
      '\x1B' + '\x21' + '\x20', // em mode on
      '\x1B' + '\x61' + '\x30', // left align
-     'Resposable: Joao' + '\x0A',     // text and line break
+     '<%= n.obs %>' + '\x0A',     // text and line break
      '\x0A',                   // line break
      '\x0A',                   // line breakk
      '------------------------' + '\x0A',
-     '<%  VendasProduto.joins(:produto).where("produtos.grupo_id in (#{@painel_preparo.grupo_ids}) and produtos.preparacao = true and vendas_produtos.venda_id = #{n.id} AND vendas_produtos.status_preparo is null ").each do |vp| %>',
+     '<%  VendasProduto.joins(:produto).where("produtos.grupo_id in (#{@painel_preparo.grupo_ids}) and produtos.preparacao = true and vendas_produtos.venda_id = #{n.id} AND (vendas_produtos.status_preparo is null or vendas_produtos.status_preparo = 0 )").each do |vp| %>',
      '<%= vp.quantidade.to_i %>x <%= vp.produto_nome %>' + '\x0A',
+     '<%= ('Obs.: ' + vp.obs) unless vp.obs.blank? %>' + '\x0A',
      '<% vp.produto_composicaos.each do |pc| %>',
      '- <%= pc.componente_nome %>' + '\x0A',
      '<% end %>',
-     '<%= vp.obs.to_s %>' + '\x0A',
      '------------------------' + '\x0A',
 
      '<% end %>',
@@ -53,7 +53,7 @@
     <div class="card-cliente">
       <ul>
         <% venda_produto_ids = [] %>
-        <%  VendasProduto.joins(:produto).where("produtos.grupo_id in (#{@painel_preparo.grupo_ids}) and produtos.preparacao = true and vendas_produtos.venda_id = #{n.id} AND vendas_produtos.status_preparo is null ").each do |vp| %>
+        <%  VendasProduto.joins(:produto).where("produtos.grupo_id in (#{@painel_preparo.grupo_ids}) and produtos.preparacao = true and vendas_produtos.venda_id = #{n.id} AND (vendas_produtos.status_preparo is null or vendas_produtos.status_preparo = 0 ) ").each do |vp| %>
           <% VendasProduto.find(vp.id).update_attribute(:status_preparo, 1) %>
         <li>
           <% venda_produto_ids += [vp.id] %>

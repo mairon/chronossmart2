@@ -1,0 +1,96 @@
+<body onload="window.print()">
+<style type="text/css">
+	td{
+		font-family: arial;
+		font-size: 12px
+	}
+
+	.ft-header{
+		text-align: center;
+	}
+
+</style>
+<table align="center">
+	<tr>
+		<td colspan="4">------------------------------------------------------------------</td>
+	</tr>
+	<tr>
+		<td align="center" ><b><%= current_unidade.nome_sys %></b></td>
+	</tr>
+	<tr>
+		<td align="center"><small><b><%= current_unidade.razao_social %></b></small></td>
+	</tr>
+
+	<tr>
+		<td align="center"><small><b><%= current_unidade.ruc %></b></small></td>
+	</tr>
+
+	<tr>
+		<td colspan="4">------------------------------------------------------------------</td>
+	</tr>
+	<tr>
+		<td align="left">
+			Favorecido: <%= @adelanto.persona_nome %>
+		</td>
+	</tr>
+	<tr>
+		<td align="left">Fecha: <%= @adelanto.data.to_date.strftime("%d/%m/%Y") %> Hora: <%= Time.now.strftime("%H:%M") %></td>
+	</tr>
+	<tr>
+		<td>Hecho por: <%= Usuario.find(@adelanto.usuario_created).usuario_nome unless @adelanto.usuario_created.nil? %></td>
+	</tr>
+	<tr>
+		<td align="left"><%= @adelanto.concepto %></td>
+	</tr>
+	<tr>
+		<td>
+        	Viatico Nº
+        <b><%= @adelanto.id.to_s.rjust(6,'0') %></b></td>
+	</tr>
+
+	<tr>
+		<td colspan="4">------------------------------------------------------------------</td>
+	</tr>
+
+	<tr>
+		<% if @adelanto.moeda == 0 %>
+			<td align="right">Monto: <%= format_decimal(@adelanto.valor_dolar) %></td>
+		<% else %>
+			<td align="right">Monto: <%= format_int(@adelanto.valor_guarani) %></td>
+		<% end %>
+	</tr>
+	<tr>
+		<td colspan="4">------------------------------------------------------------------</td>
+	</tr>
+	<tr>
+		<% if @adelanto.moeda == 0 %>
+			<td>En Letras:
+				U$ <% real,cents= ("%.2f" % @adelanto.valor_dolar.to_f).to_s.split(/\./).map{ |m| m.to_i}
+						      valor_cents=Extenso.por_extenso(cents%100)
+						      valor_cents+= case cents.to_i%100
+						      when 0 then ""
+						      when 1 then " "
+						      when 2..99 then " "
+						      end %>
+							<%= I18n.with_locale(:es) { @adelanto.valor_dolar.to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS' %>
+						</td>
+		<% else %>
+			<td>En Letras: <%= I18n.with_locale(:es) { @adelanto.valor_guarani.to_i.to_words.upcase } %></td>
+		<% end %>
+	</tr>
+	<tr>
+		<td colspan="4">------------------------------------------------------------------</td>
+	</tr>
+	<tr>
+		<td align="center">
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			_____________________________________<br>
+			Firma
+		</td>
+	</tr>
+
+<table>

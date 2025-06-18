@@ -1,16 +1,17 @@
 services:
   web:
+    restart: always
     build: .
     stdin_open: true
     tty: true
-    command: bash -c "rm -fR shared/pids/* ; bundle exec unicorn -E production -c config/unicorn.rb"
+    command: bash -c "rm -fR shared/pids/* ; bundle exec unicorn -c config/unicorn.rb -E production"
     volumes:
       - .:/chronos-smart2      
       - /chronos-smart2/shared/log
       - /chronos-smart2/shared/pids
       - /chronos-smart2/shared/sockets
     ports:
-      - "4000:4000"
+      - "3000:3000"
   nginx:
     restart: always
     build: ./nginx/

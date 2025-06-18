@@ -620,9 +620,10 @@ class Stock < ActiveRecord::Base
 
 											WHERE P.TIPO_PRODUTO = 0 AND S.DATA <= '#{params[:final].split("/").reverse.join("-")}'
 											#{deposito} #{clase} #{grupo} #{sub_grupo} #{produto}
+                      and (SELECT SS.PROMEDIO_GUARANI FROM STOCKS SS WHERE SS.STATUS = 0 AND SS.PRODUTO_ID = S.PRODUTO_ID  ORDER BY SS.DATA DESC, SS.TABELA_ID DESC  LIMIT 1) = 0
 
 											GROUP BY 1,2
-                      HAVING SUM(S.ENTRADA - S.SAIDA) <> 0
+
 											ORDER BY #{order}"
 
         Produto.find_by_sql(sql)
@@ -674,6 +675,7 @@ class Stock < ActiveRecord::Base
                      P.ID AS PRODUTO_ID,
                      V.PERSONA_ID,
                      MAX(P.NOME) AS PRODUTO_NOME,
+                     MAX(V.ID) AS COD_PROC,
                      MAX(G.DESCRICAO) AS GRUPO_NOME,
                      MAX(SG.DESCRICAO) AS SUB_GRUPO_NOME,
                      MAX(P.FABRICANTE_COD) AS REFERENCIA,
@@ -712,6 +714,7 @@ class Stock < ActiveRecord::Base
                      P.ID AS PRODUTO_ID,
                      V.PERSONA_ID,
                      MAX(P.NOME) AS PRODUTO_NOME,
+                     MAX(V.ID) AS COD_PROC,
                      MAX(G.DESCRICAO) AS GRUPO_NOME,
                      MAX(SG.DESCRICAO) AS SUB_GRUPO_NOME,
                      MAX(P.FABRICANTE_COD) AS REFERENCIA,
@@ -746,6 +749,7 @@ class Stock < ActiveRecord::Base
                      P.ID AS PRODUTO_ID,
                      V.PERSONA_ID,
                      MAX(P.NOME) AS PRODUTO_NOME,
+                     MAX(V.ID) AS COD_PROC,
                      MAX(G.DESCRICAO) AS GRUPO_NOME,
                      MAX(SG.DESCRICAO) AS SUB_GRUPO_NOME,
                      MAX(P.FABRICANTE_COD) AS REFERENCIA,

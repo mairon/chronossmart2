@@ -20,8 +20,10 @@
          <% tot_us     = 0 %>
          <% tot_gs     = 0 %>
          <% @tot_desc_gs     = 0 %>
+         <% @tot_desc_rs     = 0 %>
          <% tot_cus_gs = 0 %>
          <% tot_rs     = 0 %>
+         <% tot_cus_rs = 0 %>
          <% presupuesto_produtos.order("persona_dependente_nome, id, produto_nome").each do |pp| %>
             <tr class = "<%= cycle("cor1", "cor2") %>">
               <td width="150"> <%= pp.persona.nome unless pp.persona.nil? %> <%= pp.persona_dependente_nome %></td>
@@ -60,14 +62,38 @@
                 </td>
                  <% tot_gs += pp.total_guarani.to_f %>
                  <% tot_cus_gs += (pp.promedio_guarani.to_f * pp.quantidade) %>
-               <% else %>
-                 <td width="70" align="right"><%= format_decimal( pp.unitario_real ) %></td>
-                 <td width="70" align="right"><%= format_decimal( pp.total_real ) %></td>
-                  <% tot_rs += pp.total_real %>
-               <% end %>
-               <td width="70" align="center"><%= pp.vencimento.strftime("%d/%m/%y") %></td>
-               <td><%= link_to '', edit_presupuesto_presupuesto_produto_path(presupuesto,pp), class: 'icon-pencil' %></td>
-               <td><%= link_to '', [presupuesto,pp], :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>
+               <% elsif @presupuesto.moeda == 2 %>
+                 <td width="70" align="right"><%= format_decimal( pp.unitario_real) %></td>
+                 <td width="70" align="right"><%= format_decimal( pp.total_real) %></td>
+                 <td width="70" align="right">
+                  <% if pp.desconto.to_i > 0 %>
+                    -<%= pp.desconto.to_i %>%
+                  <% end %>
+                </td>
+                 <td width="70" align="right">
+                  <% if pp.desconto.to_i > 0 %>
+                    <%= format_decimal( (pp.total_real.to_f - (pp.total_real.to_f * (pp.desconto.to_f / 100)))  ) %>
+                    <% @tot_desc_rs += (pp.total_real.to_f - (pp.total_real.to_f * (pp.desconto.to_f / 100))) %>
+                    <% else %>
+                      <% @tot_desc_rs += (pp.total_real.to_f - (pp.total_real.to_f * (pp.desconto.to_f / 100))) %>
+                  <% end %>
+                </td>
+                 <td width="70" align="right">
+                  <% if pp.cuotas.to_i > 0 %>
+                    <%= pp.cuotas.to_i %>
+                  <% end %>
+                </td>
+                 <td width="70" align="right">
+                  <% if pp.cuotas.to_i > 0 %>
+                    <%= format_decimal( (pp.total_real.to_f - (pp.total_real.to_f * (pp.desconto.to_f / 100))) / pp.cuotas.to_i ) %>
+                  <% end %>
+                </td>
+                 <% tot_rs += pp.total_real.to_f %>
+                 <% tot_cus_rs += (pp.unitario_real.to_f * pp.quantidade.to_f) %>
+                <% end %>
+                <td width="70" align="center"><%= pp.vencimento.strftime("%d/%m/%y") %></td>
+                <td><%= link_to '', edit_presupuesto_presupuesto_produto_path(presupuesto,pp), class: 'icon-pencil' %></td>
+                <td><%= link_to '', [presupuesto,pp], :confirm => t('CONFIRMATION_MESSAGE'), :method => :delete, class: 'icon-trash' %></td>
 
                <% qtd += pp.quantidade.to_f %>
             </tr>
@@ -95,7 +121,7 @@
         <% elsif @presupuesto.moeda == 1 %>
           <%= format_int( @tot_desc_gs.to_f ) %>
         <% else %>
-          <%= format_decimal( tot_rs )   %>
+          <%= format_decimal( @tot_desc_rs.to_f ) %>
         <% end %>
     </td>
   </tr>

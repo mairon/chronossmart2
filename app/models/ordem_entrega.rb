@@ -7,9 +7,9 @@ class OrdemEntrega < ActiveRecord::Base
 
   def self.busca(params)
 
-    vend = "AND V.VENDEDOR_ID = #{params[:filtro]["vendedor"]}" unless params[:filtro]["vendedor"].blank?
-    status = "AND OE.STATUS = #{params[:status]}" unless params[:status].blank?
-    cl = "AND V.PERSONA_NOME ILIKE '%#{params[:busca]}%'" unless params[:busca].blank?
+    vend = "AND V.VENDEDOR_ID = #{params[:filtro]["boe_vendedor"]}" unless params[:filtro]["boe_vendedor"].blank?
+    status = "AND OE.STATUS = #{params[:boe_status]}" unless params[:boe_status].blank?
+    cl = "AND V.PERSONA_NOME ILIKE '%#{params[:boe_busca]}%'" unless params[:boe_busca].blank?
 
     sql = "SELECT OE.ID,
                   OE.VENDA_ID,
@@ -28,7 +28,7 @@ class OrdemEntrega < ActiveRecord::Base
               ON VD.ID = V.VENDEDOR_ID
 
               WHERE exists (select 1 from ordem_entrega_produtos oep where oep.ordem_entrega_id = OE.id ) and exists (select 1 from vendas_financas vf where vf.venda_id = V.id )
-              AND OE.CREATED_AT::DATE BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' and '#{params[:final].split("/").reverse.join("-")}'
+              AND OE.CREATED_AT::DATE BETWEEN '#{params[:boe_inicio].split("/").reverse.join("-")}' and '#{params[:boe_final].split("/").reverse.join("-")}'
               #{vend} #{status} #{cl}
                   "
     self.find_by_sql(sql)

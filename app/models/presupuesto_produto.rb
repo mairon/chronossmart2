@@ -14,7 +14,7 @@ class PresupuestoProduto < ActiveRecord::Base
     def add_produtos_compostos
       if Empresa.last.segmento.to_i == 1
         if self.tipo == 1 #registro origem
-          if self.produto.grupo_id == 1          
+          if self.produto.grupo_id == 1
             if presupuesto.qtd_dependentes.to_i == 1
               self.desconto = 0
             elsif presupuesto.qtd_dependentes.to_i == 2
@@ -46,7 +46,7 @@ class PresupuestoProduto < ActiveRecord::Base
       end
     end
 
-    
+
     def finds
         if self.moeda == 0
          self.unitario_guarani =  self.unitario_dolar.to_f * presupuesto.cotacao.to_f
@@ -54,6 +54,7 @@ class PresupuestoProduto < ActiveRecord::Base
          self.unitario_real    =  self.unitario_guarani.to_f / presupuesto.cotacao_real.to_f
          self.total_real       =  self.total_guarani.to_f / presupuesto.cotacao_real.to_f
         elsif self.moeda == 1
+         self.total_guarani    =  ((self.unitario_guarani.to_f * self.quantidade.to_f) * self.multiplo_qtd.to_f)
          self.unitario_dolar   =  self.unitario_guarani.to_f / presupuesto.cotacao.to_f
          self.total_dolar      =  self.total_guarani.to_f / presupuesto.cotacao.to_f
          self.unitario_real    =  self.unitario_guarani.to_f / presupuesto.cotacao_real.to_f

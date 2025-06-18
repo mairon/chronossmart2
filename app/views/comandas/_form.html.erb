@@ -1,0 +1,44 @@
+<%= form_for(@comanda) do |f| %>
+  <% if @comanda.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@comanda.errors.count, "error") %> prohibited this comanda from being saved:</h2>
+
+      <ul>
+      <% @comanda.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> comandas - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">cartao_id :</td>                    
+                      <td><%= f.number_field :cartao_id %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', comandas_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

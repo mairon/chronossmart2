@@ -1,0 +1,90 @@
+<%= form_tag "#", remote: true, id: "send_fatura" do %>
+	<%= hidden_field_tag :cod_proc, @nota_remicao.id %>
+	<%= hidden_field_tag :sigla_proc, 'NR' %>
+	<%= hidden_field_tag :data, Time.now.strftime("%Y-%m-%d") %>
+	<%= hidden_field_tag :status, 1 %>
+	<%= hidden_field_tag :tipo, 1 %>
+	<%= hidden_field_tag :ruc, @nota_remicao.persona.ruc %>
+	<%= hidden_field_tag :persona_nome, @nota_remicao.persona.nome_fatura %>
+	<%= hidden_field_tag :persona_id, @nota_remicao.persona_id %>
+	<%= hidden_field_tag :cota, 1 %>
+	<%= hidden_field_tag :tipo_op, 9 %>
+	<%= hidden_field_tag :moeda, 1 %>
+
+	<table>
+		<tr>
+			<td align="right">NR:</td>
+			<td><%=   select("busca", "doc", FormFiscal.all(:select => 'id,doc,doc_01,doc_02',:conditions => ["tipo_doc = 7 and status = 0 and terminal_id = #{@nota_remicao.terminal_id} "],limit: 10,:order => 'CAST(doc as integer)').collect {|p| [ p.doc_01 << '.' << p.doc_02 << '.' << p.doc, p.id ] },:class => "select")  %></td></td>
+			<td rowspan="2"><a href="javascript:void(0)" class="btn btn-green" id="submit_fatura2">Generar</a></td>
+		</tr>		
+	</table>
+<% end %>
+<div class="modal fade" id="ModalStatusFe" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="row" align="center" style="padding: 15px">
+        	<div class="col-md-12">
+	        	<h1 id="data-status">Verificando Datos</h1>
+            <div id="data-erro-status" class='alert alert-danger'  role='alert' hidden> <ul></ul></div>
+            <div id="data-success-status" class='alert alert-success'  role='alert' hidden> <ul></ul></div>
+	        	<div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+	  $("#submit_fatura2").click(function() {
+	  	$('.lds-ring').show("slow");
+	  	$("#ModalStatusFe").modal();
+	    $.ajax({
+	        type: 'POST',
+	        url:  '/form_fiscals/nota_remicao_update',
+	        data: $('#send_fatura').serialize(),
+	        dataType: "JSON",
+	        success: function(data) {
+	        	if (data['fe']['success'] == false){
+	            $("#data-erro-status").show();
+	            $.each(data['fe']['errores'], function(i, error) {
+	              $("#data-erro-status").append("<p>"+ data['fe']['errores'][i].error  +"</p>")
+	            })
+	        		$('.lds-ring').hide("slow");
+	        	} else {
+	 						$("#data-success-status").show();
+	            $.each(data['fe']["result"]['deList'], function(i, cdc) {
+	              $("#data-success-status").append("<p>"+ data['fe']["result"]["deList"][i].cdc  +"</p>")
+	            })
+
+	        		location.reload();
+	        	}
+
+	          console.log(data);
+	        },
+
+	        error: function (jqXHR, exception) {
+		        var msg = '';
+		        if (jqXHR.status === 0) {
+		            msg = 'Not connect.\n Verify Network.';
+		        } else if (jqXHR.status == 404) {
+		            msg = 'Requested page not found. [404]';
+		        } else if (jqXHR.status == 500) {
+		            msg = 'Internal Server Error [500].';
+		        } else if (exception === 'parsererror') {
+		            msg = 'Requested JSON parse failed. '
+
+		        } else if (exception === 'timeout') {
+		            msg = 'Time out error.';
+		        } else if (exception === 'abort') {
+		            msg = 'Ajax request aborted.';
+		        } else {
+		            msg = 'Uncaught Error.\n' + jqXHR.responseText;
+		        }
+		        $("#data-erro-status").show();
+		        $("#data-erro-status").append("<p>"+ msg +"</p>")
+		    },
+	    });
+	  });	
+</script>

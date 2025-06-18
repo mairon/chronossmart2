@@ -191,19 +191,25 @@
 
   def calc_promedio_update
 
-    puts saldo = Stock.sum('entrada - saida',:conditions => ["deposito_id = ? and produto_id = ? AND data <= ?",self.deposito_id,self.produto_id, compra.data])
-    puts promedio_anterior = Stock.where("status = 0 and deposito_id = ? and produto_id = ? AND data <= ?",self.deposito_id,self.produto_id, compra.data).last
+    saldo = Stock.sum('entrada - saida',:conditions => ["deposito_id = ? and produto_id = ? AND data <= ?",self.deposito_id,self.produto_id, compra.data])
+    promedio_anterior = Stock.where("status = 0 and deposito_id = ? and produto_id = ? AND data <= ?",self.deposito_id,self.produto_id, compra.data).last
 
     if saldo.to_f <= 0
       self.promedio_guarani = self.unitario_guarani.to_f
+      self.promedio_dolar = self.unitario_dolar.to_f
     else
       stock_financeiro_anterior_gs = (saldo.to_f * promedio_anterior.promedio_guarani.to_f)
       nova_entrada_gs              = (self.quantidade.to_f * self.unitario_guarani.to_f)
       calc_promedio_gs             = (stock_financeiro_anterior_gs.to_f + nova_entrada_gs.to_f) / (saldo.to_f + self.quantidade.to_f)
 
+      stock_financeiro_anterior_us = (saldo.to_f * promedio_anterior.promedio_dolar.to_f)
+      nova_entrada_us              = (self.quantidade.to_f * self.unitario_dolar.to_f)
+      calc_promedio_us             = (stock_financeiro_anterior_us.to_f + nova_entrada_us.to_f) / (saldo.to_f + self.quantidade.to_f)
+
       self.promedio_guarani = calc_promedio_gs.to_f
+      self.promedio_dolar = calc_promedio_us.to_f
     end
-    puts "#{compra.data} |||| #{ self.promedio_guarani.to_f}"
+    puts "#{compra.data} - Promedio Gs. #{ self.promedio_guarani.to_f} Promedio U$.  #{ self.promedio_dolar.to_f}"
   end
 
 

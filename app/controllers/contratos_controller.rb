@@ -156,7 +156,7 @@ class ContratosController < ApplicationController
 		@contrato = Contrato.find(params[:id])
     @cotas_cont = Cliente.where(tabela: 'CONTRATOS', tabela_id: @contrato.id).order('cota,id')
     @contra_servis = ContratoServico.where(contrato_id: @contrato.id).order(:id)
-    @fts = FormFiscal.where("sigla_proc = 'CT' AND cod_proc = #{@contrato.id} AND STATUS != 0").select("updated_at,ruc,persona_nome,tipo_emissao,cdc,id,impressao, cod_proc, tot_gs, doc_01, doc_02, doc, status, autorizacao").order('id desc ')
+    @fts = FormFiscal.where("sigla_proc = 'CT' AND cod_proc = #{@contrato.id} AND STATUS != 0").select("terminal_id, updated_at,ruc,persona_nome,tipo_emissao,cdc,id,impressao, cod_proc, tot_gs, doc_01, doc_02, doc, status, autorizacao").order('id desc ')
     @produto_sum_gs = ContratoServico.where(contrato_id: @contrato.id).sum(:total_gs)
 
     render layout: 'chart'

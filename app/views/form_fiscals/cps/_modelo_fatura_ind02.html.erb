@@ -1,0 +1,730 @@
+<body  onload="print()">
+<!--COMBUSTIVEL-FRONTEIRAS CAIXA!-->
+<!-- 3F ADM -->
+	<% if @ft.tipo == 0
+    tipo="CONTADO"
+  else
+    tipo="CREDITO"
+  end
+%>
+<% if @ft.moeda.to_i == 0
+	 	d = "DOLAR"
+	 else
+	 	d = "GUARANIES"
+	 end
+ %>
+
+<style type="text/css">
+	table {
+		font-family:Lucida Console, Courier ;font-size:9px;
+
+	}
+
+	.grid {
+		border-collapse: collapse;
+
+	}
+	.header {
+		border-collapse: collapse;
+		border: 1px solid black;
+	}
+
+	#totales {
+		border-collapse: collapse;
+		border-left: 2px solid #fff;
+		border-right: 2px solid #fff;
+	}
+
+	.cond {
+		font-family:Lucida Console, Courier ;font-size:7px;
+	}
+
+	.grid tr td {
+		border-collapse: collapse;
+		border-left: 1px solid black;
+		border-right: 1px solid black;
+	}
+
+</style>
+
+	<table>
+		<tr>
+			<td align="right" width="745" height="92" valign="bottom"><small><%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc %>/<%= @ft.cod_proc %></small></td>
+		</tr>
+	</table>
+
+	<table border="1" style="border-collapse: collapse; ">
+		<tr>
+			<td>
+				<table border="0">
+					<tr>
+						<td  width="65" align="right">Fecha :</td>
+						<td width="220"><%=l @ft.data.to_date.to_date %> - <%= Time.now.strftime('%H:%M') %></td>
+
+						<td align="right">Condición de Venta:</td>
+						<td><%= tipo %></td>
+						<td width="70">Moneda:<%= d %> </td>
+					</tr>
+
+					<tr>
+						<td align="right">RUC/CI :</td>
+						<td><b><%= @ft.persona.ruc %></b></td>
+
+					</tr>
+
+					<tr>
+						<td align="right">Cliente :</td>
+						<td width="671" colspan="4"><b><%= @ft.persona.nome %></b></td>
+					</tr>
+					<tr>
+
+						<td align="right">Dirección :</td>
+						<td><%= @ft.persona.direcao %></td>
+						<td align="right">Teléfono :</td>
+						<td><%= @ft.persona.telefone %></td>
+					</tr>
+				</table>
+
+			</td>
+		</tr>
+	</table>
+
+	<table border="0" class="grid" width="745"  style="border-bottom: 1px solid black;">
+		<tr class="header">
+			<td width="20">Ref.</td>
+			<td>Cant.</td>
+			<td colspan="3">Descripción de la mercadoria y/o servico</td>
+			<td align="right">Unitario</td>
+			<td align="right">Valor</td>
+			<td>IVA</td>
+		</tr>
+
+		<% count        = 1 %>
+		<% tottaxa0_gs  = 0 %>
+		<% tottaxa0_us  = 0 %>
+		<% tottaxa10_gs = 0 %>
+		<% tottaxa10_us = 0 %>
+		<% tottaxa05_gs = 0 %>
+		<% tottaxa05_us = 0 %>
+
+				<% tottaxa10_gs  = tottaxa10_gs.to_f + @ft.tot_gs.to_f %>
+				<% tottaxa10_us  = tottaxa10_us.to_f + @ft.tot_us.to_f %>
+
+
+
+		<tr>
+		  <td width="20"  align="center">
+		    0001
+		  </td>
+		  <td align="left">
+		    01
+		  </td>
+		  <td  colspan="3" width="320" align="left">
+				<%= @ft.produto.nome unless @ft.produto.blank? %>
+      </td>
+			<td width="50"  align="right">
+				<% if @ft.moeda.to_i == 0 %>
+					<%= format_decimal(tottaxa10_us) %>
+				<% else %>
+					<%= format_int(tottaxa10_gs) %>
+				<% end %>
+						</td>
+
+						<td width="50"  align="right">
+				<% if @ft.moeda.to_i == 0 %>
+					<%= format_decimal(tottaxa10_us) %>
+				<% else %>
+					<%= format_int(tottaxa10_gs) %>
+				<% end %>
+						</td>
+
+
+						<td>
+							10%
+						</td>
+
+		</tr>
+
+
+			<% lines = 10 - count  %>
+			<% lines.times do |l| %>
+			<tr height="10">
+				<td></td>
+				<td></td>
+				<td colspan="3"></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<% end %>
+	<table>
+
+	<!-- em letras !-->
+	<table border="0" class="grid" width="745"  style="border-bottom: 1px solid black;">
+		<tr class="header" height="25">
+			<td colspan="5" valign="top">En Letras:
+				<% if @ft.moeda.to_i == 0 %>
+			U$ <% real,cents= ("%.2f" % @ft.tot_us.to_f).to_s.split(/\./).map{ |m| m.to_i}
+		      valor_cents=Extenso.por_extenso(cents%100)
+		      valor_cents+= case cents.to_i%100
+		      when 0 then ""
+		      when 1 then " "
+		      when 2..99 then " "
+		      end %>
+			<%= I18n.with_locale(:es) { @ft.tot_us.to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS' %>
+  	<% else %>
+  		Gs.<%= I18n.with_locale(:es) { @ft.tot_gs.to_i.to_words.upcase } %>
+  	<% end %>
+			</td>
+
+				<td colspan="3" rowspan="2">
+					<table  id="totales" border="0">
+						<tr>
+							<td id="totales" align="right">Descuento</td>
+							<td id="totales" align="right" width="74">
+
+							</td>
+						</tr>
+						<tr>
+							<td id="totales" align="right">Sub-Total Exentas:</td>
+							<td id="totales" align="right" width="74">
+								<% if @ft.moeda.to_i == 0 %>
+									<%= number_to_currency(tottaxa0_us.to_f, :format=>' %n ',  :separeitor => ',')%>
+								<% else %>
+									<% if tottaxa0_gs.to_f > 0 %>
+										<%= number_to_currency( (tottaxa0_gs = (tottaxa0_gs.to_f) ) , :format=>' %n ', :precision => 0) %>
+									<% else %>
+										<%= number_to_currency(tottaxa0_gs.to_f, :format=>' %n ', :precision => 0) %>
+									<% end %>
+
+
+								<% end %>
+							</td>
+						</tr>
+
+						<tr>
+							<td align="right" id="totales">Sub-Total gravadas 05%:</td>
+							<td align="right">
+								<% if @ft.moeda.to_i == 0 %>
+									<%= number_to_currency(tottaxa05_us.to_f, :format=>' %n ',  :separeitor => ',')%>
+								<% else %>
+									<%= number_to_currency(tottaxa05_gs.to_f, :format=>' %n ',  :precision => 0 )%>
+								<% end %>
+							</td>
+						</tr>
+
+
+						<tr>
+							<td align="right"  id="totales">Sub-Total gravadas 10%:</td>
+							<td align="right">
+								<% if @ft.moeda.to_i == 0 %>
+									<%= number_to_currency(tottaxa10_us.to_f, :format=>' %n ', :separeitor => ',')%>
+								<% else %>
+									<% if tottaxa0_gs.to_f == 0 and tottaxa10_gs.to_f > 0 %>
+										<%= number_to_currency( (tottaxa10_gs = (tottaxa10_gs.to_f
+										) ), :format=>' %n ', :precision => 0) %>
+									<% else %>
+										<%= number_to_currency(tottaxa10_gs.to_f, :format=>' %n ', :precision => 0) %>
+									<% end %>
+								<% end %>
+							</td>
+						</tr>
+						<tr>
+							<td align="right" id="totales">Total a Pagar:</td>
+							<td align="right">
+								<% if @ft.moeda.to_i == 0 %>
+									<%= number_to_currency( tottaxa0_us.to_f + tottaxa10_us.to_f + tottaxa05_us.to_f, :format=>' %n ',  :separeitor => ',')%>
+								<% else %>
+									<%= number_to_currency( tottaxa0_gs.to_f + tottaxa05_gs.to_f + tottaxa10_gs.to_f, :format=>' %n ',  :precision => 0)%>
+								<% end %>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</tr>
+		<tr style="border-collapse: collapse; border-bottom: 1px solid black;">
+			<td colspan="2">
+				Liquidación del IVA: (05%)
+				<% if @ft.moeda.to_i == 0 %>
+					<%= number_to_currency((tottaxa05_us.to_f) / 21, :format=>' %n ', :separeitor => ',')%>
+				<% else %>
+					<%= number_to_currency((tottaxa05_gs.to_f) / 21, :format=>' %n ', :precision => 0)%>
+				<% end %>
+			</td>
+			<td colspan="2">
+				(10%)
+				<% if @ft.moeda.to_i == 0 %>
+					<%= number_to_currency((tottaxa10_us.to_f) / 11, :format=>' %n ', :separeitor => ',')%>
+				<% else %>
+					<%= number_to_currency((tottaxa10_gs.to_f) / 11, :format=>' %n ', :precision => 0)%>
+				<% end %>
+
+			</td>
+			<td>
+				Total del IVA:
+				<% if @ft.moeda.to_i == 0 %>
+					<%= number_to_currency( ((tottaxa05_us.to_f) / 21) + ((tottaxa10_us.to_f) / 11), :format=>' %n ', :separeitor => ',')%>
+				<% else %>
+					<%= number_to_currency( ((tottaxa05_gs.to_f) / 21) + ((tottaxa10_gs.to_f) / 11), :format=>' %n ', :precision => 0)%>
+				<% end %>
+			</td>
+		</tr>
+	</table>
+
+
+
+	<!-- Segunda Via !-->
+
+
+	<table>
+		<tr>
+			<td align="right" width="740" height="135" valign="bottom"><small><%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc %>/<%= @ft.cod_proc %></small></td>
+		</tr>
+	</table>
+
+	<table border="1" style="border-collapse: collapse; ">
+		<tr>
+			<td>
+				<table border="0">
+					<tr>
+						<td  width="65" align="right">Fecha :</td>
+						<td width="220"><%=l @ft.data.to_date.to_date %> - <%= Time.now.strftime('%H:%M') %></td>
+
+						<td align="right">Condición de Venta:</td>
+						<td><%= tipo %></td>
+						<td width="70">Moneda:<%= d %> </td>
+					</tr>
+
+					<tr>
+						<td align="right">RUC/CI :</td>
+						<td><b><%= @ft.persona.ruc %></b></td>
+
+					</tr>
+
+					<tr>
+						<td align="right">Cliente :</td>
+						<td width="671" colspan="4"><b><%= @ft.persona.nome %></b></td>
+					</tr>
+					<tr>
+
+						<td align="right">Dirección :</td>
+						<td><%= @ft.persona.direcao %></td>
+						<td align="right">Teléfono :</td>
+						<td><%= @ft.persona.telefone %></td>
+					</tr>
+				</table>
+
+			</td>
+		</tr>
+	</table>
+
+	<table border="0" class="grid" width="745"  style="border-bottom: 1px solid black;">
+		<tr class="header">
+			<td width="20">Cant.</td>
+			<td>Ref.</td>
+			<td colspan="3">Descripción de la mercadoria y/o servico</td>
+			<td align="right">Unitario</td>
+			<td align="right">Valor</td>
+			<td>IVA</td>
+
+		</tr>
+
+		<% count        = 1 %>
+		<% tottaxa0_gs  = 0 %>
+		<% tottaxa0_us  = 0 %>
+		<% tottaxa10_gs = 0 %>
+		<% tottaxa10_us = 0 %>
+		<% tottaxa05_gs = 0 %>
+		<% tottaxa05_us = 0 %>
+
+				<% tottaxa10_gs  = tottaxa10_gs.to_f + @ft.tot_gs.to_f %>
+				<% tottaxa10_us  = tottaxa10_us.to_f + @ft.tot_us.to_f %>
+
+
+
+		<tr>
+		  <td width="20"  align="center">
+		    0001
+		  </td>
+		  <td align="left">
+		    01
+		  </td>
+		  <td  colspan="3" width="320" align="left">
+				<%= @ft.produto.nome unless @ft.produto.blank? %>
+      </td>
+			<td width="50"  align="right">
+				<% if @ft.moeda.to_i == 0 %>
+					<%= format_decimal(tottaxa10_us) %>
+				<% else %>
+					<%= format_int(tottaxa10_gs) %>
+				<% end %>
+						</td>
+
+						<td width="50"  align="right">
+				<% if @ft.moeda.to_i == 0 %>
+					<%= format_decimal(tottaxa10_us) %>
+				<% else %>
+					<%= format_int(tottaxa10_gs) %>
+				<% end %>
+						</td>
+
+
+						<td>
+							10%
+						</td>
+
+		</tr>
+
+			<% lines = 10 - count  %>
+			<% lines.times do |l| %>
+			<tr height="10">
+				<td></td>
+				<td></td>
+				<td colspan="3"></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<% end %>
+	<table>
+
+	<!-- em letras !-->
+	<table border="0" class="grid" width="745"  style="border-bottom: 1px solid black;">
+		<tr class="header" height="25">
+			<td colspan="5" valign="top">En Letras:
+				<% if @ft.moeda.to_i == 0 %>
+			U$ <% real,cents= ("%.2f" % @ft.tot_us.to_f).to_s.split(/\./).map{ |m| m.to_i}
+		      valor_cents=Extenso.por_extenso(cents%100)
+		      valor_cents+= case cents.to_i%100
+		      when 0 then ""
+		      when 1 then " "
+		      when 2..99 then " "
+		      end %>
+			<%= I18n.with_locale(:es) { @ft.tot_us.to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS' %>
+  	<% else %>
+  		Gs.<%= I18n.with_locale(:es) { @ft.tot_gs.to_i.to_words.upcase } %>
+  	<% end %>
+			</td>
+
+				<td colspan="3" rowspan="2">
+					<table  id="totales" border="0">
+						<tr>
+							<td id="totales" align="right">Descuento</td>
+							<td id="totales" align="right" width="74">
+
+							</td>
+						</tr>
+
+						<tr>
+							<td id="totales" align="right">Sub-Total Exentas:</td>
+							<td id="totales" align="right" width="74">
+								<% if @ft.moeda.to_i == 0 %>
+									<%= number_to_currency(tottaxa0_us.to_f, :format=>' %n ',  :separeitor => ',')%>
+								<% else %>
+									<% if tottaxa0_gs.to_f > 0 %>
+										<%= number_to_currency( (tottaxa0_gs = (tottaxa0_gs.to_f) ) , :format=>' %n ', :precision => 0) %>
+									<% else %>
+										<%= number_to_currency(tottaxa0_gs.to_f, :format=>' %n ', :precision => 0) %>
+									<% end %>
+
+
+								<% end %>
+							</td>
+						</tr>
+
+						<tr>
+							<td align="right" id="totales">Sub-Total gravadas 05%:</td>
+							<td align="right">
+								<% if @ft.moeda.to_i == 0 %>
+									<%= number_to_currency(tottaxa05_us.to_f, :format=>' %n ',  :separeitor => ',')%>
+								<% else %>
+									<%= number_to_currency(tottaxa05_gs.to_f, :format=>' %n ',  :precision => 0 )%>
+								<% end %>
+							</td>
+						</tr>
+
+
+						<tr>
+							<td align="right"  id="totales">Sub-Total gravadas 10%:</td>
+							<td align="right">
+								<% if @ft.moeda.to_i == 0 %>
+									<%= number_to_currency(tottaxa10_us.to_f, :format=>' %n ', :separeitor => ',')%>
+								<% else %>
+									<% if tottaxa0_gs.to_f == 0 and tottaxa10_gs.to_f > 0 %>
+										<%= number_to_currency( (tottaxa10_gs = (tottaxa10_gs.to_f  ) ), :format=>' %n ', :precision => 0) %>
+									<% else %>
+										<%= number_to_currency(tottaxa10_gs.to_f, :format=>' %n ', :precision => 0) %>
+									<% end %>
+								<% end %>
+							</td>
+						</tr>
+						<tr>
+							<td align="right" id="totales">Total a Pagar:</td>
+							<td align="right">
+								<% if @ft.moeda.to_i == 0 %>
+									<%= number_to_currency( tottaxa0_us.to_f + tottaxa10_us.to_f + tottaxa05_us.to_f, :format=>' %n ',  :separeitor => ',')%>
+								<% else %>
+									<%= number_to_currency( tottaxa0_gs.to_f + tottaxa05_gs.to_f + tottaxa10_gs.to_f, :format=>' %n ',  :precision => 0)%>
+								<% end %>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</tr>
+		<tr style="border-collapse: collapse; border-bottom: 1px solid black;">
+			<td colspan="2">
+				Liquidación del IVA: (05%)
+				<% if @ft.moeda.to_i == 0 %>
+					<%= number_to_currency((tottaxa05_us.to_f) / 21, :format=>' %n ', :separeitor => ',')%>
+				<% else %>
+					<%= number_to_currency((tottaxa05_gs.to_f) / 21, :format=>' %n ', :precision => 0)%>
+				<% end %>
+			</td>
+			<td colspan="2">
+				(10%)
+				<% if @ft.moeda.to_i == 0 %>
+					<%= number_to_currency((tottaxa10_us.to_f) / 11, :format=>' %n ', :separeitor => ',')%>
+				<% else %>
+					<%= number_to_currency((tottaxa10_gs.to_f) / 11, :format=>' %n ', :precision => 0)%>
+				<% end %>
+
+			</td>
+			<td>
+				Total del IVA:
+				<% if @ft.moeda.to_i == 0 %>
+					<%= number_to_currency( ((tottaxa05_us.to_f) / 21) + ((tottaxa10_us.to_f) / 11), :format=>' %n ', :separeitor => ',')%>
+				<% else %>
+					<%= number_to_currency( ((tottaxa05_gs.to_f) / 21) + ((tottaxa10_gs.to_f) / 11), :format=>' %n ', :precision => 0)%>
+				<% end %>
+			</td>
+		</tr>
+	</table>
+
+
+	<!-- Terceira Via !-->
+
+	<table>
+		<tr>
+			<td align="right" width="740" height="120" valign="bottom"><small><%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc %>/<%= @ft.cod_proc %></small></td>
+		</tr>
+	</table>
+
+	<table border="1" style="border-collapse: collapse; ">
+		<tr>
+			<td>
+				<table border="0">
+					<tr>
+						<td  width="65" align="right">Fecha :</td>
+						<td width="220"><%=l @ft.data.to_date.to_date %> - <%= Time.now.strftime('%H:%M') %></td>
+
+						<td align="right">Condición de Venta:</td>
+						<td><%= tipo %></td>
+						<td width="70">Moneda:<%= d %> </td>
+					</tr>
+
+					<tr>
+						<td align="right">RUC/CI :</td>
+						<td><b><%= @ft.persona.ruc %></b></td>
+
+					</tr>
+
+					<tr>
+						<td align="right">Cliente :</td>
+						<td width="671" colspan="4"><b><%= @ft.persona.nome %></b></td>
+					</tr>
+					<tr>
+
+						<td align="right">Dirección :</td>
+						<td><%= @ft.persona.direcao %></td>
+						<td align="right">Teléfono :</td>
+						<td><%= @ft.persona.telefone %></td>
+					</tr>
+				</table>
+
+			</td>
+		</tr>
+	</table>
+
+	<table border="0" class="grid" width="750"  style="border-bottom: 1px solid black;">
+		<tr class="header">
+			<td width="20">Cant.</td>
+			<td>Ref.</td>
+			<td colspan="3">Descripción de la mercadoria y/o servico</td>
+			<td align="right">Unitario</td>
+			<td align="right">Valor</td>
+			<td>IVA</td>
+
+		</tr>
+
+		<% count        = 1 %>
+		<% tottaxa0_gs  = 0 %>
+		<% tottaxa0_us  = 0 %>
+		<% tottaxa10_gs = 0 %>
+		<% tottaxa10_us = 0 %>
+		<% tottaxa05_gs = 0 %>
+		<% tottaxa05_us = 0 %>
+
+				<% tottaxa10_gs  = tottaxa10_gs.to_f + @ft.tot_gs.to_f %>
+				<% tottaxa10_us  = tottaxa10_us.to_f + @ft.tot_us.to_f %>
+
+
+
+		<tr>
+		  <td width="20"  align="center">
+		    0001
+		  </td>
+		  <td align="left">
+		    01
+		  </td>
+		  <td  colspan="3" width="320" align="left">
+				<%= @ft.produto.nome unless @ft.produto.blank? %>
+      </td>
+			<td width="50"  align="right">
+				<% if @ft.moeda.to_i == 0 %>
+					<%= format_decimal(tottaxa10_us) %>
+				<% else %>
+					<%= format_int(tottaxa10_gs) %>
+				<% end %>
+						</td>
+
+						<td width="50"  align="right">
+				<% if @ft.moeda.to_i == 0 %>
+					<%= format_decimal(tottaxa10_us) %>
+				<% else %>
+					<%= format_int(tottaxa10_gs) %>
+				<% end %>
+						</td>
+
+
+						<td>
+							10%
+						</td>
+
+		</tr>
+
+			<% lines = 10 - count  %>
+			<% lines.times do |l| %>
+			<tr height="10">
+				<td></td>
+				<td></td>
+				<td colspan="3"></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<% end %>
+	<table>
+
+	<!-- em letras !-->
+	<table border="0" class="grid" width="750"  style="border-bottom: 1px solid black;">
+		<tr class="header" height="25">
+			<td colspan="5" valign="top">En Letras:
+				<% if @ft.moeda.to_i == 0 %>
+			U$ <% real,cents= ("%.2f" % @ft.tot_us.to_f).to_s.split(/\./).map{ |m| m.to_i}
+		      valor_cents=Extenso.por_extenso(cents%100)
+		      valor_cents+= case cents.to_i%100
+		      when 0 then ""
+		      when 1 then " "
+		      when 2..99 then " "
+		      end %>
+			<%= I18n.with_locale(:es) { @ft.tot_us.to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS' %>
+  	<% else %>
+  		Gs.<%= I18n.with_locale(:es) { @ft.tot_gs.to_i.to_words.upcase } %>
+  	<% end %>
+			</td>
+
+				<td colspan="3" rowspan="2">
+					<table  id="totales" border="0">
+						<tr>
+							<td id="totales" align="right">Descuento</td>
+							<td id="totales" align="right" width="74">
+
+							</td>
+						</tr>
+						<tr>
+							<td id="totales" align="right">Sub-Total Exentas:</td>
+							<td id="totales" align="right" width="74">
+								<% if @ft.moeda.to_i == 0 %>
+									<%= number_to_currency(tottaxa0_us.to_f, :format=>' %n ',  :separeitor => ',')%>
+								<% else %>
+									<% if tottaxa0_gs.to_f > 0 %>
+										<%= number_to_currency( (tottaxa0_gs = (tottaxa0_gs.to_f) ) , :format=>' %n ', :precision => 0) %>
+									<% else %>
+										<%= number_to_currency(tottaxa0_gs.to_f, :format=>' %n ', :precision => 0) %>
+									<% end %>
+
+
+								<% end %>
+							</td>
+						</tr>
+
+						<tr>
+							<td align="right" id="totales">Sub-Total gravadas 05%:</td>
+							<td align="right">
+								<% if @ft.moeda.to_i == 0 %>
+									<%= number_to_currency(tottaxa05_us.to_f, :format=>' %n ',  :separeitor => ',')%>
+								<% else %>
+									<%= number_to_currency(tottaxa05_gs.to_f, :format=>' %n ',  :precision => 0 )%>
+								<% end %>
+							</td>
+						</tr>
+
+
+						<tr>
+							<td align="right"  id="totales">Sub-Total gravadas 10%:</td>
+							<td align="right">
+								<% if @ft.moeda.to_i == 0 %>
+									<%= number_to_currency(tottaxa10_us.to_f, :format=>' %n ', :separeitor => ',')%>
+								<% else %>
+									<% if tottaxa0_gs.to_f == 0 and tottaxa10_gs.to_f > 0 %>
+										<%= number_to_currency( (tottaxa10_gs = ((tottaxa10_gs.to_f )) ), :format=>' %n ', :precision => 0) %>
+									<% else %>
+										<%= number_to_currency(tottaxa10_gs.to_f, :format=>' %n ', :precision => 0) %>
+									<% end %>
+								<% end %>
+							</td>
+						</tr>
+						<tr>
+							<td align="right" id="totales">Total a Pagar:</td>
+							<td align="right">
+								<% if @ft.moeda.to_i == 0 %>
+									<%= number_to_currency( tottaxa0_us.to_f + tottaxa10_us.to_f + tottaxa05_us.to_f, :format=>' %n ',  :separeitor => ',')%>
+								<% else %>
+									<%= number_to_currency( tottaxa0_gs.to_f + tottaxa05_gs.to_f + tottaxa10_gs.to_f, :format=>' %n ',  :precision => 0)%>
+								<% end %>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</tr>
+		<tr style="border-collapse: collapse; border-bottom: 1px solid black;">
+			<td colspan="2">
+				Liquidación del IVA: (05%)
+				<% if @ft.moeda.to_i == 0 %>
+					<%= number_to_currency((tottaxa05_us.to_f) / 21, :format=>' %n ', :separeitor => ',')%>
+				<% else %>
+					<%= number_to_currency((tottaxa05_gs.to_f) / 21, :format=>' %n ', :precision => 0)%>
+				<% end %>
+			</td>
+			<td colspan="2">
+				(10%)
+				<% if @ft.moeda.to_i == 0 %>
+					<%= number_to_currency((tottaxa10_us.to_f) / 11, :format=>' %n ', :separeitor => ',')%>
+				<% else %>
+					<%= number_to_currency((tottaxa10_gs.to_f) / 11, :format=>' %n ', :precision => 0)%>
+				<% end %>
+
+			</td>
+			<td>
+				Total del IVA:
+				<% if @ft.moeda.to_i == 0 %>
+					<%= number_to_currency( ((tottaxa05_us.to_f) / 21) + ((tottaxa10_us.to_f) / 11), :format=>' %n ', :separeitor => ',')%>
+				<% else %>
+					<%= number_to_currency( ((tottaxa05_gs.to_f) / 21) + ((tottaxa10_gs.to_f) / 11), :format=>' %n ', :precision => 0)%>
+				<% end %>
+			</td>
+		</tr>
+	</table>

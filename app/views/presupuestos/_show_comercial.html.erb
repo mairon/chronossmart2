@@ -2,6 +2,12 @@
   <h1 id="header">
     Presupuesto #<%= @presupuesto.id.to_s.rjust(6,'0') %>
     <div class="pull-right">
+
+      <% if current_user.tipo.to_i == 0 %>
+        <a href="#" class="btn" data-toggle="modal" data-load-url="<%= rentabilidade_presupuesto_path(id: @presupuesto.id) %>" data-target="#ModalRentabilidade"><span class="material-symbols-outlined">price_check</span></a>
+      <% end %>
+
+      <a href="#" class="btn" data-toggle="modal" data-load-url="<%= historico_vendas_persona_path(id: @presupuesto.persona_id) %>" data-target="#ModalHistoricoVenda"><span class="material-symbols-outlined">history</span></a>
       <%= link_to t('BACK'), edit_presupuesto_path(@presupuesto),:class =>'btn btn-default' %>
       <%= link_to 'Generar (PDF)', print_presupuesto_presupuesto_path(@presupuesto, tipo: '0'),:class =>'btn btn-blue  btn-print' %>
       <%= link_to '(PDF) - INTERNO', print_presupuesto_presupuesto_path(@presupuesto, tipo: '1', grupos: params[:grupos]),:class =>'btn btn-blue btn-print' %>
@@ -97,9 +103,51 @@
   </div>
 </div>
 
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="ModalHistoricoVenda">
+  <div class="modal-dialog modal-lg" role="document"  style="height: 720px; width: 1300px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h2 class="modal-title" id="myModalLabel" align="center">Historico de Ventas</h2>
+      </div>
+      <div class="modal-body-mhv" style="padding: 10px">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="ModalRentabilidade">
+  <div class="modal-dialog modal-lg" role="document"  style="height: 720px; width: 1200px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h2 class="modal-title" id="myModalLabel" align="center">Rentabilidad</h2>
+      </div>
+      <div class="modal-body-rent" style="padding: 10px">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $('#ModalHistoricoVenda').on('show.bs.modal', function (e) {
+    var loadurl = $(e.relatedTarget).data('load-url');
+    $(this).find('.modal-body-mhv').load(loadurl);
+  });
+
+
+</script>
+
+
 <script type="text/javascript">
-
-
 
   document.onkeydown=function(e){
     if(e.which == 113){ //F2
@@ -110,9 +158,15 @@
     };
   }
 
+  $('#ModalRentabilidade').on('show.bs.modal', function (e) {
+    var loadurl = $(e.relatedTarget).data('load-url');
+    $(this).find('.modal-body-rent').load(loadurl);
+  });
+
 </script>
 
 
 <% if @venda_config.modelo_cp.to_i == 1 %>
   <%= render 'set_print' %>
 <% end %>
+

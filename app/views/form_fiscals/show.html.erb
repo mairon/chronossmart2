@@ -28,6 +28,7 @@
       Nota de Retención
     <% end %>
     <div class="pull-right">
+      <%= link_to image_tag("icon-edit.png", width: '13'), edit_form_fiscal_path(@form_fiscal), class: 'btn btn-default' %>
     </div>
   </h1>
   <div class="panel-content">
@@ -45,10 +46,11 @@
         <% end %>
       </div>
 
+      <% if @form_fiscal.tipo_emissao == 1 %>
       <div class="col-md-3">
         <label>Situación SET</label>
-        <% if @form_fiscal.tipo_doc == 1 %>
-        <%= render partial: "/form_fiscals/consulta_estado", locals: {cdc: @form_fiscal.cdc} %>
+
+        <%= render partial: "/form_fiscals/consulta_estado", locals: {cdc: @form_fiscal.cdc, terminal: @form_fiscal.terminal } %>
 
         <td>
           <%= @get_resp["deList"][0]["situacion"].to_s %> -
@@ -73,8 +75,9 @@
           <label>Mensaje SET</label>
           <%= @get_resp["deList"][0]["respuesta_mensaje"] %>
         </div>
+        <% end %>
       </div>
-      <% end %>
+
 
     <hr>
 
@@ -121,7 +124,7 @@
 
       <div class="col-md-3">
         <label for="">Cod Proc.</label>
-        <%= @form_fiscal.cod_proc %>
+        <%= @form_fiscal.sigla_proc %>•<%= @form_fiscal.cod_proc %>
       </div>
     </div>
 
@@ -131,13 +134,35 @@
 <div class="panel">
   <div class="panel-content">
     <% if @form_fiscal.tipo_emissao == 1 %>
-      <%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: @form_fiscal.cdc, id: @form_fiscal.id), class: 'btn btn-blue' %>
+
+        <% if @form_fiscal.sigla_proc == 'VTI' and @form_fiscal.cdc.blank? %>
+          <%= link_to 'Generar DE', transmite_de_form_fiscals_path( id: @form_fiscal.id), class: 'btn btn-default' %>
+        <% end %>
+
+        <% unless @form_fiscal.cdc.blank? %>
+          <%= link_to 'Generar pdf', gera_pdf_cdc_form_fiscals_path( cdc: @form_fiscal.cdc, id: @form_fiscal.id), class: 'btn btn-blue' %>
+        <% end %>
       <% if @get_resp["deList"][0]["situacion"].to_s == '4' %>
         <%= link_to  "Inutilizacion", "#", "data-toggle" => "modal", "data-target" =>"#modal-inutilizacion", class: 'btn btn-warning' %>
         <%= render partial: "form_fiscals/eventos/inutilizacion", locals: { form_fiscal: @form_fiscal } %>
+
+        <% if @form_fiscal.data.strftime("%Y-%m-%d") == Time.now.strftime("%Y-%m-%d") %>
+          <%= link_to 'Re-Enviar', reenviar_form_fiscals_path( id: @form_fiscal.id), class: 'btn btn-default' %>
+        <% end %>
+
       <% elsif @get_resp["deList"][0]["situacion"].to_s == '2' %>
         <%= link_to  "Cancelacion", "#", "data-toggle" => "modal", "data-target" =>"#modal-cancelacion", class: 'btn btn-danger' %>
         <%= render partial: "form_fiscals/eventos/cancelacion", locals: { form_fiscal: @form_fiscal } %>
+
+        <%= link_to  "NC", "#", "data-toggle" => "modal", "data-target" =>"#modal-nc-cancelacion", class: 'btn btn-danger' %>
+        <%= render partial: "form_fiscals/eventos/nc_cancelacion", locals: { form_fiscal: @form_fiscal } %>
+
+        <% nc_ff = FormFiscal.where(cod_proc: @form_fiscal.id, sigla_proc: 'FF').last %>
+
+        <% unless nc_ff.blank? %>
+        <%= link_to 'Gerar NC PDF', gera_pdf_cdc_form_fiscals_path( cdc: nc_ff.cdc, id: nc_ff.id), class: 'btn btn-default' %>
+          <%= nc_ff.cdc %>
+        <% end %>
       <% end %>
 
 
@@ -167,22 +192,24 @@
 
 <% if @form_fiscal.tipo_emissao == 1 %>
 <%
+  if @form_fiscal.arquivo_xml.blank?
+    url = URI("https://api.facturasend.com.py/#{@form_fiscal.terminal.nome_api_fiscal}/de/xml/#{@form_fiscal.cdc}")
 
-  url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/de/xml/#{@form_fiscal.cdc}")
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-  http = Net::HTTP.new(url.host, url.port)
-  http.use_ssl = true
-  http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    request = Net::HTTP::Get.new(url)
+    request["authorization"] = "Bearer api_key_#{@form_fiscal.terminal.token_api}"
+    request["content-type"] = 'application/json'
+    # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
+    response = http.request(request)
 
-  request = Net::HTTP::Get.new(url)
-  request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
-  request["content-type"] = 'application/json'
-  # O exemplo do objeto completo está detalhado abaixo na sessão "Conteúdo de Envio".
-  response = http.request(request)
-
+    @form_fiscal.update_attributes(arquivo_xml: response.body)
+  end
 %>
 
-<% doc = Nokogiri::XML(response.body) %>
+<% doc = Nokogiri::XML(@form_fiscal.arquivo_xml) %>
   <div class="panel">
     <h1 id="header">Dados Fiscales</h1>
     <div class="panel-content">

@@ -796,7 +796,7 @@ class Proveedore < ActiveRecord::Base
         #FITRO POR DATA FATURACAO
         if params[:tipo_data].to_s == 'emicao'
             cond = "AND C.data  BETWEEN  '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{liq_open} #{liq_close} #{liq_all} #{moeda} #{doc} #{cc} #{clasif} #{cota} #{find_valor} #{desc}"
-            od = "6,13,7,8,9,12,15 DESC"
+            od = "3,9,1"
         else
             #FITRO POR DATA FATURACAO VENCIMENTO
             cond = "AND C.vencimento  BETWEEN  '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{liq_open} #{liq_close} #{liq_all} #{moeda} #{doc} #{cc} #{clasif} #{cota} #{find_valor} #{desc}"
@@ -931,11 +931,11 @@ class Proveedore < ActiveRecord::Base
         #FITRO POR DATA FATURACAO
         if params[:tipo_data].to_s == 'emicao'
             cond = "#{unidade} PV.data  BETWEEN  '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{liq_open} #{liq_close} #{liq_all} #{moeda} #{doc} #{clasif} #{cc}"
-            od = "6,13,7,8,9,12,15 DESC"
+            od = "6,2,1"
         else
             #FITRO POR DATA FATURACAO VENCIMENTO
             cond = "#{unidade} PV.vencimento  BETWEEN  '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{liq_open} #{liq_close} #{liq_all} #{moeda} #{doc} #{clasif} #{cc}"
-            od = "6,13,7,8,9,12,15 DESC"
+            od = "6,13,1"
         end
 
         sql =  "SELECT
@@ -981,7 +981,7 @@ class Proveedore < ActiveRecord::Base
 
 
       				WHERE #{cond}
-      				ORDER BY 6,13,7,8,9,12,15 DESC"
+      				ORDER BY #{od}"
 		Proveedore.find_by_sql(sql)
     end
 

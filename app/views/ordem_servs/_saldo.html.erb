@@ -19,31 +19,30 @@
      <table>
         <% rt = 0 %>
         <% vt = 0 %>
-        <% @ordem_serv.ordem_serv_prods.where(status: true).each do |os| %>
+        <% @retirados.each do |os| %>
           <tr class = "<%= cycle("cor1", "cor2") %> dv<%= os.id %>">
             <td align="center" width="60"><%= os.data.strftime("%d/%m/%y") %></td>
             <td width="280">
-              <small> <%= os.produto.nome %></small>
+              <small> <%= os.produto_nome %></small>
             </td>
-            <% retirado =  OrdemServProd.where(status: false, ordem_serv_id: @ordem_serv.id, produto_id: os.produto_id).sum(:quantidade) %>
-            <td width="60" align="right"><%= format_peso(os.quantidade.to_f - retirado.to_f) %></td>
+            <td width="60" align="right"><%= format_peso(os.quantidade.to_f - os.sum_retirados.to_f) %></td>
 
-            <td width="40" align="right"><%= os.produto.unidade_medida.sigla unless os.produto.unidade_medida.blank? %></td>
+            <td width="40" align="right"><%= os.unidade_medida_sigla %></td>
             <% if @ordem_serv.moeda.to_i == 0 %>
               <td width="60" align="right"><%= format_decimal(os.valor_us) %></td>
-              <td width="60" align="right"><%= format_decimal(os.valor_us * (os.quantidade.to_f - retirado.to_f)) %></td>
-              <% vt += (os.valor_us.to_f * (os.quantidade.to_f - retirado.to_f)) %>
+              <td width="60" align="right"><%= format_decimal(os.valor_us * (os.quantidade.to_f - os.sum_retirados.to_f)) %></td>
+              <% vt += (os.valor_us.to_f * (os.quantidade.to_f - os.sum_retirados.to_f)) %>
             <% elsif @ordem_serv.moeda.to_i == 1 %>
               <td width="60" align="right"><%= format_int(os.valor_gs) %></td>
-              <td width="60" align="right"><%= format_int(os.valor_gs * (os.quantidade.to_f - retirado.to_f)) %></td>
-              <% vt += (os.valor_gs.to_f * (os.quantidade.to_f - retirado.to_f)) %>
+              <td width="60" align="right"><%= format_int(os.valor_gs * (os.quantidade.to_f - os.sum_retirados.to_f)) %></td>
+              <% vt += (os.valor_gs.to_f * (os.quantidade.to_f - os.sum_retirados.to_f)) %>
             <% elsif @ordem_serv.moeda.to_i == 2 %>
               <td width="60" align="right"><%= format_decimal(os.valor_rs) %></td>
-              <td width="60" align="right"><%= format_decimal(os.valor_rs * (os.quantidade.to_f - retirado.to_f)) %></td>
-              <% vt += (os.valor_rs.to_f * (os.quantidade.to_f - retirado.to_f)) %>
+              <td width="60" align="right"><%= format_decimal(os.valor_rs * (os.quantidade.to_f - os.sum_retirados.to_f)) %></td>
+              <% vt += (os.valor_rs.to_f * (os.quantidade.to_f - os.sum_retirados.to_f)) %>
             <% end %>
           </tr>
-          <% rt += (os.quantidade.to_f - retirado.to_f) %>
+          <% rt += (os.quantidade.to_f - os.sum_retirados.to_f) %>
         <% end %>
      </table>
  </div>

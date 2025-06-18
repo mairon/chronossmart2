@@ -5,28 +5,28 @@
         <tr>
           <td>De</td>
           <td >
-            <%= text_field_tag :inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+            <%= text_field_tag :boe_inicio, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
             <div class="input-group-addon-f">
               <span class="icon-calendar"></span>
             </div>
           </td>
           <td>hasta</td>
           <td>
-            <%= text_field_tag :final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
+            <%= text_field_tag :boe_final, Time.now.strftime("%d/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)",required: true %>
             <div class="input-group-addon-f">
               <span class="icon-calendar"></span>
             </div>
           </td>
           <td>
-            Status<%= select_tag :status, options_for_select([["Pendientes",0],["En Separación",1],["En Curso",2],["Finalizado",3],["Todos", '']]) %>
+            Status<%= select_tag :boe_status, options_for_select([["Pendientes",0],["En Separación",1],["En Curso",2],["Finalizado",3],["Todos", '']]) %>
           </td>
           <td>
-            Vendedor <%= select("filtro", "vendedor", Persona.all(:select => 'id,nome',:conditions => ["tipo_vendedor = 1"],:order => 'nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...'}) %>
+            Vendedor <%= select("filtro", "boe_vendedor", Persona.all(:select => 'id,nome',:conditions => ["tipo_vendedor = 1"],:order => 'nome').collect {|p| [ p.nome, p.id ] }, { prompt: 'Todos...'}) %>
           </td>
 
           <td colspan="4">
-            <input id="busca" name="busca" type="search" onkeyup = "pesquisa_oe(this.value),f(this)"onkeydown = "f(this)" size="28"/>
-            <input type="button" class="btn btn-blue" onclick="pesquisa_oe(document.getElementById('busca').value)" value="Buscar"/>
+            <input id="boe_busca" name="boe_busca" type="search" onkeyup = "pesquisa_oe(this.value),f(this)"onkeydown = "f(this)" size="28"/>
+            <input type="button" class="btn btn-blue" onclick="pesquisa_oe(document.getElementById('boe_busca').value)" value="Buscar"/>
             <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "display: none;") %>
           </td>
          </tr>

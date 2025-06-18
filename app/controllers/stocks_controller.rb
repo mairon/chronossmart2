@@ -539,8 +539,8 @@ Codigo   Grupo               Sub-Grupo          Ref        Producto             
 				respond_to do |format|
 					if params["tipo"] == '1'
  format.html {
-		          render :xlsx => "resultado_pagamentos",
-		          filename: "pagamentos-#{params[:inicio]}-#{params[:final]}"
+		          render :xlsx => "resultado_iventario",
+		          filename: "Ivenatario-#{params[:final]}"
 		        }					else
 					format.html do
 						render  :pdf                    => "resultado_fechamento_caixa",

@@ -1,6 +1,54 @@
 class PresupuestosController < ApplicationController
   before_filter :authenticate
 
+
+  def rentabilidade
+    @venda  = Presupuesto.find(params[:id])
+
+    sql = " SELECT
+                         P.ID AS PRODUTO_ID,
+                         V.PERSONA_ID,
+                         MAX(P.NOME) AS PRODUTO_NOME,
+                         MAX(G.DESCRICAO) AS GRUPO_NOME,
+                         MAX(SG.DESCRICAO) AS SUB_GRUPO_NOME,
+                         MAX(P.FABRICANTE_COD) AS REFERENCIA,
+                         MAX(V.PERSONA_NOME) AS PERSONA_NOME,
+                         SUM(VP.QUANTIDADE) AS QUANTIDADE,
+                         MAX((SELECT SS.PROMEDIO_GUARANI FROM STOCKS SS WHERE SS.DATA <= VP.DATA AND SS.STATUS = 0 AND SS.PRODUTO_ID = VP.PRODUTO_ID ORDER BY SS.DATA DESC, SS.TABELA_ID DESC LIMIT 1)) CUSTO_MEDIO_GS,
+                         SUM( (VP.TOTAL_GUARANI)) / SUM(VP.QUANTIDADE) AS UNITARIO_GUARANI,
+                         SUM(VP.TOTAL_GUARANI) AS TOTAL_GUARANI,
+                         MAX((SELECT SS.PROMEDIO_DOLAR FROM STOCKS SS WHERE SS.DATA <= VP.DATA AND SS.STATUS = 0 AND SS.PRODUTO_ID = VP.PRODUTO_ID ORDER BY SS.DATA DESC, SS.TABELA_ID DESC LIMIT 1)) CUSTO_MEDIO_US,
+                         SUM( (VP.TOTAL_DOLAR)) / SUM(VP.QUANTIDADE) AS UNITARIO_DOLAR,
+                         SUM(VP.TOTAL_DOLAR) AS TOTAL_DOLAR,
+                         MAX(UM.SIGLA) AS UNIDADE_MEDIDA_NOME,
+                         MAX(UM.UNIDADE) AS UNIDADE_MEDIDA_PRECISION
+
+                         FROM PRESUPUESTO_PRODUTOS VP
+
+                         INNER JOIN PRESUPUESTOS V
+                         ON V.ID = VP.PRESUPUESTO_ID
+
+                         INNER JOIN PRODUTOS P
+                         ON P.ID = VP.PRODUTO_ID
+
+                         LEFT JOIN UNIDADE_MEDIDAS UM
+                         ON P.UNIDADE_MEDIDA_ID = UM.ID
+
+                         LEFT JOIN GRUPOS G
+                         ON P.GRUPO_ID = G.ID
+
+                         LEFT JOIN SUB_GRUPOS SG
+                         ON P.SUB_GRUPO_ID = SG.ID
+
+                         WHERE V.ID = #{@venda.id}
+
+                         GROUP BY 1,2"
+
+               @vendas_produtos = Produto.find_by_sql( sql )
+
+    render layout: false
+  end
+
   def gera_cotas
 
     PresupuestoCota.destroy_all(presupuesto_id: params[:presupuesto_id])

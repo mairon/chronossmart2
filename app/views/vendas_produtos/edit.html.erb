@@ -13,22 +13,20 @@
           </div>
         </div>
 
-
         <div class="row">
           <div class="col-md-12">
-            <label>Ingredientes</label>
-            <%= f.collection_select :produto_composicao_ids, ProdutoComposicao.where(produto_id: @vendas_produto.produto_id), :id, :componente_nome, {class: 'panel-field'}, {:multiple => true} %>
-
+            <br>
+            <%= f.text_area :obs, class: 'panel-field disable-plus-as-tab', placeholder: 'Complemento', rows: 5, cols: 40 %>
           </div>
         </div>
 
         <div class="row">
           <div class="col-md-12">
             <br>
-            <%= f.text_area :obs, rows: 5, cols: 40, placeholder: 'Obs', class: 'panel-field' %>
+            <%= f.check_box :status_preparo %> Preparo
           </div>
         </div>
-       
+
         <div class="row">
           <div class="col-md-12 footer-buttons">
             <%= f.submit "Grabar", :disable_with => "Aguarde..." , :class => "btn btn-green", "data-plus-as-tab" => "false" %>

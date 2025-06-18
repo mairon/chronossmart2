@@ -4,7 +4,7 @@
     <div class="row">
       <div class="col-md-3">
         <%= select("busca", "tabela_preco_id", TabelaPreco.all(:select => 'id,nome').collect {|p| [ p.nome, p.id ] }, {}, {onchange: "pesquisaf2()"}) %>
-      </div>        
+      </div>
       <div class="col-md-6">
         <div class="input-group">
           <span class="input-group-btn">
@@ -12,10 +12,11 @@
               <i class="icon-search" aria-hidden="true"></i>
             </button>
           </span>
-          <input id="busca_f2" name="busca_f2" type="search" placeholder="Buscar" onKeyUp="pesquisaf2()" autocapitalize="off" autocomplete="off" autocorrect="off" autofocus, class="panel-field" />          
+          <input id="busca_f2" name="busca_f2" type="search" placeholder="Buscar" autocapitalize="off" autocomplete="off" autocorrect="off" autofocus, class="panel-field" />
         </div>
       </div>
       <div class="col-md-2">
+        <%= link_to 'Buscar', "#", class: 'btn btn-blue', onclick: "pesquisaf2()", "data-plus-as-tab" => "false" %>
         <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinnerf2", :width => 21, :height => 21, :style =>"display: none;" ) %>
       </div>
     </div>
@@ -31,13 +32,13 @@
       $("#vendas_produto_produto_nome").val(produto_nome)
       $("#vendas_produto_produto_id").val(produto_id)
       $("#vendas_produto_tabela_preco_id").val($("#busca_tabela_preco_id").val())
-      
+
       if (<%= @venda.moeda %> == '0'){
         $("#vendas_produto_unitario_dolar").val(preco_us)
         $("#vendas_produto_preco_dolar").val(preco_us)
         $("#vendas_produto_total_dolar").val(preco_us)
-        
-      }else if (<%= @venda.moeda %> == '1'){        
+
+      }else if (<%= @venda.moeda %> == '1'){
         $("#vendas_produto_preco_guarani").val(preco_gs)
         $("#vendas_produto_unitario_guarani").val(preco_gs)
         $("#vendas_produto_total_guarani").val(preco_gs)
@@ -49,7 +50,7 @@
 
       $("#vendas_produto_quantidade").focus()
       $('#ModalF2').modal('hide');
-    }  
+    }
 </script>
 
   <script language="javascript">
@@ -134,8 +135,8 @@
 
 <script>
 
- $(function () {  
-        $(document).keydown(function (e) {  
+ $(function () {
+        $(document).keydown(function (e) {
 
              if((e.which || e.keyCode) == 40){
 
@@ -176,7 +177,7 @@
              return false;
              }
 
-        });  
-    }); 
+        });
+    });
 
   </script>

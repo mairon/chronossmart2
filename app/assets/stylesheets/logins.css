@@ -40,8 +40,10 @@ a:hover {
 	margin: 80px auto 100px;
 	}
 
+
 .loginbox h1{
 margin-bottom: 15px; }
+
 
 .content-loginbox{
     -moz-border-radius: 8px;
@@ -51,7 +53,7 @@ margin-bottom: 15px; }
     width: auto;
     margin: 0 auto;
     background: #FFF;
-    padding: 60px 35px;
+    padding: 35px 35px;
   -moz-box-shadow: 0 1px 2px rgba(0,0,0,.09);
   -webkit-box-shadow: 0 1px 2px,rgba(0,0,0,.09);
   box-shadow: 0 1px 2px rgb(0 0 0 / 8%) !important;
@@ -131,8 +133,7 @@ select{
   background-color: #fff;
   background-image: none;
   border: 1px solid #e6e6e6;
-  margin-left: 10px;
-  width: 80%;
+  width: 75%;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
@@ -198,4 +199,11 @@ input:focus,textarea:focus,select:focus{
   outline: none;
   border: 1px solid #8cd6f8;
   background-color:#f9f9f9;
+}
+
+
+@media (max-width: 600px) {
+  .loginbox{
+    margin: 20px;
+  }
 }

@@ -2,10 +2,10 @@
   <div class="col-md-12">
     <div class="panel">
         <div class="panel-content">
-          <%= @nota_credito.persona_id %>
+          <%= @nota_credito.documento_id %>
         <%= form_for(@nota_credito) do |vdc| %>
           <% if @nota_credito.fiscal.to_i == 1 %>
-            Selecione lo Documiento <%= vdc.collection_select :documento_id,
+            Selecione lo Documiento. <%= vdc.collection_select :documento_id,
                       FormFiscal.where("persona_id = #{@nota_credito.persona_id}").select("id,cod_proc, (doc_01 || '.' || doc_02 || '.' || doc) as doc"),:id, :doc, { :prompt => 'Selecione lo documiento' }, { required: true } %>
           <% else %>
             Selecione lo Documiento <%= vdc.collection_select :documento_id,
@@ -30,14 +30,13 @@
 <% unless @nota_credito.documento_id.blank? %>
   <% if @nota_credito.origem_proc.to_i == 1 %>
     <% ff = FormFiscal.where(id: @nota_credito.documento_id).last %>
-    <% cl = Cliente.where(id: ff.cod_proc).last %>
-    <% cs = ContratoServico.where(contrato_id: cl.cod_proc) %>
+    <% cs = ContratoServico.where(contrato_id: ff.cod_proc) %>
 
     <div class="row">
       <div class="col-md-12">
         <div class="panel">
           <div class="panel-content">
-          <header>CDC: <%= ff.cdc %></header>
+          <header>CDC: <%= ff.cdc %> <%= ff.sigla_proc %>•<%= ff.cod_proc %></header>
            <table class="head_grid">
               <tr>
                  <td width="300">Descriptión</td>

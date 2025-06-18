@@ -11,7 +11,7 @@
       <tr>
         <td>De</td>
         <td >
-          <%= text_field_tag :inicio, Time.now.strftime("01/01/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
+          <%= text_field_tag :inicio, Time.now.strftime("01/%m/%Y"), size: 10,  class: "input-addon", onkeyup: "Formatadata(this,event)" %>
           <div class="input-group-addon-f">
             <span class="icon-calendar"></span>
           </div>

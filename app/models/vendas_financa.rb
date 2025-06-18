@@ -37,9 +37,6 @@ class VendasFinanca < ActiveRecord::Base
 			self.conta_id   = cfp.conta_id.to_s
 		end
 
-		conta_vuelto = Conta.find_by_id(self.vuelto_conta_id);
-		self.vuelto_conta_nome   = conta_vuelto.nome.to_s unless self.vuelto_conta_id.blank?
-
 		if self.tipo.to_i == 0
 			self.vencimento = self.data
 			self.cheque_valor_dolar = self.valor_dolar_contado

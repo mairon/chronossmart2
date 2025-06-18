@@ -69,7 +69,7 @@ class ClientesController < ApplicationController
   def faturamento
     @cliente = Cliente.find(params[:id])
     @contra_servis = ContratoServico.where(contrato_id: @cliente.cod_proc).order(:id)
-    @fts = FormFiscal.where("sigla_proc = 'CL' AND cod_proc = #{params[:id]} AND STATUS != 0").select("id, arquivo_pdf,ruc, persona_nome,tipo_emissao,impressao, cod_proc, tot_gs, doc_01, doc_02, doc, status, cdc").order('id desc ')
+    @fts = FormFiscal.where("sigla_proc = 'CL' AND cod_proc = #{params[:id]} AND STATUS != 0").select("terminal_id, id, arquivo_pdf,ruc, persona_nome,tipo_emissao,impressao, cod_proc, tot_gs, doc_01, doc_02, doc, status, cdc").order('id desc ')
     render layout: 'chart'
   end
 

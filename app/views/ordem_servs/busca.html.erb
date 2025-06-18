@@ -20,7 +20,7 @@
     <table>
       <% @ordem_servs.each do |os| %>
         <tr class= "<%= cycle( "cor1", "cor2" )%>">
-          <td width="80"  align="center"><%= os.id.to_s.rjust(6,'0') %></td>
+          <td width="80"  align="center"><%= link_to os.id.to_s.rjust(6,'0'), ordem_serv_path(os.id) %></td>
           <td width="100"  align="center"><%= os.rt.to_s.rjust(4,'0') %></td>
           <td width="40" align="center" title="<%= os.usuario_nome %>"><%= os.usuario_created.to_s.rjust(3,'0')  %></td>
 

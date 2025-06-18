@@ -2,7 +2,7 @@
           <h1 id="header">
             Auto Factura
             <div class="pull-right">
-              <a href="#" data-toggle="modal" data-target="#modal-faturamento" class="btn btn-green" style="height: 37px;"><i class="icon-white icon-plus-sign"></i></a>    
+              <a href="#" data-toggle="modal" data-target="#modal-faturamento" class="btn btn-green" style="height: 37px;"><i class="icon-white icon-plus-sign"></i></a>
             </div>
           </h1>
 
@@ -40,14 +40,14 @@
                         }]
                     };
 
-                   url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/de/estado")
+                   url = URI("https://api.facturasend.com.py/#{ft.terminal.nome_api_fiscal}/de/estado")
 
                               http = Net::HTTP.new(url.host, url.port)
                               http.use_ssl = true
                               http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
                               request = Net::HTTP::Post.new(url)
-                              request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+                              request["authorization"] = "Bearer api_key_#{ft.terminal.token_api}"
                               request["content-type"] = 'application/json'
                               request.body = data.to_json
                               response = http.request(request)
@@ -60,20 +60,20 @@
                   <td class="bold"><%= get_resp["deList"][0]["respuesta_mensaje"] %></td>
 		              <% if ft.status == 1 %>
                     <td><span class="btn-success">Activo</span></td>
-		                <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(ft, status: '2', modal: 'true') %></td>		                
-		                <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>                    
+		                <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(ft, status: '2', modal: 'true') %></td>
+		                <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>
                     <% if ft.tipo_emissao.to_i == 0 %>
                       <td><%= link_to 'Re-imprimir', "#",  :onclick => "MultiplaFaturaVenda(#{ft.id})" %></td>
                     <% else %>
                       <td><%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: ft.cdc, id: ft.id) %></td>
-                     
+
                     <% end %>
 		              <% else %>
 		                <td><span class="btn-danger">Anulado</span></td>
 		                <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>
                     <% if ft.tipo_emissao.to_i == 1 %>
                       <td><%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: ft.cdc, id: ft.id) %></td>
-                    <% end %>                    
+                    <% end %>
 		              <% end %>
 		            </tr>
 		          <% end %>

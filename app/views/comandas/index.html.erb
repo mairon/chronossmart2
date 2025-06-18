@@ -1,0 +1,23 @@
+<h1 id="header">comandas</h1>
+<div class="acessos">
+  <%= link_to 'Nuevo', new_comanda_path, :class => "button add" %>
+</div>
+
+<table class="head_grid">
+  <tr>
+            <td>Cartao</t>
+      </tr>
+</table>
+
+<div class="rolagem" dir="div">
+  <table>
+    <% @comandas.each do |comanda| %>
+      <tr>
+                  <td><%= comanda.cartao_id %></td>
+                <td><%= link_to 'Editar', edit_comanda_path(comanda) %></td>
+        <td><%= link_to 'Borrar', comanda, method: :delete, data: { confirm: 'Esta Seguro?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+

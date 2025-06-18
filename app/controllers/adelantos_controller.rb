@@ -1,6 +1,11 @@
 class AdelantosController < ApplicationController
-
   before_filter :authenticate
+
+  def ticket
+    @adelanto    = Adelanto.find(params[:id])
+    @adelanto_cotas = AdelantoCota.where('adelanto_id = ?', @adelanto.id)
+    render  :layout => false
+  end
 
   def print_cheque
     @adelanto    = Adelanto.find(params[:id])
@@ -35,24 +40,24 @@ class AdelantosController < ApplicationController
     redirect_to("/adelantos/"<< @adelanto.id.to_s)
   end
 
-  def recibo          #
+  def recibo
     @adelanto    = Adelanto.find(params[:id])
     render  :layout => false
   end
 
-  def comprovante          #
+  def comprovante
     @adelanto    = Adelanto.find(params[:id])
     @adelanto_cotas = AdelantoCota.where('adelanto_id = ?', @adelanto.id)
     render  :layout => false
   end
 
-  def index               #
+  def index
     respond_to do |format|
       format.html # index.html.erb
     end
   end
 
-  def busca               #
+  def busca
     params[:unidade] = current_unidade.id
     @adelantos = Adelanto.filtro_busca(params)
     render :layout => false
@@ -64,7 +69,7 @@ class AdelantosController < ApplicationController
     render layout: 'chart'
   end
 
-  def new                 #
+  def new
     @adelanto = Adelanto.new
 
     respond_to do |format|
@@ -73,11 +78,11 @@ class AdelantosController < ApplicationController
     end
   end
 
-  def edit                #
+  def edit
     @adelanto = Adelanto.find(params[:id])
   end
 
-  def create              #
+  def create
     @adelanto = Adelanto.new(params[:adelanto])
     @adelanto.usuario_created = current_user.id
     @adelanto.unidade_created = current_unidade.id
@@ -105,7 +110,7 @@ class AdelantosController < ApplicationController
     end
   end
 
-  def destroy             #
+  def destroy
     @adelanto = Adelanto.find(params[:id])
     @adelanto.destroy
 

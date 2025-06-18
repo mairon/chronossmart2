@@ -22,8 +22,8 @@
 	<div class="group">
 		<table>
 			<tr>
-				<td align="right">Deposito:</td>
-				<td >
+				<td>
+          <label>Deposito</label>
 					<%= f.collection_select :deposito_id, Deposito.all(:select => 'id,nome',:conditions => ["unidade_id = #{@consumicao_interna.unidade_id}"], :order => '2'),:id, :nome %>
 				</td>
 
@@ -34,22 +34,23 @@
         <% end %>
 
 
-        <td align="right">Producto:</td>
         <td>
+          <label>Producto</label>
           <%= text_field :cod, :busca,
               :size        => 20, :placeholder => 'Ref. / Cod. Barra', :autofocus   => true %>
+              <%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner", width: 21, height: 21, style: "position: absolute; left: 320px; top: 50%; display: none;") %>
 
-          <%= f.text_field :produto_nome, size: 56, autofocus: true %>
-          <%= f.hidden_field :produto_id %>
+          <%= f.text_field :produto_nome, size: 56, autofocus: true, required: true %>
+          <%= f.hidden_field :produto_id, required: true %>
         </td>
 
 
-				<td align="right">Cantidad:</td>
 				<td>
+          <label>Cantidad</label>
 					<%= f.text_field :quantidade, size: 8, value: 1 %>
           <%= f.submit t('SAVE'), :class => 'button add', :disable_with => "Aguarde...", "data-plus-as-tab" => "false" %>
 				</td>
-        <td>Stock: <span id="sum_stock"></span></td>
+        <td class="padding-btn">Stock: <span id="sum_stock"></span></td>
 			</tr>
 		</table>
 	</div>
@@ -58,6 +59,7 @@
 <script type="text/javascript">
 
 $("#cod_busca").change(function(){
+  $('#spinner').show();
   $.ajax({url: "/buscas/busca_produto",
           type: 'GET',
           beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
@@ -74,8 +76,9 @@ $("#cod_busca").change(function(){
               },
           success: function(grade){
             $('#consumicao_interna_produto_produto_nome').val(grade["produto"].nome);
-            $('#consumicao_interna_produto_produto_id').val(grade["produto"].produto_id);
+            $('#consumicao_interna_produto_produto_id').val(grade["produto"].id);
             $('#sum_stock').text(grade["sum_stock"]);
+            $('#spinner').hide("slow");
         }
       });
 });

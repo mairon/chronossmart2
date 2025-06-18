@@ -1,7 +1,9 @@
+asdasdasd
 <% tot = @compras_produtos.count(:id)%>
 <% seq = 1 %>
 <% @compras_produtos.each do |cp| %>
-	<% cp.update_attribute :updated_at, '2025-02-27' %>
+<%= cp.produto_id %>
+	<% cp.update_attribute :updated_at, '2025-05-20' %>
 	<% seq += 1 %>
 	<%= puts "#{seq}/#{tot}"%>
 <% end %>

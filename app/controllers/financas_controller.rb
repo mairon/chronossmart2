@@ -1,5 +1,23 @@
 class FinancasController < ApplicationController
 
+	def audit_financas
+		render layout: 'crm'
+	end
+
+	def result_audit_financas
+		@financas = Financa
+			.joins(:conta)
+			.select('financas.id, financas.data, financas.diferido,
+				financas.concepto, financas.cheque, financas.entrada_dolar, financas.entrada_real,
+				financas.entrada_guarani, financas.saida_dolar, financas.saida_real,
+				financas.saida_guarani, financas.persona_nome, financas.conciliacao,
+				financas.data_conciliacao, financas.cod_proc, financas.sigla_proc, financas.moeda, contas.nome as conta_nome, 
+				financas.tabela, financas.tabela_id')
+				.filtro_audit_financas(params).order(2,1)
+		render layout: false
+	end
+
+
 	def resultado_recebimentos
 		params[:unidade] = current_unidade.id
 		@financas         = Financa.resultado_recebimentos(params)
@@ -106,9 +124,9 @@ class FinancasController < ApplicationController
 		      if params[:tipo] == '1'
 
 		        format.html {
-		          render :xlsx => "resultado_pagamentos", 
+		          render :xlsx => "resultado_pagamentos",
 		          filename: "resultado_pagamentos-#{params[:inicio]}-#{params[:final]}"
-		        } 
+		        }
            else
             format.html do
               	render :layout => 'relatorio_view'
@@ -129,15 +147,13 @@ class FinancasController < ApplicationController
 		else
 			moeda = 'Reais'
 		end
-		conta = Conta.find_by_id(params[:busca]["conta"])
 		head =
 "                                                   #{$empresa_nome}
 																															EXTRACTO CAJA
 - Fecha...: #{params[:inicio]} hasta #{params[:final]}
-- Cuenta..: #{conta.nome}
 - Moneda..: #{moeda}
 -----------------------------------------------------------------------------------------------------------------------------------------
-		Fecha    Concepto                                                                    N. Cheque       Credito      Debito       Saldo
+Cuenta		Fecha    Concepto                                                                    N. Cheque       Credito      Debito       Saldo
 -----------------------------------------------------------------------------------------------------------------------------------------
 
 "
@@ -212,14 +228,12 @@ class FinancasController < ApplicationController
 			moeda = 'Reais'
 		end
 
-		if params[:tipo_data] == '0'
-			tip = 'Registrado e no Conciliado'
+		if params[:conciliacao] == 'false'
+			tip = 'Fecha de Registro'
 		else
-			tip = 'Registrados e Conciliado'
+			tip = 'Fecha de Conciliacion'
 		end
 
-
-		conta = Conta.find_by_id(params[:busca]["conta"])
 		if params[:filtro] == '3'
 			head = ""
 		else
@@ -228,12 +242,11 @@ class FinancasController < ApplicationController
 			"                                                          #{$empresa_nome}
 																																EXTRACTO BANCARIO
 			- Fecha.....: #{params[:inicio]} hasta #{params[:final]}
-			- Cuenta....: #{conta.nome}
 			- Moneda....: #{moeda}
 			- Tipo......: #{tip}
-			-----------------------------------------------------------------------------------------------------------------------------------------
-				  Fecha     Nombre                  Concepto                                          Cheque      Credito        Debito         Saldo
-			-----------------------------------------------------------------------------------------------------------------------------------------
+	---------------------------------------------------------------------------------------------------------------------------------------------------------
+	  Fecha  Cuenta                 Nombre                  Concepto                                          Cheque      Credito        Debito         Saldo
+	---------------------------------------------------------------------------------------------------------------------------------------------------------
 			"
 		end
         respond_to do |format|

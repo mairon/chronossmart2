@@ -2,6 +2,7 @@ class FormFiscal < ActiveRecord::Base
 	belongs_to :persona
 	belongs_to :produto
 	belongs_to :unidade
+	belongs_to :terminal
 
 	before_update :calcs
 	def calcs

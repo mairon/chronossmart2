@@ -19,7 +19,7 @@
          <% tot_cus_gs = 0 %>
          <% tot_rs     = 0 %>
          <% quebra       = "" %>
-         <% @presupuesto_produtos.each do |pp| %>
+         <% @presupuesto_produtos.order('grupo_id, id').each do |pp| %>
             <% if quebra != pp.produto.grupo.descricao %>
               <% if quebra != "" %>
 

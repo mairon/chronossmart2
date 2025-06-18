@@ -57,7 +57,7 @@ class NotaRemicaosController < ApplicationController
 
   def show
     @nota_remicao = NotaRemicao.find(params[:id])
-
+    @fts = FormFiscal.where("sigla_proc = 'NR' AND cod_proc = #{@nota_remicao.id} and status != 0 ").select("tipo_emissao, id, tot_gs, doc_01, doc_02, doc, status,cdc,terminal_id")
     render layout: 'chart'
   end
 

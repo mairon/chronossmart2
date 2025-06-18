@@ -8,6 +8,7 @@
 			<tr class="head_grid">
 				<td align="center"><%= t('DATE')%></td>
 				<td>Origen</td>
+				<td>Doc.</td>
 				<td>Descrição</td>
 				<td align="right">Debito</td>
 				<td align="right">Credito</td>
@@ -18,6 +19,7 @@
 				<tr class="<%= cycle("cor1", "cor2")%>">
 					<td width="60" align="center"><%= a.data.strftime("%d/%m/%y") %></td>
 					<td width="60" align="center"><%= a.sigla_proc %><%= a.cod_proc %></td>
+					<td width="60" align="center"><%= a.documento_numero_01 %>•<%= a.documento_numero_02 %>•<%= a.documento_numero %></td>
 					<td width="200"><%= a.descricao %></td>
 					<% if @viatico.moeda == 0 %>
 						<td width="80" align="right"><%= format_decimal(a.divida_dolar) %></td>

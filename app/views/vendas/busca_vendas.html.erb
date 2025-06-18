@@ -57,15 +57,18 @@
               <td><a href="#" class="btn" data-toggle="modal" data-load-url="<%= modal_add_ordem_entregas_path(venda_id: v.id) %>" data-target="#ModalOrdemEntrega"><span class="material-symbols-outlined">local_shipping</span></a></td>
             <% end %>
             <td>
-
-              <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <span class="material-symbols-outlined">more_vert</span>
-                </button>
-                <ul class="dropdown-menu  dropdown-menu-right">
-                  <li><a href="#">Rentabilidad</a></li>
-                </ul>
-              </div>
+              <% if current_user.tipo == 0 %>
+                <div class="btn-group">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="material-symbols-outlined">more_vert</span>
+                  </button>
+                  <ul class="dropdown-menu  dropdown-menu-right">
+                    <li>
+                      <a href="#" data-toggle="modal" data-load-url="<%= rentabilidade_venda_path(v.id) %>" data-target="#ModalRentabilidade">Rentabilidad</a>
+                    </li>
+                  </ul>
+                </div>
+              <% end %>
             </td>
           </tr>
         <% end %>

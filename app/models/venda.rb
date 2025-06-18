@@ -29,6 +29,12 @@ class Venda < ActiveRecord::Base
   #validates_presence_of :persona_id, :tabela_preco_id, :moeda, :tipo_venda
   #validate  :block_cliente
   before_destroy :destroy_cartao
+  after_create :update_status_op_cartao
+
+  def update_status_op_cartao
+    cartao.update_attributes(status_op: 1) unless cartao.nil?
+    cartao.update_attributes(venda_id: self.id) unless cartao.nil?
+  end
 
   def destroy_cartao
     cartao.update_attributes(status_op: 0) unless cartao.nil?
@@ -59,7 +65,7 @@ class Venda < ActiveRecord::Base
     #transformacao das cotacaos
     if params[:moeda].to_s == '0'
       if params[:valor_us].to_s.gsub('.', '').gsub(',', '.').to_f > params[:valor_sem_us].to_s.gsub('.', '').gsub(',', '.').to_f
-        if params[:vuelto].to_f > 0 
+        if params[:vuelto].to_f > 0
           vuel_gs = params[:vuelto].to_s.gsub('.', '').gsub(',', '.').to_f
           vuel_us = vuel_gs.to_f / venda.cotacao.to_f
           vuel_rs = vuel_gs.to_f.to_f / venda.cotacao_real.to_i
@@ -241,7 +247,7 @@ class Venda < ActiveRecord::Base
 
       end
 
-    if params[:vuelto].to_f > 0 
+    if params[:vuelto].to_f > 0
       VendasFinanca.create( :venda_id        => params[:id],
                               :forma_pago_id   => 8,
                               :cartao_bandeira_id => 0,
@@ -279,7 +285,7 @@ class Venda < ActiveRecord::Base
                               )
     end
 
-    #forma de pagos a credito 
+    #forma de pagos a credito
     else
       if params[:cota_fixa] == '1'
         parc_us = (val_us.to_f)
@@ -377,7 +383,7 @@ class Venda < ActiveRecord::Base
                    V.OP,
                    V.OBS,
                    CT.NOME AS CARTAO_NOME,
-                   V.DOCUMENTO_NUMERO_01 || '-' || V.DOCUMENTO_NUMERO_02 || '-' || V.DOCUMENTO_NUMERO AS DOC, 
+                   V.DOCUMENTO_NUMERO_01 || '-' || V.DOCUMENTO_NUMERO_02 || '-' || V.DOCUMENTO_NUMERO AS DOC,
                    (SELECT SUM(VF.ID) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID) AS FIN,
                    (SELECT SUM(VP.QUANTIDADE) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID) AS QTD,
                    ((SELECT SUM(VP.TOTAL_GUARANI) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID) - v.desconto_gs) AS TOT_GS,
@@ -389,14 +395,14 @@ class Venda < ActiveRecord::Base
 
             LEFT JOIN CARTAOS CT
             ON CT.ID = V.CARTAO_ID
-            
+
             LEFT JOIN USUARIOS U
             ON V.USUARIO_CREATED = U.ID
 
             WHERE V.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{unidade} #{cond} #{caixa} #{tipo_venda}  #{finalidade} #{fin}
 
             ORDER BY 3 desc, 1 desc
-                   
+
                "
     Venda.paginate_by_sql(sql, page: params[:page], :per_page => 25)
   end

@@ -1,6 +1,6 @@
 class Presupuesto < ActiveRecord::Base
   #audit(:create, :update, :destroy) { |model, user, action| "|#{model.id.to_s.rjust(8,'0')}|Hecho por #{user.usuario_nome}" }
-  has_many :presupuesto_produtos, order: 'grupo_id, id', :dependent => :destroy
+  has_many :presupuesto_produtos, :dependent => :destroy
   has_many :presupuesto_cotas, :dependent => :destroy
   has_one :contrato
   validates_presence_of :cotacao,:persona_id, :vendedor_id

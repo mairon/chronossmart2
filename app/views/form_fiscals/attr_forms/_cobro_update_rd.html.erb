@@ -17,7 +17,7 @@
 		</div>
 		<div class="col-md-3">
 			<label>Recibo</label>
-			<%= select("busca", "doc", FormFiscal.all(:select => 'id,doc,doc_01,doc_02',:conditions => ["tipo_doc = 15 and status = 0 and unidade_id = #{current_unidade.id}"],limit: 60,:order => 'CAST(doc as integer)').collect {|p| [ p.doc_01 << '.' << p.doc_02 << '.' << p.doc, p.id ] },:class => "panel-field" )  %>
+			<%= select("busca", "doc", FormFiscal.all(:select => 'id,doc,doc_01,doc_02',:conditions => ["tipo_doc = 15 and status = 0 and unidade_id = #{current_unidade.id} and terminal_id = #{@cobro.terminal_id}"],limit: 60,:order => 'CAST(doc as integer)').collect {|p| [ p.doc_01 << '.' << p.doc_02 << '.' << p.doc, p.id ] },:class => "panel-field" )  %>
 		</div>
 		<div class="col-md-3">
 			<label>Monto</label>

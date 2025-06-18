@@ -11,11 +11,11 @@
 	table {
 		font-family:arial ;font-size:8px;
 
-	}	
+	}
 
 	.grid {
 		border-collapse: collapse;
-		
+
 	}
 	.header {
 		border-collapse: collapse;
@@ -47,10 +47,10 @@
 
 					<table  border="1" style="border-collapse: collapse;">
 					<tr>
-						<td>
+						<td width="740">
 					<table>
 					<td align="left" colspan="3"  width="350">
-						
+
             				<% if current_unidade.avatar.url.present? %>
             					<%= wicked_pdf_image_tag(current_unidade.avatar.url, :height => 40) %>
             				<% else %>
@@ -61,21 +61,22 @@
             					<b>Direcíon:</b><%= current_unidade.direcao %><br>
             					<b>Ciudad:</b><%= current_unidade.cidade.nome %> - <%= current_unidade.bairro %><br>
             					<b>Teléfono:</b><%= current_unidade.telefone %><br>
-            					<b>Correo Eletronico:</b> facturacion@dasilvainversiones.com
-          				
+            					<b>Correo Eletronico:</b> <%= current_unidade.email %>
+
 					</td>
 
 					<td width="350" colspan="2" align="center">
 						<h1><b>RECIBO DE DINERO</b><br></h1>
-						<h2><b><%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc.to_s.rjust(8,'0') %></b></h2>
+						<h2><b><%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc.to_s.rjust(7,'0') %></b></h2>
+						<small><%= @ft.sigla_proc %>•<%= @ft.cod_proc.to_s.rjust(6,'0') %></small>
 						<br>
-						<br>	
+						<br>
 						<h1>
-							
-							<% if @cobro.moeda == 0 %>							
-								<b>USD <%= format_decimal(@total_us.to_f - @tot_int_us.to_f) %></b>
+
+							<% if @cobro.moeda == 0 %>
+								<b>USD <%= format_decimal(@fecha_result_us) %></b>
 							<% else %>
-								<b>Gs. <%= format_int(@tot_cobro_gs.to_f - (@tot_des_gs.to_f + @tot_int_gs.to_f) )%></b>
+								<b>Gs. <%= format_int(@fecha_result_gs.to_f )%></b>
 							<% end %>
 
 						</h1>
@@ -85,9 +86,9 @@
 					</tr>
 				</table>
 			</td>
-				</tr>
+		</tr>
 				<tr>
-					<td colspan="5">
+					<td colspan="5" width="740">
 
 					<table border="1" style="border-collapse: collapse;">
 						<tr>
@@ -95,17 +96,17 @@
 
 						<table>
 							<tr>
-								<td  width="700" align="left"><b>Lugar y Fecha:</b> <%= current_unidade.cidade.nome %> - <%=l @cobro.data.to_date.to_date %></td>
+								<td  width="740" align="left"><b>Lugar y Fecha:</b> <%= current_unidade.cidade.nome %> - <%=l @cobro.data.to_date.to_date %></td>
 
-								
+
 							</tr>
 
-	
+
 							<tr>
 								<% per = Persona.find_by_id(@cobro.persona_id)%>
 								<td align="left"><b>Recibi(mos) de:</b> <%= per.nome_fatura %></td>
 
-								
+
 							</tr>
 
 							<tr>
@@ -115,18 +116,18 @@
 							<tr>
 						<td valign="bottom">
 							<b>La cantidad de:</b>
-							<% if @cobro.moeda == 0 %>			
-								<% real,cents=("%.2f" % @total_us.to_f).split(/\./).map{ |m| m.to_i}
+							<% if @cobro.moeda == 0 %>
+								<% real,cents=("%.2f" % @fecha_result_us.to_f).split(/\./).map{ |m| m.to_i}
 					      valor_cents=Extenso.por_extenso(cents%100)
 					      valor_cents+= case cents.to_i%100
 					      when 0 then ""
 					      when 1 then " "
 					      when 2..99 then " "
 					      end %>
-					      <% if @total_us.to_f == 1000 %>
+					      <% if @fecha_result_us.to_f == 1000 %>
 					      UN
 					      <% end %>
-								<%= I18n.with_locale(:es) { @total_us.to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS' %> )
+								<%= I18n.with_locale(:es) { @fecha_result_us.to_i.to_words.upcase } %> <%= 'CON ' + cents.to_s.rjust(2,'0') + '/100 DOLARES AMERICANOS' %> )
 							<% else %>
 								<%= I18n.with_locale(:es) { ( @tot_cobro_gs.to_f - @tot_des_gs.to_f ).to_i.to_words.upcase } %>
 							<% end %>
@@ -141,10 +142,9 @@
 					</td>
         	</tr>
         	<tr><td height="10"></td></tr>
-        	
+
 					<tr valign="top">
-						<td height="100" style="border: 1px solid #000" >
-							
+						<td height="100" style="border: 1px solid #000" width="740">
 							<% count  = 1 %>
 							<table>
 								<tr>
@@ -153,22 +153,22 @@
 									<td>
 										<table>
 											<tr>
-											<td width="1000" align="center" colspan="5" class="header">
+											<td align="center" colspan="5" class="header" width="730">
 												<b>
-												DETALLES DE FACTURAS 
+												DETALLES DE FACTURAS
 												</b>
 											</td>
 										</tr>
 								<tr  class="header">
-									<td align="center"><b><b>N<sup>o</sup> FACTURA</b></td>	
-									<td align="center"><b>CUOTA</b></td>
-									<td align="center"><b>EMISIÓN</b></td>									
-									<td align="center"><b>VENCIMIENTO</b></td>
-									<td align="center"><b>IMPORTE</b></td>
+									<td align="center" width="100"><b><b>N<sup>o</sup> FACTURA</b></td>
+									<td align="center" width="80"><b>CUOTA</b></td>
+									<td align="center" width="100"><b>EMISIÓN</b></td>
+									<td align="center" width="100"><b>VENCIMIENTO</b></td>
+									<td align="right" width="100"><b>IMPORTE</b></td>
 
 								</tr>
 								<% docs =  CobrosDetalhe.all(:conditions => ["cobro_id = ?",@cobro.id]) %>
-								
+
 								<% docs.each do |cd| %>
 								<tr >
 									<td align="center"><%= cd.documento_numero_01 %>-<%= cd.documento_numero_02 %>-<%= cd.documento_numero %></td>
@@ -177,12 +177,12 @@
 									<td align="center"><%=l cd.vencimento.to_date.to_date %></td>
 									<td align="right">
 										<% if @cobro.moeda.to_i == 0 %>
-											<%= format_decimal(cd.cobro_dolar) %>
+											<%= format_decimal((cd.cobro_dolar.to_f + cd.interes_dolar.to_f) - cd.desconto_dolar.to_f) %>
 										<% else %>
-											<%= format_int(cd.cobro_guarani) %>
+											<%= format_int( (cd.cobro_guarani.to_f + cd.interes_guarani.to_f) - cd.desconto_guarani.to_f ) %>
 										<% end %>
 									</td>
-								
+
 								<% count += 1 %>
 								<% end %>
 
@@ -193,42 +193,44 @@
 								<td></td>
 								<td></td>
 								<td></td>
-								<td></td>								
+								<td></td>
 								<td></td>
 								</tr>
 								<% end %>
 								</table>
 
 								</td>
-						
+
 							</tr>
+
 							<tr>
-								<td colspan="3">
+								<td colspan="6">
 								<table border="1" style="border-collapse: collapse;">
-									<tr  class="header"><td>
-										<table border="0">
-										<tr>
-									<td width="350">
-									<b>TOTAL DE LAS FATURAS:</b>
-								</td>
-								<td colspan="2" align="right" width="350">
-									<% if @cobro.moeda == 0 %>							
-								<b><%= format_decimal(@total_us.to_f - @tot_int_us.to_f) %></b>
-							<% else %>
-								<b><%= format_int(@tot_cobro_gs.to_f - (@tot_des_gs.to_f + @tot_int_gs.to_f) )%></b>
-							<% end %>
-
-								</td>
-								</tr>
+									<tr class="header">
+										<td width="730">
+											<table border="0">
+												<tr>
+													<td width="620">
+														<b>TOTAL DE LAS FATURAS:</b>
+													</td>
+													<td align="right" width="100">
+														<% if @cobro.moeda == 0 %>
+															<b><%= format_decimal(@fecha_result_us) %></b>
+														<% else %>
+															<b><%= format_int(@fecha_result_gs.to_f )%></b>
+														<% end %>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
 								</table>
-							</td></tr>
-							</table>
-							</td>
+								</td>
 							</tr>
 
 							</table>
-						
-							 
+
+
 							<table>
 								<tr>
 									<td>
@@ -271,56 +273,53 @@
 
 										<!-- Tarjeta credito ou debito -->
 										<% elsif cf.forma_pago_id == 3 or cf.forma_pago_id == 4 %>
-											
+
 											<% tar_g = ((tar_g + cf.valor_guarani) - @tot_int_gs.to_f) %>
-											
+
 										<% end %>
-								
+
 									<% end %>
 										<tr  class="header">
 											<td colspan="2"><b>FORMA DE PAGO</b></td>
 										</tr>
 										<tr>
-											<td width="175" align="left">Efectivo G$</td>
+											<td width="210" align="left">Efectivo G$</td>
 											<td width="75" align="right"><%= number_to_currency(efe_g.to_i, :format =>' %n ', :precision =>0) %></td>
 										</tr>
 										<tr>
-											<td width="175" align="left">Efectivo U$</td>
+											<td width="210" align="left">Efectivo U$</td>
 											<td width="75" align="right"><%= number_to_currency(efe_u.to_f,      :format =>' %n ', :separeitor => "," ) %></td>
 										</tr>
 										<tr>
-											<td width="175" align="left">Cheques G$</td>
+											<td width="210" align="left">Cheques G$</td>
 											<td width="75" align="right"><%= number_to_currency(che_g.to_i, :format =>' %n ', :precision =>0)  %></td>
 										</tr>
 										<tr>
-											<td width="175" align="left">Cheques U$</td>
+											<td width="210" align="left">Cheques U$</td>
 											<td width="75" align="right"><%= number_to_currency(che_u.to_f,      :format =>' %n ', :separeitor => "," ) %></td>
 										</tr>
 										<tr>
-											<td width="175" align="left">Tarjetas G$</td>
+											<td width="210" align="left">Tarjetas G$</td>
 											<td width="75" align="right"><%= number_to_currency(tar_g.to_i, :format =>' %n ', :precision =>0 ) %></td>
 										</tr>
-										
+
 										<tr>
-											<td width="175" align="left">Transferencia Bancaria G$</td>
+											<td width="210" align="left">Transferencia Bancaria G$</td>
 											<td width="75" align="right"><%= number_to_currency(tra_g.to_i, :format =>' %n ', :precision =>0 ) %></td>
 										</tr>
 										<tr>
-											<td width="175" align="left">Transferencia Bancaria U$</td>
+											<td width="210" align="left">Transferencia Bancaria U$</td>
 											<td width="75" align="right"><%= number_to_currency(tra_u.to_f,      :format =>' %n ', :separeitor => "," ) %></td>
 										</tr>
-									
+
 								</table>
 
-								
+
 
 									</td>
 
-									<td>
-										<table border="1" style="border-collapse: collapse;">
-									<tr  class="header">
-										<td colspan="5" align="center" width="420"><b>CHEQUES</b></td>
-									</tr>
+									<td valign="top">
+										<table border="1" style="border-collapse: collapse;" >
 									<tr  class="header">
 										<td width="80"><b>CHEQUE N</b></td>
 										<td width="100"><b>BANCO</b></td>
@@ -348,7 +347,7 @@
 											<% linha = linha + 1 %>
 									<% end %>
 										</tr>
-										
+
 									<% end %>
 									<% lines2 = 6 - linha  %>
 								<% lines2.times do |l| %>
@@ -360,9 +359,15 @@
 								<td></td>
 								</tr>
 								<% end %>
+								<tr>
+									<td colspan="5">
+										<b>En caso que la factura sea pagada con cheque o transferencia, queda sujeto a confirmación del banco, en caso de rechazo, la deuda quedará pendiente.</b>
+									</td>
+								</tr>
 								</table>
 									</td>
 								</tr>
+								
 							</table>
 						</td>
 					</tr>

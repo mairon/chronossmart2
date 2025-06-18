@@ -1,0 +1,89 @@
+<div class="panel">
+	<h1 id="header">Presupuesto: <%= @venda.id.to_s.rjust(6,'0') %> Cliente: <%= @venda.persona.nome %> - Vendedor: <%= Persona.find(@venda.vendedor_id).nome unless @venda.vendedor_id.blank? %></h1>
+  <div class="panel-content">
+		<% qtd = 0 %>
+		<% cmv = 0 %>
+		<% fat = 0 %>
+		<% dif = 0 %>
+
+    <table>
+    	<thead class="head_grid">
+		  <tr>
+
+		    <td data-s="bold" align="center" width="50">Cod.</td>
+		    <td width="200">Grupo</td>
+		    <td width="400">Producto</td>
+		    <td align="right" width="40">Ctd</td>
+		    <td align="left"  width="10"></td>
+		    <td align="right" width="70">CMV Unit</td>
+		    <td align="right" width="70">CMV Tot</td>
+		    <td align="right" width="70">Venta Unit.</td>
+		    <td align="right" width="70">Tot Unit.</td>
+		    <td align="right" width="70">Marg</td>
+		    <td align="right" width="40">Renta</td>
+		  </tr>
+		</thead>
+
+			<% @vendas_produtos.each do |v|%>
+				<tr class = "<%= cycle("cor1", "cor2") %> list">
+					<% if v.quantidade.to_f < 0 %>
+						<% color = '#ffa0a2' %>
+					<% else %>
+						<% color = '' %>
+					<% end %>
+					<td bgcolor="<%=color%>" align="center" width="50"><%= v.produto_id.to_s.rjust(6,'0') %></td>
+					<td bgcolor="<%=color%>" width="200"><small><%= v.grupo_nome %></small></td>
+					<td bgcolor="<%=color%>" width="400"><small><%= v.produto_nome %></small></td>
+					<td bgcolor="<%=color%>" align="right" width="40"><%= format_um(v.quantidade.to_f, (v.unidade_medida_precision ? v.unidade_medida_precision : 0 )) %></td>
+					<td bgcolor="<%=color%>" align="left" width="10"><%= v.unidade_medida_nome %></td>
+					<% qtd += v.quantidade.to_f %>
+					<% if @venda.moeda == 1 %>
+						<td bgcolor="<%=color%>" align="right" width="70"><%= format_int(v.custo_medio_gs.to_f) %></td>
+						<td bgcolor="<%=color%>" align="right" width="70"><%= format_int(v.custo_medio_gs.to_f * v.quantidade.to_f) %></td>
+						<td bgcolor="<%=color%>" align="right" width="70"><%= format_int(v.unitario_guarani.to_f) %> </td>
+						<td bgcolor="<%=color%>" align="right" width="70"><%= format_int(v.total_guarani) %> </td>
+						<td bgcolor="<%=color%>" align="right" width="70"><%= format_int( (v.total_guarani.to_f - (v.custo_medio_gs.to_f * v.quantidade.to_f) ) ) %></td>
+						<td bgcolor="<%=color%>" align="right" width="40"><%= format_int( ((v.total_guarani.to_f - (v.custo_medio_gs.to_f * v.quantidade.to_f) ) / (v.custo_medio_gs.to_f * v.quantidade.to_f)) * 100  ) %>%</td>
+
+							<% cmv += (v.custo_medio_gs.to_f * v.quantidade.to_f) %>
+							<% fat += v.total_guarani.to_f %>
+							<% dif += (v.total_guarani.to_f - (v.custo_medio_gs.to_f * v.quantidade.to_f) ) %>
+					<% else %>
+						<td bgcolor="<%=color%>" align="right" width="70"><%= format_decimal(v.custo_medio_us.to_f) %></td>
+						<td bgcolor="<%=color%>" align="right" width="70"><%= format_decimal(v.custo_medio_us.to_f * v.quantidade.to_f) %></td>
+						<td bgcolor="<%=color%>" align="right" width="70"><%= format_decimal(v.unitario_dolar.to_f) %></td>
+						<td bgcolor="<%=color%>" align="right" width="70"><%= format_decimal(v.total_dolar) %></td>
+						<td bgcolor="<%=color%>" align="right" width="70"><%= format_decimal( (v.total_dolar.to_f - (v.custo_medio_us.to_f * v.quantidade.to_f) ) ) %></td>
+						<td bgcolor="<%=color%>" align="right" width="40"><%= format_decimal( ((v.total_dolar.to_f - (v.custo_medio_us.to_f * v.quantidade.to_f) ) / (v.custo_medio_gs.to_f * v.quantidade.to_f)) * 100  ) %>%</td>
+
+							<% cmv += (v.custo_medio_us.to_f * v.quantidade.to_f) %>
+							<% fat += v.total_dolar.to_f %>
+							<% dif += (v.total_dolar.to_f - (v.custo_medio_us.to_f * v.quantidade.to_f) ) %>
+
+					<% end %>
+
+				</tr>
+			<% end %>
+			<tr class="head_grid">
+					<td colspan="3"></td>
+					<td align="right" width="40"><%= format_peso(qtd.to_f) %> </td>
+					<td></td>
+					<% if @venda.moeda == 1 %>
+						<td align="right" width="70"><%= format_int(cmv.to_f) %> </td>
+						<td></td>
+						<td></td>
+						<td align="right" width="70"><%= format_int(fat.to_f) %> </td>
+						<td align="right" width="70"><%= format_int(dif.to_f) %> </td>
+						<td align="right" width="40"><%= format_int( (dif.to_f * 100) / cmv.to_f) %>% </td>
+					<% else %>
+						<td align="right" width="70"><%= format_decimal(cmv.to_f) %> </td>
+						<td></td>
+						<td></td>
+						<td align="right" width="70"><%= format_decimal(fat.to_f) %> </td>
+						<td align="right" width="70"><%= format_decimal(dif.to_f) %> </td>
+						<td align="right" width="40"><%= format_decimal( (dif.to_f * 100) / cmv.to_f) %>% </td>
+					<% end %>
+			</tr>
+		</table>
+	</div>
+</div>

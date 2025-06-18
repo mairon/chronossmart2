@@ -1,18 +1,51 @@
 class ApplicationController < ActionController::Base
-
   helper_method :current_user
   helper_method :current_unidade
   helper_method :permission_action_user
   helper ApplicationHelper
   before_filter :subdomain_change_database, :set_locale
 
-
   def subdomain_change_database
+    return if @subdomain_processed # Evita processar múltiplas vezes
+    @subdomain_processed = true
+
     if request.subdomain.present? && request.subdomain != "www"
-      if request.subdomain == 'tresfronteira'
-        ActiveRecord::Base.establish_connection('development-s1')
-      else
-        ActiveRecord::Base.establish_connection(website_connection(request.subdomain))
+      # Salva a conexão atual para restaurar em caso de erro
+      original_connection = ActiveRecord::Base.connection_config
+
+      begin
+        connection_config = website_connection(request.subdomain)
+
+        # Tenta conectar - aqui pode gerar o erro
+        ActiveRecord::Base.establish_connection(connection_config)
+
+        # Força uma conexão real para verificar se o banco existe
+        ActiveRecord::Base.connection.active?
+
+      rescue PG::ConnectionBad => e
+        # Restaura conexão original antes de redirecionar
+        ActiveRecord::Base.establish_connection(original_connection)
+
+        Rails.logger.warn "Subdomínio inválido (PG::ConnectionBad): #{request.subdomain} - #{e.message}"
+        redirect_to "https://chronos.com.py" and return
+
+      rescue ActiveRecord::DatabaseConnectionError,
+             ActiveRecord::ConnectionNotEstablished,
+             PG::InvalidCatalogName,
+             PG::Error => e
+
+        # Restaura conexão original antes de redirecionar
+        ActiveRecord::Base.establish_connection(original_connection)
+
+        Rails.logger.warn "Subdomínio inválido: #{request.subdomain} - #{e.message}"
+        redirect_to "https://chronos.com.py" and return
+
+      rescue => e
+        # Restaura conexão original antes de redirecionar
+        ActiveRecord::Base.establish_connection(original_connection)
+
+        Rails.logger.error "Erro inesperado com subdomínio #{request.subdomain}: #{e.class} - #{e.message}"
+        redirect_to "https://chronos.com.py" and return
       end
     end
   end
@@ -29,6 +62,7 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
   def current_user
     @current_user ||= Usuario.find(session[:logged]) unless session[:logged] == false
     Auditor::User.current_user = @current_user
@@ -56,6 +90,3 @@ class ApplicationController < ActionController::Base
     I18n.locale = 'es'
   end
 end
-
-
-

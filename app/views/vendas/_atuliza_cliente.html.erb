@@ -72,10 +72,12 @@
 
     <div class="col-md-7">
       <label>
-        <Cliente></Cliente>
-        <a href="#" target="popup" style="font-size: 12px;" onclick="window.open('/personas/new?layout=resumido','popup','width=600,height=600'); return false;"> Add
-        </a> |
-        <a href="#" title="Histórico Cliente" onclick="HistoricoCliente()" style="font-size: 12px;">Histórico</a>
+      <div class="pull-left" style="position: absolute; margin-left: 45px">
+        <a href="#" data-toggle="modal" style="float: left; margin-right: 5px; margin-top: -4px" data-target="#ModalAddCliente"><span class="material-symbols-outlined">add_circle</span></a>
+
+        <a href="#" data-toggle="modal" style="float: left; margin-right: 5px; margin-top: -4px" data-target="#ModalHistoricoVenda"><span class="material-symbols-outlined">history</span></a>
+      </div>
+      Cliente
       </label>
       <% unless @venda.vendas_produtos.present? %>
         <%= vdc.text_field :persona_nome, placeholder: 'Busca Cliente', style: 'width: 100%', onclick: "this.select();" %>
@@ -311,3 +313,46 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="ModalHistoricoVenda">
+  <div class="modal-dialog modal-lg" role="document"  style="height: 720px; width: 1300px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h2 class="modal-title" id="myModalLabel" align="center">Historico de Ventas</h2>
+      </div>
+      <div class="modal-body-mhv" style="padding: 10px">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="ModalAddCliente">
+  <div class="modal-dialog modal-lg" role="document"  style="height: 720px; width: 800px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h2 class="modal-title" id="myModalLabel" align="center">Add Cliente</h2>
+      </div>
+      <div class="modal-body-mac" style="padding: 10px">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $('#ModalHistoricoVenda').on('show.bs.modal', function (e) {
+    $(this).find('.modal-body-mhv').load('/personas/' + $("#venda_persona_id").val() + '/historico_vendas');
+  });
+
+  $('#ModalAddCliente').on('show.bs.modal', function (e) {
+    $(this).find('.modal-body-mac').load('/personas/new?layout=resumido');
+  });
+
+</script>

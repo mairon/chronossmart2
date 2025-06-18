@@ -5,33 +5,39 @@
       <table>
         <tr>
           <td>
-            <label>[Venda] Fatura</label>
+            <label>[Factura] Venda</label>
             <%= f.text_area :form_venda_fatura, rows: 1 %>
           </td>
         </tr>
 
         <tr>
           <td>
-            <label>[Venda] Cobro</label>
+            <label>[Factura] Cobro</label>
             <%= f.text_area :form_cobro_fatura, rows: 1 %>
           </td>
         </tr>
 
         <tr>
           <td>
-            <label>[Venda] Comprovante</label>
+            <label>[Factura] Form Fisca - Factura Independente </label>
+            <%= f.text_area :form_fatura_indep, rows: 1 %>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label>[Comprovante] Venda</label>
             <%= f.text_area :vendas_comprovante, rows: 1 %>
           </td>
         </tr>
         <tr>
           <td>
-            <label>[Cobro] Recibo</label>
+            <label>[Recibo Comum] Cobro</label>
             <%= f.text_area :recibo_cobro, rows: 1 %>
           </td>
         </tr>
         <tr>
           <td>
-            <label>[Cobro] Adelanto</label>
+            <label>[Recibo Comum] Adelanto</label>
             <%= f.text_area :recibo_adelanto, rows: 1 %>
           </td>
         </tr>

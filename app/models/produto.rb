@@ -36,7 +36,7 @@ class Produto < ActiveRecord::Base
       if Produto.last == nil
         self.barra = "89000"
       else
-        self.barra = "890000#{(Produto.last.id.to_i + 1).to_s}"
+        self.barra = "88#{(Produto.last.id.to_i + 1).to_s}"
       end
 
     end

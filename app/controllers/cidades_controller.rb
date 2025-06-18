@@ -2,7 +2,7 @@ class CidadesController < ApplicationController
   before_filter :authenticate
 
   def index
-    @cidades = Cidade.includes('paise').includes('estado').includes('regiao').order('paise_id,estado_id,regiao_id, nome')
+    @cidades = Cidade.paginate( page: params[:page], per_page: 50).includes('paise').includes('estado').includes('regiao').order('paise_id,estado_id,regiao_id, nome')
 
     respond_to do |format|
       format.html # index.html.erb

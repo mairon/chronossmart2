@@ -1337,10 +1337,10 @@ ________________________________________________________________________________
 					cc_desc_title = 'TODOS...'
 				end
 				sql_f = "
-								SELECT RUBRO_ID,MAX(R.CODIGO) AS COD, MAX(GRUPO_CUSTO_NOME) AS GRUPO_CUSTO_NOME, MAX(R.DESCRICAO) AS DESC, SUM(VALOR_US) AS VALOR_US, SUM(VALOR_GS) AS VALOR_GS, SUM(VALOR_RS) AS VALOR_RS
+								SELECT RUBRO_ID ,MAX(R.CODIGO) AS COD, MAX(GRUPO_CUSTO_NOME) AS GRUPO_CUSTO_NOME, MAX(R.DESCRICAO) AS DESC, SUM(VALOR_US) AS VALOR_US, SUM(VALOR_GS) AS VALOR_GS, SUM(VALOR_RS) AS VALOR_RS
 								FROM (
 											SELECT
-															CC.RUBRO_ID,
+															CC.PLANO_DE_CONTA_ID AS RUBRO_ID,
 															MAX(R.CODIGO) AS COD,
 															MAX(PC.DESCRICAO) AS GRUPO_CUSTO_NOME,
 															MAX(R.DESCRICAO) AS DESC,
@@ -1348,8 +1348,8 @@ ________________________________________________________________________________
 															SUM(CC.VALOR_GS) AS VALOR_GS,
 															SUM(CC.VALOR_RS) AS VALOR_RS
 											 FROM COMPRAS_CUSTOS CC
-											 INNER JOIN RUBROS R
-											 ON R.ID = CC.RUBRO_ID
+											 INNER JOIN PLANO_DE_CONTAS R
+											 ON R.ID = CC.PLANO_DE_CONTA_ID
 
 											 LEFT JOIN PLANO_DE_CONTAS PC
 											 ON PC.CODIGO = SUBSTR(R.CODIGO, 0, 9)
@@ -1363,7 +1363,7 @@ ________________________________________________________________________________
 
 
 								 ) T
-								 INNER JOIN RUBROS R
+								 INNER JOIN PLANO_DE_CONTAS R
 								 ON R.ID = T.RUBRO_ID
 								 GROUP BY 1
 								 ORDER BY 2, 5 DESC
@@ -1373,7 +1373,7 @@ ________________________________________________________________________________
 								SELECT RUBRO_ID,MAX(R.CODIGO) AS COD, MAX(GRUPO_CUSTO_NOME) AS GRUPO_CUSTO_NOME, MAX(R.DESCRICAO) AS DESC, SUM(VALOR_US) AS VALOR_US, SUM(VALOR_GS) AS VALOR_GS, SUM(VALOR_RS) AS VALOR_RS
 								FROM (
 											SELECT
-															CC.RUBRO_ID,
+															CC.PLANO_DE_CONTA_ID AS RUBRO_ID,
 															MAX(R.CODIGO) AS COD,
 															MAX(PC.DESCRICAO) AS GRUPO_CUSTO_NOME,
 															MAX(R.DESCRICAO) AS DESC,
@@ -1384,8 +1384,8 @@ ________________________________________________________________________________
 											 INNER JOIN COMPRAS C
 											 ON C.ID = CC.COMPRA_ID
 
-											 INNER JOIN RUBROS R
-											 ON R.ID = CC.RUBRO_ID
+											 INNER JOIN PLANO_DE_CONTAS R
+											 ON R.ID = CC.PLANO_DE_CONTA_ID
 											 LEFT JOIN PLANO_DE_CONTAS PC
 											 ON PC.CODIGO = SUBSTR(R.CODIGO, 0, 9)
 
@@ -1397,7 +1397,7 @@ ________________________________________________________________________________
 											 GROUP BY 1
 
 								 ) T
-								 INNER JOIN RUBROS R
+								 INNER JOIN PLANO_DE_CONTAS R
 								 ON R.ID = T.RUBRO_ID
 								 GROUP BY 1
 								 ORDER BY 2,5 DESC

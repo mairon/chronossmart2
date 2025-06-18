@@ -43,7 +43,9 @@ class SuportesController < ApplicationController
         'thomaze',
         'tork_performace',
         'vmmujer',
-        'rodoeste'
+        'rodoeste',
+        'hanor',
+        'mikaelito'
         ]
 
 

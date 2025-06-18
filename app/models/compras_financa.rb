@@ -15,17 +15,17 @@ class ComprasFinanca < ActiveRecord::Base
 
       extrato = Cliente.where(persona_id: compra.funcionario_id, documento_numero_01: 'V00', documento_numero: self.fact_an )
       if self.moeda == 0
-         if extrato.sum('divida_dolar - cobro_dolar') == 0 
+         if extrato.sum('divida_dolar - cobro_dolar') == 0
             extrato.update_all(liquidacao: 1)
          end
 
       elsif self.moeda == 1
-         if extrato.sum('divida_guarani - cobro_guarani').to_f == 0 
+         if extrato.sum('divida_guarani - cobro_guarani').to_f == 0
             extrato.update_all(liquidacao: 1)
          end
 
       elsif self.moeda == 2
-         if extrato.sum('divida_real - cobro_real').to_f == 0 
+         if extrato.sum('divida_real - cobro_real').to_f == 0
             extrato.update_all(liquidacao: 1)
          end
       end
@@ -34,7 +34,7 @@ class ComprasFinanca < ActiveRecord::Base
   def trigger_viatico_cliente_destroy
     extrato = Cliente.where(persona_id: self.persona_id, documento_numero_01: 'V00', documento_numero: self.documento_numero )
     extrato.update_all(liquidacao: 0)
-  end    
+  end
 
 
     def finds
@@ -54,8 +54,9 @@ class ComprasFinanca < ActiveRecord::Base
           self.valor_dolar = self.valor_euro.to_f * compra.cotacao_eu_us.to_f
         end
 
-        conta          = Conta.find_by_id(self.conta_id);
-        self.conta_nome = conta.nome.to_s  unless self.conta_id.blank?;
+        conta = Conta.find_by_id(self.conta_id);
+        self.conta_nome = conta.nome.to_s unless self.conta_id.blank?;
+        self.moeda = conta.moeda.to_s  unless self.conta_id.blank?;
 
         if compra.tipo_compra == 1
             if compra.descricao == ''
@@ -71,35 +72,35 @@ class ComprasFinanca < ActiveRecord::Base
         end
     end
 
-    def liquida_prov_gasto 
-      if compra.prov_gasto_id.to_i > 0 
-        titulo = Proveedore.where( persona_id: compra.persona_id, documento_numero: compra.documento_numero, documento_numero_01: compra.documento_numero_01, 
+    def liquida_prov_gasto
+      if compra.prov_gasto_id.to_i > 0
+        titulo = Proveedore.where( persona_id: compra.persona_id, documento_numero: compra.documento_numero, documento_numero_01: compra.documento_numero_01,
                 documento_numero_02: compra.documento_numero_02, cota: compra.cota )
         if compra.moeda.to_i == 0
-          div_us = Proveedore.where( persona_id: compra.persona_id, documento_numero: compra.documento_numero, documento_numero_01: compra.documento_numero_01, 
+          div_us = Proveedore.where( persona_id: compra.persona_id, documento_numero: compra.documento_numero, documento_numero_01: compra.documento_numero_01,
                 documento_numero_02: compra.documento_numero_02, cota: compra.cota ).sum(:divida_dolar)
-          pago_us = Proveedore.where( persona_id: compra.persona_id, documento_numero: compra.documento_numero, documento_numero_01: compra.documento_numero_01, 
+          pago_us = Proveedore.where( persona_id: compra.persona_id, documento_numero: compra.documento_numero, documento_numero_01: compra.documento_numero_01,
                 documento_numero_02: compra.documento_numero_02, cota: compra.cota ).sum(:pago_dolar)
           if div_us.to_f == pago_us.to_f
             titulo.each do |t|
               t.update_attribute :liquidacao, 1
             end
-            
+
           else
             titulo.each do |t|
               t.update_attribute :liquidacao, 0
             end
           end
         elsif compra.moeda.to_i == 1
-          div_gs = Proveedore.where( persona_id: compra.persona_id, documento_numero: compra.documento_numero, documento_numero_01: compra.documento_numero_01, 
+          div_gs = Proveedore.where( persona_id: compra.persona_id, documento_numero: compra.documento_numero, documento_numero_01: compra.documento_numero_01,
                 documento_numero_02: compra.documento_numero_02, cota: compra.cota ).sum(:divida_guarani)
-          pago_gs = Proveedore.where( persona_id: compra.persona_id, documento_numero: compra.documento_numero, documento_numero_01: compra.documento_numero_01, 
+          pago_gs = Proveedore.where( persona_id: compra.persona_id, documento_numero: compra.documento_numero, documento_numero_01: compra.documento_numero_01,
                 documento_numero_02: compra.documento_numero_02, cota: compra.cota ).sum(:pago_guarani)
           if div_gs.to_f == pago_gs.to_f
             titulo.each do |t|
               t.update_attribute :liquidacao, 1
             end
-            
+
           else
             titulo.each do |t|
               t.update_attribute :liquidacao, 0
@@ -107,15 +108,15 @@ class ComprasFinanca < ActiveRecord::Base
           end
 
         elsif compra.moeda.to_i == 2
-          div_rs = Proveedore.where( persona_id: compra.persona_id, documento_numero: compra.documento_numero, documento_numero_01: compra.documento_numero_01, 
+          div_rs = Proveedore.where( persona_id: compra.persona_id, documento_numero: compra.documento_numero, documento_numero_01: compra.documento_numero_01,
                 documento_numero_02: compra.documento_numero_02, cota: compra.cota ).sum(:divida_real)
-          pago_rs = Proveedore.where( persona_id: compra.persona_id, documento_numero: compra.documento_numero, documento_numero_01: compra.documento_numero_01, 
+          pago_rs = Proveedore.where( persona_id: compra.persona_id, documento_numero: compra.documento_numero, documento_numero_01: compra.documento_numero_01,
                 documento_numero_02: compra.documento_numero_02, cota: compra.cota ).sum(:pago_real)
           if div_rs.to_f == pago_rs.to_f
             titulo.each do |t|
               t.update_attribute :liquidacao, 1
             end
-            
+
           else
             titulo.each do |t|
               t.update_attribute :liquidacao, 0

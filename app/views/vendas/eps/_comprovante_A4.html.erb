@@ -60,7 +60,10 @@
             <% @venda_produtos.each do |pc|%>
             <tr class = "<%= cycle("cor1", "cor2") %>">
               <td align="center" width="100"><%= pc.produto.fabricante_cod %></td>
-              <td align="left" width="600"><%= pc.produto_nome %></td>
+              <td align="left" width="600">
+                <%= pc.produto_nome %>
+                <%=raw pc.obs.to_s.gsub(/\n/, '<br/>') %>
+              </td>
               <td align="center" width="60"><%= pc.quantidade %></td>
               <% if @venda.moeda == 0 %>
                 <td width="60" align="right"><%=h number_to_currency( pc.unitario_dolar,      :format =>' %n ', :separeitor => "," ) %></td>

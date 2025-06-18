@@ -6,6 +6,27 @@ class Financa < ActiveRecord::Base
   after_create :trigger_viatico_cliente
   after_destroy :trigger_viatico_cliente_destroy
 
+  def self.filtro_audit_financas(params)
+    # Garante que sempre será uma Relation
+    base_query = self.where({})
+
+    Rails.logger.debug "Base query class: #{base_query.class}"
+
+    query = base_query
+
+    if params[:busca_conta].present?
+      query = query.where(conta_id: params[:busca_conta])
+    end
+
+    if params[:inicio].present? && params[:final].present?
+      inicio = converter_data(params[:inicio])
+      final = converter_data(params[:final])
+      query = query.where(data: inicio..final) if inicio && final
+    end
+
+    query
+  end
+
   def trigger_viatico_cliente
 
     Cliente.create(
@@ -35,17 +56,17 @@ class Financa < ActiveRecord::Base
 
       extrato = Cliente.where(persona_id: self.persona_id, documento_numero_01: 'V00', documento_numero: self.documento_numero )
       if self.moeda == 0
-         if extrato.sum('divida_dolar - cobro_dolar') == 0 
+         if extrato.sum('divida_dolar - cobro_dolar') == 0
             extrato.update_all(liquidacao: 1)
          end
 
       elsif self.moeda == 1
-         if extrato.sum('divida_guarani - cobro_guarani').to_f == 0 
+         if extrato.sum('divida_guarani - cobro_guarani').to_f == 0
             extrato.update_all(liquidacao: 1)
          end
 
       elsif self.moeda == 2
-         if extrato.sum('divida_real - cobro_real').to_f == 0 
+         if extrato.sum('divida_real - cobro_real').to_f == 0
             extrato.update_all(liquidacao: 1)
          end
       end
@@ -79,7 +100,7 @@ class Financa < ActiveRecord::Base
                    PC.DESCRICAO AS PLANO_DE_CONTA_NOME,
                    FP.NOME AS FORMA_PAGO_NOME,
                    F.MOEDA
-                FROM FINANCAS F 
+                FROM FINANCAS F
 
                 LEFT JOIN CONTAS C
                 ON C.ID = F.CONTA_ID
@@ -95,7 +116,7 @@ class Financa < ActiveRecord::Base
 
 
                 WHERE (COALESCE(F.ENTRADA_DOLAR,0) + COALESCE(F.ENTRADA_GUARANI,0) + COALESCE(F.ENTRADA_REAL,0) ) > 0 #{unidade} AND F.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
-                #{persona} #{conta} #{plano_de_conta}"   
+                #{persona} #{conta} #{plano_de_conta}"
 
     Financa.find_by_sql(sql)
 
@@ -125,7 +146,7 @@ class Financa < ActiveRecord::Base
                    FP.NOME AS FORMA_PAGO_NOME,
                    F.MOEDA,
                    CC.NOME AS CENTRO_CUSTO_NOME
-                FROM FINANCAS F 
+                FROM FINANCAS F
 
                 LEFT JOIN CONTAS C
                 ON C.ID = F.CONTA_ID
@@ -145,7 +166,7 @@ class Financa < ActiveRecord::Base
 
                 WHERE (F.SAIDA_DOLAR + F.SAIDA_GUARANI + F.SAIDA_REAL) > 0 #{unidade} AND F.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
                 #{persona} #{conta} #{plano_de_conta} #{cc}
-                ORDER BY 1"   
+                ORDER BY 1"
 
     Financa.find_by_sql(sql)
 
@@ -297,7 +318,7 @@ class Financa < ActiveRecord::Base
                       F.TITULAR,
                       F.ID
                       CB.NOME AS D
-                FROM FINANCAS F 
+                FROM FINANCAS F
                 LEFT JOIN CARTAO_BANDEIRAS CB
                 ON F.CARTAO_BANDEIRA_ID = CB.ID
                 WHERE F.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'
@@ -456,14 +477,14 @@ class Financa < ActiveRecord::Base
 
 
     def self.relatorio_financas(params)
-    find_moeda = Conta.find_by_id(params[:busca]["conta"])
+    find_moeda = Conta.find_by_id(params[:busca_conta])
     params[:moeda] = find_moeda.moeda.to_s
     if params[:filtro] == '2'
 
 
-        if params[:tipo_data] == '0'
+        if params[:conciliacao] == 'false'
           tipo_data = "DATA"
-        elsif params[:tipo_data] == '1'
+        elsif params[:conciliacao] == 'true'
           tipo_data = "DATA_CONCILIACAO"
           solo_conciliados = "AND CONCILIACAO = true"
         end
@@ -503,7 +524,7 @@ class Financa < ActiveRecord::Base
               FROM
                     FINANCAS
               WHERE
-                    #{tipo_data} BETWEEN '#{params[:inicio].split("/").reverse.join("-")}}' AND '#{params[:final].split("/").reverse.join("-")}}' AND conta_id = #{params[:busca]["conta"]} #{cond}  #{conciliacao} #{solo_conciliados}
+                    #{tipo_data} BETWEEN '#{params[:inicio].split("/").reverse.join("-")}}' AND '#{params[:final].split("/").reverse.join("-")}}' AND conta_id = #{params[:busca_conta]} #{cond}  #{conciliacao} #{solo_conciliados}
               GROUP BY
                     1,2,3
               ORDER BY  2,3"
@@ -526,8 +547,7 @@ class Financa < ActiveRecord::Base
             saida   = "COALESCE(F.SAIDA_REAL,0)"
         end
 
-        conta  = "AND F.conta_id = #{params[:busca]["conta"]}" unless params[:busca]["conta"].blank?
-        conciliacao = "AND F.CONCILIACAO = #{params[:conciliacao]}" unless params[:conciliacao].blank?
+        conta  = "AND F.conta_id in (?)" unless params[:busca_conta].blank?
 
         if params[:conciliacao] == 'true'
             tipo_data = "F.DATA_CONCILIACAO"
@@ -579,15 +599,19 @@ class Financa < ActiveRecord::Base
                                   F.DATA_CONCILIACAO,
                                   F.ID,
                                   F.COD_PROC,
-                                  F.SIGLA_PROC
+                                  F.SIGLA_PROC,
+                                  C.NOME AS CONTA_NOME
                  FROM FINANCAS F
                  LEFT JOIN PERSONAS P
                  ON P.ID = F.PERSONA_ID
-                 WHERE #{tipo_data} BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{moeda} #{conta} #{s} #{status} #{conciliacao} #{solo_conciliados} #{find_cheque}
+                 LEFT JOIN CONTAS C
+                 ON C.ID = F.CONTA_ID
+
+                 WHERE #{tipo_data} BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{moeda} #{conta} #{s} #{status} #{solo_conciliados} #{find_cheque}
                  ORDER BY F.DATA,F,ID, F.CHEQUE
         "
 
-      Financa.find_by_sql(sql)
+      Financa.find_by_sql([sql, params[:busca_conta]] )
     end
     end
 
@@ -607,7 +631,7 @@ class Financa < ActiveRecord::Base
             saida   = "COALESCE(SAIDA_REAL,0)"
         end
 
-        conta  = "AND conta_id = #{params[:busca]["conta"]}" unless params[:busca]["conta"].blank?
+        conta  = "AND conta_id in (?) " unless params[:busca_conta].blank?
         conciliacao = "AND CONCILIACAO = #{params[:conciliacao]}" unless params[:conciliacao].blank?
 
         if params[:conciliacao] == 'true'
@@ -638,18 +662,18 @@ class Financa < ActiveRecord::Base
         unless params[:cheque].blank?
             cond  = "cheque LIKE ? #{moeda} AND  ESTADO = 0 AND #{entrada} + #{saida} != 0 #{conta} #{s} #{status}","%#{params[:cheque]}%"
         else
-            cond  = "#{tipo_data} < '#{params[:inicio].split("/").reverse.join("-")}}' #{moeda} AND ESTADO = 0 AND #{entrada} + #{saida} != 0 #{moeda} #{conta} #{s} #{status} #{conciliacao} #{solo_conciliados} #{find_cheque}"
+            cond  = "#{tipo_data} < '#{params[:inicio].split("/").reverse.join("-")}}' #{moeda} AND ESTADO = 0 AND #{entrada} + #{saida} != 0 #{moeda} #{conta} #{s} #{status} #{solo_conciliados} #{find_cheque}"
         end
 
-        self.sum(" #{entrada} - #{saida}",:conditions => cond)
-    end  
+        self.sum(" #{entrada} - #{saida}",:conditions => [cond, params[:busca_conta]])
+    end
 
 
 
 
 
     def self.lanz_futuros_extr_bc(params)
-           
+
         if params[:moeda].to_s == "0"
             moeda   = " and moeda = 0"
             entrada = "entrada_dolar"
@@ -665,15 +689,15 @@ class Financa < ActiveRecord::Base
         end
 
         conta = "AND conta_id = #{params[:busca]["conta"]}" unless params[:busca]["conta"].blank?
-        cond  = "DIFERIDO > '#{params[:final].split("/").reverse.join("-")}' #{moeda} #{conta}"        
+        cond  = "DIFERIDO > '#{params[:final].split("/").reverse.join("-")}' #{moeda} #{conta}"
         self.all(:conditions => cond, :order => 'data,id')
     end
 
     def self.resumo_contas_cajas(params)
         periodo  = "F.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' AND F.ESTADO = 0"
         cond  = "WHERE C.ID = #{params[:busca]["conta"]}" unless params[:busca]["conta"].blank?
-        sql = "SELECT 
-                    C.ID, 
+        sql = "SELECT
+                    C.ID,
                     C.NOME,
                     C.TIPO,
                     C.MOEDA,
@@ -692,8 +716,8 @@ class Financa < ActiveRecord::Base
     def self.resumo_contas_bancos(params)
         periodo  = "F.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}}' AND '#{params[:final].split("/").reverse.join("-")}}' AND F.ESTADO = 0"
         cond  = "WHERE C.ID = #{params[:busca]["conta"]}" unless params[:busca]["conta"].blank?
-        sql = "SELECT 
-                    C.ID, 
+        sql = "SELECT
+                    C.ID,
                     C.NOME,
                     C.TIPO,
                     C.MOEDA,
@@ -708,4 +732,19 @@ class Financa < ActiveRecord::Base
 
         Financa.find_by_sql(sql)
     end
+
+
+private
+
+  def self.converter_data(data_string)
+    # Converte de DD/MM/YYYY para YYYY-MM-DD
+    return nil unless data_string.present?
+
+    partes = data_string.split("/")
+    return nil unless partes.length == 3
+
+    "#{partes[2]}-#{partes[1]}-#{partes[0]}"
+  rescue
+    nil
+  end
 end

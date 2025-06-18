@@ -6,14 +6,14 @@
   <%= f.hidden_field :deposito_id,   :value => @nota_remicao.deposito_id %>
   <%= f.hidden_field :deposito_nome, :value => @nota_remicao.deposito_nome %>
   <%= f.hidden_field :persona_id,    :value => @nota_remicao.destino_unidade_id %>
-  <%= f.hidden_field :persona_nome,  :value => @nota_remicao.destino_unidade_nome %>        
+  <%= f.hidden_field :persona_nome,  :value => @nota_remicao.destino_unidade_nome %>
   <div class="group">
     <div class="row">
       <div class="col-md-4">
         <label>Producto</label>
         <%= f.text_field :produto_nome, class: 'autocomplete panel-field', required: true, autofocus: true %>
         <span id="sppiner" class="sppiner"><%= image_tag 'select2-spinner.gif' %></span>
-        <%= f.hidden_field :produto_id %>               
+        <%= f.hidden_field :produto_id %>
       </div>
       <div class="col-md-2">
         <label>Bruto</label>
@@ -33,7 +33,7 @@
         <%= f.submit t('SAVE'), :disable_with => "Aguarde...", :class => "btn btn-green", "data-plus-as-tab" => "false" %>
       </div>
     </div>
-  </div>    
+  </div>
 <% end %>
 
 
@@ -63,5 +63,5 @@ $(function() {
       return false;
     }
   });
-});  
+});
 </script>

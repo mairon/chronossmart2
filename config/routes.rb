@@ -1,5 +1,11 @@
 ﻿Zetta::Application.routes.draw do
 
+  resources :comanda_produtos
+
+
+  resources :comandas
+
+
   resources :custom_fields
 
 
@@ -715,8 +721,10 @@
 			post 'anula_nc'
 			post 'inutilizacion'
 			post 'cancelacion'
+			post 'nc_cancelacion'
 			post 'retencao_update_cp'
 			post 'adelanto_update_rd'
+			post 'nota_remicao_update'
 			get 'nc'
 			get 'rt'
 			get 'busca'
@@ -734,6 +742,7 @@
 			get 'impressao_rc_adelanto'
 			get 'fatura_matricial'
 			post 'update_impressao'
+
 		end
 
 	end
@@ -1516,6 +1525,7 @@ resources :analizes_financas
 			get 'prazos'
 			get 'descontos'
 			get 'visao_geral_cliente'
+			get 'visao_geral_cliente_print'
 			get 'folha_de_pagamento'
 			get 'unidades'
 			get 'show_funcionario'
@@ -1621,6 +1631,8 @@ resources :analizes_financas
 			get 'pagamentos'
 			get 'resultado_pagamentos'
 			get 'painel'
+			get 'audit_financas'
+			get 'result_audit_financas'
 
 		end
 	end
@@ -1784,6 +1796,7 @@ resources :pagares_detalhe
 			get 'print_presupuesto_grade'
 			post 'add_produtos'
 			get 'resultado_grade'
+			get 'rentabilidade'
 		end
 
 	end
@@ -1869,6 +1882,7 @@ resources :pagares_detalhe
 			get 'pagare_escritura'
 			get 'pagare_usado'
 			get 'modal_ordem_entrega'
+			get 'rentabilidade'
 		end
 	end
 	resources :vendas_financas
@@ -2036,6 +2050,7 @@ resources :pagares_detalhe
 		member do
 			get 'comprovante'
 			get 'recibo'
+			get 'ticket'
 			get 'print_cheque'
 			get 'liquidacao'
 		end

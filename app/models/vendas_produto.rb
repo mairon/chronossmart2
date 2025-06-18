@@ -16,9 +16,9 @@ class VendasProduto < ActiveRecord::Base
   after_save :add_produtos_compostos, :gera_tickets
   before_update :calc_qtd
   belongs_to :promo
-  
+
   attr_accessor :current_user
-  
+
   def add_produtos_compostos
     if self.produto.tipo_produto == 2
       prods = ProdutoComposicao.where(produto_id: self.produto_id)
@@ -29,7 +29,7 @@ class VendasProduto < ActiveRecord::Base
           vendas_produto_id:   self.id,
           produto_id:          p.componente_id,
           quantidade:         (p.quantidade.to_f * self.quantidade.to_f)
-        )        
+        )
       end
     end
   end
@@ -41,8 +41,8 @@ class VendasProduto < ActiveRecord::Base
     if produto.tickets.to_i > 0
       (produto.tickets.to_i * self.quantidade.to_i).times do |t|
         EventoConvidado.create(venda_id: self.venda_id,
-          nome: venda.persona_nome, 
-          persona_id: venda.persona_id, 
+          nome: venda.persona_nome,
+          persona_id: venda.persona_id,
           vendas_produto_id: self.id)
       end
     end
@@ -53,7 +53,7 @@ class VendasProduto < ActiveRecord::Base
     self.total_real = self.unitario_real.to_f * self.quantidade.to_f
     self.total_dolar = self.unitario_dolar.to_f * self.quantidade.to_f
   end
-  
+
   def self.nota_credito_produto(params)
     sql = "SELECT VP.id,
                   V.data,
@@ -70,13 +70,13 @@ class VendasProduto < ActiveRecord::Base
                   VP.iva_guarani,
                   VP.deposito_id,
                   VP.deposito_nome,
-                  VP.venda_id 
+                  VP.venda_id
         FROM VENDAS_PRODUTOS VP
         INNER JOIN VENDAS V
         ON V.ID = VP.VENDA_ID
         WHERE V.PERSONA_ID = #{params[:persona_id]}
         ORDER BY V.DATA DESC"
-    
+
     VendasProduto.find_by_sql(sql)
 
   end
@@ -154,7 +154,7 @@ class VendasProduto < ActiveRecord::Base
 	  self.data = venda.data
     self.taxa     = produto.taxa
     self.persona_id = venda.persona_id
-    
+
       preco_personal = PersonaProduto.find_by_produto_id(self.produto_id, conditions: ["persona_id = #{venda.persona_id}"])
       if preco_personal
         self.unitario_guarani = preco_personal.preco_gs

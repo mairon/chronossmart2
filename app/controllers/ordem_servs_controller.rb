@@ -17,12 +17,69 @@ class OrdemServsController < ApplicationController
     render layout: false
   end
 
-  def index    
+  def index
   end
 
   def show
     @ordem_serv = OrdemServ.find(params[:id])
-    
+    sql_ret = "SELECT
+                      OSP.ID,
+                      OSP.DATA,
+                      OSP.PRODUTO_ID,
+                      OSP.DEPOSITO_ID,
+                      P.NOME AS PRODUTO_NOME,
+                      UM.SIGLA AS unidade_medida_sigla,
+                      OSP.QUANTIDADE,
+                      OSP.VALOR_GS,
+                      OSP.VALOR_US,
+                      OSP.VALOR_RS,
+                      COALESCE(RETIRADOS.SUM_RETIRADOS, 0) AS SUM_RETIRADOS
+
+                  FROM ORDEM_SERV_PRODS OSP
+                      INNER JOIN PRODUTOS P ON P.ID = OSP.PRODUTO_ID
+
+                      LEFT JOIN UNIDADE_MEDIDAS UM ON UM.ID = P.UNIDADE_MEDIDA_ID
+
+                      -- LEFT JOIN para substituir a subquery correlacionada
+                      LEFT JOIN (
+                          SELECT
+                              PRODUTO_ID,
+                              SUM(QUANTIDADE) AS SUM_RETIRADOS
+                          FROM ORDEM_SERV_PRODS
+                          WHERE ORDEM_SERV_ID = #{params[:id]}
+                            AND STATUS = FALSE
+                          GROUP BY PRODUTO_ID
+                      ) RETIRADOS ON RETIRADOS.PRODUTO_ID = OSP.PRODUTO_ID
+
+                  WHERE
+                      OSP.STATUS = TRUE
+                      AND OSP.ORDEM_SERV_ID = #{params[:id]}
+
+                  ORDER BY OSP.ID;"
+    @retirados = OrdemServProd.find_by_sql(sql_ret)
+
+    sql_dev = "SELECT
+                      OSP.ID,
+                      OSP.DATA,
+                      OSP.PRODUTO_ID,
+                      OSP.DEPOSITO_ID,
+                      P.NOME AS PRODUTO_NOME,
+                      UM.SIGLA AS unidade_medida_sigla,
+                      OSP.QUANTIDADE,
+                      OSP.VALOR_GS,
+                      OSP.VALOR_US,
+                      OSP.VALOR_RS
+
+                  FROM ORDEM_SERV_PRODS OSP
+                      INNER JOIN PRODUTOS P ON P.ID = OSP.PRODUTO_ID
+                      LEFT JOIN UNIDADE_MEDIDAS UM ON UM.ID = P.UNIDADE_MEDIDA_ID
+
+                  WHERE
+                      OSP.STATUS = FALSE
+                      AND OSP.ORDEM_SERV_ID = #{params[:id]}
+
+                  ORDER BY OSP.ID;"
+    @devolvidos = OrdemServProd.find_by_sql(sql_dev)
     if params[:vs] == 'true'
       render layout: 'consulta'
     else

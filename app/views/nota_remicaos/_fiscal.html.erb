@@ -1,0 +1,84 @@
+<div class="panel">
+  <h1 id="header">
+  Nota de Remición
+  <div class="pull-right">
+    <a href="#" data-toggle="modal" data-target="#modal-faturamento" class="btn btn-green" style="height: 37px;"><i class="icon-white icon-plus-sign"></i></a>
+  </div>
+</h1>
+  <table class="head_grid">
+    <tr>
+      <td width="70">Lanz.</td>
+      <td width="100">Factura</td>
+      <td width="60">CDC</td>
+      <td width="100">Estado SET</td>
+    </tr>
+  </table>
+
+  <div class="rolagem" dir="div" style="height: 180px">
+    <table>
+      <% @fts.each do |ft| %>
+      <% if ft.status == 2 %>
+        <% anulada  = 'li-ft' %>
+      <% end %>
+
+        <tr class = "<%= cycle("cor1", "cor2") %> <%= raw anulada %>">
+          <td  width="70">
+            <%= link_to  "#detalhe-doc-#{ft.id}", "data-toggle" => "modal", "data-target" =>"#detalhe-doc-#{ft.id}", "data-id" => "#{ft.id}" do %>
+              <%= ft.id %>
+            <% end %>
+          </td>
+          <td  width="100"><%= ft.doc_01 %>.<%= ft.doc_02 %>.<%= ft.doc %></td>
+
+
+          <td  width="60" title="<%= ft.cdc %>"><small></small></td>
+          <td class="bold"></td>
+          <% if ft.status == 1 %>
+            <td><span class="btn-success">Activo</span></td>
+            <td><%= link_to 'Anular', form_anula_nc_form_fiscal_path(ft, status: '2', modal: 'true') %></td>
+
+            <% if current_user.tipo.to_i == 0  %>
+              <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>
+            <% end %>
+
+            <% if ft.tipo_emissao.to_i == 0 %>
+              <td><%= link_to 'Re-imprimir', "#",  :onclick => "MultiplaFaturaVenda(#{ft.id})" %></td>
+            <% else %>
+              <td><%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: ft.cdc, id: ft.id) %></td>
+            <% end %>
+          <% else %>
+            <td><span class="btn-danger">Anulado</span></td>
+
+            <% if current_user.tipo.to_i == 0  %>
+              <td><%= link_to 'Retroceder', form_anula_nc_form_fiscal_path(ft, status: '0', modal: 'true') %></td>
+            <% end %>
+
+            <% if ft.tipo_emissao.to_i == 1 %>
+              <td><%= link_to 'Gerar pdf', gera_pdf_cdc_form_fiscals_path( cdc: ft.cdc, id: ft.id) %></td>
+            <% end %>
+          <% end %>
+        </tr>
+
+      <% end %>
+    </table>
+  </div>
+</div>
+
+
+<div class="modal fade" id="modal-faturamento" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="close-button">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <h1 id="myModalLabelf">Datos de Documiento</h1>
+      </div>
+
+      <div class="modal-body">
+        <div class="group">
+          <%= render partial: "form_fiscals/attr_forms/nota_remicao_update" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

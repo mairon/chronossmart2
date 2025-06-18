@@ -21,6 +21,8 @@ class ViaticosController < ApplicationController
     @viatico = Viatico.find(params[:id])
     sql = "SELECT C.ID, 
                   C.DATA,
+                  C.DOCUMENTO_NUMERO_01,
+                  C.DOCUMENTO_NUMERO_02,
                   C.DOCUMENTO_NUMERO,
                   C.PERSONA_NOME,
                   C.MOEDA,

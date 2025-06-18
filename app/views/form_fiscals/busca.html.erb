@@ -79,14 +79,14 @@
           <%
             data = {cdcList: [{cdc: "#{form_fiscal.cdc}"}]};
 
-             url = URI("https://api.facturasend.com.py/#{current_unidade.nome_api_fiscal}/de/estado")
+             url = URI("https://api.facturasend.com.py/#{form_fiscal.terminal.nome_api_fiscal}/de/estado")
 
                         http = Net::HTTP.new(url.host, url.port)
                         http.use_ssl = true
                         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
                         request = Net::HTTP::Post.new(url)
-                        request["authorization"] = "Bearer api_key_#{current_unidade.token_api}"
+                        request["authorization"] = "Bearer api_key_#{form_fiscal.terminal.token_api}"
                         request["content-type"] = 'application/json'
                         request.body = data.to_json
                         response = http.request(request)

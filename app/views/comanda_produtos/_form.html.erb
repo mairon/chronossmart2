@@ -1,0 +1,71 @@
+<%= form_for(@comanda_produto) do |f| %>
+  <% if @comanda_produto.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@comanda_produto.errors.count, "error") %> prohibited this comanda_produto from being saved:</h2>
+
+      <ul>
+      <% @comanda_produto.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+<ul class="tabs">
+      <li><a href="#tab1"> comanda_produtos - [Edicion]</a></li>
+</ul>
+
+<div class="tab_container">
+      <div id="tab1" class="tab_content">
+        <table>
+          <tr>
+            <td width="1000">
+              <fieldset>
+
+                <table>
+                  <tr>
+                                      
+                      <td align="right">comanda_id :</td>                    
+                      <td><%= f.number_field :comanda_id %></td>
+                                      
+                      <td align="right">produto_id :</td>                    
+                      <td><%= f.number_field :produto_id %></td>
+                                      
+                      <td align="right">produto_nome :</td>                    
+                      <td><%= f.text_field :produto_nome %></td>
+                                      
+                      <td align="right">quantidade :</td>                    
+                      <td><%= f.text_field :quantidade %></td>
+                                      
+                      <td align="right">obs :</td>                    
+                      <td><%= f.text_area :obs %></td>
+                                      
+                      <td align="right">persona_id :</td>                    
+                      <td><%= f.number_field :persona_id %></td>
+                                      
+                      <td align="right">unit_gs :</td>                    
+                      <td><%= f.text_field :unit_gs %></td>
+                                      
+                      <td align="right">tot_gs :</td>                    
+                      <td><%= f.text_field :tot_gs %></td>
+                                      
+                      <td align="right">unit_us :</td>                    
+                      <td><%= f.text_field :unit_us %></td>
+                                      
+                      <td align="right">tot_us :</td>                    
+                      <td><%= f.text_field :tot_us %></td>
+                                      </tr>                 
+                </table>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="buttons">
+        <%= f.submit :value => " Grabar ", :class => "button" %>
+        <%= link_to 'Volver', comanda_produtos_path, :class => "button back" %>        
+      </div>
+
+    </div>
+<% end %>

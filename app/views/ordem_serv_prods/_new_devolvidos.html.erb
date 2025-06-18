@@ -25,13 +25,13 @@
   <div class="row">
     <div class="col-md-12">
       <label>Deposito</label>
-      <%= f.collection_select :deposito_id, Deposito.all( :select => ' id,nome', :order  => '2' ), :id, :nome, {},{ readonly: true} %>
+      <%= f.collection_select :deposito_id, Deposito.all( :select => ' id,nome', :order  => '2' ), :id, :nome, {},{ readonly: true, class: 'dev_deposito_id'} %>
     </div>
   </div>
   <div class="row">
     <div class="col-md-12">
       <label>Producto</label>
-      <%= f.collection_select :produto_id, Produto.all( :select => ' id,nome', :order  => '2' ), :id, :nome,{ prompt: 'Selecione lo producto'}, {required: true, readonly: true, class: 'panel-field'} %>
+      <%= f.collection_select :produto_id, Produto.all( :select => ' id,nome', :order  => '2' ), :id, :nome,{ prompt: 'Selecione lo producto'}, {required: true, readonly: true, class: 'panel-field dev_produto_id'} %>
       
     </div>
   </div>

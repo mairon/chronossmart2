@@ -1,5 +1,7 @@
+<div class="panel">
+
 <h1 id="header">Terminal - [<%= t('EDITION') %>]</h1>
- <div class="group">
+	<div class="panel-content">
 
 	<%= form_for(@terminal) do |f| %>
 		<% if @terminal.errors.any? %>
@@ -24,13 +26,6 @@
 
 				<tr>
 					<td>
-						<label>Form</label>
-						<%= f.text_field :form_venda, class: 'panel-field' %>
-					</td>
-				</tr>
-
-				<tr>
-					<td>
 						<label>Deposito</label>
 						<%= f.collection_select :deposito_id, Deposito.all(:select => 'id,nome', conditions: "unidade_id = #{current_unidade.id}",:order => '2'),:id,:nome, {prompt: 'Seleccione el Deposito'} %>
 					</td>
@@ -41,24 +36,17 @@
 					<label><%= t('UNIT') %></label>
 						<%= f.text_field :documento_numero_01, size: 6 %>Punto:<%= f.text_field :documento_numero_02, size: 6 %></td>
 				</tr>
-				<tr>
-					<td>
-						<label>Tipo Emissión</label>
-            <%= f.radio_button :tipo_emissao, 0,  :Checked => "True" %> Impreso
-            <%= f.radio_button :tipo_emissao, 1 %> Eletronico
 
-					</td>
-				</tr>
 				<tr>
 					<td>
 						<label>Token API</label>
-      			<%= f.text_field :token_api, class: 'panel-field' %>
+      			<%= f.text_area :token_api, class: 'panel-field', rows: 1 %>
 					</td>
 				</tr>
 				<tr>
 					<td>
 			      <label>Tenit</label>
-			      <%= f.text_field :nome_api_fiscal, class: 'panel-field' %>
+			      <%= f.text_area :nome_api_fiscal, class: 'panel-field', rows: 1 %>
 					</td>
 				</tr>
 			</table>
@@ -68,7 +56,9 @@
       <%= link_to t('BACK'), terminals_path, :class => "btn btn-back" %>
    	</div>
 	<% end %>
+	</div>
 </div>
+
 
 <script type="text/javascript">
   $('#terminal_deposito_id').selectize();

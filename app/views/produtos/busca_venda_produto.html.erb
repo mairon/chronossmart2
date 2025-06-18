@@ -6,7 +6,8 @@
           <i class="icon-search" aria-hidden="true"></i>
         </button>
       </span>
-      <input id="busca" name="busca" style="padding: 12px" type="search" value="<%= params[:busca]%>" placeholder="Buscar" onKeyUp="pesquisa(document.getElementById('busca').value)" size="40" autocapitalize="off" autocomplete="off" autocorrect="off" autofocus />
+      <input id="busca" name="busca" style="padding: 12px" type="search" value="<%= params[:busca]%>" placeholder="Buscar" size="40" autocapitalize="off" autocomplete="off" autocorrect="off" autofocus />
+      <input type="button" class="btn btn-blue" onclick="pesquisa(document.getElementById('busca').value)" placeholder="Cliente" value="Buscar"/>
 
       <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinner", :width => 21, :height => 21, :style =>"display: none;" ) %>
     </div>

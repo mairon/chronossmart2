@@ -32,7 +32,8 @@
   <div class="row">
     <div class="col-md-12">
       <label>Producto</label>
-      <%= f.collection_select :produto_id, Produto.all( :select => "id, (barra || ' - ' || nome) as nome", :order  => '2' ), :id, :nome,{prompt: 'Selecione lo producto'}, {required: true, class: 'ret_produto_id panel-field'} %>
+      <%= f.text_field :produto_nome, class: 'panel-field' %>
+      <%= f.hidden_field :produto_id, class: 'panel-field' %>
     </div>
   </div>
   <div class="row">
@@ -69,18 +70,18 @@ $("#cod_busca").change(function(){
       beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
       data: 'tipo_busca=BARRA&cod=' + $('#cod_busca').val(),
       success: function(grade){
-        alert(grade)
-     $(".ret_produto_id").val(grade);
+     $("#ordem_serv_prod_produto_id").val(grade["prod"].id);
+     $("#ordem_serv_prod_produto_nome").val(grade["prod"].nome);
     }
   });
 });
 
 
-  $(".ret_produto_id").change(function(){
+  $("#ordem_serv_prod_produto_nome").blur(function(){
       $.ajax({url: "/buscas/busca_venda_produto",
         type: 'GET',
         beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
-        data: 'tipo_busca=ID&cod=' + $('.ret_produto_id').val() +
+        data: 'tipo_busca=ID&cod=' + $('#ordem_serv_prod_produto_id').val() +
           "&unidade=" + <%= current_unidade.id %> +
           "&data=" + '<%= @ordem_serv.data.strftime("%d/%m/%Y") %>' +
           "&deposito=" + $("#ordem_serv_prod_deposito_id").val() +
@@ -101,4 +102,58 @@ $("#cod_busca").change(function(){
 
 
   });
+</script>
+
+<script>
+
+  //busca por descricao produto
+    $(function() {
+      $( "#ordem_serv_prod_produto_nome" ).autocomplete({
+          source: function( request, response ) {
+          $("#sppiner").addClass("sppiner_show");
+          $.ajax({
+            url: "/buscas/search_all_produtos",
+            dataType: "json",
+            data: {
+              tipo: 'DESCRIPCION',
+              busca: request.term
+            },
+            success: function( data ) {
+              response( data );
+              $("#sppiner").removeClass("sppiner_show");
+            },
+          });
+        },
+        minLength: 2,
+        select: function( event, ui ) {
+          $("#ordem_serv_prod_produto_id").val("");
+          $( "#ordem_serv_prod_produto_nome" ).val(ui.item.label);
+          $('#ordem_serv_prod_produto_id').val(ui.item.id);
+
+          $.ajax({url: "/buscas/busca_venda_produto",
+            type: 'GET',
+            beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+            data: 'tipo_busca=ID&cod=' + $('#ordem_serv_prod_produto_id').val() +
+              "&unidade=" + <%= current_unidade.id %> +
+              "&data=" + '<%= @ordem_serv.data.strftime("%d/%m/%Y") %>' +
+              "&deposito=" + $("#ordem_serv_prod_deposito_id").val() +
+              "&barra_balanca=0" +
+              "&persona_id=" + <%= @ordem_serv.persona_id %> +
+              "&tabela_preco=" + <%= @ordem_serv.persona.tabela_preco_id %>,
+            success: function(grade){
+            //tabela de preco
+            if (<%= @ordem_serv.moeda %> == '0'){
+              $('.new-valor_us').val(number_format( grade["produto"].preco_1_us, 2, ',', '.'));
+            }if (<%= @ordem_serv.moeda %> == '1'){
+              $('.new-valor_gs').val(number_format( grade["produto"].preco_1_gs, 0, ',', '.'));
+            }if (<%= @ordem_serv.moeda %> == '2'){
+              $('.new-valor_rs').val(number_format( grade["produto"].preco_1_rs, 2, ',', '.'));
+            }
+          }
+        });
+          return false;
+        }
+      });
+    });
+
 </script>

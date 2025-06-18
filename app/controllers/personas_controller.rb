@@ -141,24 +141,24 @@ def visao_geral_cliente_print
 
 	def historico_vendas
     @persona = Persona.find(params[:id])
-    render layout: 'consulta'
+    render layout: false
   end
 
 	def busca_historico_vendas
 		@persona = Persona.find(params[:id])
-    unless params[:inicio].blank?
-      data =  "AND S.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}'" unless params[:inicio].blank?
+    unless params[:hv_inicio].blank?
+      data =  "AND S.DATA BETWEEN '#{params[:hv_inicio].split("/").reverse.join("-")}' AND '#{params[:hv_final].split("/").reverse.join("-")}'" unless params[:hv_inicio].blank?
     end
 
-      if [:tipo] == "TODOS"
+      if [:hv_tipo] == "TODOS"
         todos = ""
-      elsif params[:tipo] == "VENDEDOR"
-        vendedor_nome = "AND  VD.NOME ILIKE '%#{params[:busca]}%'"
-      elsif params[:tipo] == "PRODUTO"
-        produto = "AND S.PRODUTO_NOME ILIKE '%#{params[:busca]}%'"
+      elsif params[:hv_tipo] == "VENDEDOR"
+        vendedor_nome = "AND  VD.NOME ILIKE '%#{params[:hv_busca]}%'"
+      elsif params[:hv_tipo] == "PRODUTO"
+        produto = "AND S.PRODUTO_NOME ILIKE '%#{params[:hv_busca]}%'"
       end
 
-      busca = "AND to_tsvector(upper((P.NOME)) ) @@ to_tsquery(upper('#{params[:busca].to_s.gsub(/\s/,'&')}:*'))" unless params[:busca].blank?
+      busca = "AND to_tsvector(upper((P.NOME)) ) @@ to_tsquery(upper('#{params[:hv_busca].to_s.gsub(/\s/,'&')}:*'))" unless params[:hv_busca].blank?
     sql = "SELECT S.DATA,
             S.COD_PROCESSO,
             S.SIGLA_PROC,
@@ -654,7 +654,11 @@ def visao_geral_cliente_print
 
 	def new
 		@persona = Persona.new
-		render layout: 'chart'
+		if params[:layout] == 'resumido'
+			render layout: false
+		else
+			render layout: 'chart'
+		end
 	end
 
 	def edit

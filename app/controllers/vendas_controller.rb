@@ -1,6 +1,53 @@
 ﻿class VendasController < ApplicationController
   before_filter :authenticate, :except => [:ticket_cozinha, :comprovante01]
 
+  def rentabilidade
+    @venda  = Venda.find(params[:id])
+
+    sql = " SELECT
+                         P.ID AS PRODUTO_ID,
+                         V.PERSONA_ID,
+                         MAX(P.NOME) AS PRODUTO_NOME,
+                         MAX(G.DESCRICAO) AS GRUPO_NOME,
+                         MAX(SG.DESCRICAO) AS SUB_GRUPO_NOME,
+                         MAX(P.FABRICANTE_COD) AS REFERENCIA,
+                         MAX(V.PERSONA_NOME) AS PERSONA_NOME,
+                         SUM(VP.QUANTIDADE) AS QUANTIDADE,
+                         MAX((SELECT SS.PROMEDIO_GUARANI FROM STOCKS SS WHERE SS.DATA <= VP.DATA AND SS.STATUS = 0 AND SS.DEPOSITO_ID = VP.DEPOSITO_ID AND SS.PRODUTO_ID = VP.PRODUTO_ID ORDER BY SS.DATA DESC, SS.TABELA_ID DESC LIMIT 1)) CUSTO_MEDIO_GS,
+                         SUM( (VP.TOTAL_GUARANI - COALESCE(VP.DESCONTO_GUARANI,0))) / SUM(VP.QUANTIDADE) AS UNITARIO_GUARANI,
+                         SUM(VP.TOTAL_GUARANI - COALESCE(VP.DESCONTO_GUARANI,0)) AS TOTAL_GUARANI,
+                         MAX((SELECT SS.PROMEDIO_DOLAR FROM STOCKS SS WHERE SS.DATA <= VP.DATA AND SS.STATUS = 0 AND SS.DEPOSITO_ID = VP.DEPOSITO_ID AND SS.PRODUTO_ID = VP.PRODUTO_ID ORDER BY SS.DATA DESC, SS.TABELA_ID DESC LIMIT 1)) CUSTO_MEDIO_US,
+                         SUM( (VP.TOTAL_DOLAR)) / SUM(VP.QUANTIDADE) AS UNITARIO_DOLAR,
+                         SUM(VP.TOTAL_DOLAR) AS TOTAL_DOLAR,
+                         MAX(UM.SIGLA) AS UNIDADE_MEDIDA_NOME,
+                         MAX(UM.UNIDADE) AS UNIDADE_MEDIDA_PRECISION
+
+                         FROM VENDAS_PRODUTOS VP
+
+                         INNER JOIN VENDAS V
+                         ON V.ID = VP.VENDA_ID
+
+                         INNER JOIN PRODUTOS P
+                         ON P.ID = VP.PRODUTO_ID
+
+                         LEFT JOIN UNIDADE_MEDIDAS UM
+                         ON P.UNIDADE_MEDIDA_ID = UM.ID
+
+                         LEFT JOIN GRUPOS G
+                         ON P.GRUPO_ID = G.ID
+
+                         LEFT JOIN SUB_GRUPOS SG
+                         ON P.SUB_GRUPO_ID = SG.ID
+
+                         WHERE V.ID = #{@venda.id}
+
+                         GROUP BY 1,2"
+
+               @vendas_produtos = Produto.find_by_sql( sql )
+
+    render layout: false
+  end
+
   def entregas_pendentes
     render layout: 'chart'
   end
@@ -304,7 +351,8 @@
   def lista_mapa_mesas
     @venda_config = VendasConfig.where(unidade_id: current_unidade.id).last
     ct = "and nome ILIKE '%#{params[:cartao_nome]}%'" unless params[:cartao_nome].blank?
-    @mesas = Cartao.where("UNIDADE_ID = #{current_unidade.id} and status = true #{ct}").order('id')
+    st = "and status_op = #{params[:status]}" unless params[:status].blank?
+    @mesas = Cartao.select('id,nome, status_op').where("UNIDADE_ID = #{current_unidade.id} and status = true #{ct} #{st}").order('id')
     render layout: false
   end
 
@@ -340,33 +388,7 @@
            "
     @vendas = Venda.find_by_sql(sql)
 
-    if current_unidade.id.to_i == 1
-    sql = "
-          SELECT V.ID,
-                 C.NOME AS CARTAO_NOME,
-                 VP.PRODUTO_NOME,
-                 VP.QUANTIDADE,
-                 VP.CREATED_AT,
-                 VP.OBS,
-                 VP.STATUS_PREPARO
-          FROM VENDAS_PRODUTOS VP
 
-          INNER JOIN VENDAS V
-          ON V.ID = VP.VENDA_ID
-
-          INNER JOIN CARTAOS C
-          ON C.ID = V.CARTAO_ID
-
-          INNER JOIN PRODUTOS P
-          ON P.ID = VP.PRODUTO_ID
-
-          WHERE V.UNIDADE_ID = 10 AND VP.STATUS_PREPARO IN (0,1)
-          AND P.PREPARACAO = TRUE
-          AND V.OP = TRUE
-          ORDER BY 5
-
-    "
-    else
     sql = "
           SELECT V.ID,
                  C.NOME AS CARTAO_NOME,
@@ -390,9 +412,7 @@
           AND P.PREPARACAO = TRUE
           AND V.OP = TRUE
           ORDER BY 5
-
     "
-    end
 
     @produtos = VendasProduto.find_by_sql(sql)
 
@@ -590,7 +610,7 @@
       @saldo_cashback = MovVantagen.where(tipo_promo: 1, persona_id: @venda.persona_id).sum(:valor_gs)
       @cashback_gs    = (VendasProduto.sum(:cashback_gs, :conditions => ['venda_id = ?',params[:id]] ))
       @saldo_antecipado = Cliente.sum("cobro_guarani - divida_guarani", conditions: "PERSONA_ID = #{@venda.persona_id} AND DOCUMENTO_NUMERO = ('999' || CAST(#{@venda.persona_id} AS VARCHAR) )" )
-      @fts = FormFiscal.where("sigla_proc = 'VT' AND cod_proc = #{@venda.id} AND STATUS != 0").select("cdc, tipo_emissao, ruc, persona_nome, id,impressao, cod_proc, tot_gs, doc_01, doc_02, doc, status, autorizacao").order('id desc ')
+      @fts = FormFiscal.where("sigla_proc = 'VT' AND cod_proc = #{@venda.id} AND STATUS != 0").select("terminal_id, cdc, tipo_emissao, ruc, persona_nome, id,impressao, cod_proc, tot_gs, doc_01, doc_02, doc, status, autorizacao").order('id desc ')
       @vendas_fs      = VendasFatura.where("venda_id = #{params[:id]}").order('1 desc')
       @produto_count  = VendasProduto.sum(:quantidade,:conditions => ['venda_id = ?',params[:id]] )
       @produto_sum_us = (VendasProduto.sum(:total_dolar,:conditions => ['venda_id = ?',params[:id]] ) -  @venda.desconto_us.to_f)

@@ -36,8 +36,10 @@
   	<td align="center" width="40">#</td>
     <td width="150">Producto</td>
     <td align="right" width="50">Cantidad</td>
-    <td align="right" width="60">Unit.</td>
-    <td align="right" width="60">Tot.</td>
+    <% if current_user.tipo > 2 %>
+      <td align="right" width="60">Unit.</td>
+      <td align="right" width="60">Tot.</td>
+    <% end %>
   </tr>
       <% qtd    = 0 %>
       <% tot    = 0 %>
@@ -47,14 +49,16 @@
       	<td align="center" width="40"><%= indice %></td>
         <td align="left" width="150"><%= pc.produto_id.to_s.rjust(6,'0') %>-<%= pc.produto.nome %></td>
         <td align="right" width="50"><%= pc.quantidade %></td>
-        <% if @consumicao_interna.moeda.to_i == 0 %>
-          <td align="right" width="60"><%= format_decimal(pc.unitario_dolar) %></td>
-          <td align="right" width="60"><%= format_decimal(pc.total_dolar) %></td>
-          <% tot    += pc.total_dolar %>
-        <% else %>
-          <td align="right" width="60"><%= format_int(pc.unitario_guarani) %></td>
-          <td align="right" width="60"><%= format_int(pc.total_guarani) %></td>
-          <% tot    += pc.total_guarani %>
+        <% if current_user.tipo > 2 %>
+          <% if @consumicao_interna.moeda.to_i == 0 %>
+            <td align="right" width="60"><%= format_decimal(pc.unitario_dolar) %></td>
+            <td align="right" width="60"><%= format_decimal(pc.total_dolar) %></td>
+            <% tot    += pc.total_dolar %>
+          <% else %>
+            <td align="right" width="60"><%= format_int(pc.unitario_guarani) %></td>
+            <td align="right" width="60"><%= format_int(pc.total_guarani) %></td>
+            <% tot    += pc.total_guarani %>
+          <% end %>
         <% end %>
       </tr>
       <% qtd    += pc.quantidade %>
@@ -64,10 +68,12 @@
       <td colspan="2" align="right">Total</td>
       <td align="right"> <%= qtd.to_f %></td>
       <td></td>
-      <% if @consumicao_interna.moeda.to_i == 0 %>
-        <td align="right" width="70"><%= format_decimal(tot) %></td>
-      <% else %>
-        <td align="right" width="70"><%= format_int(tot) %></td>
+      <% if current_user.tipo > 2 %>
+        <% if @consumicao_interna.moeda.to_i == 0 %>
+          <td align="right" width="70"><%= format_decimal(tot) %></td>
+        <% else %>
+          <td align="right" width="70"><%= format_int(tot) %></td>
+        <% end %>
       <% end %>
 
      </tr>

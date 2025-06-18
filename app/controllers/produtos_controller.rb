@@ -5,7 +5,7 @@
 
 		@produto = Produto.find(params[:id])
 		render layout: 'chart'
-		
+
 	end
 
 	def gera_etiqueta
@@ -194,8 +194,6 @@
 					SELECT P.ID AS PRODUTO_ID,
 								 P.NOME AS NOME,
 								 P.FABRICANTE_COD,
-								 P.COR,
-								 P.TAMANHO,
 								 P.BARRA,
 								 CL.DESCRICAO AS CLASE_NOME,
 								 GP.DESCRICAO AS GRUPO_NOME,
@@ -408,14 +406,81 @@
 
     def dinamic_busca_venda_produto
 
+
+
+			sql = " -- Versão otimizada com busca no meio das palavras e JOINs otimizados
+			SELECT P.ID AS PRODUTO_ID,
+			       P.NOME,
+			       SIMILARITY('#{params[:busca]}', search_text) AS similaridade,
+			       P.FABRICANTE_COD,
+			       P.BARRA,
+			       P.LOCACAO,
+			       P.OBS,
+			       CL.DESCRICAO AS CLASE_NOME,
+			       G.DESCRICAO AS GRUPO_NOME,
+			       SG.DESCRICAO AS SUB_GRUPO_NOME,
+
+			       -- Preços otimizados com um único JOIN
+			       TB.PRECO_1_US,
+			       TB.PRECO_1_GS,
+			       TB.PRECO_1_RS,
+
+			       -- Stock otimizado
+			       COALESCE(stock_calc.stock_total, 0) AS STOCK
+
+			FROM PRODUTOS P
+			-- Calcula o texto de busca uma vez
+			CROSS JOIN LATERAL (
+			    SELECT UPPER(COALESCE(P.NOME,'') || ' ' || COALESCE(P.FABRICANTE_COD,'') || ' ' ||
+			                 COALESCE(P.BARRA,'') || ' ' || COALESCE(P.OBS,'')) AS search_text
+			) texto
+
+			-- JOINs das tabelas relacionadas
+			LEFT JOIN SUB_GRUPOS SG ON SG.ID = P.SUB_GRUPO_ID
+			LEFT JOIN CLASES CL ON CL.ID = P.CLASE_ID
+			LEFT JOIN GRUPOS G ON G.ID = P.GRUPO_ID
+
+			-- JOIN otimizado para preços (substitui as 4 subconsultas)
+			LEFT JOIN PRODUTOS_TABELA_PRECOS TB ON (
+			    TB.PRODUTO_ID = P.ID
+			    AND TB.UNIDADE_ID = #{params[:unidade]}
+			    AND TB.TABELA_PRECO_ID = #{params[:tabela_preco_id]}
+			)
+
+			-- Stock otimizado com LATERAL JOIN
+			LEFT JOIN LATERAL (
+			    SELECT SUM(entrada - saida) AS stock_total
+			    FROM stocks s
+			    WHERE s.produto_id = P.ID
+			      AND s.deposito_id = #{params[:deposito_id]}
+			      AND s.data <= '#{params[:data]}'
+			) stock_calc ON true
+
+			WHERE P.STATUS = TRUE -- Assumindo que existe este campo para produtos ativos
+			  AND (
+			    -- Busca no meio das palavras usando ILIKE
+			    search_text ILIKE '%#{params[:busca].gsub(/\s/,'%')}%'
+			    -- Ou busca com ambos os termos
+			    OR search_text % '#{params[:busca]}'
+			    -- Ou full-text search com prefixos
+			    OR to_tsvector('portuguese', search_text) @@ to_tsquery('portuguese', '#{params[:busca].gsub(/\s/,':* |')}')
+			  )
+
+			ORDER BY similaridade DESC, P.NOME, P.ID
+			LIMIT 50;"
+
+
+
+
+
+
       tipo = " (P.BARRA || P.FABRICANTE_COD || P.NOME) ILIKE '%#{params[:busca]}%'"            if params[:tipo] == "DESCRIPCION"
       tipo = "P.FABRICANTE_COD ILIKE '%#{params[:busca]}%'"  if params[:tipo] == "REFERENCIA"
       tipo = "CAST(P.ID AS VARCHAR) = '#{params[:busca]}'"             if params[:tipo] == "CODIGO"
       subg = "AND P.SUB_GRUPO_ID = #{params[:sub_grupo]}"     unless params[:sub_grupo].blank?
-      sql = "
+      sql2 = "
 
       SELECT DISTINCT( P.ID ) AS PRODUTO_ID,
-             SIMILARITY('#{params[:busca].gsub(/\s/,'|')}', (upper( COALESCE(P.NOME,'') || ' ' || COALESCE(P.FABRICANTE_COD,'') || ' ' || COALESCE(P.BARRA,'') || ' ' || COALESCE(P.OBS,'') ) )),
              P.NOME AS NOME,
              P.BARRA,
              P.FABRICANTE_COD,
@@ -549,24 +614,66 @@
       tipo = "P.FABRICANTE_COD ILIKE '%#{params[:busca]}%'"  if params[:tipo] == "REFERENCIA"
       tipo = "CAST(P.ID AS VARCHAR) = '#{params[:busca]}'"             if params[:tipo] == "CODIGO"
       subg = "AND P.SUB_GRUPO_ID = #{params[:sub_grupo]}"     unless params[:sub_grupo].blank?
-      sql = "
+			sql = " -- Versão otimizada com busca no meio das palavras e JOINs otimizados
+			SELECT P.ID AS PRODUTO_ID,
+			       P.NOME,
+			       SIMILARITY('#{params[:busca]}', search_text) AS similaridade,
+			       P.FABRICANTE_COD,
+			       P.BARRA,
+			       P.LOCACAO,
+			       P.OBS,
+			       CL.DESCRICAO AS CLASE_NOME,
+			       G.DESCRICAO AS GRUPO_NOME,
+			       SG.DESCRICAO AS SUB_GRUPO_NOME,
 
-      SELECT DISTINCT( P.ID ) AS PRODUTO_ID,
-             P.NOME AS NOME,
-             P.BARRA,
-             P.FABRICANTE_COD,
-             TB.PRECO_1_US,
-             TB.PRECO_1_GS,
-             TB.PRECO_1_RS,
-             (SELECT SUM(entrada - saida) AS sum_id FROM stocks s WHERE ( s.deposito_id = #{params[:deposito_id]} and s.produto_id = P.ID AND s.data <= '#{params[:data]}' ) ) AS STOCK
-      FROM PRODUTOS P
-      INNER JOIN PRODUTOS_TABELA_PRECOS TB
-      ON P.ID = TB.PRODUTO_ID
-      WHERE  P.STATUS = TRUE
-      AND TB.TABELA_PRECO_ID = #{params[:tabela_preco_id]}
-      AND TB.UNIDADE_ID = #{params[:unidade]}
-      AND to_tsvector(upper(COALESCE(P.NOME, '') || ' ' || COALESCE(P.CHASSI, '') || ' ' || COALESCE(P.REFERENCIA, '') || ' ' || COALESCE(P.COR, '') || ' ' ||  COALESCE(P.ANO, '') || ' ' ||  COALESCE(P.OBS, '') || ' ' || COALESCE(P.FABRICANTE_COD, '') || ' '  || ' ' || COALESCE(P.BARRA, '') || ' ' || COALESCE( CAST(P.ID AS CHARACTER VARYING ), '') )) @@ to_tsquery(upper('#{params[:busca].gsub(/\s/,'&')}:*'))
-      ORDER BY 2,3 LIMIT 50"
+			       -- Preços otimizados com um único JOIN
+			       TB.PRECO_1_US,
+			       TB.PRECO_1_GS,
+			       TB.PRECO_1_RS,
+
+			       -- Stock otimizado
+			       COALESCE(stock_calc.stock_total, 0) AS STOCK
+
+			FROM PRODUTOS P
+			-- Calcula o texto de busca uma vez
+			CROSS JOIN LATERAL (
+			    SELECT UPPER(COALESCE(P.NOME,'') || ' ' || COALESCE(P.FABRICANTE_COD,'') || ' ' ||
+			                 COALESCE(P.BARRA,'') || ' ' || COALESCE(P.OBS,'')) AS search_text
+			) texto
+
+			-- JOINs das tabelas relacionadas
+			LEFT JOIN SUB_GRUPOS SG ON SG.ID = P.SUB_GRUPO_ID
+			LEFT JOIN CLASES CL ON CL.ID = P.CLASE_ID
+			LEFT JOIN GRUPOS G ON G.ID = P.GRUPO_ID
+
+			-- JOIN otimizado para preços (substitui as 4 subconsultas)
+			LEFT JOIN PRODUTOS_TABELA_PRECOS TB ON (
+			    TB.PRODUTO_ID = P.ID
+			    AND TB.UNIDADE_ID = #{params[:unidade]}
+			    AND TB.TABELA_PRECO_ID = #{params[:tabela_preco_id]}
+			)
+
+			-- Stock otimizado com LATERAL JOIN
+			LEFT JOIN LATERAL (
+			    SELECT SUM(entrada - saida) AS stock_total
+			    FROM stocks s
+			    WHERE s.produto_id = P.ID
+			      AND s.deposito_id = #{params[:deposito_id]}
+			      AND s.data <= '#{params[:data]}'
+			) stock_calc ON true
+
+			WHERE P.STATUS = TRUE -- Assumindo que existe este campo para produtos ativos
+			  AND (
+			    -- Busca no meio das palavras usando ILIKE
+			    search_text ILIKE '%#{params[:busca].gsub(/\s/,'%')}%'
+			    -- Ou busca com ambos os termos
+			    OR search_text % '#{params[:busca]}'
+			    -- Ou full-text search com prefixos
+			    OR to_tsvector('portuguese', search_text) @@ to_tsquery('portuguese', '#{params[:busca].gsub(/\s/,':* |')}')
+			  )
+
+			ORDER BY similaridade DESC, P.NOME, P.ID
+			LIMIT 50;"
 
       @produtos = Produto.find_by_sql(sql)
       render :layout => false
@@ -641,8 +748,68 @@
 		end
 
 		def dinamic_busca_consulta_stock
+sql = " -- Versão otimizada com busca no meio das palavras e JOINs otimizados
+SELECT P.ID AS PRODUTO_ID,
+       P.NOME,
+       SIMILARITY('#{params[:busca]}', search_text) AS similaridade,
+       P.FABRICANTE_COD,
+       P.BARRA,
+       P.LOCACAO,
+       P.OBS,
+       CL.DESCRICAO AS CLASE_NOME,
+       G.DESCRICAO AS GRUPO_NOME,
+       SG.DESCRICAO AS SUB_GRUPO_NOME,
 
-				sql = "
+       -- Preços otimizados com um único JOIN
+       TB.PRECO_1_US AS TABELA_1_US,
+       TB.PRECO_2_US AS TABELA_2_US,
+       TB.PRECO_1_GS AS TABELA_1_GS,
+       TB.PRECO_2_GS AS TABELA_2_GS,
+
+       -- Stock otimizado
+       COALESCE(stock_calc.stock_total, 0) AS STOCK
+
+FROM PRODUTOS P
+-- Calcula o texto de busca uma vez
+CROSS JOIN LATERAL (
+    SELECT UPPER(COALESCE(P.NOME,'') || ' ' || COALESCE(P.FABRICANTE_COD,'') || ' ' ||
+                 COALESCE(P.BARRA,'') || ' ' || COALESCE(P.OBS,'')) AS search_text
+) texto
+
+-- JOINs das tabelas relacionadas
+LEFT JOIN SUB_GRUPOS SG ON SG.ID = P.SUB_GRUPO_ID
+LEFT JOIN CLASES CL ON CL.ID = P.CLASE_ID
+LEFT JOIN GRUPOS G ON G.ID = P.GRUPO_ID
+
+-- JOIN otimizado para preços (substitui as 4 subconsultas)
+LEFT JOIN PRODUTOS_TABELA_PRECOS TB ON (
+    TB.PRODUTO_ID = P.ID
+    AND TB.UNIDADE_ID = #{params[:unidade]}
+    AND TB.TABELA_PRECO_ID = 1
+)
+
+-- Stock otimizado com LATERAL JOIN
+LEFT JOIN LATERAL (
+    SELECT SUM(entrada - saida) AS stock_total
+    FROM stocks s
+    WHERE s.produto_id = P.ID
+      AND s.deposito_id = #{params[:dp]["deposito"]}
+) stock_calc ON true
+
+WHERE P.STATUS = TRUE -- Assumindo que existe este campo para produtos ativos
+  AND (
+    -- Busca no meio das palavras usando ILIKE
+    search_text ILIKE '%#{params[:busca].gsub(/\s/,'%')}%'
+    -- Ou busca com ambos os termos
+    OR search_text % '#{params[:busca]}'
+    -- Ou full-text search com prefixos
+    OR to_tsvector('portuguese', search_text) @@ to_tsquery('portuguese', '#{params[:busca].gsub(/\s/,':* |')}')
+  )
+
+ORDER BY similaridade DESC, P.NOME, P.ID
+LIMIT 50;"
+
+				sql2 = "
 
 					SELECT P.ID AS PRODUTO_ID,
 							 P.NOME AS NOME,
@@ -690,7 +857,7 @@
 						format.json {render :json => {:pd => @produtos} }
 				end
 		end
-		
+
 		def index
 			render layout: 'chart'
 		end
@@ -881,7 +1048,7 @@
 
 			unidades_tabelas = TabelaPreco.order('id')
 			unidades = Unidade.where(id: current_unidade.id).order('id')
-				
+
 			unidades.each do |u|
 				unidades_tabelas.each do |un|
 					produtos_tabela_precos =  @produto.produtos_tabela_precos.build(tabela_preco_id: un.id, unidade_id: u.id)

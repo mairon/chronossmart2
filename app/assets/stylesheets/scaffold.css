@@ -408,9 +408,9 @@ div.group_menu h2
 .pagination span.current {
     padding: 2px 5px 2px 5px;
     margin: 2px;
-    border: 1px solid #515fb6;
+    border: 1px solid #1060ff;
     font-weight: bold;
-    background-color: #5d9cec;
+    background-color: #1060ff;
     color: #FFF;
 }
 .pagination span.disabled {
@@ -436,7 +436,7 @@ div.group_menu h2
     padding: 5px;
 }
 .pagination .current {
-  background: #5d9cec;
+  background: #1060ff;
   color: white;
   border-radius:0.2em;
   padding: 5px 7px 5px 7px;
@@ -564,7 +564,6 @@ div.group{
   display: block;
   width: 100%;
   border-radius: 8px;
-  color: #918f8f;
 }
 
 div.acessos{

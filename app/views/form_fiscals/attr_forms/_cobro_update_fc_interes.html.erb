@@ -2,7 +2,6 @@
 	<%= hidden_field_tag :cod_proc, @cobro.id %>
 	<%= hidden_field_tag :sigla_proc, 'CB' %>
 	<%= hidden_field_tag :status, 1 %>
-	<%= hidden_field_tag :tipo, 0 %>
 	<%= hidden_field_tag :persona_id, @cobro.persona_id %>
 	<%= hidden_field_tag :cota, 1 %>
 	<%= hidden_field_tag :tipo_op, 9 %>
@@ -24,11 +23,16 @@
 		<% end %>
 
 <div class="row">
-	<div class="col-md-6">
+	<div class="col-md-3">
+		<label>Tipo</label>
+		<%= select_tag(:tipo, options_for_select([["CONTADO", 0],["CREDITO",1]] ), class: 'panel-field') %>
+	</div>
+
+	<div class="col-md-3">
 		<label>Fecha</label>
 		<%= text_field_tag :data, Time.now.strftime("%d/%m/%Y"), class: 'panel-field' %>
 	</div>
-	<div class="col-md-6">
+	<div class="col-md-3">
 		<label>RUC</label>
 		<%= text_field_tag :ruc, ruc, class: 'panel-field'  %>
 		<%= image_tag("load.gif", align: "absmiddle", border: 0, id: "spinner-add-prod", width: 15, height: 15, style: "position: relative; left: 150px; top: 20px; display: none;") %>

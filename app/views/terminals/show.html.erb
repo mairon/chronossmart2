@@ -5,30 +5,40 @@
         Terminal #<%= @terminal.id.to_s.rjust(6,'0') %> - <%= @terminal.nome %>
       </header>
       <div class="panel-content">
+        <p>Cuentas Vinculadas a la forma de pagos dentro del terminal</p>
           <table class="head_grid">
              <tr>
-                <td width="100">Cod</td>
-                <td width="180"><%= t('ACCOUNT') %></td>
-                <td width="100" align="center"><%= t('COIN') %></td>                
+                <td width="200">Forma Pago</td>
+                <td width="200"><%= t('ACCOUNT') %></td>
+                <td width="100" align="center"><%= t('COIN') %></td>
              </tr>
           </table>
           <div class="list" dir="div">
              <table>
-                <% Conta.where(terminal_id: @terminal.id).each do |cf| %>
-                  <tr class = "<%= cycle("cor1", "cor2") %>">
-                    <td width="100"><%= link_to cf.id, edit_conta_path(cf.id), target: '_blank?'%></td>
-                    <td width="180"><%= cf.nome %></td>
-                    <% if cf.moeda.to_i == 0 %>
-                      <td width="100" align="center"><span class="us">U$</span></td>
-                    <% elsif cf.moeda.to_i == 1 %>
-                      <td width="100" align="center"><span class="gs">Gs</span></td>
-                    <% elsif cf.moeda.to_i == 2 %>
-                      <td width="100" align="center"><span class="rs">R$</span></td>
+              <% FormaPago.where(venda: true, tipo: 0).order(1).each do |fp| %>
+                <tr class = "<%= cycle("cor1", "cor2") %>">
+                  <td width="200"><%= fp.id %>-<%= fp.nome %></td>
+                  <td>
+                    <table>
+                    <% ContasFormaPago.joins(:conta).where("contas_forma_pagos.forma_pago_id = #{fp.id} and contas.terminal_id = #{@terminal.id}").each do |cfp| %>
+
+                      <tr class = "<%= cycle("cor1", "cor2") %>">
+                        <td width="200"><%= link_to "#{cfp.conta_id}-#{cfp.conta.nome}", edit_conta_path(cfp.conta_id), target: '_blank?'%></td>
+                        <% if cfp.conta.moeda.to_i == 0 %>
+                          <td width="100" align="center"><span class="us">U$</span></td>
+                        <% elsif cfp.conta.moeda.to_i == 1 %>
+                          <td width="100" align="center"><span class="gs">Gs</span></td>
+                        <% elsif cfp.conta.moeda.to_i == 2 %>
+                          <td width="100" align="center"><span class="rs">R$</span></td>
+                        <% end %>
+                      </tr>
                     <% end %>
-                  </tr>
-                <% end %>
+                    </table>
+                  </td>
+                </tr>
+              <% end %>
              </table>
-          </div>        
+          </div>
       </div>
     </div>
   </div>

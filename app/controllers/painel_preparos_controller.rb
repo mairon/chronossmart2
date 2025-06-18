@@ -21,17 +21,34 @@ class PainelPreparosController < ApplicationController
   def preparo_pendentes
     @painel_preparo = PainelPreparo.find(params[:painel_preparo_id])
     sql = "
-          SELECT V.ID, 
-                 V.DATA,
-                 V.CREATED_AT, 
-                 C.NOME AS CARTAO_NOME,
-              (SELECT COUNT(VP.ID) FROM VENDAS_PRODUTOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.STATUS_PREPARO is null AND VP.VENDA_ID = V.ID AND P.PREPARACAO = TRUE AND VP.PRINT = FALSE  AND P.GRUPO_ID IN (#{@painel_preparo.grupo_ids})  ) AS TOT_QTD
-          FROM VENDAS V
-          INNER JOIN CARTAOS C
-          ON C.ID = V.CARTAO_ID
-          WHERE V.UNIDADE_ID = #{current_unidade.id} AND OP = TRUE AND (SELECT COUNT(VP.ID) FROM VENDAS_PRODUTOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.STATUS_PREPARO is null AND VP.VENDA_ID = V.ID  AND P.PREPARACAO = TRUE AND VP.PRINT = FALSE AND P.GRUPO_ID IN (#{@painel_preparo.grupo_ids}) ) > 0
-
-           ORDER BY ID
+         SELECT V.ID,
+       V.DATA,
+       V.OBS,
+       V.CREATED_AT,
+       C.NOME AS CARTAO_NOME,
+       (SELECT COUNT(VP.ID)
+        FROM VENDAS_PRODUTOS VP
+        INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID
+        WHERE (VP.STATUS_PREPARO IS NULL OR VP.STATUS_PREPARO = 0)
+          AND VP.VENDA_ID = V.ID
+          AND P.PREPARACAO = TRUE
+          AND VP.PRINT = FALSE
+          AND P.GRUPO_ID IN (#{@painel_preparo.grupo_ids})
+       ) AS TOT_QTD
+FROM VENDAS V
+INNER JOIN CARTAOS C ON C.ID = V.CARTAO_ID
+WHERE V.UNIDADE_ID = #{current_unidade.id}
+  AND OP = TRUE
+  AND (SELECT COUNT(VP.ID)
+       FROM VENDAS_PRODUTOS VP
+       INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID
+       WHERE (VP.STATUS_PREPARO IS NULL OR VP.STATUS_PREPARO = 0)
+         AND VP.VENDA_ID = V.ID
+         AND P.PREPARACAO = TRUE
+         AND VP.PRINT = FALSE
+         AND P.GRUPO_ID IN (#{@painel_preparo.grupo_ids})
+      ) > 0
+ORDER BY ID
 
     "
     @produtos = VendasProduto.find_by_sql(sql)
@@ -48,9 +65,9 @@ class PainelPreparosController < ApplicationController
 
 
     sql_s1 = "
-          SELECT V.ID, 
+          SELECT V.ID,
                  V.DATA,
-                 V.CREATED_AT, 
+                 V.CREATED_AT,
                  C.NOME AS CARTAO_NOME,
               (SELECT COUNT(VP.ID) FROM VENDAS_PRODUTOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.STATUS_PREPARO = 1 AND VP.VENDA_ID = V.ID AND P.PREPARACAO = TRUE AND VP.PRINT = FALSE AND P.GRUPO_ID IN (#{@painel_preparo.grupo_ids}) ) AS TOT_QTD
           FROM VENDAS V
@@ -68,10 +85,10 @@ class PainelPreparosController < ApplicationController
 
 
     sql_f = "
-          SELECT V.ID, 
+          SELECT V.ID,
                  V.DATA,
                  V.CREATED_AT,
-                 V.UPDATED_AT, 
+                 V.UPDATED_AT,
                  C.NOME AS CARTAO_NOME,
               (SELECT COUNT(VP.ID) FROM VENDAS_PRODUTOS VP INNER JOIN PRODUTOS P ON P.ID = VP.PRODUTO_ID WHERE VP.STATUS_PREPARO = 1 AND VP.VENDA_ID = V.ID AND VP.PRINT = FALSE AND P.GRUPO_ID IN (#{@painel_preparo.grupo_ids}) ) AS TOT_QTD
           FROM VENDAS V

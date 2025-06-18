@@ -13,7 +13,7 @@
       </ul>
     </div>
   <% end %>
-  
+
   <table>
     <tr>
       <td>
@@ -21,7 +21,7 @@
         <%= f.date_select :data %>
       </td>
 
-      <td> 
+      <td>
         <label>Cotz. GsxU$</label>
         <%= f.text_field  :cotacao, size: 10, precision: 0, autofocus: true, required: true  %>
       </td>
@@ -30,7 +30,7 @@
         <%= f.text_field :cotacao_real, size: 10, precision: 0, required: true  %>
       </td>
     </tr>
-                      
+
 
     <tr>
       <td colspan="3">
@@ -51,24 +51,31 @@
         <% else %>
           <%= f.text_field :numero, size: 27 %>
         <% end %>
-      </td>      
+      </td>
 
     </tr>
-
+    <tr><td colspan="3"><hr></td></tr>
     <!--CONTA ORIGEM !-->
-    <tr>        
-      <td>
+    <tr>
+      <td colspan="3">
         <label>Cuenta Origem</label>
-        <%= f.collection_select :ingreso_id, Conta.all( :select => ' id,nome', 
-                :conditions => ["unidade_id = #{current_unidade.id}"], :order  => 'ordem' ), :id,:nome, {prompt: 'Seleccione la Cuenta'}, {required: true } %>
-      </td>
-
-            <!--DESTINO CONTA!-->
-      <td colspan="2">
-        <label>Cuenta Destino</label>
-        <%= f.collection_select :destino_id, Conta.all( :select => ' id,nome',:conditions => ["unidade_id = #{current_unidade.id}"], :order  => 'ordem' ), :id, :nome, {prompt: 'Seleccione la Cuenta'}, {required: true } %>
+        <%= f.collection_select :ingreso_id, Conta.select("contas.id, (unidades.unidade_nome ||' - '|| contas.nome) as nome").joins(:unidade).where(status: true).order('unidade_id,nome'), :id, :nome, {prompt: 'Seleccione la Cuenta Origen'}, {required: true } %>
       </td>
     </tr>
+    <tr>
+      <td align="center" colspan="3"> <br>
+        <span class="material-symbols-outlined" style="zoom: 1.5;">currency_exchange</span>
+      </td>
+      </tr>
+      <tr>
+            <!--DESTINO CONTA!-->
+      <td colspan="3">
+        <label>Cuenta Destino</label>
+        <%= f.collection_select :destino_id, Conta.select("contas.id, (unidades.unidade_nome ||' - '|| contas.nome) as nome").joins(:unidade).where(status: true).order('unidade_id,nome'), :id, :nome, {prompt: 'Seleccione la Cuenta Destino'}, {required: true } %>
+
+      </td>
+    </tr>
+    <tr><td colspan="3"><hr></td></tr>
     <tr>
       <td colspan="3">
         <fieldset>
@@ -84,7 +91,7 @@
             </tr>
           </table>
         </fieldset>
-      </td>       
+      </td>
     </tr>
     <tr>
       <td colspan="3"><br><%= f.text_area :concepto, class: 'panel-field', rows: 4, placeholder: 'Obs', required: true %></td>
@@ -149,7 +156,7 @@
       $("#transferencia_conta_destino_id").value(0);
       $("#transferencia_conta_ingreso_id").focus();
     }
-    
+
   });
 
   $('#transferencia_conta_ingreso_id').selectize();

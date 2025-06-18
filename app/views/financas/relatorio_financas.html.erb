@@ -55,10 +55,10 @@
 
 				%>
 					<td class="head"  align="center"><%= fin.data.strftime("%d/%m/%y") %><% quebra = fin.data.strftime("%Y-%m-%d") %></td>
-				  <% condante = "#{tipo_data} < '#{quebra}' AND MOEDA = #{params[:moeda]} AND conta_id = #{params[:busca]["conta"]}"  %>
-		      <% anterior = Financa.sum(valor_sum,:conditions => condante)%>
+				  <% condante = "#{tipo_data} < '#{quebra}' AND MOEDA = #{params[:moeda]} AND conta_id in (?)"  %>
+		      <% anterior = Financa.sum(valor_sum,:conditions => [condante, params[:busca_conta] ])%>
 
-					<td  class="head" align="right" colspan="5">Anterior =></td>
+					<td  class="head" align="right" colspan="6">Anterior =></td>
 					<% if params[:moeda].to_s == '1' %>
 						<td  class="head" align="right"><%= format_int(anterior)%></td>
 					<% else %>
@@ -69,7 +69,8 @@
 
 	  	<% ant += (entrada.to_f - saida.to_f) %>
 			<tr class="<%= cycle("cor1", "cor2")%>">
-				<td width="80" align="center"> <%= fin.data.strftime("%d/%m/%y")%> </td>
+				<td width="100"> <%= fin.conta_nome %> </td>
+				<td width="60" align="center"> <%= fin.data.strftime("%d/%m/%y") %> </td>
 				<td width="250">
 					<%= fin.persona_nome ? truncate(fin.persona_nome.to_s, :length => 26) : "Operación Financiera" %>
 				</td>
@@ -110,8 +111,8 @@
 		<% end %>
 
 		<% if quebra != '' %>
-		  <% condante = "#{tipo_data} < '#{quebra}' AND MOEDA = #{params[:moeda]} AND conta_id = #{params[:busca]["conta"]}" %>
-	  	<% anterior = Financa.sum(valor_sum,:conditions => condante) %>
+		  <% condante = "#{tipo_data} < '#{quebra}' AND MOEDA = #{params[:moeda]} AND conta_id in (?)" %>
+	  	<% anterior = Financa.sum(valor_sum,:conditions => [condante, params[:busca_conta]]) %>
 	  <% else %>
 	  	<% anterior = @financas_anterior %>
 	  <% end %>

@@ -1,38 +1,27 @@
-  <div class="group">
-    <div class="row">
-      <div class="col-md-12">
-        <h2>
-          Cliente: <%= @persona.id.to_s.rjust(6,'0') %>-<%= @persona.nome_fatura %> | Fantasia: <%= @persona.nome %> | RUC/CI: <%= @persona.ruc %>
-        </h2>
-      </div>
-    </div>
-     <%= form_tag busca_historico_vendas_persona_path, :method => "get" do %>
-      <div class="row">
-        <div class="col-md-12">
-          <label>Periodo</label>
-        </div>
-      </div>
+<div class="panel">
+  <h1 id="header">
+    Cliente: <%= @persona.id.to_s.rjust(6,'0') %>-<%= @persona.nome_fatura %> | Fantasia: <%= @persona.nome %> | RUC/CI: <%= @persona.ruc %>
+  </h1>
+  <div class="panel-content">
+     <%= form_tag busca_historico_vendas_persona_path, id: 'historico_vendas', :method => "get" do %>
+
       <div class="row">
         <div class="col-md-2">
-            <div class="input-group">
-              <%= text_field_tag :inicio, nil, onkeyup: "Formatadata(this,event)", required: true, size: 15 %>
-              <span class="input-group-btn">
-                <button type="button" class="btn btn-default" >
-                  <i class="icon-calendar" aria-hidden="true"></i>
-                </button>
-              </span>
-            </div>
+          <%= text_field_tag :hv_inicio, nil, class: 'input-addon', onkeyup: "Formatadata(this,event)", required: true, size: 15 %>
+          <span class="input-group-btn">
+            <button type="button" class="btn btn-default" >
+              <i class="icon-calendar" aria-hidden="true"></i>
+            </button>
+          </span>
         </div>
 
         <div class="col-md-2">
-            <div class="input-group">
-              <%= text_field_tag :final, nil, onkeyup: "Formatadata(this,event)", required: true, size: 15 %>
-              <span class="input-group-btn">
-                <button type="button" class="btn btn-default" >
-                  <i class="icon-calendar" aria-hidden="true"></i>
-                </button>
-              </span>
-            </div>
+          <%= text_field_tag :hv_final, nil, class: 'input-addon', onkeyup: "Formatadata(this,event)", required: true, size: 15 %>
+          <span class="input-group-btn">
+            <button type="button" class="btn btn-default" >
+              <i class="icon-calendar" aria-hidden="true"></i>
+            </button>
+          </span>
         </div>
         <div class="col-md-4">
           <div class="input-group">
@@ -41,32 +30,26 @@
                 <i class="icon-search" aria-hidden="true"></i>
               </button>
             </span>
-            <input id="busca" name="busca" type="search" value="<%= params[:busca]%>" placeholder="Buscar" onKeyUp="pesquisa(document.getElementById('busca').value)" size="40" autocapitalize="off" autocomplete="off" autocorrect="off" autofocus />
+            <input id="hv_busca" name="hv_busca" type="search" value="<%= params[:hv_busca]%>" placeholder="Buscar" onKeyUp="pesquisa(document.getElementById('hv_busca').value)" size="40" autocapitalize="off" autocomplete="off" autocorrect="off" autofocus />
+            <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinner_hv", :width => 21, :height => 21, :style =>"display: none;" ) %>
           </div>
         </div>
-
-        <div class="col-md-2">
-          <%= image_tag("load.gif", :align => "absmiddle", :border => 0, :id => "spinner", :width => 21, :height => 21, :style =>"display: none;" ) %>
-        </div>
-
-
       </div>
-       <% end %>
-   </div>
+   <% end %>
+  </div>
+</div>
 
-   <div id="pagina"></div>
-</body>
-
+<div id="hv_pagina"></div>
 
  <script language="javascript">
 
   function pesquisa(valor){
-    url="/personas/<%= @persona.id %>/busca_historico_vendas?" + $('form').serialize();
+    url="/personas/<%= @persona.id %>/busca_historico_vendas?" + $('#historico_vendas').serialize();
     ajax(url);
   }
 
   function ajax(url){
-    $('#spinner').show();
+    $('#spinner_hv').show();
     req = null;
 
     if (window.XMLHttpRequest) {
@@ -100,8 +83,8 @@
     if (req.readyState == 4) {
 
       if (req.status ==200) {
-        onSuccess:$('#spinner').hide();
-        document.getElementById('pagina').innerHTML = req.responseText;
+        onSuccess:$('#spinner_hv').hide();
+        document.getElementById('hv_pagina').innerHTML = req.responseText;
 
       } else {
         alert("Houve um problema ao obter os dados:n" + req.statusText);
