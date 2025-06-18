@@ -30,8 +30,14 @@ config/initializers/secret_token.rb
 ## Environment normalization:
 /.bundle
 /test
+<<<<<<< HEAD
 docker-compose.yml
 dockerfile
+=======
+
+docker-compose.yml
+
+>>>>>>> development
 rubocop_report.html
 gems_outdated.html
 report.html

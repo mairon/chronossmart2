@@ -4,7 +4,7 @@
 	<% if @venda.tipo == 0
     tipo="CONTADO"
   else
-    tipo="CONTADO"
+    tipo="CREDITO"
   end
 %>
 <% if @venda.moeda == 0
@@ -71,7 +71,7 @@
 								</td>
 								<td align="center" width="230">
 									<h1><b>FACTURA</b><br></h1>
-									<h2><b><%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc.to_s.rjust(8,'0') %></b></h2>
+									<h2><b><%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc.to_s.rjust(7,'0') %></b></h2>
 									<p><small>Timbrado: <%= @ft.timbrado %></small></p>
 									<p><small>Vigencia: <%= @ft.vencimento.strftime("%d/%m/%Y") %></small></p>
 
@@ -356,7 +356,7 @@
 								</td>
 								<td align="center" width="230">
 									<h1><b>FACTURA</b><br></h1>
-									<h2><b><%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc.to_s.rjust(8,'0') %></b></h2>
+									<h2><b><%= @ft.doc_01 %>-<%= @ft.doc_02 %>-<%= @ft.doc.to_s.rjust(7,'0') %></b></h2>
 									<p><small>Timbrado: <%= @ft.timbrado %></small></p>
 									<p><small>Vigencia: <%= @ft.vencimento.strftime("%d/%m/%Y") %></small></p>
 
