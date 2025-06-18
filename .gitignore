@@ -31,6 +31,7 @@ config/initializers/secret_token.rb
 /vendor
 /test
 
+docker-compose.yml
 
 rubocop_report.html
 gems_outdated.html
