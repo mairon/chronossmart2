@@ -1,32 +1,11 @@
 <% if @ft.sigla_proc == 'CB' or @ft.sigla_proc == 'CT' %>
-	<% if current_unidade.unidade_nome == 'CRECER - CDE' or current_unidade.unidade_nome == 'CRESCER - SANTA RITA' %>
-		<%= render partial: '/form_fiscals/cps/modelo_fatura_config_cobro_crecer' %>
-	<% else %>
-		<%= render :partial => Form.first.form_cobro_fatura %>
-	<% end %>
-<% elsif (@ft.sigla_proc == 'VTI' and @ft.sigla_proc != 'CB') or @ft.sigla_proc == nil %>
-	<% if current_unidade.unidade_nome == 'CDE' %>
-		<%= render partial: '/form_fiscals/cps/modelo_fatura_ind_theboss' %>
-	<% else %>
-		<%= render partial: '/form_fiscals/cps/modelo_fatura_ind' %>
-	<% end %>
+	<%= render :partial => Form.first.form_cobro_fatura %>
+<% elsif @ft.sigla_proc == 'VTI' %>
+	<%= render :partial => Form.first.form_fatura_indep %>
 <% else %>
-	<% if current_unidade.unidade_nome == 'SANTA CATALINA' %>
-		<%= render partial: '/form_fiscals/cps/modelo_fatura_aserradero' %>
-	<% elsif current_unidade.unidade_nome == 'CDE' %>
-		<%= render partial: '/form_fiscals/cps/modelo_fatura_theboss' %>
-	<% elsif current_unidade.unidade_nome == 'CRECER - CDE' or current_unidade.unidade_nome == 'CRESCER - SANTA RITA'%>
-		<%= render partial: '/form_fiscals/cps/modelo_fatura_config_crecer' %>
-	<% elsif current_unidade.unidade_nome == 'MUFFATAO' %>
-		<%= render partial: '/form_fiscals/cps/modelo_fatura_config_muffatao' %>
-	<% elsif current_unidade.unidade_nome == 'MEGACENTER' %>
-		<%= render partial: '/form_fiscals/cps/modelo_fatura_config_megacenter' %>
-	<% elsif current_unidade.unidade_nome == 'IMPACTUS' %>
-		<%= render partial: '/form_fiscals/cps/modelo_fatura_impactus' %>
-	<% else %>
-		<%= render :partial => Form.first.form_venda_fatura %>
-	<% end %>
+	<%= render :partial => Form.first.form_venda_fatura %>
 <% end %>
 
+<%= Form.first.form_cobro_fatura %>
 
 

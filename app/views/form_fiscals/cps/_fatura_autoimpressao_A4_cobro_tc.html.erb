@@ -149,15 +149,28 @@
 							CURSO DE FORMACIÓN PROFESIONAL
 						</td>
 							<td width="50"  align="right">
-								<%= format_int(@venda.cobros_detalhes.sum(:cobro_guarani)) %>
+								<% if @ft.moeda == 0 %>
+									<%= format_decimal(@venda.cobros_detalhes.sum(:cobro_dolar)) %>
+								<% else %>
+									<%= format_int(@venda.cobros_detalhes.sum(:cobro_guarani)) %>
+								<% end %>
 							</td>
 
 							<td width="60" align="right">
-								<%= format_int(@venda.cobros_detalhes.sum(:cobro_guarani)) %>
+								<% if @ft.moeda == 0 %>
+									<%= format_decimal(@venda.cobros_detalhes.sum(:cobro_dolar)) %>
+								<% else %>
+									<%= format_int(@venda.cobros_detalhes.sum(:cobro_guarani)) %>
+								<% end %>
 							</td>
 							<td>
-								10%
-								<% tottaxa10_gs  = tottaxa10_gs.to_f + @venda.cobros_detalhes.sum(:cobro_guarani) %>
+								0%
+								<% if @ft.moeda == 0 %>
+									<% tottaxa0_us  = tottaxa10_us.to_f + @venda.cobros_detalhes.sum(:cobro_dolar) %>
+								<% else %>
+									<% tottaxa0_gs  = tottaxa10_gs.to_f + @venda.cobros_detalhes.sum(:cobro_guarani) %>
+								<% end %>
+								
 							</td>
 				</tr>
 
@@ -368,7 +381,7 @@
 		</tr>
 	</table>
 
-		<table border="0" class="grid" width="738"  style="border-bottom: 1px solid black;">
+	<table border="0" class="grid" width="738"  style="border-bottom: 1px solid black;">
 		<tr class="header">
 			<td width="20">Cant.</td>
 			<td>Ref.</td>
@@ -400,15 +413,28 @@
 							CURSO DE FORMACIÓN PROFESIONAL
 						</td>
 							<td width="50"  align="right">
-								<%= format_int(@venda.cobros_detalhes.sum(:cobro_guarani)) %>
+								<% if @ft.moeda == 0 %>
+									<%= format_decimal(@venda.cobros_detalhes.sum(:cobro_dolar)) %>
+								<% else %>
+									<%= format_int(@venda.cobros_detalhes.sum(:cobro_guarani)) %>
+								<% end %>
 							</td>
 
 							<td width="60" align="right">
-								<%= format_int(@venda.cobros_detalhes.sum(:cobro_guarani)) %>
+								<% if @ft.moeda == 0 %>
+									<%= format_decimal(@venda.cobros_detalhes.sum(:cobro_dolar)) %>
+								<% else %>
+									<%= format_int(@venda.cobros_detalhes.sum(:cobro_guarani)) %>
+								<% end %>
 							</td>
 							<td>
-								10%
-								<% tottaxa10_gs  = tottaxa10_gs.to_f + @venda.cobros_detalhes.sum(:cobro_guarani) %>
+								0%
+								<% if @ft.moeda == 0 %>
+									<% tottaxa0_us  = tottaxa10_us.to_f + @venda.cobros_detalhes.sum(:cobro_dolar) %>
+								<% else %>
+									<% tottaxa0_gs  = tottaxa10_gs.to_f + @venda.cobros_detalhes.sum(:cobro_guarani) %>
+								<% end %>
+								
 							</td>
 				</tr>
 
