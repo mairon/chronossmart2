@@ -1,8 +1,69 @@
 module ApplicationHelper
 
+  # Cache que inclui user_id e unidade_id automaticamente
+  def smart_cache(base_key, expires_in: 30.minutes, &block)
+    user_id = current_user&.id || 'guest'
+    unidade_id = current_unidade&.id || 'none'
+
+    cache_key = "#{base_key}_u#{user_id}_un#{unidade_id}"
+
+    Rails.cache.fetch(cache_key, expires_in: expires_in, &block)
+  end
+
+  # Limpa cache específico
+  def clear_smart_cache(base_key)
+    user_id = current_user&.id || 'guest'
+    unidade_id = current_unidade&.id || 'none'
+
+    cache_key = "#{base_key}_u#{user_id}_un#{unidade_id}"
+    Rails.cache.delete(cache_key)
+  end
+
+  def cached_user_menu_units
+    cache_key = "user_menu_units_#{current_user&.id}_#{current_unidade&.id}"
+
+    Rails.cache.fetch(cache_key, expires_in: 30.minutes) do
+      if current_user
+        UnidadesUsuario.joins(:unidade)
+                       .where(usuario_id: current_user.id)
+                       .select("unidades_usuarios.id, unidades.unidade_nome, unidades_usuarios.unidade_id")
+                       .map do |uu|
+          {
+            id: uu.id,
+            unidade_nome: uu.unidade_nome,
+            unidade_id: uu.unidade_id
+          }
+        end
+      else
+        []
+      end
+    end
+  end
+
+  def cached_user_permissions
+    cache_key = "user_permissions_#{current_user&.id}"
+
+    Rails.cache.fetch(cache_key, expires_in: 20.minutes) do
+      if current_user
+        UsuarioPerfil.joins(:menu)
+                     .where(usuario_id: current_user.id)
+                     .select("menus.url, menus.nome, usuario_perfils.id")
+                     .map do |up|
+          {
+            url: up.url,
+            nome: up.nome,
+            id: up.id
+          }
+        end
+      else
+        []
+      end
+    end
+  end
+
   def flash_class(level)
       case level
-          when :notice then "alert alert-info"  
+          when :notice then "alert alert-info"
           when :success then "alert alert-success"
           when :error then "alert alert-error"
           when :alert then "alert alert-error"
@@ -122,7 +183,7 @@ module ApplicationHelper
           </td> }.html_safe
   end
 
-    
+
     def field_p4(text,form,field,html_options={})
 
         options = { :size  => 15,
@@ -134,7 +195,7 @@ module ApplicationHelper
             <td>#{form.telephone_field field,options}</td> }.html_safe
 
 
-    end  
+    end
 
     def field_text(text,colsp,form,field,size,prox_field,html_options={})
 
@@ -145,7 +206,7 @@ module ApplicationHelper
 
         %Q{ <td align="right">#{text}</td>
             <td colspan="#{colsp}">#{form.text_field field, options}</td> }.html_safe
-            
+
 
     end
 
@@ -157,7 +218,7 @@ module ApplicationHelper
       %Q{ #{form.text_field field,options} }.html_safe
     end
 
-    
+
   def pdf_image_tag(image, options = {})
     options[:src] = File.expand_path(Rails.root) + '/assets/images/' + image
     tag(:img, options)
@@ -179,7 +240,7 @@ module ApplicationHelper
       render(association.to_s.singularize + "_fields", f: builder)
     end
     link_to_function(name, '#', class: "add_fields btn btn-blue", data: {id: id, fields: fields.gsub("\n", "")})
-  end 
+  end
 
   def format_decimal(valor)
     number_to_currency( valor, format: '%n', separator: "," )

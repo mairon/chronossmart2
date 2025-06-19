@@ -826,13 +826,12 @@
   end
 
   def index
+    @venda_config = Venda.cached_vendas_config(current_unidade.id)
     render layout: 'chart'
   end
 
   def busca_vendas
-    params[:unidade] = current_unidade.id
-    @vendas = Venda.filtro_vendas(params)
-    @venda_config = VendasConfig.where(unidade_id: current_unidade.id).last
+    @vendas = Venda.filtro_vendas_max_performance(params.merge(unidade: current_unidade.id))
     respond_to do |format|
         format.html { render :layout => false}
         format.js { render :layout => false }

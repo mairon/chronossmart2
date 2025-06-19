@@ -2,15 +2,15 @@
   <div class="panel-content">
     <table class="head_grid">
       <tr>
-        <td width="68" align="center"><%= t('CODE') %></td>
-        <td width="70" align="center"><%= t('DATE') %></td>
-        <td width="120"><%= t('DOC') %></td>
+        <td width="68" align="center"><%= t('code') %></td>
+        <td width="70" align="center"><%= t('l_date') %></td>
+        <td width="120"><%= t('doc') %></td>
         <td width="40" align="center"></td>
         <td width="250">Cliente</td>
         <td width="150">Obs.</td>
         <td width="80" align="right">Ctd</td>
         <td width="30" align="center"></td>
-        <td width="100" align="right"><%= t('VALUE') %></td>
+        <td width="100" align="right"><%= t('value') %></td>
         <td width="60" align="right">Tipo</td>
       </tr>
     </table>
@@ -53,7 +53,7 @@
             <% if params[:processo] == "venda-finalizada" %>
               <td><%= link_to image_tag("icon-coin.png", height: 16), financas_venda_path(v) %></td>
             <% end %>
-            <% if @venda_config.entrega == true %>
+            <% if params[:config_vendas_entrega] == 'true' %>
               <td><a href="#" class="btn" data-toggle="modal" data-load-url="<%= modal_add_ordem_entregas_path(venda_id: v.id) %>" data-target="#ModalOrdemEntrega"><span class="material-symbols-outlined">local_shipping</span></a></td>
             <% end %>
             <td>

@@ -1,15 +1,30 @@
-<%= form_for(vendas_ordem_serv) do |f| %>
+<%= form_for(VendasOrdemServ.new) do |f| %>
 <div class="panel">
   <div class="panel-content">
     <div class="group">
       <div class="row">
-        <div class="col-md-10" >
+        <div class="col-md-12" >
           <label>Nº OS</label>
-          <%= f.hidden_field :venda_id %>
-          <%= f.collection_select :ordem_serv_id, OrdemServ.where(status: 'PENDIENTE', persona_id: @venda.persona_id).select("id,
+          <%= f.hidden_field :venda_id, value: params[:venda_id] %>
+          <%= f.collection_select :ordem_serv_id, OrdemServ.where(status: 'PENDIENTE', persona_id: params[:persona_id]).select("id,
            ( CAST(ID AS VARCHAR) || '-' || RT) AS rt"), :id, :rt, { prompt: 'Selecione a OS' }, {required: true} %>
         </div>
-        <div class="col-md-2" style="margin-top: 27px">
+      </div>
+      <div class="row">
+        <div class="col-md-12" >
+          <label>Servicio</label>
+          <%= f.collection_select :produto_id, Produto.where(tipo_produto: 1).select("id,nome"), :id, :nome, { prompt: 'Selecione lo servicio' }, {required: true} %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12" >
+          <br>
+          <%= f.text_area :complemento, class: 'panel-field disable-plus-as-tab', placeholder: 'Complemento', rows: 5, cols: 40 %>
+
+        </div>
+      </div>
+
 
           <%= f.submit t('SAVE'), class: "btn btn-green", disable_with: "Aguarde...", "data-plus-as-tab" => "false"%>
         </div>
@@ -19,5 +34,5 @@
 </div>
 <% end %>
 <script>
-  $('#vendas_ordem_serv_ordem_serv_id').selectize();
+  $('#vendas_ordem_serv_ordem_serv_id, #vendas_ordem_serv_produto_id').selectize();
 </script>

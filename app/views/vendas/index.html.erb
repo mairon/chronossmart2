@@ -58,7 +58,7 @@
  	<div id="pagina"></div>
 <script language="javascript">
   function pesquisa(valor){
-    url="/vendas/busca_vendas?" + $('form').serialize();
+    url="/vendas/busca_vendas?config_vendas_entrega=<%= @venda_config.entrega %>&" + $('form').serialize();
     ajax(url);
   }
 </script>

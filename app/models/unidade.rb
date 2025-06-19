@@ -16,4 +16,11 @@ class Unidade < ActiveRecord::Base
   validates_presence_of :unidade_nome, :moeda
   validates_uniqueness_of :unidade_nome
 
+
+  # Cache para unidade específica
+  def self.cached_find(id)
+    Rails.cache.fetch("unidade_#{id}", expires_in: 30.minutes) do
+      find(id)
+    end
+  end
 end

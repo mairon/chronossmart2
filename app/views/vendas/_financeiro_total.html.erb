@@ -20,7 +20,7 @@
         </font>
 
         <font class="style3 us" color="green" style="font-family: 'prox-bold'; font-size: 43px;">
-          <span id="sub_total_guarani"><%= format_int(@produto_sum_us) %>U$</span>
+          <span id="sub_total_guarani"><%= format_decimal(@produto_sum_us) %>U$</span>
         </font>
 
       <% elsif @venda.moeda.to_i == 1 %>

@@ -25,11 +25,7 @@ class VendasPedidosController < ApplicationController
   # GET /vendas_pedidos/new.json
   def new
     @vendas_pedido = VendasPedido.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @vendas_pedido }
-    end
+    render layout: false
   end
 
   # GET /vendas_pedidos/1/edit

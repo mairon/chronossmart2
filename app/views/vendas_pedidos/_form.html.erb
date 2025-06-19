@@ -1,12 +1,12 @@
-<%= form_for(vendas_pedido) do |f| %>
+<%= form_for(VendasPedido.new) do |f| %>
 <div class="panel">
   <div class="panel-content">
     <div class="group">
       <div class="row">
         <div class="col-md-10" >
           <label>Nº Pedido</label>
-          <%= f.hidden_field :venda_id %>
-          <%= f.collection_select :presupuesto_id, Presupuesto.where(status: 'PENDENTE', persona_id: @venda.persona_id).select('id'), :id, :id, { prompt: 'Selecione o Pedido' }, {required: true} %>
+          <%= f.hidden_field :venda_id, value: params[:venda_id] %>
+          <%= f.collection_select :presupuesto_id, Presupuesto.where(status: 'PENDENTE', persona_id: params[:persona_id]).select('id'), :id, :id, { prompt: 'Selecione o Pedido' }, {required: true} %>
         </div>
         <div class="col-md-2" style="margin-top: 27px">
 

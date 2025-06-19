@@ -111,7 +111,7 @@
 
 
 
-<% if (@venda.moeda.to_i == 1 and @saldo_gs.to_i == 0) || (@venda.moeda.to_i == 0 and @saldo_us.to_i == 0) || (@venda.moeda.to_i == 2 and @saldo_rs.to_i == 0) %>
+<% if (@venda.moeda.to_i == 1 and @saldo_gs.to_i == 0) || (@venda.moeda.to_i == 0 and @saldo_us.to_f == 0) || (@venda.moeda.to_i == 2 and @saldo_rs.to_i == 0) %>
   <script>
     $(".content-forma-pago").hide();
     $(".content-btns").show();

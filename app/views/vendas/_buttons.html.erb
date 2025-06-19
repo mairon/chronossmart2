@@ -22,30 +22,28 @@
 <% end %>
 
 <% if @venda_config.pedido == true %>
-  <a class="acao_pedido btn btn-default">Pedidos</a>
+
+  <a href="#" class="btn" data-toggle="modal" data-target="#myModalPedido">Pedidos</a>
 
   <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="myModalPedido">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <div class="close-button">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           </div>
-          <h4 class="modal-title us" id="myModalLabel" align="center">Add Pedido</h4>
+          <h2 class="modal-title" id="myModalLabel" align="center">Add Pedido</h2>
         </div>
-        <div class="modal-body" style="padding: 10px 0px 25px 0px">
-          <%= render partial: "/vendas_pedidos/form", locals: {vendas_pedido: VendasPedido.new(venda_id: @venda.id)} %>
+        <div class="modal-body-pd" style="padding: 10px">
+
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    $(".acao_pedido").click(function() {
-      $('#myModalPedido').modal('show');
-      $('#myModalPedido').on('shown.bs.modal', function () {
-        $('#vendas_pedido_presupuesto_id').focus();
-      })
+    $('#myModalPedido').on('show.bs.modal', function (e) {
+      $(this).find('.modal-body-pd').load("/vendas_pedidos/new?venda_id=<%= @venda.id%>&persona_id=" + $("#venda_persona_id").val());
     });
   </script>
 
@@ -72,31 +70,32 @@
 
 
 <% if @venda_config.os == true %>
-  <a class="acao btn btn-default">OS</a>
-  <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="myModal">
-    <div class="modal-dialog" role="document">
+
+
+  <a href="#" class="btn" data-toggle="modal" data-target="#myModalOs">OS</a>
+
+  <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="myModalOs">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <div class="close-button">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           </div>
-          <h4 class="modal-title us" id="myModalLabel" align="center">Add OS</h4>
+          <h2 class="modal-title" id="myModalLabel" align="center">Add Os</h2>
         </div>
-        <div class="modal-body" style="padding: 10px 0px 25px 0px">
-          <%= render partial: "/vendas_ordem_servs/form", locals: {vendas_ordem_serv: VendasOrdemServ.new(venda_id: @venda.id)} %>
+        <div class="modal-body-pd" style="padding: 10px">
+
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    $(".acao").click(function() {
-      $('#myModal').modal('show');
-      $('#myModal').on('shown.bs.modal', function () {
-        $('#ordem_serv_prod_produto_id').focus();
-      })
+    $('#myModalOs').on('show.bs.modal', function (e) {
+      $(this).find('.modal-body-pd').load("/vendas_ordem_servs/new?venda_id=<%= @venda.id%>&persona_id=" + $("#venda_persona_id").val());
     });
   </script>
+
 
 <% end %>
 

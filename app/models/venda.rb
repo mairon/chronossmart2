@@ -341,71 +341,211 @@ class Venda < ActiveRecord::Base
     end
   end
 
-  def self.filtro_vendas(params)
-    unidade = "AND V.UNIDADE_ID = #{params[:unidade]}"
-    caixa   = "AND V.CONTROLE_CAIXA = #{params[:caixa]}" unless params[:caixa].blank?
-    tipo_venda = "AND V.TIPO_VENDA = #{params[:tipo_venda]}" unless params[:tipo_venda].blank?
-    if params[:tipo] == "CODIGO"
-      tipo = "V.ID"
-      cond =  " AND V.ID = #{params[:busca]} " unless params[:busca].blank?
-    elsif params[:tipo] == "DOC"
-      tipo = "V.DOCUMENTO_NUMERO "
-      cond =  " AND #{tipo} LIKE ? ","%#{params[:busca]}%" unless params[:busca].blank?
-    elsif params[:tipo] == "CLIENTE"
-      tipo = "V.PERSONA_NOME"
-      cond =  " AND #{tipo} LIKE '%#{params[:busca]}%' " unless params[:busca].blank?
-    elsif params[:tipo] == "COMANDA"
-      tipo = "CT.NOME"
-      cond =  " AND #{tipo} = '#{params[:busca]}' " unless params[:busca].blank?
 
+ def self.cached_vendas_config(unidade_id)
+    begin
+      # Força carregamento da classe se necessário
+      require_dependency 'vendas_config' if Rails.env.development? && !defined?(VendasConfig)
+
+      if defined?(VendasConfig)
+        if Rails.cache && defined?(Rails.cache)
+          Rails.cache.fetch("vendas_config_#{unidade_id}", expires_in: 15.minutes) do
+            VendasConfig.where(:unidade_id => unidade_id).order("id DESC").first
+          end
+        else
+          VendasConfig.where(:unidade_id => unidade_id).order("id DESC").first
+        end
+      else
+        Rails.logger.warn "VendasConfig class not defined"
+        nil
+      end
+    rescue NameError => e
+      Rails.logger.error "VendasConfig não encontrada: #{e.message}"
+      nil
+    rescue => e
+      Rails.logger.error "Erro no cached_vendas_config: #{e.message}"
+      nil
     end
-    if params[:finalidade] == "VENTA"
-      finalidade =  "AND V.FINALIDADE = 0"
-    else
-      finalidade =  "AND V.FINALIDADE = 1"
-    end
-
-
-    if params[:processo] == "venda-finalizada"
-      fin = "AND (SELECT SUM(VF.ID) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID) > 0"
-    end
-    sql = "SELECT V.ID,
-                   V.USUARIO_CREATED,
-                   V.DATA,
-                   V.TIPO_VENDA,
-                   V.MOEDA,
-                   V.PERSONA_NOME,
-                   V.TIPO,
-                   VD.NOME AS VENDEDOR_NOME,
-                   U.USUARIO_NOME,
-                   V.CONTROLE_CAIXA,
-                   V.FINALIDADE,
-                   V.OP,
-                   V.OBS,
-                   CT.NOME AS CARTAO_NOME,
-                   V.DOCUMENTO_NUMERO_01 || '-' || V.DOCUMENTO_NUMERO_02 || '-' || V.DOCUMENTO_NUMERO AS DOC,
-                   (SELECT SUM(VF.ID) FROM VENDAS_FINANCAS VF WHERE VF.VENDA_ID = V.ID) AS FIN,
-                   (SELECT SUM(VP.QUANTIDADE) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID) AS QTD,
-                   ((SELECT SUM(VP.TOTAL_GUARANI) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID) - v.desconto_gs) AS TOT_GS,
-                   (SELECT SUM(VP.TOTAL_DOLAR) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID) AS TOT_US,
-                   (SELECT SUM(VP.TOTAL_REAL) FROM VENDAS_PRODUTOS VP WHERE VP.VENDA_ID = V.ID) AS TOT_RS
-            FROM VENDAS V
-            LEFT JOIN PERSONAS VD
-            ON V.VENDEDOR_ID = VD.ID
-
-            LEFT JOIN CARTAOS CT
-            ON CT.ID = V.CARTAO_ID
-
-            LEFT JOIN USUARIOS U
-            ON V.USUARIO_CREATED = U.ID
-
-            WHERE V.DATA BETWEEN '#{params[:inicio].split("/").reverse.join("-")}' AND '#{params[:final].split("/").reverse.join("-")}' #{unidade} #{cond} #{caixa} #{tipo_venda}  #{finalidade} #{fin}
-
-            ORDER BY 3 desc, 1 desc
-
-               "
-    Venda.paginate_by_sql(sql, page: params[:page], :per_page => 25)
   end
+
+def self.filtro_vendas_max_performance(params)
+  unidade = params[:unidade]
+  data_inicio = params[:inicio].split("/").reverse.join("-")
+  data_final = params[:final].split("/").reverse.join("-")
+
+  # Constrói condições
+  where_conditions = []
+  where_values = []
+
+  where_conditions << "V.UNIDADE_ID = ?"
+  where_values << unidade
+
+  where_conditions << "V.DATA BETWEEN ? AND ?"
+  where_values << data_inicio
+  where_values << data_final
+
+  # Finalidade
+  if params[:finalidade] == "VENTA"
+    where_conditions << "V.FINALIDADE = 0"
+  else
+    where_conditions << "V.FINALIDADE = 1"
+  end
+
+  # Filtros opcionais
+  unless params[:caixa].blank?
+    where_conditions << "V.CONTROLE_CAIXA = ?"
+    where_values << params[:caixa]
+  end
+
+  unless params[:tipo_venda].blank?
+    where_conditions << "V.TIPO_VENDA = ?"
+    where_values << params[:tipo_venda]
+  end
+
+  # Busca por tipo
+  unless params[:busca].blank?
+    case params[:tipo]
+    when "CODIGO"
+      where_conditions << "V.ID = ?"
+      where_values << params[:busca]
+    when "DOC"
+      where_conditions << "(V.DOCUMENTO_NUMERO_01 || '-' || V.DOCUMENTO_NUMERO_02 || '-' || V.DOCUMENTO_NUMERO) LIKE ?"
+      where_values << "%#{params[:busca]}%"
+    when "CLIENTE"
+      where_conditions << "V.PERSONA_NOME LIKE ?"
+      where_values << "%#{params[:busca]}%"
+    when "COMANDA"
+      where_conditions << "CT.NOME = ?"
+      where_values << params[:busca]
+    end
+  end
+
+  where_clause = where_conditions.join(" AND ")
+
+  # SQL otimizado que PRIMEIRO filtra, depois agrega
+  page = (params[:page] || 1).to_i
+  per_page = 25
+  offset = (page - 1) * per_page
+
+  # Primeiro busca apenas as vendas que atendem aos critérios
+  vendas_ids_sql = "
+    SELECT V.ID
+    FROM VENDAS V
+      LEFT JOIN CARTAOS CT ON V.CARTAO_ID = CT.ID
+    WHERE #{where_clause}
+    ORDER BY V.DATA DESC, V.ID DESC
+    LIMIT #{per_page} OFFSET #{offset}
+  "
+
+  # Count otimizado
+  count_sql = "
+    SELECT COUNT(*)
+    FROM VENDAS V
+      LEFT JOIN CARTAOS CT ON V.CARTAO_ID = CT.ID
+    WHERE #{where_clause}
+  "
+
+  # SQL principal que usa os IDs pré-filtrados
+  main_sql = "
+    SELECT
+      V.ID,
+      V.USUARIO_CREATED,
+      V.DATA,
+      V.TIPO_VENDA,
+      V.MOEDA,
+      V.PERSONA_NOME,
+      V.TIPO,
+      V.CONTROLE_CAIXA,
+      V.FINALIDADE,
+      V.OP,
+      V.OBS,
+      V.DESCONTO_GS,
+      V.DOCUMENTO_NUMERO_01,
+      V.DOCUMENTO_NUMERO_02,
+      V.DOCUMENTO_NUMERO,
+      VD.NOME AS vendedor_nome,
+      CT.NOME AS cartao_nome,
+      U.USUARIO_NOME AS usuario_nome,
+      V.DOCUMENTO_NUMERO_01 || '-' || V.DOCUMENTO_NUMERO_02 || '-' || V.DOCUMENTO_NUMERO AS doc,
+      COALESCE(VP.qtd, 0) AS qtd,
+      COALESCE(VP.total_guarani, 0) - COALESCE(V.DESCONTO_GS, 0) AS tot_gs,
+      COALESCE(VP.total_dolar, 0) AS tot_us,
+      COALESCE(VP.total_real, 0) AS tot_rs,
+      COALESCE(VF.fin_count, 0) AS fin
+    FROM (#{vendas_ids_sql}) filtered_vendas
+      INNER JOIN VENDAS V ON filtered_vendas.ID = V.ID
+      LEFT JOIN PERSONAS VD ON V.VENDEDOR_ID = VD.ID
+      LEFT JOIN CARTAOS CT ON V.CARTAO_ID = CT.ID
+      LEFT JOIN USUARIOS U ON V.USUARIO_CREATED = U.ID
+      LEFT JOIN (
+        SELECT
+          VENDA_ID,
+          SUM(QUANTIDADE) AS qtd,
+          SUM(TOTAL_GUARANI) AS total_guarani,
+          SUM(TOTAL_DOLAR) AS total_dolar,
+          SUM(TOTAL_REAL) AS total_real
+        FROM VENDAS_PRODUTOS
+        WHERE VENDA_ID IN (#{vendas_ids_sql})
+        GROUP BY VENDA_ID
+      ) VP ON V.ID = VP.VENDA_ID
+      LEFT JOIN (
+        SELECT
+          VENDA_ID,
+          COUNT(ID) AS fin_count
+        FROM VENDAS_FINANCAS
+        WHERE VENDA_ID IN (#{vendas_ids_sql})
+        GROUP BY VENDA_ID
+      ) VF ON V.ID = VF.VENDA_ID
+    ORDER BY V.DATA DESC, V.ID DESC
+  "
+
+  # Adiciona filtro para vendas finalizadas se necessário
+  if params[:processo] == "venda-finalizada"
+    main_sql = main_sql.gsub("LEFT JOIN (", "INNER JOIN (").gsub("VF.fin_count", "VF.fin_count").gsub("COALESCE(VF.fin_count, 0)", "VF.fin_count")
+  end
+
+  # Executa queries
+  count_result = Venda.connection.execute(Venda.send(:sanitize_sql, [count_sql] + where_values))
+  total_count = count_result.first['count'].to_i
+
+  main_result = Venda.connection.execute(Venda.send(:sanitize_sql, [main_sql] + where_values * 3))
+
+  if main_result.any?
+    # Converte resultados para objetos Venda
+    vendas = main_result.map do |row|
+      venda = Venda.new
+
+      # Atributos básicos da venda
+      Venda.column_names.each do |column|
+        if row.has_key?(column.downcase)
+          venda.send("#{column}=", row[column.downcase])
+        end
+      end
+
+      # Adiciona campos extras como métodos
+      venda.define_singleton_method(:vendedor_nome) { row['vendedor_nome'] }
+      venda.define_singleton_method(:cartao_nome) { row['cartao_nome'] }
+      venda.define_singleton_method(:usuario_nome) { row['usuario_nome'] }
+      venda.define_singleton_method(:doc) { row['doc'] }
+      venda.define_singleton_method(:qtd) { row['qtd'].to_f }
+      venda.define_singleton_method(:tot_gs) { row['tot_gs'].to_f }
+      venda.define_singleton_method(:tot_us) { row['tot_us'].to_f }
+      venda.define_singleton_method(:tot_rs) { row['tot_rs'].to_f }
+      venda.define_singleton_method(:fin) { row['fin'].to_i }
+
+      venda.readonly!
+      venda
+    end
+
+    # Cria coleção paginada
+    WillPaginate::Collection.create(page, per_page, total_count) do |pager|
+      pager.replace(vendas)
+    end
+  else
+    WillPaginate::Collection.create(page, per_page, 0) { |pager| pager.replace([]) }
+  end
+end
+
 
   def finds
     md =  Moeda.last(:select => 'dolar_compra,rs_us_compra,real_compra,ps_gs_compra')

@@ -170,6 +170,7 @@
         '<%= "Valor Total Bruto : " + "#{format_int(@totais.total_guarani)}".to_s.rjust(8, ' ') %>',
         '\x1B' + '\x45' + '\x0A', // bold off
         '<%= "***OBS: NO SE ACEPTAN CAMBIOS NI DEVOLUCIONES PASADAS LAS 48 HS*** "  %>' + '\x0A',
+        '<%= "#{@venda.obs}"  %>' + '\x0A',
 
         '\x0C'
 
